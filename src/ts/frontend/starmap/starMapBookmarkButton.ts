@@ -1,8 +1,9 @@
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+
 import i18n from "@/i18n";
 
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
 
 export class StarMapBookmarkButton {

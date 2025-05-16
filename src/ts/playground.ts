@@ -20,8 +20,9 @@ import "@babylonjs/inspector";
 
 import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
 
+import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
+
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
-import { LoadingScreen } from "./uberCore/loadingScreen";
 
 const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;

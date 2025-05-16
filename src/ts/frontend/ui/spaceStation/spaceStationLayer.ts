@@ -21,6 +21,7 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { OrbitalFacilityModel, OrbitalObjectModel } from "@/frontend/architecture/orbitalObjectModel";
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
 import { DeepReadonly } from "@/utils/types";
@@ -28,7 +29,6 @@ import { DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";

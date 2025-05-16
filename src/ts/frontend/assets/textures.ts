@@ -22,13 +22,13 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
-import { RingsLut } from "@/frontend/rings/ringsLut";
+import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
+import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
 import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
 
 import { ItemPool } from "@/utils/itemPool";
 
-import { CloudsLut } from "../clouds/cloudsLut";
-import { TelluricPlanetMaterialLut } from "../planets/telluricPlanet/telluricPlanetMaterialLut";
 import { LandingPadTexturePool } from "./landingPadTexturePool";
 
 import butterflyTexture from "@assets/butterfly.webp";

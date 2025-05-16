@@ -6,14 +6,13 @@ import { SaveLoadingError, saveLoadingErrorToI18nString } from "@/backend/save/s
 import { SaveManager } from "@/backend/save/saveManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
-
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";

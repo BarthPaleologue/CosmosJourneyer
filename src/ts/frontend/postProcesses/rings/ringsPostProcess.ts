@@ -31,10 +31,10 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+import { CelestialBodyModel } from "@/frontend/universe/architecture/orbitalObjectModel";
 
 import { DeepReadonly } from "@/utils/types";
 
-import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
 
 import ringsFragment from "@shaders/ringsFragment.glsl";

@@ -23,7 +23,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { getOrbitalPeriod, getPointOnOrbitLocal } from "@/backend/universe/orbitalObjects/orbit";
 
-import { OrbitalObject } from "../architecture/orbitalObject";
+import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 export class OrbitRenderer {
     private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();

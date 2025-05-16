@@ -17,7 +17,8 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+
 import { PanelType, SidePanels } from "./sidePanels";
 
 export class PauseMenu {

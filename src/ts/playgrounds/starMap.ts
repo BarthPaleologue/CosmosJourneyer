@@ -19,14 +19,14 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { initI18n } from "@/i18n";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { Player } from "@/frontend/player/player";
+import { StarMap } from "@/frontend/starmap/starMap";
 
-import { SoundPlayerMock } from "../audio/soundPlayer";
-import { Player } from "../frontend/player/player";
-import { StarMap } from "../starmap/starMap";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
+import { initI18n } from "@/i18n";
 
 export async function createStarMapScene(
     engine: AbstractEngine,

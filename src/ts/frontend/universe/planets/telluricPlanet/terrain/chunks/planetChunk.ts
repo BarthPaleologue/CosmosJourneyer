@@ -30,6 +30,8 @@ import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricP
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { getChunkPlaneSpacePositionFromPath } from "@/utils/chunkUtils";
 import { Cullable } from "@/utils/cullable";
@@ -39,8 +41,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
 
-import { HasBoundingSphere } from "../../../../architecture/hasBoundingSphere";
-import { Transformable } from "../../../../architecture/transformable";
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { IPatch } from "../instancePatch/iPatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";

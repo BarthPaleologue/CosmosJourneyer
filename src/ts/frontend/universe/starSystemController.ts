@@ -19,6 +19,7 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -41,10 +42,6 @@ import { DeepReadonly, NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { StarFieldBox } from "../../starSystem/starFieldBox";
-import { StarSystemLoader } from "../../starSystem/starSystemLoader";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
 import {
     Anomaly,
     CelestialBody,
@@ -53,7 +50,10 @@ import {
     Planet,
     StellarObject,
 } from "./architecture/orbitalObject";
-import { OrbitalObjectType } from "./architecture/orbitalObjectType";
+import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
+import { ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
+import { StarFieldBox } from "./starFieldBox";
+import { StarSystemLoader } from "./starSystemLoader";
 
 export type PlanetarySystem = {
     readonly planets: Planet[];

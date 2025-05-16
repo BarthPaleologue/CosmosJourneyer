@@ -27,10 +27,16 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
 import { TexturePools } from "@/frontend/assets/textures";
+import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
+import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
@@ -41,12 +47,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { StellarObjectBase } from "../../architecture/stellarObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { RingsLut } from "../../rings/ringsLut";
-import { RingsUniforms } from "../../rings/ringsUniform";
 import { StarMaterial } from "../star/starMaterial";
 
 export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {

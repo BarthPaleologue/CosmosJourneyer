@@ -22,14 +22,14 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { OrbitalObjectType } from "@/frontend/universe/architecture/orbitalObjectType";
-import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { AxisRenderer } from "../orbit/axisRenderer";
-import { OrbitRenderer } from "../orbit/orbitRenderer";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
+import { AxisRenderer } from "@/frontend/universe/axisRenderer";
+import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,

@@ -20,6 +20,7 @@ import { uniformRandBool } from "extended-random";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { OrbitalFacilityModel } from "@/frontend/architecture/orbitalObjectModel";
+import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -29,7 +30,6 @@ import { DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { generateSightseeingMissions } from "../../../missions/generateSightSeeingMissions";
-import { ISoundPlayer } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 

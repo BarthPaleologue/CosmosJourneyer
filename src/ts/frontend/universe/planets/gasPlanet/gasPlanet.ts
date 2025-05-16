@@ -27,6 +27,14 @@ import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
 import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
@@ -36,13 +44,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { RingsLut } from "../../rings/ringsLut";
-import { RingsUniforms } from "../../rings/ringsUniform";
 import { GasPlanetMaterial } from "./gasPlanetMaterial";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {

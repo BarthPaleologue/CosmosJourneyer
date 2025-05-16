@@ -22,14 +22,15 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+
+import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
 
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { StellarObjectBase } from "../../architecture/stellarObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 
 export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {

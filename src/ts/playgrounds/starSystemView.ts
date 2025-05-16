@@ -19,9 +19,13 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { UberScene } from "@/frontend/uberCore/uberScene";
 import { updateNotifications } from "@/frontend/ui/notification";
@@ -30,10 +34,6 @@ import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
 import { initI18n } from "@/i18n";
 
-import { SoundPlayerMock } from "../audio/soundPlayer";
-import { TtsMock } from "../audio/tts";
-import { Player } from "../frontend/player/player";
-import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
 import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(

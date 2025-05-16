@@ -17,11 +17,11 @@
 
 import { describe, expect, it } from "vitest";
 
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { OrbitalObjectType } from "@/frontend/universe/architecture/orbitalObjectType";
 
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
 import { FlightTutorial } from "./flightTutorial";
 
 describe("flightTutorial", () => {

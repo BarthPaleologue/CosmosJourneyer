@@ -37,6 +37,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
@@ -50,7 +51,6 @@ import { View } from "@/utils/view";
 
 import { Settings } from "@/settings";
 
-import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
 import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";

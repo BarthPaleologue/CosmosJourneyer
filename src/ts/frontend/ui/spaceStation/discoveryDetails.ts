@@ -22,6 +22,7 @@ import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
@@ -31,7 +32,6 @@ import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrin
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 
 export class DiscoveryDetails {

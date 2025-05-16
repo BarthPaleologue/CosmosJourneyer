@@ -32,10 +32,10 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { Controls } from "@/frontend/uberCore/controls";
 import { setUpVector, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { CollisionMask, Settings } from "@/settings";
 
-import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { CharacterInputs } from "./characterControlsInputs";
 

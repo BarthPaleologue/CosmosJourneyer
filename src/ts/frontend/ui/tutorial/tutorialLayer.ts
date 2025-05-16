@@ -1,6 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { IDisposable } from "@babylonjs/core/scene";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { promptModalBoolean } from "@/frontend/ui/dialogModal";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -8,7 +9,6 @@ import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import { Tutorial } from "./tutorials/tutorial";
 

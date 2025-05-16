@@ -31,9 +31,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
-import { CharacterControls } from "../characterControls/characterControls";
-import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(

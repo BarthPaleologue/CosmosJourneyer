@@ -20,10 +20,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { AiSpaceshipControls } from "@/frontend/spaceship/aiSpaceshipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 
-import { ISoundPlayer } from "../audio/soundPlayer";
 import { Player } from "./player";
 
 export class AiPlayerControls {

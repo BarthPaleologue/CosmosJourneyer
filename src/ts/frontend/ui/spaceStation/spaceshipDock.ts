@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+
 import i18n from "@/i18n";
 
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
 

@@ -23,13 +23,14 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/un
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import { ISoundPlayer } from "../audio/soundPlayer";
 import { Player } from "../player/player";
 import { factionToString } from "../society/factions";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";

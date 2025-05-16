@@ -25,13 +25,13 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/player/player";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 
 import { initI18n } from "@/i18n";
 
-import { Player } from "../frontend/player/player";
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(

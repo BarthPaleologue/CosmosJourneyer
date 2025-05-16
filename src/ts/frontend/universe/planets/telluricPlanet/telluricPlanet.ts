@@ -24,10 +24,20 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
+import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
+import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
+import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { Cullable } from "@/utils/cullable";
 import { Direction } from "@/utils/direction";
@@ -37,16 +47,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
-import { PlanetaryMassObjectBase } from "../../architecture/planetaryMassObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { AtmosphereUniforms } from "../../atmosphere/atmosphereUniforms";
-import { CloudsLut } from "../../clouds/cloudsLut";
-import { CloudsUniforms } from "../../clouds/cloudsUniforms";
-import { OceanUniforms } from "../../ocean/oceanUniforms";
-import { RingsLut } from "../../rings/ringsLut";
-import { RingsUniforms } from "../../rings/ringsUniform";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";

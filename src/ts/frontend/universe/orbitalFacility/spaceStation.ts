@@ -20,19 +20,22 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
+import { StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { StellarObjectModel } from "@/frontend/architecture/orbitalObjectModel";
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
 import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
 import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
 import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
-import { LandingPadManager } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -45,9 +48,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { Transformable } from "../architecture/transformable";
 import { OrbitalFacilityBase } from "./orbitalFacility";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {

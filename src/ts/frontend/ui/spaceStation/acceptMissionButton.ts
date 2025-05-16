@@ -1,7 +1,8 @@
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+
 import i18n from "@/i18n";
 
 import { Mission } from "../../../missions/mission";
-import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 
 export class AcceptMissionButton {

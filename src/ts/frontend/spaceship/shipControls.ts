@@ -27,6 +27,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { LandingPadSize } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
 import { ManagesLandingPads } from "@/frontend/assets/procedural/spaceStation/landingPad/managesLandingPads";
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { ITts, Speaker, VoiceLine } from "@/frontend/audio/tts";
 import { Controls } from "@/frontend/uberCore/controls";
 import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
@@ -46,8 +48,6 @@ import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
-import { ISoundPlayer } from "../audio/soundPlayer";
-import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { StarSystemInputs } from "../inputs/starSystemInputs";
 import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import { Transformable } from "../universe/architecture/transformable";

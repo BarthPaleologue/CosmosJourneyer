@@ -17,10 +17,11 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+
 import { Settings } from "@/settings";
 
 import { Mission } from "../../../missions/mission";
-import { ISoundPlayer } from "../../audio/soundPlayer";
 import { Player } from "../../player/player";
 import { AcceptMissionButton } from "./acceptMissionButton";
 
