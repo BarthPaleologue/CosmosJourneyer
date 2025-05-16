@@ -26,8 +26,8 @@ import { LandingPad } from "../assets/procedural/landingPad/landingPad";
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
+import { LandingPadSize } from "../frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
 import { Spaceship } from "../frontend/spaceship/spaceship";
-import { LandingPadSize } from "../frontend/spacestation/landingPad/landingPadManager";
 import { CollisionMask } from "../settings";
 import { enablePhysics } from "./utils";
 

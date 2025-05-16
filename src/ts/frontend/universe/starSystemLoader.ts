@@ -21,22 +21,23 @@ import { Scene } from "@babylonjs/core/scene";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
+import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "@/utils/types";
+import { wait } from "@/utils/wait";
+
 import { RenderingAssets } from "../../assets/renderingAssets";
-import { getDistancesToStellarObjects } from "../../utils/distanceToStellarObject";
-import { EmptyCelestialBody } from "../../utils/emptyCelestialBody";
-import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "../../utils/types";
-import { wait } from "../../utils/wait";
-import { DarkKnight } from "../anomalies/darkKnight";
 import { Anomaly, OrbitalFacility, Planet, StellarObject } from "../architecture/orbitalObject";
 import { AnomalyModel, PlanetModel, StellarObjectModel } from "../architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { SpaceElevator } from "../spacestation/spaceElevator";
-import { SpaceStation } from "../spacestation/spaceStation";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
+import { DarkKnight } from "./darkKnight";
+import { EmptyCelestialBody } from "./emptyCelestialBody";
+import { SpaceElevator } from "./orbitalFacility/spaceElevator";
+import { SpaceStation } from "./orbitalFacility/spaceStation";
 
 export class StarSystemLoader {
     private loadingIndex: number;

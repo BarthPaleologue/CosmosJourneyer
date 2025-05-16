@@ -18,8 +18,9 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { makeNoise3D } from "fast-simplex-noise";
 
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
 import { Settings } from "../../settings";
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
 
 const materialistSpiritualistRng = getRngFromSeed(Settings.POWER_PLAY_SEED);
 let materialistSpiritualistSampleStep = 0;

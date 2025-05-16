@@ -31,11 +31,11 @@ import { createEnvironmentAggregate } from "@/utils/havok";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
 import { DeepReadonly } from "@/utils/types";
 
+import { Settings } from "../../../../../settings";
 import { OrbitalFacilityModel } from "../../../frontend/architecture/orbitalObjectModel";
-import { LandingPadSize } from "../../../frontend/spacestation/landingPad/landingPadManager";
-import { Settings } from "../../../settings";
 import { RenderingAssets } from "../../renderingAssets";
 import { LandingPad } from "../landingPad/landingPad";
+import { LandingPadSize } from "../landingPad/landingPadManager";
 import { LandingBayMaterial } from "./landingBayMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

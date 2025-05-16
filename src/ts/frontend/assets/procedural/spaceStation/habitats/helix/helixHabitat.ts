@@ -25,16 +25,18 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Transformable } from "@/frontend/architecture/transformable";
+import { Textures } from "@/frontend/assets/textures";
+
 import { createHelix } from "@/utils/geometry/helixBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
 
-import { Transformable } from "../../../architecture/transformable";
-import { Settings } from "../../../settings";
-import { Textures } from "../../textures";
+import { Settings } from "@/settings";
+
+import { MetalSectionMaterial } from "../../metalSectionMaterial";
 import { HelixHabitatMaterial } from "./helixHabitatMaterial";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;

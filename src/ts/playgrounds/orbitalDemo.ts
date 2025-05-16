@@ -24,12 +24,13 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { setOrbitalPosition, setRotation } from "@/frontend/architecture/orbitalObjectUtils";
 
+import { CustomOrbitalObject } from "@/utils/customOrbitalObject";
+
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { OrbitalObject } from "../frontend/architecture/orbitalObject";
 import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { AxisRenderer } from "../orbit/axisRenderer";
 import { OrbitRenderer } from "../orbit/orbitRenderer";
-import { CustomOrbitalObject } from "../utils/customOrbitalObject";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,

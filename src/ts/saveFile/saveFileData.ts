@@ -19,8 +19,9 @@ import { z } from "zod";
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { encodeBase64 } from "../utils/base64";
-import { Result } from "../utils/types";
+import { encodeBase64 } from "@/utils/base64";
+import { Result } from "@/utils/types";
+
 import { SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 

@@ -10,8 +10,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { ObjectTargetCursorType, TargetInfo } from "../../../architecture/targetable";
 import i18n from "../../../i18n";
 import { CollisionMask, Settings } from "../../../settings";
-import { ILandingPad, LandingPadSize } from "../../../spacestation/landingPad/landingPadManager";
 import { RenderingAssets } from "../../renderingAssets";
+import { ILandingPad, LandingPadSize } from "../spaceStation/landingPad/landingPadManager";
 import { LandingPadMaterial } from "./landingPadMaterial";
 
 export class LandingPad implements ILandingPad {

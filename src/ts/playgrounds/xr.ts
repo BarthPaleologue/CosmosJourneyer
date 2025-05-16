@@ -26,13 +26,13 @@ import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerator
 import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
 import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
-import { JuliaSetPostProcess } from "../frontend/anomalies/julia/juliaSetPostProcess";
-import { MandelboxPostProcess } from "../frontend/anomalies/mandelbox/mandelboxPostProcess";
-import { MandelbulbPostProcess } from "../frontend/anomalies/mandelbulb/mandelbulbPostProcess";
-import { MengerSpongePostProcess } from "../frontend/anomalies/mengerSponge/mengerSpongePostProcess";
-import { SierpinskiPyramidPostProcess } from "../frontend/anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { JuliaSetPostProcess } from "../frontend/postProcesses/anomalies/julia/juliaSetPostProcess";
+import { MandelboxPostProcess } from "../frontend/postProcesses/anomalies/mandelbox/mandelboxPostProcess";
+import { MandelbulbPostProcess } from "../frontend/postProcesses/anomalies/mandelbulb/mandelbulbPostProcess";
+import { MengerSpongePostProcess } from "../frontend/postProcesses/anomalies/mengerSponge/mengerSpongePostProcess";
+import { SierpinskiPyramidPostProcess } from "../frontend/postProcesses/anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { EmptyCelestialBody } from "../frontend/universe/emptyCelestialBody";
 import { UpdatablePostProcess } from "../postProcesses/updatablePostProcess";
-import { EmptyCelestialBody } from "../utils/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,

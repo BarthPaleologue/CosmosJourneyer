@@ -22,6 +22,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
+import { getTransformationQuaternion } from "@/utils/algebra";
+import { lerpSmooth } from "@/utils/math";
+
 import { Settings } from "../settings";
 import { Controls } from "../uberCore/controls";
 import { LocalDirection } from "../uberCore/localDirections";
@@ -34,8 +37,6 @@ import {
     translate,
     yaw,
 } from "../uberCore/transforms/basicTransform";
-import { getTransformationQuaternion } from "../utils/algebra";
-import { lerpSmooth } from "../utils/math";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {

@@ -21,12 +21,13 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { getUniverseObjectId, UniverseObjectId } from "@/utils/coordinates/universeObjectId";
+import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
+import { DeepReadonly } from "@/utils/types";
+
 import packageInfo from "../../../../package.json";
 import i18n from "../../i18n";
-import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
-import { getUniverseObjectId, UniverseObjectId } from "../../utils/coordinates/universeObjectId";
-import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "../../utils/positionNearObject";
-import { DeepReadonly } from "../../utils/types";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";

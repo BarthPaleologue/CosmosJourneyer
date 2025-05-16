@@ -19,6 +19,10 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { axisCompositeToString, pressInteractionToStrings } from "@/utils/strings/inputControlsString";
+import { Result } from "@/utils/types";
+
 import congratsImageSrc from "../../asset/tutorials/flightTutorial/congrats.webp";
 import rotationImageSrc from "../../asset/tutorials/flightTutorial/rotation.webp";
 import saveData from "../../asset/tutorials/flightTutorial/save.json";
@@ -32,9 +36,6 @@ import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInp
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { axisCompositeToString, pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Result } from "../utils/types";
 import { Tutorial } from "./tutorial";
 
 export class FlightTutorial implements Tutorial {

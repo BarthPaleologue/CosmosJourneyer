@@ -17,12 +17,13 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
+
 import i18n from "../../i18n";
 import { Mission } from "../../missions/mission";
 import { MissionContext } from "../../missions/missionContext";
 import { Player } from "../../player/player";
-import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../../utils/strings/inputControlsString";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 

@@ -45,7 +45,7 @@ import { ISoundPlayer, SoundPlayer, SoundType } from "@/frontend/audio/soundPlay
 import { Tts } from "@/frontend/audio/tts";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { StarMap } from "@/frontend/starmap/starMap";
-import { StarSystemView } from "@/frontend/starSystem/starSystemView";
+import { StarSystemView } from "@/frontend/starSystemView";
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 import { UberScene } from "@/frontend/uberCore/uberScene";
 import { MainMenu } from "@/frontend/ui/mainMenu";

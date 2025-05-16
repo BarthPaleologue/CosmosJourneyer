@@ -46,7 +46,7 @@ import {
     vertexAttribute,
 } from "@/utils/bsl";
 
-import { PBRTextures } from "../../textures";
+import { PBRTextures } from "../../../../textures";
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {

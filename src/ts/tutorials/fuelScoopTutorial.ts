@@ -17,6 +17,10 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
+import { Result } from "@/utils/types";
+
 import fuelIconLocation from "../../asset/tutorials/fuelScoopTutorial/fuelIconLocation.webp";
 import welcomeImageSrc from "../../asset/tutorials/fuelScoopTutorial/fuelScoop.webp";
 import howToFuelScoop from "../../asset/tutorials/fuelScoopTutorial/howToFuelScoop.webp";
@@ -25,9 +29,6 @@ import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInp
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Result } from "../utils/types";
 import { Tutorial } from "./tutorial";
 
 export class FuelScoopTutorial implements Tutorial {

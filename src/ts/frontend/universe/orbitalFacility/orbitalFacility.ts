@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Cullable } from "../../utils/cullable";
-import { OrbitalObjectBase } from "../architecture/orbitalObjectBase";
+import { Cullable } from "@/utils/cullable";
+
+import { OrbitalObjectBase } from "../../architecture/orbitalObjectBase";
+import { Targetable } from "../../architecture/targetable";
+import { ManagesLandingPads } from "../../assets/procedural/spaceStation/landingPad/managesLandingPads";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { Targetable } from "../architecture/targetable";
-import { ManagesLandingPads } from "./landingPad/managesLandingPads";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
     extends OrbitalObjectBase<T>,

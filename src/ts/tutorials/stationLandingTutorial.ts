@@ -17,6 +17,10 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
+import { Result } from "@/utils/types";
+
 import saveData from "../../asset/tutorials/stationLandingTutorial/save.json";
 import station1ImageSrc from "../../asset/tutorials/stationLandingTutorial/station1.webp";
 import stationLandingBayImageSrc from "../../asset/tutorials/stationLandingTutorial/stationLandingBay.webp";
@@ -27,9 +31,6 @@ import { TutorialControlsInputs } from "../frontend/ui/tutorial/tutorialLayerInp
 import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import { pressInteractionToStrings } from "../utils/strings/inputControlsString";
-import { Result } from "../utils/types";
 import { Tutorial } from "./tutorial";
 
 export class StationLandingTutorial implements Tutorial {

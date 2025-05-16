@@ -27,7 +27,8 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { moveTowards } from "../utils/math";
+import { moveTowards } from "@/utils/math";
+
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";

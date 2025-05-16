@@ -19,7 +19,8 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IDisposable, Scene } from "@babylonjs/core/scene";
 
-import { getRngFromSeed } from "../../utils/getRngFromSeed";
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
 import { Objects } from "../assets/objects";
 import { AsteroidPatch } from "./asteroidPatch";
 

@@ -37,11 +37,9 @@ import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/man
 import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
 
-import { JuliaSetPostProcess } from "../anomalies/julia/juliaSetPostProcess";
-import { MandelboxPostProcess } from "../anomalies/mandelbox/mandelboxPostProcess";
-import { MandelbulbPostProcess } from "../anomalies/mandelbulb/mandelbulbPostProcess";
-import { MengerSpongePostProcess } from "../anomalies/mengerSponge/mengerSpongePostProcess";
-import { SierpinskiPyramidPostProcess } from "../anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
+import { getRgbFromTemperature } from "@/utils/specrend";
+import { DeepReadonly } from "@/utils/types";
+
 import { CelestialBody, StellarObject } from "../architecture/orbitalObject";
 import { Textures } from "../assets/textures";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
@@ -54,8 +52,11 @@ import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostP
 import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
 import { Star } from "../stellarObjects/star/star";
 import { UberScene } from "../uberCore/uberScene";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { DeepReadonly } from "../utils/types";
+import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
+import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";
+import { MandelbulbPostProcess } from "./anomalies/mandelbulb/mandelbulbPostProcess";
+import { MengerSpongePostProcess } from "./anomalies/mengerSponge/mengerSpongePostProcess";
+import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramid/sierpinskiPyramidPostProcess";
 import { ColorCorrection } from "./colorCorrection";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";

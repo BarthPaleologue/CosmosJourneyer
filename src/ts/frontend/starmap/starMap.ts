@@ -36,6 +36,13 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { alertModal } from "@/utils/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@/utils/notification";
+import { getRgbFromTemperature } from "@/utils/specrend";
+import { ThickLines } from "@/utils/thickLines";
+import { View } from "@/utils/view";
+
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
@@ -45,12 +52,6 @@ import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius"
 import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
 import { translate } from "../uberCore/transforms/basicTransform";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { alertModal } from "../utils/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "../utils/notification";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { ThickLines } from "../utils/thickLines";
-import { View } from "../utils/view";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";

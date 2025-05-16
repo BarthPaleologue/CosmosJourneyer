@@ -8,14 +8,15 @@ import {
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import Interaction from "@brianchirls/game-input/interactions/Interaction";
 
-import { getGlobalKeyboardLayoutMap } from "../../utils/keyboardAPI";
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import {
     axisCompositeToString,
     buttonInputToString,
     dPadCompositeToString,
     stickInputToString,
     vector2ToString,
-} from "../../utils/strings/inputControlsString";
+} from "@/utils/strings/inputControlsString";
+
 import { InputMaps } from "../inputs/inputMaps";
 
 export function initSettingsPanel(): HTMLElement {

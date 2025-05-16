@@ -20,6 +20,14 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import {
+    axisCompositeToString,
+    dPadCompositeToString,
+    pressInteractionToStrings,
+} from "@/utils/strings/inputControlsString";
+import { Result } from "@/utils/types";
+
 import controlsImgSrc from "../../asset/tutorials/starMapTutorial/controls.webp";
 import coverImgSrc from "../../asset/tutorials/starMapTutorial/cover.webp";
 import jumpImgSrc from "../../asset/tutorials/starMapTutorial/jump.webp";
@@ -34,13 +42,6 @@ import i18n from "../i18n";
 import { safeParseSave, Save } from "../saveFile/saveFileData";
 import { SaveLoadingError } from "../saveFile/saveLoadingError";
 import { StarMapInputs } from "../starmap/starMapInputs";
-import { getGlobalKeyboardLayoutMap } from "../utils/keyboardAPI";
-import {
-    axisCompositeToString,
-    dPadCompositeToString,
-    pressInteractionToStrings,
-} from "../utils/strings/inputControlsString";
-import { Result } from "../utils/types";
 import { Tutorial } from "./tutorial";
 
 export class StarMapTutorial implements Tutorial {

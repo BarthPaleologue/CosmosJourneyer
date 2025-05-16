@@ -17,7 +17,8 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ok, Result } from "../utils/types";
+import { ok, Result } from "@/utils/types";
+
 import { CmdrSaves, Save } from "./saveFileData";
 import { SaveLoadingError } from "./saveLoadingError";
 

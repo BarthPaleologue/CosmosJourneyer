@@ -22,12 +22,12 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 
-import { PBRTextures } from "../../assets/textures";
-import i18n from "../../i18n";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
-import { ClimberRingMaterial } from "../assets/climberRingMaterial";
-import { SolarPanelMaterial } from "../assets/procedural/solarPanel/solarPanelMaterial";
-import { MetalSectionMaterial } from "../assets/procedural/spaceStation/metalSectionMaterial";
+import i18n from "../../../../../i18n";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../../architecture/targetable";
+import { PBRTextures } from "../../../textures";
+import { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
+import { MetalSectionMaterial } from "../metalSectionMaterial";
+import { ClimberRingMaterial } from "./climberRingMaterial";
 
 export class SpaceElevatorClimber implements Targetable {
     private readonly transform: TransformNode;

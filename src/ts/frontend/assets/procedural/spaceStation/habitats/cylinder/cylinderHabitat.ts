@@ -24,13 +24,15 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Transformable } from "@/frontend/architecture/transformable";
+import { Textures } from "@/frontend/assets/textures";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
 
-import { Transformable } from "../../../architecture/transformable";
-import { Settings } from "../../../settings";
-import { Textures } from "../../textures";
+import { Settings } from "@/settings";
+
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {

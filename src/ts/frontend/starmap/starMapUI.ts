@@ -22,14 +22,15 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/utils/coordinates/starSystemCoordinates";
+import { getRgbFromTemperature } from "@/utils/specrend";
+import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { DeepReadonly } from "@/utils/types";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
 import i18n from "../i18n";
 import { Player } from "../player/player";
 import { factionToString } from "../society/factions";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "../utils/coordinates/starSystemCoordinates";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { getOrbitalObjectTypeToI18nString } from "../utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "../utils/types";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { SystemIcons } from "./systemIcons";
 

@@ -22,22 +22,18 @@ import { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     add,
-    atan2,
     f,
     fract,
-    length,
     mix,
     mul,
     outputFragColor,
     outputVertexPosition,
     pbrMetallicRoughnessMaterial,
     perturbNormal,
-    remap,
     smoothstep,
     split,
     step,
     sub,
-    Target,
     textureSample,
     transformDirection,
     transformPosition,
@@ -48,35 +44,36 @@ import {
     vec2,
     vec3,
     vertexAttribute,
-    xz,
 } from "@/utils/bsl";
 
-import { PBRTextures } from "../../textures";
+import { PBRTextures } from "../../../../textures";
 
-export class CylinderHabitatMaterial extends NodeMaterial {
-    constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
-        super("CylinderHabitatMaterial", scene);
+export class HelixHabitatMaterial extends NodeMaterial {
+    constructor(
+        meanRadius: number,
+        deltaRadius: number,
+        thicknessMultiplier: number,
+        textures: PBRTextures,
+        scene: Scene,
+    ) {
+        super("HelixHabitatMaterial", scene);
         this.mode = NodeMaterialModes.Material;
-
-        const circumference = 2 * Math.PI * radius;
-        const nbSectors = tesselation;
-        const sectorSize = circumference / nbSectors;
 
         const position = vertexAttribute("position");
         const normal = vertexAttribute("normal");
         const uv = vertexAttribute("uv");
 
-        const positionXZ = xz(position);
-        const splitPositionXZ = split(positionXZ);
-
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
         const normalW = transformDirection(world, normal);
 
+        const splitUV = split(uv);
+        const scaledUvX = mul(splitUV.x, f((2.0 * Math.PI * meanRadius) / deltaRadius));
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
         const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
-        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height / sectorSize), mask));
+        const scaledUvY = mul(splitUV.y, mix(f(1.0), f(thicknessMultiplier), mask));
+        const proceduralUV = vec2(scaledUvX, scaledUvY);
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -84,14 +81,6 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const vertexOutput = outputVertexPosition(positionClipSpace);
 
         this.addOutputNode(vertexOutput);
-
-        const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
-
-        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), f(1.0 / sectorSize));
-
-        const proceduralUvX = remap(theta, f(0), f(2 * Math.PI), f(0), f(nbSectors));
-        const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
-        const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
         const albedo = textureSample(textures.albedo, proceduralUV, {
             convertToLinearSpace: true,
@@ -118,16 +107,13 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         );
 
         const lightEmission = mul(
-            mask,
             mul(
-                mul(
-                    smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
-                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX))),
-                ),
-                mul(
-                    smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
-                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY))),
-                ),
+                smoothstep(f(0.48), f(0.5), fract(scaledUvX)),
+                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX))),
+            ),
+            mul(
+                smoothstep(f(0.4), f(0.45), fract(scaledUvY)),
+                sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))),
             ),
         );
 

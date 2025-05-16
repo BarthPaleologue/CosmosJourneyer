@@ -17,8 +17,9 @@
 
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { jsonSafeParse } from "../utils/json";
-import { err, ok, Result } from "../utils/types";
+import { jsonSafeParse } from "@/utils/json";
+import { err, ok, Result } from "@/utils/types";
+
 import { CmdrSaves, parseSaveArray, Save, SavesSchema } from "./saveFileData";
 import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
 import { SaveBackend } from "./saveManager";

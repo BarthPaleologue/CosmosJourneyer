@@ -24,15 +24,17 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Transformable } from "@/frontend/architecture/transformable";
+import { Textures } from "@/frontend/assets/textures";
+
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
 
-import { Transformable } from "../../../architecture/transformable";
-import { Settings } from "../../../settings";
-import { Textures } from "../../textures";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { Settings } from "@/settings";
+
+import { MetalSectionMaterial } from "../../metalSectionMaterial";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
 
 export class RingHabitat implements Transformable {

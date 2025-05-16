@@ -28,7 +28,7 @@ import { DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { OrbitalObjectModel } from "./orbitalObjects/index";
-import { newSeededStarSystemModel } from "./proceduralGenerators/seededStarSystemModel";
+import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
 import { getObjectModelById, StarSystemModel } from "./starSystemModel";
 
 /**

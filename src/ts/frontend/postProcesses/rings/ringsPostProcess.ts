@@ -24,6 +24,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
+import { DeepReadonly } from "@/utils/types";
+
 import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
@@ -31,7 +33,6 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "../../postProcesses/uniforms/stellarObjectUniforms";
-import { DeepReadonly } from "../../utils/types";
 import { CelestialBodyModel } from "../architecture/orbitalObjectModel";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "./ringsUniform";
 

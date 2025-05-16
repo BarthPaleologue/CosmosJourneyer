@@ -28,6 +28,10 @@ import {
     setRotation,
 } from "@/frontend/architecture/orbitalObjectUtils";
 
+import { StarSystemCoordinates } from "@/utils/coordinates/starSystemCoordinates";
+import { SystemTarget } from "@/utils/systemTarget";
+import { DeepReadonly, NonEmptyArray } from "@/utils/types";
+
 import { RenderingAssets } from "../../assets/renderingAssets";
 import { OrbitalObjectId } from "../../backend/universe/orbitalObjects/orbitalObjectId";
 import { PostProcessManager } from "../../postProcesses/postProcessManager";
@@ -36,9 +40,6 @@ import { StarFieldBox } from "../../starSystem/starFieldBox";
 import { StarSystemLoader } from "../../starSystem/starSystemLoader";
 import { translate } from "../../uberCore/transforms/basicTransform";
 import { UberScene } from "../../uberCore/uberScene";
-import { StarSystemCoordinates } from "../../utils/coordinates/starSystemCoordinates";
-import { SystemTarget } from "../../utils/systemTarget";
-import { DeepReadonly, NonEmptyArray } from "../../utils/types";
 import {
     Anomaly,
     CelestialBody,
