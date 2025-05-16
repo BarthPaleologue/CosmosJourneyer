@@ -28,6 +28,7 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -44,12 +45,33 @@ import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defau
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { Mission } from "@/frontend/missions/mission";
 import { MissionContext } from "@/frontend/missions/missionContext";
+import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import { ShipControls } from "@/frontend/spaceship/shipControls";
+import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
+import {
+    getForwardDirection,
+    getRotationQuaternion,
+    setRotationQuaternion,
+    translate,
+} from "@/frontend/uberCore/transforms/basicTransform";
+import { UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
+import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
+import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
+import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
+import { ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
+import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -62,30 +84,8 @@ import { View } from "@/utils/view";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { ChunkForgeWorkers } from "../planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { AiPlayerControls } from "../player/aiPlayerControls";
 import { Player } from "../player/player";
-import { PostProcessManager } from "../postProcesses/postProcessManager";
-import { ShipControls } from "../spaceship/shipControls";
-import { Spaceship } from "../spaceship/spaceship";
-import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
-import { LandingPadSize } from "../spacestation/landingPad/landingPadManager";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate,
-} from "../uberCore/transforms/basicTransform";
-import { UberScene } from "../uberCore/uberScene";
-import { SpaceShipLayer } from "../ui/spaceShipLayer";
-import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
-import { TargetCursorLayer } from "../ui/targetCursorLayer";
-import { HasBoundingSphere } from "./universe/architecture/hasBoundingSphere";
-import { OrbitalObjectType } from "./universe/architecture/orbitalObjectType";
 import { Transformable } from "./universe/architecture/transformable";
 import { TypedObject } from "./universe/architecture/typedObject";
 
