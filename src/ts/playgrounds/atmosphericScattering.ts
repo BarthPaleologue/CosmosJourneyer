@@ -19,9 +19,9 @@ import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { AtmosphereUniforms } from "../atmosphere/atmosphereUniforms";
-import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
-import { DefaultControls } from "../defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,

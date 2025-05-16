@@ -20,15 +20,18 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { createTexturePools } from "../assets/textures";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { LensFlarePostProcess } from "../postProcesses/lensFlarePostProcess";
-import { MatterJetPostProcess } from "../postProcesses/matterJetPostProcess";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { newSeededNeutronStarModel } from "../stellarObjects/neutronStar/neutronStarModelGenerator";
-import { translate } from "../uberCore/transforms/basicTransform";
-import { getRgbFromTemperature } from "../utils/specrend";
-import { VolumetricLight } from "../volumetricLight/volumetricLight";
+import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
+
+import { createTexturePools } from "@/frontend/assets/textures";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
+import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
+import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
+import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+
+import { getRgbFromTemperature } from "@/utils/specrend";
+
 import { enablePhysics } from "./utils";
 
 export async function createNeutronStarScene(

@@ -21,7 +21,8 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+
 import { enablePhysics } from "./utils";
 
 export async function createDebugAssetsScene(

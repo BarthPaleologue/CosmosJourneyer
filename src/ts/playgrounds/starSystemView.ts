@@ -18,18 +18,22 @@
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
-import { SoundPlayerMock } from "../audio/soundPlayer";
-import { TtsMock } from "../audio/tts";
-import { initI18n } from "../i18n";
-import { Player } from "../player/player";
-import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
-import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { StarSystemView } from "../starSystem/starSystemView";
-import { UberScene } from "../uberCore/uberScene";
-import { updateNotifications } from "../utils/notification";
-import { positionNearObjectBrightSide } from "../utils/positionNearObject";
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/player/player";
+import { StarSystemView } from "@/frontend/starSystemView";
+import { UberScene } from "@/frontend/uberCore/uberScene";
+import { updateNotifications } from "@/frontend/ui/notification";
+
+import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
+
+import { initI18n } from "@/i18n";
+
 import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(

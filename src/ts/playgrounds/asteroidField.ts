@@ -26,10 +26,11 @@ import {
     Vector3,
 } from "@babylonjs/core";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
-import { AsteroidField } from "../asteroidFields/asteroidField";
-import { AsteroidPatch } from "../asteroidFields/asteroidPatch";
-import { DefaultControls } from "../defaultControls/defaultControls";
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
+import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
+
 import { enablePhysics } from "./utils";
 
 export async function createAsteroidFieldScene(

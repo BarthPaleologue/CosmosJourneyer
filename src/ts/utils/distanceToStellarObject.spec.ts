@@ -17,10 +17,12 @@
 
 import { describe, expect, it } from "vitest";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { Settings } from "../settings";
-import { Faction } from "../society/factions";
-import { getObjectModelById, StarSystemModel } from "../starSystem/starSystemModel";
+import { Faction } from "@/backend/society/factions";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
+
+import { Settings } from "@/settings";
+
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
 import { DeepReadonly } from "./types";
 

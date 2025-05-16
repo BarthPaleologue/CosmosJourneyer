@@ -19,16 +19,19 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "../architecture/orbitalObjectType";
-import { loadRenderingAssets } from "../assets/renderingAssets";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { Settings } from "../settings";
-import { SpaceStation } from "../spacestation/spaceStation";
-import { newSeededSpaceStationModel } from "../spacestation/spaceStationModelGenerator";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { Star } from "../stellarObjects/star/star";
-import { StarModel } from "../stellarObjects/star/starModel";
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
+
+import { Settings } from "@/settings";
+
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(

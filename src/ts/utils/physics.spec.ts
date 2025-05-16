@@ -17,7 +17,8 @@
 
 import { describe, expect, test } from "vitest";
 
-import { Settings } from "../settings";
+import { Settings } from "@/settings";
+
 import {
     celsiusToKelvin,
     computeMeanTemperature,

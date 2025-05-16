@@ -18,17 +18,20 @@
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
-import { SoundPlayerMock } from "../audio/soundPlayer";
-import { TtsMock } from "../audio/tts";
-import { initI18n } from "../i18n";
-import { Player } from "../player/player";
-import { EncyclopaediaGalacticaManager } from "../society/encyclopaediaGalacticaManager";
-import { ShipControls } from "../spaceship/shipControls";
-import { Spaceship } from "../spaceship/spaceship";
-import { getLoneStarSystem } from "../starSystem/customSystems/loneStar";
-import { StarSystemDatabase } from "../starSystem/starSystemDatabase";
-import { SpaceStationLayer } from "../ui/spaceStation/spaceStationLayer";
+import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
+import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/player/player";
+import { ShipControls } from "@/frontend/spaceship/shipControls";
+import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
+
+import { initI18n } from "@/i18n";
+
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(

@@ -21,9 +21,10 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadTextures } from "../assets/textures";
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { HyperSpaceTunnel } from "../utils/hyperSpaceTunnel";
+import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
+import { loadTextures } from "@/frontend/assets/textures";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+
 import { enablePhysics } from "./utils";
 
 export async function createHyperspaceTunnelDemo(

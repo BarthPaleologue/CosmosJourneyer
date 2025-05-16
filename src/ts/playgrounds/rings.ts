@@ -19,12 +19,14 @@ import { Color3, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core"
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { DefaultControls } from "../defaultControls/defaultControls";
-import { RingsLut } from "../rings/ringsLut";
-import { RingsModel } from "../rings/ringsModel";
-import { RingsPostProcess } from "../rings/ringsPostProcess";
-import { RingsUniforms } from "../rings/ringsUniform";
-import { ItemPool } from "../utils/itemPool";
+import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+
+import { ItemPool } from "@/utils/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,

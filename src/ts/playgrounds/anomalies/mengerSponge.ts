@@ -17,10 +17,10 @@
 
 import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
 
-import { EmptyCelestialBody } from "@/utils/emptyCelestialBody";
+import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
 
-import { newSeededMengerSpongeModel } from "../../anomalies/mengerSponge/mengerSpongeModelGenerator";
-import { MengerSpongePostProcess } from "../../anomalies/mengerSponge/mengerSpongePostProcess";
+import { MengerSpongePostProcess } from "@/frontend/postProcesses/anomalies/mengerSpongePostProcess";
+import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createMengerSpongeScene(
     engine: AbstractEngine,
