@@ -25,6 +25,7 @@ import { createSierpinskiScene } from "./anomalies/sierpinski";
 import { createAsteroidFieldScene } from "./asteroidField";
 import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createAutomaticLandingScene } from "./automaticLanding";
+import { createBlackHoleScene } from "./blackHole";
 import { createCharacterDemoScene } from "./character";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
@@ -68,6 +69,7 @@ export class PlaygroundRegistry {
         ["mengerSponge", createMengerSpongeScene],
         ["atmosphericScattering", createAtmosphericScatteringScene],
         ["darkKnight", createDarkKnightScene],
+        ["blackHole", createBlackHoleScene],
     ]);
 
     register(
