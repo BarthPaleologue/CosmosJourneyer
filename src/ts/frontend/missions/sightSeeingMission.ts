@@ -21,7 +21,8 @@ import { MissionType } from "@/backend/missions/missionSerialized";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
+import { OrbitalObjectType } from "@/frontend/architecture/orbitalObjectType";
+
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";

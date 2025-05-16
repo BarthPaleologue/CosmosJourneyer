@@ -17,10 +17,11 @@
 
 import { AbstractEngine, HemisphericLight, Scene, Vector3 } from "@babylonjs/core";
 
+import { generateDarkKnightModel } from "@/frontend/postProcesses/anomalies/darkKnight/darkKnightModelGenerator";
+import { DarkKnight } from "@/frontend/universe/darkKnight";
+
 import { loadTextures } from "../assets/textures";
 import { DefaultControls } from "../defaultControls/defaultControls";
-import { generateDarkKnightModel } from "../frontend/postProcesses/anomalies/darkKnight/darkKnightModelGenerator";
-import { DarkKnight } from "../frontend/universe/darkKnight";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,

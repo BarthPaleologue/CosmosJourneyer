@@ -37,13 +37,14 @@ import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/man
 import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
 
+import { RingsPostProcess } from "@/frontend/rings/ringsPostProcess";
+
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { DeepReadonly } from "@/utils/types";
 
 import { Textures } from "../assets/textures";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
-import { RingsPostProcess } from "../frontend/rings/ringsPostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "../stellarObjects/blackHole/blackHole";

@@ -18,11 +18,11 @@
 import { factionToString } from "@/backend/society/factions";
 import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 
+import { OrbitalFacilityModel, OrbitalObjectModel } from "@/frontend/architecture/orbitalObjectModel";
+
 import { CropType, cropTypeToString } from "@/utils/agriculture";
 import { makeD3PieChart } from "@/utils/d3PieChart";
 import { DeepReadonly } from "@/utils/types";
-
-import { OrbitalFacilityModel, OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,

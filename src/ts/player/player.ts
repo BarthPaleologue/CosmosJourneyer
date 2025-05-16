@@ -25,7 +25,8 @@ import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates"
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { Spaceship } from "../frontend/spaceship/spaceship";
+import { Spaceship } from "@/frontend/spaceship/spaceship";
+
 import { Mission } from "../missions/mission";
 
 export class Player {

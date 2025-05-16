@@ -5,10 +5,11 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { ObjectTargetCursorType, Targetable } from "@/frontend/universe/architecture/targetable";
+
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { ObjectTargetCursorType, Targetable } from "../frontend/universe/architecture/targetable";
 import { DeepReadonly } from "./types";
 
 export class SystemTarget implements Targetable {

@@ -21,8 +21,8 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
-import { HasBoundingSphere } from "../architecture/hasBoundingSphere";
-import { Transformable } from "../architecture/transformable";
+import { HasBoundingSphere } from "./architecture/hasBoundingSphere";
+import { Transformable } from "./architecture/transformable";
 
 /**
  * Visual helper designed to display the rotation axis of given objects

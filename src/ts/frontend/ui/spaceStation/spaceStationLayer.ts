@@ -20,6 +20,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { OrbitalFacilityModel, OrbitalObjectModel } from "@/frontend/architecture/orbitalObjectModel";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
 import { DeepReadonly } from "@/utils/types";
@@ -29,7 +30,6 @@ import { Settings } from "@/settings";
 
 import { Player } from "../../../player/player";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
-import { OrbitalFacilityModel, OrbitalObjectModel } from "../../frontend/architecture/orbitalObjectModel";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
 import { generateInfoHTML } from "./spaceStationInfos";

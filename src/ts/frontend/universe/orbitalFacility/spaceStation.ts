@@ -22,6 +22,8 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 
+import { StellarObjectModel } from "@/frontend/architecture/orbitalObjectModel";
+
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
@@ -46,7 +48,6 @@ import { RenderingAssets } from "../../assets/renderingAssets";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { Transformable } from "../architecture/transformable";
-import { StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalFacilityBase } from "./orbitalFacility";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {

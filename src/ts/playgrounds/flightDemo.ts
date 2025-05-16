@@ -21,11 +21,12 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ShipControls } from "@/frontend/spaceship/shipControls";
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+
 import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { ShipControls } from "../frontend/spaceship/shipControls";
-import { SpaceShipControlsInputs } from "../frontend/spaceship/spaceShipControlsInputs";
 import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(

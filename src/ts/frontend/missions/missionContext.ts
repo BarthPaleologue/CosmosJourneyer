@@ -20,7 +20,7 @@ import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { StarSystemController } from "../frontend/universe/starSystemController";
+import { StarSystemController } from "@/frontend/universe/starSystemController";
 
 /**
  * Describes information used by mission nodes to update their state

@@ -17,7 +17,8 @@
 
 import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 
-import { TerrainSettings } from "../../../frontend/universe/planets/telluricPlanet/terrain/terrainSettings";
+import { TerrainSettings } from "@/frontend/universe/planets/telluricPlanet/terrain/terrainSettings";
+
 import { AtmosphereModel } from "./atmosphereModel";
 import { OceanModel } from "./oceanModel";
 import { CelestialBodyModelBase } from "./orbitalObjectModelBase";

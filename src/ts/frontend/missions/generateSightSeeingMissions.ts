@@ -23,12 +23,13 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { OrbitalFacilityModel } from "@/frontend/architecture/orbitalObjectModel";
+import { OrbitalObjectType } from "@/frontend/architecture/orbitalObjectType";
+
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { DeepReadonly } from "@/utils/types";
 
-import { OrbitalFacilityModel } from "../frontend/architecture/orbitalObjectModel";
-import { OrbitalObjectType } from "../frontend/architecture/orbitalObjectType";
 import { Player } from "../player/player";
 import { Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";

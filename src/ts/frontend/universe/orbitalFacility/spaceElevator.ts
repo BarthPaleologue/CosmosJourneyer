@@ -24,6 +24,8 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
 
+import { StellarObjectModel } from "@/frontend/architecture/orbitalObjectModel";
+
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
@@ -51,7 +53,6 @@ import { setUpVector } from "../../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { Transformable } from "../architecture/transformable";
-import { StellarObjectModel } from "../frontend/architecture/orbitalObjectModel";
 import { OrbitalFacilityBase } from "./orbitalFacility";
 
 export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {

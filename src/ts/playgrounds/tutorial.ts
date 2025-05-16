@@ -19,14 +19,14 @@ import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { initI18n } from "@/i18n";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
+import { FlightTutorial } from "@/frontend/ui/tutorial/tutorials/flightTutorial";
+import { FuelScoopTutorial } from "@/frontend/ui/tutorial/tutorials/fuelScoopTutorial";
+import { StarMapTutorial } from "@/frontend/ui/tutorial/tutorials/starMapTutorial";
+import { StationLandingTutorial } from "@/frontend/ui/tutorial/tutorials/stationLandingTutorial";
 
-import { SoundPlayerMock } from "../audio/soundPlayer";
-import { TutorialLayer } from "../frontend/ui/tutorial/tutorialLayer";
-import { FlightTutorial } from "../frontend/ui/tutorial/tutorials/flightTutorial";
-import { FuelScoopTutorial } from "../frontend/ui/tutorial/tutorials/fuelScoopTutorial";
-import { StarMapTutorial } from "../frontend/ui/tutorial/tutorials/starMapTutorial";
-import { StationLandingTutorial } from "../frontend/ui/tutorial/tutorials/stationLandingTutorial";
+import { initI18n } from "@/i18n";
 
 export async function createTutorialScene(
     engine: AbstractEngine,
