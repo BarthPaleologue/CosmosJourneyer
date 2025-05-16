@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
 import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { Settings } from "@/settings";
-
-import { DarkKnightModel } from "../../orbitalObjects/anomalies/darkKnightModel";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
 
 export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
     return {

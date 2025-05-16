@@ -25,12 +25,13 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
 
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
+
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { wheelOfFortune } from "@/utils/random";
 
-import { Transformable } from "../../../universe/architecture/transformable";
-import { RenderingAssets } from "../../renderingAssets";
 import { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

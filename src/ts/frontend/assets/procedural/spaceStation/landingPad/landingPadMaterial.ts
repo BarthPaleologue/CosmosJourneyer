@@ -3,6 +3,9 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
+import { PBRTextures } from "@/frontend/assets/textures";
+
 import {
     add,
     div,
@@ -32,9 +35,6 @@ import {
 } from "@/utils/bsl";
 
 import { Settings } from "@/settings";
-
-import { LandingPadTexturePool } from "../../../landingPadTexturePool";
-import { PBRTextures } from "../../../textures";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {

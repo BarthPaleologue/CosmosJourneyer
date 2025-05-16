@@ -27,10 +27,11 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
+
 import { createEnvironmentAggregate } from "@/utils/havok";
 
-import { Transformable } from "../../../universe/architecture/transformable";
-import { RenderingAssets } from "../../renderingAssets";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class EngineBay implements Transformable {

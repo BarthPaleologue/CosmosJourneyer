@@ -17,17 +17,17 @@
 
 import { normalRandom } from "extended-random";
 
+import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { estimateStarRadiusFromMass } from "@/utils/physics";
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
-
-import { CelestialBodyModel } from "../../orbitalObjects/index";
-import { Orbit } from "../../orbitalObjects/orbit";
-import { OrbitalObjectType } from "../../orbitalObjects/orbitalObjectType";
-import { BlackHoleModel } from "../../orbitalObjects/stellarObjects/blackHoleModel";
 
 export function newSeededBlackHoleModel(
     id: string,

@@ -17,12 +17,13 @@
 
 import { getComponentTypeI18n, getComponentValue } from "@/backend/spaceship/serializedComponents/component";
 
+import { Player } from "@/frontend/player/player";
+import { deserializeComponent } from "@/frontend/spaceship/components/component";
+import { ComponentSlot } from "@/frontend/spaceship/componentSlot";
+import { SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
+
 import i18n from "@/i18n";
 
-import { Player } from "../../player/player";
-import { deserializeComponent } from "../../spaceship/components/component";
-import { ComponentSlot } from "../../spaceship/componentSlot";
-import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
 

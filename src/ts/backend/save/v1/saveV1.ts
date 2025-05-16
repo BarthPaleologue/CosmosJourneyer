@@ -17,12 +17,12 @@
 
 import { z } from "zod";
 
+import { CompletedTutorialsSchema } from "@/backend/player/serializedPlayer";
 import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 
 import { err, ok, Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";
-import { CompletedTutorialsSchema } from "../../player/serializedPlayer";
 import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
 
 export enum SystemObjectType {

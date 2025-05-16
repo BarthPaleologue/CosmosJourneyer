@@ -17,14 +17,14 @@
 
 import { z } from "zod";
 
+import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { UniverseCoordinates, UniverseCoordinatesSchema } from "@/utils/coordinates/universeCoordinates";
 import { DeepReadonly, ok, Result } from "@/utils/types";
 
-import { SerializedPlayerSchema } from "../../player/serializedPlayer";
-import { getDefaultSerializedSpaceship } from "../../spaceship/serializedSpaceship";
 import { SaveLoadingError } from "../saveLoadingError";
 import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
 

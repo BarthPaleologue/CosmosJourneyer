@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Player } from "@/frontend/player/player";
 
 import i18n from "@/i18n";
 
-import { Player } from "../../player/player";
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
 
 export class SpaceshipDockUI {

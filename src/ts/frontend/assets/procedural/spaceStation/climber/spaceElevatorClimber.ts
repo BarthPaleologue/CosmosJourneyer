@@ -22,10 +22,11 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 
+import { PBRTextures } from "@/frontend/assets/textures";
+import { ObjectTargetCursorType, Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
+
 import i18n from "@/i18n";
 
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "../../../../universe/architecture/targetable";
-import { PBRTextures } from "../../../textures";
 import { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { ClimberRingMaterial } from "./climberRingMaterial";

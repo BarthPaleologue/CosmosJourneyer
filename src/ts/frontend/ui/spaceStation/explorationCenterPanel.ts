@@ -20,13 +20,13 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { Player } from "../../player/player";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const ExplorationCenterFilter = {

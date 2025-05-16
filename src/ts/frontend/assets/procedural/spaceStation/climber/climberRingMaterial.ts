@@ -20,9 +20,9 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import * as BSL from "@/utils/bsl";
+import { PBRTextures } from "@/frontend/assets/textures";
 
-import { PBRTextures } from "../../../textures";
+import * as BSL from "@/utils/bsl";
 
 export class ClimberRingMaterial extends NodeMaterial {
     constructor(name: string, textures: PBRTextures, scene: Scene) {

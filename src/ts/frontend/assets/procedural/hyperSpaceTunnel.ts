@@ -9,8 +9,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { NoiseTextures } from "@/frontend/assets/textures";
 import { getForwardDirection, rotate } from "@/frontend/uberCore/transforms/basicTransform";
-
-import { Transformable } from "../../universe/architecture/transformable";
+import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "@shaders/warpConeMaterial/vertex.glsl";

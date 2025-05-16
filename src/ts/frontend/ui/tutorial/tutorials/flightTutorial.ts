@@ -21,14 +21,15 @@ import { safeParseSave, Save } from "@/backend/save/saveFileData";
 import { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { StarSystemInputs } from "@/frontend//inputs/starSystemInputs";
+import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControlsInputs";
+
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { axisCompositeToString, pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import { StarSystemInputs } from "../../../inputs/starSystemInputs";
-import { SpaceShipControlsInputs } from "../../../spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import { Tutorial } from "./tutorial";
 
