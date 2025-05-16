@@ -1,15 +1,23 @@
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
-
 import path from "path";
+import { fileURLToPath } from "url";
 
+import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 
-const isProduction = process.env.NODE_ENV === "production";
-const htmlPath = path.join(import.meta.dirname, "/src/html/");
+// __dirname replacement in ESM modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const config = {
+const isProduction = process.env.NODE_ENV === "production";
+
+// Define reusable paths
+const projectRoot = __dirname;
+const htmlPath = path.resolve(projectRoot, "src", "html");
+
+export default defineConfig({
+    mode: isProduction ? "production" : "development",
     entry: {
         main: "./src/ts/index.ts",
         blackHole: "./src/ts/blackHoleDemo.ts",
@@ -17,7 +25,7 @@ const config = {
     },
     output: {
         filename: "[name].[contenthash].js",
-        path: path.resolve(import.meta.dirname, "dist"),
+        path: path.resolve(projectRoot, "dist"),
         clean: true,
     },
     target: ["web", "es2022"],
@@ -32,7 +40,6 @@ const config = {
         },
         compress: true,
     },
-
     plugins: [
         new rspack.BannerPlugin({
             raw: true,
@@ -95,46 +102,38 @@ const config = {
     module: {
         rules: [
             {
-                test: /\.(ts|tsx)$/i,
+                test: /\.[jt]sx?$/i,
                 loader: "builtin:swc-loader",
-                exclude: [/node_modules/],
+                exclude: /node_modules/,
             },
             {
                 test: /\.s[ac]ss$/i,
                 use: [{ loader: "sass-loader", options: { sourceMap: !isProduction } }],
                 type: "css/auto",
-                exclude: [/node_modules/],
+                exclude: /node_modules/,
             },
             {
-                test: /\.(eot|svg|ttf|woff|woff2|otf|png|jpg|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
+                test: /\.(eot|svg|ttf|woff2?|otf|png|jpe?g|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
-                exclude: [/node_modules/],
+                exclude: /node_modules/,
             },
             {
                 test: /\.(glsl|vs|fs|vert|frag|fx)$/,
+                loader: "ts-shader-loader",
                 exclude: /node_modules/,
-                use: ["ts-shader-loader"],
             },
         ],
     },
     resolve: {
-        tsConfig: path.resolve(import.meta.dirname, "tsconfig.json"),
+        tsConfig: path.resolve(projectRoot, "tsconfig.json"),
         extensions: [".tsx", ".ts", ".js"],
     },
-};
-
-export default () => {
-    if (isProduction) {
-        config.mode = "production";
-    } else {
-        config.mode = "development";
-    }
-    config.experiments = {
+    experiments: {
         asyncWebAssembly: true,
         topLevelAwait: true,
         css: true,
-    };
-    config.optimization = {
+    },
+    optimization: {
         minimize: isProduction,
         splitChunks: {
             chunks: "async",
@@ -155,6 +154,5 @@ export default () => {
                 },
             },
         },
-    };
-    return config;
-};
+    },
+});
