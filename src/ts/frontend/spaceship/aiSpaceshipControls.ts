@@ -21,7 +21,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Controls } from "../../uberCore/controls";
+import { Controls } from "@/frontend/uberCore/controls";
+
 import { ISoundPlayer } from "../audio/soundPlayer";
 import { Spaceship } from "./spaceship";
 

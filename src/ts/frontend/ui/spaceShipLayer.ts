@@ -25,8 +25,8 @@ import { smoothstep } from "@/utils/math";
 import { parseSpeed } from "@/utils/strings/parseToStrings";
 
 import { MissionContext } from "../../missions/missionContext";
-import { Player } from "../../player/player";
 import { ISoundPlayer } from "../audio/soundPlayer";
+import { Player } from "../player/player";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 
 import canisterIconPath from "@assets/icons/fuel_canister.webp";

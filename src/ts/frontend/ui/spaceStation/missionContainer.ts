@@ -20,8 +20,8 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { Settings } from "@/settings";
 
 import { Mission } from "../../../missions/mission";
-import { Player } from "../../../player/player";
 import { ISoundPlayer } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 import { AcceptMissionButton } from "./acceptMissionButton";
 
 export class MissionContainer {

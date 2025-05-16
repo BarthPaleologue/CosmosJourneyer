@@ -25,8 +25,8 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "@/fr
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { Player } from "../../../player/player";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const ExplorationCenterFilter = {

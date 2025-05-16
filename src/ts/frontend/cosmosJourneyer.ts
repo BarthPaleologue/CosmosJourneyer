@@ -50,6 +50,7 @@ import { MusicConductor } from "@/frontend/audio/musicConductor";
 import { ISoundPlayer, SoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
+import { Player } from "@/frontend/player/player";
 import { StarMap } from "@/frontend/starmap/starMap";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
@@ -76,7 +77,6 @@ import { positionNearObject } from "@/utils/positionNearObject";
 import { View } from "@/utils/view";
 
 import i18n, { initI18n } from "@/i18n";
-import { Player } from "@/player/player";
 import { Settings } from "@/settings";
 
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";

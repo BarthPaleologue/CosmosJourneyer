@@ -24,8 +24,8 @@ import i18n from "@/i18n";
 
 import { Mission } from "../../missions/mission";
 import { MissionContext } from "../../missions/missionContext";
-import { Player } from "../../player/player";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
+import { Player } from "../player/player";
 import { SpaceShipControlsInputs } from "../spaceship/spaceShipControlsInputs";
 
 export class CurrentMissionDisplay {

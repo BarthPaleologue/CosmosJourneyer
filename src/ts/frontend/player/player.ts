@@ -17,17 +17,16 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { CompletedTutorials, SerializedPlayer } from "@/backend/player/serializedPlayer";
-import { SpaceDiscoveryData } from "@/backend/society/encyclopaediaGalactica";
 import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship, SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { Mission } from "@/frontend/missions/mission";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
-
-import { Mission } from "../missions/mission";
 
 export class Player {
     uuid: string;

@@ -17,7 +17,8 @@
 
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
-import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+
 import { ChunkForge } from "./chunkForge";
 import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
 import { TransferBuildData } from "./workerDataTypes";

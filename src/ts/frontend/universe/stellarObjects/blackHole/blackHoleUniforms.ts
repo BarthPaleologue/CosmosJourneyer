@@ -22,9 +22,9 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 import { getKerrMetricA } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 
-import { DeepReadonly } from "@/utils/types";
+import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 
-import { getForwardDirection } from "../../uberCore/transforms/basicTransform";
+import { DeepReadonly } from "@/utils/types";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",

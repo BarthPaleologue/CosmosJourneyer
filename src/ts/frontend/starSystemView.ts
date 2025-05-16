@@ -84,8 +84,8 @@ import { View } from "@/utils/view";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { AiPlayerControls } from "../player/aiPlayerControls";
-import { Player } from "../player/player";
+import { AiPlayerControls } from "./player/aiPlayerControls";
+import { Player } from "./player/player";
 import { Transformable } from "./universe/architecture/transformable";
 import { TypedObject } from "./universe/architecture/typedObject";
 

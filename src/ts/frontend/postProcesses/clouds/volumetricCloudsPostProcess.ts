@@ -24,10 +24,14 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CameraUniformNames, setCameraUniforms } from "../postProcesses/uniforms/cameraUniforms";
-import { ObjectUniformNames, setObjectUniforms } from "../postProcesses/uniforms/objectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../postProcesses/uniforms/samplerUniforms";
-import { setStellarObjectUniforms, StellarObjectUniformNames } from "../postProcesses/uniforms/stellarObjectUniforms";
+import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
+import {
+    setStellarObjectUniforms,
+    StellarObjectUniformNames,
+} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+
 import { CloudsUniforms } from "./cloudsUniforms";
 import { FlatCloudsPostProcess } from "./flatCloudsPostProcess";
 

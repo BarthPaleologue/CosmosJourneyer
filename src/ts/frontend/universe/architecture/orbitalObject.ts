@@ -18,6 +18,9 @@
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { DarkKnight } from "../darkKnight";
 import { EmptyCelestialBody } from "../emptyCelestialBody";
@@ -25,9 +28,6 @@ import { SpaceElevator } from "../orbitalFacility/spaceElevator";
 import { SpaceStation } from "../orbitalFacility/spaceStation";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { Star } from "../stellarObjects/star/star";
 
 export type StellarObject = Star | NeutronStar | BlackHole;
 

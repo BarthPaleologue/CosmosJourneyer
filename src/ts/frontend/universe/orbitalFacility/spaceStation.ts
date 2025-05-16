@@ -23,6 +23,16 @@ import { Scene } from "@babylonjs/core/scene";
 import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 
 import { StellarObjectModel } from "@/frontend/architecture/orbitalObjectModel";
+import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
+import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
+import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
+import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
+import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
+import { LandingPadManager } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
+import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
+import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
+import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -35,16 +45,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { EngineBay } from "../../assets/procedural/spaceStation/engineBay";
-import { CylinderHabitat } from "../../assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
-import { HelixHabitat } from "../../assets/procedural/spaceStation/habitats/helix/helixHabitat";
-import { RingHabitat } from "../../assets/procedural/spaceStation/habitats/ring/ringHabitat";
-import { LandingBay } from "../../assets/procedural/spaceStation/landingBay/landingBay";
-import { LandingPadManager } from "../../assets/procedural/spaceStation/landingPad/landingPadManager";
-import { SolarSection } from "../../assets/procedural/spaceStation/solarSection";
-import { SpaceStationNodeType } from "../../assets/procedural/spaceStation/spaceStationNode";
-import { UtilitySection } from "../../assets/procedural/spaceStation/utilitySection";
-import { RenderingAssets } from "../../assets/renderingAssets";
 import { OrbitalObjectType } from "../architecture/orbitalObjectType";
 import { ObjectTargetCursorType, Targetable, TargetInfo } from "../architecture/targetable";
 import { Transformable } from "../architecture/transformable";

@@ -30,7 +30,8 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+
 import { CharacterControls } from "../characterControls/characterControls";
 import { CharacterInputs } from "../characterControls/characterControlsInputs";
 import { enablePhysics } from "./utils";

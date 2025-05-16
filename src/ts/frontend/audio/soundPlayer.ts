@@ -17,7 +17,8 @@
 
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { Sounds } from "../assets/sounds";
+import { Sounds } from "@/frontend/assets/sounds";
+
 import { ISoundInstance, SoundInstance, SoundInstanceMock } from "./soundInstance";
 
 export const enum SoundType {

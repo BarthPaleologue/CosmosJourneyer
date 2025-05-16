@@ -24,7 +24,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { WaterTextures } from "../../assets/textures";
+import { WaterTextures } from "@/frontend/assets/textures";
+
 import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "../uniforms/samplerUniforms";

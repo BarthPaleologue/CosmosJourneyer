@@ -23,28 +23,28 @@ import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates"
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { UberScene } from "@/frontend/uberCore/uberScene";
 import {
     getOrbitalPosition,
     getRotationAngle,
     setOrbitalPosition,
     setRotation,
 } from "@/frontend/universe/architecture/orbitalObjectUtils";
+import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { SystemTarget } from "@/utils/systemTarget";
 import { DeepReadonly, NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { RenderingAssets } from "../../assets/renderingAssets";
-import { PostProcessManager } from "../../postProcesses/postProcessManager";
 import { StarFieldBox } from "../../starSystem/starFieldBox";
 import { StarSystemLoader } from "../../starSystem/starSystemLoader";
-import { translate } from "../../uberCore/transforms/basicTransform";
-import { UberScene } from "../../uberCore/uberScene";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 import { ChunkForge } from "../planets/telluricPlanet/terrain/chunks/chunkForge";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { Star } from "../stellarObjects/star/star";
 import {
     Anomaly,
     CelestialBody,

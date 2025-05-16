@@ -19,7 +19,8 @@ import { Sound } from "@babylonjs/core/Audio/sound";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { Musics } from "../assets/musics";
+import { Musics } from "@/frontend/assets/musics";
+
 import { StarSystemView } from "../starSystem/starSystemView";
 import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 

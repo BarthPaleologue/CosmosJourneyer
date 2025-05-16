@@ -23,6 +23,11 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
+import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
+import { UberScene } from "@/frontend/uberCore/uberScene";
+
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
 import { DeepReadonly } from "@/utils/types";
 
@@ -32,10 +37,6 @@ import packageInfo from "../../../../package.json";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { DefaultControls } from "../defaultControls/defaultControls";
 import { StarSystemView } from "../starSystemView";
-import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
-import { getForwardDirection } from "../uberCore/transforms/basicTransform";
-import { UberScene } from "../uberCore/uberScene";
 import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { PanelType, SidePanels } from "./sidePanels";
 

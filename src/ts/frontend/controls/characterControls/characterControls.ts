@@ -30,12 +30,13 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { Scene } from "@babylonjs/core/scene";
 
+import { Controls } from "@/frontend/uberCore/controls";
+import { setUpVector, translate } from "@/frontend/uberCore/transforms/basicTransform";
+
 import { CollisionMask, Settings } from "@/settings";
 
 import { Transformable } from "../architecture/transformable";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { Controls } from "../uberCore/controls";
-import { setUpVector, translate } from "../uberCore/transforms/basicTransform";
 import { CharacterInputs } from "./characterControlsInputs";
 
 class AnimationGroupWrapper {

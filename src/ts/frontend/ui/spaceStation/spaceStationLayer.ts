@@ -28,8 +28,8 @@ import { DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { Player } from "../../../player/player";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
 import { generateInfoHTML } from "./spaceStationInfos";

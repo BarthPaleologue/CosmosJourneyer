@@ -19,7 +19,7 @@ import { getComponentTypeI18n, getComponentValue } from "@/backend/spaceship/ser
 
 import i18n from "@/i18n";
 
-import { Player } from "../../../player/player";
+import { Player } from "../../player/player";
 import { deserializeComponent } from "../../spaceship/components/component";
 import { ComponentSlot } from "../../spaceship/componentSlot";
 import { SpaceshipInternals } from "../../spaceship/spaceshipInternals";

@@ -29,6 +29,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
+import { TexturePools } from "@/frontend/assets/textures";
+import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
+
 import { Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { ItemPool } from "@/utils/itemPool";
@@ -41,9 +44,7 @@ import { Settings } from "@/settings";
 import { OrbitalObjectType } from "../../architecture/orbitalObjectType";
 import { StellarObjectBase } from "../../architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "../../architecture/targetable";
-import { TexturePools } from "../../assets/textures";
 import { AsteroidField } from "../../asteroidFields/asteroidField";
-import { VolumetricLightUniforms } from "../../postProcesses/volumetricLight/volumetricLightUniforms";
 import { RingsLut } from "../../rings/ringsLut";
 import { RingsUniforms } from "../../rings/ringsUniform";
 import { StarMaterial } from "../star/starMaterial";

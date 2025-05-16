@@ -21,16 +21,17 @@ import { Scene } from "@babylonjs/core/scene";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
+
 import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 
-import { RenderingAssets } from "../../assets/renderingAssets";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { Star } from "../stellarObjects/star/star";
 import { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
 import { AnomalyModel, PlanetModel, StellarObjectModel } from "./architecture/orbitalObjectModel";
 import { OrbitalObjectType } from "./architecture/orbitalObjectType";

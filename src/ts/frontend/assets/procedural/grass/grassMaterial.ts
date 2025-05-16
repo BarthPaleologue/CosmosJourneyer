@@ -25,7 +25,8 @@ import { Scene } from "@babylonjs/core/scene";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+
 import { NoiseTextures } from "../../textures";
 
 import grassFragment from "@shaders/grassMaterial/grassFragment.glsl";

@@ -29,8 +29,8 @@ import { DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { generateSightseeingMissions } from "../../../missions/generateSightSeeingMissions";
-import { Player } from "../../../player/player";
 import { ISoundPlayer } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 import { MissionContainer } from "./missionContainer";
 
 /**

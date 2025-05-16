@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { RenderingAssets } from "../../../../assets/renderingAssets";
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+
 import { BuildTask } from "./taskTypes";
 
 export interface ChunkForge {

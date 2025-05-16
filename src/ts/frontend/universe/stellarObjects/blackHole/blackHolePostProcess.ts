@@ -23,10 +23,11 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CameraUniformNames, setCameraUniforms } from "../../postProcesses/uniforms/cameraUniforms";
-import { ObjectUniformNames, setObjectUniforms } from "../../postProcesses/uniforms/objectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "../../postProcesses/uniforms/samplerUniforms";
-import { UpdatablePostProcess } from "../../postProcesses/updatablePostProcess";
+import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
+import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
+import { UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+
 import { BlackHoleSamplerNames, BlackHoleUniformNames, BlackHoleUniforms } from "./blackHoleUniforms";
 
 import blackHoleFragment from "@shaders/blackhole.glsl";

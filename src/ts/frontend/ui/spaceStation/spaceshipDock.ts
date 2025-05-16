@@ -17,8 +17,8 @@
 
 import i18n from "@/i18n";
 
-import { Player } from "../../../player/player";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
 
 export class SpaceshipDockUI {

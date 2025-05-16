@@ -1,8 +1,8 @@
 import i18n from "@/i18n";
 
 import { Mission } from "../../../missions/mission";
-import { Player } from "../../../player/player";
 import { ISoundPlayer, SoundType } from "../../audio/soundPlayer";
+import { Player } from "../../player/player";
 
 export class AcceptMissionButton {
     readonly rootNode: HTMLElement;

@@ -26,7 +26,7 @@ import { Scene } from "@babylonjs/core/scene";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "../../../postProcesses/uniforms/stellarObjectUniforms";
+} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
 import butterflyFragment from "@shaders/butterflyMaterial/butterflyFragment.glsl";
 import butterflyVertex from "@shaders/butterflyMaterial/butterflyVertex.glsl";

@@ -24,6 +24,20 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
+import { LandingPadSize } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadManager";
+import { ManagesLandingPads } from "@/frontend/assets/procedural/spaceStation/landingPad/managesLandingPads";
+import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { Controls } from "@/frontend/uberCore/controls";
+import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
+import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
+import {
+    getForwardDirection,
+    getRightDirection,
+    getUpwardDirection,
+    pitch,
+    roll,
+    yaw,
+} from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -32,20 +46,6 @@ import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
-import { Controls } from "../../uberCore/controls";
-import { CameraShakeAnimation } from "../../uberCore/transforms/animations/cameraShake";
-import { quickAnimation } from "../../uberCore/transforms/animations/quickAnimation";
-import {
-    getForwardDirection,
-    getRightDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    yaw,
-} from "../../uberCore/transforms/basicTransform";
-import { LandingPadSize } from "../assets/procedural/spaceStation/landingPad/landingPadManager";
-import { ManagesLandingPads } from "../assets/procedural/spaceStation/landingPad/managesLandingPads";
-import { RenderingAssets } from "../assets/renderingAssets";
 import { ISoundPlayer } from "../audio/soundPlayer";
 import { ITts, Speaker, VoiceLine } from "../audio/tts";
 import { StarSystemInputs } from "../inputs/starSystemInputs";

@@ -37,21 +37,21 @@ import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/man
 import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
 
+import { Textures } from "@/frontend/assets/textures";
 import { RingsPostProcess } from "@/frontend/rings/ringsPostProcess";
+import { UberScene } from "@/frontend/uberCore/uberScene";
+import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
+import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { DeepReadonly } from "@/utils/types";
 
-import { Textures } from "../assets/textures";
 import { AtmosphericScatteringPostProcess } from "../atmosphere/atmosphericScatteringPostProcess";
 import { FlatCloudsPostProcess } from "../clouds/flatCloudsPostProcess";
 import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "../stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "../stellarObjects/blackHole/blackHolePostProcess";
-import { NeutronStar } from "../stellarObjects/neutronStar/neutronStar";
-import { Star } from "../stellarObjects/star/star";
-import { UberScene } from "../uberCore/uberScene";
 import { CelestialBody, StellarObject } from "../universe/architecture/orbitalObject";
 import { JuliaSetPostProcess } from "./anomalies/julia/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelbox/mandelboxPostProcess";

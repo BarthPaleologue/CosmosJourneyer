@@ -25,6 +25,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
+import { getRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
+
 import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
 import { Cullable } from "@/utils/cullable";
 import { Direction } from "@/utils/direction";
@@ -33,7 +35,6 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { getRotationQuaternion } from "../../../../uberCore/transforms/basicTransform";
 import { TerrainSettings } from "../terrainSettings";
 import { ChunkForge } from "./chunkForge";
 import { DeleteSemaphore } from "./deleteSemaphore";

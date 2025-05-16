@@ -18,7 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { getForwardDirection } from "../../../uberCore/transforms/basicTransform";
+import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
+
 import { OrbitalObject } from "../../universe/architecture/orbitalObject";
 import { OrbitalObjectType } from "../../universe/architecture/orbitalObjectType";
 

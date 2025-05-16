@@ -23,7 +23,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
-import { Objects } from "../assets/objects";
+import { Objects } from "@/frontend/assets/objects";
 
 export class AsteroidPatch {
     readonly parent: TransformNode;

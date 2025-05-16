@@ -24,13 +24,14 @@ import { normalRandom, randRange, randRangeInt } from "extended-random";
 
 import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { DeepReadonly } from "@/utils/types";
-
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "../../postProcesses/uniforms/stellarObjectUniforms";
+} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { DeepReadonly } from "@/utils/types";
+
 import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
 
 import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";

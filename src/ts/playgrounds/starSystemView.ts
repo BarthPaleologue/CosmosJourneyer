@@ -21,19 +21,19 @@ import { Scene } from "@babylonjs/core/scene";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { UberScene } from "@/frontend/uberCore/uberScene";
 import { updateNotifications } from "@/frontend/ui/notification";
 
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
 import { initI18n } from "@/i18n";
 
-import { loadRenderingAssets } from "../assets/renderingAssets";
 import { SoundPlayerMock } from "../audio/soundPlayer";
 import { TtsMock } from "../audio/tts";
-import { Player } from "../player/player";
+import { Player } from "../frontend/player/player";
 import { getAlphaTestisSystemModel } from "../starSystem/customSystems/alphaTestis";
-import { UberScene } from "../uberCore/uberScene";
 import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(

@@ -37,6 +37,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
+import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
+import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
+import { translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
@@ -49,10 +53,6 @@ import { Settings } from "@/settings";
 import { ISoundPlayer, SoundType } from "../audio/soundPlayer";
 import { Player } from "../player/player";
 import { EncyclopaediaGalactica } from "../society/encyclopaediaGalactica";
-import { CameraRadiusAnimation } from "../uberCore/transforms/animations/radius";
-import { TransformRotationAnimation } from "../uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "../uberCore/transforms/animations/translation";
-import { translate } from "../uberCore/transforms/basicTransform";
 import { OrbitalObjectType } from "../universe/architecture/orbitalObjectType";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
