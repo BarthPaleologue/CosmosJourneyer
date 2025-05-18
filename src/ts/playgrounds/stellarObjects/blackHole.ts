@@ -28,7 +28,7 @@ import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
 
-import { enablePhysics } from "./utils";
+import { enablePhysics } from "../utils";
 
 export async function createBlackHoleScene(
     engine: AbstractEngine,
