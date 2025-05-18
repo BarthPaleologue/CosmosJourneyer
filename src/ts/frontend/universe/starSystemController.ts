@@ -54,19 +54,6 @@ import { ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
 import { StarFieldBox } from "./starFieldBox";
 import { StarSystemLoader } from "./starSystemLoader";
 
-export type PlanetarySystem = {
-    readonly planets: Planet[];
-    readonly satellites: TelluricPlanet[];
-    readonly spaceStations: OrbitalFacility[];
-};
-
-export type SubStarSystem = {
-    readonly stellarObjects: StellarObject[];
-    readonly planetarySystems: PlanetarySystem[];
-    readonly anomalies: Anomaly[];
-    readonly spaceStations: OrbitalFacility[];
-};
-
 /**
  * The controller of the star system manages all resources specific to a single star system.
  * Changing star system means destroying and creating a new controller.
