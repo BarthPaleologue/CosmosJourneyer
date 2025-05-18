@@ -18,7 +18,7 @@
 import "@styles/index.scss";
 import "@babylonjs/inspector";
 
-import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
+import { Engine, PhysicsViewer, Scene, Tools } from "@babylonjs/core";
 
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 
@@ -111,3 +111,12 @@ document.addEventListener("keypress", (e) => {
         Tools.CreateScreenshot(engine, scene.activeCamera, { precision: 1 });
     }
 });
+
+// Make the scene available in the browser console
+declare global {
+    interface Window {
+        scene: Scene;
+    }
+}
+
+window.scene = scene;
