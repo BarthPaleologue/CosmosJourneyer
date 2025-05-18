@@ -31,13 +31,14 @@ import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
-import { createNeutronStarScene } from "./neutronStar";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
 import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
+import { createBlackHoleScene } from "./stellarObjects/blackHole";
+import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
 
@@ -68,6 +69,7 @@ export class PlaygroundRegistry {
         ["mengerSponge", createMengerSpongeScene],
         ["atmosphericScattering", createAtmosphericScatteringScene],
         ["darkKnight", createDarkKnightScene],
+        ["blackHole", createBlackHoleScene],
     ]);
 
     register(

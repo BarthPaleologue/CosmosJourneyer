@@ -32,7 +32,7 @@ import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neut
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import { enablePhysics } from "./utils";
+import { enablePhysics } from "../utils";
 
 export async function createNeutronStarScene(
     engine: AbstractEngine,
