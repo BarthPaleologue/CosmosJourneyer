@@ -80,6 +80,10 @@ export async function createSolScene(
     controls.getTransform().lookAt(sun.getTransform().position);
 
     const postProcessManager = new PostProcessManager(assets.textures, scene);
+    postProcessManager.addCelestialBodies(
+        starSystemController.getCelestialBodies(),
+        starSystemController.getStellarObjects(),
+    );
 
     const targetCursorLayer = new TargetCursorLayer();
 
@@ -93,7 +97,7 @@ export async function createSolScene(
 
         chunkForge.update(assets);
         postProcessManager.update(deltaSeconds);
-        starSystemController.update(deltaSeconds, chunkForge, postProcessManager);
+        starSystemController.update(deltaSeconds, chunkForge);
         targetCursorLayer.update(camera);
     });
 

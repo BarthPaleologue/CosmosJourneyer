@@ -25,7 +25,6 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { UberScene } from "@/frontend/uberCore/uberScene";
 import {
@@ -278,93 +277,9 @@ export class StarSystemController {
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      */
-    public initPositions(
-        nbWarmUpUpdates: number,
-        chunkForge: ChunkForge,
-        postProcessManager: PostProcessManager,
-    ): void {
-        this.update(Date.now() / 1000, chunkForge, postProcessManager);
-        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge, postProcessManager);
-    }
-
-    /**
-     * Inits the post processes of all the bodies in the system
-     * This method cannot be awaited as its completion depends on the execution of BabylonJS that happens afterward.
-     */
-    public initPostProcesses(postProcessManager: PostProcessManager): void {
-        const celestialBodies = this.getCelestialBodies();
-        const stellarObjects = this.getStellarObjects();
-
-        for (const object of celestialBodies) {
-            switch (object.type) {
-                case OrbitalObjectType.STAR:
-                    postProcessManager.addStar(object, [this.starFieldBox.mesh]);
-                    break;
-                case OrbitalObjectType.NEUTRON_STAR:
-                    postProcessManager.addNeutronStar(object, [this.starFieldBox.mesh]);
-                    break;
-                case OrbitalObjectType.BLACK_HOLE:
-                    postProcessManager.addBlackHole(object);
-                    break;
-                case OrbitalObjectType.TELLURIC_PLANET:
-                    postProcessManager.addTelluricPlanet(object, stellarObjects);
-                    break;
-                case OrbitalObjectType.TELLURIC_SATELLITE:
-                    postProcessManager.addTelluricPlanet(object, stellarObjects);
-                    break;
-                case OrbitalObjectType.GAS_PLANET:
-                    postProcessManager.addGasPlanet(object, stellarObjects);
-                    break;
-                case OrbitalObjectType.MANDELBULB:
-                    postProcessManager.addMandelbulb(
-                        object.getTransform(),
-                        object.getRadius(),
-                        object.model,
-                        stellarObjects.map((object) => object.getLight()),
-                    );
-                    break;
-                case OrbitalObjectType.JULIA_SET:
-                    postProcessManager.addJuliaSet(
-                        object.getTransform(),
-                        object.getRadius(),
-                        object.model,
-                        stellarObjects.map((object) => object.getLight()),
-                    );
-                    break;
-                case OrbitalObjectType.MANDELBOX:
-                    postProcessManager.addMandelbox(
-                        object.getTransform(),
-                        object.getRadius(),
-                        object.model,
-                        stellarObjects.map((object) => object.getLight()),
-                    );
-                    break;
-                case OrbitalObjectType.SIERPINSKI_PYRAMID:
-                    postProcessManager.addSierpinskiPyramid(
-                        object.getTransform(),
-                        object.getRadius(),
-                        object.model,
-                        stellarObjects.map((object) => object.getLight()),
-                    );
-                    break;
-                case OrbitalObjectType.MENGER_SPONGE:
-                    postProcessManager.addMengerSponge(
-                        object.getTransform(),
-                        object.getRadius(),
-                        object.model,
-                        stellarObjects.map((object) => object.getLight()),
-                    );
-                    break;
-                case OrbitalObjectType.DARK_KNIGHT:
-                    // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
-                    break;
-            }
-        }
-
-        postProcessManager.setCelestialBody(
-            this.getNearestCelestialBody(this.scene.getActiveControls().getTransform().getAbsolutePosition()),
-        );
-        postProcessManager.rebuild();
+    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
+        this.update(Date.now() / 1000, chunkForge);
+        for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge);
     }
 
     /**
@@ -372,9 +287,8 @@ export class StarSystemController {
      * The nearest object is kept in place and the other objects are updated accordingly.
      * @param deltaSeconds The time elapsed since the last update
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
-     * @param postProcessManager
      */
-    public update(deltaSeconds: number, chunkForge: ChunkForge, postProcessManager: PostProcessManager): void {
+    public update(deltaSeconds: number, chunkForge: ChunkForge): void {
         this.elapsedSeconds += deltaSeconds;
 
         const controls = this.scene.getActiveControls();
@@ -503,7 +417,7 @@ export class StarSystemController {
         // floating origin
         this.applyFloatingOrigin();
 
-        this.updateShaders(deltaSeconds, postProcessManager);
+        this.updateShaders(deltaSeconds);
     }
 
     /**
@@ -528,15 +442,10 @@ export class StarSystemController {
     }
 
     /**
-     * Updates the shaders of all the bodies in the system with the given delta time
+     * Updates the material shaders of all the bodies in the system with the given delta time
      * @param deltaSeconds The time elapsed in seconds since the last update
-     * @param postProcessManager
      */
-    public updateShaders(deltaSeconds: number, postProcessManager: PostProcessManager) {
-        const nearestBody = this.getNearestCelestialBody(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-        );
-
+    public updateShaders(deltaSeconds: number) {
         const stellarObjects = this.getStellarObjects();
         const planetaryMassObjects = this.getPlanetaryMassObjects();
 
@@ -553,9 +462,6 @@ export class StarSystemController {
         }
 
         this.scene.activeCamera?.getViewMatrix(true);
-
-        postProcessManager.setCelestialBody(nearestBody);
-        postProcessManager.update(deltaSeconds);
     }
 
     addSystemTarget(

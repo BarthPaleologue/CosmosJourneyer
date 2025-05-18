@@ -527,9 +527,10 @@ export class StarSystemView implements View {
      */
     public initStarSystem(): void {
         const starSystem = this.getStarSystem();
-        starSystem.initPostProcesses(this.postProcessManager);
-        starSystem.initPositions(2, this.chunkForge, this.postProcessManager);
+        starSystem.initPositions(2, this.chunkForge);
         this.targetCursorLayer.reset();
+
+        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects());
 
         const celestialBodies = starSystem.getCelestialBodies();
         const spaceStations = starSystem.getOrbitalFacilities();
@@ -724,7 +725,14 @@ export class StarSystemView implements View {
 
         this.chunkForge.update(this.assets);
 
-        starSystem.update(deltaSeconds, this.chunkForge, this.postProcessManager);
+        starSystem.update(deltaSeconds, this.chunkForge);
+
+        const nearestCelestialBody = starSystem.getNearestCelestialBody(
+            this.scene.getActiveControls().getActiveCamera().globalPosition,
+        );
+
+        this.postProcessManager.setCelestialBody(nearestCelestialBody);
+        this.postProcessManager.update(deltaSeconds);
     }
 
     public updateBeforeRender(deltaSeconds: number) {
