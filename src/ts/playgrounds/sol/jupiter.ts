@@ -27,6 +27,8 @@ import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
 
+import { Settings } from "@/settings";
+
 import { enablePhysics } from "../utils";
 
 export async function createJupiterScene(
@@ -61,13 +63,13 @@ export async function createJupiterScene(
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
 
+    Settings.EARTH_RADIUS = 6_371e3;
+
     const gasPlanetModel = getJupiterModel([]);
 
     const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
-
-    planet.atmosphereUniforms.rayleighHeight = 100e3;
 
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
@@ -92,7 +94,7 @@ export async function createJupiterScene(
         light.position.subtractInPlace(cameraPosition);
     });
 
-    progressCallback(1, "Rings scene loaded");
+    progressCallback(1, "Jupiter scene loaded");
 
     return scene;
 }
