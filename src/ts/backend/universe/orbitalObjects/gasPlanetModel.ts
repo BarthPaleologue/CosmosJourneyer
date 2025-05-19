@@ -31,7 +31,7 @@ export type GasPlanetProceduralColorPalette = {
     colorSharpness: number;
 };
 
-export type GasPlanetTextureId = "jupiter";
+export type GasPlanetTextureId = "jupiter" | "saturn" | "uranus" | "neptune";
 
 export type GasPlanetTexturedColorPalette = {
     type: "textured";

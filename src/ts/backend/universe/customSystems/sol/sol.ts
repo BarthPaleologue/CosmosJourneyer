@@ -323,7 +323,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            textureId: "jupiter",
+            textureId: "saturn",
         },
         rings: {
             seed: 0,
@@ -356,7 +356,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            textureId: "jupiter",
+            textureId: "uranus",
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
@@ -386,7 +386,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "textured",
-            textureId: "jupiter",
+            textureId: "neptune",
         },
         atmosphere: {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,

@@ -32,6 +32,15 @@ export function createGasPlanetTextureMaterial(
         case "jupiter":
             material.diffuseTexture = textures.jupiter;
             break;
+        case "saturn":
+            material.diffuseTexture = textures.saturn;
+            break;
+        case "uranus":
+            material.diffuseTexture = textures.uranus;
+            break;
+        case "neptune":
+            material.diffuseTexture = textures.neptune;
+            break;
     }
 
     material.specularColor.set(0.2, 0.2, 0.2);

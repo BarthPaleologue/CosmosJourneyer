@@ -57,6 +57,9 @@ import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughn
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
+import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
+import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
+import uranusTexturePath from "@assets/sol/textures/uranus.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
@@ -124,6 +127,9 @@ export type TexturePools = {
 
 export type GasPlanetTextures = {
     jupiter: Texture;
+    saturn: Texture;
+    uranus: Texture;
+    neptune: Texture;
 };
 
 export type Textures = {
@@ -266,6 +272,9 @@ export async function loadTextures(
 
     // Jupiter texture
     const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath);
+    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath);
+    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath);
+    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
@@ -335,6 +344,9 @@ export async function loadTextures(
         },
         gasPlanet: {
             jupiter: await jupiterTexturePromise,
+            saturn: await saturnTexturePromise,
+            uranus: await uranusTexturePromise,
+            neptune: await neptuneTexturePromise,
         },
         environment: {
             milkyWay: await milkyWayPromise,
