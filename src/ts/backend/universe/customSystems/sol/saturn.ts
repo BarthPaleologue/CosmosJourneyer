@@ -55,7 +55,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             seed: 0,
             innerRadius: 74_658e3,
             outerRadius: 136_775e3,
-            color: new Color3(0.8, 0.8, 0.7),
+            color: new Color3(180, 180, 165).scaleInPlace(1 / 255),
             opacity: 0.5,
             frequency: 1,
         },

@@ -54,6 +54,8 @@ void main() {
 
     vec4 finalColor = screenColor;
 
+    const float rings_thickness = 2.0;
+
     float impactPoint;
     if (rayIntersectsPlane(camera_position, rayDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
         // if the ray intersect the ring plane
@@ -63,29 +65,32 @@ void main() {
             if (!rayIntersectSphere(camera_position, rayDir, object_position, object_radius, t0, t1) || t0 > impactPoint) {
                 // if the ray is impacting a solid object after the ring plane
                 vec3 samplePoint = camera_position + impactPoint * rayDir;
-                float ringDensity = ringDensityAtPoint(samplePoint) * rings_opacity;
+                float ringDensity = ringDensityAtPoint(samplePoint);
 
                 ringDensity *= smoothstep(rings_fade_out_distance * 2.0, rings_fade_out_distance * 5.0, impactPoint);
 
-                vec3 ringShadeColor = rings_color;
+                float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
 
-                float softShadowFactor = 1.0;
+                vec3 ringShadeColor = vec3(0.0);
+
                 for (int i = 0; i < nbStars; i++) {
-                    // hypothèse des rayons parallèles
-                    vec3 rayToSun = normalize(star_positions[i] - object_position);
+                    vec3 rayToSun = normalize(star_positions[i] - samplePoint);
+                    
                     float t2, t3;
+                    float softShadowFactor = 1.0;
                     if (rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
                         vec3 closestPointToPlanetCenter = samplePoint + rayToSun * (t2 + t3) * 0.5;
                         float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
                         float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
-                        softShadowFactor = min(softShadowFactor, 0.05 + 0.95 * smoothstep(0.98, 1.0, r01));
-                    } else {
-                        softShadowFactor = 1.0;
+                        softShadowFactor = smoothstep(0.98, 1.0, r01);
                     }
+                    // scattering term
+                    vec3 scatteredLight = star_colors[i] * rings_color * ringOpacity;
+                    ringShadeColor += scatteredLight * softShadowFactor;
                 }
-                ringShadeColor *= softShadowFactor;
 
-                finalColor = vec4(mix(finalColor.rgb * (1.0 - ringDensity), ringShadeColor, ringDensity), 1.0);
+
+                finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringOpacity), 1.0);
             }
         }
     }
