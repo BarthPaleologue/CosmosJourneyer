@@ -78,7 +78,7 @@ void main() {
                         vec3 closestPointToPlanetCenter = samplePoint + rayToSun * (t2 + t3) * 0.5;
                         float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
                         float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
-                        softShadowFactor = min(softShadowFactor, 0.2 + 0.8 * smoothstep(0.85, 1.0, r01));
+                        softShadowFactor = min(softShadowFactor, 0.05 + 0.95 * smoothstep(0.98, 1.0, r01));
                     } else {
                         softShadowFactor = 1.0;
                     }
