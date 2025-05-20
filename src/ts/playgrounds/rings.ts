@@ -63,11 +63,11 @@ export async function createRingsScene(
     const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
 
     const ringsModel: RingsModel = {
-        ringStart: 1.7,
-        ringEnd: 3.5,
-        ringFrequency: 5,
-        ringOpacity: 0.9,
-        ringColor: Color3.White(),
+        innerRadius: 1.7 * scalingFactor,
+        outerRadius: 3.5 * scalingFactor,
+        frequency: 5,
+        opacity: 0.9,
+        color: Color3.White(),
         seed: 0,
     };
 

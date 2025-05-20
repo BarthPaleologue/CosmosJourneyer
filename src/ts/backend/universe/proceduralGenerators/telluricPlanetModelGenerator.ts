@@ -131,7 +131,9 @@ export function newSeededTelluricPlanetModel(
         mountains_frequency: (60 * radius) / 1000e3,
     };
 
-    const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
+    const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS)
+        ? newSeededRingsModel(radius, rng)
+        : null;
 
     return {
         type: OrbitalObjectType.TELLURIC_PLANET,

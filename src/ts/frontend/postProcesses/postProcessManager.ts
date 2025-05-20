@@ -618,12 +618,12 @@ export class PostProcessManager {
         const rings = this.celestialBodyToPostProcesses
             .get(body.getTransform())
             ?.find((pp) => pp instanceof RingsPostProcess);
-        const switchLimit = rings !== undefined ? rings.ringsUniforms.model.ringStart : 2;
+        const switchLimit = rings !== undefined ? rings.ringsUniforms.model.innerRadius : 2 * body.getBoundingRadius();
         const distance2 = Vector3.DistanceSquared(
             body.getTransform().getAbsolutePosition(),
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
-        if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder(body);
+        if (distance2 < switchLimit ** 2) this.setSurfaceOrder(body);
         else this.setSpaceOrder(body);
     }
 

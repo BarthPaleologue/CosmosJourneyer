@@ -304,8 +304,7 @@ export class StarSystemController {
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
             shouldCompensateRotation =
-                shouldCompensateRotation ||
-                distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
+                shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.outerRadius;
         }
         // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);

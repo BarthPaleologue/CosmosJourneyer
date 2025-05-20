@@ -62,8 +62,8 @@ export function canEngageWarpDrive(
         nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z,
     );
 
-    const ringsMinDistance = asteroidField.minRadius;
-    const ringsMaxDistance = asteroidField.maxRadius;
+    const ringsMinDistance = asteroidField.innerRadius;
+    const ringsMaxDistance = asteroidField.outerRadius;
 
     const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
     const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;

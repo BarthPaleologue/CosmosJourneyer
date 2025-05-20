@@ -21,23 +21,24 @@ varying vec2 vUV;
 
 uniform float seed;
 uniform float frequency;
-uniform float ringStart;
-uniform float ringEnd;
+uniform float innerRadius;
+uniform float outerRadius;
 
 #include "../utils/noise1D.glsl";
 
 #include "../utils/remap.glsl";
 
 void main() {
-    float normalizedDistance = remap(vUV.x, 0.0, 1.0, ringStart, ringEnd);
+    float distanceToPlanet = remap(vUV.x, 0.0, 1.0, innerRadius, outerRadius);
 
-    float macroRingDensity = completeNoise(fract(seed) + normalizedDistance * frequency / 10.0, 1, 2.0, 2.0);
-    float ringDensity = completeNoise(fract(seed) + normalizedDistance * frequency, 5, 2.0, 2.0);
-    ringDensity = mix(ringDensity, macroRingDensity, 0.5);
-    ringDensity *= smoothstep(ringStart, ringStart + 0.03, normalizedDistance);
-    ringDensity *= 1.0 - smoothstep(ringEnd - 0.03, ringEnd, normalizedDistance);
+    float macroRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 0.1, 1, 2.0, 2.0);
+    macroRingDensity = smoothstep(0.0, 0.7, macroRingDensity);
 
-    ringDensity *= ringDensity;
+    float microRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency, 5, 2.0, 2.0);
+
+    float ringDensity = sqrt(macroRingDensity * microRingDensity);
+    ringDensity *= smoothstep(innerRadius, innerRadius + 0.03, distanceToPlanet);
+    ringDensity *= 1.0 - smoothstep(outerRadius - 0.03, outerRadius, distanceToPlanet);
 
     gl_FragColor = vec4(ringDensity, 0.0, 0.0, 0.0);
 }

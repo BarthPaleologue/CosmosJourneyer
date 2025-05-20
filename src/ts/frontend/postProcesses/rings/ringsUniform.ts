@@ -29,8 +29,8 @@ import { DeepReadonly } from "@/utils/types";
 import { RingsLut } from "./ringsLut";
 
 export const RingsUniformNames = {
-    RING_START: "rings_start",
-    RING_END: "rings_end",
+    RING_INNER_RADIUS: "rings_inner_radius",
+    RING_OUTER_RADIUS: "rings_outer_radius",
     RING_FREQUENCY: "rings_frequency",
     RING_OPACITY: "rings_opacity",
     RING_COLOR: "rings_color",
@@ -67,17 +67,17 @@ export class RingsUniforms {
     }
 
     public setUniforms(effect: Effect) {
-        effect.setFloat(RingsUniformNames.RING_START, this.model.ringStart);
-        effect.setFloat(RingsUniformNames.RING_END, this.model.ringEnd);
-        effect.setFloat(RingsUniformNames.RING_FREQUENCY, this.model.ringFrequency);
-        effect.setFloat(RingsUniformNames.RING_OPACITY, this.model.ringOpacity);
-        effect.setColor3(RingsUniformNames.RING_COLOR, this.model.ringColor);
+        effect.setFloat(RingsUniformNames.RING_INNER_RADIUS, this.model.innerRadius);
+        effect.setFloat(RingsUniformNames.RING_OUTER_RADIUS, this.model.outerRadius);
+        effect.setFloat(RingsUniformNames.RING_FREQUENCY, this.model.frequency);
+        effect.setFloat(RingsUniformNames.RING_OPACITY, this.model.opacity);
+        effect.setColor3(RingsUniformNames.RING_COLOR, this.model.color);
         effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, this.fadeOutDistance);
     }
 
     public static SetEmptyUniforms(effect: Effect) {
-        effect.setFloat(RingsUniformNames.RING_START, 0);
-        effect.setFloat(RingsUniformNames.RING_END, 0);
+        effect.setFloat(RingsUniformNames.RING_INNER_RADIUS, 0);
+        effect.setFloat(RingsUniformNames.RING_OUTER_RADIUS, 0);
         effect.setFloat(RingsUniformNames.RING_FREQUENCY, 0);
         effect.setFloat(RingsUniformNames.RING_OPACITY, 0);
         effect.setColor3(RingsUniformNames.RING_COLOR, new Color3(0, 0, 0));
