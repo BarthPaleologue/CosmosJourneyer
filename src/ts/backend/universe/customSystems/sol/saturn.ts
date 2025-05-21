@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
 import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
@@ -55,7 +54,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             seed: 0,
             innerRadius: 74_658e3,
             outerRadius: 136_775e3,
-            color: new Color3(180, 180, 165).scaleInPlace(1 / 255),
+            color: { r: 220 / 255, g: 220 / 255, b: 210 / 255 },
             opacity: 0.5,
             frequency: 1,
         },

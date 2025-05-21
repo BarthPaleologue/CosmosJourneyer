@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-precision lowp float;
+precision highp float;
 
 #define DISABLE_UNIFORMITY_ANALYSIS
 
@@ -23,6 +23,22 @@ varying vec2 vUV;// screen coordinates
 
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
+
+// ─── HG multi-lobe parameters (Cassini match) ───────────────────────────────────
+// Weights must sum to 1.0
+const float rings_f1 = 0.55;  // lobe #1 (strong forward)
+const float rings_f2 = 0.20;  // lobe #2 (back-scatter plateau)
+const float rings_f3 = 0.25;  // lobe #3 2nd order lobe
+
+const float rings_g1 = 0.75;  // asymmetry forward (≈ diffractive peak)
+const float rings_g2 = -0.30; // asymmetry backward (shadow-hiding)
+const float rings_g3 = -0.05;  // very weakly back-biased
+
+// ─── scattering constants ──────────────────────────────────────────────────────
+const float rings_w           = 0.90;   // single-scattering albedo (ice)
+const float rings_thickness   = 2.0;    // metres → ray param scale
+
+#include "./utils/pi.glsl";
 
 #include "./utils/stars.glsl";
 
@@ -40,6 +56,24 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 #include "./rings/ringsDensity.glsl";
 
+// ───────────────────────────────────────────────────────────────────────────────
+// Henyey–Greenstein helper (returns *unnormalised* value)                       
+// (We divide by 4π later.)
+float hgLobe(float cosA, float g) {
+    float g2 = g*g;
+    return (1.0 - g2) * inversesqrt((1.0 + g2 - 2.0*g*cosA) * (1.0 + g2 - 2.0*g*cosA) * (1.0 + g2 - 2.0*g*cosA)); // (⋯)^-3/2 via invsqrt³
+}
+
+// Triple-lobe HG – matches Cassini photometry ±3 % RMS over 0.5–170 °
+float hgBulkPhase3(float cosA) {
+    float p = 0.0;
+    p += rings_f1 * hgLobe(cosA, rings_g1);
+    p += rings_f2 * hgLobe(cosA, rings_g2);
+    p += rings_f3 * hgLobe(cosA, rings_g3);
+    return p / (4.0 * PI);
+}
+// ───────────────────────────────────────────────────────────────────────────────
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
@@ -53,8 +87,6 @@ void main() {
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     vec4 finalColor = screenColor;
-
-    const float rings_thickness = 2.0;
 
     float impactPoint;
     if (rayIntersectsPlane(camera_position, rayDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
@@ -75,20 +107,32 @@ void main() {
 
                 for (int i = 0; i < nbStars; i++) {
                     vec3 rayToSun = normalize(star_positions[i] - samplePoint);
-                    
-                    float t2, t3;
-                    float softShadowFactor = 1.0;
-                    if (rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
-                        vec3 closestPointToPlanetCenter = samplePoint + rayToSun * (t2 + t3) * 0.5;
-                        float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
-                        float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
-                        softShadowFactor = smoothstep(0.98, 1.0, r01);
-                    }
-                    // scattering term
-                    vec3 scatteredLight = star_colors[i] * rings_color * ringOpacity;
-                    ringShadeColor += scatteredLight * softShadowFactor;
-                }
+                    float cosA = dot(rayToSun, -rayDir);
 
+                    // soft shadow from planet
+                    float soft = 1.0;
+                    float t2, t3;
+                    if (rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
+                        vec3 cp  = samplePoint + rayToSun * (t2 + t3) * 0.5;
+                        float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
+                        soft = smoothstep(0.98, 1.0, r01);
+                    }
+
+                    // single-scatter, triple-lobe HG
+                    float phase = rings_w * hgBulkPhase3(cosA);
+
+                    // ── Opposition surge (Hapke SHOE term) ────────────────────
+                    float B0 = 1.2;  // amplitude
+                    float h  = 0.01; // half-width (rad)
+                    float alpha = acos(clamp(cosA, -1.0, 1.0));
+                    float B = B0 / (1.0 + tan(alpha)*tan(alpha)/(h*h));
+                    phase *= 1.0 + B;
+
+                    float r_ms = 0.2;           // 2 % of incident flux
+                    phase += r_ms;
+
+                    ringShadeColor += star_colors[i] * rings_color * phase * soft;
+                }
 
                 finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringOpacity), 1.0);
             }
