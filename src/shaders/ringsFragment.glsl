@@ -36,7 +36,6 @@ const float rings_g3 = -0.05;  // very weakly back-biased
 
 // ─── scattering constants ──────────────────────────────────────────────────────
 const float rings_w           = 0.90;   // single-scattering albedo (ice)
-const float rings_thickness   = 2.0;    // metres → ray param scale
 
 #include "./utils/pi.glsl";
 
@@ -100,10 +99,9 @@ void main() {
                 vec4 pattern = ringPatternAtPoint(samplePoint);
 
                 vec3 ringAlbedo = pattern.rgb;
-                float ringDensity = pattern.a;
-                ringDensity *= smoothstep(rings_fade_out_distance * 2.0, rings_fade_out_distance * 5.0, impactPoint);
 
-                float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
+                float ringOpacity = pattern.a;
+                ringOpacity *= smoothstep(rings_fade_out_distance * 2.0, rings_fade_out_distance * 5.0, impactPoint);
 
                 vec3 ringShadeColor = vec3(0.0);
 

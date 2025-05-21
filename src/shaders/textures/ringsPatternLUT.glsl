@@ -41,5 +41,9 @@ void main() {
     ringDensity *= smoothstep(innerRadius, innerRadius + 0.03, distanceToPlanet);
     ringDensity *= 1.0 - smoothstep(outerRadius - 0.03, outerRadius, distanceToPlanet);
 
-    gl_FragColor = vec4(albedo, ringDensity);
+
+    const float rings_thickness   = 2.0;
+    float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
+
+    gl_FragColor = vec4(albedo, ringOpacity);
 }
