@@ -18,21 +18,16 @@
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
-import { normalRandom, randRange, randRangeInt } from "extended-random";
 
-import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { GasPlanetProceduralColorPalette } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { DeepReadonly } from "@/utils/types";
-
-import { GazColorSettings } from "../telluricPlanet/colorSettingsInterface";
 
 import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";
@@ -49,11 +44,15 @@ const GasPlanetMaterialUniformNames = {
     COLOR_SHARPNESS: "colorSharpness",
 };
 
-export class GasPlanetMaterial extends ShaderMaterial {
-    readonly colorSettings: GazColorSettings;
+export class GasPlanetProceduralMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
 
-    constructor(planetName: string, model: DeepReadonly<GasPlanetModel>, scene: Scene) {
+    constructor(
+        planetName: string,
+        seed: number,
+        colorPalette: DeepReadonly<GasPlanetProceduralColorPalette>,
+        scene: Scene,
+    ) {
         const shaderName = "gasPlanetMaterial";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = surfaceMaterialFragment;
@@ -67,45 +66,31 @@ export class GasPlanetMaterial extends ShaderMaterial {
             uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)],
         });
 
-        const rng = getRngFromSeed(model.seed);
+        this.setFloat(GasPlanetMaterialUniformNames.SEED, seed);
 
-        const hue1 = normalRandom(240, 30, rng, 70);
-        const hue2 = normalRandom(0, 180, rng, 72);
+        this.setArray3(GasPlanetMaterialUniformNames.COLOR1, [
+            colorPalette.color1.r,
+            colorPalette.color1.g,
+            colorPalette.color1.b,
+        ]);
+        this.setArray3(GasPlanetMaterialUniformNames.COLOR2, [
+            colorPalette.color2.r,
+            colorPalette.color2.g,
+            colorPalette.color2.b,
+        ]);
+        this.setArray3(GasPlanetMaterialUniformNames.COLOR3, [
+            colorPalette.color3.r,
+            colorPalette.color3.g,
+            colorPalette.color3.b,
+        ]);
 
-        const divergence = -180;
-
-        const color1 = Color3.FromHSV(hue1 % 360, randRange(0.4, 0.9, rng, 72), randRange(0.7, 0.9, rng, 73));
-        const color2 = Color3.FromHSV(hue2 % 360, randRange(0.6, 0.9, rng, 74), randRange(0.0, 0.3, rng, 75));
-        const color3 = Color3.FromHSV(
-            (hue1 + divergence) % 360,
-            randRange(0.4, 0.9, rng, 76),
-            randRange(0.7, 0.9, rng, 77),
-        );
-
-        this.colorSettings = {
-            color1: color1,
-            color2: color2,
-            color3: color3,
-            colorSharpness: randRangeInt(40, 80, rng, 80) / 10,
-        };
-
-        this.setFloat(GasPlanetMaterialUniformNames.SEED, model.seed);
-
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR1, this.colorSettings.color1);
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR2, this.colorSettings.color2);
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR3, this.colorSettings.color3);
-
-        this.updateConstants();
+        this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
 
         this.onBindObservable.add((mesh) => {
             const activeCamera = mesh.getScene().activeCamera;
             if (activeCamera === null) throw new Error("No active camera in the scene");
             this.getEffect().setVector3(GasPlanetMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
         });
-    }
-
-    public updateConstants(): void {
-        this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, this.colorSettings.colorSharpness);
     }
 
     public update(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number) {

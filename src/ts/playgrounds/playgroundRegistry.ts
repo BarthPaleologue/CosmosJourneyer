@@ -30,9 +30,12 @@ import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
+import { createGasPlanetScene } from "./gasPlanet";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
+import { createJupiterScene } from "./sol/jupiter";
+import { createSolScene } from "./sol/sol";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
 import { createStarMapScene } from "./starMap";
@@ -70,6 +73,10 @@ export class PlaygroundRegistry {
         ["atmosphericScattering", createAtmosphericScatteringScene],
         ["darkKnight", createDarkKnightScene],
         ["blackHole", createBlackHoleScene],
+        ["gasPlanet", createGasPlanetScene],
+        ["gasPlanet", createGasPlanetScene],
+        ["jupiter", createJupiterScene],
+        ["sol", createSolScene],
     ]);
 
     register(

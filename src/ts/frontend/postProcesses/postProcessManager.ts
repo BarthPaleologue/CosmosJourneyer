@@ -36,6 +36,7 @@ import { MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mand
 import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
 import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { Textures } from "@/frontend/assets/textures";
 import { UberScene } from "@/frontend/uberCore/uberScene";
@@ -137,12 +138,6 @@ export class PostProcessManager {
      * @private
      */
     private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
-
-    /**
-     * The closest celestial body to the active camera. This is useful to split post-processes that are specific to a body from the others.
-     * @private
-     */
-    private currentBody: CelestialBody | null = null;
 
     readonly volumetricLights: VolumetricLight[] = [];
     readonly oceans: OceanPostProcess[] = [];
@@ -558,6 +553,61 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(transform, [mengerSponge]);
     }
 
+    public addCelestialBodies(bodies: ReadonlyArray<CelestialBody>, stellarObjects: ReadonlyArray<StellarObject>) {
+        const lightSources = stellarObjects.map((object) => object.getLight());
+        for (const object of bodies) {
+            switch (object.type) {
+                case OrbitalObjectType.STAR:
+                    this.addStar(object, [
+                        /*this.starFieldBox.mesh*/
+                    ]);
+                    break;
+                case OrbitalObjectType.NEUTRON_STAR:
+                    this.addNeutronStar(object, [
+                        /*this.starFieldBox.mesh*/
+                    ]);
+                    break;
+                case OrbitalObjectType.BLACK_HOLE:
+                    this.addBlackHole(object);
+                    break;
+                case OrbitalObjectType.TELLURIC_PLANET:
+                    this.addTelluricPlanet(object, stellarObjects);
+                    break;
+                case OrbitalObjectType.TELLURIC_SATELLITE:
+                    this.addTelluricPlanet(object, stellarObjects);
+                    break;
+                case OrbitalObjectType.GAS_PLANET:
+                    this.addGasPlanet(object, stellarObjects);
+                    break;
+                case OrbitalObjectType.MANDELBULB:
+                    this.addMandelbulb(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    break;
+                case OrbitalObjectType.JULIA_SET:
+                    this.addJuliaSet(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    break;
+                case OrbitalObjectType.MANDELBOX:
+                    this.addMandelbox(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    break;
+                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                    this.addSierpinskiPyramid(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    break;
+                case OrbitalObjectType.MENGER_SPONGE:
+                    this.addMengerSponge(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    break;
+                case OrbitalObjectType.DARK_KNIGHT:
+                    // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
+                    break;
+            }
+        }
+
+        const newCurrentBody = bodies[0] ?? stellarObjects[0];
+        if (newCurrentBody === undefined) {
+            throw new Error("No arguments provided to addCelestialBodies");
+        }
+
+        this.rebuild(newCurrentBody);
+    }
+
     /**
      * Sets the current celestial body of the post process manager.
      * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
@@ -565,8 +615,6 @@ export class PostProcessManager {
      * @param body The closest celestial body to the active camera
      */
     public setCelestialBody(body: CelestialBody) {
-        this.currentBody = body;
-
         const rings = this.celestialBodyToPostProcesses
             .get(body.getTransform())
             ?.find((pp) => pp instanceof RingsPostProcess);
@@ -575,41 +623,32 @@ export class PostProcessManager {
             body.getTransform().getAbsolutePosition(),
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
-        if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder();
-        else this.setSpaceOrder();
+        if (distance2 < (switchLimit * body.getBoundingRadius()) ** 2) this.setSurfaceOrder(body);
+        else this.setSpaceOrder(body);
     }
 
     /**
      * Sets the rendering order to the space rendering order and rebuilds the pipeline.
      */
-    public setSpaceOrder() {
+    private setSpaceOrder(currentBody: CelestialBody) {
         if (this.currentRenderingOrder === spaceRenderingOrder) return;
         this.currentRenderingOrder = spaceRenderingOrder;
-        this.rebuild();
+        this.rebuild(currentBody);
     }
 
     /**
      * Sets the rendering order to the surface rendering order and rebuilds the pipeline.
      */
-    public setSurfaceOrder() {
+    private setSurfaceOrder(currentBody: CelestialBody) {
         if (this.currentRenderingOrder === surfaceRenderingOrder) return;
         this.currentRenderingOrder = surfaceRenderingOrder;
-        this.rebuild();
-    }
-
-    /**
-     * Returns the current celestial body, or throws an error if it is null.
-     * @private
-     */
-    private getCurrentBody() {
-        if (this.currentBody === null) throw new Error("No body set to the postProcessManager");
-        return this.currentBody;
+        this.rebuild(currentBody);
     }
 
     /**
      * Rebuilds the rendering pipeline with the current rendering order.
      */
-    public rebuild() {
+    private rebuild(currentBody: CelestialBody) {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
         this.renderingPipeline.dispose();
@@ -618,73 +657,73 @@ export class PostProcessManager {
 
         const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = this.makeSplitRenderEffects(
             "VolumetricLights",
-            this.getCurrentBody(),
+            currentBody,
             this.volumetricLights,
             this.engine,
         );
         const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = this.makeSplitRenderEffects(
             "BlackHoles",
-            this.getCurrentBody(),
+            currentBody,
             this.blackHoles,
             this.engine,
         );
         const [otherOceansRenderEffect, bodyOceansRenderEffect] = this.makeSplitRenderEffects(
             "Oceans",
-            this.getCurrentBody(),
+            currentBody,
             this.oceans,
             this.engine,
         );
         const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = this.makeSplitRenderEffects(
             "Clouds",
-            this.getCurrentBody(),
+            currentBody,
             this.clouds,
             this.engine,
         );
         const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = this.makeSplitRenderEffects(
             "Atmospheres",
-            this.getCurrentBody(),
+            currentBody,
             this.atmospheres,
             this.engine,
         );
         const [otherRingsRenderEffect, bodyRingsRenderEffect] = this.makeSplitRenderEffects(
             "Rings",
-            this.getCurrentBody(),
+            currentBody,
             this.rings,
             this.engine,
         );
         const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = this.makeSplitRenderEffects(
             "Mandelbulbs",
-            this.getCurrentBody(),
+            currentBody,
             this.mandelbulbs,
             this.engine,
         );
         const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = this.makeSplitRenderEffects(
             "JuliaSets",
-            this.getCurrentBody(),
+            currentBody,
             this.juliaSets,
             this.engine,
         );
         const [otherMandelboxesRenderEffect, bodyMandelboxRenderEffect] = this.makeSplitRenderEffects(
             "Mandelboxes",
-            this.getCurrentBody(),
+            currentBody,
             this.mandelboxes,
             this.engine,
         );
         const [otherSierpinskiPyramidsRenderEffect, bodySierpinskiPyramidsRenderEffect] = this.makeSplitRenderEffects(
             "SierpinskiPyramids",
-            this.getCurrentBody(),
+            currentBody,
             this.sierpinskiPyramids,
             this.engine,
         );
         const [otherMengerSpongesRenderEffect, bodyMengerSpongesRenderEffect] = this.makeSplitRenderEffects(
             "MengerSponges",
-            this.getCurrentBody(),
+            currentBody,
             this.mengerSponges,
             this.engine,
         );
         const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
             "MatterJets",
-            this.getCurrentBody(),
+            currentBody,
             this.matterJets,
             this.engine,
         );

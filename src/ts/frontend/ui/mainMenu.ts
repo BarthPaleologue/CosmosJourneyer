@@ -286,7 +286,8 @@ export class MainMenu {
             this.controls.getActiveCamera().getViewMatrix();
 
             starSystemController.applyFloatingOrigin();
-            starSystemController.updateShaders(0.0, this.starSystemView.postProcessManager);
+            this.starSystemView.postProcessManager.update(0.0);
+            starSystemController.updateShaders(0.0);
         };
 
         this.scene.onBeforePhysicsObservable.add(animationCallback);

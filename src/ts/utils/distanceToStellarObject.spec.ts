@@ -86,6 +86,10 @@ describe("distanceToStellarObject", () => {
                     greenHouseEffectFactor: 1,
                     pressure: 1,
                 },
+                colorPalette: {
+                    type: "textured",
+                    textureId: "jupiter",
+                },
             },
         ],
         satellites: [],

@@ -20,7 +20,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { getLoneStarSystem } from "./customSystems/loneStar";
-import { getSolSystemModel } from "./customSystems/sol";
+import { getSolSystemModel } from "./customSystems/sol/sol";
 import { StarSystemDatabase } from "./starSystemDatabase";
 import { StarSystemModel } from "./starSystemModel";
 

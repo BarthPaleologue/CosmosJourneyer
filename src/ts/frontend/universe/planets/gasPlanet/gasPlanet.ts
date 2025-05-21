@@ -17,6 +17,7 @@
 
 import { Camera } from "@babylonjs/core/Cameras/camera";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -29,6 +30,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { Textures } from "@/frontend/assets/textures";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
@@ -44,7 +46,8 @@ import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { GasPlanetMaterial } from "./gasPlanetMaterial";
+import { GasPlanetProceduralMaterial } from "./gasPlanetProceduralMaterial";
+import { createGasPlanetTextureMaterial } from "./gasPlanetTextureMaterial";
 
 export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
@@ -52,7 +55,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     readonly type = OrbitalObjectType.GAS_PLANET;
 
     private readonly mesh: Mesh;
-    readonly material: GasPlanetMaterial;
+    readonly material: GasPlanetProceduralMaterial | Material;
 
     readonly aggregate: PhysicsAggregate;
 
@@ -68,7 +71,12 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<GasPlanetModel>, ringsLutPool: ItemPool<RingsLut>, scene: Scene) {
+    constructor(
+        model: DeepReadonly<GasPlanetModel>,
+        textures: Textures,
+        ringsLutPool: ItemPool<RingsLut>,
+        scene: Scene,
+    ) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -95,7 +103,21 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.material = new GasPlanetMaterial(this.model.name, this.model, scene);
+        if (this.model.colorPalette.type === "procedural") {
+            this.material = new GasPlanetProceduralMaterial(
+                this.model.name,
+                this.model.seed,
+                this.model.colorPalette,
+                scene,
+            );
+        } else {
+            this.material = createGasPlanetTextureMaterial(
+                this.model.colorPalette.textureId,
+                textures.gasPlanet,
+                scene,
+            );
+        }
+
         this.mesh.material = this.material;
 
         const atmosphereThickness =
@@ -128,7 +150,9 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     }
 
     updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
-        this.material.update(stellarObjects, deltaSeconds);
+        if (this.material instanceof GasPlanetProceduralMaterial) {
+            this.material.update(stellarObjects, deltaSeconds);
+        }
     }
 
     public getRadius(): number {
