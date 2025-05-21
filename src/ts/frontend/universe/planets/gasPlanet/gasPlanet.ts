@@ -32,7 +32,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 
 import { Textures } from "@/frontend/assets/textures";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -74,7 +74,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     constructor(
         model: DeepReadonly<GasPlanetModel>,
         textures: Textures,
-        ringsLutPool: ItemPool<RingsLut>,
+        ringsLutPool: ItemPool<RingsPatternLut>,
         scene: Scene,
     ) {
         this.model = model;
@@ -170,7 +170,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
         this.mesh.dispose();
         this.aggregate.dispose();
         this.material.dispose();

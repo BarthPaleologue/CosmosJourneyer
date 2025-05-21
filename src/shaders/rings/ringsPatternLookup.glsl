@@ -19,13 +19,17 @@
 
 #include "../utils/remap.glsl";
 
-float ringDensityAtPoint(vec3 samplePoint) {
+/**
+ * Returns the albedo of the rings in r,g,b and the density in a.
+ * The density is a value between 0 and 1.
+ */
+vec4 ringPatternAtPoint(vec3 samplePoint) {
     vec3 samplePointPlanetSpace = samplePoint - object_position;
 
     float distanceToPlanet = length(samplePointPlanetSpace);
     
     // out if not intersecting with rings and interpolation area
-    if (distanceToPlanet < rings_inner_radius || distanceToPlanet > rings_outer_radius) return 0.0;
+    if (distanceToPlanet < rings_inner_radius || distanceToPlanet > rings_outer_radius) return vec4(0.0);
 
     float uvX = remap(distanceToPlanet, rings_inner_radius, rings_outer_radius, 0.0, 1.0);
     vec2 uv = vec2(uvX, 0.0);
@@ -33,7 +37,5 @@ float ringDensityAtPoint(vec3 samplePoint) {
     // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
     vec2 df = fwidth(uv);
     if(df.x > 0.5) df.x = 0.0;
-    float lutDensity = textureLod(rings_lut, uv, log2(max(df.x, df.y) * 1024.0)).r;
-
-    return lutDensity;
+    return textureLod(rings_pattern_lut, uv, log2(max(df.x, df.y) * 1024.0));
 }

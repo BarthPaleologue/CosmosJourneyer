@@ -22,7 +22,7 @@ import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
@@ -69,7 +69,7 @@ export async function createSaturnScene(
 
     const gasPlanetModel = getSaturnModel([]);
 
-    const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
+    const ringsLutPool = new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, assets.textures, ringsLutPool, scene);
 

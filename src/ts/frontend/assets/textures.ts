@@ -23,7 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
 import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
 
@@ -119,7 +119,7 @@ export type AllMaterialTextures = {
 
 export type TexturePools = {
     cloudsLut: ItemPool<CloudsLut>;
-    ringsLut: ItemPool<RingsLut>;
+    ringsPatternLut: ItemPool<RingsPatternLut>;
     starMaterialLut: ItemPool<StarMaterialLut>;
     telluricPlanetMaterialLut: ItemPool<TelluricPlanetMaterialLut>;
     landingPad: LandingPadTexturePool;
@@ -365,7 +365,7 @@ export async function loadTextures(
 export function createTexturePools(scene: Scene): TexturePools {
     return {
         cloudsLut: new ItemPool<CloudsLut>(() => new CloudsLut(scene)),
-        ringsLut: new ItemPool<RingsLut>(() => new RingsLut(scene)),
+        ringsPatternLut: new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene)),
         starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
         telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
         landingPad: new LandingPadTexturePool(),

@@ -22,7 +22,7 @@ import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
@@ -67,7 +67,7 @@ export async function createJupiterScene(
 
     const gasPlanetModel = getJupiterModel([]);
 
-    const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
+    const ringsLutPool = new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
 

@@ -54,7 +54,7 @@ const float rings_thickness   = 2.0;    // metres → ray param scale
 
 #include "./utils/rayIntersectsPlane.glsl";
 
-#include "./rings/ringsDensity.glsl";
+#include "./rings/ringsPatternLookup.glsl";
 
 // ───────────────────────────────────────────────────────────────────────────────
 // Henyey–Greenstein helper (returns *unnormalised* value)                       
@@ -97,8 +97,10 @@ void main() {
             if (!rayIntersectSphere(camera_position, rayDir, object_position, object_radius, t0, t1) || t0 > impactPoint) {
                 // if the ray is impacting a solid object after the ring plane
                 vec3 samplePoint = camera_position + impactPoint * rayDir;
-                float ringDensity = ringDensityAtPoint(samplePoint);
+                vec4 pattern = ringPatternAtPoint(samplePoint);
 
+                vec3 ringAlbedo = pattern.rgb;
+                float ringDensity = pattern.a;
                 ringDensity *= smoothstep(rings_fade_out_distance * 2.0, rings_fade_out_distance * 5.0, impactPoint);
 
                 float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
@@ -131,7 +133,7 @@ void main() {
                     float r_ms = 0.2;           // 2 % of incident flux
                     phase += r_ms;
 
-                    ringShadeColor += star_colors[i] * rings_color * phase * soft;
+                    ringShadeColor += star_colors[i] * ringAlbedo * phase * soft;
                 }
 
                 finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringOpacity), 1.0);

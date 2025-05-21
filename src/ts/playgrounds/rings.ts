@@ -22,7 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
@@ -60,7 +60,7 @@ export async function createRingsScene(
     // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 32 }, scene);
 
-    const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
+    const ringsLutPool = new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene));
 
     const ringsModel: RingsModel = {
         innerRadius: 1.7 * scalingFactor,
@@ -76,7 +76,7 @@ export async function createRingsScene(
     const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);
 
     await new Promise<void>((resolve) => {
-        ringsUniforms.lut.getTexture().executeWhenReady(() => {
+        ringsUniforms.patternLut.getTexture().executeWhenReady(() => {
             resolve();
         });
     });

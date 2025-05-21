@@ -31,7 +31,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
 import { TexturePools } from "@/frontend/assets/textures";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
 import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
@@ -118,7 +118,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
             this.ringsUniforms = new RingsUniforms(
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
-                texturePools.ringsLut,
+                texturePools.ringsPatternLut,
                 scene,
             );
 
@@ -165,7 +165,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
         this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();

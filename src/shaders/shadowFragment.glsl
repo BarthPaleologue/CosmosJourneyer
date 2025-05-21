@@ -44,7 +44,7 @@ uniform bool shadowUniforms_hasOcean;
 
 #include "./utils/rayIntersectsPlane.glsl";
 
-#include "./rings/ringsDensity.glsl";
+#include "./rings/ringsPatternLookup.glsl";
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
     if(length(camera_position + rayDir * maximumDistance - star_positions[0]) <= star_radiuses[0] + 1.0) {
@@ -77,7 +77,7 @@ float ringOccultation(vec3 rayDir, float maximumDistance) {
         if (rayIntersectsPlane(camera_position + rayDir * maximumDistance, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
             vec3 shadowSamplePoint = camera_position + rayDir * maximumDistance + t2 * towardLight;
             float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
-            accDensity += pow(1.0 - exp(-ringDensityAtPoint(shadowSamplePoint)), 0.5) * nearOccultationFactor;
+            accDensity += pow(1.0 - exp(-ringPatternAtPoint(shadowSamplePoint)).a, 0.5) * nearOccultationFactor;
         }
     }
     return pow(1.0 - accDensity, 4.0) * 0.99 + 0.01;

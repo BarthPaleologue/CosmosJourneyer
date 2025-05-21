@@ -30,7 +30,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
 import { TexturePools } from "@/frontend/assets/textures";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
 import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
@@ -114,7 +114,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
             this.ringsUniforms = new RingsUniforms(
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
-                texturePools.ringsLut,
+                texturePools.ringsPatternLut,
                 scene,
             );
 
@@ -161,7 +161,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
         this.aggregate.dispose();
         this.material.dispose();
         this.light.dispose();

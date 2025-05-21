@@ -17,6 +17,5 @@
 
 uniform float rings_inner_radius;
 uniform float rings_outer_radius;
-uniform vec3 rings_color;
 uniform float rings_fade_out_distance;
-uniform sampler2D rings_lut;
+uniform sampler2D rings_pattern_lut;

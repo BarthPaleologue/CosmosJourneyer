@@ -21,6 +21,7 @@ varying vec2 vUV;
 
 uniform float seed;
 uniform float frequency;
+uniform vec3 albedo;
 uniform float innerRadius;
 uniform float outerRadius;
 
@@ -40,5 +41,5 @@ void main() {
     ringDensity *= smoothstep(innerRadius, innerRadius + 0.03, distanceToPlanet);
     ringDensity *= 1.0 - smoothstep(outerRadius - 0.03, outerRadius, distanceToPlanet);
 
-    gl_FragColor = vec4(ringDensity, 0.0, 0.0, 0.0);
+    gl_FragColor = vec4(albedo, ringDensity);
 }

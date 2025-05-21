@@ -203,7 +203,7 @@ export class StarSystemLoader {
                     planet = new TelluricPlanet(planetModel, assets, scene);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsLut, scene);
+                    planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsPatternLut, scene);
                     break;
             }
 

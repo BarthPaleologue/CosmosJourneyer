@@ -33,7 +33,7 @@ import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphe
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -127,7 +127,7 @@ export class TelluricPlanet
             this.ringsUniforms = new RingsUniforms(
                 this.model.rings,
                 Settings.RINGS_FADE_OUT_DISTANCE,
-                assets.textures.pools.ringsLut,
+                assets.textures.pools.ringsPatternLut,
                 scene,
             );
 
@@ -207,7 +207,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.computeCulling(camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsPatternLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
         this.sides.forEach((side) => {
             side.dispose();
         });
