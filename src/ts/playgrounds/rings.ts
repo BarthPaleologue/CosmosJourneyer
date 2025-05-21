@@ -65,10 +65,12 @@ export async function createRingsScene(
     const ringsModel: RingsModel = {
         innerRadius: 1.7 * scalingFactor,
         outerRadius: 3.5 * scalingFactor,
-        frequency: 5,
-        opacity: 0.9,
-        color: Color3.White(),
         seed: 0,
+        pattern: {
+            type: "procedural",
+            frequency: 5,
+            albedo: Color3.White(),
+        },
     };
 
     const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);

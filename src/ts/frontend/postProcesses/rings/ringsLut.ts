@@ -51,7 +51,7 @@ export class RingsLut {
 
     setModel(model: DeepReadonly<RingsModel>): void {
         this.lut.setFloat("seed", model.seed);
-        this.lut.setFloat("frequency", model.frequency);
+        this.lut.setFloat("frequency", model.pattern.frequency);
         this.lut.setFloat("innerRadius", model.innerRadius);
         this.lut.setFloat("outerRadius", model.outerRadius);
 

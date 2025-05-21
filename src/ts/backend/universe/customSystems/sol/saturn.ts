@@ -51,12 +51,14 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             textureId: "saturn",
         },
         rings: {
-            seed: 0,
             innerRadius: 74_658e3,
             outerRadius: 136_775e3,
-            color: { r: 220 / 255, g: 220 / 255, b: 210 / 255 },
-            opacity: 0.5,
-            frequency: 1,
+            seed: 0,
+            pattern: {
+                type: "procedural",
+                albedo: { r: 220 / 255, g: 220 / 255, b: 210 / 255 },
+                frequency: 1,
+            },
         },
         seed: 0,
     };

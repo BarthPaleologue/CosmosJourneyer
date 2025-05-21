@@ -15,11 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 
 import { RGBColor } from "@/utils/colors";
-import { clamp } from "@/utils/math";
+
+export type ProceduralRingsPatternModel = {
+    type: "procedural";
+
+    /**
+     * The frequency of the stripes pattern
+     */
+    frequency: number;
+
+    /**
+     * The main color of the rings in RGB color space
+     */
+    albedo: RGBColor;
+};
 
 /**
  * Represents the rings of a celestial body
@@ -36,35 +48,30 @@ export type RingsModel = {
     outerRadius: number;
 
     /**
-     * The frequency of the stripes pattern
-     */
-    frequency: number;
-
-    /**
-     * Opacity of the planetary rings
-     */
-    opacity: number;
-
-    /**
-     * The main color of the rings in RGB color space
-     */
-    color: RGBColor;
-
-    /**
-     * The seed used for random
+     * The seed used for randomness
      */
     seed: number;
+
+    /**
+     * The striped pattern of the rings
+     */
+    pattern: ProceduralRingsPatternModel;
 };
 
 export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
     const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
     const ringWidth = celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
+
+    const albedoMultiplier = randRange(0.7, 1.2, rng, 1430) / 255;
+
     return {
         innerRadius: innerRadius,
         outerRadius: innerRadius + ringWidth,
-        frequency: 30.0,
-        opacity: clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1),
-        color: new Color3(255, 225, 171).scaleInPlace(randRange(0.7, 1.2, rng, 1430) / 255),
         seed: randRange(-1, 1, rng, 1440),
+        pattern: {
+            type: "procedural",
+            frequency: 30.0,
+            albedo: { r: 255 * albedoMultiplier, g: 225 * albedoMultiplier, b: 171 * albedoMultiplier },
+        },
     };
 }
