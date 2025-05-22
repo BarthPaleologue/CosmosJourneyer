@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Axis, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Axis, Light, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
@@ -68,6 +68,7 @@ export async function createSaturnScene(
     sun.position = new Vector3(7, 5.5, -10).scaleInPlace(scalingFactor);
 
     const light = new PointLight("light1", Vector3.Zero(), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
     light.parent = sun;
 
     Settings.EARTH_RADIUS = 6_371e3;
@@ -123,7 +124,6 @@ export async function createSaturnScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        planet.getTransform().rotate(Axis.Y, deltaSeconds * 0.1);
         planet.updateMaterial([light], deltaSeconds);
 
         const cameraPosition = controls.getTransform().position.clone();
