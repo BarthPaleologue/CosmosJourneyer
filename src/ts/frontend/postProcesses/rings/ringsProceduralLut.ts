@@ -20,13 +20,13 @@ import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedural
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 
-import { ProceduralRingsPatternModel, RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { ProceduralRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { DeepReadonly } from "@/utils/types";
 
 import ringsPatternLutCode from "@shaders/textures/ringsPatternLUT.glsl";
 
-export class RingsPatternLut {
+export class RingsProceduralPatternLut {
     private readonly lut: ProceduralTexture;
 
     constructor(scene: Scene) {
@@ -50,10 +50,10 @@ export class RingsPatternLut {
         this.lut.refreshRate = 0;
     }
 
-    setModel(model: DeepReadonly<Extract<RingsModel, { pattern: ProceduralRingsPatternModel }>>): void {
+    setModel(model: DeepReadonly<ProceduralRingsModel>): void {
         this.lut.setFloat("seed", model.seed);
-        this.lut.setFloat("frequency", model.pattern.frequency);
-        this.lut.setColor3("albedo", Color3.FromArray(Object.values(model.pattern.albedo)));
+        this.lut.setFloat("frequency", model.frequency);
+        this.lut.setColor3("albedo", Color3.FromArray(Object.values(model.albedo)));
         this.lut.setFloat("innerRadius", model.innerRadius);
         this.lut.setFloat("outerRadius", model.outerRadius);
 

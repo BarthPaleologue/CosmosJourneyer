@@ -29,8 +29,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
-import { TexturePools } from "@/frontend/assets/textures";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { Textures } from "@/frontend/assets/textures";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
 import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
@@ -72,7 +72,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<StarModel>, texturePools: TexturePools, scene: Scene) {
+    constructor(model: DeepReadonly<StarModel>, textures: Textures, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -105,21 +105,16 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.material = new StarMaterial(
             this.model.seed,
             this.model.blackBodyTemperature,
-            texturePools.starMaterialLut,
+            textures.pools.starMaterialLut,
             scene,
         );
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
-                this.model.rings,
-                Settings.RINGS_FADE_OUT_DISTANCE,
-                texturePools.ringsPatternLut,
-                scene,
-            );
+            this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
 
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
                 this.model.rings.innerRadius,
                 this.model.rings.outerRadius,
@@ -161,7 +156,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.aggregate.dispose();
         this.material.dispose();
         this.light.dispose();

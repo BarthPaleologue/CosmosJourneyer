@@ -22,8 +22,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
 import { ItemPool } from "@/utils/itemPool";
@@ -60,25 +60,25 @@ export async function createRingsScene(
     // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 32 }, scene);
 
-    const ringsLutPool = new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene));
+    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
     const ringsModel: RingsModel = {
         innerRadius: 1.7 * scalingFactor,
         outerRadius: 3.5 * scalingFactor,
+        type: "procedural",
         seed: 0,
-        pattern: {
-            type: "procedural",
-            frequency: 5,
-            albedo: Color3.White(),
-        },
+        frequency: 5,
+        albedo: Color3.White(),
     };
 
-    const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);
+    const ringsUniforms = RingsUniforms.NewProcedural(ringsModel, ringsLutPool, 0, scene);
 
     await new Promise<void>((resolve) => {
-        ringsUniforms.patternLut.getTexture().executeWhenReady(() => {
-            resolve();
-        });
+        if (ringsUniforms.patternLut.type === "procedural") {
+            ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {
+                resolve();
+            });
+        }
     });
 
     const rings = new RingsPostProcess(sphere, ringsUniforms, { name: "Sphere", radius: 1 * scalingFactor }, [], scene);

@@ -22,8 +22,8 @@ import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { Settings } from "@/settings";
@@ -72,7 +72,7 @@ export async function createGasPlanetScene(
         [],
     );
 
-    const ringsLutPool = new ItemPool<RingsPatternLut>(() => new RingsPatternLut(scene));
+    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
 
@@ -89,11 +89,13 @@ export async function createGasPlanetScene(
         const rings = new RingsPostProcess(planet.getTransform(), planet.ringsUniforms, gasPlanetModel, [light], scene);
         camera.attachPostProcess(rings);
 
-        await new Promise<void>((resolve) =>
-            planet.ringsUniforms?.patternLut.getTexture().executeWhenReady(() => {
-                resolve();
-            }),
-        );
+        await new Promise<void>((resolve) => {
+            if (planet.ringsUniforms?.patternLut.type === "procedural") {
+                planet.ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {
+                    resolve();
+                });
+            }
+        });
     }
 
     scene.onBeforeRenderObservable.add(() => {

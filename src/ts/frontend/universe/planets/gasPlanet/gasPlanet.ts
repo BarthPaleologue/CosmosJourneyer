@@ -32,7 +32,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 
 import { Textures } from "@/frontend/assets/textures";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -74,7 +74,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     constructor(
         model: DeepReadonly<GasPlanetModel>,
         textures: Textures,
-        ringsLutPool: ItemPool<RingsPatternLut>,
+        ringsLutPool: ItemPool<RingsProceduralPatternLut>,
         scene: Scene,
     ) {
         this.model = model;
@@ -125,15 +125,10 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
-                this.model.rings,
-                Settings.RINGS_FADE_OUT_DISTANCE,
-                ringsLutPool,
-                scene,
-            );
+            this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
 
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
                 this.model.rings.innerRadius,
                 this.model.rings.outerRadius,
@@ -170,7 +165,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.mesh.dispose();
         this.aggregate.dispose();
         this.material.dispose();

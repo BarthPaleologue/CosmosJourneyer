@@ -22,7 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 
-import { createTexturePools } from "@/frontend/assets/textures";
+import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
@@ -43,7 +43,9 @@ export async function createNeutronStarScene(
 
     await enablePhysics(scene);
 
-    const texturePools = createTexturePools(scene);
+    const textures = await loadTextures((loadedCount, totalCount, itemName) => {
+        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
+    }, scene);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -56,7 +58,7 @@ export async function createNeutronStarScene(
     scene.enableDepthRenderer(camera, false, true);
 
     const neutronStarModel = newSeededNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
-    const neutronStar = new NeutronStar(neutronStarModel, texturePools, scene);
+    const neutronStar = new NeutronStar(neutronStarModel, textures, scene);
     neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 2000000);
 
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);

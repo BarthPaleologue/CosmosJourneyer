@@ -30,8 +30,8 @@ import { Scene } from "@babylonjs/core/scene";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
-import { TexturePools } from "@/frontend/assets/textures";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { Textures } from "@/frontend/assets/textures";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
 import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
@@ -74,7 +74,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
      * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(model: DeepReadonly<NeutronStarModel>, texturePools: TexturePools, scene: Scene) {
+    constructor(model: DeepReadonly<NeutronStarModel>, textures: Textures, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -109,21 +109,16 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.material = new StarMaterial(
             this.model.seed,
             this.model.blackBodyTemperature,
-            texturePools.starMaterialLut,
+            textures.pools.starMaterialLut,
             scene,
         );
         this.mesh.material = this.material;
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
-                this.model.rings,
-                Settings.RINGS_FADE_OUT_DISTANCE,
-                texturePools.ringsPatternLut,
-                scene,
-            );
+            this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
 
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
                 this.model.rings.innerRadius,
                 this.model.rings.outerRadius,
@@ -165,7 +160,7 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsPatternLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.aggregate.dispose();
         this.mesh.dispose();
         this.light.dispose();

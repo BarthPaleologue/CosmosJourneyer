@@ -33,7 +33,7 @@ import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphe
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { RingsPatternLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -124,15 +124,15 @@ export class TelluricPlanet
         }
 
         if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
+            this.ringsUniforms = RingsUniforms.New(
                 this.model.rings,
+                assets.textures,
                 Settings.RINGS_FADE_OUT_DISTANCE,
-                assets.textures.pools.ringsPatternLut,
                 scene,
             );
 
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
                 this.model.rings.innerRadius,
                 this.model.rings.outerRadius,
@@ -207,7 +207,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.computeCulling(camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsPatternLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
         this.sides.forEach((side) => {
             side.dispose();
         });

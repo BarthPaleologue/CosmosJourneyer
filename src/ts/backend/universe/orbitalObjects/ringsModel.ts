@@ -19,8 +19,25 @@ import { normalRandom, randRange } from "extended-random";
 
 import { RGBColor } from "@/utils/colors";
 
-export type ProceduralRingsPatternModel = {
+type RingsModelBase = {
+    /**
+     * The closest distance between the rings and the center of the celestial body in meters
+     */
+    innerRadius: number;
+
+    /**
+     * The farthest distance between the rings and the center of the celestial body in meters
+     */
+    outerRadius: number;
+};
+
+export type ProceduralRingsModel = RingsModelBase & {
     type: "procedural";
+
+    /**
+     * The seed used for randomness
+     */
+    seed: number;
 
     /**
      * The frequency of the stripes pattern
@@ -33,30 +50,19 @@ export type ProceduralRingsPatternModel = {
     albedo: RGBColor;
 };
 
+export type TexturedRingsModel = RingsModelBase & {
+    type: "textured";
+
+    /**
+     * The id of the texture used for the rings
+     */
+    textureId: "saturn";
+};
+
 /**
  * Represents the rings of a celestial body
  */
-export type RingsModel = {
-    /**
-     * The closest distance between the rings and the center of the celestial body in meters
-     */
-    innerRadius: number;
-
-    /**
-     * The farthest distance between the rings and the center of the celestial body in meters
-     */
-    outerRadius: number;
-
-    /**
-     * The seed used for randomness
-     */
-    seed: number;
-
-    /**
-     * The striped pattern of the rings
-     */
-    pattern: ProceduralRingsPatternModel;
-};
+export type RingsModel = ProceduralRingsModel | TexturedRingsModel;
 
 export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
     const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
@@ -67,11 +73,9 @@ export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: num
     return {
         innerRadius: innerRadius,
         outerRadius: innerRadius + ringWidth,
+        type: "procedural",
         seed: randRange(-1, 1, rng, 1440),
-        pattern: {
-            type: "procedural",
-            frequency: 30.0,
-            albedo: { r: 255 * albedoMultiplier, g: 225 * albedoMultiplier, b: 171 * albedoMultiplier },
-        },
+        frequency: 30.0,
+        albedo: { r: 255 * albedoMultiplier, g: 225 * albedoMultiplier, b: 171 * albedoMultiplier },
     };
 }
