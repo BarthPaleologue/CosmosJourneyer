@@ -328,7 +328,12 @@ export function getSolSystemModel(): StarSystemModel {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
             greenHouseEffectFactor: 0.5,
         },
-        rings: null,
+        rings: {
+            innerRadius: 50_724e3,
+            outerRadius: 62_000e3,
+            type: "textured",
+            textureId: "uranus",
+        },
         seed: 0,
     };
 

@@ -88,6 +88,9 @@ export class RingsUniforms {
             case "saturn":
                 texture = textures.rings.saturn;
                 break;
+            case "uranus":
+                texture = textures.rings.uranus;
+                break;
         }
 
         return new RingsUniforms(model, { type: "textured", texture }, fadeOutDistance, scene);

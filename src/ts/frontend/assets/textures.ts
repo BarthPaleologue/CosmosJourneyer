@@ -60,6 +60,7 @@ import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
+import uranusRingsPath from "@assets/sol/textures/uranus_rings.png";
 import uranusTexturePath from "@assets/sol/textures/uranus.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
@@ -135,6 +136,7 @@ export type GasPlanetTextures = {
 
 export type RingsTextures = {
     saturn: Texture;
+    uranus: Texture;
 };
 
 export type Textures = {
@@ -282,8 +284,9 @@ export async function loadTextures(
     const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath);
     const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath);
 
-    // Saturn rings texture
+    // Rings texture
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
+    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
@@ -359,6 +362,7 @@ export async function loadTextures(
         },
         rings: {
             saturn: await saturnRingsTexturePromise,
+            uranus: await uranusRingsTexturePromise,
         },
         environment: {
             milkyWay: await milkyWayPromise,

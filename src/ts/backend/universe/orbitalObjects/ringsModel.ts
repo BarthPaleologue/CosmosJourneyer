@@ -56,7 +56,7 @@ export type TexturedRingsModel = RingsModelBase & {
     /**
      * The id of the texture used for the rings
      */
-    textureId: "saturn";
+    textureId: "saturn" | "uranus";
 };
 
 /**
