@@ -86,7 +86,7 @@ export class RingsUniforms {
         let texture;
         switch (model.textureId) {
             case "saturn":
-                texture = textures.gasPlanet.saturn;
+                texture = textures.rings.saturn;
                 break;
         }
 

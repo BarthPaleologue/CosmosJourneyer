@@ -58,6 +58,7 @@ import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metalli
 import skyBox from "@assets/skybox/milkyway.env";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
+import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
 import uranusTexturePath from "@assets/sol/textures/uranus.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
@@ -132,12 +133,17 @@ export type GasPlanetTextures = {
     neptune: Texture;
 };
 
+export type RingsTextures = {
+    saturn: Texture;
+};
+
 export type Textures = {
     readonly terrains: Readonly<AllTerrainTextures>;
     readonly water: Readonly<WaterTextures>;
     readonly particles: Readonly<ParticleTextures>;
     readonly materials: Readonly<AllMaterialTextures>;
     readonly gasPlanet: Readonly<GasPlanetTextures>;
+    readonly rings: Readonly<RingsTextures>;
     readonly environment: {
         readonly milkyWay: CubeTexture;
     };
@@ -270,11 +276,14 @@ export async function loadTextures(
     const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
     const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
 
-    // Jupiter texture
+    // Gas giants texture
     const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath);
     const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath);
     const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath);
     const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath);
+
+    // Saturn rings texture
+    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
@@ -347,6 +356,9 @@ export async function loadTextures(
             saturn: await saturnTexturePromise,
             uranus: await uranusTexturePromise,
             neptune: await neptuneTexturePromise,
+        },
+        rings: {
+            saturn: await saturnRingsTexturePromise,
         },
         environment: {
             milkyWay: await milkyWayPromise,
