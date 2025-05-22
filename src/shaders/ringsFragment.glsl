@@ -26,13 +26,13 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 // ─── HG multi-lobe parameters (Cassini match) ───────────────────────────────────
 // Weights must sum to 1.0
-const float rings_f1 = 0.55;  // lobe #1 (strong forward)
-const float rings_f2 = 0.20;  // lobe #2 (back-scatter plateau)
-const float rings_f3 = 0.25;  // lobe #3 2nd order lobe
+const float rings_f1 = 0.60;  // lobe #1 (strong forward)
+const float rings_f2 = 0.25;  // lobe #2 (back‑scatter plateau)
+const float rings_f3 = 0.15;  // lobe #3 (quasi‑isotropic haze)
 
 const float rings_g1 = 0.75;  // asymmetry forward (≈ diffractive peak)
-const float rings_g2 = -0.30; // asymmetry backward (shadow-hiding)
-const float rings_g3 = -0.05;  // very weakly back-biased
+const float rings_g2 = -0.30; // asymmetry backward (shadow‑hiding)
+const float rings_g3 = 0.00;  // asymmetry isotropic
 
 // ─── scattering constants ──────────────────────────────────────────────────────
 const float rings_w           = 0.90;   // single-scattering albedo (ice)
@@ -128,7 +128,7 @@ void main() {
                     float B = B0 / (1.0 + tan(alpha)*tan(alpha)/(h*h));
                     phase *= 1.0 + B;
 
-                    float r_ms = 0.2;           // 2 % of incident flux
+                    float r_ms = 0.3;
                     phase += r_ms;
 
                     ringShadeColor += star_colors[i] * ringAlbedo * phase * soft;
