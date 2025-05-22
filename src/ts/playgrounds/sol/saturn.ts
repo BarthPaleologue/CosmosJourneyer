@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Axis, PointLight, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Axis, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
@@ -24,6 +24,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
@@ -63,7 +64,11 @@ export async function createSaturnScene(
 
     scene.enableDepthRenderer(null, false, true);
 
-    const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
+    const sun = new TransformNode("sun", scene);
+    sun.position = new Vector3(7, 5.5, -10).scaleInPlace(scalingFactor);
+
+    const light = new PointLight("light1", Vector3.Zero(), scene);
+    light.parent = sun;
 
     Settings.EARTH_RADIUS = 6_371e3;
 
@@ -83,6 +88,22 @@ export async function createSaturnScene(
             scene,
         );
     }
+
+    const shadow = new ShadowPostProcess(
+        planet.getTransform(),
+        planet.getBoundingRadius(),
+        planet.ringsUniforms,
+        null,
+        false,
+        [
+            {
+                getBoundingRadius: () => 0,
+                getLight: () => light,
+            },
+        ],
+        scene,
+    );
+    camera.attachPostProcess(shadow);
 
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
