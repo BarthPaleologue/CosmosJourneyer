@@ -76,6 +76,6 @@ export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: num
         type: "procedural",
         seed: randRange(-1, 1, rng, 1440),
         frequency: 30.0,
-        albedo: { r: 255 * albedoMultiplier, g: 225 * albedoMultiplier, b: 171 * albedoMultiplier },
+        albedo: { r: 225 * albedoMultiplier, g: 225 * albedoMultiplier, b: 200 * albedoMultiplier },
     };
 }
