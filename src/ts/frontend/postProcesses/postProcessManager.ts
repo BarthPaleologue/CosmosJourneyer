@@ -294,7 +294,13 @@ export class PostProcessManager {
         postProcesses.push(lensFlare);
 
         if (star.ringsUniforms !== null) {
-            const rings = new RingsPostProcess(star.getTransform(), star.ringsUniforms, star.model, [], this.scene);
+            const rings = new RingsPostProcess(
+                star.getTransform(),
+                star.ringsUniforms,
+                star.model,
+                [star.getLight()],
+                this.scene,
+            );
             this.rings.push(rings);
             postProcesses.push(rings);
         }
@@ -336,7 +342,7 @@ export class PostProcessManager {
                 neutronStar.getTransform(),
                 neutronStar.ringsUniforms,
                 neutronStar.model,
-                [],
+                [neutronStar.getLight()],
                 this.scene,
             );
             this.rings.push(rings);

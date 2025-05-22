@@ -112,7 +112,7 @@ void main() {
                     // soft shadow from planet
                     float soft = 1.0;
                     float t2, t3;
-                    if (rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
+                    if (object_position != star_positions[i] && rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
                         vec3 cp  = samplePoint + rayToSun * (t2 + t3) * 0.5;
                         float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
                         soft = smoothstep(0.98, 1.0, r01);
