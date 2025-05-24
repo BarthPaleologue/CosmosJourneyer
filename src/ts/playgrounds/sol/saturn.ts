@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Axis, Light, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Light, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
