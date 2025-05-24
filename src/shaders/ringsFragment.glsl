@@ -79,6 +79,37 @@ float tan2(float cosA) {
     return (1.0 - cosA2) / (cosA2);
 }
 
+// Calculates the lighting contribution from a single star for the rings
+vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 rayDir, vec3 ringAlbedo, vec3 starPosition, vec3 starColor) {
+    vec3 rayToSun = normalize(starPosition - samplePoint);
+    float cosA = dot(rayToSun, -rayDir);
+
+    // soft shadow from planet
+    float softShadowFactor = 1.0;
+    float t2, t3;
+    if (object_position != starPosition && rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
+        vec3 cp = samplePoint + rayToSun * (t2 + t3) * 0.5;
+        float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
+        softShadowFactor = smoothstep(0.98, 1.0, r01);
+    }
+
+    // single-scatter, triple-lobe HG
+    float phase = rings_w * hgBulkPhase3(cosA);
+
+    // ── Opposition surge (Hapke SHOE term) ────────────────────
+    float B0 = 1.2;  // amplitude
+    float h  = 0.01; // half-width (rad)
+    float B = B0 / (1.0 + tan2(cosA)/(h*h));
+    phase *= 1.0 + B;
+
+    // Isotropic multiple‐scattering approximation
+    // This avoids the rings being too dark
+    float multiScattering = 0.3;
+    phase += multiScattering;
+    
+    return starColor * ringAlbedo * phase * softShadowFactor;
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);
 
@@ -112,33 +143,7 @@ void main() {
                 vec3 ringShadeColor = vec3(0.0);
 
                 for (int i = 0; i < nbStars; i++) {
-                    vec3 rayToSun = normalize(star_positions[i] - samplePoint);
-                    float cosA = dot(rayToSun, -rayDir);
-
-                    // soft shadow from planet
-                    float softShadowFactor = 1.0;
-                    float t2, t3;
-                    if (object_position != star_positions[i] && rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
-                        vec3 cp  = samplePoint + rayToSun * (t2 + t3) * 0.5;
-                        float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
-                        softShadowFactor = smoothstep(0.98, 1.0, r01);
-                    }
-
-                    // single-scatter, triple-lobe HG
-                    float phase = rings_w * hgBulkPhase3(cosA);
-
-                    // ── Opposition surge (Hapke SHOE term) ────────────────────
-                    float B0 = 1.2;  // amplitude
-                    float h  = 0.01; // half-width (rad)
-                    float B = B0 / (1.0 + tan2(cosA)/(h*h));
-                    phase *= 1.0 + B;
-
-                    // Isotropic multiple‐scattering approximation
-                    // This avoids the rings being too dark
-                    float multiScattering = 0.3;
-                    phase += multiScattering;
-
-                    ringShadeColor += star_colors[i] * ringAlbedo * phase * softShadowFactor;
+                    ringShadeColor += calculateStarLightingForRings(samplePoint, rayDir, ringAlbedo, star_positions[i], star_colors[i]);
                 }
 
                 finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringOpacity), 1.0);
