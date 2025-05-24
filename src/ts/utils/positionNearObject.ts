@@ -186,7 +186,7 @@ export function positionNearObjectAsteroidField(
 
     const bodyPosition = body.getTransform().getAbsolutePosition();
 
-    const distanceToPlanet = Lerp(asteroidField.minRadius, asteroidField.maxRadius, t);
+    const distanceToPlanet = Lerp(asteroidField.innerRadius, asteroidField.outerRadius, t);
 
     const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();

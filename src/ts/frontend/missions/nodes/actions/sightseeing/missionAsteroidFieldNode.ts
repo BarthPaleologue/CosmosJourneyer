@@ -135,7 +135,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         const distanceToCenterOfBodyInPlane = projectionOnPlane.length();
 
         const clampedLocalPosition = projectionOnPlane.scaleInPlace(
-            clamp(distanceToCenterOfBodyInPlane, asteroidField.minRadius, asteroidField.maxRadius) /
+            clamp(distanceToCenterOfBodyInPlane, asteroidField.innerRadius, asteroidField.outerRadius) /
                 distanceToCenterOfBodyInPlane,
         );
 

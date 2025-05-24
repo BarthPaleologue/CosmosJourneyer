@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";

@@ -94,7 +94,7 @@ export async function createSpaceStationScene(
         rings: null,
     };
 
-    const sun = new Star(sunModel, assets.textures.pools, scene);
+    const sun = new Star(sunModel, assets.textures, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
     const spaceStationModel = newSeededSpaceStationModel(

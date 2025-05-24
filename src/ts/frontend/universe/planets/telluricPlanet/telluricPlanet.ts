@@ -33,7 +33,7 @@ import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphe
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -124,20 +124,18 @@ export class TelluricPlanet
         }
 
         if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
+            this.ringsUniforms = RingsUniforms.New(
                 this.model.rings,
+                assets.textures,
                 Settings.RINGS_FADE_OUT_DISTANCE,
-                assets.textures.pools.ringsLut,
                 scene,
             );
 
-            const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
-            const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
-                averageRadius,
-                spread,
+                this.model.rings.innerRadius,
+                this.model.rings.outerRadius,
                 scene,
             );
         } else {
@@ -209,7 +207,7 @@ export class TelluricPlanet
         for (const side of this.sides) side.computeCulling(camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
         this.sides.forEach((side) => {
             side.dispose();
         });

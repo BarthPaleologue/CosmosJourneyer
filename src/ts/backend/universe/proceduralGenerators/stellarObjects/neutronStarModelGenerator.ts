@@ -73,7 +73,7 @@ export function newSeededNeutronStarModel(
 
     const ringProportion = 0.02;
 
-    const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
+    const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(radius, rng) : null;
 
     return {
         type: OrbitalObjectType.NEUTRON_STAR,

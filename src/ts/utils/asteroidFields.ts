@@ -27,8 +27,8 @@ export function distanceToAsteroidField(position: Vector3, asteroidField: Astero
     const distanceAboveRings = Math.abs(Vector3.Dot(relativePosition, celestialBody.up));
     const planarDistance = relativePosition.subtract(celestialBody.up.scale(distanceAboveRings)).length();
 
-    const ringsMinDistance = asteroidField.minRadius;
-    const ringsMaxDistance = asteroidField.maxRadius;
+    const ringsMinDistance = asteroidField.innerRadius;
+    const ringsMaxDistance = asteroidField.outerRadius;
 
     const isAboveRings = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
 

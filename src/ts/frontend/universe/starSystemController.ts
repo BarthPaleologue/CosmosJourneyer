@@ -304,8 +304,7 @@ export class StarSystemController {
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
             shouldCompensateRotation =
-                shouldCompensateRotation ||
-                distanceOfNearestToControls < ringUniforms.model.ringEnd * nearestOrbitalObject.getBoundingRadius();
+                shouldCompensateRotation || distanceOfNearestToControls < ringUniforms.model.outerRadius;
         }
         // never compensate the rotation of a black hole
         shouldCompensateRotation = shouldCompensateRotation && !(nearestOrbitalObject instanceof BlackHole);
@@ -504,13 +503,13 @@ export class StarSystemController {
             anomaly.dispose();
         });
         this.satellites.forEach((satellite) => {
-            satellite.dispose(pools.ringsLut, pools.cloudsLut);
+            satellite.dispose(pools.ringsPatternLut, pools.cloudsLut);
         });
         this.planets.forEach((planet) => {
-            planet.dispose(pools.ringsLut, pools.cloudsLut);
+            planet.dispose(pools.ringsPatternLut, pools.cloudsLut);
         });
         this.stellarObjects.forEach((stellarObject) => {
-            stellarObject.dispose(pools.ringsLut);
+            stellarObject.dispose(pools.ringsPatternLut);
         });
 
         this.systemTargets.forEach((target) => {

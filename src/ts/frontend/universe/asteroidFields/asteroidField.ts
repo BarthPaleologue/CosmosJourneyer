@@ -38,8 +38,8 @@ export class AsteroidField implements IDisposable {
     readonly averageRadius: number;
     readonly spread: number;
 
-    readonly minRadius: number;
-    readonly maxRadius: number;
+    readonly innerRadius: number;
+    readonly outerRadius: number;
 
     readonly resolution = 15;
     readonly patchSize = 30000;
@@ -60,17 +60,17 @@ export class AsteroidField implements IDisposable {
      * @param spread The spread of the distance to the parent around the average distance
      * @param scene The scene where the asteroid field exists
      */
-    constructor(seed: number, parent: TransformNode, averageRadius: number, spread: number, scene: Scene) {
+    constructor(seed: number, parent: TransformNode, innerRadius: number, outerRadius: number, scene: Scene) {
         this.seed = seed;
         this.rng = getRngFromSeed(this.seed);
 
         this.parent = parent;
 
-        this.averageRadius = averageRadius;
-        this.spread = spread;
+        this.innerRadius = innerRadius;
+        this.outerRadius = outerRadius;
 
-        this.minRadius = averageRadius - spread;
-        this.maxRadius = averageRadius + spread;
+        this.averageRadius = (innerRadius + outerRadius) / 2;
+        this.spread = outerRadius - innerRadius;
 
         this.scene = scene;
     }
@@ -116,7 +116,10 @@ export class AsteroidField implements IDisposable {
                 const cellZ = cameraCellZ + z;
 
                 const radiusSquared = (cellX * this.patchSize) ** 2 + (cellZ * this.patchSize) ** 2;
-                if (radiusSquared < this.minRadius * this.minRadius || radiusSquared > this.maxRadius * this.maxRadius)
+                if (
+                    radiusSquared < this.innerRadius * this.innerRadius ||
+                    radiusSquared > this.outerRadius * this.outerRadius
+                )
                     continue;
 
                 if (this.patches.has(`${cellX};${cellZ}`)) continue;
@@ -135,8 +138,8 @@ export class AsteroidField implements IDisposable {
                         this.resolution,
                         this.patchSize,
                         this.patchThickness,
-                        this.minRadius,
-                        this.maxRadius,
+                        this.innerRadius,
+                        this.outerRadius,
                         objects.asteroids.length - 1,
                         this.rng,
                     );

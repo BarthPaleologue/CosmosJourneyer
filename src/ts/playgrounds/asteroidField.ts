@@ -75,7 +75,7 @@ export async function createAsteroidFieldScene(
 
     AsteroidPatch.BATCH_SIZE = 10_000;
 
-    const belt = new AsteroidField(42, sphere, beltRadius, beltSpread, scene);
+    const belt = new AsteroidField(42, sphere, beltRadius - beltSpread / 2, beltRadius + beltRadius / 2, scene);
 
     const torus = MeshBuilder.CreateTorus(
         "torus",

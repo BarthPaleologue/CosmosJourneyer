@@ -64,7 +64,9 @@ export function newSeededStarModel(
         initialMeanAnomaly: 0,
     };
 
-    const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
+    const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS)
+        ? newSeededRingsModel(radius, rng)
+        : null;
 
     return {
         type: OrbitalObjectType.STAR,
