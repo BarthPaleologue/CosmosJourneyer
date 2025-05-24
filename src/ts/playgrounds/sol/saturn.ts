@@ -48,7 +48,7 @@ export async function createSaturnScene(
         progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
     }, scene);
 
-    const scalingFactor = 6_000e3 * 11;
+    const scalingFactor = 6_000e3 * 16;
 
     const controls = new DefaultControls(scene);
 
@@ -56,7 +56,7 @@ export async function createSaturnScene(
     controls.speed = scalingFactor;
     camera.maxZ *= scalingFactor;
 
-    controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
+    controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
     controls.getTransform().lookAt(Vector3.Zero());
 
     // This attaches the camera to the canvas
