@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { Color3, HemisphericLight, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -52,7 +52,7 @@ export async function createRingsScene(
     scene.enableDepthRenderer();
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+    const light = new PointLight("light1", new Vector3(-1, 0.5, -2).scaleInPlace(10 * scalingFactor), scene);
 
     // Default intensity is 1. Let's dim the light a small amount
     light.intensity = 0.7;
@@ -81,7 +81,13 @@ export async function createRingsScene(
         }
     });
 
-    const rings = new RingsPostProcess(sphere, ringsUniforms, { name: "Sphere", radius: 1 * scalingFactor }, [], scene);
+    const rings = new RingsPostProcess(
+        sphere,
+        ringsUniforms,
+        { name: "Sphere", radius: 1 * scalingFactor },
+        [light],
+        scene,
+    );
     camera.attachPostProcess(rings);
 
     scene.onBeforeRenderObservable.add(() => {
@@ -92,6 +98,7 @@ export async function createRingsScene(
 
         controls.getTransform().position = Vector3.Zero();
         sphere.position.subtractInPlace(cameraPosition);
+        light.position.subtractInPlace(cameraPosition);
     });
 
     progressCallback(1, "Rings scene loaded");
