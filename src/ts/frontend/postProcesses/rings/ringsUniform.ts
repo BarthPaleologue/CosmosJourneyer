@@ -65,6 +65,15 @@ export class RingsUniforms {
         this.fallbackTexture = createEmptyTexture(scene);
     }
 
+    /**
+     * Creates a new `RingsUniforms` instance for procedural ring models.
+     *
+     * @param model - The procedural ring model to use for generating the uniforms.
+     * @param texturePool - A pool of reusable procedural pattern LUTs.
+     * @param fadeOutDistance - The distance at which the ring fades out.
+     * @param scene - The Babylon.js scene where the ring is rendered.
+     * @returns A new `RingsUniforms` instance configured for procedural rings.
+     */
     public static NewProcedural(
         model: DeepReadonly<ProceduralRingsModel>,
         texturePool: ItemPool<RingsProceduralPatternLut>,
