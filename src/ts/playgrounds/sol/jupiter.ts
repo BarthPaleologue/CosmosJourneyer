@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Axis, PointLight, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Axis, Light, PointLight, Scene, Vector3 } from "@babylonjs/core";
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
@@ -62,6 +62,7 @@ export async function createJupiterScene(
     scene.enableDepthRenderer(null, false, true);
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
 
     Settings.EARTH_RADIUS = 6_371e3;
 
