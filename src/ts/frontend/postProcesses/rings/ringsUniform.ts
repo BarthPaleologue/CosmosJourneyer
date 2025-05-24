@@ -111,7 +111,6 @@ export class RingsUniforms {
                 return RingsUniforms.NewProcedural(model, textures.pools.ringsPatternLut, fadeOutDistance, scene);
             case "textured":
                 return RingsUniforms.NewTextured(model, textures, fadeOutDistance, scene);
-                break;
         }
     }
 
