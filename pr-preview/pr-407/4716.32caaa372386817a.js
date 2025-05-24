@@ -1,0 +1,4 @@
+"use strict";(globalThis.webpackChunkcosmos_journeyer=globalThis.webpackChunkcosmos_journeyer||[]).push([["4716"],{24854:function(e,r,c){c.r(r),c.d(r,{iblCdfxPixelShader:()=>l});var i=c(80709);let o="iblCdfxPixelShader",d=`precision highp sampler2D;
+#define PI 3.1415927
+varying vec2 vUV;uniform sampler2D cdfy;void main(void) {ivec2 cdfyRes=textureSize(cdfy,0);ivec2 currentPixel=ivec2(gl_FragCoord.xy);float cdfx=0.0;for (int x=1; x<=currentPixel.x; x++) {cdfx+=texelFetch(cdfy,ivec2(x-1,cdfyRes.y-1),0).x;}
+gl_FragColor=vec4(vec3(cdfx),1.0);}`;i.v.ShadersStore[o]||(i.v.ShadersStore[o]=d);let l={name:o,shader:d}}}]);
