@@ -73,6 +73,12 @@ float hgBulkPhase3(float cosA) {
 }
 // ───────────────────────────────────────────────────────────────────────────────
 
+float tan2(float cosA) {
+    float cosA2 = cosA * cosA;
+    // tan²(α) = (1 - cos²(α)) / cos²(α)
+    return (1.0 - cosA2) / (cosA2);
+}
+
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);
 
@@ -124,8 +130,7 @@ void main() {
                     // ── Opposition surge (Hapke SHOE term) ────────────────────
                     float B0 = 1.2;  // amplitude
                     float h  = 0.01; // half-width (rad)
-                    float alpha = acos(clamp(cosA, -1.0, 1.0));
-                    float B = B0 / (1.0 + tan(alpha)*tan(alpha)/(h*h));
+                    float B = B0 / (1.0 + tan2(cosA)/(h*h));
                     phase *= 1.0 + B;
 
                     // Isotropic multiple‐scattering approximation
