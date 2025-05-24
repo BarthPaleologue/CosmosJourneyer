@@ -37,9 +37,11 @@ void main() {
 
     float microRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency, 5, 2.0, 2.0);
 
+    float ringRange = outerRadius - innerRadius;
+
     float ringDensity = sqrt(macroRingDensity * microRingDensity);
-    ringDensity *= smoothstep(innerRadius, innerRadius + 0.03, distanceToPlanet);
-    ringDensity *= 1.0 - smoothstep(outerRadius - 0.03, outerRadius, distanceToPlanet);
+    ringDensity *= smoothstep(innerRadius, innerRadius + ringRange * 0.05, distanceToPlanet);
+    ringDensity *= 1.0 - smoothstep(outerRadius - ringRange * 0.05, outerRadius, distanceToPlanet);
 
 
     const float rings_thickness   = 2.0;
