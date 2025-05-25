@@ -34,8 +34,11 @@ vec4 ringPatternAtPoint(vec3 samplePoint) {
     float uvX = remap(distanceToPlanet, rings_inner_radius, rings_outer_radius, 0.0, 1.0);
     vec2 uv = vec2(uvX, 0.0);
     
-    // trick from https://www.shadertoy.com/view/3dVSzm to avoid Greenwich artifacts
-    vec2 df = fwidth(uv);
-    if(df.x > 0.5) df.x = 0.0;
-    return textureLod(rings_pattern_lut, uv, log2(max(df.x, df.y) * 1024.0));
+    vec4 result = texture2D(rings_pattern_lut, uv);
+
+    // fade at the edge of the texture to avoid sampling artifacts
+    result.a *= smoothstep(0.02, 0.03, uvX);
+    result.a *= (1.0 - smoothstep(0.97, 0.98, uvX));
+
+    return result;
 }
