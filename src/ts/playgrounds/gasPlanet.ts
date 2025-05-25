@@ -38,6 +38,7 @@ export async function createGasPlanetScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+    scene.clearColor.setAll(0);
 
     const textures = await loadTextures((loadedCount, totalCount, itemName) => {
         progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
