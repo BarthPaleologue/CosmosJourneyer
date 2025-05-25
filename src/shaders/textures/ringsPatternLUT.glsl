@@ -37,13 +37,13 @@ void main() {
 
     float microRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 5.0, 5, 2.0, 2.0);
 
-    float ringDensity = macroRingDensity * microRingDensity;
+    float mediumRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency, 5, 2.0, 2.0);
+    mediumRingDensity = remap(mediumRingDensity, 0.0, 1.0, 0.4, 1.6);
+
+    float ringDensity = macroRingDensity * microRingDensity * mediumRingDensity;
 
     const float rings_thickness   = 2.0;
     float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
 
-    float albedoVariation = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 1.0, 5, 2.0, 2.0);
-    albedoVariation = remap(albedoVariation, 0.0, 1.0, 0.4, 1.6);
-
-    gl_FragColor = vec4(albedo * albedoVariation, ringOpacity);
+    gl_FragColor = vec4(albedo, ringOpacity);
 }
