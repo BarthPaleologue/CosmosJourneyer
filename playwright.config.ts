@@ -9,8 +9,13 @@ export default defineConfig({
         launchOptions: {
             args: [
                 "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--use-gl=swiftshader", // software WebGL
+                "--headless=new",
+                "--enable-unsafe-webgpu",
+                "--enable-features=Vulkan",
+                "--use-angle=vulkan",
+                "--use-vulkan=swiftshader",
+                "--use-webgpu-adapter=swiftshader",
+                "--use-gpu-in-tests",
             ],
         },
         viewport: { width: 1280, height: 720 },
