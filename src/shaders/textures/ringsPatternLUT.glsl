@@ -32,20 +32,18 @@ uniform float outerRadius;
 void main() {
     float distanceToPlanet = remap(vUV.x, 0.0, 1.0, innerRadius, outerRadius);
 
-    float macroRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 0.1, 1, 2.0, 2.0);
+    float macroRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 0.05, 1, 2.0, 2.0);
     macroRingDensity = smoothstep(0.0, 0.7, macroRingDensity);
 
-    float microRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency, 5, 2.0, 2.0);
+    float microRingDensity = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 5.0, 5, 2.0, 2.0);
 
-    float ringRange = outerRadius - innerRadius;
-
-    float ringDensity = sqrt(macroRingDensity * microRingDensity);
-    ringDensity *= smoothstep(innerRadius, innerRadius + ringRange * 0.05, distanceToPlanet);
-    ringDensity *= 1.0 - smoothstep(outerRadius - ringRange * 0.05, outerRadius, distanceToPlanet);
-
+    float ringDensity = macroRingDensity * microRingDensity;
 
     const float rings_thickness   = 2.0;
     float ringOpacity = 1.0 - exp(-ringDensity * rings_thickness);
 
-    gl_FragColor = vec4(albedo, ringOpacity);
+    float albedoVariation = completeNoise(fract(seed) + distanceToPlanet * 1e-6 * frequency * 1.0, 5, 2.0, 2.0);
+    albedoVariation = remap(albedoVariation, 0.0, 1.0, 0.4, 1.6);
+
+    gl_FragColor = vec4(albedo * albedoVariation, ringOpacity);
 }
