@@ -34,6 +34,7 @@ export async function createRingsScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
 
     const scalingFactor = 10_000e3;
 
