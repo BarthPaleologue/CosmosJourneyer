@@ -24,6 +24,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { Settings } from "@/settings";
@@ -75,6 +76,22 @@ export async function createGasPlanetScene(
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
+
+    const shadow = new ShadowPostProcess(
+        planet.getTransform(),
+        planet.getBoundingRadius(),
+        planet.ringsUniforms,
+        null,
+        false,
+        [
+            {
+                getBoundingRadius: () => 0,
+                getLight: () => light,
+            },
+        ],
+        scene,
+    );
+    camera.attachPostProcess(shadow);
 
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
