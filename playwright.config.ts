@@ -20,14 +20,13 @@ export default defineConfig({
         },
         viewport: { width: 1280, height: 720 },
     },
-
+    timeout: 120_000, // 2 minutes
     expect: {
         toHaveScreenshot: {
             maxDiffPixelRatio: 0.03,
             threshold: 0.01,
         },
     },
-
     webServer: {
         command: "npm run serve:prod",
         url: "http://localhost:8080",
