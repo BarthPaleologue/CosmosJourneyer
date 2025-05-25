@@ -56,7 +56,7 @@ export function newSeededSpaceStationModel(
             body.type === OrbitalObjectType.STAR ||
             body.type === OrbitalObjectType.NEUTRON_STAR
         ) {
-            radius += (body.rings?.ringEnd ?? 0) * body.radius;
+            radius = body.rings?.outerRadius ?? radius;
         }
 
         return radius;

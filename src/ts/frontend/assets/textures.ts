@@ -23,7 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
 import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
 
@@ -58,7 +58,9 @@ import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metalli
 import skyBox from "@assets/skybox/milkyway.env";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
+import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
+import uranusRingsPath from "@assets/sol/textures/uranus_rings.png";
 import uranusTexturePath from "@assets/sol/textures/uranus.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
@@ -119,7 +121,7 @@ export type AllMaterialTextures = {
 
 export type TexturePools = {
     cloudsLut: ItemPool<CloudsLut>;
-    ringsLut: ItemPool<RingsLut>;
+    ringsPatternLut: ItemPool<RingsProceduralPatternLut>;
     starMaterialLut: ItemPool<StarMaterialLut>;
     telluricPlanetMaterialLut: ItemPool<TelluricPlanetMaterialLut>;
     landingPad: LandingPadTexturePool;
@@ -132,12 +134,18 @@ export type GasPlanetTextures = {
     neptune: Texture;
 };
 
+export type RingsTextures = {
+    saturn: Texture;
+    uranus: Texture;
+};
+
 export type Textures = {
     readonly terrains: Readonly<AllTerrainTextures>;
     readonly water: Readonly<WaterTextures>;
     readonly particles: Readonly<ParticleTextures>;
     readonly materials: Readonly<AllMaterialTextures>;
     readonly gasPlanet: Readonly<GasPlanetTextures>;
+    readonly rings: Readonly<RingsTextures>;
     readonly environment: {
         readonly milkyWay: CubeTexture;
     };
@@ -270,11 +278,15 @@ export async function loadTextures(
     const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
     const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
 
-    // Jupiter texture
+    // Gas giants texture
     const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath);
     const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath);
     const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath);
     const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath);
+
+    // Rings texture
+    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
+    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
@@ -348,6 +360,10 @@ export async function loadTextures(
             uranus: await uranusTexturePromise,
             neptune: await neptuneTexturePromise,
         },
+        rings: {
+            saturn: await saturnRingsTexturePromise,
+            uranus: await uranusRingsTexturePromise,
+        },
         environment: {
             milkyWay: await milkyWayPromise,
         },
@@ -365,7 +381,7 @@ export async function loadTextures(
 export function createTexturePools(scene: Scene): TexturePools {
     return {
         cloudsLut: new ItemPool<CloudsLut>(() => new CloudsLut(scene)),
-        ringsLut: new ItemPool<RingsLut>(() => new RingsLut(scene)),
+        ringsPatternLut: new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene)),
         starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
         telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
         landingPad: new LandingPadTexturePool(),

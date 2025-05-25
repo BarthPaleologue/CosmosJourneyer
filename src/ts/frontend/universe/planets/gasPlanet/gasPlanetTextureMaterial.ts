@@ -43,7 +43,7 @@ export function createGasPlanetTextureMaterial(
             break;
     }
 
-    material.specularColor.set(0.2, 0.2, 0.2);
+    material.specularColor.setAll(0.1);
     material.specularPower = 32;
 
     return material;

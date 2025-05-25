@@ -77,7 +77,7 @@ export function newSeededGasPlanetModel(
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
     const siderealDaySeconds = (24 * 60 * 60) / 10;
 
-    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(rng) : null;
+    const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? newSeededRingsModel(radius, rng) : null;
 
     // color palette
     const hue1 = normalRandom(240, 30, rng, 70);

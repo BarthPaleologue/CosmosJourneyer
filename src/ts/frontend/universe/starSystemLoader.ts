@@ -101,13 +101,13 @@ export class StarSystemLoader {
             let stellarObject: StellarObject;
             switch (stellarObjectModel.type) {
                 case OrbitalObjectType.STAR:
-                    stellarObject = new Star(stellarObjectModel, assets.textures.pools, scene);
+                    stellarObject = new Star(stellarObjectModel, assets.textures, scene);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
                     stellarObject = new BlackHole(stellarObjectModel, assets.textures.environment.milkyWay, scene);
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    stellarObject = new NeutronStar(stellarObjectModel, assets.textures.pools, scene);
+                    stellarObject = new NeutronStar(stellarObjectModel, assets.textures, scene);
                     break;
             }
             stellarObjects.push(stellarObject);
@@ -203,7 +203,7 @@ export class StarSystemLoader {
                     planet = new TelluricPlanet(planetModel, assets, scene);
                     break;
                 case OrbitalObjectType.GAS_PLANET:
-                    planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsLut, scene);
+                    planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsPatternLut, scene);
                     break;
             }
 

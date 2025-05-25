@@ -30,6 +30,7 @@ import { celsiusToKelvin } from "@/utils/physics";
 import { Settings } from "@/settings";
 
 import { getJupiterModel } from "./jupiter";
+import { getSaturnModel } from "./saturn";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun: StarModel = {
@@ -299,42 +300,7 @@ export function getSolSystemModel(): StarSystemModel {
 
     const jupiter: GasPlanetModel = getJupiterModel([sun.id]);
 
-    const saturn: GasPlanetModel = {
-        id: "saturn",
-        name: "Saturn",
-        type: OrbitalObjectType.GAS_PLANET,
-        radius: 58_232e3,
-        mass: 5.683e26,
-        axialTilt: Tools.ToRadians(26.73),
-        siderealDaySeconds: 60 * 60 * 10.656,
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 1_433_449_370e3,
-            eccentricity: 0.0565,
-            inclination: Tools.ToRadians(2.49),
-            longitudeOfAscendingNode: Tools.ToRadians(113.715),
-            argumentOfPeriapsis: Tools.ToRadians(336.092),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        atmosphere: {
-            pressure: Settings.BAR_TO_PASCAL,
-            greenHouseEffectFactor: 0.5,
-        },
-        colorPalette: {
-            type: "textured",
-            textureId: "saturn",
-        },
-        rings: {
-            seed: 0,
-            ringStart: 1.2,
-            ringEnd: 2.27,
-            ringColor: new Color3(0.8, 0.8, 0.8),
-            ringOpacity: 0.5,
-            ringFrequency: 2,
-        },
-        seed: 0,
-    };
+    const saturn: GasPlanetModel = getSaturnModel([sun.id]);
 
     const uranus: GasPlanetModel = {
         id: "uranus",
@@ -362,7 +328,12 @@ export function getSolSystemModel(): StarSystemModel {
             pressure: 0.1 * Settings.BAR_TO_PASCAL,
             greenHouseEffectFactor: 0.5,
         },
-        rings: null,
+        rings: {
+            innerRadius: 50_724e3,
+            outerRadius: 62_000e3,
+            type: "textured",
+            textureId: "uranus",
+        },
         seed: 0,
     };
 

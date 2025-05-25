@@ -15,15 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
 import { ItemPool } from "@/utils/itemPool";
@@ -34,6 +34,7 @@ export async function createRingsScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
 
     const scalingFactor = 10_000e3;
 
@@ -52,7 +53,7 @@ export async function createRingsScene(
     scene.enableDepthRenderer();
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
+    const light = new PointLight("light1", new Vector3(-1, 0.5, -2).scaleInPlace(10 * scalingFactor), scene);
 
     // Default intensity is 1. Let's dim the light a small amount
     light.intensity = 0.7;
@@ -60,26 +61,34 @@ export async function createRingsScene(
     // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 32 }, scene);
 
-    const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
+    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
     const ringsModel: RingsModel = {
-        ringStart: 1.7,
-        ringEnd: 3.5,
-        ringFrequency: 5,
-        ringOpacity: 0.9,
-        ringColor: Color3.White(),
+        innerRadius: 1.7 * scalingFactor,
+        outerRadius: 3.5 * scalingFactor,
+        type: "procedural",
         seed: 0,
+        frequency: 10.0,
+        albedo: { r: 120 / 255, g: 112 / 255, b: 104 / 255 },
     };
 
-    const ringsUniforms = new RingsUniforms(ringsModel, 0, ringsLutPool, scene);
+    const ringsUniforms = RingsUniforms.NewProcedural(ringsModel, ringsLutPool, 0, scene);
 
     await new Promise<void>((resolve) => {
-        ringsUniforms.lut.getTexture().executeWhenReady(() => {
-            resolve();
-        });
+        if (ringsUniforms.patternLut.type === "procedural") {
+            ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {
+                resolve();
+            });
+        }
     });
 
-    const rings = new RingsPostProcess(sphere, ringsUniforms, { name: "Sphere", radius: 1 * scalingFactor }, [], scene);
+    const rings = new RingsPostProcess(
+        sphere,
+        ringsUniforms,
+        { name: "Sphere", radius: 1 * scalingFactor },
+        [light],
+        scene,
+    );
     camera.attachPostProcess(rings);
 
     scene.onBeforeRenderObservable.add(() => {
@@ -90,6 +99,7 @@ export async function createRingsScene(
 
         controls.getTransform().position = Vector3.Zero();
         sphere.position.subtractInPlace(cameraPosition);
+        light.position.subtractInPlace(cameraPosition);
     });
 
     progressCallback(1, "Rings scene loaded");

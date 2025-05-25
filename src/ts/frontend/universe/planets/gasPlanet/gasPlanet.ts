@@ -32,7 +32,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 
 import { Textures } from "@/frontend/assets/textures";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
 import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
@@ -74,7 +74,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
     constructor(
         model: DeepReadonly<GasPlanetModel>,
         textures: Textures,
-        ringsLutPool: ItemPool<RingsLut>,
+        ringsLutPool: ItemPool<RingsProceduralPatternLut>,
         scene: Scene,
     ) {
         this.model = model;
@@ -125,20 +125,13 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
-            this.ringsUniforms = new RingsUniforms(
-                this.model.rings,
-                Settings.RINGS_FADE_OUT_DISTANCE,
-                ringsLutPool,
-                scene,
-            );
+            this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
 
-            const averageRadius = (this.model.radius * (this.model.rings.ringStart + this.model.rings.ringEnd)) / 2;
-            const spread = (this.model.radius * (this.model.rings.ringEnd - this.model.rings.ringStart)) / 2;
             this.asteroidField = new AsteroidField(
-                this.model.rings.seed,
+                this.model.seed,
                 this.getTransform(),
-                averageRadius,
-                spread,
+                this.model.rings.innerRadius,
+                this.model.rings.outerRadius,
                 scene,
             );
         } else {
@@ -172,7 +165,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
-    public dispose(ringsLutPool: ItemPool<RingsLut>): void {
+    public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.mesh.dispose();
         this.aggregate.dispose();
         this.material.dispose();

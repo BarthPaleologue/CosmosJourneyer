@@ -15,38 +15,40 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, PointLight, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Light, PointLight, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
-import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
+import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
+import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+
+import { ItemPool } from "@/utils/itemPool";
 
 import { Settings } from "@/settings";
 
-import { ItemPool } from "../utils/itemPool";
-import { enablePhysics } from "./utils";
+import { enablePhysics } from "../utils";
 
-export async function createGasPlanetScene(
+export async function createSaturnScene(
     engine: AbstractEngine,
     progressCallback: (progress: number, text: string) => void,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
-    scene.clearColor.setAll(0);
-
-    const textures = await loadTextures((loadedCount, totalCount, itemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
-    }, scene);
+    scene.clearColor.set(0, 0, 0, 1);
 
     await enablePhysics(scene);
 
-    const scalingFactor = Settings.EARTH_RADIUS * 10;
+    const assets = await loadRenderingAssets((loadedCount, totalCount, itemName) => {
+        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
+    }, scene);
+
+    const scalingFactor = 6_000e3 * 16;
 
     const controls = new DefaultControls(scene);
 
@@ -54,7 +56,7 @@ export async function createGasPlanetScene(
     controls.speed = scalingFactor;
     camera.maxZ *= scalingFactor;
 
-    controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
+    controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
     controls.getTransform().lookAt(Vector3.Zero());
 
     // This attaches the camera to the canvas
@@ -62,21 +64,31 @@ export async function createGasPlanetScene(
 
     scene.enableDepthRenderer(null, false, true);
 
-    const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
+    const sun = new TransformNode("sun", scene);
+    sun.position = new Vector3(7, 5.5, -10).scaleInPlace(scalingFactor);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const seed = urlParams.get("seed");
+    const light = new PointLight("light1", Vector3.Zero(), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
+    light.parent = sun;
 
-    const gasPlanetModel = newSeededGasPlanetModel(
-        "gasPlanet",
-        seed !== null ? Number(seed) : Math.random() * 1000,
-        "Gas Planet",
-        [],
-    );
+    Settings.EARTH_RADIUS = 6_371e3;
+
+    const gasPlanetModel = getSaturnModel([]);
 
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
-    const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
+    const planet = new GasPlanet(gasPlanetModel, assets.textures, ringsLutPool, scene);
+
+    let asteroidField: AsteroidField | null = null;
+    if (gasPlanetModel.rings !== null) {
+        asteroidField = new AsteroidField(
+            0,
+            planet.getTransform(),
+            gasPlanetModel.rings.innerRadius,
+            gasPlanetModel.rings.outerRadius,
+            scene,
+        );
+    }
 
     const shadow = new ShadowPostProcess(
         planet.getTransform(),
@@ -103,22 +115,15 @@ export async function createGasPlanetScene(
     );
     camera.attachPostProcess(atmosphere);
 
-    if (planet.ringsUniforms) {
-        const rings = new RingsPostProcess(planet.getTransform(), planet.ringsUniforms, gasPlanetModel, [light], scene);
+    if (planet.ringsUniforms !== null) {
+        const rings = new RingsPostProcess(planet.getTransform(), planet.ringsUniforms, planet.model, [light], scene);
         camera.attachPostProcess(rings);
-
-        await new Promise<void>((resolve) => {
-            if (planet.ringsUniforms?.patternLut.type === "procedural") {
-                planet.ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {
-                    resolve();
-                });
-            }
-        });
     }
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
+
         planet.updateMaterial([light], deltaSeconds);
 
         const cameraPosition = controls.getTransform().position.clone();
@@ -126,9 +131,11 @@ export async function createGasPlanetScene(
         controls.getTransform().position = Vector3.Zero();
         planet.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
+
+        asteroidField?.update(camera.globalPosition, assets.objects, deltaSeconds);
     });
 
-    progressCallback(1, "Rings scene loaded");
+    progressCallback(1, "Jupiter scene loaded");
 
     return scene;
 }

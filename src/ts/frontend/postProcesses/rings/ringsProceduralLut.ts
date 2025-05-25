@@ -17,20 +17,21 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 
-import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { ProceduralRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { DeepReadonly } from "@/utils/types";
 
-import ringsLUT from "@shaders/textures/ringsLUT.glsl";
+import ringsPatternLutCode from "@shaders/textures/ringsPatternLUT.glsl";
 
-export class RingsLut {
+export class RingsProceduralPatternLut {
     private readonly lut: ProceduralTexture;
 
     constructor(scene: Scene) {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
-            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsLUT;
+            Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsPatternLutCode;
         }
 
         this.lut = new ProceduralTexture(
@@ -49,11 +50,12 @@ export class RingsLut {
         this.lut.refreshRate = 0;
     }
 
-    setModel(model: DeepReadonly<RingsModel>): void {
+    setModel(model: DeepReadonly<ProceduralRingsModel>): void {
         this.lut.setFloat("seed", model.seed);
-        this.lut.setFloat("frequency", model.ringFrequency);
-        this.lut.setFloat("ringStart", model.ringStart);
-        this.lut.setFloat("ringEnd", model.ringEnd);
+        this.lut.setFloat("frequency", model.frequency);
+        this.lut.setColor3("albedo", Color3.FromArray([model.albedo.r, model.albedo.g, model.albedo.b]));
+        this.lut.setFloat("innerRadius", model.innerRadius);
+        this.lut.setFloat("outerRadius", model.outerRadius);
 
         this.lut.resetRefreshCounter();
     }

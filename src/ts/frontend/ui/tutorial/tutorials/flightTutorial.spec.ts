@@ -75,10 +75,8 @@ describe("flightTutorial", () => {
             shipLocation.position.x ** 2 + shipLocation.position.y ** 2 + shipLocation.position.z ** 2,
         );
 
-        const distanceToPlanetNormalized = distanceToPlanet / planetModel.radius;
+        expect(distanceToPlanet).toBeLessThan(planetModel.rings.outerRadius);
 
-        expect(distanceToPlanetNormalized).toBeLessThan(planetModel.rings.ringEnd);
-
-        expect(distanceToPlanetNormalized).toBeGreaterThan(planetModel.rings.ringStart);
+        expect(distanceToPlanet).toBeGreaterThan(planetModel.rings.innerRadius);
     });
 });

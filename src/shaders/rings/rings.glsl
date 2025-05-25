@@ -15,10 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-uniform float rings_start;
-uniform float rings_end;
-uniform float rings_frequency;
-uniform float rings_opacity;
-uniform vec3 rings_color;
+uniform float rings_inner_radius;
+uniform float rings_outer_radius;
 uniform float rings_fade_out_distance;
-uniform sampler2D rings_lut;
+uniform sampler2D rings_pattern_lut;

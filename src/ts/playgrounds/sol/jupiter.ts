@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Axis, PointLight, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, Axis, Light, PointLight, Scene, Vector3 } from "@babylonjs/core";
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsLut } from "@/frontend/postProcesses/rings/ringsLut";
+import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
@@ -62,12 +62,13 @@ export async function createJupiterScene(
     scene.enableDepthRenderer(null, false, true);
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
 
     Settings.EARTH_RADIUS = 6_371e3;
 
     const gasPlanetModel = getJupiterModel([]);
 
-    const ringsLutPool = new ItemPool<RingsLut>(() => new RingsLut(scene));
+    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
 

@@ -15,30 +15,67 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 
-import { clamp } from "@/utils/math";
+import { RGBColor } from "@/utils/colors";
 
-export type RingsModel = {
-    ringStart: number;
-    ringEnd: number;
-    ringFrequency: number;
-    ringOpacity: number;
-    ringColor: Color3;
-    seed: number;
+type RingsModelBase = {
+    /**
+     * The closest distance between the rings and the center of the celestial body in meters
+     */
+    innerRadius: number;
+
+    /**
+     * The farthest distance between the rings and the center of the celestial body in meters
+     */
+    outerRadius: number;
 };
 
-export function newSeededRingsModel(rng: (step: number) => number): RingsModel {
-    const ringStart = randRange(1.8, 2.2, rng, 1400);
-    const ringSpan = Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
-    return {
-        ringStart: ringStart,
-        ringEnd: ringStart + ringSpan,
-        ringFrequency: 30.0,
-        ringOpacity: clamp(normalRandom(0.7, 0.1, rng, 1420), 0, 1),
-        ringColor: new Color3(255, 225, 171).scaleInPlace(randRange(0.7, 1.2, rng, 1430) / 255),
+export type ProceduralRingsModel = RingsModelBase & {
+    type: "procedural";
 
+    /**
+     * The seed used for randomness
+     */
+    seed: number;
+
+    /**
+     * The frequency of the stripes pattern
+     */
+    frequency: number;
+
+    /**
+     * The main color of the rings in RGB color space
+     */
+    albedo: RGBColor;
+};
+
+export type TexturedRingsModel = RingsModelBase & {
+    type: "textured";
+
+    /**
+     * The id of the texture used for the rings
+     */
+    textureId: "saturn" | "uranus";
+};
+
+/**
+ * Represents the rings of a celestial body
+ */
+export type RingsModel = ProceduralRingsModel | TexturedRingsModel;
+
+export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
+    const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
+    const ringWidth = celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
+
+    const albedoMultiplier = randRange(0.7, 1.2, rng, 1430) / 255;
+
+    return {
+        innerRadius: innerRadius,
+        outerRadius: innerRadius + ringWidth,
+        type: "procedural",
         seed: randRange(-1, 1, rng, 1440),
+        frequency: 10.0,
+        albedo: { r: 120 * albedoMultiplier, g: 112 * albedoMultiplier, b: 104 * albedoMultiplier },
     };
 }
