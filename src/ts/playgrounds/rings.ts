@@ -68,8 +68,8 @@ export async function createRingsScene(
         outerRadius: 3.5 * scalingFactor,
         type: "procedural",
         seed: 0,
-        frequency: 5,
-        albedo: Color3.White(),
+        frequency: 10.0,
+        albedo: { r: 120 / 255, g: 112 / 255, b: 104 / 255 },
     };
 
     const ringsUniforms = RingsUniforms.NewProcedural(ringsModel, ringsLutPool, 0, scene);
