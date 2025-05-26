@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { MeshBuilder } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
 import { enablePhysics } from "./utils";
 
@@ -30,20 +31,34 @@ export async function createWarpTunnelScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const freeCamera = new FreeCamera("FreeCamera", new Vector3(0, 0, 0), scene);
-    freeCamera.attachControl();
+    const controls = new DefaultControls(scene);
+
+    const camera = controls.getActiveCamera();
 
     await enablePhysics(scene);
 
     const anchor = MeshBuilder.CreateBox("Anchor", { size: 10 }, scene);
     anchor.position.z = 200;
 
-    const warpTunnel = new WarpTunnel(anchor, scene);
+    const warpTunnel = new WarpTunnel(scene);
     warpTunnel.setThrottle(1);
+
+    warpTunnel.getTransform().parent = anchor;
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         warpTunnel.update(deltaSeconds);
+
+        controls.update(deltaSeconds);
+
+        const anchorDisplacement = 2000;
+        anchor.position.z += anchorDisplacement * deltaSeconds;
+        controls.getTransform().position.z += anchorDisplacement * deltaSeconds;
+
+        const cameraPosition = camera.globalPosition;
+        anchor.position.subtractInPlace(cameraPosition);
+
+        controls.getTransform().position.subtractInPlace(cameraPosition);
     });
 
     progressCallback(1, "Warp tunnel scene loaded");

@@ -186,7 +186,9 @@ export class Spaceship implements Transformable {
 
         this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
 
-        this.warpTunnel = new WarpTunnel(this.getTransform(), scene);
+        this.warpTunnel = new WarpTunnel(scene);
+        this.warpTunnel.getTransform().parent = this.getTransform();
+
         this.hyperSpaceTunnel = new HyperSpaceTunnel(
             this.getTransform().getDirection(Axis.Z),
             scene,
