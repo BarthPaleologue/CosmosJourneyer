@@ -6,24 +6,24 @@ on:
     branches: [main]
   workflow_dispatch:
  
-  concurrency:
+concurrency:
   group: ci-${{ github.head_ref || github.ref || github.run_id }}
   cancel-in-progress: true
  
-  jobs:
+jobs:
   validate:
     name: Validate All
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     strategy:
       matrix:
-        node-version: [20]
+        node-version: [22]
     steps:
       # ─────────── Setup Environment ───────────
      
       # ─────────── repo + LFS
       - name: Checkout repository with LFS
-      - uses: actions/checkout@v4 # ⬇ repo
+        uses: actions/checkout@v4 # ⬇ repo
         with: #    + LFS blobs
           lfs: true #   (LFS support)
           fetch-depth: 0 #    (helps LFS cache hits)
@@ -35,7 +35,6 @@ on:
           key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}  
 
       - name: Setup pnpm
-      - uses: actions/checkout@v4
         uses: pnpm/action-setup@v4
         with:
           version: 8  
