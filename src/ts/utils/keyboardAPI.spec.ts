@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getGlobalKeyboardLayoutMap } from "./keyboardAPI";
 
@@ -9,11 +9,6 @@ describe("getGlobalKeyboardLayoutMap", () => {
         ["KeyB", "b"],
     ]);
     const mockGetLayoutMap = vi.fn().mockResolvedValue(mockMap);
-    let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-
-    beforeEach(() => {
-        consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    });
 
     afterEach(() => {
         vi.restoreAllMocks();
@@ -39,7 +34,6 @@ describe("getGlobalKeyboardLayoutMap", () => {
 
         expect(mockGetLayoutMap).toHaveBeenCalledTimes(1);
         expect(result).toBe(mockMap);
-        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     it("should return empty map when navigator.keyboard exists but getLayoutMap is undefined", async () => {
@@ -55,9 +49,7 @@ describe("getGlobalKeyboardLayoutMap", () => {
 
         const result = await getGlobalKeyboardLayoutMap();
 
-        expect(result).toBeInstanceOf(Map);
-        expect(result.size).toBe(0);
-        expect(consoleWarnSpy).toHaveBeenCalledWith("navigator.keyboard is not available, returning an empty map");
+        expect(result).toBe(null);
     });
 
     it("should return empty map when navigator.keyboard is undefined", async () => {
@@ -71,8 +63,6 @@ describe("getGlobalKeyboardLayoutMap", () => {
 
         const result = await getGlobalKeyboardLayoutMap();
 
-        expect(result).toBeInstanceOf(Map);
-        expect(result.size).toBe(0);
-        expect(consoleWarnSpy).toHaveBeenCalledWith("navigator.keyboard is not available, returning an empty map");
+        expect(result).toBe(null);
     });
 });

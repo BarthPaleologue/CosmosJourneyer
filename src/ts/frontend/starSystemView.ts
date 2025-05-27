@@ -259,7 +259,7 @@ export class StarSystemView implements View {
         this.assets = assets;
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
-            this.keyboardLayoutMap = keyboardLayoutMap;
+            this.keyboardLayoutMap = keyboardLayoutMap ?? new Map<string, string>();
         });
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
