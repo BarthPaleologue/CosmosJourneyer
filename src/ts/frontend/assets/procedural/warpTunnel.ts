@@ -18,7 +18,7 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { RandomRange, RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
+import { RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -26,7 +26,7 @@ import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
 import { Scene } from "@babylonjs/core/scene";
 
-import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
+//import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { Transformable } from "../../universe/architecture/transformable";
 
@@ -36,9 +36,6 @@ import { Transformable } from "../../universe/architecture/transformable";
  * @see https://playground.babylonjs.com/#W9LE0U#28
  */
 export class WarpTunnel implements Transformable {
-    readonly anchor: TransformNode;
-    readonly parent: TransformNode;
-
     readonly solidParticleSystem: SolidParticleSystem;
 
     private throttle = 0;
@@ -51,12 +48,6 @@ export class WarpTunnel implements Transformable {
     private targetNbParticles = 0;
 
     private recycledParticles: SolidParticle[] = [];
-
-    private readonly spaceshipDisplacement = Vector3.Zero();
-
-    private readonly oldShipPosition = Vector3.Zero();
-
-    private readonly spaceshipForward = Vector3.Zero();
 
     private readonly particleScaling = new Vector3(0.1, 0.1, 4);
 
@@ -74,17 +65,11 @@ export class WarpTunnel implements Transformable {
     private emitPeriod = 1;
     private emitCounter = 0;
 
+    private currentForce = Vector3.Zero();
+
     private lastDeltaSeconds = 0;
 
-    constructor(parent: TransformNode, scene: Scene) {
-        this.anchor = new TransformNode("anchor", scene);
-        this.anchor.position = new Vector3(0, 0, WarpTunnel.TUNNEL_LENGTH / 2);
-        this.anchor.rotationQuaternion = Quaternion.Identity();
-        this.anchor.computeWorldMatrix(true);
-
-        this.anchor.parent = parent;
-        this.parent = parent;
-
+    constructor(scene: Scene) {
         const SPS = new SolidParticleSystem("SPS", scene);
         const poly = MeshBuilder.CreatePolyhedron("p", { type: 1 });
         SPS.addShape(poly, WarpTunnel.MAX_NB_PARTICLES);
@@ -114,7 +99,6 @@ export class WarpTunnel implements Transformable {
                 } else {
                     this.nbParticlesAlive++;
                 }
-                particle.position.z = RandomRange(-WarpTunnel.TUNNEL_LENGTH / 2, WarpTunnel.TUNNEL_LENGTH / 2);
             }
         };
 
@@ -130,18 +114,14 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
 
-            const particleDirection = this.particleToDirection.get(particle) ?? this.particleDirection;
-            this.particleToDirection.set(particle, particleDirection);
-
-            particle.velocity.copyFrom(particleDirection.scale(this.particleSpeed));
+            particle.velocity.addInPlace(this.currentForce.scale(this.lastDeltaSeconds));
 
             particle.position.addInPlace(particle.velocity.scale(this.lastDeltaSeconds));
-            particle.position.addInPlace(this.spaceshipDisplacement);
 
-            const relativePosition = particle.position.subtract(this.parent.position);
-            const localZ = relativePosition.dot(this.spaceshipForward);
+            const relativePosition = particle.position; //.subtract(this.parent.position);
+            const localZ = relativePosition.z; //.dot(this.spaceshipForward);
 
-            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2 || relativePosition.length() > WarpTunnel.TUNNEL_LENGTH / 2) {
+            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2) {
                 SPS.recycleParticle(particle);
                 this.nbParticlesAlive--;
                 return particle;
@@ -172,20 +152,23 @@ export class WarpTunnel implements Transformable {
         particle.position.addInPlace(this.tunnelAxis1.scale(r * Math.cos(theta)));
         particle.position.addInPlace(this.tunnelAxis2.scale(r * Math.sin(theta)));
         particle.position.addInPlace(this.particleDirection.scale(Math.random() * 10));
-        particle.position.addInPlace(this.anchor.getAbsolutePosition());
+        particle.position.z += WarpTunnel.TUNNEL_LENGTH / 2;
 
         this.particleToDirection.set(particle, this.particleDirection.clone());
 
         particle.rotationQuaternion = this.particleRotationQuaternion;
 
         particle.scaling = this.particleScaling;
+
+        const particleDirection = this.particleToDirection.get(particle) ?? this.particleDirection;
+        this.particleToDirection.set(particle, particleDirection);
+
+        particle.velocity.copyFrom(particleDirection.scale(this.particleSpeed));
     }
 
     private updateGlobals() {
-        this.particleRotationQuaternion.copyFrom(this.anchor.absoluteRotationQuaternion);
-        this.particleDirection.copyFrom(
-            this.parent.getAbsolutePosition().subtract(this.anchor.getAbsolutePosition()).normalize(),
-        );
+        this.particleRotationQuaternion.copyFrom(Quaternion.Identity());
+        this.particleDirection.copyFromFloats(0, 0, -1);
 
         this.tunnelAxis1.copyFrom(this.particleDirection.add(new Vector3(Math.random(), Math.random(), Math.random())));
         this.tunnelAxis1.subtractInPlace(this.particleDirection.scale(this.tunnelAxis1.dot(this.particleDirection)));
@@ -204,18 +187,14 @@ export class WarpTunnel implements Transformable {
         this.initParticle(particle);
     }
 
+    public applyForce(force: Vector3) {
+        this.currentForce.addInPlace(force);
+    }
+
     update(deltaSeconds: number) {
         this.lastDeltaSeconds = deltaSeconds;
 
         this.particleSpeed = 200 * (1 + this.throttle);
-
-        const newShipPosition = this.parent.getAbsolutePosition().clone();
-
-        this.spaceshipDisplacement.copyFrom(newShipPosition.subtract(this.oldShipPosition));
-
-        this.oldShipPosition.copyFrom(newShipPosition);
-
-        this.spaceshipForward.copyFrom(getForwardDirection(this.parent));
 
         this.updateGlobals();
 
@@ -254,12 +233,11 @@ export class WarpTunnel implements Transformable {
     }
 
     getTransform(): TransformNode {
-        return this.anchor;
+        return this.solidParticleSystem.mesh;
     }
 
     dispose() {
         this.solidParticleSystem.dispose();
-        this.anchor.dispose();
         this.particleToDirection.clear();
     }
 }
