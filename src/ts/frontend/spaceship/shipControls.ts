@@ -396,6 +396,10 @@ export class ShipControls implements Controls {
         return this.getTransform().getAbsolutePosition();
     }
 
+    syncCameraTransform() {
+        this.thirdPersonCameraTransform.rotationQuaternion?.copyFrom(this.getTransform().absoluteRotationQuaternion);
+    }
+
     reset() {
         this.resetCameraHandler();
         this.cameraShakeAnimation.reset();
