@@ -988,6 +988,8 @@ export class StarSystemView implements View {
             getRotationQuaternion(defaultControls.getTransform()).clone(),
         );
 
+        shipControls.syncCameraTransform();
+
         shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
     }
