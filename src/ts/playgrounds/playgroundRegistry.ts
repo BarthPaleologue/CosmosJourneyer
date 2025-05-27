@@ -43,6 +43,7 @@ import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
+import { createTerrainScene } from "./terrain";
 import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
 
@@ -78,6 +79,7 @@ export class PlaygroundRegistry {
         ["jupiter", createJupiterScene],
         ["saturn", createSaturnScene],
         ["sol", createSolScene],
+        ["terrain", createTerrainScene],
     ]);
 
     register(
