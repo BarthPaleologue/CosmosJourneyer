@@ -98,11 +98,13 @@ void main() {
     float scaling = 1.0 + 0.3 * (texture2D(perlinNoise, objectWorld.xz * 0.1).r * 2.0 - 1.0);
     scaling *= 1.0 - smoothstep(70.0, 90.0, objectCameraDistance); // fade grass in the distance using scaling
 
-    vec3 terrainNormal = normalize(vec3(worldMatrix * vec4(0.0, 1.0, 0.0, 0.0)));
-    vec3 sphereNormal = normalize(objectWorld - planetPosition);
-    float flatness = max(dot(terrainNormal, sphereNormal), 0.0);
+    //vec3 terrainNormal = normalize(vec3(worldMatrix * vec4(0.0, 1.0, 0.0, 0.0)));
+    vec3 sphereNormal = length(objectWorld - planetPosition) < 0.01 ? normalize(objectWorld - planetPosition) : vec3(0.0, 1.0, 0.0);
+    
+    // calculate the flatness of the terrain
+    //float flatness = max(dot(terrainNormal, sphereNormal), 0.0);
 
-    scaling *= smoothstep(0.78, 0.8, flatness);
+    //scaling *= smoothstep(0.78, 0.8, flatness);
 
     // taller grass bends more than short grass
     curveAmount *= max(scaling, 0.3);

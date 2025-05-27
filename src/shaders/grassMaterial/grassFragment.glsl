@@ -46,11 +46,11 @@ void main() {
     vec3 baseColor = vec3(0.4, 0.8, 0.08);
     vec3 tipColor = vec3(0.5, 0.5, 0.1);
 
-    vec3 albedo = mix(baseColor, tipColor, pow(vPosition.y, 4.0));
+    vec3 albedo = 2.0 * mix(baseColor, tipColor, pow(vPosition.y, 4.0));
 
     vec3 normalW = vNormalW;
 
-    float ao = 0.5 + 0.5 * (vPosition.y * vPosition.y);
+    float ao = 0.7 + 0.3 * (vPosition.y * vPosition.y);
 
     vec3 Lo = vec3(0.0);
 
@@ -63,12 +63,8 @@ void main() {
         if (ndl < 0.0) {
             normalW = -normalW;
         }
-        Lo += calculateLight(albedo, normalW, 0.2, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
+        Lo += calculateLight(albedo, normalW, 0.4, 0.0, lightDirectionW, viewDirectionW, star_colors[i]);
     }
-
-    Lo *= vPlanetNdl;
-
-    Lo += albedo * 0.2;
 
     gl_FragColor = vec4(Lo * ao, 1.0);// apply color and lighting
     #endif

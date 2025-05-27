@@ -31,6 +31,7 @@ import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
 import { createGasPlanetScene } from "./gasPlanet";
+import { createGrassScene } from "./grass";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
@@ -78,6 +79,7 @@ export class PlaygroundRegistry {
         ["jupiter", createJupiterScene],
         ["saturn", createSaturnScene],
         ["sol", createSolScene],
+        ["grass", createGrassScene],
     ]);
 
     register(
