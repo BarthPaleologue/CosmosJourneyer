@@ -36,7 +36,7 @@ describe("getGlobalKeyboardLayoutMap", () => {
         expect(result).toBe(mockMap);
     });
 
-    it("should return empty map when navigator.keyboard exists but getLayoutMap is undefined", async () => {
+    it("should return null when navigator.keyboard exists but getLayoutMap is undefined", async () => {
         // Mock navigator.keyboard without getLayoutMap
         Object.defineProperty(global, "navigator", {
             value: {
@@ -52,7 +52,7 @@ describe("getGlobalKeyboardLayoutMap", () => {
         expect(result).toBe(null);
     });
 
-    it("should return empty map when navigator.keyboard is undefined", async () => {
+    it("should return null when navigator.keyboard is undefined", async () => {
         // Mock navigator without keyboard
         Object.defineProperty(global, "navigator", {
             value: {
