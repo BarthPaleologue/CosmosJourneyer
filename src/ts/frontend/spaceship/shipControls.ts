@@ -373,6 +373,10 @@ export class ShipControls implements Controls {
             roll(this.getTransform(), this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds);
             yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
             pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
+
+            this.spaceship.warpTunnel.applyForce(
+                new Vector3(this.rotationInertia.x, this.rotationInertia.y, 0).scale(-1),
+            );
         }
 
         this.thirdPersonCameraTransform.position =

@@ -65,6 +65,8 @@ export class WarpTunnel implements Transformable {
     private emitPeriod = 1;
     private emitCounter = 0;
 
+    private currentForce = Vector3.Zero();
+
     private lastDeltaSeconds = 0;
 
     constructor(scene: Scene) {
@@ -97,7 +99,6 @@ export class WarpTunnel implements Transformable {
                 } else {
                     this.nbParticlesAlive++;
                 }
-                particle.position.z = 0;
             }
         };
 
@@ -113,10 +114,7 @@ export class WarpTunnel implements Transformable {
         SPS.updateParticle = (particle) => {
             if (!particle.isVisible) return particle;
 
-            const particleDirection = this.particleToDirection.get(particle) ?? this.particleDirection;
-            this.particleToDirection.set(particle, particleDirection);
-
-            particle.velocity.copyFrom(particleDirection.scale(this.particleSpeed));
+            particle.velocity.addInPlace(this.currentForce.scale(this.lastDeltaSeconds));
 
             particle.position.addInPlace(particle.velocity.scale(this.lastDeltaSeconds));
 
@@ -161,6 +159,11 @@ export class WarpTunnel implements Transformable {
         particle.rotationQuaternion = this.particleRotationQuaternion;
 
         particle.scaling = this.particleScaling;
+
+        const particleDirection = this.particleToDirection.get(particle) ?? this.particleDirection;
+        this.particleToDirection.set(particle, particleDirection);
+
+        particle.velocity.copyFrom(particleDirection.scale(this.particleSpeed));
     }
 
     private updateGlobals() {
@@ -182,6 +185,10 @@ export class WarpTunnel implements Transformable {
         }
         particle.isVisible = true;
         this.initParticle(particle);
+    }
+
+    public applyForce(force: Vector3) {
+        this.currentForce.addInPlace(force);
     }
 
     update(deltaSeconds: number) {
