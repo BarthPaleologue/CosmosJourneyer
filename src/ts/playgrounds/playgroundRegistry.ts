@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene } from "@babylonjs/core";
+import { Scene, WebGPUEngine } from "@babylonjs/core";
 
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";
@@ -51,7 +51,7 @@ import { createXrScene } from "./xr";
 export class PlaygroundRegistry {
     private readonly map: Map<
         string,
-        (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene>
+        (engine: WebGPUEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene>
     > = new Map([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
@@ -87,7 +87,7 @@ export class PlaygroundRegistry {
     register(
         name: string,
         createScene: (
-            engine: AbstractEngine,
+            engine: WebGPUEngine,
             progressCallback: (progress: number, text: string) => void,
         ) => Promise<Scene>,
     ) {
@@ -96,7 +96,7 @@ export class PlaygroundRegistry {
 
     get(
         name: string,
-    ): (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
+    ): (engine: WebGPUEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }
 }
