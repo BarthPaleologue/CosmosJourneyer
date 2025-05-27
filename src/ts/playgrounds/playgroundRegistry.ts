@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine, type Scene } from "@babylonjs/core";
+import { type Scene, type WebGPUEngine } from "@babylonjs/core";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
@@ -54,7 +54,7 @@ import { createXrScene } from "./xr";
 export class PlaygroundRegistry {
     private readonly map: Map<
         string,
-        (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>
+        (engine: WebGPUEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>
     > = new Map([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
@@ -90,12 +90,12 @@ export class PlaygroundRegistry {
 
     register(
         name: string,
-        createScene: (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>,
+        createScene: (engine: WebGPUEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>,
     ) {
         this.map.set(name, createScene);
     }
 
-    get(name: string): (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene> {
+    get(name: string): (engine: WebGPUEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }
 }
