@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, MeshBuilder, PointLight, TransformNode, Vector3 } from "@babylonjs/core";
+import { FreeCamera, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+import { seededSquirrelNoise } from "squirrel-noise";
 
 import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
@@ -74,7 +75,13 @@ export async function createGrassScene(
     grassMaterial.setPlanet(ground);
     grassBladeMesh.material = grassMaterial;
 
-    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256));
+    const rng = seededSquirrelNoise(0);
+    let rngState = 0;
+    const wrappedRng = () => {
+        return rng(rngState++);
+    };
+
+    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng));
     grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
 
     scene.onBeforeRenderObservable.add(() => {
