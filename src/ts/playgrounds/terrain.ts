@@ -19,8 +19,11 @@ import {
     Color3,
     ComputeShader,
     DirectionalLight,
+    GizmoManager,
+    LightGizmo,
     Mesh,
     PBRMetallicRoughnessMaterial,
+    ShadowGenerator,
     StorageBuffer,
     UniformBuffer,
     Vector3,
@@ -129,6 +132,7 @@ export async function createTerrainScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+    scene.defaultCursor = "default";
 
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
@@ -142,7 +146,23 @@ export async function createTerrainScene(
 
     scene.activeCamera = camera;
 
-    new DirectionalLight("light", new Vector3(-5, -7, 10).normalize(), scene);
+    const light = new DirectionalLight("light", new Vector3(-5, -2, 10).normalize(), scene);
+    light.position = new Vector3(0, 100, 0);
+
+    const lightGizmo = new LightGizmo();
+    lightGizmo.light = light;
+    lightGizmo.attachedMesh?.position.set(0, 20, 0);
+
+    const gizmoManager = new GizmoManager(scene);
+    gizmoManager.positionGizmoEnabled = true;
+    gizmoManager.rotationGizmoEnabled = true;
+    gizmoManager.boundingBoxGizmoEnabled = true;
+    gizmoManager.usePointerToAttachGizmos = false;
+    gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+
+    const shadowGenerator = new ShadowGenerator(1024, light);
+    shadowGenerator.usePercentageCloserFiltering = true;
+    shadowGenerator.bias = 0.0001;
 
     const nbVerticesPerRow = 512;
     const size = 8;
@@ -164,6 +184,9 @@ export async function createTerrainScene(
     terrain.material = terrainMat;
 
     terrain.scaling.scaleInPlace(10);
+
+    terrain.receiveShadows = true;
+    shadowGenerator.addShadowCaster(terrain);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
