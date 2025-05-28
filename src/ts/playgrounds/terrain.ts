@@ -31,7 +31,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
-import heightMapComputeSource from "@shaders/compute/terrain/planarHeightField.wgsl";
+import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHeightField.wgsl";
 
 export async function computeVertexData2(
     nbVerticesPerRow: number,
