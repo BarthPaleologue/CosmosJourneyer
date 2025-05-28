@@ -19,7 +19,6 @@ import { StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { ComputeShader } from "@babylonjs/core/Compute/computeShader";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHeightField.wgsl";
 
@@ -83,7 +82,10 @@ export class PlanarProceduralHeightField {
         this.computeShader.setUniformBuffer("params", paramsBuffer);
     }
 
-    dispatch(): Promise<VertexData> {
+    dispatch(): Promise<{
+        positions: Float32Array;
+        indices: Uint32Array;
+    }> {
         return new Promise((resolve) => {
             this.computeShader
                 .dispatchWhenReady(this.nbVerticesPerRow, this.nbVerticesPerRow, 1)
@@ -100,15 +102,10 @@ export class PlanarProceduralHeightField {
                         const indices = new Uint32Array(indicesBufferView.buffer);
                         this.indicesBuffer.dispose();
 
-                        const normals = new Float32Array(this.nbVerticesPerRow * this.nbVerticesPerRow * 3);
-                        VertexData.ComputeNormals(positions, indices, normals);
-
-                        const vertexData = new VertexData();
-                        vertexData.positions = positions;
-                        vertexData.indices = indices;
-                        vertexData.normals = normals;
-
-                        resolve(vertexData);
+                        resolve({
+                            positions: positions,
+                            indices: indices,
+                        });
                     } catch (error) {
                         console.error("Error reading buffers:", error);
                     }
