@@ -25,18 +25,13 @@ import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHei
 export class PlanarProceduralHeightField {
     private readonly computeShader: ComputeShader;
 
-    readonly nbVerticesPerRow: number;
+    private readonly paramsBuffer: UniformBuffer;
 
-    readonly positionsBuffer: StorageBuffer;
-    readonly indicesBuffer: StorageBuffer;
-
-    constructor(nbVerticesPerRow: number, size: number, engine: WebGPUEngine) {
+    constructor(engine: WebGPUEngine) {
         const numOctaves = 2;
         const lacunarity = 2.0;
         const persistence = 0.5;
         const initialScale = 0.5;
-
-        this.nbVerticesPerRow = nbVerticesPerRow;
 
         this.computeShader = new ComputeShader(
             "heightMap",
@@ -51,56 +46,62 @@ export class PlanarProceduralHeightField {
             },
         );
 
-        const positions = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
-        const indices = new Uint32Array((nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6);
+        this.paramsBuffer = new UniformBuffer(engine);
 
-        this.positionsBuffer = new StorageBuffer(engine, positions.byteLength);
-        this.positionsBuffer.update(positions);
-        this.computeShader.setStorageBuffer("positions", this.positionsBuffer);
+        this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
+        this.paramsBuffer.addUniform("size", 1);
+        this.paramsBuffer.addUniform("octaves", 1);
+        this.paramsBuffer.addUniform("lacunarity", 1);
+        this.paramsBuffer.addUniform("persistence", 1);
+        this.paramsBuffer.addUniform("scaleFactor", 1);
 
-        this.indicesBuffer = new StorageBuffer(engine, indices.byteLength);
-        this.indicesBuffer.update(indices);
-        this.computeShader.setStorageBuffer("indices", this.indicesBuffer);
+        this.paramsBuffer.updateInt("octaves", numOctaves);
+        this.paramsBuffer.updateFloat("lacunarity", lacunarity);
+        this.paramsBuffer.updateFloat("persistence", persistence);
+        this.paramsBuffer.updateFloat("scaleFactor", initialScale);
+        this.paramsBuffer.update();
 
-        const paramsBuffer = new UniformBuffer(engine);
-
-        paramsBuffer.addUniform("nbVerticesPerRow", 1);
-        paramsBuffer.addUniform("size", 1);
-        paramsBuffer.addUniform("octaves", 1);
-        paramsBuffer.addUniform("lacunarity", 1);
-        paramsBuffer.addUniform("persistence", 1);
-        paramsBuffer.addUniform("scaleFactor", 1);
-
-        paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
-        paramsBuffer.updateFloat("size", size);
-        paramsBuffer.updateInt("octaves", numOctaves);
-        paramsBuffer.updateFloat("lacunarity", lacunarity);
-        paramsBuffer.updateFloat("persistence", persistence);
-        paramsBuffer.updateFloat("scaleFactor", initialScale);
-        paramsBuffer.update();
-
-        this.computeShader.setUniformBuffer("params", paramsBuffer);
+        this.computeShader.setUniformBuffer("params", this.paramsBuffer);
     }
 
-    dispatch(): Promise<{
+    dispatch(
+        nbVerticesPerRow: number,
+        size: number,
+        engine: WebGPUEngine,
+    ): Promise<{
         positions: Float32Array;
         indices: Uint32Array;
     }> {
+        this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
+        this.paramsBuffer.updateFloat("size", size);
+        this.paramsBuffer.update();
+
+        const positions = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
+        const indices = new Uint32Array((nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6);
+
+        const positionsBuffer = new StorageBuffer(engine, positions.byteLength);
+        positionsBuffer.update(positions);
+        this.computeShader.setStorageBuffer("positions", positionsBuffer);
+
+        const indicesBuffer = new StorageBuffer(engine, indices.byteLength);
+        indicesBuffer.update(indices);
+        this.computeShader.setStorageBuffer("indices", indicesBuffer);
+
         return new Promise((resolve) => {
             this.computeShader
-                .dispatchWhenReady(this.nbVerticesPerRow, this.nbVerticesPerRow, 1)
+                .dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1)
                 .then(async () => {
                     try {
                         const [positionsBufferView, indicesBufferView] = await Promise.all([
-                            this.positionsBuffer.read(),
-                            this.indicesBuffer.read(),
+                            positionsBuffer.read(),
+                            indicesBuffer.read(),
                         ]);
 
                         const positions = new Float32Array(positionsBufferView.buffer);
-                        this.positionsBuffer.dispose();
+                        positionsBuffer.dispose();
 
                         const indices = new Uint32Array(indicesBufferView.buffer);
-                        this.indicesBuffer.dispose();
+                        indicesBuffer.dispose();
 
                         resolve({
                             positions: positions,
