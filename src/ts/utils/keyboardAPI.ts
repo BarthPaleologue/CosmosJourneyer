@@ -2,16 +2,15 @@ declare global {
     interface Navigator {
         keyboard:
             | {
-                  getLayoutMap: () => Promise<Map<string, string>>;
+                  getLayoutMap: (() => Promise<Map<string, string>>) | undefined;
               }
             | undefined;
     }
 }
 
-export function getGlobalKeyboardLayoutMap(): Promise<Map<string, string>> {
-    if (navigator.keyboard !== undefined) {
-        return navigator.keyboard.getLayoutMap();
-    }
-    console.warn("navigator.keyboard is not available, returning an empty map");
-    return Promise.resolve(new Map<string, string>());
+/**
+ * @returns A promise that resolves to a Map of keyboard layout keys and their corresponding characters, or null if the API is not available.
+ */
+export async function getGlobalKeyboardLayoutMap(): Promise<Map<string, string> | null> {
+    return (await navigator.keyboard?.getLayoutMap?.()) ?? null;
 }

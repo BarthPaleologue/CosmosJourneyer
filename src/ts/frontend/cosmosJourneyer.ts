@@ -73,6 +73,7 @@ import {
     UniverseCoordinates,
 } from "@/utils/coordinates/universeCoordinates";
 import { hashArray } from "@/utils/hash";
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
 import { View } from "@/utils/view";
 
@@ -506,7 +507,9 @@ export class CosmosJourneyer {
 
         await starSystemView.resetPlayer();
 
-        if (!navigator.keyboard) {
+        const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
+
+        if (keyboardLayoutMap === null) {
             await alertModal(
                 "Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.",
                 soundPlayer,
