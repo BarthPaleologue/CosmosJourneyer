@@ -51,9 +51,8 @@ export async function computeVertexData2(
         {
             bindingsMapping: {
                 positions: { group: 0, binding: 0 },
-                normals: { group: 0, binding: 1 },
-                indices: { group: 0, binding: 2 },
-                params: { group: 0, binding: 3 },
+                indices: { group: 0, binding: 1 },
+                params: { group: 0, binding: 2 },
             },
         },
     );
@@ -65,10 +64,6 @@ export async function computeVertexData2(
     const positionsBuffer = new StorageBuffer(engine, positions.byteLength);
     positionsBuffer.update(positions);
     computeShader.setStorageBuffer("positions", positionsBuffer);
-
-    const normalsBuffer = new StorageBuffer(engine, normals.byteLength);
-    normalsBuffer.update(normals);
-    computeShader.setStorageBuffer("normals", normalsBuffer);
 
     const indicesBuffer = new StorageBuffer(engine, indices.byteLength);
     indicesBuffer.update(indices);
@@ -98,20 +93,18 @@ export async function computeVertexData2(
             .dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1)
             .then(async () => {
                 try {
-                    const [positionsBufferView, normalsBufferView, indicesBufferView] = await Promise.all([
+                    const [positionsBufferView, indicesBufferView] = await Promise.all([
                         positionsBuffer.read(),
-                        normalsBuffer.read(),
                         indicesBuffer.read(),
                     ]);
 
                     const positions = new Float32Array(positionsBufferView.buffer);
                     positionsBuffer.dispose();
 
-                    const normals = new Float32Array(normalsBufferView.buffer);
-                    normalsBuffer.dispose();
-
                     const indices = new Uint32Array(indicesBufferView.buffer);
                     indicesBuffer.dispose();
+
+                    VertexData.ComputeNormals(positions, indices, normals);
 
                     const vertexData = new VertexData();
                     vertexData.positions = positions;
@@ -149,7 +142,7 @@ export async function createTerrainScene(
 
     scene.activeCamera = camera;
 
-    new DirectionalLight("light", new Vector3(-5, -20, 10).normalize(), scene);
+    new DirectionalLight("light", new Vector3(-5, -7, 10).normalize(), scene);
 
     const nbVerticesPerRow = 512;
     const size = 8;
