@@ -17,113 +17,20 @@
 
 import {
     Color3,
-    ComputeShader,
     DirectionalLight,
     GizmoManager,
     LightGizmo,
     Mesh,
     PBRMetallicRoughnessMaterial,
     ShadowGenerator,
-    StorageBuffer,
-    UniformBuffer,
     Vector3,
-    VertexData,
     type WebGPUEngine,
 } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-
-import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHeightField.wgsl";
-
-export async function computeVertexData2(
-    nbVerticesPerRow: number,
-    size: number,
-    engine: WebGPUEngine,
-): Promise<VertexData> {
-    const numOctaves = 2;
-    const lacunarity = 2.0;
-    const persistence = 0.5;
-    const initialScale = 0.5;
-
-    const computeShader = new ComputeShader(
-        "heightMap",
-        engine,
-        { computeSource: heightMapComputeSource },
-        {
-            bindingsMapping: {
-                positions: { group: 0, binding: 0 },
-                indices: { group: 0, binding: 1 },
-                params: { group: 0, binding: 2 },
-            },
-        },
-    );
-
-    const positions = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
-    const normals = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
-    const indices = new Uint32Array((nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6);
-
-    const positionsBuffer = new StorageBuffer(engine, positions.byteLength);
-    positionsBuffer.update(positions);
-    computeShader.setStorageBuffer("positions", positionsBuffer);
-
-    const indicesBuffer = new StorageBuffer(engine, indices.byteLength);
-    indicesBuffer.update(indices);
-    computeShader.setStorageBuffer("indices", indicesBuffer);
-
-    const paramsBuffer = new UniformBuffer(engine);
-
-    paramsBuffer.addUniform("nbVerticesPerRow", 1);
-    paramsBuffer.addUniform("size", 1);
-    paramsBuffer.addUniform("octaves", 1);
-    paramsBuffer.addUniform("lacunarity", 1);
-    paramsBuffer.addUniform("persistence", 1);
-    paramsBuffer.addUniform("scaleFactor", 1);
-
-    paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
-    paramsBuffer.updateFloat("size", size);
-    paramsBuffer.updateInt("octaves", numOctaves);
-    paramsBuffer.updateFloat("lacunarity", lacunarity);
-    paramsBuffer.updateFloat("persistence", persistence);
-    paramsBuffer.updateFloat("scaleFactor", initialScale);
-    paramsBuffer.update();
-
-    computeShader.setUniformBuffer("params", paramsBuffer);
-
-    return new Promise((resolve) => {
-        computeShader
-            .dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1)
-            .then(async () => {
-                try {
-                    const [positionsBufferView, indicesBufferView] = await Promise.all([
-                        positionsBuffer.read(),
-                        indicesBuffer.read(),
-                    ]);
-
-                    const positions = new Float32Array(positionsBufferView.buffer);
-                    positionsBuffer.dispose();
-
-                    const indices = new Uint32Array(indicesBufferView.buffer);
-                    indicesBuffer.dispose();
-
-                    VertexData.ComputeNormals(positions, indices, normals);
-
-                    const vertexData = new VertexData();
-                    vertexData.positions = positions;
-                    vertexData.indices = indices;
-                    vertexData.normals = normals;
-
-                    resolve(vertexData);
-                } catch (error) {
-                    console.error("Error reading buffers:", error);
-                }
-            })
-            .catch((error: unknown) => {
-                console.error("Error dispatching compute shader:", error);
-            });
-    });
-}
+import { PlanarProceduralHeightField } from "@/frontend/terrain/planarProceduralHeightField";
 
 export async function createTerrainScene(
     engine: WebGPUEngine,
@@ -171,7 +78,9 @@ export async function createTerrainScene(
 
     const t0 = performance.now();
 
-    const vertexData = await computeVertexData2(nbVerticesPerRow, size, engine);
+    const generator = new PlanarProceduralHeightField(nbVerticesPerRow, size, engine);
+
+    const vertexData = await generator.dispatch();
     vertexData.applyToMesh(terrain);
 
     const t1 = performance.now();
