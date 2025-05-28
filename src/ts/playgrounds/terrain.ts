@@ -22,11 +22,12 @@ import {
     LightGizmo,
     Mesh,
     PBRMetallicRoughnessMaterial,
+    Scene,
     ShadowGenerator,
     Vector3,
+    VertexData,
     WebGPUEngine,
 } from "@babylonjs/core";
-import { Scene } from "@babylonjs/core/scene";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PlanarProceduralHeightField } from "@/frontend/terrain/planarProceduralHeightField";
@@ -78,7 +79,16 @@ export async function createTerrainScene(
 
     const generator = new PlanarProceduralHeightField(nbVerticesPerRow, size, engine);
 
-    const vertexData = await generator.dispatch();
+    const { positions, indices } = await generator.dispatch();
+
+    const normals = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
+    VertexData.ComputeNormals(positions, indices, normals);
+
+    const vertexData = new VertexData();
+    vertexData.positions = positions;
+    vertexData.indices = indices;
+    vertexData.normals = normals;
+
     vertexData.applyToMesh(terrain);
 
     const t1 = performance.now();
