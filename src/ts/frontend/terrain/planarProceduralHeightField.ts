@@ -76,15 +76,16 @@ export class PlanarProceduralHeightField {
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
 
-        const positions = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
-        const indices = new Uint32Array((nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6);
-
-        const positionsBuffer = new StorageBuffer(engine, positions.byteLength);
-        positionsBuffer.update(positions);
+        const positionsBuffer = new StorageBuffer(
+            engine,
+            Float32Array.BYTES_PER_ELEMENT * nbVerticesPerRow * nbVerticesPerRow * 3,
+        );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
-        const indicesBuffer = new StorageBuffer(engine, indices.byteLength);
-        indicesBuffer.update(indices);
+        const indicesBuffer = new StorageBuffer(
+            engine,
+            Uint32Array.BYTES_PER_ELEMENT * (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
+        );
         this.computeShader.setStorageBuffer("indices", indicesBuffer);
 
         return new Promise((resolve) => {
