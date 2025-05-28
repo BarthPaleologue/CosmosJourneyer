@@ -79,9 +79,9 @@ export async function createTerrainScene(
 
     const t0 = performance.now();
 
-    const generator = new PlanarProceduralHeightField(nbVerticesPerRow, size, engine);
+    const generator = new PlanarProceduralHeightField(engine);
 
-    const { positions, indices } = await generator.dispatch();
+    const { positions, indices } = await generator.dispatch(nbVerticesPerRow, size, engine);
 
     const normals = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
     VertexData.ComputeNormals(positions, indices, normals);
