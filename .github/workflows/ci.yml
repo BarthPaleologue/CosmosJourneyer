@@ -7,12 +7,12 @@ on:
   workflow_dispatch:
  
 concurrency:
-  group: ci-${{ github.head_ref || github.ref || github.run_id }}
+  group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
   cancel-in-progress: true
  
 jobs:
   validate:
-    name: Validate All
+    name: full-ci-pipeline
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
