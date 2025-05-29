@@ -46,10 +46,10 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let idx = x + y * row_vertex_count;
 
     // get neighbor coords with clamped forward/backward differences
-    let x_left = clamp(x - 1u, 0u, row_vertex_count - 1u);
-    let x_right = clamp(x + 1u, 0u, row_vertex_count - 1u);
-    let y_down = clamp(y - 1u, 0u, row_vertex_count - 1u);
-    let y_up = clamp(y + 1u, 0u, row_vertex_count - 1u);
+    let x_left = select(x - 1u, 0u, x == 0u);
+    let x_right = min(x + 1u, row_vertex_count - 1u);
+    let y_down = select(y - 1u, 0u, y == 0u);
+    let y_up = min(y + 1u, row_vertex_count - 1u);
 
     // fetch neighbor positions
     let position_left = load_position(x_left, y, row_vertex_count);
