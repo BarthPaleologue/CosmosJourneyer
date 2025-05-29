@@ -34,7 +34,7 @@ struct Params {
 
 #include "../noise/erosionNoise2D.wgsl";
 
-@compute @workgroup_size(1,1,1)
+@compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let x : f32 = f32(id.x);
     let y : f32 = f32(id.y);
