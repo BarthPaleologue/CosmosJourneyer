@@ -1,104 +1,101 @@
 name: CI Pipeline
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
- 
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
 concurrency:
-  group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
-  cancel-in-progress: true
- 
+    group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
+    cancel-in-progress: true
+
 jobs:
-  validate:
-    name: full-ci-pipeline
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        node-version: [22]
-    steps:
-      # ─────────── Setup Environment ───────────
-     
-      # ─────────── repo + LFS
-      - name: Checkout repository with LFS
-        uses: actions/checkout@v4 # ⬇ repo
-        with: #    + LFS blobs
-          lfs: true #   (LFS support)
-          fetch-depth: 0 #    (helps LFS cache hits)
-         
-      - name: Cache Git-LFS objects
-        uses: actions/cache@v4
-        with:
-          path: ~/.git/lfs/ # default client cache
-          key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}  
+    validate:
+        name: full-ci-pipeline
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        strategy:
+            matrix:
+                node-version: [22]
+        steps:
+            # ─────────── Setup Environment ───────────
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8  
-         
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-         
-       # ─────────── Install & Checks ───────────
-       
-      - name: Install dependencies
-        run: pnpm install
-         
-      - name: Format check
-        run: pnpm run format:check
-       
-      - name: Lint
-        run: pnpm run lint
-       
-      - name: Test
-        run: pnpm test:unit
-       
-      # ─────────── Build & E2E Tests ───────────
-     
-      - name: Build
-        run: pnpm run build
-       
-       # ─────────── build test image (local load, no push)  
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          tags: cosmos-journeyer-e2e:${{ github.sha }}
-          load: true # load into the runner’s daemon
-          build-args: |
-            PW_VERSION=1.52.0
-       
-       # ─────────── run Playwright
-      - name: Run Playwright suite
-        run: |
-          mkdir -p artifacts                 # host dir for reports / diffs  
-          docker run --rm --ipc=host -e CI=1 \
-            -v ${{ github.workspace }}/tests/e2e:/app/tests/e2e \
-            -v ${{ github.workspace }}/artifacts:/output \
-            cosmos-journeyer-e2e:${{ github.sha }} \
-            npx playwright test \
-                --output=/output \
-                --reporter=line,html
-               
-     
-      # ─────────── publish results
-      - name: Upload HTML report
-        if: always() # even on failure
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: artifacts/playwright-report
+            # ─────────── repo + LFS
+            - name: Checkout repository with LFS
+              uses: actions/checkout@v4 # ⬇ repo
+              with: #    + LFS blobs
+                  lfs: true #   (LFS support)
+                  fetch-depth: 0 #    (helps LFS cache hits)
 
-      - name: Upload raw diffs (only on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: artifacts/test-results
-          
+            - name: Cache Git-LFS objects
+              uses: actions/cache@v4
+              with:
+                  path: ~/.git/lfs/ # default client cache
+                  key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 8
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+              # ─────────── Install & Checks ───────────
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Format check
+              run: pnpm run format:check
+
+            - name: Lint
+              run: pnpm run lint
+
+            - name: Test
+              run: pnpm test:unit
+
+            # ─────────── Build & E2E Tests ───────────
+            - name: Build
+              run: pnpm run build
+
+              # ─────────── build test image (local load, no push)
+            - name: Build Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  tags: cosmos-journeyer-e2e:${{ github.sha }}
+                  load: true # load into the runner’s daemon
+                  build-args: |
+                      PW_VERSION=1.52.0
+
+              # ─────────── run Playwright
+            - name: Run Playwright suite
+              run: |
+                  mkdir -p artifacts                 # host dir for reports / diffs  
+                  docker run --rm --ipc=host -e CI=1 \
+                    -v ${{ github.workspace }}/tests/e2e:/app/tests/e2e \
+                    -v ${{ github.workspace }}/artifacts:/output \
+                    cosmos-journeyer-e2e:${{ github.sha }} \
+                    npx playwright test \
+                        --output=/output \
+                        --reporter=line,html
+
+            # ─────────── publish results
+            - name: Upload HTML report
+              if: always() # even on failure
+              uses: actions/upload-artifact@v4
+              with:
+                  name: playwright-report
+                  path: artifacts/playwright-report
+
+            - name: Upload raw diffs (only on failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-results
+                  path: artifacts/test-results
