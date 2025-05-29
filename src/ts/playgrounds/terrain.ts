@@ -31,6 +31,7 @@ import {
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PlanarProceduralHeightField } from "@/frontend/terrain/planarProceduralHeightField";
+import { SquareGridNormalComputer } from "@/frontend/terrain/squareGridNormalComputer";
 
 export async function createTerrainScene(
     engine: WebGPUEngine,
@@ -78,9 +79,23 @@ export async function createTerrainScene(
     const generator = new PlanarProceduralHeightField(engine);
 
     const t0 = performance.now();
-    const { positions, indices } = await generator.dispatch(nbVerticesPerRow, size, engine);
+    const { positions: positionsBuffer, indices: indicesBuffer } = await generator.dispatch(
+        nbVerticesPerRow,
+        size,
+        engine,
+    );
     const t1 = performance.now();
     console.log("Height field generation:", t1 - t0, "ms");
+
+    /*const normalComputer = new SquareGridNormalComputer(engine);
+    const normalsGpu = await normalComputer.dispatch(nbVerticesPerRow, positions, engine);
+    const normalsGpuOnCpu = new Float32Array((await normalsGpu.read()).buffer);*/
+
+    const positionsBufferView = await positionsBuffer.read();
+    const indicesBufferView = await indicesBuffer.read();
+
+    const positions = new Float32Array(positionsBufferView.buffer);
+    const indices = new Uint32Array(indicesBufferView.buffer);
 
     const normals = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
     VertexData.ComputeNormals(positions, indices, normals);
