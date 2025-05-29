@@ -48,7 +48,7 @@ export class SquareGridNormalComputer {
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
     }
 
-    dispatch(nbVerticesPerRow: number, positions: StorageBuffer, engine: WebGPUEngine): Promise<StorageBuffer> {
+    async dispatch(nbVerticesPerRow: number, positions: StorageBuffer, engine: WebGPUEngine): Promise<StorageBuffer> {
         const positionsBuffer = positions;
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
@@ -61,19 +61,12 @@ export class SquareGridNormalComputer {
         this.paramsBuffer.updateUInt("row_vertex_count", nbVerticesPerRow);
         this.paramsBuffer.update();
 
-        return new Promise((resolve) => {
-            this.computeShader
-                .dispatchWhenReady(
-                    nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[0],
-                    nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[1],
-                    1,
-                )
-                .then(() => {
-                    resolve(normalBuffer);
-                })
-                .catch((error: unknown) => {
-                    console.error("Error dispatching compute shader:", error);
-                });
-        });
+        await this.computeShader.dispatchWhenReady(
+            nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[0],
+            nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[1],
+            1,
+        );
+
+        return normalBuffer;
     }
 }
