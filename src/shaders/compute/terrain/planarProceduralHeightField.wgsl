@@ -36,6 +36,10 @@ struct Params {
 
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+    if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
+        return; 
+    }
+
     let x : f32 = f32(id.x);
     let y : f32 = f32(id.y);
 
