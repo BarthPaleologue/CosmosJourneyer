@@ -17,6 +17,7 @@
 
 import { StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { ComputeShader } from "@babylonjs/core/Compute/computeShader";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
@@ -55,6 +56,7 @@ export class SquareGridNormalComputer {
         const normalBuffer = new StorageBuffer(
             engine,
             Float32Array.BYTES_PER_ELEMENT * nbVerticesPerRow * nbVerticesPerRow * 3,
+            Constants.BUFFER_CREATIONFLAG_VERTEX | Constants.BUFFER_CREATIONFLAG_READWRITE,
         );
         this.computeShader.setStorageBuffer("normals", normalBuffer);
 
