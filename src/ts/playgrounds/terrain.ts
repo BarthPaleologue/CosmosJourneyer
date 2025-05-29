@@ -77,11 +77,12 @@ export async function createTerrainScene(
 
     const terrain = new Mesh("terrain", scene);
 
-    const t0 = performance.now();
-
     const generator = new PlanarProceduralHeightField(engine);
 
+    const t0 = performance.now();
     const { positions, indices } = await generator.dispatch(nbVerticesPerRow, size, engine);
+    const t1 = performance.now();
+    console.log("Height field generation:", t1 - t0, "ms");
 
     const normals = new Float32Array(nbVerticesPerRow * nbVerticesPerRow * 3);
     VertexData.ComputeNormals(positions, indices, normals);
@@ -92,9 +93,6 @@ export async function createTerrainScene(
     vertexData.normals = normals;
 
     vertexData.applyToMesh(terrain);
-
-    const t1 = performance.now();
-    console.log("Terrain generation:", t1 - t0, "ms");
 
     const terrainMat = new PBRMetallicRoughnessMaterial("terrainMat", scene);
     terrainMat.baseColor = new Color3(0.5, 0.5, 0.5);
