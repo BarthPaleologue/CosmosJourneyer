@@ -80,14 +80,14 @@ export async function createTerrainScene(
     const generator = new PlanarProceduralHeightField(engine);
 
     const t0 = performance.now();
-    const { positions: positionsBuffer, indices: indicesBuffer } = await generator.dispatch(
+    const { positions: positionBuffer, indices: indexBuffer } = await generator.dispatch(
         nbVerticesPerRow,
         size,
         engine,
     );
     const t1 = performance.now();
     const normalComputer = new SquareGridNormalComputer(engine);
-    const normalsGpu = await normalComputer.dispatch(nbVerticesPerRow, positionsBuffer, engine);
+    const normalBuffer = await normalComputer.dispatch(nbVerticesPerRow, positionBuffer, engine);
     const t2 = performance.now();
 
     console.log("Height field generation:", t1 - t0, "ms");
@@ -96,43 +96,32 @@ export async function createTerrainScene(
     const keepDataOnGPU = false;
 
     if (keepDataOnGPU) {
-        const positionsVertexBuffer = new VertexBuffer(
-            engine,
-            positionsBuffer.getBuffer(),
-            "position",
-            false,
-            false,
-            3,
-        );
+        const positionsVertexBuffer = new VertexBuffer(engine, positionBuffer.getBuffer(), "position", false, false, 3);
         terrain.setVerticesBuffer(positionsVertexBuffer);
 
-        const normalsVertexBuffer = new VertexBuffer(engine, normalsGpu.getBuffer(), "normal", false, false, 3);
+        const normalsVertexBuffer = new VertexBuffer(engine, normalBuffer.getBuffer(), "normal", false, false, 3);
         terrain.setVerticesBuffer(normalsVertexBuffer);
 
         terrain.setIndexBuffer(
-            indicesBuffer.getBuffer(),
+            indexBuffer.getBuffer(),
             nbVerticesPerRow * nbVerticesPerRow,
             (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
         );
     } else {
-        const positionsBufferView = await positionsBuffer.read();
-        const indicesBufferView = await indicesBuffer.read();
-        const normalsBufferView = await normalsGpu.read();
-
-        const positions = new Float32Array(positionsBufferView.buffer);
-        const indices = new Uint32Array(indicesBufferView.buffer);
-        const normals = new Float32Array(normalsBufferView.buffer);
+        const positionBufferView = await positionBuffer.read();
+        const indexBufferView = await indexBuffer.read();
+        const normalBufferView = await normalBuffer.read();
 
         const vertexData = new VertexData();
-        vertexData.positions = positions;
-        vertexData.indices = indices;
-        vertexData.normals = normals;
+        vertexData.positions = new Float32Array(positionBufferView.buffer);
+        vertexData.indices = new Uint32Array(indexBufferView.buffer);
+        vertexData.normals = new Float32Array(normalBufferView.buffer);
 
         vertexData.applyToMesh(terrain);
     }
 
     const terrainMat = new PBRMetallicRoughnessMaterial("terrainMat", scene);
-    terrainMat.baseColor = new Color3(0.5, 0.5, 0.5);
+    terrainMat.baseColor = new Color3(0.5, 1.0, 0.5);
     terrainMat.metallic = 0.0;
     terrainMat.roughness = 0.8;
     terrain.material = terrainMat;
