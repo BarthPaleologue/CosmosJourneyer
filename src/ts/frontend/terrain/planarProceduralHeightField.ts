@@ -27,6 +27,8 @@ export class PlanarProceduralHeightField {
 
     private readonly paramsBuffer: UniformBuffer;
 
+    private static WORKGROUP_SIZE = [16, 16] as const;
+
     constructor(engine: WebGPUEngine) {
         const numOctaves = 2;
         const lacunarity = 2.0;
@@ -88,7 +90,11 @@ export class PlanarProceduralHeightField {
         );
         this.computeShader.setStorageBuffer("indices", indicesBuffer);
 
-        await this.computeShader.dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1);
+        await this.computeShader.dispatchWhenReady(
+            nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[0],
+            nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[1],
+            1,
+        );
 
         return {
             positions: positionsBuffer,
