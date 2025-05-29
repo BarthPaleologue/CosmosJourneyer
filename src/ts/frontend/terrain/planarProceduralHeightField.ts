@@ -64,7 +64,7 @@ export class PlanarProceduralHeightField {
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
     }
 
-    dispatch(
+    async dispatch(
         nbVerticesPerRow: number,
         size: number,
         engine: WebGPUEngine,
@@ -88,18 +88,11 @@ export class PlanarProceduralHeightField {
         );
         this.computeShader.setStorageBuffer("indices", indicesBuffer);
 
-        return new Promise((resolve) => {
-            this.computeShader
-                .dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1)
-                .then(() => {
-                    resolve({
-                        positions: positionsBuffer,
-                        indices: indicesBuffer,
-                    });
-                })
-                .catch((error: unknown) => {
-                    console.error("Error dispatching compute shader:", error);
-                });
-        });
+        await this.computeShader.dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1);
+
+        return {
+            positions: positionsBuffer,
+            indices: indicesBuffer,
+        };
     }
 }
