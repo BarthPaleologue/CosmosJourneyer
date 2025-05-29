@@ -21,7 +21,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
-import heightMapComputeSource from "@shaders/compute/utils/squareGridComputeNormals.wgsl";
+import computeSource from "@shaders/compute/utils/squareGridComputeNormals.wgsl";
 
 export class SquareGridNormalComputer {
     private readonly computeShader: ComputeShader;
@@ -34,7 +34,7 @@ export class SquareGridNormalComputer {
         this.computeShader = new ComputeShader(
             "squareGridNormalComputer",
             engine,
-            { computeSource: heightMapComputeSource },
+            { computeSource },
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
