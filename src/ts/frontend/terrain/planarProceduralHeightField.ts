@@ -69,8 +69,8 @@ export class PlanarProceduralHeightField {
         size: number,
         engine: WebGPUEngine,
     ): Promise<{
-        positions: Float32Array;
-        indices: Uint32Array;
+        positions: StorageBuffer;
+        indices: StorageBuffer;
     }> {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateFloat("size", size);
@@ -91,26 +91,11 @@ export class PlanarProceduralHeightField {
         return new Promise((resolve) => {
             this.computeShader
                 .dispatchWhenReady(nbVerticesPerRow, nbVerticesPerRow, 1)
-                .then(async () => {
-                    try {
-                        const [positionsBufferView, indicesBufferView] = await Promise.all([
-                            positionsBuffer.read(),
-                            indicesBuffer.read(),
-                        ]);
-
-                        const positions = new Float32Array(positionsBufferView.buffer);
-                        positionsBuffer.dispose();
-
-                        const indices = new Uint32Array(indicesBufferView.buffer);
-                        indicesBuffer.dispose();
-
-                        resolve({
-                            positions: positions,
-                            indices: indices,
-                        });
-                    } catch (error) {
-                        console.error("Error reading buffers:", error);
-                    }
+                .then(() => {
+                    resolve({
+                        positions: positionsBuffer,
+                        indices: indicesBuffer,
+                    });
                 })
                 .catch((error: unknown) => {
                     console.error("Error dispatching compute shader:", error);
