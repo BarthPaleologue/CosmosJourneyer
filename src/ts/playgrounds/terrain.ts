@@ -25,6 +25,7 @@ import {
     Scene,
     ShadowGenerator,
     Vector3,
+    VertexBuffer,
     VertexData,
     WebGPUEngine,
 } from "@babylonjs/core";
@@ -89,23 +90,46 @@ export async function createTerrainScene(
     const normalsGpu = await normalComputer.dispatch(nbVerticesPerRow, positionsBuffer, engine);
     const t2 = performance.now();
 
-    const normals = new Float32Array((await normalsGpu.read()).buffer);
-
     console.log("Height field generation:", t1 - t0, "ms");
     console.log("Normals computation:", t2 - t1, "ms");
 
-    const positionsBufferView = await positionsBuffer.read();
-    const indicesBufferView = await indicesBuffer.read();
+    const keepDataOnGPU = false;
 
-    const positions = new Float32Array(positionsBufferView.buffer);
-    const indices = new Uint32Array(indicesBufferView.buffer);
+    if (keepDataOnGPU) {
+        const positionsVertexBuffer = new VertexBuffer(
+            engine,
+            positionsBuffer.getBuffer(),
+            "position",
+            false,
+            false,
+            3,
+        );
+        terrain.setVerticesBuffer(positionsVertexBuffer);
 
-    const vertexData = new VertexData();
-    vertexData.positions = positions;
-    vertexData.indices = indices;
-    vertexData.normals = normals;
+        const normalsVertexBuffer = new VertexBuffer(engine, normalsGpu.getBuffer(), "normal", false, false, 3);
+        terrain.setVerticesBuffer(normalsVertexBuffer);
 
-    vertexData.applyToMesh(terrain);
+        terrain.setIndexBuffer(
+            indicesBuffer.getBuffer(),
+            nbVerticesPerRow * nbVerticesPerRow,
+            (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
+        );
+    } else {
+        const positionsBufferView = await positionsBuffer.read();
+        const indicesBufferView = await indicesBuffer.read();
+        const normalsBufferView = await normalsGpu.read();
+
+        const positions = new Float32Array(positionsBufferView.buffer);
+        const indices = new Uint32Array(indicesBufferView.buffer);
+        const normals = new Float32Array(normalsBufferView.buffer);
+
+        const vertexData = new VertexData();
+        vertexData.positions = positions;
+        vertexData.indices = indices;
+        vertexData.normals = normals;
+
+        vertexData.applyToMesh(terrain);
+    }
 
     const terrainMat = new PBRMetallicRoughnessMaterial("terrainMat", scene);
     terrainMat.baseColor = new Color3(0.5, 0.5, 0.5);
@@ -115,8 +139,8 @@ export async function createTerrainScene(
 
     terrain.scaling.scaleInPlace(10);
 
-    terrain.receiveShadows = true;
-    shadowGenerator.addShadowCaster(terrain);
+    //terrain.receiveShadows = true;
+    //shadowGenerator.addShadowCaster(terrain);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
