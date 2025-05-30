@@ -1,4 +1,4 @@
-name: e2e
+name: CI Pipeline
 on:
     push:
         branches: [main]
@@ -6,13 +6,24 @@ on:
         branches: [main]
     workflow_dispatch:
 
-jobs:
-    playwright-e2e:
-        runs-on: ubuntu-latest
+concurrency:
+    group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
+    cancel-in-progress: true
 
+jobs:
+    validate:
+        name: full-ci-pipeline
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        strategy:
+            matrix:
+                node-version: [22]
         steps:
-            # 1 ─────────── repo + LFS
-            - uses: actions/checkout@v4 # ⬇ repo
+            # ─────────── Setup Environment ───────────
+
+            # ─────────── repo + LFS
+            - name: Checkout repository with LFS
+              uses: actions/checkout@v4 # ⬇ repo
               with: #    + LFS blobs
                   lfs: true #   (LFS support)
                   fetch-depth: 0 #    (helps LFS cache hits)
@@ -23,7 +34,36 @@ jobs:
                   path: ~/.git/lfs/ # default client cache
                   key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
 
-            # 2 ─────────── build test image (local load, no push)
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+              # ─────────── Install & Checks ───────────
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Format check
+              run: pnpm run format:check
+
+            - name: Lint
+              run: pnpm run lint
+
+            - name: Test
+              run: pnpm test:unit
+
+            # ─────────── Build & E2E Tests ───────────
+            - name: Build
+              run: pnpm run build
+
+              # ─────────── build test image (local load, no push)
             - name: Build Docker image
               uses: docker/build-push-action@v5
               with:
@@ -33,10 +73,10 @@ jobs:
                   build-args: |
                       PW_VERSION=1.52.0
 
-            # 3 ─────────── run Playwright
+              # ─────────── run Playwright
             - name: Run Playwright suite
               run: |
-                  mkdir -p artifacts                 # host dir for reports / diffs
+                  mkdir -p artifacts                 # host dir for reports / diffs  
                   docker run --rm --ipc=host -e CI=1 \
                     -v ${{ github.workspace }}/tests/e2e:/app/tests/e2e \
                     -v ${{ github.workspace }}/artifacts:/output \
@@ -45,7 +85,7 @@ jobs:
                         --output=/output \
                         --reporter=line,html
 
-            # 4 ─────────── publish results
+            # ─────────── publish results
             - name: Upload HTML report
               if: always() # even on failure
               uses: actions/upload-artifact@v4
