@@ -205,7 +205,7 @@ Thank you to all the people who have contributed to Cosmos Journeyer!
 
 ## License
 
-Cosmos Journeyer is a free and open-source software licensed under the terms of the GNU AGPL License. Look at the `LICENSE.md` files for the exact terms.
+Cosmos Journeyer is a free and open-source software licensed under the terms of the GNU AGPL License. Look at the `LICENSE.md` file for the exact terms.
 
 ## Credits
 
