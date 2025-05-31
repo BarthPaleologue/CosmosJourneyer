@@ -21,6 +21,7 @@
 - [Roadmap](#roadmap)
 - [Features](#features)
 - [Development](#development)
+    - [Tech stack](#tech-stack)
     - [Setup](#setup)
     - [Building](#building)
         - [Web](#web)
