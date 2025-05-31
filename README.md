@@ -159,7 +159,7 @@ The deadlines are not set in stone and can be moved around as I am not working f
 
 ## Features
 
-Every telluric planet and moon has a surface that can be explored by the player using a spaceship, or by foot!
+Every telluric planet and moon has a surface that can be explored by the player using a spaceship, or by foot.
 
 ![From Space](./coverImages/space.png)
 
@@ -189,7 +189,7 @@ To start the production server version, run `pnpm serve:prod`. The development v
 
 ### Tauri
 
-Cosmos Journeyer can be built as a desktop application using Tauri!
+Cosmos Journeyer can be built as a desktop application using Tauri.
 
 First you will need a bazillion dependencies, here is a list of some of them if you are using a Debian based OS:
 
