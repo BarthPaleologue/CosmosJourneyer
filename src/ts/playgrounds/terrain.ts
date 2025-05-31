@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+    BoundingInfo,
     Color3,
     DirectionalLight,
     GizmoManager,
@@ -101,6 +102,7 @@ export async function createTerrainScene(
 
         const normalsVertexBuffer = new VertexBuffer(engine, normalBuffer.getBuffer(), "normal", false, false, 3);
         terrain.setVerticesBuffer(normalsVertexBuffer);
+        terrain.setBoundingInfo(new BoundingInfo(new Vector3(-size, -size, -size), new Vector3(size, size, size)));
 
         terrain.setIndexBuffer(
             indexBuffer.getBuffer(),
@@ -129,8 +131,8 @@ export async function createTerrainScene(
     terrain.scaling.scaleInPlace(10);
     terrain.scaling.y *= 2;
 
-    //terrain.receiveShadows = true;
-    //shadowGenerator.addShadowCaster(terrain);
+    terrain.receiveShadows = true;
+    shadowGenerator.addShadowCaster(terrain);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
