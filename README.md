@@ -2,8 +2,8 @@
 
 ![Latest Release](https://img.shields.io/github/v/release/BarthPaleologue/CosmosJourneyer)
 [![CI Pipeline](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/ci.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/ci.yml)
-[![pages-build-deployment](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment)
-[![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
+[![pages-build-deployment](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/pages/pages-build-deployment)
+[![License](https://img.shields.io/github/license/BarthPaleologue/CosmosJourneyer)](./LICENSE.md)
 
 [![Teaser Video](./coverImages/video.png)](https://youtu.be/5pXZqHRShTE)
 
