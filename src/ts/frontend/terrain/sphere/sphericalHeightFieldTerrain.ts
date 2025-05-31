@@ -23,6 +23,7 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { Direction } from "@/utils/direction";
 
+import { ChunkForgeCompute } from "./chunkForgeCompute";
 import { SphericalHeightFieldSide } from "./sphericalHeightFieldSide";
 
 export class SphericalHeightFieldTerrain implements Transformable {
@@ -53,6 +54,12 @@ export class SphericalHeightFieldTerrain implements Transformable {
 
     getTransform(): TransformNode {
         return this.transform;
+    }
+
+    update(chunkForge: ChunkForgeCompute) {
+        for (const side of this.sides) {
+            side.update(chunkForge);
+        }
     }
 
     dispose(): void {
