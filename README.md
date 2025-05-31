@@ -42,7 +42,7 @@ From stellar black holes and fully explorable planets down to single grass blade
 
 ### Online
 
-You can play freely from the main website of the project at https://cosmosjourneyer.com/
+You can play freely from the main website of the project at [cosmosjourneyer.com](https://cosmosjourneyer.com/)
 
 ### Locally
 
