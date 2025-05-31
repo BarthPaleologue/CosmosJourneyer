@@ -37,6 +37,7 @@ export function createSphericalHeightFieldTerrain(
     controls.getTransform().lookAt(Vector3.Zero());
 
     const camera = controls.getActiveCamera();
+    camera.minZ = 0.01; // Set a minimum Z distance to avoid clipping issues
 
     // This attaches the camera to the canvas
     camera.attachControl();
