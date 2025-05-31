@@ -37,17 +37,17 @@ export class SphericalHeightFieldTerrain implements Transformable {
         SphericalHeightFieldSide,
     ];
 
-    constructor(scene: Scene) {
+    constructor(radius: number, scene: Scene) {
         this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.sides = [
-            new SphericalHeightFieldSide(Direction.UP, this.transform, scene),
-            new SphericalHeightFieldSide(Direction.DOWN, this.transform, scene),
-            new SphericalHeightFieldSide(Direction.FORWARD, this.transform, scene),
-            new SphericalHeightFieldSide(Direction.BACKWARD, this.transform, scene),
-            new SphericalHeightFieldSide(Direction.LEFT, this.transform, scene),
-            new SphericalHeightFieldSide(Direction.RIGHT, this.transform, scene),
+            new SphericalHeightFieldSide(Direction.UP, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(Direction.DOWN, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(Direction.FORWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(Direction.BACKWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(Direction.LEFT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(Direction.RIGHT, radius, this.getTransform(), scene),
         ];
     }
 
