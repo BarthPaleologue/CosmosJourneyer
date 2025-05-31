@@ -11,14 +11,13 @@
 - [How to play](#how-to-play)
     - [Online](#online)
     - [Locally](#locally)
-- [Support](#support)
+- [Community and support](#community-and-support)
 - [My vision for the project](#my-vision-for-the-project)
     - [Themes and atmosphere](#themes-and-atmosphere)
     - [The narrative](#the-narrative)
     - [Gameplay](#gameplay)
     - [Main tutorial](#main-tutorial)
 - [Why Cosmos Journeyer?](#why-cosmos-journeyer)
-- [Share your screenshots](#share-your-screenshots)
 - [Contributing](#contributing)
 - [Sponsor](#sponsor)
 - [Documentation](#documentation)
@@ -58,9 +57,11 @@ If you want the cutting edge version, follow these steps:
 
 To update your local version, either download the latest installer or run `git pull` in your local install.
 
-## Support
+## Community and support
 
-If you encounter any bugs or want to request features, please open an [issue](https://github.com/BarthPaleologue/CosmosJourneyer/issues). For general discussion and screenshots, visit the [official subreddit](https://www.reddit.com/r/CosmosJourneyer/).
+If you encounter any bugs or want to request features, please open an [issue](https://github.com/BarthPaleologue/CosmosJourneyer/issues) or send an email to <barth.paleologue@cosmosjourneyer.com>.
+
+For general discussion and sharing screenshots, visit the [official subreddit](https://www.reddit.com/r/CosmosJourneyer/).
 
 ## My vision for the project
 
@@ -119,11 +120,6 @@ There are many reasons of course but here are the main ones:
   exploration first game, where your main drive is to discover cool things, take pictures, and dream for a bit.
 - **Personal**: I don't know it's just so exciting to create an entire universe from scratch. It really is a dream
   comming true for me.
-
-## Share your screenshots!
-
-There is a subreddit for Cosmos Journeyer at https://www.reddit.com/r/CosmosJourneyer/. Don't hesitate to share
-screenshots or just ask questions about the project!
 
 ## Contributing
 
