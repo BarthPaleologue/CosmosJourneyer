@@ -36,7 +36,7 @@
 
 Cosmos Journeyer is a space exploration game running directly in the browser! Take your spaceship and witness the beauty of this virtually infinite universe.
 
-From stellar black holes, to fully explorable planets down to single grass blades, to asteroid fields, your journey will be unforgettable.
+From stellar black holes and fully explorable planets down to single grass blades, to asteroid fields, your journey will be unforgettable.
 
 ## How to play
 
