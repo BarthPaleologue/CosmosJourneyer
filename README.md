@@ -7,36 +7,36 @@
 
 [![Teaser Video](./coverImages/video.png)](https://youtu.be/5pXZqHRShTE)
 
-- [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)  
-- [How to play](#how-to-play)  
-  - [Online](#online)  
-  - [Locally](#locally)
+- [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)
+- [How to play](#how-to-play)
+    - [Online](#online)
+    - [Locally](#locally)
 - [Support](#support)
-- [My vision for the project](#my-vision-for-the-project)  
-  - [Themes and atmosphere](#themes-and-atmosphere)  
-  - [The narrative](#the-narrative)  
-  - [Gameplay](#gameplay)  
-  - [Main tutorial](#main-tutorial)  
-- [Why Cosmos Journeyer?](#why-cosmos-journeyer)  
-- [Share your screenshots](#share-your-screenshots)  
-- [Contributing](#contributing)  
-- [Sponsor](#sponsor)  
-- [Documentation](#documentation)  
-- [Roadmap](#roadmap)  
-- [Features](#features)  
-- [Build](#build)  
-  - [Web](#web)  
-  - [Tauri](#tauri)  
-- [Contributors](#contributors)  
-- [License](#license)  
-- [Credits](#credits)  
-- [Special Thanks](#special-thanks)  
+- [My vision for the project](#my-vision-for-the-project)
+    - [Themes and atmosphere](#themes-and-atmosphere)
+    - [The narrative](#the-narrative)
+    - [Gameplay](#gameplay)
+    - [Main tutorial](#main-tutorial)
+- [Why Cosmos Journeyer?](#why-cosmos-journeyer)
+- [Share your screenshots](#share-your-screenshots)
+- [Contributing](#contributing)
+- [Sponsor](#sponsor)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Features](#features)
+- [Build](#build)
+    - [Web](#web)
+    - [Tauri](#tauri)
+- [Contributors](#contributors)
+- [License](#license)
+- [Credits](#credits)
+- [Special Thanks](#special-thanks)
 
 ## What is Cosmos Journeyer?
 
-Cosmos Journeyer is a space exploration game running directly in the browser! Take your spaceship and witness the beauty of this virtually infinite universe. 
+Cosmos Journeyer is a space exploration game running directly in the browser! Take your spaceship and witness the beauty of this virtually infinite universe.
 
-From stellar black holes, to fully explorable planets down to single grass blades, to asteroid fields, your journey will be unforgettable.  
+From stellar black holes, to fully explorable planets down to single grass blades, to asteroid fields, your journey will be unforgettable.
 
 ## How to play
 
@@ -46,9 +46,9 @@ You can play freely from the main website of the project at https://cosmosjourne
 
 ### Locally
 
-You can also play locally! You can get an installer for your system by going to [the latest release](https://github.com/BarthPaleologue/CosmosJourneyer/releases). 
+You can also play locally! You can get an installer for your system by going to [the latest release](https://github.com/BarthPaleologue/CosmosJourneyer/releases).
 
-If you want the cutting edge version, follow these steps: 
+If you want the cutting edge version, follow these steps:
 
 1. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git` (you need Git to run this command)
 2. Install the dependencies with `pnpm install` (you need Node.JS and Pnpm to run this command)
