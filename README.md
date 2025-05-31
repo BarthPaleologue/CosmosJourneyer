@@ -60,6 +60,14 @@ If you want the cutting edge version, follow these steps:
 
 To update your local version, either download the latest installer or run `git pull` in your local install.
 
+### Gameplay
+
+Once Cosmos Journeyer has started, simply start a new game: tutorials will guide you through the basics of the game as you play.
+
+You can pause the game at any time by pressing `ESC` and access the main menu to have a look at the keybindings, view the credits, and save your game.
+
+The game has auto-saves, so you can quit at any time and resume your game later from where you left off.
+
 ## Community and support
 
 If you encounter any bugs or want to request features, please open an [issue](https://github.com/BarthPaleologue/CosmosJourneyer/issues) or send an email to <barth.paleologue@cosmosjourneyer.com>.
