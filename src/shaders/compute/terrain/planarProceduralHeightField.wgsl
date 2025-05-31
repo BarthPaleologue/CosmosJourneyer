@@ -32,7 +32,7 @@ struct Params {
 
 #include "../noise/gradientNoise2D.wgsl";
 
-#include "../noise/erosionNoise2D.wgsl";
+#include "../noise/erosionNoise3D.wgsl";
 
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -47,30 +47,10 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     var vertex_position = vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
 
-    var scale : f32 = params.scaleFactor;
-    var weight : f32 = 1.0;
-    let mapResolution : vec2<f32> = vec2<f32>(f32(params.nbVerticesPerRow), f32(params.nbVerticesPerRow));
-    var gradient : vec2<f32> = vec2<f32>(0.0, 0.0);
-    var elevation : f32 = 0.0;
-    for (var i : i32 = 0; i < params.octaves; i = i + 1) {
-        let samplePoint = vertex_position.xz * scale;
-
-        let val = noised(samplePoint) * weight;
-        var local_gradient = vec2<f32>(val.y, val.z);
-        local_gradient *= scale;
-
-        gradient += local_gradient;
-        elevation += val.x;
-
-        scale = scale * params.lacunarity;
-        weight = weight * params.persistence;
-    }
-
-    let erosionBase = vec3(elevation, gradient.x, gradient.y);
-    let result = mountain(vec2<f32>(x,y)/mapResolution * 10.0, erosionBase);
+    let elevation = mountain(vertex_position, vec3f(0.0, 1.0, 0.0));
 
     positions[index * 3 + 0] = vertex_position.x;
-    positions[index * 3 + 1] = result.x;
+    positions[index * 3 + 1] = elevation;
     positions[index * 3 + 2] = vertex_position.z;
 
     if(x > 0 && y > 0) {
