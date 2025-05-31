@@ -154,6 +154,21 @@ sometimes moons.
 
 ## Development
 
+### Tech stack
+
+Cosmos Journeyer is built using the following technologies:
+
+- [BabylonJS](https://www.babylonjs.com/) for the 3D engine
+- [TypeScript](https://www.typescriptlang.org/) for the programming language
+- [Rspack](https://rspack.dev/) for bundling the application
+- [Pnpm](https://pnpm.io/) for the package manager
+- [Tauri](https://tauri.app/) for building the desktop application
+- [Playwright](https://playwright.dev/) for end-to-end testing
+- [Prettier](https://prettier.io/) for code formatting
+- [Vitest](https://vitest.dev/) for unit testing
+- [ESLint](https://eslint.org/) for linting
+- [Git LFS](https://git-lfs.github.com/) for versioning large files like screenshots
+
 ### Setup
 
 1. Install [Node.js](https://nodejs.org/) (version 20 or higher)
