@@ -26,12 +26,15 @@ export class SphericalHeightFieldSide {
 
     private readonly direction: Direction;
 
-    constructor(direction: Direction, parent: TransformNode, scene: Scene) {
+    private readonly radius: number;
+
+    constructor(direction: Direction, radius: number, parent: TransformNode, scene: Scene) {
         this.mesh = new Mesh("SphericalHeightFieldSide", scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
 
         this.direction = direction;
+        this.radius = radius;
     }
 
     dispose(): void {
