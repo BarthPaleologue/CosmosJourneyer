@@ -19,7 +19,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Direction } from "@/utils/direction";
+import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 
 import { type ChunkForgeCompute } from "./chunkForgeCompute";
 
@@ -44,6 +44,9 @@ export class SphericalHeightFieldSide {
         this.mesh = new Mesh("SphericalHeightFieldSide", scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
+
+        this.mesh.position.z = radius;
+        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
         this.direction = direction;
         this.radius = radius;
