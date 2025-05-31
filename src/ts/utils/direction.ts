@@ -18,14 +18,16 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
-export const enum Direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    FORWARD,
-    BACKWARD,
-}
+export const Direction = {
+    UP: 0,
+    DOWN: 1,
+    LEFT: 2,
+    RIGHT: 3,
+    FORWARD: 4,
+    BACKWARD: 5,
+} as const;
+
+export type Direction = (typeof Direction)[keyof typeof Direction];
 
 export function getQuaternionFromDirection(direction: Direction): Quaternion {
     switch (direction) {
