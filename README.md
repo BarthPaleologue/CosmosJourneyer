@@ -128,21 +128,21 @@ The deadlines are not set in stone and can be moved around as I am not working f
 
 Every telluric planet and moon has a surface that can be explored by the player using a spaceship, or by foot.
 
-![From Space](./coverImages/space.png)
+![Screenshot of a procedurally generated planet seen from orbit](./coverImages/space.png)
 
 Cosmos Journeyer lets you travel from one celestial body to another without any loading screen, giving the player a
 seamless experience while exploring.
 
-![A little bit closer](./coverImages/moon.png)
+![Screenshot from the surface a moon. There is a yellow star in the sky and a blue crescent from a planet near the horizon. Someone is standing on the surface below the sun.](./coverImages/moon.png)
 
 Planet surfaces are filled with procedural vegetation and rocks and butterflies to make them feel more alive.
 
-![On the surface](./coverImages/ground.png)
+![Screenshot of the surface of a telluric planet. A character is standing in a grass field with trees surrounding him. A lake can be seen in the distance under a blue-green sky.](./coverImages/ground.png)
 
 Cosmos Journeyer generates a virtually infinite amount of star systems that all have a star, often planets, and
 sometimes moons.
 
-![Star map](./coverImages/starmap.png)
+![Screenshot of the star map, many stars are scattered in all directions.](./coverImages/starmap.png)
 
 ## Build
 
