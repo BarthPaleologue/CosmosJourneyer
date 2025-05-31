@@ -49,8 +49,14 @@ You can also play locally! You can get an installer for your system by going to 
 
 If you want the cutting edge version, follow these steps:
 
-1. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git` (you need Git to run this command)
-2. Install the dependencies with `pnpm install` (you need Node.JS and Pnpm to run this command)
+0. Install prerequisites:
+
+- [Git](https://git-scm.com/) (install with your package manager or from https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/) (version 20 or higher)
+- [Pnpm](https://pnpm.io/) (install with `npm install -g pnpm`)
+
+1. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
+2. Install the dependencies with `pnpm install`
 3. Build the project with `pnpm build`
 4. Serve the project with `pnpm serve:prod`
 5. Play at http://localhost:8080
