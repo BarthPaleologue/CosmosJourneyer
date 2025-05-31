@@ -25,20 +25,17 @@ import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 
 type HeightFieldTask = {
     mesh: Mesh;
-    rowVertexCount: number;
     size: number;
 };
 
 type NormalTask = {
     mesh: Mesh;
-    rowVertexCount: number;
     positions: StorageBuffer;
     indices: StorageBuffer;
 };
 
 type ApplyTask = {
     mesh: Mesh;
-    rowVertexCount: number;
     positions: StorageBuffer;
     indices: StorageBuffer;
     normals: StorageBuffer;
@@ -54,17 +51,20 @@ export class ChunkForgeCompute {
 
     private readonly engine: WebGPUEngine;
 
-    constructor(nbComputeShaders: number, engine: WebGPUEngine) {
+    private readonly rowVertexCount: number;
+
+    constructor(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
         for (let i = 0; i < nbComputeShaders; i++) {
             this.availableHeightFieldComputers.push(new PlanarProceduralHeightField(engine));
             this.availableNormalComputers.push(new SquareGridNormalComputer(engine));
         }
 
+        this.rowVertexCount = rowVertexCount;
         this.engine = engine;
     }
 
     addBuildTask(mesh: Mesh, rowVertexCount: number, size: number): void {
-        this.heightFieldQueue.push({ mesh, rowVertexCount, size });
+        this.heightFieldQueue.push({ mesh, size });
     }
 
     async update(): Promise<void> {
@@ -74,15 +74,16 @@ export class ChunkForgeCompute {
                 break;
             }
 
+            console.log("Dispatching height field task for mesh:", nextTask.mesh.name);
+
             const { positions, indices } = await availableComputer.dispatch(
-                nextTask.rowVertexCount,
+                this.rowVertexCount,
                 nextTask.size,
                 this.engine,
             );
 
             this.normalQueue.push({
                 mesh: nextTask.mesh,
-                rowVertexCount: nextTask.rowVertexCount,
                 positions,
                 indices,
             });
@@ -94,11 +95,12 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            const normals = await availableComputer.dispatch(nextTask.rowVertexCount, nextTask.positions, this.engine);
+            console.log("Dispatching normal computation task for mesh:", nextTask.mesh.name);
+
+            const normals = await availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
 
             this.applyQueue.push({
                 mesh: nextTask.mesh,
-                rowVertexCount: nextTask.rowVertexCount,
                 positions: nextTask.positions,
                 indices: nextTask.indices,
                 normals,
@@ -111,7 +113,9 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            const { mesh, positions, indices, normals, rowVertexCount } = nextTask;
+            console.log("Applying computed buffers to mesh:", nextTask.mesh.name);
+
+            const { mesh, positions, indices, normals } = nextTask;
 
             const positionsVertexBuffer = new VertexBuffer(
                 this.engine,
@@ -128,8 +132,8 @@ export class ChunkForgeCompute {
 
             mesh.setIndexBuffer(
                 indices.getBuffer(),
-                rowVertexCount * rowVertexCount,
-                (rowVertexCount - 1) * (rowVertexCount - 1) * 6,
+                this.rowVertexCount * this.rowVertexCount,
+                (this.rowVertexCount - 1) * (this.rowVertexCount - 1) * 6,
             );
         }
     }
