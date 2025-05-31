@@ -20,12 +20,15 @@ import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 
+import { type Direction } from "@/utils/direction";
+
 import { PlanarProceduralHeightField } from "../planarProceduralHeightField";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 
 type HeightFieldTask = {
     mesh: Mesh;
     size: number;
+    direction: Direction;
 };
 
 type NormalTask = {
@@ -63,8 +66,8 @@ export class ChunkForgeCompute {
         this.engine = engine;
     }
 
-    addBuildTask(mesh: Mesh, rowVertexCount: number, size: number): void {
-        this.heightFieldQueue.push({ mesh, size });
+    addBuildTask(mesh: Mesh, direction: Direction, size: number): void {
+        this.heightFieldQueue.push({ mesh, direction, size });
     }
 
     async update(): Promise<void> {
