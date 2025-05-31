@@ -129,6 +129,7 @@ export async function createTerrainScene(
     terrain.material = terrainMat;
 
     terrain.scaling.scaleInPlace(10);
+    terrain.scaling.y *= 2;
 
     //terrain.receiveShadows = true;
     //shadowGenerator.addShadowCaster(terrain);

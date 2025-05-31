@@ -118,7 +118,7 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
     var n: vec4<f32> = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var nf: f32 = 1.0;
     var na: f32 = 0.6;
-    for (var i: i32 = 0; i < 2; i++) {
+    for (var i: i32 = 0; i < 3; i++) {
        n += gradient_noise_3d(p*nf)*na*vec4<f32>(1.0, nf, nf, nf);
        na *= 0.5;
        nf *= 2.0;
