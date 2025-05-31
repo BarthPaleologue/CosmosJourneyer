@@ -24,7 +24,7 @@
 
 //GRADIENT 3D NOISE DERIVATIVES SCENE/PREVIEW BY IQ : https://www.shadertoy.com/view/4dffRH
 
-const erosionscale: f32 = 1.0;
+const erosionscale: f32 = 4.0;
 
 // From https://www.shadertoy.com/view/4djSRW
 // Name : Hash without Sine
