@@ -21,12 +21,24 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type Direction } from "@/utils/direction";
 
+import { type ChunkForgeCompute } from "./chunkForgeCompute";
+
+const ChunkLoadingStatus = {
+    NOT_STARTED: 0,
+    IN_PROGRESS: 1,
+    COMPLETED: 2,
+} as const;
+
+type ChunkLoadingStatus = (typeof ChunkLoadingStatus)[keyof typeof ChunkLoadingStatus];
+
 export class SphericalHeightFieldSide {
     readonly mesh: Mesh;
 
     private readonly direction: Direction;
 
     private readonly radius: number;
+
+    private status: ChunkLoadingStatus = ChunkLoadingStatus.NOT_STARTED;
 
     constructor(direction: Direction, radius: number, parent: TransformNode, scene: Scene) {
         this.mesh = new Mesh("SphericalHeightFieldSide", scene);
@@ -35,6 +47,14 @@ export class SphericalHeightFieldSide {
 
         this.direction = direction;
         this.radius = radius;
+    }
+
+    update(chunkForge: ChunkForgeCompute) {
+        if (this.status === ChunkLoadingStatus.NOT_STARTED) {
+            this.status = ChunkLoadingStatus.IN_PROGRESS;
+
+            chunkForge.addBuildTask(this.mesh, 64, this.radius);
+        }
     }
 
     dispose(): void {
