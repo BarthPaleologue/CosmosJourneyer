@@ -74,7 +74,7 @@ export async function createTerrainScene(
     shadowGenerator.usePercentageCloserFiltering = true;
     shadowGenerator.bias = 0.0001;
 
-    const nbVerticesPerRow = 512;
+    const nbVerticesPerRow = 1024;
     const size = 8;
 
     const terrain = new Mesh("terrain", scene);
@@ -95,7 +95,7 @@ export async function createTerrainScene(
     console.log("Height field generation:", t1 - t0, "ms");
     console.log("Normals computation:", t2 - t1, "ms");
 
-    const keepDataOnGPU = false;
+    const keepDataOnGPU = true;
 
     if (keepDataOnGPU) {
         const positionsVertexBuffer = new VertexBuffer(engine, positionBuffer.getBuffer(), "position", false, false, 3);
@@ -129,7 +129,6 @@ export async function createTerrainScene(
     terrain.material = terrainMat;
 
     terrain.scaling.scaleInPlace(10);
-    terrain.scaling.y *= 2;
 
     //terrain.receiveShadows = true;
     //shadowGenerator.addShadowCaster(terrain);
