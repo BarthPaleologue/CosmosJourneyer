@@ -87,7 +87,7 @@ There are many reasons of course but here are the main ones:
   I feel the other games are too focused on combat, trading or multiplayer content. I want Cosmos Journeyer to be an
   exploration first game, where your main drive is to discover cool things, take pictures, and dream for a bit.
 - **Personal**: I don't know it's just so exciting to create an entire universe from scratch. It really is a dream
-  comming true for me.
+  coming true for me.
 
 ## Contributing
 
@@ -125,7 +125,7 @@ Every telluric planet and moon has a surface that can be explored by the player 
 
 ![From Space](./coverImages/space.png)
 
-Cosmos Journeyer allows to travel from one celestial body to another without any loading screen, giving the player a
+Cosmos Journeyer lets you travel from one celestial body to another without any loading screen, giving the player a
 seamless experience while exploring.
 
 ![A little bit closer](./coverImages/moon.png)
