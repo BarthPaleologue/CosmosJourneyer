@@ -1,16 +1,66 @@
 # Cosmos Journeyer
 
+![Latest Release](https://img.shields.io/github/v/release/BarthPaleologue/CosmosJourneyer)
 [![CI Pipeline](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/ci.yml/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/ci.yml)
 [![pages-build-deployment](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/planetEngine/actions/workflows/pages/pages-build-deployment)
 [![License](https://img.shields.io/github/license/BarthPaleologue/planetEngine)](./LICENSE.md)
 
 [![Teaser Video](./coverImages/video.png)](https://youtu.be/5pXZqHRShTE)
 
+- [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)  
+- [How to play](#how-to-play)  
+  - [Online](#online)  
+  - [Locally](#locally)
+- [Support](#support)
+- [My vision for the project](#my-vision-for-the-project)  
+  - [Themes and atmosphere](#themes-and-atmosphere)  
+  - [The narrative](#the-narrative)  
+  - [Gameplay](#gameplay)  
+  - [Main tutorial](#main-tutorial)  
+- [Why Cosmos Journeyer?](#why-cosmos-journeyer)  
+- [Share your screenshots](#share-your-screenshots)  
+- [Contributing](#contributing)  
+- [Sponsor](#sponsor)  
+- [Documentation](#documentation)  
+- [Roadmap](#roadmap)  
+- [Features](#features)  
+- [Build](#build)  
+  - [Web](#web)  
+  - [Tauri](#tauri)  
+- [Contributors](#contributors)  
+- [License](#license)  
+- [Credits](#credits)  
+- [Special Thanks](#special-thanks)  
+
 ## What is Cosmos Journeyer?
 
-Cosmos Journeyer is the open-source procedural universe running inside a web page that makes space exploration
-accessible for everyone.
-Planets are fully explorable from orbit down to the surface, and the universe is virtually infinite.
+Cosmos Journeyer is a space exploration game running directly in the browser! Take your spaceship and witness the beauty of this virtually infinite universe. 
+
+From stellar black holes, to fully explorable planets down to single grass blades, to asteroid fields, your journey will be unforgettable.  
+
+## How to play
+
+### Online
+
+You can play freely from the main website of the project at https://cosmosjourneyer.com/
+
+### Locally
+
+You can also play locally! You can get an installer for your system by going to [the latest release](https://github.com/BarthPaleologue/CosmosJourneyer/releases). 
+
+If you want the cutting edge version, follow these steps: 
+
+1. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git` (you need Git to run this command)
+2. Install the dependencies with `pnpm install` (you need Node.JS and Pnpm to run this command)
+3. Build the project with `pnpm build`
+4. Serve the project with `pnpm serve:prod`
+5. Play at http://localhost:8080
+
+To update your local version, either download the latest installer or run `git pull` in your local install.
+
+## Support
+
+If you encounter any bugs or want to request features, please open an [issue](https://github.com/BarthPaleologue/CosmosJourneyer/issues). For general discussion and screenshots, visit the [official subreddit](https://www.reddit.com/r/CosmosJourneyer/).
 
 ## My vision for the project
 
@@ -54,21 +104,6 @@ This introductory star cluster would be fully handcrafted to make the best possi
 
 Upon reaching the milestone, the player gains an extended jump range, granting access to the rest of the universe and opening up the game’s full scope.
 
-## Sponsor
-
-Help me make Cosmos Journeyer a reality! The development is time-consuming but generates no revenue by itself.
-
-Sponsoring the project on [Patreon](https://www.patreon.com/barthpaleologue)
-or [GitHub Sponsors](https://github.com/sponsors/BarthPaleologue) will help secure the future of the project.
-
-The project also has a ko-fi page at https://ko-fi.com/cosmosjourneyer if you feel like buying me a coffee!
-
-## Try it now!
-
-The main website of the project is online at https://cosmosjourneyer.com/
-
-The main deployment of the procedural universe can be accessed https://barthpaleologue.github.io/CosmosJourneyer/
-
 ## Why Cosmos Journeyer?
 
 Why make Cosmos Journeyer when games like Elite Dangerous, Star Citizen, No Man's Sky or Kerbal Space Program already exist?
@@ -95,6 +130,15 @@ screenshots or just ask questions about the project!
 Contributions are welcome! There is too much to do for one person alone.
 
 If you want to contribute, you will find guidelines and ideas [here](./CONTRIBUTING.md).
+
+## Sponsor
+
+Help me make Cosmos Journeyer a reality! The development is time-consuming but generates no revenue by itself.
+
+Sponsoring the project on [Patreon](https://www.patreon.com/barthpaleologue)
+or [GitHub Sponsors](https://github.com/sponsors/BarthPaleologue) will help secure the future of the project.
+
+The project also has a ko-fi page at https://ko-fi.com/cosmosjourneyer if you feel like buying me a coffee!
 
 ### Documentation
 
@@ -158,6 +202,10 @@ Then you can build the application with `pnpm tauri build` or run it with `pnpm 
 Thank you to all the people who have contributed to Cosmos Journeyer!
 
 ![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
+
+## License
+
+Cosmos Journeyer is a free and open-source software licensed under the terms of the GNU AGPL License. Look at the `LICENSE.md` files for the exact terms.
 
 ## Credits
 
