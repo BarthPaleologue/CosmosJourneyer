@@ -20,10 +20,14 @@
 - [Documentation](#documentation)
 - [Roadmap](#roadmap)
 - [Features](#features)
-- [Build](#build)
-    - [Web](#web)
-    - [Tauri](#tauri)
-- [Contributors](#contributors)
+- [Development](#development)
+    - [Setup](#setup)
+    - [Building](#building)
+        - [Web](#web)
+        - [Tauri](#tauri)
+    - [Testing](#testing)
+    - [Formatting](#formatting)
+    - [Linting](#linting)
 - [License](#license)
 - [Credits](#credits)
 - [Special Thanks](#special-thanks)
@@ -100,6 +104,10 @@ Contributions are welcome! There is too much to do for one person alone.
 
 If you want to contribute, you will find guidelines and ideas [here](./CONTRIBUTING.md).
 
+Thank you to all the people who have contributed to Cosmos Journeyer!
+
+![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
+
 ## Sponsor
 
 Help me make Cosmos Journeyer a reality! The development is time-consuming but generates no revenue by itself.
@@ -109,7 +117,7 @@ or [GitHub Sponsors](https://github.com/sponsors/BarthPaleologue) will help secu
 
 The project also has a ko-fi page at https://ko-fi.com/cosmosjourneyer if you feel like buying me a coffee!
 
-### Documentation
+## Documentation
 
 The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/doc/
 
@@ -144,17 +152,25 @@ sometimes moons.
 
 ![Screenshot of the star map, many stars are scattered in all directions.](./coverImages/starmap.png)
 
-## Build
+## Development
 
-First, clone the repository and install the dependencies with `pnpm install`.
+### Setup
 
-### Web
+1. Install [Node.js](https://nodejs.org/) (version 20 or higher)
+2. Install [Pnpm](https://pnpm.io/) globally with `npm install -g pnpm`
+3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
+4. Navigate to the project directory with `cd CosmosJourneyer`
+5. Install the dependencies with `pnpm install`
+
+### Building
+
+#### Web
 
 To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in the `dist` folder.
 
 To start the production server version, run `pnpm serve:prod`. The development version can be started with `pnpm serve`.
 
-### Tauri
+#### Tauri
 
 Cosmos Journeyer can be built as a desktop application using Tauri.
 
@@ -164,11 +180,19 @@ Then you can build the application with `pnpm tauri build` or run the dev versio
 
 The build artifacts will appear in `src-tauri/target/release/bundle/<platform>`.
 
-## Contributors
+### Testing
 
-Thank you to all the people who have contributed to Cosmos Journeyer!
+Cosmos Journeyer has unit tests and end-to-end tests.
 
-![Contributors](https://contrib.rocks/image?repo=BarthPaleologue/CosmosJourneyer)
+You can run the unit tests with `pnpm test:unit` and the end-to-end tests with `pnpm test:e2e:docker`.
+
+### Formatting
+
+Cosmos Journeyer uses [Prettier](https://prettier.io/) for code formatting. You can format the code with `pnpm format`.
+
+### Linting
+
+Cosmos Journeyer uses [ESLint](https://eslint.org/) for linting. You can lint the code with `pnpm lint`.
 
 ## License
 
