@@ -25,8 +25,6 @@ float getSun(vec2 uv){
     return length(uv) < 0.009 ? 1.0 : 0.0;
 }
 
-#define CHEAP_FLARE
-
 //from: https://www.shadertoy.com/view/XdfXRX
 vec3 lensflares(vec2 uv, vec2 pos, float fadeOut)
 {
@@ -71,11 +69,10 @@ vec3 lensflares(vec2 uv, vec2 pos, float fadeOut)
 
     return sunflare+lensflare;
 }
-//
 
 
 // based on https://www.shadertoy.com/view/XsGfWV
-vec3 anflares(vec2 uv, float threshold, float intensity, float stretch, float brightness, float fadeOut)
+/*vec3 anflares(vec2 uv, float threshold, float intensity, float stretch, float brightness, float fadeOut)
 {
     threshold = 1.0 - threshold;
 
@@ -93,10 +90,7 @@ vec3 anflares(vec2 uv, float threshold, float intensity, float stretch, float br
     }
 
     return hdr*brightness;
-}
-
-
-
+}*/
 
 
 vec3 anflares(vec2 uv, float intensity, float stretch, float brightness)
@@ -137,14 +131,11 @@ void main() {
 
     vec3 flare = lensflares(uv*1.5, mouse*1.5, fadeOut);
 
-    #ifdef CHEAP_FLARE
     vec3 anflare = pow(anflares(uv-mouse, 400.0, 0.5, 0.6) * fadeOut, vec3(4.0));
     anflare += smoothstep(0.0025, 1.0, anflare)*10.0;
     anflare *= smoothstep(0.0, 1.0, anflare);
-    #else
-    vec3 anflare = pow(anflares(uv-mouse, 0.5, 400.0, 0.9, 0.1), vec3(4.0));
-    #endif
 
+    //vec3 anflare = pow(anflares(uv-mouse, 0.5, 400.0, 0.9, 0.1), vec3(4.0));
 
     vec3 sun = getSun(uv-mouse) * fadeOut + (flare + anflare)*flareColor*2.0;
 
