@@ -22,8 +22,8 @@ import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 
 import { type Direction } from "@/utils/direction";
 
-import { PlanarProceduralHeightField } from "../planarProceduralHeightField";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
+import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 
 type HeightFieldTask = {
     mesh: Mesh;
@@ -45,7 +45,7 @@ type ApplyTask = {
 };
 
 export class ChunkForgeCompute {
-    private readonly availableHeightFieldComputers: Array<PlanarProceduralHeightField> = [];
+    private readonly availableHeightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
     private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
 
     private readonly heightFieldQueue: Array<HeightFieldTask> = [];
@@ -58,7 +58,7 @@ export class ChunkForgeCompute {
 
     constructor(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
         for (let i = 0; i < nbComputeShaders; i++) {
-            this.availableHeightFieldComputers.push(new PlanarProceduralHeightField(engine));
+            this.availableHeightFieldComputers.push(new SphericalProceduralHeightFieldBuilder(engine));
             this.availableNormalComputers.push(new SquareGridNormalComputer(engine));
         }
 
@@ -81,6 +81,7 @@ export class ChunkForgeCompute {
 
             const { positions, indices } = await availableComputer.dispatch(
                 this.rowVertexCount,
+                nextTask.direction,
                 nextTask.size,
                 this.engine,
             );
