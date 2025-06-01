@@ -51,17 +51,20 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Format check
-              run: pnpm run format:check
+              run: pnpm format:check
 
             - name: Lint
-              run: pnpm run lint
+              run: pnpm lint
 
             - name: Test
               run: pnpm test:unit
 
+            - name: Build documentation
+              run: pnpm doc
+
             # ─────────── Build & E2E Tests ───────────
             - name: Build
-              run: pnpm run build
+              run: pnpm build
 
               # ─────────── build test image (local load, no push)
             - name: Build Docker image
