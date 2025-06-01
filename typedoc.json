@@ -1,20 +1,14 @@
 {
     "name": "Cosmos Journeyer API Documentation",
     "out": "doc",
+    "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"],
     "theme": "typedoc-github-theme",
+
+    "entryPointStrategy": "expand",
+    "entryPoints": ["src/ts"],
     "exclude": ["**/node_modules/**/*.*", "**/test/**/*.*"],
-    "entryPoints": [
-        "src/ts/frontend/cosmosJourneyer.ts",
-        "src/ts/frontend/starmap/starMap.ts",
-        "src/ts/frontend/starSystemView.ts"
-    ],
-    "visibilityFilters": {
-        "protected": false,
-        "private": false,
-        "inherited": true,
-        "external": false,
-        "@alpha": false,
-        "@beta": false
-    },
-    "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"]
+
+    "includeVersion": true,
+    "excludeInternal": true,
+    "excludePrivate": true
 }
