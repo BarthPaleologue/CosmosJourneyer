@@ -19,9 +19,9 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 
-import { PanelType, SidePanels } from "./sidePanels";
-
 import i18n from "@/i18n";
+
+import { PanelType, SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -98,7 +98,7 @@ export class PauseMenu {
         const listItems: NodeListOf<HTMLElement> = this.rootNode.querySelectorAll("li");
 
         listItems.forEach((li) => {
-            // play a sound when hovering over a button
+            // play a sound when hovering over a buon
             li.addEventListener("mouseenter", () => {
                 soundPlayer.playNow(SoundType.HOVER);
             });
