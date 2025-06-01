@@ -21,6 +21,8 @@ import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 
 import { PanelType, SidePanels } from "./sidePanels";
 
+import i18n from "@/i18n";
+
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
     private readonly mask: HTMLElement;
@@ -51,24 +53,23 @@ export class PauseMenu {
         this.rootNode.id = "pauseMenu";
         this.rootNode.classList.add("leftSideMenu");
 
-        const createButton = (id: string, i18nKey: string, text: string): HTMLElement => {
+        const createButton = (id: string, i18nKey: string): HTMLElement => {
             const button = document.createElement("li");
             button.id = id;
             button.classList.add("button");
-            button.dataset["i18n"] = i18nKey;
-            button.textContent = text;
+            button.innerText = i18n.t(i18nKey);
             this.rootNode.appendChild(button);
             return button;
         };
 
-        this.resumeButton = createButton("resumeButton", "pauseMenu:resume", "Resume");
-        this.saveButton = createButton("saveButton", "pauseMenu:save", "Save Game");
-        this.loadButton = createButton("loadButton", "pauseMenu:load", "Load Game");
-        this.tutorialsButton = createButton("pauseTutorialsButton", "pauseMenu:tutorials", "Tutorials");
-        this.settingsButton = createButton("pauseSettingsButton", "pauseMenu:settings", "Settings");
-        this.contributeButton = createButton("pauseContributeButton", "pauseMenu:contribute", "Contribute");
-        this.screenshotButton = createButton("screenshotButton", "pauseMenu:screenshot", "Take Screenshot");
-        this.shareButton = createButton("shareButton", "pauseMenu:share", "Share Position");
+        this.resumeButton = createButton("resumeButton", "pauseMenu:resume");
+        this.saveButton = createButton("saveButton", "pauseMenu:save");
+        this.loadButton = createButton("loadButton", "pauseMenu:load");
+        this.tutorialsButton = createButton("pauseTutorialsButton", "pauseMenu:tutorials");
+        this.settingsButton = createButton("pauseSettingsButton", "pauseMenu:settings");
+        this.contributeButton = createButton("pauseContributeButton", "pauseMenu:contribute");
+        this.screenshotButton = createButton("screenshotButton", "pauseMenu:screenshot");
+        this.shareButton = createButton("shareButton", "pauseMenu:share");
 
         this.mask.appendChild(this.rootNode);
         document.body.appendChild(this.mask);
