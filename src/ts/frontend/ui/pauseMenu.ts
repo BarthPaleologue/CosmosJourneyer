@@ -98,7 +98,7 @@ export class PauseMenu {
         const listItems: NodeListOf<HTMLElement> = this.rootNode.querySelectorAll("li");
 
         listItems.forEach((li) => {
-            // play a sound when hovering over a buon
+            // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
                 soundPlayer.playNow(SoundType.HOVER);
             });
