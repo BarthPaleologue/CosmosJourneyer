@@ -19,6 +19,8 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 
+import i18n from "@/i18n";
+
 import { PanelType, SidePanels } from "./sidePanels";
 
 export class PauseMenu {
@@ -44,50 +46,58 @@ export class PauseMenu {
     constructor(sidePanels: SidePanels, soundPlayer: ISoundPlayer) {
         this.sidePanels = sidePanels;
 
-        this.rootNode = document.getElementById("pauseMenu") as HTMLElement;
-        this.mask = document.getElementById("pauseMask") as HTMLElement;
+        this.mask = document.createElement("div");
+        this.mask.id = "pauseMask";
 
-        this.screenshotButton = document.getElementById("screenshotButton") as HTMLElement;
+        this.rootNode = document.createElement("ul");
+        this.rootNode.id = "pauseMenu";
+        this.rootNode.classList.add("leftSideMenu");
+
+        const createButton = (id: string, i18nKey: string): HTMLElement => {
+            const button = document.createElement("li");
+            button.id = id;
+            button.classList.add("button");
+            button.innerText = i18n.t(i18nKey);
+            this.rootNode.appendChild(button);
+            return button;
+        };
+
+        this.resumeButton = createButton("resumeButton", "pauseMenu:resume");
+        this.saveButton = createButton("saveButton", "pauseMenu:save");
+        this.loadButton = createButton("loadButton", "pauseMenu:load");
+        this.tutorialsButton = createButton("pauseTutorialsButton", "pauseMenu:tutorials");
+        this.settingsButton = createButton("pauseSettingsButton", "pauseMenu:settings");
+        this.contributeButton = createButton("pauseContributeButton", "pauseMenu:contribute");
+        this.screenshotButton = createButton("screenshotButton", "pauseMenu:screenshot");
+        this.shareButton = createButton("shareButton", "pauseMenu:share");
+
+        this.mask.appendChild(this.rootNode);
+        document.body.appendChild(this.mask);
+
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
-
-        this.shareButton = document.getElementById("shareButton") as HTMLElement;
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
-
-        this.contributeButton = document.getElementById("pauseContributeButton") as HTMLElement;
         this.contributeButton.addEventListener("click", () => {
             soundPlayer.playNow(SoundType.CLICK);
-
             this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
-
-        this.tutorialsButton = document.getElementById("pauseTutorialsButton") as HTMLElement;
         this.tutorialsButton.addEventListener("click", () => {
             soundPlayer.playNow(SoundType.CLICK);
-
             this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
-
-        this.settingsButton = document.getElementById("pauseSettingsButton") as HTMLElement;
         this.settingsButton.addEventListener("click", () => {
             soundPlayer.playNow(SoundType.CLICK);
-
             this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
-
-        this.loadButton = document.getElementById("loadButton") as HTMLElement;
         this.loadButton.addEventListener("click", () => {
             soundPlayer.playNow(SoundType.CLICK);
-
             this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
-
-        this.saveButton = document.getElementById("saveButton") as HTMLElement;
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
-
-        this.resumeButton = document.getElementById("resumeButton") as HTMLElement;
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
 
-        document.querySelectorAll("#pauseMenu li").forEach((li) => {
+        const listItems: NodeListOf<HTMLElement> = this.rootNode.querySelectorAll("li");
+
+        listItems.forEach((li) => {
             // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
                 soundPlayer.playNow(SoundType.HOVER);
@@ -105,11 +115,10 @@ export class PauseMenu {
     public setVisibility(visible: boolean) {
         this.rootNode.style.display = visible ? "grid" : "none";
         this.mask.style.display = visible ? "block" : "none";
-
         if (!visible) this.sidePanels.hideActivePanel();
     }
 
     public isVisible(): boolean {
-        return this.rootNode.style.visibility !== "none";
+        return this.rootNode.style.display !== "none";
     }
 }
