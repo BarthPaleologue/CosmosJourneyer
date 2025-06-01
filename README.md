@@ -17,7 +17,6 @@
 - [Why Cosmos Journeyer?](#why-cosmos-journeyer)
 - [Contributing](#contributing)
 - [Sponsor](#sponsor)
-- [Documentation](#documentation)
 - [Roadmap](#roadmap)
 - [Features](#features)
 - [Development](#development)
@@ -29,6 +28,7 @@
     - [Testing](#testing)
     - [Formatting](#formatting)
     - [Linting](#linting)
+    - [Documentation](#documentation)
 - [License](#license)
 - [Credits](#credits)
 - [Special Thanks](#special-thanks)
@@ -118,15 +118,6 @@ or [GitHub Sponsors](https://github.com/sponsors/BarthPaleologue) will help secu
 
 The project also has a ko-fi page at https://ko-fi.com/cosmosjourneyer if you feel like buying me a coffee!
 
-## Documentation
-
-The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/doc/
-
-Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
-the project.
-
-To build it locally, run `npm run doc` and then `npm run serve:doc` to serve it at `localhost:8081`.
-
 ## Roadmap
 
 You can have a look at the roadmap of the project on the website at https://cosmosjourneyer.com/
@@ -207,6 +198,15 @@ Cosmos Journeyer uses [Prettier](https://prettier.io/) for code formatting. You 
 ### Linting
 
 Cosmos Journeyer uses [ESLint](https://eslint.org/) for linting. You can lint the code with `pnpm lint`.
+
+### Documentation
+
+The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/doc/
+
+Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
+the project.
+
+To build it locally, run `pnpm doc` and then `pnpm serve:doc` to serve it at `localhost:8081`.
 
 ## License
 
