@@ -33,25 +33,25 @@ struct Params {
 
 #include "../noise/erosionNoise3D.wgsl";
 
-fn get_vertex_position_on_cube(chunk_position_on_cube: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
+fn get_vertex_position_on_cube(chunk_position_on_cube: vec3<f32>, direction: u32, offset: vec2<f32>) -> vec3<f32> {
     switch (direction) {
         case 0: { // UP
-            return chunk_position_on_cube + vec3<f32>(x, 0.0, y);
+            return chunk_position_on_cube + vec3<f32>(offset.x, 0.0, offset.y);
         }
         case 1: { // DOWN
-            return chunk_position_on_cube + vec3<f32>(y, 0.0, x);
+            return chunk_position_on_cube + vec3<f32>(offset.y, 0.0, offset.x);
         }
         case 2: { // LEFT
-            return chunk_position_on_cube + vec3<f32>(0.0, x, y);
+            return chunk_position_on_cube + vec3<f32>(0.0, offset.x, offset.y);
         }
         case 3: { // RIGHT
-            return chunk_position_on_cube + vec3<f32>(0.0, y, x);
+            return chunk_position_on_cube + vec3<f32>(0.0, offset.y, offset.x);
         }
         case 4: { // FORWARD
-            return chunk_position_on_cube + vec3<f32>(x, y, 0.0);
+            return chunk_position_on_cube + vec3<f32>(offset.x, offset.y, 0.0);
         }
         default: { // BACKWARD
-            return chunk_position_on_cube + vec3<f32>(y, x, 0.0);
+            return chunk_position_on_cube + vec3<f32>(offset.y, offset.x, 0.0);
         }
     }
 }
@@ -65,10 +65,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     // this one can be precomputed
     let chunk_position_on_sphere = normalize(params.chunk_position_on_cube) * params.sphere_radius;
 
-    let vertex_offset_x = params.size * ((f32(id.x) / f32(params.nbVerticesPerRow - 1)) - 0.5);
-    let vertex_offset_y = params.size * ((f32(id.y) / f32(params.nbVerticesPerRow - 1)) - 0.5);
-    
-    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_x, vertex_offset_y);
+    let vertex_offset = params.size * ((vec2<f32>(f32(id.x), f32(id.y)) / f32(params.nbVerticesPerRow - 1)) - 0.5);
+
+    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset);
 
     let sphere_up = normalize(vertex_position_on_cube);
 
