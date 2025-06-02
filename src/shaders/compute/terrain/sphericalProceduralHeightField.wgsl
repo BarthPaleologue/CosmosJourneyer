@@ -19,10 +19,6 @@ struct Params {
     nbVerticesPerRow : u32,
     size : f32,
     direction: u32,
-    octaves : i32,
-    lacunarity : f32,
-    persistence : f32,
-    scaleFactor : f32,
     chunk_position : vec3<f32>,
     sphere_radius : f32,
 };
