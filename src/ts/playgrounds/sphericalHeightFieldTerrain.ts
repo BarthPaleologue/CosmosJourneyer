@@ -33,7 +33,7 @@ export function createSphericalHeightFieldTerrain(
 
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
-    controls.getTransform().position = new Vector3(0, 5, -10).scale(1);
+    controls.getTransform().position = new Vector3(0, 5, -10).scale(5);
     controls.getTransform().lookAt(Vector3.Zero());
 
     const camera = controls.getActiveCamera();
