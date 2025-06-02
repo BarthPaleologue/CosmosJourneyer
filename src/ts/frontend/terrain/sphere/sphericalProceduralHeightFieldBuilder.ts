@@ -57,17 +57,8 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
         this.paramsBuffer.addUniform("size", 1);
         this.paramsBuffer.addUniform("direction", 1);
-        this.paramsBuffer.addUniform("octaves", 1);
-        this.paramsBuffer.addUniform("lacunarity", 1);
-        this.paramsBuffer.addUniform("persistence", 1);
-        this.paramsBuffer.addUniform("scaleFactor", 1);
         this.paramsBuffer.addUniform("chunk_position", 3);
         this.paramsBuffer.addUniform("sphere_radius", 1);
-
-        this.paramsBuffer.updateInt("octaves", numOctaves);
-        this.paramsBuffer.updateFloat("lacunarity", lacunarity);
-        this.paramsBuffer.updateFloat("persistence", persistence);
-        this.paramsBuffer.updateFloat("scaleFactor", initialScale);
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
