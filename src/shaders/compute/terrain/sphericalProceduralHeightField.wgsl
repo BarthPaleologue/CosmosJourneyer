@@ -19,7 +19,7 @@ struct Params {
     nbVerticesPerRow : u32,
     size : f32,
     direction: u32,
-    chunk_position : vec3<f32>,
+    chunk_position_on_cube : vec3<f32>,
     sphere_radius : f32,
 };
 
@@ -33,25 +33,25 @@ struct Params {
 
 #include "../noise/erosionNoise3D.wgsl";
 
-fn get_vertex_position(chunk_position: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
+fn get_vertex_position(chunk_position_on_cube: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
     switch (direction) {
         case 0: { // UP
-            return chunk_position + vec3<f32>(x, 0.0, y);
+            return chunk_position_on_cube + vec3<f32>(x, 0.0, y);
         }
         case 1: { // DOWN
-            return chunk_position + vec3<f32>(y, 0.0, x);
+            return chunk_position_on_cube + vec3<f32>(y, 0.0, x);
         }
         case 2: { // LEFT
-            return chunk_position + vec3<f32>(0.0, x, y);
+            return chunk_position_on_cube + vec3<f32>(0.0, x, y);
         }
         case 3: { // RIGHT
-            return chunk_position + vec3<f32>(0.0, y, x);
+            return chunk_position_on_cube + vec3<f32>(0.0, y, x);
         }
         case 4: { // FORWARD
-            return chunk_position + vec3<f32>(x, y, 0.0);
+            return chunk_position_on_cube + vec3<f32>(x, y, 0.0);
         }
         default: { // BACKWARD
-            return chunk_position + vec3<f32>(y, x, 0.0);
+            return chunk_position_on_cube + vec3<f32>(y, x, 0.0);
         }
     }
 }
@@ -70,15 +70,17 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let vertex_x = params.size * ((x / f32(params.nbVerticesPerRow - 1)) - 0.5);
     let vertex_y = params.size * ((y / f32(params.nbVerticesPerRow - 1)) - 0.5);
 
-    let vertex_position = get_vertex_position(params.chunk_position, params.direction, vertex_x, vertex_y);
+    let vertex_position = get_vertex_position(params.chunk_position_on_cube, params.direction, vertex_x, vertex_y);
 
     let sphere_up = normalize(vertex_position);
 
     let vertex_position_sphere = sphere_up * params.sphere_radius;
 
+    let chunk_position_on_sphere = normalize(params.chunk_position_on_cube) * params.sphere_radius;
+
     let elevation = mountain(vertex_position_sphere, sphere_up);
 
-    let final_position = vertex_position_sphere + sphere_up * elevation - params.chunk_position;
+    let final_position = vertex_position_sphere + sphere_up * elevation - chunk_position_on_sphere;
 
     positions[index * 3 + 0] = final_position.x;
     positions[index * 3 + 1] = final_position.y;
