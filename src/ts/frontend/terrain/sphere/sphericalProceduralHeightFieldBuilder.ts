@@ -20,6 +20,7 @@ import { ComputeShader } from "@babylonjs/core/Compute/computeShader";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type Direction } from "@/utils/direction";
 
@@ -60,6 +61,8 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.addUniform("lacunarity", 1);
         this.paramsBuffer.addUniform("persistence", 1);
         this.paramsBuffer.addUniform("scaleFactor", 1);
+        this.paramsBuffer.addUniform("chunk_position", 3);
+        this.paramsBuffer.addUniform("sphere_radius", 1);
 
         this.paramsBuffer.updateInt("octaves", numOctaves);
         this.paramsBuffer.updateFloat("lacunarity", lacunarity);
@@ -71,8 +74,10 @@ export class SphericalProceduralHeightFieldBuilder {
     }
 
     async dispatch(
+        chunkPosition: Vector3,
         nbVerticesPerRow: number,
         direction: Direction,
+        sphereRadius: number,
         size: number,
         engine: WebGPUEngine,
     ): Promise<{
@@ -80,6 +85,8 @@ export class SphericalProceduralHeightFieldBuilder {
         indices: StorageBuffer;
     }> {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
+        this.paramsBuffer.updateVector3("chunk_position", chunkPosition);
+        this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
         this.paramsBuffer.updateUInt("direction", direction);
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
