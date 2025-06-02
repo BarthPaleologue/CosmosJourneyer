@@ -67,19 +67,18 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
 
-    let vertex_x = params.size * (x / f32(params.nbVerticesPerRow - 1) - 0.5);
-    let vertex_y = params.size * (y / f32(params.nbVerticesPerRow - 1) - 0.5);
+    let vertex_x = params.size * ((x / f32(params.nbVerticesPerRow - 1)) - 0.5);
+    let vertex_y = params.size * ((y / f32(params.nbVerticesPerRow - 1)) - 0.5);
 
-    let vertex_position = get_vertex_position(params.chunk_position, params.direction, vertex_x, vertex_y); // vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
+    let vertex_position = get_vertex_position(params.chunk_position, params.direction, vertex_x, vertex_y);
 
     let sphere_up = normalize(vertex_position);
 
     let vertex_position_sphere = sphere_up * params.sphere_radius;
 
-    let elevation = mountain(vertex_position_sphere * 0.5, sphere_up);
+    let elevation = mountain(vertex_position_sphere, sphere_up);
 
-
-    let final_position = vertex_position_sphere + sphere_up * elevation;
+    let final_position = vertex_position_sphere + sphere_up * elevation - params.chunk_position;
 
     positions[index * 3 + 0] = final_position.x;
     positions[index * 3 + 1] = final_position.y;
