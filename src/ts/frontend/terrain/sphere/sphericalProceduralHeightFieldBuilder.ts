@@ -52,7 +52,7 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
         this.paramsBuffer.addUniform("size", 1);
         this.paramsBuffer.addUniform("direction", 1);
-        this.paramsBuffer.addUniform("chunk_position", 3);
+        this.paramsBuffer.addUniform("chunk_position_on_cube", 3);
         this.paramsBuffer.addUniform("sphere_radius", 1);
         this.paramsBuffer.update();
 
@@ -60,7 +60,7 @@ export class SphericalProceduralHeightFieldBuilder {
     }
 
     async dispatch(
-        chunkPosition: Vector3,
+        chunkPositionOnCube: Vector3,
         nbVerticesPerRow: number,
         direction: Direction,
         sphereRadius: number,
@@ -71,7 +71,7 @@ export class SphericalProceduralHeightFieldBuilder {
         indices: StorageBuffer;
     }> {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
-        this.paramsBuffer.updateVector3("chunk_position", chunkPosition);
+        this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
         this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
         this.paramsBuffer.updateUInt("direction", direction);
         this.paramsBuffer.updateFloat("size", size);
