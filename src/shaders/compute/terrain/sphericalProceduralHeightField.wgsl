@@ -33,7 +33,7 @@ struct Params {
 
 #include "../noise/erosionNoise3D.wgsl";
 
-fn get_vertex_position(chunk_position_on_cube: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
+fn get_vertex_position_on_cube(chunk_position_on_cube: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
     switch (direction) {
         case 0: { // UP
             return chunk_position_on_cube + vec3<f32>(x, 0.0, y);
@@ -62,31 +62,28 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
         return; 
     }
 
-    let x : f32 = f32(id.x);
-    let y : f32 = f32(id.y);
-
-    let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
-
-    let vertex_x = params.size * ((x / f32(params.nbVerticesPerRow - 1)) - 0.5);
-    let vertex_y = params.size * ((y / f32(params.nbVerticesPerRow - 1)) - 0.5);
-
-    let vertex_position = get_vertex_position(params.chunk_position_on_cube, params.direction, vertex_x, vertex_y);
-
-    let sphere_up = normalize(vertex_position);
-
-    let vertex_position_sphere = sphere_up * params.sphere_radius;
-
+    // this one can be precomputed
     let chunk_position_on_sphere = normalize(params.chunk_position_on_cube) * params.sphere_radius;
 
-    let elevation = mountain(vertex_position_sphere, sphere_up);
+    let vertex_offset_x = params.size * ((f32(id.x) / f32(params.nbVerticesPerRow - 1)) - 0.5);
+    let vertex_offset_y = params.size * ((f32(id.y) / f32(params.nbVerticesPerRow - 1)) - 0.5);
+    
+    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_x, vertex_offset_y);
 
-    let final_position = vertex_position_sphere + sphere_up * elevation - chunk_position_on_sphere;
+    let sphere_up = normalize(vertex_position_on_cube);
 
+    let vertex_position_on_sphere = sphere_up * params.sphere_radius;
+
+    let elevation = mountain(vertex_position_on_sphere, sphere_up);
+
+    let final_position = vertex_position_on_sphere + sphere_up * elevation - chunk_position_on_sphere;
+
+    let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
     positions[index * 3 + 0] = final_position.x;
     positions[index * 3 + 1] = final_position.y;
     positions[index * 3 + 2] = final_position.z;
 
-    if(x > 0 && y > 0) {
+    if(id.x > 0 && id.y > 0) {
         let indexIndex = ((id.x - 1) + (id.y - 1) * (params.nbVerticesPerRow - 1)) * 6;
 
         indices[indexIndex + 0] = index - 1;
