@@ -23,6 +23,8 @@ struct Params {
     lacunarity : f32,
     persistence : f32,
     scaleFactor : f32,
+    chunk_position : vec3<f32>,
+    sphere_radius : f32,
 };
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
@@ -38,25 +40,22 @@ struct Params {
 fn get_vertex_position(chunk_position: vec3<f32>, direction: u32, x: f32, y: f32) -> vec3<f32> {
     switch (direction) {
         case 0: { // UP
-            return chunk_position + vec3<f32>(x, 0.0, chunk_position.z + y);
+            return chunk_position + vec3<f32>(x, 0.0, y);
         }
         case 1: { // DOWN
-            return chunk_position + vec3<f32>(y, 0.0, chunk_position.z + x);
+            return chunk_position + vec3<f32>(y, 0.0, x);
         }
         case 2: { // LEFT
-            return chunk_position + vec3<f32>(x, 0.0, chunk_position.z - y);
+            return chunk_position + vec3<f32>(0.0, x, y);
         }
         case 3: { // RIGHT
-            return chunk_position + vec3<f32>(-y, 0.0, chunk_position.z + x);
+            return chunk_position + vec3<f32>(0.0, y, x);
         }
         case 4: { // FORWARD
-            return chunk_position + vec3<f32>(x, 0.0, chunk_position.z - y);
+            return chunk_position + vec3<f32>(x, y, 0.0);
         }
-        case 5: { // BACKWARD
-            return chunk_position + vec3<f32>(-y, 0.0, chunk_position.z - x);
-        }
-        default: {
-            unreachable;
+        default: { // BACKWARD
+            return chunk_position + vec3<f32>(y, x, 0.0);
         }
     }
 }
@@ -72,26 +71,33 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
 
-    let vertex_x = params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0;
-    let vertex_y = params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0;
+    let vertex_x = params.size * (x / f32(params.nbVerticesPerRow - 1) - 0.5);
+    let vertex_y = params.size * (y / f32(params.nbVerticesPerRow - 1) - 0.5);
 
-    let vertex_position = get_vertex_position(vec3f(0.0), params.direction, vertex_x, vertex_y); // vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
+    let vertex_position = get_vertex_position(params.chunk_position, params.direction, vertex_x, vertex_y); // vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
 
-    let elevation = mountain(vertex_position * 0.5, vec3f(0.0, 1.0, 0.0));
+    let sphere_up = normalize(vertex_position);
 
-    positions[index * 3 + 0] = vertex_position.x;
-    positions[index * 3 + 1] = elevation;
-    positions[index * 3 + 2] = vertex_position.z;
+    let vertex_position_sphere = sphere_up * params.sphere_radius;
+
+    let elevation = mountain(vertex_position_sphere * 0.5, sphere_up);
+
+
+    let final_position = vertex_position_sphere + sphere_up * elevation;
+
+    positions[index * 3 + 0] = final_position.x;
+    positions[index * 3 + 1] = final_position.y;
+    positions[index * 3 + 2] = final_position.z;
 
     if(x > 0 && y > 0) {
         let indexIndex = ((id.x - 1) + (id.y - 1) * (params.nbVerticesPerRow - 1)) * 6;
 
         indices[indexIndex + 0] = index - 1;
-        indices[indexIndex + 1] = index - params.nbVerticesPerRow - 1;
-        indices[indexIndex + 2] = index;
+        indices[indexIndex + 1] = index;
+        indices[indexIndex + 2] = index - params.nbVerticesPerRow - 1;
 
         indices[indexIndex + 3] = index;
-        indices[indexIndex + 4] = index - params.nbVerticesPerRow - 1;
-        indices[indexIndex + 5] = index - params.nbVerticesPerRow;
+        indices[indexIndex + 4] = index - params.nbVerticesPerRow;
+        indices[indexIndex + 5] = index - params.nbVerticesPerRow - 1;
     }
 }

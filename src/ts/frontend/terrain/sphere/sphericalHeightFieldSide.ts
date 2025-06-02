@@ -56,7 +56,7 @@ export class SphericalHeightFieldSide {
         if (this.status === ChunkLoadingStatus.NOT_STARTED) {
             this.status = ChunkLoadingStatus.IN_PROGRESS;
 
-            chunkForge.addBuildTask(this.mesh, this.direction, this.radius);
+            chunkForge.addBuildTask(this.mesh, this.direction, this.radius * 2, this.radius);
         }
     }
 
