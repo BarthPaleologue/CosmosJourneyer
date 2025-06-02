@@ -29,6 +29,7 @@ type HeightFieldTask = {
     mesh: Mesh;
     size: number;
     direction: Direction;
+    sphereRadius: number;
 };
 
 type NormalTask = {
@@ -66,8 +67,8 @@ export class ChunkForgeCompute {
         this.engine = engine;
     }
 
-    addBuildTask(mesh: Mesh, direction: Direction, size: number): void {
-        this.heightFieldQueue.push({ mesh, direction, size });
+    addBuildTask(mesh: Mesh, direction: Direction, size: number, sphereRadius: number): void {
+        this.heightFieldQueue.push({ mesh, direction, size, sphereRadius });
     }
 
     async update(): Promise<void> {
@@ -80,8 +81,10 @@ export class ChunkForgeCompute {
             console.log("Dispatching height field task for mesh:", nextTask.mesh.name);
 
             const { positions, indices } = await availableComputer.dispatch(
+                nextTask.mesh.position,
                 this.rowVertexCount,
                 nextTask.direction,
+                nextTask.sphereRadius,
                 nextTask.size,
                 this.engine,
             );
