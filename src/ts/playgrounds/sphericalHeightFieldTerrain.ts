@@ -58,14 +58,14 @@ export async function createSphericalHeightFieldTerrain(
 
     const terrain = new SphericalHeightFieldTerrain(4, scene);
 
-    const chunkForge = new ChunkForgeCompute(6, 512, engine);
+    const chunkForge = await ChunkForgeCompute.New(6, 512, engine);
 
-    scene.onBeforeRenderObservable.add(async () => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
         terrain.update(chunkForge);
-        await chunkForge.update();
+        chunkForge.update();
     });
 
     progressCallback(1, "Loaded terrain scene");
