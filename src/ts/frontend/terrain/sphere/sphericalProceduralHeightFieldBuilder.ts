@@ -34,11 +34,6 @@ export class SphericalProceduralHeightFieldBuilder {
     private static WORKGROUP_SIZE = [16, 16] as const;
 
     constructor(engine: WebGPUEngine) {
-        const numOctaves = 2;
-        const lacunarity = 2.0;
-        const persistence = 0.5;
-        const initialScale = 0.5;
-
         this.computeShader = new ComputeShader(
             "heightMap",
             engine,
