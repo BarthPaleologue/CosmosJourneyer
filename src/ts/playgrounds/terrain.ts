@@ -100,6 +100,7 @@ export async function createTerrainScene(
             indexBuffer.getBuffer(),
             nbVerticesPerRow * nbVerticesPerRow,
             (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
+            true,
         );
     } else {
         const positionBufferView = await positionBuffer.read();
