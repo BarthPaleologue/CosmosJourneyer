@@ -23,6 +23,7 @@ import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type Direction } from "@/utils/direction";
+import { retry } from "@/utils/retry";
 
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalProceduralHeightField.wgsl";
 
@@ -33,19 +34,8 @@ export class SphericalProceduralHeightFieldBuilder {
 
     private static WORKGROUP_SIZE = [16, 16] as const;
 
-    constructor(engine: WebGPUEngine) {
-        this.computeShader = new ComputeShader(
-            "heightMap",
-            engine,
-            { computeSource: heightMapComputeSource },
-            {
-                bindingsMapping: {
-                    positions: { group: 0, binding: 0 },
-                    indices: { group: 0, binding: 1 },
-                    params: { group: 0, binding: 2 },
-                },
-            },
-        );
+    private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
+        this.computeShader = computeShader;
 
         this.paramsBuffer = new UniformBuffer(engine);
 
@@ -59,17 +49,36 @@ export class SphericalProceduralHeightFieldBuilder {
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
     }
 
-    async dispatch(
+    static async New(engine: WebGPUEngine): Promise<SphericalProceduralHeightFieldBuilder> {
+        const computeShader = new ComputeShader(
+            "heightMap",
+            engine,
+            { computeSource: heightMapComputeSource },
+            {
+                bindingsMapping: {
+                    positions: { group: 0, binding: 0 },
+                    indices: { group: 0, binding: 1 },
+                    params: { group: 0, binding: 2 },
+                },
+            },
+        );
+
+        await retry(() => computeShader.isReady(), 1000, 10);
+
+        return new SphericalProceduralHeightFieldBuilder(computeShader, engine);
+    }
+
+    dispatch(
         chunkPositionOnCube: Vector3,
         nbVerticesPerRow: number,
         direction: Direction,
         sphereRadius: number,
         size: number,
         engine: WebGPUEngine,
-    ): Promise<{
+    ): {
         positions: StorageBuffer;
         indices: StorageBuffer;
-    }> {
+    } {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
         this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
@@ -91,7 +100,7 @@ export class SphericalProceduralHeightFieldBuilder {
         );
         this.computeShader.setStorageBuffer("indices", indicesBuffer);
 
-        await this.computeShader.dispatchWhenReady(
+        this.computeShader.dispatch(
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[0],
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[1],
             1,

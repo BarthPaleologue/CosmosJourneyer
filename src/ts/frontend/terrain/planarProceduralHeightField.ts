@@ -21,6 +21,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
+import { retry } from "@/utils/retry";
+
 import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHeightField.wgsl";
 
 export class PlanarProceduralHeightField {
@@ -30,24 +32,13 @@ export class PlanarProceduralHeightField {
 
     private static WORKGROUP_SIZE = [16, 16] as const;
 
-    constructor(engine: WebGPUEngine) {
+    private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
         const numOctaves = 2;
         const lacunarity = 2.0;
         const persistence = 0.5;
         const initialScale = 0.5;
 
-        this.computeShader = new ComputeShader(
-            "heightMap",
-            engine,
-            { computeSource: heightMapComputeSource },
-            {
-                bindingsMapping: {
-                    positions: { group: 0, binding: 0 },
-                    indices: { group: 0, binding: 1 },
-                    params: { group: 0, binding: 2 },
-                },
-            },
-        );
+        this.computeShader = computeShader;
 
         this.paramsBuffer = new UniformBuffer(engine);
 
@@ -67,14 +58,33 @@ export class PlanarProceduralHeightField {
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
     }
 
-    async dispatch(
+    static async New(engine: WebGPUEngine): Promise<PlanarProceduralHeightField> {
+        const computeShader = new ComputeShader(
+            "heightMap",
+            engine,
+            { computeSource: heightMapComputeSource },
+            {
+                bindingsMapping: {
+                    positions: { group: 0, binding: 0 },
+                    indices: { group: 0, binding: 1 },
+                    params: { group: 0, binding: 2 },
+                },
+            },
+        );
+
+        await retry(() => computeShader.isReady(), 1000, 10);
+
+        return new PlanarProceduralHeightField(computeShader, engine);
+    }
+
+    dispatch(
         nbVerticesPerRow: number,
         size: number,
         engine: WebGPUEngine,
-    ): Promise<{
+    ): {
         positions: StorageBuffer;
         indices: StorageBuffer;
-    }> {
+    } {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
@@ -93,7 +103,7 @@ export class PlanarProceduralHeightField {
         );
         this.computeShader.setStorageBuffer("indices", indicesBuffer);
 
-        await this.computeShader.dispatchWhenReady(
+        this.computeShader.dispatch(
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[0],
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[1],
             1,

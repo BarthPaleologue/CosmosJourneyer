@@ -80,21 +80,11 @@ export async function createTerrainScene(
 
     const terrain = new Mesh("terrain", scene);
 
-    const generator = new PlanarProceduralHeightField(engine);
+    const generator = await PlanarProceduralHeightField.New(engine);
+    const normalComputer = await SquareGridNormalComputer.New(engine);
 
-    const t0 = performance.now();
-    const { positions: positionBuffer, indices: indexBuffer } = await generator.dispatch(
-        nbVerticesPerRow,
-        size,
-        engine,
-    );
-    const t1 = performance.now();
-    const normalComputer = new SquareGridNormalComputer(engine);
-    const normalBuffer = await normalComputer.dispatch(nbVerticesPerRow, positionBuffer, engine);
-    const t2 = performance.now();
-
-    console.log("Height field generation:", t1 - t0, "ms");
-    console.log("Normals computation:", t2 - t1, "ms");
+    const { positions: positionBuffer, indices: indexBuffer } = generator.dispatch(nbVerticesPerRow, size, engine);
+    const normalBuffer = normalComputer.dispatch(nbVerticesPerRow, positionBuffer, engine);
 
     const keepDataOnGPU = true;
 
