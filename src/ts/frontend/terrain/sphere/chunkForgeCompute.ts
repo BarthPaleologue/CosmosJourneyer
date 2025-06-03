@@ -92,8 +92,6 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            console.log("Dispatching height field task for mesh:", nextTask.mesh.name);
-
             const { positions, indices } = availableComputer.dispatch(
                 nextTask.mesh.position,
                 this.rowVertexCount,
@@ -116,8 +114,6 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            console.log("Dispatching normal computation task for mesh:", nextTask.mesh.name);
-
             const normals = availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
 
             this.applyQueue.push({
@@ -133,8 +129,6 @@ export class ChunkForgeCompute {
             if (nextTask === undefined) {
                 break;
             }
-
-            console.log("Applying computed buffers to mesh:", nextTask.mesh.name);
 
             const { mesh, positions, indices, normals } = nextTask;
 
