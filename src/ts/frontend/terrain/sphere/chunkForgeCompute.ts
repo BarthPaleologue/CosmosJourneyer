@@ -57,21 +57,35 @@ export class ChunkForgeCompute {
 
     private readonly rowVertexCount: number;
 
-    constructor(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
-        for (let i = 0; i < nbComputeShaders; i++) {
-            this.availableHeightFieldComputers.push(new SphericalProceduralHeightFieldBuilder(engine));
-            this.availableNormalComputers.push(new SquareGridNormalComputer(engine));
-        }
-
+    private constructor(
+        heightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
+        normalComputers: ReadonlyArray<SquareGridNormalComputer>,
+        rowVertexCount: number,
+        engine: WebGPUEngine,
+    ) {
+        this.availableHeightFieldComputers.push(...heightFieldComputers);
+        this.availableNormalComputers.push(...normalComputers);
         this.rowVertexCount = rowVertexCount;
         this.engine = engine;
+    }
+
+    static async New(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
+        const heightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
+        const normalComputers: Array<SquareGridNormalComputer> = [];
+
+        for (let i = 0; i < nbComputeShaders; i++) {
+            heightFieldComputers.push(await SphericalProceduralHeightFieldBuilder.New(engine));
+            normalComputers.push(await SquareGridNormalComputer.New(engine));
+        }
+
+        return new ChunkForgeCompute(heightFieldComputers, normalComputers, rowVertexCount, engine);
     }
 
     addBuildTask(mesh: Mesh, direction: Direction, size: number, sphereRadius: number): void {
         this.heightFieldQueue.push({ mesh, direction, size, sphereRadius });
     }
 
-    async update(): Promise<void> {
+    update() {
         for (const availableComputer of this.availableHeightFieldComputers) {
             const nextTask = this.heightFieldQueue.shift();
             if (nextTask === undefined) {
@@ -80,7 +94,7 @@ export class ChunkForgeCompute {
 
             console.log("Dispatching height field task for mesh:", nextTask.mesh.name);
 
-            const { positions, indices } = await availableComputer.dispatch(
+            const { positions, indices } = availableComputer.dispatch(
                 nextTask.mesh.position,
                 this.rowVertexCount,
                 nextTask.direction,
@@ -104,7 +118,7 @@ export class ChunkForgeCompute {
 
             console.log("Dispatching normal computation task for mesh:", nextTask.mesh.name);
 
-            const normals = await availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
+            const normals = availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
 
             this.applyQueue.push({
                 mesh: nextTask.mesh,
