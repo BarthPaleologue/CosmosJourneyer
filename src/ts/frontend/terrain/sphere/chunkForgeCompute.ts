@@ -149,6 +149,7 @@ export class ChunkForgeCompute {
                 indices.getBuffer(),
                 this.rowVertexCount * this.rowVertexCount,
                 (this.rowVertexCount - 1) * (this.rowVertexCount - 1) * 6,
+                true,
             );
         }
     }
