@@ -22,7 +22,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-export function createSphericalHeightFieldTerrain(
+export async function createSphericalHeightFieldTerrain(
     engine: WebGPUEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
@@ -60,15 +60,15 @@ export function createSphericalHeightFieldTerrain(
 
     const terrain = new SphericalHeightFieldTerrain(4, scene);
 
-    const chunkForge = new ChunkForgeCompute(6, 512, engine);
+    const chunkForge = await ChunkForgeCompute.New(6, 512, engine);
 
-    scene.onBeforeRenderObservable.add(async () => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
         terrain.update(chunkForge);
-        await chunkForge.update();
+        chunkForge.update();
     });
 
-    return Promise.resolve(scene);
+    return scene;
 }

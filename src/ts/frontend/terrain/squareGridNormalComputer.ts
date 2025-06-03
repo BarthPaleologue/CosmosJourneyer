@@ -21,6 +21,8 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
+import { retry } from "@/utils/retry";
+
 import computeSource from "@shaders/compute/utils/squareGridComputeNormals.wgsl";
 
 export class SquareGridNormalComputer {
@@ -30,8 +32,16 @@ export class SquareGridNormalComputer {
 
     private static WORKGROUP_SIZE = [16, 16] as const;
 
-    constructor(engine: WebGPUEngine) {
-        this.computeShader = new ComputeShader(
+    protected constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
+        this.computeShader = computeShader;
+
+        this.paramsBuffer = new UniformBuffer(engine);
+        this.paramsBuffer.addUniform("row_vertex_count", 1);
+        this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+    }
+
+    public static async New(engine: WebGPUEngine): Promise<SquareGridNormalComputer> {
+        const computeShader = new ComputeShader(
             "squareGridNormalComputer",
             engine,
             { computeSource },
@@ -44,12 +54,12 @@ export class SquareGridNormalComputer {
             },
         );
 
-        this.paramsBuffer = new UniformBuffer(engine);
-        this.paramsBuffer.addUniform("row_vertex_count", 1);
-        this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+        await retry(() => computeShader.isReady(), 1000, 10);
+
+        return new SquareGridNormalComputer(computeShader, engine);
     }
 
-    async dispatch(nbVerticesPerRow: number, positions: StorageBuffer, engine: WebGPUEngine): Promise<StorageBuffer> {
+    dispatch(nbVerticesPerRow: number, positions: StorageBuffer, engine: WebGPUEngine): StorageBuffer {
         const positionsBuffer = positions;
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
@@ -63,7 +73,7 @@ export class SquareGridNormalComputer {
         this.paramsBuffer.updateUInt("row_vertex_count", nbVerticesPerRow);
         this.paramsBuffer.update();
 
-        await this.computeShader.dispatchWhenReady(
+        this.computeShader.dispatch(
             nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[0],
             nbVerticesPerRow / SquareGridNormalComputer.WORKGROUP_SIZE[1],
             1,
