@@ -15,7 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
@@ -23,7 +25,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
-import { type ChunkForgeCompute } from "./chunkForgeCompute";
+import { type ChunkForgeCompute, type ChunkForgeOutput } from "./chunkForgeCompute";
 
 const ChunkLoadingStatus = {
     NOT_STARTED: 0,
@@ -58,6 +60,8 @@ export class SphericalHeightFieldChunk {
 
     private readonly positionOnCube: Vector3;
 
+    private vertexData: ChunkForgeOutput | null = null;
+
     constructor(indices: ChunkIndices, direction: Direction, radius: number, parent: TransformNode, scene: Scene) {
         this.mesh = new Mesh(`SphericalHeightFieldSide[${direction};${JSON.stringify(indices)}]`, scene);
         this.mesh.isPickable = false;
@@ -84,6 +88,38 @@ export class SphericalHeightFieldChunk {
         this.radius = radius;
 
         this.size = (radius * 2) / 2 ** indices.lod;
+    }
+
+    setVertexData(vertexData: ChunkForgeOutput, rowVertexCount: number, engine: AbstractEngine) {
+        const positionsVertexBuffer = new VertexBuffer(
+            engine,
+            vertexData.gpu.positions.getBuffer(),
+            "position",
+            false,
+            false,
+            3,
+        );
+
+        this.mesh.setVerticesBuffer(positionsVertexBuffer);
+
+        const normalsVertexBuffer = new VertexBuffer(
+            engine,
+            vertexData.gpu.normals.getBuffer(),
+            "normal",
+            false,
+            false,
+            3,
+        );
+        this.mesh.setVerticesBuffer(normalsVertexBuffer);
+
+        this.mesh.setIndexBuffer(
+            vertexData.gpu.indices.getBuffer(),
+            rowVertexCount * rowVertexCount,
+            (rowVertexCount - 1) * (rowVertexCount - 1) * 6,
+            true,
+        );
+
+        this.vertexData = vertexData;
     }
 
     static Subdivide(
@@ -145,7 +181,17 @@ export class SphericalHeightFieldChunk {
         if (this.status === ChunkLoadingStatus.NOT_STARTED) {
             this.status = ChunkLoadingStatus.IN_PROGRESS;
 
-            chunkForge.addBuildTask(this.mesh, this.positionOnCube, this.direction, this.size, this.radius);
+            chunkForge.addBuildTask(
+                (output) => {
+                    this.setVertexData(output, chunkForge.rowVertexCount, this.mesh.getScene().getEngine());
+                    this.status = ChunkLoadingStatus.COMPLETED;
+                    this.mesh.setEnabled(true);
+                },
+                this.positionOnCube,
+                this.direction,
+                this.size,
+                this.radius,
+            );
         }
 
         const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
@@ -170,10 +216,8 @@ export class SphericalHeightFieldChunk {
             child.update(cameraPosition, chunkForge);
         }
 
-        if (this.children !== null) {
-            if (this.children.every((child) => child.status !== ChunkLoadingStatus.NOT_STARTED)) {
-                this.mesh.setEnabled(false);
-            }
+        if (this.children !== null && this.children.every((child) => child.status === ChunkLoadingStatus.COMPLETED)) {
+            this.mesh.setEnabled(false);
         }
     }
 
