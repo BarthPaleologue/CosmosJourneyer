@@ -24,18 +24,18 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 import { Direction } from "@/utils/direction";
 
 import { ChunkForgeCompute } from "./chunkForgeCompute";
-import { ChunkIndices, SphericalHeightFieldSide } from "./sphericalHeightFieldSide";
+import { ChunkIndices, SphericalHeightFieldChunk } from "./sphericalHeightFieldChunk";
 
 export class SphericalHeightFieldTerrain implements Transformable {
     private readonly transform: TransformNode;
 
     private readonly sides: [
-        SphericalHeightFieldSide,
-        SphericalHeightFieldSide,
-        SphericalHeightFieldSide,
-        SphericalHeightFieldSide,
-        SphericalHeightFieldSide,
-        SphericalHeightFieldSide,
+        SphericalHeightFieldChunk,
+        SphericalHeightFieldChunk,
+        SphericalHeightFieldChunk,
+        SphericalHeightFieldChunk,
+        SphericalHeightFieldChunk,
+        SphericalHeightFieldChunk,
     ];
 
     constructor(radius: number, scene: Scene) {
@@ -49,12 +49,12 @@ export class SphericalHeightFieldTerrain implements Transformable {
         };
 
         this.sides = [
-            new SphericalHeightFieldSide(indices, Direction.UP, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(indices, Direction.DOWN, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(indices, Direction.FORWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(indices, Direction.BACKWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(indices, Direction.LEFT, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(indices, Direction.RIGHT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.UP, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.DOWN, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.FORWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.BACKWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.LEFT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.RIGHT, radius, this.getTransform(), scene),
         ];
     }
 
