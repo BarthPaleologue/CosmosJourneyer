@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 import { type Direction } from "@/utils/direction";
 
@@ -27,7 +26,7 @@ import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 
 type HeightFieldTask = {
-    mesh: Mesh;
+    onFinish: (output: ChunkForgeOutput) => void;
     positionOnCube: Vector3;
     size: number;
     direction: Direction;
@@ -35,16 +34,25 @@ type HeightFieldTask = {
 };
 
 type NormalTask = {
-    mesh: Mesh;
+    onFinish: (output: ChunkForgeOutput) => void;
     positions: StorageBuffer;
     indices: StorageBuffer;
 };
 
 type ApplyTask = {
-    mesh: Mesh;
+    onFinish: (output: ChunkForgeOutput) => void;
     positions: StorageBuffer;
     indices: StorageBuffer;
     normals: StorageBuffer;
+};
+
+export type ChunkForgeOutput = {
+    cpu: VertexData;
+    gpu: {
+        positions: StorageBuffer;
+        normals: StorageBuffer;
+        indices: StorageBuffer;
+    };
 };
 
 export class ChunkForgeCompute {
@@ -57,7 +65,7 @@ export class ChunkForgeCompute {
 
     private readonly engine: WebGPUEngine;
 
-    private readonly rowVertexCount: number;
+    readonly rowVertexCount: number;
 
     private constructor(
         heightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
@@ -83,8 +91,14 @@ export class ChunkForgeCompute {
         return new ChunkForgeCompute(heightFieldComputers, normalComputers, rowVertexCount, engine);
     }
 
-    addBuildTask(mesh: Mesh, positionOnCube: Vector3, direction: Direction, size: number, sphereRadius: number): void {
-        this.heightFieldQueue.push({ mesh, positionOnCube, direction, size, sphereRadius });
+    addBuildTask(
+        onFinish: (output: ChunkForgeOutput) => void,
+        positionOnCube: Vector3,
+        direction: Direction,
+        size: number,
+        sphereRadius: number,
+    ): void {
+        this.heightFieldQueue.push({ onFinish, positionOnCube, direction, size, sphereRadius });
     }
 
     update() {
@@ -104,7 +118,7 @@ export class ChunkForgeCompute {
             );
 
             this.normalQueue.push({
-                mesh: nextTask.mesh,
+                onFinish: nextTask.onFinish,
                 positions,
                 indices,
             });
@@ -119,7 +133,7 @@ export class ChunkForgeCompute {
             const normals = availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
 
             this.applyQueue.push({
-                mesh: nextTask.mesh,
+                onFinish: nextTask.onFinish,
                 positions: nextTask.positions,
                 indices: nextTask.indices,
                 normals,
@@ -132,27 +146,29 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            const { mesh, positions, indices, normals } = nextTask;
-
-            const positionsVertexBuffer = new VertexBuffer(
-                this.engine,
-                positions.getBuffer(),
-                "position",
-                false,
-                false,
-                3,
-            );
-            mesh.setVerticesBuffer(positionsVertexBuffer);
-
-            const normalsVertexBuffer = new VertexBuffer(this.engine, normals.getBuffer(), "normal", false, false, 3);
-            mesh.setVerticesBuffer(normalsVertexBuffer);
-
-            mesh.setIndexBuffer(
-                indices.getBuffer(),
-                this.rowVertexCount * this.rowVertexCount,
-                (this.rowVertexCount - 1) * (this.rowVertexCount - 1) * 6,
-                true,
-            );
+            void this.runApplyTask(nextTask);
         }
+    }
+
+    private async runApplyTask(task: ApplyTask) {
+        const { onFinish, positions, indices, normals } = task;
+
+        const positionBufferView = await positions.read();
+        const indexBufferView = await indices.read();
+        const normalBufferView = await normals.read();
+
+        const vertexData = new VertexData();
+        vertexData.positions = new Float32Array(positionBufferView.buffer);
+        vertexData.indices = new Uint32Array(indexBufferView.buffer);
+        vertexData.normals = new Float32Array(normalBufferView.buffer);
+
+        onFinish({
+            cpu: vertexData,
+            gpu: {
+                positions,
+                normals,
+                indices,
+            },
+        });
     }
 }
