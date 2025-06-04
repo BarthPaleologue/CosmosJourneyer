@@ -15,7 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DirectionalLight, GizmoManager, LightGizmo, Scene, Vector3, WebGPUEngine } from "@babylonjs/core";
+import {
+    Color3,
+    DirectionalLight,
+    GizmoManager,
+    LightGizmo,
+    PBRMetallicRoughnessMaterial,
+    Scene,
+    Vector3,
+    WebGPUEngine,
+} from "@babylonjs/core";
 
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
@@ -60,15 +69,20 @@ export async function createSphericalHeightFieldTerrain(
     gizmoManager.usePointerToAttachGizmos = false;
     gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const terrain = new SphericalHeightFieldTerrain(earthRadius, scene);
+    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
+    material.baseColor = new Color3(0.5, 0.5, 0.5);
+    material.metallic = 0.0;
+    material.roughness = 1.0;
 
-    const chunkForge = await ChunkForgeCompute.New(6, 128, engine);
+    const terrain = new SphericalHeightFieldTerrain(earthRadius, material, scene);
+
+    const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, chunkForge);
+        terrain.update(camera.globalPosition, material, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
