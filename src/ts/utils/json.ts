@@ -21,7 +21,7 @@ const JsonSchema = z.record(z.unknown());
 
 export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
     try {
-        const parsed = JSON.parse(jsonString);
+        const parsed: unknown = JSON.parse(jsonString);
         return JsonSchema.parse(parsed);
     } catch {
         return null;
