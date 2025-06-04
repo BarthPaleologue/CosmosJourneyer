@@ -33,7 +33,7 @@ export async function createSphericalHeightFieldTerrain(
 
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
-    controls.getTransform().position = new Vector3(0, 5, -10).scale(5);
+    controls.getTransform().position = new Vector3(0, 5, -10).scale(2);
     controls.getTransform().lookAt(Vector3.Zero());
 
     const camera = controls.getActiveCamera();
@@ -44,7 +44,7 @@ export async function createSphericalHeightFieldTerrain(
 
     scene.activeCamera = camera;
 
-    const light = new DirectionalLight("light", new Vector3(-5, -2, 10).normalize(), scene);
+    const light = new DirectionalLight("light", new Vector3(-5, 2, -10).normalize(), scene);
     light.position = new Vector3(0, 100, 0);
 
     const lightGizmo = new LightGizmo();
@@ -66,7 +66,7 @@ export async function createSphericalHeightFieldTerrain(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(chunkForge);
+        terrain.update(camera.globalPosition, chunkForge);
         chunkForge.update();
     });
 

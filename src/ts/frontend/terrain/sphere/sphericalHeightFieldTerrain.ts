@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -62,9 +62,9 @@ export class SphericalHeightFieldTerrain implements Transformable {
         return this.transform;
     }
 
-    update(chunkForge: ChunkForgeCompute) {
+    update(cameraPosition: Vector3, chunkForge: ChunkForgeCompute) {
         for (const side of this.sides) {
-            side.update(chunkForge);
+            side.update(cameraPosition, chunkForge);
         }
     }
 
