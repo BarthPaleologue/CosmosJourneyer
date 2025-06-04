@@ -46,6 +46,8 @@ export class SphericalHeightFieldSide {
 
     private readonly radius: number;
 
+    private readonly size: number;
+
     private status: ChunkLoadingStatus = ChunkLoadingStatus.NOT_STARTED;
 
     private indices: ChunkIndices;
@@ -81,15 +83,16 @@ export class SphericalHeightFieldSide {
         this.direction = direction;
         this.radius = radius;
 
-        if (this.children !== null || this.indices.lod === 2) {
-            return;
-        }
-
-        this.mesh.setEnabled(false);
-        this.children = this.subdivide(this.indices, scene);
+        this.size = (radius * 2) / 2 ** indices.lod;
     }
 
-    subdivide(indices: ChunkIndices, scene: Scene): FixedLengthArray<SphericalHeightFieldSide, 4> {
+    static Subdivide(
+        indices: ChunkIndices,
+        direction: Direction,
+        radius: number,
+        parent: TransformNode,
+        scene: Scene,
+    ): FixedLengthArray<SphericalHeightFieldSide, 4> {
         return [
             new SphericalHeightFieldSide(
                 {
@@ -97,9 +100,9 @@ export class SphericalHeightFieldSide {
                     y: indices.y * 2,
                     lod: indices.lod + 1,
                 },
-                this.direction,
-                this.radius,
-                this.parent,
+                direction,
+                radius,
+                parent,
                 scene,
             ),
             new SphericalHeightFieldSide(
@@ -108,9 +111,9 @@ export class SphericalHeightFieldSide {
                     y: indices.y * 2,
                     lod: indices.lod + 1,
                 },
-                this.direction,
-                this.radius,
-                this.parent,
+                direction,
+                radius,
+                parent,
                 scene,
             ),
             new SphericalHeightFieldSide(
@@ -119,9 +122,9 @@ export class SphericalHeightFieldSide {
                     y: indices.y * 2 + 1,
                     lod: indices.lod + 1,
                 },
-                this.direction,
-                this.radius,
-                this.parent,
+                direction,
+                radius,
+                parent,
                 scene,
             ),
             new SphericalHeightFieldSide(
@@ -130,33 +133,54 @@ export class SphericalHeightFieldSide {
                     y: indices.y * 2 + 1,
                     lod: indices.lod + 1,
                 },
-                this.direction,
-                this.radius,
-                this.parent,
+                direction,
+                radius,
+                parent,
                 scene,
             ),
         ];
     }
 
-    update(chunkForge: ChunkForgeCompute) {
+    update(cameraPosition: Vector3, chunkForge: ChunkForgeCompute) {
         if (this.status === ChunkLoadingStatus.NOT_STARTED) {
             this.status = ChunkLoadingStatus.IN_PROGRESS;
 
-            chunkForge.addBuildTask(
-                this.mesh,
-                this.positionOnCube,
+            chunkForge.addBuildTask(this.mesh, this.positionOnCube, this.direction, this.size, this.radius);
+        }
+
+        const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
+        if (this.children === null && distanceSquared < (this.size * 2) ** 2) {
+            this.children = SphericalHeightFieldSide.Subdivide(
+                this.indices,
                 this.direction,
-                (this.radius * 2) / 2 ** this.indices.lod,
                 this.radius,
+                this.parent,
+                this.mesh.getScene(),
             );
+        } else if (this.children !== null && distanceSquared >= (this.size * 2.5) ** 2) {
+            for (const child of this.children) {
+                child.dispose();
+            }
+            this.children = null;
+            this.status = ChunkLoadingStatus.NOT_STARTED;
+            this.mesh.setEnabled(true);
         }
 
         for (const child of this.children ?? []) {
-            child.update(chunkForge);
+            child.update(cameraPosition, chunkForge);
+        }
+
+        if (this.children !== null) {
+            if (this.children.every((child) => child.status !== ChunkLoadingStatus.NOT_STARTED)) {
+                this.mesh.setEnabled(false);
+            }
         }
     }
 
     dispose(): void {
         this.mesh.dispose();
+        this.children?.forEach((child) => {
+            child.dispose();
+        });
     }
 }
