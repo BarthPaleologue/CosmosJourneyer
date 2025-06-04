@@ -38,3 +38,9 @@ export type NonEmptyArray<T> = [T, ...T[]];
 export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
     return arr.length > 0;
 }
+
+type BuildTuple<T, N extends number, Acc extends T[] = []> = Acc["length"] extends N
+    ? Acc // Base case: if Acc already has length N, return it
+    : BuildTuple<T, N, [T, ...Acc]>; // Otherwise, prepend T and recurse
+
+export type FixedLengthArray<T, N extends number> = BuildTuple<T, N>;
