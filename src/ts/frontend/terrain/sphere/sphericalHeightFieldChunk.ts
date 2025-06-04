@@ -17,6 +17,7 @@
 
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -62,10 +63,18 @@ export class SphericalHeightFieldChunk {
 
     private vertexData: ChunkForgeOutput | null = null;
 
-    constructor(indices: ChunkIndices, direction: Direction, radius: number, parent: TransformNode, scene: Scene) {
+    constructor(
+        indices: ChunkIndices,
+        direction: Direction,
+        radius: number,
+        parent: TransformNode,
+        material: Material,
+        scene: Scene,
+    ) {
         this.mesh = new Mesh(`SphericalHeightFieldSide[${direction};${JSON.stringify(indices)}]`, scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
+        this.mesh.material = material;
 
         this.parent = parent;
 
@@ -127,6 +136,7 @@ export class SphericalHeightFieldChunk {
         direction: Direction,
         radius: number,
         parent: TransformNode,
+        material: Material,
         scene: Scene,
     ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
         return [
@@ -139,6 +149,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                material,
                 scene,
             ),
             new SphericalHeightFieldChunk(
@@ -150,6 +161,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                material,
                 scene,
             ),
             new SphericalHeightFieldChunk(
@@ -161,6 +173,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                material,
                 scene,
             ),
             new SphericalHeightFieldChunk(
@@ -172,12 +185,13 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                material,
                 scene,
             ),
         ];
     }
 
-    update(cameraPosition: Vector3, chunkForge: ChunkForgeCompute) {
+    update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
         if (this.status === ChunkLoadingStatus.NOT_STARTED) {
             this.status = ChunkLoadingStatus.IN_PROGRESS;
 
@@ -201,6 +215,7 @@ export class SphericalHeightFieldChunk {
                 this.direction,
                 this.radius,
                 this.parent,
+                material,
                 this.mesh.getScene(),
             );
         } else if (this.children !== null && distanceSquared >= (this.size * 2.5) ** 2) {
@@ -213,7 +228,7 @@ export class SphericalHeightFieldChunk {
         }
 
         for (const child of this.children ?? []) {
-            child.update(cameraPosition, chunkForge);
+            child.update(cameraPosition, material, chunkForge);
         }
 
         if (this.children !== null && this.children.every((child) => child.status === ChunkLoadingStatus.COMPLETED)) {

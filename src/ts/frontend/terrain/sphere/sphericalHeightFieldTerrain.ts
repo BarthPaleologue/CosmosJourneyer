@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
@@ -22,6 +23,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { Direction } from "@/utils/direction";
+import { type FixedLengthArray } from "@/utils/types";
 
 import { type ChunkForgeCompute } from "./chunkForgeCompute";
 import { SphericalHeightFieldChunk, type ChunkIndices } from "./sphericalHeightFieldChunk";
@@ -29,16 +31,9 @@ import { SphericalHeightFieldChunk, type ChunkIndices } from "./sphericalHeightF
 export class SphericalHeightFieldTerrain implements Transformable {
     private readonly transform: TransformNode;
 
-    private readonly sides: [
-        SphericalHeightFieldChunk,
-        SphericalHeightFieldChunk,
-        SphericalHeightFieldChunk,
-        SphericalHeightFieldChunk,
-        SphericalHeightFieldChunk,
-        SphericalHeightFieldChunk,
-    ];
+    private readonly sides: FixedLengthArray<SphericalHeightFieldChunk, 6>;
 
-    constructor(radius: number, scene: Scene) {
+    constructor(radius: number, material: Material, scene: Scene) {
         this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
@@ -49,12 +44,12 @@ export class SphericalHeightFieldTerrain implements Transformable {
         };
 
         this.sides = [
-            new SphericalHeightFieldChunk(indices, Direction.UP, radius, this.getTransform(), scene),
-            new SphericalHeightFieldChunk(indices, Direction.DOWN, radius, this.getTransform(), scene),
-            new SphericalHeightFieldChunk(indices, Direction.FORWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldChunk(indices, Direction.BACKWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldChunk(indices, Direction.LEFT, radius, this.getTransform(), scene),
-            new SphericalHeightFieldChunk(indices, Direction.RIGHT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldChunk(indices, Direction.UP, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.DOWN, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.FORWARD, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.BACKWARD, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.LEFT, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.RIGHT, radius, this.getTransform(), material, scene),
         ];
     }
 
@@ -62,9 +57,9 @@ export class SphericalHeightFieldTerrain implements Transformable {
         return this.transform;
     }
 
-    update(cameraPosition: Vector3, chunkForge: ChunkForgeCompute) {
+    update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
         for (const side of this.sides) {
-            side.update(cameraPosition, chunkForge);
+            side.update(cameraPosition, material, chunkForge);
         }
     }
 

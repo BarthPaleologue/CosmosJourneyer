@@ -73,7 +73,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let vertex_position_on_sphere = sphere_up * params.sphere_radius;
 
-    let elevation = mountain(vertex_position_on_sphere, sphere_up);
+    let elevation = 7e3 * mountain(vertex_position_on_sphere * 0.0001, sphere_up);
 
     let final_position = vertex_position_on_sphere + sphere_up * elevation - chunk_position_on_sphere;
 

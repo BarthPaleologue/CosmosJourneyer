@@ -15,7 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DirectionalLight, GizmoManager, LightGizmo, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
+import {
+    Color3,
+    DirectionalLight,
+    GizmoManager,
+    LightGizmo,
+    PBRMetallicRoughnessMaterial,
+    Scene,
+    Vector3,
+    type WebGPUEngine,
+} from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -31,13 +40,17 @@ export async function createSphericalHeightFieldTerrain(
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
 
+    const earthRadius = 6_371e3; // Average radius of Earth in meters
+
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
-    controls.getTransform().position = new Vector3(0, 5, -10).scale(2);
+    controls.getTransform().position = new Vector3(0, 5, -10).normalize().scale(earthRadius * 3);
     controls.getTransform().lookAt(Vector3.Zero());
+    controls.speed = earthRadius / 3;
 
     const camera = controls.getActiveCamera();
-    camera.minZ = 0.01; // Set a minimum Z distance to avoid clipping issues
+    camera.minZ = 0.01;
+    camera.maxZ = 0.0;
 
     // This attaches the camera to the canvas
     camera.attachControl();
@@ -58,16 +71,25 @@ export async function createSphericalHeightFieldTerrain(
     gizmoManager.usePointerToAttachGizmos = false;
     gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const terrain = new SphericalHeightFieldTerrain(4, scene);
+    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
+    material.baseColor = new Color3(0.5, 0.5, 0.5);
+    material.metallic = 0.0;
+    material.roughness = 1.0;
 
-    const chunkForge = await ChunkForgeCompute.New(6, 128, engine);
+    const terrain = new SphericalHeightFieldTerrain(earthRadius, material, scene);
+
+    const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, chunkForge);
+        terrain.update(camera.globalPosition, material, chunkForge);
         chunkForge.update();
+
+        const cameraPosition = camera.globalPosition.clone();
+        terrain.getTransform().position.subtractInPlace(cameraPosition);
+        controls.getTransform().position.subtractInPlace(cameraPosition);
     });
 
     return scene;
