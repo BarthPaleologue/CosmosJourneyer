@@ -18,6 +18,7 @@
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 
 import { type Direction } from "@/utils/direction";
@@ -27,6 +28,7 @@ import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeig
 
 type HeightFieldTask = {
     mesh: Mesh;
+    positionOnCube: Vector3;
     size: number;
     direction: Direction;
     sphereRadius: number;
@@ -81,8 +83,8 @@ export class ChunkForgeCompute {
         return new ChunkForgeCompute(heightFieldComputers, normalComputers, rowVertexCount, engine);
     }
 
-    addBuildTask(mesh: Mesh, direction: Direction, size: number, sphereRadius: number): void {
-        this.heightFieldQueue.push({ mesh, direction, size, sphereRadius });
+    addBuildTask(mesh: Mesh, positionOnCube: Vector3, direction: Direction, size: number, sphereRadius: number): void {
+        this.heightFieldQueue.push({ mesh, positionOnCube, direction, size, sphereRadius });
     }
 
     update() {
@@ -93,7 +95,7 @@ export class ChunkForgeCompute {
             }
 
             const { positions, indices } = availableComputer.dispatch(
-                nextTask.mesh.position,
+                nextTask.positionOnCube,
                 this.rowVertexCount,
                 nextTask.direction,
                 nextTask.sphereRadius,

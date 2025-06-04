@@ -53,3 +53,9 @@ export type StrictEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => 
 
 /** Turns “should be true” into a compilation error when it’s not. */
 export type Assert<T extends true> = T;
+
+type BuildTuple<T, N extends number, Acc extends T[] = []> = Acc["length"] extends N
+    ? Acc // Base case: if Acc already has length N, return it
+    : BuildTuple<T, N, [T, ...Acc]>; // Otherwise, prepend T and recurse
+
+export type FixedLengthArray<T, N extends number> = BuildTuple<T, N>;

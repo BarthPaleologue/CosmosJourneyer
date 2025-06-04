@@ -24,7 +24,7 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { Direction } from "@/utils/direction";
 
 import { type ChunkForgeCompute } from "./chunkForgeCompute";
-import { SphericalHeightFieldSide } from "./sphericalHeightFieldSide";
+import { SphericalHeightFieldSide, type ChunkIndices } from "./sphericalHeightFieldSide";
 
 export class SphericalHeightFieldTerrain implements Transformable {
     private readonly transform: TransformNode;
@@ -42,13 +42,19 @@ export class SphericalHeightFieldTerrain implements Transformable {
         this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
+        const indices: ChunkIndices = {
+            x: 0,
+            y: 0,
+            lod: 0,
+        };
+
         this.sides = [
-            new SphericalHeightFieldSide(Direction.UP, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(Direction.DOWN, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(Direction.FORWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(Direction.BACKWARD, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(Direction.LEFT, radius, this.getTransform(), scene),
-            new SphericalHeightFieldSide(Direction.RIGHT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.UP, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.DOWN, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.FORWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.BACKWARD, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.LEFT, radius, this.getTransform(), scene),
+            new SphericalHeightFieldSide(indices, Direction.RIGHT, radius, this.getTransform(), scene),
         ];
     }
 

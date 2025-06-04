@@ -60,7 +60,7 @@ export async function createSphericalHeightFieldTerrain(
 
     const terrain = new SphericalHeightFieldTerrain(4, scene);
 
-    const chunkForge = await ChunkForgeCompute.New(6, 512, engine);
+    const chunkForge = await ChunkForgeCompute.New(6, 128, engine);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
