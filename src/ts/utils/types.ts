@@ -42,3 +42,9 @@ export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<
 export function assertUnreachable(value: never): never {
     throw new Error(`Unexpected value: ${String(value)}`);
 }
+
+type BuildTuple<T, N extends number, Acc extends T[] = []> = Acc["length"] extends N
+    ? Acc // Base case: if Acc already has length N, return it
+    : BuildTuple<T, N, [T, ...Acc]>; // Otherwise, prepend T and recurse
+
+export type FixedLengthArray<T, N extends number> = BuildTuple<T, N>;
