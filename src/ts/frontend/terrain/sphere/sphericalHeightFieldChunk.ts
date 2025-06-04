@@ -39,7 +39,7 @@ export type ChunkIndices = {
     lod: number;
 };
 
-export class SphericalHeightFieldSide {
+export class SphericalHeightFieldChunk {
     readonly mesh: Mesh;
 
     private readonly direction: Direction;
@@ -52,7 +52,7 @@ export class SphericalHeightFieldSide {
 
     private indices: ChunkIndices;
 
-    private children: FixedLengthArray<SphericalHeightFieldSide, 4> | null = null;
+    private children: FixedLengthArray<SphericalHeightFieldChunk, 4> | null = null;
 
     private readonly parent: TransformNode;
 
@@ -92,9 +92,9 @@ export class SphericalHeightFieldSide {
         radius: number,
         parent: TransformNode,
         scene: Scene,
-    ): FixedLengthArray<SphericalHeightFieldSide, 4> {
+    ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
         return [
-            new SphericalHeightFieldSide(
+            new SphericalHeightFieldChunk(
                 {
                     x: indices.x * 2,
                     y: indices.y * 2,
@@ -105,7 +105,7 @@ export class SphericalHeightFieldSide {
                 parent,
                 scene,
             ),
-            new SphericalHeightFieldSide(
+            new SphericalHeightFieldChunk(
                 {
                     x: indices.x * 2 + 1,
                     y: indices.y * 2,
@@ -116,7 +116,7 @@ export class SphericalHeightFieldSide {
                 parent,
                 scene,
             ),
-            new SphericalHeightFieldSide(
+            new SphericalHeightFieldChunk(
                 {
                     x: indices.x * 2,
                     y: indices.y * 2 + 1,
@@ -127,7 +127,7 @@ export class SphericalHeightFieldSide {
                 parent,
                 scene,
             ),
-            new SphericalHeightFieldSide(
+            new SphericalHeightFieldChunk(
                 {
                     x: indices.x * 2 + 1,
                     y: indices.y * 2 + 1,
@@ -150,7 +150,7 @@ export class SphericalHeightFieldSide {
 
         const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
         if (this.children === null && distanceSquared < (this.size * 2) ** 2) {
-            this.children = SphericalHeightFieldSide.Subdivide(
+            this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
                 this.direction,
                 this.radius,
