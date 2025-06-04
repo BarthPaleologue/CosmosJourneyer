@@ -17,11 +17,12 @@
 
 import { z } from "zod";
 
-const JsonSchema = z.object({});
+const JsonSchema = z.record(z.unknown());
 
 export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
     try {
-        return JsonSchema.parse(JSON.parse(jsonString));
+        const parsed = JSON.parse(jsonString);
+        return JsonSchema.parse(parsed);
     } catch {
         return null;
     }
