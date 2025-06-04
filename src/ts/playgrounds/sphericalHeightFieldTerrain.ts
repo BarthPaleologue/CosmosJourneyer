@@ -29,13 +29,17 @@ export async function createSphericalHeightFieldTerrain(
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
 
+    const earthRadius = 6_371e3; // Average radius of Earth in meters
+
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
-    controls.getTransform().position = new Vector3(0, 5, -10).scale(2);
+    controls.getTransform().position = new Vector3(0, 5, -10).normalize().scale(earthRadius * 3);
     controls.getTransform().lookAt(Vector3.Zero());
+    controls.speed = earthRadius / 3;
 
     const camera = controls.getActiveCamera();
-    camera.minZ = 0.01; // Set a minimum Z distance to avoid clipping issues
+    camera.minZ = 0.01;
+    camera.maxZ = 0.0;
 
     // This attaches the camera to the canvas
     camera.attachControl();
@@ -56,7 +60,7 @@ export async function createSphericalHeightFieldTerrain(
     gizmoManager.usePointerToAttachGizmos = false;
     gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const terrain = new SphericalHeightFieldTerrain(4, scene);
+    const terrain = new SphericalHeightFieldTerrain(earthRadius, scene);
 
     const chunkForge = await ChunkForgeCompute.New(6, 128, engine);
 
@@ -66,6 +70,10 @@ export async function createSphericalHeightFieldTerrain(
 
         terrain.update(camera.globalPosition, chunkForge);
         chunkForge.update();
+
+        const cameraPosition = camera.globalPosition.clone();
+        terrain.getTransform().position.subtractInPlace(cameraPosition);
+        controls.getTransform().position.subtractInPlace(cameraPosition);
     });
 
     progressCallback(1, "Loaded terrain scene");
