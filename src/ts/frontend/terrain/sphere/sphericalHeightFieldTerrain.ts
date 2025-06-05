@@ -33,7 +33,7 @@ export class SphericalHeightFieldTerrain implements Transformable {
 
     private readonly sides: FixedLengthArray<SphericalHeightFieldChunk, 6>;
 
-    constructor(radius: number, material: Material, scene: Scene) {
+    constructor(sphereRadius: number, material: Material, scene: Scene) {
         this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
@@ -44,12 +44,26 @@ export class SphericalHeightFieldTerrain implements Transformable {
         };
 
         this.sides = [
-            new SphericalHeightFieldChunk(indices, Direction.UP, radius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.DOWN, radius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.FORWARD, radius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.BACKWARD, radius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.LEFT, radius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.RIGHT, radius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.UP, sphereRadius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.DOWN, sphereRadius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.FORWARD,
+                sphereRadius,
+                this.getTransform(),
+                material,
+                scene,
+            ),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.BACKWARD,
+                sphereRadius,
+                this.getTransform(),
+                material,
+                scene,
+            ),
+            new SphericalHeightFieldChunk(indices, Direction.LEFT, sphereRadius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(indices, Direction.RIGHT, sphereRadius, this.getTransform(), material, scene),
         ];
     }
 
