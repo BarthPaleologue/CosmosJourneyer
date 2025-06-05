@@ -15,7 +15,7 @@
     "bugReports": "Bug Reports",
     "bugReportsText": "If you experience any bug during your exploration, please add it to the <a href=\"https://github.com/BarthPaleologue/CosmosJourneyer/issues\">issue tracker</a>. You can also send an email at <a href=\"mailto:barth.paleologue@cosmosjourneyer.com\">barth.paleologue@cosmosjourneyer.com</a>. Sending screenshots and save files can help enormously with the debugging process.",
     "translation": "Translation",
-    "translationText": "Translating Cosmos Journeyer makes it accessible to more people around the world! You don't need any coding skills, only proficiency in a language not currently supported or that can be enhanced. You can access the translation guide <a href=\"https://github.com/BarthPaleologue/CosmosJourneyer/CONTRIBUTING.md#translation\">here</a>.",
+    "translationText": "Translating Cosmos Journeyer makes it accessible to more people around the world! You don't need any coding skills, only proficiency in a language not currently supported or that can be enhanced. You can access the translation guide <a href=\"https://github.com/BarthPaleologue/CosmosJourneyer/blob/main/CONTRIBUTING.md#translation\">here</a>.",
     "knowHowToCode": "Know how to code?",
     "knowHowToCodeText": "Cosmos Journeyer is an open-source project which means anyone can help build it! Why not you?\n You can check out <a target=\"_blank\" href=\"https://github.com/BarthPaleologue/CosmosJourneyer\">the repository of the project</a> for more details. Please take a look at the contributing guidelines before starting to contribute to Cosmos Journeyer.",
     "supportFinancially": "Support financially",
