@@ -33,4 +33,17 @@ describe("computeRayleighBetaRGB", () => {
         expect(relErr(prediction[1], groundTruth[1])).toBeLessThan(0.05);
         expect(relErr(prediction[2], groundTruth[2])).toBeLessThan(0.05);
     });
+
+    it("should compute Titan's rayleigh beta scattering coefficients within 5 %", () => {
+        const titanAtmosphereComposition = [
+            ["N2", 0.95], // Cassini/Huygens shows 94–98 % N₂
+            ["CH4", 0.05], // and 1–5 % CH₄; trace H₂ neglected
+        ] as const;
+        const prediction = computeRayleighBetaRGB(titanAtmosphereComposition, 146_700, 94);
+        const groundTruth = [2.34e-5, 5.46e-5, 1.33e-4] as const;
+
+        expect(relErr(prediction[0], groundTruth[0])).toBeLessThan(0.05);
+        expect(relErr(prediction[1], groundTruth[1])).toBeLessThan(0.05);
+        expect(relErr(prediction[2], groundTruth[2])).toBeLessThan(0.05);
+    });
 });
