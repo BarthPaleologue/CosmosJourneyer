@@ -90,7 +90,7 @@ export function computeRayleighBetaRGB(
     fractions: DeepReadonly<Array<[Gas, number]>>,
     pressure: number,
     temperature: number,
-    waveLengths: ReadonlyArray<number> = RGB_WAVELENGTHS,
+    waveLengths: DeepReadonly<[number, number, number]> = RGB_WAVELENGTHS,
 ): [number, number, number] {
     /* --- (1) Mixture refractive index and depolarisation --- */
     let nMinus1 = 0;
@@ -107,11 +107,13 @@ export function computeRayleighBetaRGB(
     const N = pressure / (K_B * temperature);
 
     /* --- (3) β(λ) for each wavelength --- */
-    const betas = waveLengths.map((wavelength) => {
-        const sigma =
-            ((((24 * Math.PI ** 3) / (wavelength ** 4 * N_S ** 2)) * (n ** 2 - 1) ** 2) / (n ** 2 + 2) ** 2) * F;
-        return sigma * N;
-    }) as [number, number, number];
+    return [
+        N * computeRayleighCrossSection(waveLengths[0], n, F),
+        N * computeRayleighCrossSection(waveLengths[1], n, F),
+        N * computeRayleighCrossSection(waveLengths[2], n, F),
+    ];
+}
 
-    return betas;
+function computeRayleighCrossSection(wavelength: number, n: number, F: number): number {
+    return ((24 * Math.PI ** 3 * (n ** 2 - 1) ** 2) / (wavelength ** 4 * N_S ** 2)) * (F / (n ** 2 + 2) ** 2);
 }
