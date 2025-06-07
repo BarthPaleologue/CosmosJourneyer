@@ -21,7 +21,7 @@ import { PresetBands } from "./common";
 import { Gas, getGasDepolarization, getGasRefractiveIndex } from "./gas";
 
 /**
- * Boltzmann constant, J K⁻¹  (CODATA 2019)
+ * Boltzmann constant, J K⁻¹
  * @see https://en.wikipedia.org/wiki/Boltzmann_constant
  */
 const K_B = 1.380_649e-23;

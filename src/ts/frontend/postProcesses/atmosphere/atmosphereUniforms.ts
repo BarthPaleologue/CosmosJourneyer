@@ -20,7 +20,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
+import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
 import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
+import { computeAtmospherePressureScaleHeight } from "@/utils/physics/atmosphere/scaleHeight";
+import { computeGravityAcceleration } from "@/utils/physics/gravity";
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -91,12 +94,24 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, atmosphereThickness: number, model: DeepReadonly<AtmosphereModel>) {
-        //TODO: do not hardcode temperature
-        const rayleighScatteringCoefficients = computeRayleighBetaRGB(model.gasMix, model.pressure, 273);
+    constructor(
+        planetBoundingRadius: number,
+        atmosphereThickness: number,
+        mass: number,
+        temperature: number,
+        model: DeepReadonly<AtmosphereModel>,
+    ) {
+        const rayleighScatteringCoefficients = computeRayleighBetaRGB(model.gasMix, model.pressure, temperature);
+
+        const meanMolecularWeight = computeMeanMolecularWeight(model.gasMix);
+
+        const gravity = computeGravityAcceleration(mass, planetBoundingRadius);
+
+        const rayleighScaleHeight = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
 
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
-        this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
+
+        this.rayleighHeight = rayleighScaleHeight;
         this.rayleighScatteringCoefficients = Vector3.FromArray(rayleighScatteringCoefficients);
 
         this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
@@ -104,11 +119,13 @@ export class AtmosphereUniforms {
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
         );
         this.mieAsymmetry = 0.8;
+
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
         );
         this.ozoneFalloff = (5e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
+
         this.lightIntensity = 15;
     }
 
