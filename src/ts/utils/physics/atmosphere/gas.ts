@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type DeepReadonly } from "@/utils/types";
+
 export type Gas = "N2" | "O2" | "Ar" | "CO2" | "He" | "Ne" | "H2" | "CH4" | "SO2";
 
 /**
@@ -42,8 +44,6 @@ export function getGasRefractiveIndex(gas: Gas): number {
             return 1.000444;
         case "SO2":
             return 1.3396; // https://pubchem.ncbi.nlm.nih.gov/compound/Sulfur-Dioxide#section=Refractive-Index
-        default:
-            throw new Error(`Unknown gas: ${String(gas)}`);
     }
 }
 
@@ -64,7 +64,41 @@ export function getGasDepolarization(gas: Gas): number {
         case "CH4":
         case "SO2":
             return 0; // Remaining gases assumed ≈ 0
-        default:
-            throw new Error(`Unknown gas: ${String(gas)}`);
     }
+}
+
+/**
+ * @param gas The gas for which to return the molar mass in g/mol.
+ * @returns The molar mass of the gas in grams per mole.
+ * @see https://en.wikipedia.org/wiki/Molar_mass
+ */
+export function getMolarMass(gas: Gas): number {
+    switch (gas) {
+        case "N2":
+            return 28.0134;
+        case "O2":
+            return 31.9988;
+        case "Ar":
+            return 39.948;
+        case "CO2":
+            return 44.0095;
+        case "He":
+            return 4.002602;
+        case "Ne":
+            return 20.1797;
+        case "H2":
+            return 2.01588;
+        case "CH4":
+            return 16.043;
+        case "SO2":
+            return 64.066;
+    }
+}
+
+/**
+ * Mean molecular weight μ (kg mol-1) of a gas mixture.
+ */
+export function computeMeanMolecularWeight(fractions: DeepReadonly<Array<[Gas, number]>>): number {
+    const sum = fractions.reduce((s, [, x]) => s + x, 0);
+    return 1e-3 * fractions.reduce((mean, [gas, x]) => mean + (x / sum) * getMolarMass(gas), 0);
 }
