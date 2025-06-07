@@ -166,6 +166,9 @@ Cosmos Journeyer is built using the following technologies:
 3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 4. Navigate to the project directory with `cd CosmosJourneyer`
 5. Install the dependencies with `pnpm install`
+   (this also sets up Git hooks for formatting changed files before commit.
+   For pnpm 10 and later, hooks are installed because Husky is listed in
+   `onlyBuiltDependencies`.)
 
 ### Building
 
@@ -193,7 +196,7 @@ You can run the unit tests with `pnpm test:unit` and the end-to-end tests with `
 
 ### Formatting
 
-Cosmos Journeyer uses [Prettier](https://prettier.io/) for code formatting. You can format the code with `pnpm format`.
+Cosmos Journeyer uses [Prettier](https://prettier.io/) for code formatting. Changed files are automatically formatted via a pre-commit hook. You can also format the entire project with `pnpm format`.
 
 ### Linting
 
