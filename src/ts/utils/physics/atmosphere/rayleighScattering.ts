@@ -80,10 +80,12 @@ export function getGasDepolarization(gas: Gas): number {
     }
 }
 
-/**
- * Default photopic RGB band-centres (metres)
- */
-const RGB_WAVELENGTHS = [680e-9, 550e-9, 440e-9] as const;
+const PresetBands = {
+    /**
+     * Default photopic RGB band-centres (metres)
+     */
+    PHOTOPIC: [680e-9, 550e-9, 440e-9],
+} as const;
 
 /**
  * Compute Rayleigh β_R, β_G, β_B (m⁻¹) for a well-mixed gas atmosphere.
@@ -98,7 +100,7 @@ export function computeRayleighBetaRGB(
     fractions: DeepReadonly<Array<[Gas, number]>>,
     pressure: number,
     temperature: number,
-    waveLengths: DeepReadonly<[number, number, number]> = RGB_WAVELENGTHS,
+    waveLengths: DeepReadonly<[number, number, number]> = PresetBands.PHOTOPIC,
 ): [number, number, number] {
     /* --- (1) Mixture refractive index and depolarisation --- */
     let nMinus1 = 0;
