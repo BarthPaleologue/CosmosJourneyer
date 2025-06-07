@@ -127,7 +127,7 @@ export function computeRayleighBetaRGB(
  * @param wavelength Wavelength of light (m) Inverse of frequency nu.
  * @param n Refractive index of the gas at standard conditions (dimensionless)
  * @param F King correction factor (dimensionless)
- * @returns Rayleigh scattering cross section (m²mol⁻¹)
+ * @returns Rayleigh scattering cross section (m²)
  * @see https://pmc.ncbi.nlm.nih.gov/articles/PMC6800691/pdf/nihms-1036079.pdf Rayleigh scattering cross sections of argon, carbon dioxide, sulfur hexafluoride, and methane in the UV-A region using Broadband Cavity Enhanced Spectroscopy
  * @see https://acp.copernicus.org/articles/21/14927/2021/ Scattering and absorption cross sections of atmospheric gases in the ultraviolet–visible wavelength range (307–725nm)
  */
