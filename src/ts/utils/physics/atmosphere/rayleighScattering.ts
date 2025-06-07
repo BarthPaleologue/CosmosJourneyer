@@ -15,7 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type DeepReadonly } from "../../types";
+import { type DeepReadonly } from "@/utils/types";
+
+import { PresetBands } from "./common";
+import { getGasDepolarization, getGasRefractiveIndex, type Gas } from "./gas";
 
 /**
  * Boltzmann constant, J K⁻¹  (CODATA 2019)
@@ -28,64 +31,6 @@ const K_B = 1.380_649e-23;
  * @see https://en.wikipedia.org/wiki/Loschmidt_constant
  */
 const N_S = 2.686_78e25;
-
-export type Gas = "N2" | "O2" | "Ar" | "CO2" | "He" | "Ne" | "H2" | "CH4";
-
-/**
- * @param gas The gas for which to return the refractive index.
- * @returns The refractive index of the gas at standard conditions.
- * @see https://www.engineeringtoolbox.com/refractive-index-d_1264.html
- */
-export function getGasRefractiveIndex(gas: Gas): number {
-    switch (gas) {
-        case "N2":
-            return 1.000298;
-        case "O2":
-            return 1.000271;
-        case "Ar":
-            return 1.000281;
-        case "CO2":
-            return 1.00045;
-        case "He":
-            return 1.000036;
-        case "Ne":
-            return 1.000067;
-        case "H2":
-            return 1.000132;
-        case "CH4":
-            return 1.000444;
-        default:
-            throw new Error(`Unknown gas: ${String(gas)}`);
-    }
-}
-
-export function getGasDepolarization(gas: Gas): number {
-    switch (gas) {
-        case "N2":
-            return 0.022;
-        case "O2":
-            return 0.054;
-        case "CO2":
-            // King correction is 1.1364 according to https://acp.copernicus.org/articles/21/14927/2021/acp-21-14927-2021.pdf
-            // So solving for delta in the King correction formula gives us 0.075
-            return 0.075;
-        case "Ar":
-        case "He":
-        case "Ne":
-        case "H2":
-        case "CH4":
-            return 0; // Remaining gases assumed ≈ 0
-        default:
-            throw new Error(`Unknown gas: ${String(gas)}`);
-    }
-}
-
-const PresetBands = {
-    /**
-     * Default photopic RGB band-centres (metres)
-     */
-    PHOTOPIC: [680e-9, 550e-9, 440e-9],
-} as const;
 
 /**
  * Compute Rayleigh β_R, β_G, β_B (m⁻¹) for a well-mixed gas atmosphere.
