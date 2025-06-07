@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Gas } from "@/utils/physics/atmosphere/gas";
+
 export type AtmosphereModel = {
     /**
      * The pressure of the atmosphere in Pa
@@ -25,4 +27,10 @@ export type AtmosphereModel = {
      * The amount of greenhouse gases in the atmosphere (between 0 and 1)
      */
     greenHouseEffectFactor: number;
+
+    /**
+     * The composition of the atmosphere, as a list of gas and its associated Mole/volume fraction.
+     * The sum of all fractions must add up to 1.0
+     */
+    gasMix: Array<[Gas, number]>;
 };
