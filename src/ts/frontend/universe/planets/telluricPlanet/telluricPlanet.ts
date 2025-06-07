@@ -115,6 +115,8 @@ export class TelluricPlanet
             this.atmosphereUniforms = new AtmosphereUniforms(
                 this.getBoundingRadius(),
                 atmosphereThickness,
+                this.model.mass,
+                this.model.temperature.max,
                 this.model.atmosphere,
             );
         } else {
