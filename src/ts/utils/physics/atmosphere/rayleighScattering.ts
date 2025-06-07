@@ -65,8 +65,11 @@ export function getGasDepolarization(gas: Gas): number {
             return 0.022;
         case "O2":
             return 0.054;
-        case "Ar":
         case "CO2":
+            // King correction is 1.1364 according to https://acp.copernicus.org/articles/21/14927/2021/acp-21-14927-2021.pdf
+            // So solving for delta in the King correction formula gives us 0.075
+            return 0.075;
+        case "Ar":
         case "He":
         case "Ne":
         case "H2":
