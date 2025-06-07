@@ -109,6 +109,10 @@ export function newSeededGasPlanetModel(
         atmosphere: {
             pressure: EarthSeaLevelPressure,
             greenHouseEffectFactor: 0.5,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
         },
         rings: rings,
         colorPalette: {

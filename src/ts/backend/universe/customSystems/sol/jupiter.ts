@@ -45,6 +45,10 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         atmosphere: {
             pressure: EarthSeaLevelPressure,
             greenHouseEffectFactor: 0.7,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
         },
         colorPalette: {
             type: "textured",
