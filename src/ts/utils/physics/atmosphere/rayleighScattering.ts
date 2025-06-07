@@ -90,7 +90,7 @@ const PresetBands = {
 /**
  * Compute Rayleigh β_R, β_G, β_B (m⁻¹) for a well-mixed gas atmosphere.
  *
- * @param fractions An array of tuples containing a gas and its associated Mole/volume fraction. The sum of all fractions must add up to 1.0
+ * @param fractions An array of tuples containing a gas and its associated Mole/volume fraction. The sum of all fractions must add up to 1.0 (will be normalized if not).
  * @param pressure Ambient pressure (Pa)
  * @param temperature Ambient temperature (K)
  * @param waveLengths Wavelength array (m). Default: RGB_WAVELENGTHS
@@ -106,9 +106,11 @@ export function computeRayleighBetaRGB(
     let nMinus1 = 0;
     let delta = 0;
 
+    const sum = fractions.map((fraction) => fraction[1]).reduce((acc, fraction) => acc + fraction, 0);
+
     for (const [gas, fraction] of fractions) {
-        nMinus1 += fraction * (getGasRefractiveIndex(gas) - 1);
-        delta += fraction * getGasDepolarization(gas);
+        nMinus1 += (fraction * (getGasRefractiveIndex(gas) - 1)) / sum;
+        delta += (fraction * getGasDepolarization(gas)) / sum;
     }
     const n = 1 + nMinus1;
     const F = (6 + 3 * delta) / (6 - 7 * delta); // King correction
