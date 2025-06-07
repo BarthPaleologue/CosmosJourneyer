@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { computeRayleighBetaRGB } from "./atmosphere";
+import { computeRayleighBetaRGB } from "./rayleighScattering";
 
 const relErr = (calc: number, ref: number) => Math.abs(calc - ref) / ref;
 
