@@ -18,6 +18,11 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+
+import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
+import { DeepReadonly } from "@/utils/types";
+
 import { Settings } from "@/settings";
 
 const AtmosphereUniformNames = {
@@ -86,12 +91,14 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, atmosphereThickness: number) {
+    constructor(planetBoundingRadius: number, atmosphereThickness: number, model: DeepReadonly<AtmosphereModel>) {
+        //TODO: do not hardcode temperature
+        const rayleighScatteringCoefficients = computeRayleighBetaRGB(model.gasMix, model.pressure, 273);
+
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
         this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
-        );
+        this.rayleighScatteringCoefficients = Vector3.FromArray(rayleighScatteringCoefficients);
+
         this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.mieScatteringCoefficients = new Vector3(3.9e-6, 3.9e-6, 3.9e-6).scaleInPlace(
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,

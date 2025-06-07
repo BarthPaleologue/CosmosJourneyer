@@ -122,7 +122,11 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
 
         const atmosphereThickness =
             Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
-        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+        this.atmosphereUniforms = new AtmosphereUniforms(
+            this.getBoundingRadius(),
+            atmosphereThickness,
+            model.atmosphere,
+        );
 
         if (this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
