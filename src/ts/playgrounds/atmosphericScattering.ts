@@ -35,6 +35,7 @@ export function createAtmosphericScatteringScene(
     scene.useRightHandedSystem = true;
 
     const scalingFactor = 6_000e3;
+    const earthMass = 5.972e24; // kg
 
     const controls = new DefaultControls(scene);
 
@@ -67,7 +68,7 @@ export function createAtmosphericScatteringScene(
         ],
     };
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3, atmosphereModel);
+    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3, earthMass, 298, atmosphereModel);
 
     const atmosphere = new AtmosphericScatteringPostProcess(sphere, scalingFactor, atmosphereUniforms, [light], scene);
     camera.attachPostProcess(atmosphere);
