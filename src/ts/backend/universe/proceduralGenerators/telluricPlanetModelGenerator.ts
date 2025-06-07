@@ -59,6 +59,11 @@ export function newSeededTelluricPlanetModel(
             ? {
                   pressure,
                   greenHouseEffectFactor: 0.5,
+                  gasMix: [
+                      ["N2", 0.78],
+                      ["O2", 0.21],
+                      ["Ar", 0.01],
+                  ],
               }
             : null;
 
