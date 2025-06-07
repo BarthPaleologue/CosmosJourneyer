@@ -25,7 +25,9 @@ import { Result } from "@/utils/types";
 import { SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 
-export const SaveSchema = SaveSchemaV2;
+export const SaveSchema = SaveSchemaV2.extend({
+    thumbnail: z.string().optional(),
+});
 
 export type Save = z.infer<typeof SaveSchema>;
 
