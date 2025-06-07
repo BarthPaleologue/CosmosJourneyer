@@ -125,6 +125,8 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
         this.atmosphereUniforms = new AtmosphereUniforms(
             this.getBoundingRadius(),
             atmosphereThickness,
+            model.mass,
+            273, //TODO: do not hardcode temperature
             model.atmosphere,
         );
 
