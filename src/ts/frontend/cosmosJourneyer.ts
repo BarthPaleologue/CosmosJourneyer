@@ -181,13 +181,13 @@ export class CosmosJourneyer {
         });
 
         this.starSystemView = starSystemView;
-        this.starSystemView.onBeforeJump.add(() => {
+        this.starSystemView.onBeforeJump.add(async () => {
             // in case something goes wrong during the jump, we want to save the player's progress
-            this.createAutoSave();
+            await this.createAutoSave();
         });
         this.starSystemView.onAfterJump.add(async () => {
             // always save the player's progress after a jump
-            this.createAutoSave();
+            await this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
                 await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
@@ -196,8 +196,8 @@ export class CosmosJourneyer {
                 });
             }
         });
-        this.starSystemView.onNewDiscovery.add(() => {
-            this.createAutoSave();
+        this.starSystemView.onNewDiscovery.add(async () => {
+            await this.createAutoSave();
         });
 
         this.musicConductor = new MusicConductor(this.assets.audio.musics, this.starSystemView);
@@ -229,7 +229,7 @@ export class CosmosJourneyer {
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: Save) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
-                    this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
+                    await this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
                 }
                 await this.resume();
                 this.starSystemView.setUIEnabled(true);
@@ -260,13 +260,13 @@ export class CosmosJourneyer {
                     return currentDistance < closestDistance ? current : closest;
                 });
             this.starSystemView.setTarget(closestSpaceStation);
-            this.createAutoSave();
+            await this.createAutoSave();
         });
 
         this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
             if (!this.mainMenu.isVisible()) {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
-                this.createAutoSave();
+                await this.createAutoSave();
                 const shouldLoadTutorial = await promptModalBoolean(
                     i18n.t("tutorials:common:loadTutorialWillLeaveGame"),
                     this.soundPlayer,
@@ -296,8 +296,8 @@ export class CosmosJourneyer {
             });
         });
 
-        this.starSystemView.getSpaceshipControls().onCompleteLanding.add(() => {
-            this.createAutoSave();
+        this.starSystemView.getSpaceshipControls().onCompleteLanding.add(async () => {
+            await this.createAutoSave();
         });
 
         this.starSystemView.onInitStarSystem.add(() => {
@@ -321,7 +321,7 @@ export class CosmosJourneyer {
         this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             this.engine.onEndFrameObservable.addOnce(async () => {
-                const save = this.generateSaveData();
+                const save = await this.generateSaveData();
                 save.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
                 const url = createUrlFromSave(save);
                 if (url === null) {
@@ -372,9 +372,9 @@ export class CosmosJourneyer {
             this.engine.resize(true);
         });
 
-        window.addEventListener("beforeunload", () => {
+        window.addEventListener("beforeunload", async () => {
             if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
-            this.createAutoSave();
+            await this.createAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", async () => {
@@ -592,7 +592,7 @@ export class CosmosJourneyer {
                 if (!this.mainMenu.isVisible() && !this.starSystemView.isJumpingBetweenSystems()) {
                     // don't autosave if the main menu is visible: the player is not in the game yet
                     // don't autosave when jumping between systems
-                    this.createAutoSave();
+                    void this.createAutoSave();
                 }
             }
 
@@ -733,7 +733,7 @@ export class CosmosJourneyer {
     /**
      * Generates a save file data object from the current star system and the player's position
      */
-    public generateSaveData(): Save {
+    public async generateSaveData(): Promise<Save> {
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
         const spaceship = spaceShipControls.getSpaceship();
 
@@ -746,6 +746,16 @@ export class CosmosJourneyer {
               }
             : shipUniverseCoordinates;
 
+        const camera = this.activeView.getMainScene().activeCamera;
+        let thumbnail = "";
+        if (camera) {
+            thumbnail = await Tools.CreateScreenshotAsync(this.engine, camera, {
+                width: 320,
+                height: 180,
+                precision: 0.8,
+            });
+        }
+
         return {
             timestamp: Date.now(),
             player: Player.Serialize(this.player),
@@ -756,6 +766,7 @@ export class CosmosJourneyer {
             shipLocations: {
                 [spaceship.id]: shipLocation,
             },
+            thumbnail: thumbnail,
         };
     }
 
@@ -772,7 +783,7 @@ export class CosmosJourneyer {
             );
         }
 
-        const saveData = this.generateSaveData();
+        const saveData = await this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
@@ -791,10 +802,10 @@ export class CosmosJourneyer {
     /**
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
-    public createAutoSave(): void {
+    public async createAutoSave(): Promise<void> {
         if (!this.isAutoSaveEnabled) return;
 
-        const saveData = this.generateSaveData();
+        const saveData = await this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
@@ -819,8 +830,8 @@ export class CosmosJourneyer {
      * Generates save file data and downloads it as a json file
      */
     public downloadSaveFile(): void {
-        this.engine.onEndFrameObservable.addOnce(() => {
-            const saveData = this.generateSaveData();
+        this.engine.onEndFrameObservable.addOnce(async () => {
+            const saveData = await this.generateSaveData();
             const blob = new Blob([JSON.stringify(saveData)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -834,6 +845,9 @@ export class CosmosJourneyer {
     public loadTutorial(tutorial: Tutorial) {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
+            if (!this.mainMenu.isVisible()) {
+                await this.createAutoSave();
+            }
             const saveResult = tutorial.getSaveData(this.starSystemDatabase);
             if (!saveResult.success) {
                 console.error(saveResult.error);
