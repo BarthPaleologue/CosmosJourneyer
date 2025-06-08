@@ -104,7 +104,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const scoopRate = document.createElement("p");
-        scoopRate.innerText = `${i18n.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond} L/s`;
+        scoopRate.innerText = `${i18n.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L/s`;
         container.appendChild(scoopRate);
 
         return container;
@@ -115,7 +115,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const capacity = document.createElement("p");
-        capacity.innerText = `${i18n.t("spaceStation:capacity")}: ${spec.maxFuel} L`;
+        capacity.innerText = `${i18n.t("spaceStation:capacity")}: ${spec.maxFuel.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L`;
         container.appendChild(capacity);
 
         return container;
@@ -126,7 +126,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const relativeRange = document.createElement("p");
-        relativeRange.innerText = `${i18n.t("spaceStation:relativeRange")}: ${spec.relativeRange}`;
+        relativeRange.innerText = `${i18n.t("spaceStation:relativeRange")}: ${spec.relativeRange.toLocaleString(undefined, { maximumSignificantDigits: 3 })}`;
         container.appendChild(relativeRange);
 
         return container;
