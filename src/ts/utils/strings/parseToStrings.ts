@@ -83,6 +83,10 @@ export function parseSecondsPrecise(seconds: number): string {
     if (nbMinutes > 0) result.push(i18n.t("units:minutes", { count: nbMinutes }));
     if (nbSeconds > 0) result.push(i18n.t("units:seconds", { count: nbSeconds }));
 
+    if (result.length === 0) {
+        return i18n.t("units:seconds", { count: 0 });
+    }
+
     return result.join(" ");
 }
 
