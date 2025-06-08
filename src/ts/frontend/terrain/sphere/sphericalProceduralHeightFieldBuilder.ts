@@ -57,8 +57,7 @@ export class SphericalProceduralHeightFieldBuilder {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    indices: { group: 0, binding: 1 },
-                    params: { group: 0, binding: 2 },
+                    params: { group: 0, binding: 1 },
                 },
             },
         );
@@ -75,10 +74,7 @@ export class SphericalProceduralHeightFieldBuilder {
         sphereRadius: number,
         size: number,
         engine: WebGPUEngine,
-    ): {
-        positions: StorageBuffer;
-        indices: StorageBuffer;
-    } {
+    ): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
         this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
@@ -93,22 +89,12 @@ export class SphericalProceduralHeightFieldBuilder {
         );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
-        const indicesBuffer = new StorageBuffer(
-            engine,
-            Uint32Array.BYTES_PER_ELEMENT * (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
-            Constants.BUFFER_CREATIONFLAG_INDEX | Constants.BUFFER_CREATIONFLAG_READWRITE,
-        );
-        this.computeShader.setStorageBuffer("indices", indicesBuffer);
-
         this.computeShader.dispatch(
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[0],
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[1],
             1,
         );
 
-        return {
-            positions: positionsBuffer,
-            indices: indicesBuffer,
-        };
+        return positionsBuffer;
     }
 }
