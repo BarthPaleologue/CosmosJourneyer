@@ -22,6 +22,7 @@ import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 import { type Direction } from "@/utils/direction";
 
+import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 
@@ -59,6 +60,10 @@ export class ChunkForgeCompute {
     private readonly availableHeightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
     private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
 
+    private readonly gridIndicesComputer: SquareGridIndicesComputer;
+
+    private readonly gridIndicesBuffer: StorageBuffer;
+
     private readonly heightFieldQueue: Array<HeightFieldTask> = [];
     private readonly normalQueue: Array<NormalTask> = [];
     private readonly applyQueue: Array<ApplyTask> = [];
@@ -70,11 +75,15 @@ export class ChunkForgeCompute {
     private constructor(
         heightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
         normalComputers: ReadonlyArray<SquareGridNormalComputer>,
+        gridIndicesComputer: SquareGridIndicesComputer,
+        gridIndicesBuffer: StorageBuffer,
         rowVertexCount: number,
         engine: WebGPUEngine,
     ) {
         this.availableHeightFieldComputers.push(...heightFieldComputers);
         this.availableNormalComputers.push(...normalComputers);
+        this.gridIndicesComputer = gridIndicesComputer;
+        this.gridIndicesBuffer = gridIndicesBuffer;
         this.rowVertexCount = rowVertexCount;
         this.engine = engine;
     }
@@ -88,7 +97,18 @@ export class ChunkForgeCompute {
             normalComputers.push(await SquareGridNormalComputer.New(engine));
         }
 
-        return new ChunkForgeCompute(heightFieldComputers, normalComputers, rowVertexCount, engine);
+        const gridIndicesComputer = await SquareGridIndicesComputer.New(engine);
+
+        const gridIndicesBuffer = gridIndicesComputer.dispatch(rowVertexCount, engine);
+
+        return new ChunkForgeCompute(
+            heightFieldComputers,
+            normalComputers,
+            gridIndicesComputer,
+            gridIndicesBuffer,
+            rowVertexCount,
+            engine,
+        );
     }
 
     addBuildTask(
@@ -151,10 +171,10 @@ export class ChunkForgeCompute {
     }
 
     private async runApplyTask(task: ApplyTask) {
-        const { onFinish, positions, indices, normals } = task;
+        const { onFinish, positions, normals } = task;
 
         const positionBufferView = await positions.read();
-        const indexBufferView = await indices.read();
+        const indexBufferView = await this.gridIndicesBuffer.read();
         const normalBufferView = await normals.read();
 
         const vertexData = new VertexData();
@@ -167,7 +187,7 @@ export class ChunkForgeCompute {
             gpu: {
                 positions,
                 normals,
-                indices,
+                indices: this.gridIndicesBuffer,
             },
         });
     }
