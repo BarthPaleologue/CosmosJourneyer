@@ -37,13 +37,11 @@ type HeightFieldTask = {
 type NormalTask = {
     onFinish: (output: ChunkForgeOutput) => void;
     positions: StorageBuffer;
-    indices: StorageBuffer;
 };
 
 type ApplyTask = {
     onFinish: (output: ChunkForgeOutput) => void;
     positions: StorageBuffer;
-    indices: StorageBuffer;
     normals: StorageBuffer;
 };
 
@@ -128,7 +126,7 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            const { positions, indices } = availableComputer.dispatch(
+            const positions = availableComputer.dispatch(
                 nextTask.positionOnCube,
                 this.rowVertexCount,
                 nextTask.direction,
@@ -140,7 +138,6 @@ export class ChunkForgeCompute {
             this.normalQueue.push({
                 onFinish: nextTask.onFinish,
                 positions,
-                indices,
             });
         }
 
@@ -155,7 +152,6 @@ export class ChunkForgeCompute {
             this.applyQueue.push({
                 onFinish: nextTask.onFinish,
                 positions: nextTask.positions,
-                indices: nextTask.indices,
                 normals,
             });
         }
