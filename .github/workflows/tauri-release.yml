@@ -2,9 +2,7 @@ name: "tauri build and release"
 
 # This will trigger the action on each push to main branch if a tag is present
 on:
-    push:
-        tags:
-            - "*"
+    workflow_dispatch: # This allows you to manually trigger the workflow from the GitHub UI.
 
 jobs:
     publish-tauri:
