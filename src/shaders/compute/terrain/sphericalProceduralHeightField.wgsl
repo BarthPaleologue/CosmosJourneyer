@@ -24,8 +24,7 @@ struct Params {
 };
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
-@group(0) @binding(1) var<storage, read_write> indices : array<u32>;
-@group(0) @binding(2) var<uniform> params : Params;
+@group(0) @binding(1) var<uniform> params : Params;
 
 #include "../utils/pi.wgsl";
 
@@ -81,16 +80,4 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     positions[index * 3 + 0] = final_position.x;
     positions[index * 3 + 1] = final_position.y;
     positions[index * 3 + 2] = final_position.z;
-
-    if(id.x > 0 && id.y > 0) {
-        let indexIndex = ((id.x - 1) + (id.y - 1) * (params.nbVerticesPerRow - 1)) * 6;
-
-        indices[indexIndex + 0] = index - 1;
-        indices[indexIndex + 1] = index;
-        indices[indexIndex + 2] = index - params.nbVerticesPerRow - 1;
-
-        indices[indexIndex + 3] = index;
-        indices[indexIndex + 4] = index - params.nbVerticesPerRow;
-        indices[indexIndex + 5] = index - params.nbVerticesPerRow - 1;
-    }
 }
