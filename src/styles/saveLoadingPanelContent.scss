@@ -24,7 +24,6 @@
             .cmdrHeaderText {
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
                 row-gap: 10px;
 
                 h3,
@@ -56,6 +55,7 @@
                 .saveText {
                     display: flex;
                     flex-direction: column;
+                    justify-content: center;
                     row-gap: 10px;
                     padding-left: 10px;
 

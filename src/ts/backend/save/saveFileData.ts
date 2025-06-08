@@ -27,7 +27,7 @@ import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 
 export const SaveSchema = SaveSchemaV2;
 
-export type Save = z.infer<typeof SaveSchemaV2>;
+export type Save = z.infer<typeof SaveSchema>;
 
 /**
  * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
