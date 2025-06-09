@@ -315,6 +315,24 @@ export class SaveLoadingPanelContent {
         });
         saveText.appendChild(saveLocation);
 
+        // save info and thumbnail
+        const saveContent = document.createElement("div");
+        saveContent.classList.add("saveContent");
+        saveDiv.appendChild(saveContent);
+
+        // Add thumbnail
+        if (save.thumbnail !== undefined) {
+            const thumbnailContainer = document.createElement("div");
+            thumbnailContainer.classList.add("saveThumbnail");
+
+            const thumbnailImg = document.createElement("img");
+            thumbnailImg.src = save.thumbnail;
+            thumbnailImg.alt = "Save thumbnail";
+            thumbnailContainer.appendChild(thumbnailImg);
+
+            saveContent.appendChild(thumbnailContainer);
+        }
+
         const saveButtons = document.createElement("div");
         saveButtons.classList.add("saveButtons");
         saveDiv.appendChild(saveButtons);
