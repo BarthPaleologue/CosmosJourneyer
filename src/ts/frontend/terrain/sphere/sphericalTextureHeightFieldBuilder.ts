@@ -34,6 +34,8 @@ export class SphericalTextureHeightFieldBuilder {
 
     private readonly paramsBuffer: UniformBuffer;
 
+    private readonly terrainModelBuffer: UniformBuffer;
+
     private static WORKGROUP_SIZE = [16, 16] as const;
 
     private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
@@ -50,6 +52,12 @@ export class SphericalTextureHeightFieldBuilder {
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+
+        this.terrainModelBuffer = new UniformBuffer(engine);
+        this.terrainModelBuffer.addUniform("min_height", 1);
+        this.terrainModelBuffer.addUniform("max_height", 1);
+
+        this.computeShader.setUniformBuffer("terrainModel", this.terrainModelBuffer);
 
         const heightMapSampler = new TextureSampler();
         heightMapSampler.setParameters(); // use the default values
@@ -69,6 +77,7 @@ export class SphericalTextureHeightFieldBuilder {
                     params: { group: 0, binding: 1 },
                     heightMap: { group: 0, binding: 2 },
                     heightMapSampler: { group: 0, binding: 3 },
+                    terrainModel: { group: 0, binding: 4 },
                 },
             },
         );
@@ -85,7 +94,11 @@ export class SphericalTextureHeightFieldBuilder {
         direction: Direction,
         sphereRadius: number,
         size: number,
-        heightMap: Texture,
+        terrainModel: {
+            heightMap: Texture;
+            minHeight: number;
+            maxHeight: number;
+        },
         engine: WebGPUEngine,
     ): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
@@ -96,7 +109,11 @@ export class SphericalTextureHeightFieldBuilder {
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
 
-        this.computeShader.setTexture("heightMap", heightMap, false);
+        this.terrainModelBuffer.updateFloat("min_height", terrainModel.minHeight);
+        this.terrainModelBuffer.updateFloat("max_height", terrainModel.maxHeight);
+        this.terrainModelBuffer.update();
+
+        this.computeShader.setTexture("heightMap", terrainModel.heightMap, false);
 
         const positionsBuffer = new StorageBuffer(
             engine,
