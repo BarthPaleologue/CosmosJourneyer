@@ -21,6 +21,7 @@ struct Params {
     direction: u32,
     chunk_position_on_cube : vec3<f32>,
     sphere_radius : f32,
+    chunk_position_on_sphere : vec3<f32>,
 };
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
@@ -55,26 +56,42 @@ fn get_vertex_position_on_cube(chunk_position_on_cube: vec3<f32>, direction: u32
     }
 }
 
+/**
+ * Maps a position on the cube to a point on the unit sphere.
+ * @see https://catlikecoding.com/unity/tutorials/cube-sphere/
+ */
+fn map_cube_to_unit_sphere(position_on_cube: vec3<f32>) -> vec3<f32> {
+    /*let p = position_on_cube / (params.sphere_radius);
+    let x2 = p.x*p.x;
+    let y2 = p.y*p.y;
+    let z2 = p.z*p.z;
+
+    return vec3(
+        p.x * sqrt(1.0 - 0.5*(y2+z2) + (y2*z2)/3.0),
+        p.y * sqrt(1.0 - 0.5*(z2+x2) + (z2*x2)/3.0),
+        p.z * sqrt(1.0 - 0.5*(x2+y2) + (x2*y2)/3.0)
+    );*/
+
+    return normalize(position_on_cube);
+}
+
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
         return; 
     }
-
-    // this one can be precomputed
-    let chunk_position_on_sphere = normalize(params.chunk_position_on_cube) * params.sphere_radius;
-
+    
     let vertex_offset = params.size * ((vec2<f32>(f32(id.x), f32(id.y)) / f32(params.nbVerticesPerRow - 1)) - 0.5);
 
     let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset);
 
-    let sphere_up = normalize(vertex_position_on_cube);
+    let sphere_up = map_cube_to_unit_sphere(vertex_position_on_cube);
 
     let vertex_position_on_sphere = sphere_up * params.sphere_radius;
 
     let elevation = 7e3 * mountain(vertex_position_on_sphere * 0.0001, sphere_up);
 
-    let final_position = vertex_position_on_sphere + sphere_up * elevation - chunk_position_on_sphere;
+    let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
 
     let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
     positions[index * 3 + 0] = final_position.x;
