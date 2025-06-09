@@ -121,6 +121,7 @@ export class SphericalHeightFieldChunk {
         );
         this.mesh.setVerticesBuffer(normalsVertexBuffer);
 
+        vertexData.gpu.indices.getBuffer().references++;
         this.mesh.setIndexBuffer(
             vertexData.gpu.indices.getBuffer(),
             rowVertexCount * rowVertexCount,
