@@ -24,10 +24,16 @@ struct Params {
     chunk_position_on_sphere : vec3<f32>,
 };
 
+struct TerrainModel {
+    min_height: f32,
+    max_height: f32,
+}
+
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
 @group(0) @binding(1) var<uniform> params : Params;
 @group(0) @binding(2) var heightMap : texture_2d<f32>;
 @group(0) @binding(3) var heightMapSampler : sampler;
+@group(0) @binding(4) var<uniform> terrainModel : TerrainModel;
 
 #include "../utils/pi.wgsl";
 
@@ -73,6 +79,10 @@ fn map_cube_to_unit_sphere(position_on_cube: vec3<f32>) -> vec3<f32> {
     return normalize(position_on_cube);
 }
 
+fn remap(value: f32, old_min: f32, old_max: f32, new_min: f32, new_max: f32) -> f32 {
+    return new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min);
+}
+
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
@@ -96,7 +106,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     
     let vertex_position_on_sphere = sphere_up * params.sphere_radius;
 
-    let elevation = heightMapSample.r * 22e3;
+    let elevation = remap(heightMapSample.r, 0.0, 1.0, terrainModel.min_height, terrainModel.max_height);
 
     let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
 
