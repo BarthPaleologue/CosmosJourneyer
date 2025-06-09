@@ -58,8 +58,7 @@ export class ChunkForgeCompute {
     private readonly availableHeightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
     private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
 
-    private readonly gridIndicesComputer: SquareGridIndicesComputer;
-
+    private readonly gridIndicesBufferCpu: Uint32Array;
     private readonly gridIndicesBuffer: StorageBuffer;
 
     private readonly heightFieldQueue: Array<HeightFieldTask> = [];
@@ -73,15 +72,17 @@ export class ChunkForgeCompute {
     private constructor(
         heightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
         normalComputers: ReadonlyArray<SquareGridNormalComputer>,
-        gridIndicesComputer: SquareGridIndicesComputer,
+        gridIndicesBufferCpu: Uint32Array,
         gridIndicesBuffer: StorageBuffer,
         rowVertexCount: number,
         engine: WebGPUEngine,
     ) {
         this.availableHeightFieldComputers.push(...heightFieldComputers);
         this.availableNormalComputers.push(...normalComputers);
-        this.gridIndicesComputer = gridIndicesComputer;
+
+        this.gridIndicesBufferCpu = gridIndicesBufferCpu;
         this.gridIndicesBuffer = gridIndicesBuffer;
+
         this.rowVertexCount = rowVertexCount;
         this.engine = engine;
     }
@@ -99,10 +100,14 @@ export class ChunkForgeCompute {
 
         const gridIndicesBuffer = gridIndicesComputer.dispatch(rowVertexCount, engine);
 
+        const gridIndexBufferView = await gridIndicesBuffer.read();
+
+        const gridIndexBufferCpu = new Uint32Array(gridIndexBufferView.buffer);
+
         return new ChunkForgeCompute(
             heightFieldComputers,
             normalComputers,
-            gridIndicesComputer,
+            gridIndexBufferCpu,
             gridIndicesBuffer,
             rowVertexCount,
             engine,
@@ -170,12 +175,11 @@ export class ChunkForgeCompute {
         const { onFinish, positions, normals } = task;
 
         const positionBufferView = await positions.read();
-        const indexBufferView = await this.gridIndicesBuffer.read();
         const normalBufferView = await normals.read();
 
         const vertexData = new VertexData();
         vertexData.positions = new Float32Array(positionBufferView.buffer);
-        vertexData.indices = new Uint32Array(indexBufferView.buffer);
+        vertexData.indices = this.gridIndicesBufferCpu;
         vertexData.normals = new Float32Array(normalBufferView.buffer);
 
         onFinish({
