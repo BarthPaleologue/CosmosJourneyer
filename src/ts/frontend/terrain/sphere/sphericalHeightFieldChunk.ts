@@ -203,6 +203,7 @@ export class SphericalHeightFieldChunk {
                     this.mesh.setEnabled(true);
                 },
                 this.positionOnCube,
+                this.mesh.position,
                 this.direction,
                 this.size,
                 this.radius,
