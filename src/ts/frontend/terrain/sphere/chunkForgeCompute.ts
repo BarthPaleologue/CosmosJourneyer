@@ -29,6 +29,7 @@ import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeig
 type HeightFieldTask = {
     onFinish: (output: ChunkForgeOutput) => void;
     positionOnCube: Vector3;
+    positionOnSphere: Vector3;
     size: number;
     direction: Direction;
     sphereRadius: number;
@@ -117,11 +118,12 @@ export class ChunkForgeCompute {
     addBuildTask(
         onFinish: (output: ChunkForgeOutput) => void,
         positionOnCube: Vector3,
+        positionOnSphere: Vector3,
         direction: Direction,
         size: number,
         sphereRadius: number,
     ): void {
-        this.heightFieldQueue.push({ onFinish, positionOnCube, direction, size, sphereRadius });
+        this.heightFieldQueue.push({ onFinish, positionOnCube, positionOnSphere, direction, size, sphereRadius });
     }
 
     update() {
@@ -133,6 +135,7 @@ export class ChunkForgeCompute {
 
             const positions = availableComputer.dispatch(
                 nextTask.positionOnCube,
+                nextTask.positionOnSphere,
                 this.rowVertexCount,
                 nextTask.direction,
                 nextTask.sphereRadius,
