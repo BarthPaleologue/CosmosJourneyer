@@ -34,6 +34,7 @@ import {
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PlanarProceduralHeightField } from "@/frontend/terrain/planarProceduralHeightField";
+import { SquareGridIndicesComputer } from "@/frontend/terrain/squareGridIndexComputer";
 import { SquareGridNormalComputer } from "@/frontend/terrain/squareGridNormalComputer";
 
 export async function createTerrainScene(
@@ -79,12 +80,15 @@ export async function createTerrainScene(
     const size = 8;
 
     const terrain = new Mesh("terrain", scene);
+    terrain.sideOrientation = Mesh.BACKSIDE;
 
     const generator = await PlanarProceduralHeightField.New(engine);
     const normalComputer = await SquareGridNormalComputer.New(engine);
+    const indexComputer = await SquareGridIndicesComputer.New(engine);
 
-    const { positions: positionBuffer, indices: indexBuffer } = generator.dispatch(nbVerticesPerRow, size, engine);
+    const positionBuffer = generator.dispatch(nbVerticesPerRow, size, engine);
     const normalBuffer = normalComputer.dispatch(nbVerticesPerRow, positionBuffer, engine);
+    const indexBuffer = indexComputer.dispatch(nbVerticesPerRow, engine);
 
     const keepDataOnGPU = true;
 

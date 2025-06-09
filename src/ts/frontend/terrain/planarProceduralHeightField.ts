@@ -66,8 +66,7 @@ export class PlanarProceduralHeightField {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    indices: { group: 0, binding: 1 },
-                    params: { group: 0, binding: 2 },
+                    params: { group: 0, binding: 1 },
                 },
             },
         );
@@ -77,14 +76,7 @@ export class PlanarProceduralHeightField {
         return new PlanarProceduralHeightField(computeShader, engine);
     }
 
-    dispatch(
-        nbVerticesPerRow: number,
-        size: number,
-        engine: WebGPUEngine,
-    ): {
-        positions: StorageBuffer;
-        indices: StorageBuffer;
-    } {
+    dispatch(nbVerticesPerRow: number, size: number, engine: WebGPUEngine): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
@@ -96,22 +88,12 @@ export class PlanarProceduralHeightField {
         );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
-        const indicesBuffer = new StorageBuffer(
-            engine,
-            Uint32Array.BYTES_PER_ELEMENT * (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
-            Constants.BUFFER_CREATIONFLAG_INDEX | Constants.BUFFER_CREATIONFLAG_READWRITE,
-        );
-        this.computeShader.setStorageBuffer("indices", indicesBuffer);
-
         this.computeShader.dispatch(
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[0],
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[1],
             1,
         );
 
-        return {
-            positions: positionsBuffer,
-            indices: indicesBuffer,
-        };
+        return positionsBuffer;
     }
 }
