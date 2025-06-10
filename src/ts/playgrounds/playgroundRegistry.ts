@@ -39,6 +39,7 @@ import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
 import { createJupiterScene } from "./sol/jupiter";
 import { createSaturnScene } from "./sol/saturn";
 import { createSolScene } from "./sol/sol";
+import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
 import { createStarMapScene } from "./starMap";
@@ -84,6 +85,7 @@ export class PlaygroundRegistry {
         ["grass", createGrassScene],
         ["warpTunnel", createWarpTunnelScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
+        ["sun", createSunScene],
     ]);
 
     register(
