@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, FreeCamera, Scene, Vector3 } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
@@ -54,6 +54,11 @@ export async function createSunScene(
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
     controls.getTransform().lookAt(Vector3.Zero());
+
+    // This is a fix for E2E testing: the starfield box does not render correctly if the camera target is zero
+    if (camera instanceof FreeCamera) {
+        camera.setTarget(new Vector3(1e-3, 0, 1e-1));
+    }
 
     // This attaches the camera to the canvas
     camera.attachControl();
