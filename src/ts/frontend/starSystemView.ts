@@ -530,7 +530,9 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge);
         this.targetCursorLayer.reset();
 
-        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects());
+        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects(), [
+            starSystem.starFieldBox.mesh,
+        ]);
 
         const celestialBodies = starSystem.getCelestialBodies();
         const spaceStations = starSystem.getOrbitalFacilities();

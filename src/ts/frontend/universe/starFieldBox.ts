@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
 import { Material } from "@babylonjs/core/Materials/material";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
@@ -42,13 +42,12 @@ export class StarFieldBox implements Transformable {
         this.texture = texture;
         this.texture.setReflectionTextureMatrix(Matrix.Identity());
 
-        const material = new StandardMaterial("skyboxMat", scene);
+        const material = new BackgroundMaterial("skyboxMat", scene);
         material.backFaceCulling = false;
         material.reflectionTexture = this.texture;
         material.reflectionTexture.gammaSpace = true;
         material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
         material.disableDepthWrite = true;
-        material.disableLighting = true;
 
         this.material = material;
 

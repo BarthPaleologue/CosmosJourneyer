@@ -273,7 +273,7 @@ export class PostProcessManager {
         return [otherRenderEffect, relevantRenderEffect];
     }
 
-    public addStar(star: Star, excludedMeshes: AbstractMesh[]) {
+    public addStar(star: Star, excludedMeshes: ReadonlyArray<AbstractMesh>) {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             star.mesh,
@@ -308,7 +308,7 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(star.getTransform(), postProcesses);
     }
 
-    public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: AbstractMesh[]) {
+    public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: ReadonlyArray<AbstractMesh>) {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             neutronStar.mesh,
@@ -559,19 +559,19 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(transform, [mengerSponge]);
     }
 
-    public addCelestialBodies(bodies: ReadonlyArray<CelestialBody>, stellarObjects: ReadonlyArray<StellarObject>) {
+    public addCelestialBodies(
+        bodies: ReadonlyArray<CelestialBody>,
+        stellarObjects: ReadonlyArray<StellarObject>,
+        excludedMeshes: ReadonlyArray<AbstractMesh>,
+    ) {
         const lightSources = stellarObjects.map((object) => object.getLight());
         for (const object of bodies) {
             switch (object.type) {
                 case OrbitalObjectType.STAR:
-                    this.addStar(object, [
-                        /*this.starFieldBox.mesh*/
-                    ]);
+                    this.addStar(object, excludedMeshes);
                     break;
                 case OrbitalObjectType.NEUTRON_STAR:
-                    this.addNeutronStar(object, [
-                        /*this.starFieldBox.mesh*/
-                    ]);
+                    this.addNeutronStar(object, excludedMeshes);
                     break;
                 case OrbitalObjectType.BLACK_HOLE:
                     this.addBlackHole(object);
