@@ -83,6 +83,7 @@ export async function createSolScene(
     postProcessManager.addCelestialBodies(
         starSystemController.getCelestialBodies(),
         starSystemController.getStellarObjects(),
+        [starSystemController.starFieldBox.mesh],
     );
 
     const targetCursorLayer = new TargetCursorLayer();

@@ -27,7 +27,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
     constructor(
         starMesh: Mesh,
         volumetricLightUniforms: VolumetricLightUniforms,
-        excludedMeshes: AbstractMesh[],
+        excludedMeshes: ReadonlyArray<AbstractMesh>,
         scene: Scene,
     ) {
         if (scene.activeCamera === null) throw new Error("no camera");
@@ -49,6 +49,6 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
         this.exposure = volumetricLightUniforms.exposure;
         this.decay = volumetricLightUniforms.decay;
 
-        this.excludedMeshes = excludedMeshes;
+        this.excludedMeshes = [...excludedMeshes];
     }
 }

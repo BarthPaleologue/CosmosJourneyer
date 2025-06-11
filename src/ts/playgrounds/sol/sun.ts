@@ -63,13 +63,13 @@ export async function createSunScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    new StarFieldBox(textures.environment.milkyWay, scene);
+    const starField = new StarFieldBox(textures.environment.milkyWay, scene);
 
     const sunModel = getSunModel();
 
     const sun = new Star(sunModel, textures, scene);
 
-    const volumetricLight = new VolumetricLight(sun.mesh, sun.volumetricLightUniforms, [], scene);
+    const volumetricLight = new VolumetricLight(sun.mesh, sun.volumetricLightUniforms, [starField.mesh], scene);
     camera.attachPostProcess(volumetricLight);
 
     const lensFlare = new LensFlarePostProcess(
