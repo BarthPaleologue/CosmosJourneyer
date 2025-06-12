@@ -19,5 +19,5 @@ export const PresetBands = {
     /**
      * Default photopic RGB band-centres (metres)
      */
-    PHOTOPIC: [680e-9, 550e-9, 440e-9],
+    PHOTOPIC: [650e-9, 550e-9, 450e-9],
 } as const;

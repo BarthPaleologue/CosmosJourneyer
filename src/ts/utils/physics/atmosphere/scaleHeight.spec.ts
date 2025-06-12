@@ -57,4 +57,14 @@ describe("computeAtmospherePressureScaleHeight", () => {
         expect(prediction / 1000).toBeGreaterThan(15.0); // at least 15 km
         expect(prediction / 1000).toBeLessThan(25.0); // below 25 km (lower stratosphere)
     });
+    it("should compute Jupiter's pressure scale height within 15%", () => {
+        const temperature = 165; // K
+        const gravity = 25.92; // m/s²
+        const meanMolecularWeight = 0.00222; // kg/mol (2.22 g/mol, mostly H2) see https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+
+        const prediction = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
+        const groundTruth = 27.0e3; // 27.0 km = 27000 m see https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+
+        expect(relErr(prediction, groundTruth)).toBeLessThan(0.15);
+    });
 });
