@@ -81,5 +81,14 @@ export function computeRayleighBetaRGB(
  * @see https://acp.copernicus.org/articles/21/14927/2021/ Scattering and absorption cross sections of atmospheric gases in the ultraviolet–visible wavelength range (307–725nm)
  */
 function computeRayleighCrossSection(wavelength: number, n: number, F: number): number {
-    return ((24 * Math.PI ** 3 * (n ** 2 - 1) ** 2) / (wavelength ** 4 * N_S ** 2)) * (F / (n ** 2 + 2) ** 2);
+    const n2 = n * n;
+    const lambda4 = wavelength ** 4;
+    const loschmidtSquared = N_S ** 2;
+
+    // Lorentz-Lorenz factor part
+    const polarizabilityTerm = ((n2 - 1) / (n2 + 2)) ** 2;
+
+    const mainTerm = (24 * Math.PI ** 3) / (lambda4 * loschmidtSquared);
+
+    return mainTerm * polarizabilityTerm * F;
 }
