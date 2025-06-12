@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
+
 import { type DeepReadonly } from "@/utils/types";
 
-import { getGasDepolarization, getGasRefractiveIndex, type Gas } from "./gas";
+import { getGasDepolarization, getGasRefractiveIndex } from "./gas";
 
 /**
  * Boltzmann constant, J K⁻¹
