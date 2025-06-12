@@ -20,6 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
+import { PresetBands } from "@/utils/physics/atmosphere/common";
 import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
 import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
 import { computeAtmospherePressureScaleHeight } from "@/utils/physics/atmosphere/scaleHeight";
@@ -101,7 +102,12 @@ export class AtmosphereUniforms {
         temperature: number,
         model: DeepReadonly<AtmosphereModel>,
     ) {
-        const rayleighScatteringCoefficients = computeRayleighBetaRGB(model.gasMix, model.pressure, temperature);
+        const rayleighScatteringCoefficients = computeRayleighBetaRGB(
+            model.gasMix,
+            model.pressure,
+            temperature,
+            PresetBands.PHOTOPIC,
+        );
 
         const meanMolecularWeight = computeMeanMolecularWeight(model.gasMix);
 
