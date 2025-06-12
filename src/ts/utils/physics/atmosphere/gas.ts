@@ -35,11 +35,11 @@ export function getGasRefractiveIndex(gas: Gas): number {
         case "CO2":
             return 1.00045;
         case "He":
-            return 1.000036;
+            return 1.00003;
         case "Ne":
             return 1.000067;
         case "H2":
-            return 1.000132;
+            return 1.000118;
         case "CH4":
             return 1.000444;
         case "SO2":
