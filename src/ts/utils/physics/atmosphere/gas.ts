@@ -43,7 +43,7 @@ export function getGasRefractiveIndex(gas: Gas): number {
         case "CH4":
             return 1.000444;
         case "SO2":
-            return 1.3396; // https://pubchem.ncbi.nlm.nih.gov/compound/Sulfur-Dioxide#section=Refractive-Index
+            return 1.000686;
     }
 }
 
