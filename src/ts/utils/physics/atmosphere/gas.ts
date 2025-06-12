@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DeepReadonly } from "@/utils/types";
+import { Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
-export type Gas = "N2" | "O2" | "Ar" | "CO2" | "He" | "Ne" | "H2" | "CH4" | "SO2";
+import { DeepReadonly } from "@/utils/types";
 
 /**
  * @param gas The gas for which to return the refractive index.
