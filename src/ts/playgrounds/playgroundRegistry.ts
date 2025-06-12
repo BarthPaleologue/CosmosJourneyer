@@ -29,7 +29,6 @@ import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createAutomaticLandingScene } from "./automaticLanding";
 import { createCharacterDemoScene } from "./character";
 import { createDarkKnightScene } from "./darkKnight";
-import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
 import { createGasPlanetScene } from "./gasPlanet";
@@ -60,7 +59,6 @@ export class PlaygroundRegistry {
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
         ["automaticLanding", createAutomaticLandingScene],
-        ["debugAssets", createDebugAssetsScene],
         ["spaceStation", createSpaceStationScene],
         ["spaceStationUI", createSpaceStationUIScene],
         ["xr", createXrScene],
