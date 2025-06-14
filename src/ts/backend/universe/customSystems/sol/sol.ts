@@ -112,7 +112,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         rings: null,
         atmosphere: {
-            pressure: barToPascal(93),
+            seaLevelPressure: barToPascal(93),
             greenHouseEffectFactor: 0.99,
             gasMix: [
                 ["CO2", 0.96],
@@ -172,7 +172,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         rings: null,
         atmosphere: {
-            pressure: barToPascal(1),
+            seaLevelPressure: barToPascal(1),
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["N2", 0.78],
@@ -275,7 +275,7 @@ export function getSolSystemModel(): StarSystemModel {
             mountains_frequency: 0,
         },
         atmosphere: {
-            pressure: barToPascal(0.006),
+            seaLevelPressure: barToPascal(0.006),
             greenHouseEffectFactor: 0.1,
             gasMix: [
                 ["CO2", 0.95],
@@ -317,7 +317,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "uranus",
         },
         atmosphere: {
-            pressure: barToPascal(1),
+            seaLevelPressure: barToPascal(1),
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.83],
@@ -357,7 +357,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "neptune",
         },
         atmosphere: {
-            pressure: barToPascal(1),
+            seaLevelPressure: barToPascal(1),
             greenHouseEffectFactor: 0.7,
             gasMix: [
                 ["H2", 0.8],
