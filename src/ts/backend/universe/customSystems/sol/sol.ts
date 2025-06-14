@@ -82,7 +82,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Venus",
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_051.8e3,
-        mass: 4.8e20,
+        mass: 4.865e24,
         axialTilt: degreesToRadians(177.36),
         siderealDaySeconds: 60 * 60 * 24 * 243.025,
         waterAmount: 0,
@@ -319,7 +319,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "uranus",
         },
         atmosphere: {
-            pressure: barToPascal(0.1),
+            pressure: barToPascal(1),
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.83],
@@ -359,7 +359,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "neptune",
         },
         atmosphere: {
-            pressure: barToPascal(0.1),
+            pressure: barToPascal(1),
             greenHouseEffectFactor: 0.7,
             gasMix: [
                 ["H2", 0.8],
