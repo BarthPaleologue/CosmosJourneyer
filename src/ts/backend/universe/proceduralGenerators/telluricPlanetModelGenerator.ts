@@ -18,7 +18,7 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 
-import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+import { AtmosphereModel, Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
 import { CloudsModel, newCloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
@@ -58,19 +58,6 @@ export function newSeededTelluricPlanetModel(
     );
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
-    const atmosphere: AtmosphereModel | null =
-        pressure > 0
-            ? {
-                  seaLevelPressure: pressure,
-                  greenHouseEffectFactor: 0.5,
-                  gasMix: [
-                      ["N2", 0.78],
-                      ["O2", 0.21],
-                      ["Ar", 0.01],
-                  ],
-              }
-            : null;
-
     //TODO: use distance to star to determine min temperature when using 1:1 scale
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
@@ -88,6 +75,28 @@ export function newSeededTelluricPlanetModel(
               depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE,
           }
         : null;
+
+    const gasMix: Array<[Gas, number]> =
+        ocean !== null
+            ? [
+                  ["N2", 0.78],
+                  ["O2", 0.21],
+                  ["Ar", 0.01],
+              ]
+            : [
+                  ["CO2", 0.95],
+                  ["N2", 0.04],
+                  ["Ar", 0.01],
+              ];
+
+    const atmosphere: AtmosphereModel | null =
+        pressure > 0
+            ? {
+                  seaLevelPressure: pressure,
+                  greenHouseEffectFactor: 0.5,
+                  gasMix,
+              }
+            : null;
 
     const clouds: CloudsModel | null =
         ocean !== null
