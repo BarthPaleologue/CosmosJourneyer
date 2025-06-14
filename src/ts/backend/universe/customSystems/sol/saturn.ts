@@ -21,8 +21,6 @@ import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanet
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { barToPascal } from "@/utils/physics/unitConversions";
-
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {
         id: "saturn",
@@ -43,7 +41,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             p: 2,
         },
         atmosphere: {
-            seaLevelPressure: barToPascal(1),
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.9],
