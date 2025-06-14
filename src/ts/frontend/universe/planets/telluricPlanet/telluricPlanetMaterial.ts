@@ -166,7 +166,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         lut.setPlanetPhysicsInfo(
             this.planetModel.temperature.min,
             this.planetModel.temperature.max,
-            this.planetModel.atmosphere?.pressure ?? 0,
+            this.planetModel.atmosphere?.seaLevelPressure ?? 0,
         );
         lut.getTexture().executeWhenReady(() => {
             this.setTexture(TelluricPlanetMaterialSamplerNames.LUT, lut.getTexture());
@@ -218,7 +218,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.temperature.min);
         this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.temperature.max);
-        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.atmosphere?.pressure ?? 0);
+        this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.atmosphere?.seaLevelPressure ?? 0);
         this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.waterAmount);
 
         this.setFloat(
