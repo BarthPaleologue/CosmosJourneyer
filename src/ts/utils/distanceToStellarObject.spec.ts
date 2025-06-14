@@ -84,7 +84,7 @@ describe("distanceToStellarObject", () => {
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,
-                    seaLevelPressure: 1,
+                    seaLevelPressure: 100_000,
                     gasMix: [
                         ["H2", 0.9],
                         ["He", 0.1],
