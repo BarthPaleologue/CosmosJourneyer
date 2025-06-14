@@ -15,23 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type Gas = "N2" | "O2" | "Ar" | "CO2" | "He" | "Ne" | "H2" | "CH4" | "SO2";
+/**
+ * Gravitational constant, m³ kg⁻¹ s⁻²
+ * @see https://en.wikipedia.org/wiki/Gravitational_constant
+ */
+export const G = 6.674_30e-11;
 
-export type AtmosphereModel = {
-    /**
-     * The pressure of the atmosphere in Pa at sea level.
-     * For Gas giants, this is always 101325 Pa (1 bar) by definition.
-     */
-    seaLevelPressure: number;
-
-    /**
-     * The amount of greenhouse gases in the atmosphere (between 0 and 1)
-     */
-    greenHouseEffectFactor: number;
-
-    /**
-     * The composition of the atmosphere, as a list of gas and its associated Mole/volume fraction.
-     * The sum of all fractions must add up to 1.0
-     */
-    gasMix: Array<[Gas, number]>;
-};
+/**
+ * @param mass The mass of the object (kg)
+ * @param distance The distance from the center of the object to the point where the gravitational acceleration is computed (m)
+ * @returns The gravitational acceleration at the given distance (m/s²)
+ * @see https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation
+ */
+export function computeGravityAcceleration(mass: number, distance: number): number {
+    return (G * mass) / (distance * distance);
+}
