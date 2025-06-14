@@ -15,10 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-uniform vec3  camera_position;
-uniform mat4  camera_projection;
-uniform mat4  camera_view;
-uniform mat4  camera_inverseProjectionView;
-uniform float camera_near;
-uniform float camera_far;
-uniform float camera_fov;
+export const PresetBands = {
+    /**
+     * Default photopic RGB band-centres (metres)
+     */
+    PHOTOPIC: [650e-9, 550e-9, 450e-9],
+} as const;

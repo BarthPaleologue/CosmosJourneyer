@@ -15,10 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-uniform vec3  camera_position;
-uniform mat4  camera_projection;
-uniform mat4  camera_view;
-uniform mat4  camera_inverseProjectionView;
-uniform float camera_near;
-uniform float camera_far;
-uniform float camera_fov;
+/**
+ * Gravitational constant, m³ kg⁻¹ s⁻²
+ * @see https://en.wikipedia.org/wiki/Gravitational_constant
+ */
+export const G = 6.674_30e-11;
+
+/**
+ * @param mass The mass of the object (kg)
+ * @param distance The distance from the center of the object to the point where the gravitational acceleration is computed (m)
+ * @returns The gravitational acceleration at the given distance (m/s²)
+ * @see https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation
+ */
+export function computeGravityAcceleration(mass: number, distance: number): number {
+    return (G * mass) / (distance * distance);
+}
