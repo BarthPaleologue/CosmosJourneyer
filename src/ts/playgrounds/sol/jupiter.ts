@@ -29,8 +29,6 @@ import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
 
-import { Settings } from "@/settings";
-
 import { enablePhysics } from "../utils";
 
 export async function createJupiterScene(
@@ -64,8 +62,6 @@ export async function createJupiterScene(
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
-
-    Settings.EARTH_RADIUS = 6_371e3;
 
     const gasPlanetModel = getJupiterModel([]);
 

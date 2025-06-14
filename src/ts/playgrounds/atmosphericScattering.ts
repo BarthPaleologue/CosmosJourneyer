@@ -19,6 +19,8 @@ import { Color4, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
@@ -34,6 +36,7 @@ export function createAtmosphericScatteringScene(
     scene.useRightHandedSystem = true;
 
     const scalingFactor = 6_000e3;
+    const earthMass = 5.972e24; // kg
 
     const controls = new DefaultControls(scene);
 
@@ -56,7 +59,17 @@ export function createAtmosphericScatteringScene(
     // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 64 }, scene);
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
+    const atmosphereModel: AtmosphereModel = {
+        seaLevelPressure: 101325, // Sea level pressure in Pascals
+        greenHouseEffectFactor: 0.5, // Arbitrary value for greenhouse effect
+        gasMix: [
+            ["N2", 0.78], // Nitrogen
+            ["O2", 0.21], // Oxygen
+            ["Ar", 0.01], // Argon
+        ],
+    };
+
+    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, earthMass, 298, atmosphereModel);
 
     const atmosphere = new AtmosphericScatteringPostProcess(sphere, scalingFactor, atmosphereUniforms, [light], scene);
     camera.attachPostProcess(atmosphere);

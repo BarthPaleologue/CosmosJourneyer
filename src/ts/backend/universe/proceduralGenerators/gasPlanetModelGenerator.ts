@@ -20,7 +20,7 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 import { hsvToRgb } from "@/utils/colors";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { EarthSeaLevelPressure, JupiterMass } from "@/utils/physics/constants";
+import { JupiterMass } from "@/utils/physics/constants";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -107,8 +107,12 @@ export function newSeededGasPlanetModel(
         axialTilt,
         mass,
         atmosphere: {
-            pressure: EarthSeaLevelPressure,
+            seaLevelPressure: 100_000, // 1 bar
             greenHouseEffectFactor: 0.5,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
         },
         rings: rings,
         colorPalette: {

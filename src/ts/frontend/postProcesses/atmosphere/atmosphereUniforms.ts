@@ -18,6 +18,15 @@
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+
+import { PresetBands } from "@/utils/physics/atmosphere/common";
+import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
+import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
+import { computeAtmospherePressureScaleHeight, getHeightForPressure } from "@/utils/physics/atmosphere/scaleHeight";
+import { computeGravityAcceleration } from "@/utils/physics/gravity";
+import { type DeepReadonly } from "@/utils/types";
+
 import { Settings } from "@/settings";
 
 const AtmosphereUniformNames = {
@@ -86,12 +95,34 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, atmosphereThickness: number) {
-        this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
-        this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
+    constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
+        const rayleighScatteringCoefficients = computeRayleighBetaRGB(
+            model.gasMix,
+            model.seaLevelPressure,
+            temperature,
+            PresetBands.PHOTOPIC,
         );
+
+        const meanMolecularWeight = computeMeanMolecularWeight(model.gasMix);
+
+        const gravity = computeGravityAcceleration(mass, planetBoundingRadius);
+
+        const rayleighScaleHeight = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
+
+        const earthPressureAtKarmannLine = 3.2e-2; // Pa at 100 km altitude
+        const atmosphereThickness = getHeightForPressure(
+            earthPressureAtKarmannLine,
+            {
+                pressure: model.seaLevelPressure,
+                height: 0,
+            },
+            rayleighScaleHeight,
+        );
+
+        this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
+
+        this.rayleighHeight = rayleighScaleHeight;
+        this.rayleighScatteringCoefficients = Vector3.FromArray(rayleighScatteringCoefficients);
 
         // https://playerunknownproductions.net/news/atmospheric-scattering
         this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
@@ -105,6 +136,7 @@ export class AtmosphereUniforms {
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
         );
         this.ozoneFalloff = (5e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
+
         this.lightIntensity = 15;
     }
 

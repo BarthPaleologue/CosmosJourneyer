@@ -59,7 +59,7 @@ export async function createSolScene(
 
     await scene.setActiveControls(controls);
 
-    scene.enableDepthRenderer(null, false, true);
+    scene.enableDepthRenderer(null, true, true);
 
     const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 

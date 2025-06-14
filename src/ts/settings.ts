@@ -75,7 +75,7 @@ export const Settings = {
     TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000",
 
     QUALITY_CHARS: "FEDCBA",
-};
+} as const;
 
 export const CollisionMask = {
     ENVIRONMENT: 0b00000001,
