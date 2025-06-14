@@ -106,7 +106,7 @@ export function newSeededGasPlanetModel(
         axialTilt,
         mass,
         atmosphere: {
-            pressure: Settings.EARTH_SEA_LEVEL_PRESSURE,
+            seaLevelPressure: Settings.EARTH_SEA_LEVEL_PRESSURE,
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.9],

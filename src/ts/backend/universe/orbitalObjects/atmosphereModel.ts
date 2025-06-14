@@ -19,9 +19,10 @@ export type Gas = "N2" | "O2" | "Ar" | "CO2" | "He" | "Ne" | "H2" | "CH4" | "SO2
 
 export type AtmosphereModel = {
     /**
-     * The pressure of the atmosphere in Pa
+     * The pressure of the atmosphere in Pa at sea level.
+     * For Gas giants, this is always 101325 Pa (1 bar) by definition.
      */
-    pressure: number;
+    seaLevelPressure: number;
 
     /**
      * The amount of greenhouse gases in the atmosphere (between 0 and 1)
