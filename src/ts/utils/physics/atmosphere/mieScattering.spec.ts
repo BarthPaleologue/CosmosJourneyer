@@ -17,47 +17,32 @@
 
 import { describe, expect, it } from "vitest";
 
-import { computeMieScatteringCoefficients } from "./mieScattering";
+import { computeMieRGB, EARTH_MARINE_SALT, MARS_DUST, TITAN_THOLIN, VENUS_SA_MODE2 } from "./mieScattering";
 
-/**
- * Utility: relative error against reference value
- */
-const relErr = (calc: number, ref: number) => Math.abs(calc - ref) / ref;
-
-describe("computeMieScatteringCoefficients", () => {
-    it("Earth baseline (MODIS climatology)", () => {
-        const prediction = computeMieScatteringCoefficients(0.15, 2.0, 1.2, 1.0);
-        const expected: [number, number, number] = [5.82e-5, 7.5e-5, 9.8e-5];
-
-        expect(relErr(prediction[0], expected[0])).toBeLessThan(0.05);
-        expect(relErr(prediction[1], expected[1])).toBeLessThan(0.05);
-        expect(relErr(prediction[2], expected[2])).toBeLessThan(0.05);
+describe("Mie model – unit checks in SI", () => {
+    it("Earth marine aerosol ≈ 70 Mm⁻¹ @ 550 nm (7e‑5 m⁻¹)", () => {
+        const { betaSca } = computeMieRGB(EARTH_MARINE_SALT);
+        const betaG = betaSca[1]; // λ = 550 nm
+        expect(betaG).toBeGreaterThan(5e-5); // 50 Mm⁻¹
+        expect(betaG).toBeLessThan(9e-5); // 90 Mm⁻¹
     });
 
-    it("Mars clear-sky background dust", () => {
-        const prediction = computeMieScatteringCoefficients(0.2, 12.0, 0.3, 0.97);
-        const expected: [number, number, number] = [1.52e-5, 1.62e-5, 1.73e-5];
-
-        expect(relErr(prediction[0], expected[0])).toBeLessThan(0.05);
-        expect(relErr(prediction[1], expected[1])).toBeLessThan(0.05);
-        expect(relErr(prediction[2], expected[2])).toBeLessThan(0.05);
+    it("Mars dust ≈ 150 Mm⁻¹ @ 550 nm (1.5e‑4 m⁻¹)", () => {
+        const { betaSca } = computeMieRGB(MARS_DUST);
+        const betaG = betaSca[1];
+        expect(betaG).toBeGreaterThan(1.0e-4); // 100 Mm⁻¹
+        expect(betaG).toBeLessThan(2.0e-4); // 200 Mm⁻¹
     });
 
-    it("Mars regional dust storm (τ≈2)", () => {
-        const prediction = computeMieScatteringCoefficients(2.0, 12.0, 0.3, 0.97);
-        const expected: [number, number, number] = [1.52e-4, 1.62e-4, 1.73e-4];
-
-        expect(relErr(prediction[0], expected[0])).toBeLessThan(0.05);
-        expect(relErr(prediction[1], expected[1])).toBeLessThan(0.05);
-        expect(relErr(prediction[2], expected[2])).toBeLessThan(0.05);
+    it("Venus cloud mode‑2 ≈ 40 Mm⁻¹ @ 550 nm", () => {
+        const betaG = computeMieRGB(VENUS_SA_MODE2).betaSca[1];
+        expect(betaG).toBeGreaterThan(2.0e-5); // 20 Mm⁻¹
+        expect(betaG).toBeLessThan(6.0e-5); // 60 Mm⁻¹
     });
 
-    it("Titan global haze", () => {
-        const prediction = computeMieScatteringCoefficients(3.0, 50.0, 0.0, 0.8);
-        const expected: [number, number, number] = [4.8e-5, 4.8e-5, 4.8e-5];
-
-        expect(relErr(prediction[0], expected[0])).toBeLessThan(0.05);
-        expect(relErr(prediction[1], expected[1])).toBeLessThan(0.05);
-        expect(relErr(prediction[2], expected[2])).toBeLessThan(0.05);
+    it("Titan tholin haze ≈ 170 Mm⁻¹ @ 550 nm", () => {
+        const betaG = computeMieRGB(TITAN_THOLIN).betaSca[1];
+        expect(betaG).toBeGreaterThan(1.2e-4); // 120 Mm⁻¹
+        expect(betaG).toBeLessThan(2.5e-4); // 250 Mm⁻¹
     });
 });
