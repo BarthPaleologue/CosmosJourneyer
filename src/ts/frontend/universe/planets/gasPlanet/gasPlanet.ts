@@ -120,11 +120,8 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
 
         this.mesh.material = this.material;
 
-        const atmosphereThickness =
-            Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
         this.atmosphereUniforms = new AtmosphereUniforms(
             this.getBoundingRadius(),
-            atmosphereThickness,
             model.mass,
             273, //TODO: do not hardcode temperature
             model.atmosphere,
