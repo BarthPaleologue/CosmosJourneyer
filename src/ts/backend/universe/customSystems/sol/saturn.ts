@@ -43,7 +43,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             p: 2,
         },
         atmosphere: {
-            pressure: Settings.BAR_TO_PASCAL,
+            seaLevelPressure: Settings.BAR_TO_PASCAL,
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.9],

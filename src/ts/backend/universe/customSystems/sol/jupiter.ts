@@ -43,7 +43,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             p: 2,
         },
         atmosphere: {
-            pressure: Settings.BAR_TO_PASCAL,
+            seaLevelPressure: Settings.BAR_TO_PASCAL,
             greenHouseEffectFactor: 0.7,
             gasMix: [
                 ["H2", 0.9],

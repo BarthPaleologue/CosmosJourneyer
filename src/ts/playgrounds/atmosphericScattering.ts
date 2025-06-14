@@ -57,7 +57,7 @@ export function createAtmosphericScatteringScene(
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 64 }, scene);
 
     const atmosphereModel: AtmosphereModel = {
-        pressure: 101325, // Sea level pressure in Pascals
+        seaLevelPressure: 101325, // Sea level pressure in Pascals
         greenHouseEffectFactor: 0.5, // Arbitrary value for greenhouse effect
         gasMix: [
             ["N2", 0.78], // Nitrogen

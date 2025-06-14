@@ -98,7 +98,7 @@ export class AtmosphereUniforms {
     constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
         const rayleighScatteringCoefficients = computeRayleighBetaRGB(
             model.gasMix,
-            model.pressure,
+            model.seaLevelPressure,
             temperature,
             PresetBands.PHOTOPIC,
         );
@@ -113,7 +113,7 @@ export class AtmosphereUniforms {
         const atmosphereThickness = getHeightForPressure(
             earthPressureAtKarmannLine,
             {
-                pressure: model.pressure,
+                pressure: model.seaLevelPressure,
                 height: 0,
             },
             rayleighScaleHeight,

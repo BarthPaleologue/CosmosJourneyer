@@ -61,7 +61,7 @@ export function newSeededTelluricPlanetModel(
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
-                  pressure,
+                  seaLevelPressure: pressure,
                   greenHouseEffectFactor: 0.5,
                   gasMix: [
                       ["N2", 0.78],
