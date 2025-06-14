@@ -23,7 +23,7 @@ import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphe
 import { PresetBands } from "@/utils/physics/atmosphere/common";
 import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
 import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
-import { computeAtmospherePressureScaleHeight } from "@/utils/physics/atmosphere/scaleHeight";
+import { computeAtmospherePressureScaleHeight, getHeightForPressure } from "@/utils/physics/atmosphere/scaleHeight";
 import { computeGravityAcceleration } from "@/utils/physics/gravity";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -95,13 +95,7 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(
-        planetBoundingRadius: number,
-        atmosphereThickness: number,
-        mass: number,
-        temperature: number,
-        model: DeepReadonly<AtmosphereModel>,
-    ) {
+    constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
         const rayleighScatteringCoefficients = computeRayleighBetaRGB(
             model.gasMix,
             model.pressure,
@@ -114,6 +108,16 @@ export class AtmosphereUniforms {
         const gravity = computeGravityAcceleration(mass, planetBoundingRadius);
 
         const rayleighScaleHeight = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
+
+        const earthPressureAtKarmannLine = 3.2e-2; // Pa at 100 km altitude
+        const atmosphereThickness = getHeightForPressure(
+            earthPressureAtKarmannLine,
+            {
+                pressure: model.pressure,
+                height: 0,
+            },
+            rayleighScaleHeight,
+        );
 
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
 

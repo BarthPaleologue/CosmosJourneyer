@@ -68,7 +68,7 @@ export function createAtmosphericScatteringScene(
         ],
     };
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3, earthMass, 298, atmosphereModel);
+    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, earthMass, 298, atmosphereModel);
 
     const atmosphere = new AtmosphericScatteringPostProcess(sphere, scalingFactor, atmosphereUniforms, [light], scene);
     camera.attachPostProcess(atmosphere);
