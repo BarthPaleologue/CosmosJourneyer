@@ -21,8 +21,6 @@ import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanet
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { EarthSeaLevelPressure } from "@/utils/physics/constants";
-
 export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {
         id: "jupiter",
@@ -43,8 +41,12 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             p: 2,
         },
         atmosphere: {
-            pressure: EarthSeaLevelPressure,
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.7,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
         },
         colorPalette: {
             type: "textured",

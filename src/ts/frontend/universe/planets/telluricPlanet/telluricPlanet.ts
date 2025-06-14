@@ -110,9 +110,12 @@ export class TelluricPlanet
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         if (this.model.atmosphere !== null) {
-            const atmosphereThickness =
-                Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
-            this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+            this.atmosphereUniforms = new AtmosphereUniforms(
+                this.getBoundingRadius(),
+                this.model.mass,
+                this.model.temperature.max,
+                this.model.atmosphere,
+            );
         } else {
             this.atmosphereUniforms = null;
         }
