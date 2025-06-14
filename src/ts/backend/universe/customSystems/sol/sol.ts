@@ -317,7 +317,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "uranus",
         },
         atmosphere: {
-            seaLevelPressure: barToPascal(1),
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.83],
@@ -357,7 +357,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "neptune",
         },
         atmosphere: {
-            seaLevelPressure: barToPascal(1),
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.7,
             gasMix: [
                 ["H2", 0.8],

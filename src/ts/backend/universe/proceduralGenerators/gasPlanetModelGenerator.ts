@@ -22,7 +22,6 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { JupiterMass } from "@/utils/physics/constants";
-import { barToPascal } from "@/utils/physics/unitConversions";
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -108,7 +107,7 @@ export function newSeededGasPlanetModel(
         axialTilt,
         mass,
         atmosphere: {
-            seaLevelPressure: barToPascal(1),
+            seaLevelPressure: 100_000, // 1 bar
             greenHouseEffectFactor: 0.5,
             gasMix: [
                 ["H2", 0.9],
