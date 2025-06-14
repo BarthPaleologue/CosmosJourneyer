@@ -19,7 +19,7 @@ import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanet
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { barToPascal, degreesToRadians } from "@/utils/physics/unitConversions";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {
@@ -41,7 +41,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             p: 2,
         },
         atmosphere: {
-            seaLevelPressure: barToPascal(1),
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.7,
             gasMix: [
                 ["H2", 0.9],
