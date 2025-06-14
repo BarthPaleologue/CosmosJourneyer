@@ -35,3 +35,23 @@ export function computeAtmospherePressureScaleHeight(
     // Scale height formula: H = R * T / (M * g)
     return (R * temperature) / (meanMolecularWeight * gravity);
 }
+
+/**
+ * Computes the height at which a given pressure is reached in an atmosphere with a known scale height.
+ * @param targetPressure The pressure in Pascals at the desired height.
+ * @param reference The reference pressure and height to calculate from.
+ * @param scaleHeight The scale height of the atmosphere in meters.
+ * @returns The height at which the target pressure is reached in meters.
+ */
+export function getHeightForPressure(
+    targetPressure: number,
+    reference: { pressure: number; height: number },
+    scaleHeight: number,
+): number {
+    // Using the exponential decay of pressure with height
+    // P = P0 * exp(-h / H)
+    // Rearranging gives us: h = -H * ln(P / P0)
+    const { pressure: referencePressure, height: referenceHeight } = reference;
+
+    return referenceHeight - scaleHeight * Math.log(targetPressure / referencePressure);
+}
