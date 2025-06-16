@@ -19,6 +19,8 @@ import {
     vector2ToString,
 } from "@/utils/strings/inputControlsString";
 
+import i18n from "@/i18n";
+
 import { MusicConductor } from "../audio/musicConductor";
 
 export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
@@ -29,7 +31,7 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     volumeSection.classList.add("settings-section");
 
     const volumeTitle = document.createElement("h3");
-    volumeTitle.textContent = "Music Volume";
+    volumeTitle.textContent = i18n.t("Music Volume");
     volumeSection.appendChild(volumeTitle);
 
     const sliderContainer = document.createElement("div");
