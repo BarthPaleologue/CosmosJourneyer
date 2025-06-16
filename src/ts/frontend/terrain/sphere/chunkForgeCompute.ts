@@ -20,6 +20,8 @@ import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
+import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { type Direction } from "@/utils/direction";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
@@ -33,6 +35,7 @@ type HeightFieldTask = {
     size: number;
     direction: Direction;
     sphereRadius: number;
+    terrainModel: TerrainModel;
 };
 
 type NormalTask = {
@@ -122,8 +125,17 @@ export class ChunkForgeCompute {
         direction: Direction,
         size: number,
         sphereRadius: number,
+        terrainModel: TerrainModel,
     ): void {
-        this.heightFieldQueue.push({ onFinish, positionOnCube, positionOnSphere, direction, size, sphereRadius });
+        this.heightFieldQueue.push({
+            onFinish,
+            positionOnCube,
+            positionOnSphere,
+            terrainModel,
+            direction,
+            size,
+            sphereRadius,
+        });
     }
 
     update() {

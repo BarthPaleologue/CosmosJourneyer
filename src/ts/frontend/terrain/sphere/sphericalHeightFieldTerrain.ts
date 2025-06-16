@@ -20,6 +20,8 @@ import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { Direction } from "@/utils/direction";
@@ -33,7 +35,7 @@ export class SphericalHeightFieldTerrain implements Transformable {
 
     private readonly sides: FixedLengthArray<SphericalHeightFieldChunk, 6>;
 
-    constructor(sphereRadius: number, material: Material, scene: Scene) {
+    constructor(sphereRadius: number, model: TerrainModel, material: Material, scene: Scene) {
         this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
@@ -44,13 +46,30 @@ export class SphericalHeightFieldTerrain implements Transformable {
         };
 
         this.sides = [
-            new SphericalHeightFieldChunk(indices, Direction.UP, sphereRadius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.DOWN, sphereRadius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.UP,
+                sphereRadius,
+                this.getTransform(),
+                model,
+                material,
+                scene,
+            ),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.DOWN,
+                sphereRadius,
+                this.getTransform(),
+                model,
+                material,
+                scene,
+            ),
             new SphericalHeightFieldChunk(
                 indices,
                 Direction.FORWARD,
                 sphereRadius,
                 this.getTransform(),
+                model,
                 material,
                 scene,
             ),
@@ -59,11 +78,28 @@ export class SphericalHeightFieldTerrain implements Transformable {
                 Direction.BACKWARD,
                 sphereRadius,
                 this.getTransform(),
+                model,
                 material,
                 scene,
             ),
-            new SphericalHeightFieldChunk(indices, Direction.LEFT, sphereRadius, this.getTransform(), material, scene),
-            new SphericalHeightFieldChunk(indices, Direction.RIGHT, sphereRadius, this.getTransform(), material, scene),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.LEFT,
+                sphereRadius,
+                this.getTransform(),
+                model,
+                material,
+                scene,
+            ),
+            new SphericalHeightFieldChunk(
+                indices,
+                Direction.RIGHT,
+                sphereRadius,
+                this.getTransform(),
+                model,
+                material,
+                scene,
+            ),
         ];
     }
 
