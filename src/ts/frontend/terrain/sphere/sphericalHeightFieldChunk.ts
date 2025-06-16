@@ -23,6 +23,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
@@ -63,11 +65,14 @@ export class SphericalHeightFieldChunk {
 
     private vertexData: ChunkForgeOutput | null = null;
 
+    private readonly terrainModel: TerrainModel;
+
     constructor(
         indices: ChunkIndices,
         direction: Direction,
         radius: number,
         parent: TransformNode,
+        terrainModel: TerrainModel,
         material: Material,
         scene: Scene,
     ) {
@@ -79,6 +84,8 @@ export class SphericalHeightFieldChunk {
         this.parent = parent;
 
         this.indices = indices;
+
+        this.terrainModel = terrainModel;
 
         this.mesh.position.x = -radius + (radius * 2 * indices.x) / 2 ** indices.lod;
         this.mesh.position.y = -radius + (radius * 2 * indices.y) / 2 ** indices.lod;
@@ -137,6 +144,7 @@ export class SphericalHeightFieldChunk {
         direction: Direction,
         radius: number,
         parent: TransformNode,
+        terrainModel: TerrainModel,
         material: Material,
         scene: Scene,
     ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
@@ -150,6 +158,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                terrainModel,
                 material,
                 scene,
             ),
@@ -162,6 +171,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                terrainModel,
                 material,
                 scene,
             ),
@@ -174,6 +184,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                terrainModel,
                 material,
                 scene,
             ),
@@ -186,6 +197,7 @@ export class SphericalHeightFieldChunk {
                 direction,
                 radius,
                 parent,
+                terrainModel,
                 material,
                 scene,
             ),
@@ -207,6 +219,7 @@ export class SphericalHeightFieldChunk {
                 this.direction,
                 this.size,
                 this.radius,
+                this.terrainModel,
             );
         }
 
@@ -217,6 +230,7 @@ export class SphericalHeightFieldChunk {
                 this.direction,
                 this.radius,
                 this.parent,
+                this.terrainModel,
                 material,
                 this.mesh.getScene(),
             );
