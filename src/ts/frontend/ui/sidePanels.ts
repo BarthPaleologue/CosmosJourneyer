@@ -3,6 +3,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+import { MusicConductor } from "../audio/musicConductor";
 import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 import { initSettingsPanel } from "./settingsPanel";
 import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
@@ -35,7 +36,12 @@ export class SidePanels {
 
     private readonly saveManager: SaveManager;
 
-    constructor(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager, soundPlayer: ISoundPlayer) {
+    constructor(
+        starSystemDatabase: StarSystemDatabase,
+        saveManager: SaveManager,
+        soundPlayer: ISoundPlayer,
+        musicConductor: MusicConductor,
+    ) {
         this.starSystemDatabase = starSystemDatabase;
         this.saveManager = saveManager;
 
@@ -46,7 +52,7 @@ export class SidePanels {
         this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
         this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
-        this.settingsPanel = initSettingsPanel();
+        this.settingsPanel = initSettingsPanel(musicConductor);
 
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
