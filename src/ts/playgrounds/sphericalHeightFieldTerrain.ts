@@ -28,6 +28,7 @@ import {
 
 import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
+import { PlanetHeightMapAtlasMock } from "@/frontend/assets/planetHeightMapAtlas";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
@@ -84,12 +85,14 @@ export async function createSphericalHeightFieldTerrain(
 
     const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
 
+    const heightMapAtlas = new PlanetHeightMapAtlasMock();
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
         terrain.update(camera.globalPosition, material, chunkForge);
-        chunkForge.update();
+        chunkForge.update(heightMapAtlas);
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
