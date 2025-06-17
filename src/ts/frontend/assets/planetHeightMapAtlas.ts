@@ -19,12 +19,35 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
+import type { HeightMap, HeightMaps } from "./textures/heightmaps/types";
+
 export interface IPlanetHeightMapAtlas {
-    getHeightMap(key: CustomTerrainModel["id"]): Texture;
+    getHeightMap(key: CustomTerrainModel["id"]): HeightMap;
+}
+
+export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
+    private readonly heightMaps: HeightMaps;
+    constructor(heightMaps: HeightMaps) {
+        this.heightMaps = heightMaps;
+    }
+
+    getHeightMap(key: CustomTerrainModel["id"]): HeightMap {
+        switch (key) {
+            case "mercury":
+            case "venus":
+            case "earth":
+            case "moon":
+            case "mars":
+                return this.heightMaps.mars2x4;
+        }
+    }
 }
 
 export class PlanetHeightMapAtlasMock implements IPlanetHeightMapAtlas {
-    getHeightMap(): Texture {
-        return new Texture(null, null);
+    getHeightMap(): HeightMap {
+        return {
+            type: "1x1",
+            texture: new Texture(null, null),
+        };
     }
 }

@@ -19,10 +19,11 @@ import { StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { ComputeShader } from "@babylonjs/core/Compute/computeShader";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { TextureSampler } from "@babylonjs/core/Materials/Textures/textureSampler";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { type HeightMap1x1 } from "@/frontend/assets/textures/heightmaps/types";
 
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
@@ -95,7 +96,7 @@ export class SphericalTextureHeightFieldBuilder {
         sphereRadius: number,
         size: number,
         terrainModel: {
-            heightMap: Texture;
+            heightMap: HeightMap1x1;
             minHeight: number;
             maxHeight: number;
         },
@@ -113,7 +114,7 @@ export class SphericalTextureHeightFieldBuilder {
         this.terrainModelBuffer.updateFloat("max_height", terrainModel.maxHeight);
         this.terrainModelBuffer.update();
 
-        this.computeShader.setTexture("heightMap", terrainModel.heightMap, false);
+        this.computeShader.setTexture("heightMap", terrainModel.heightMap.texture, false);
 
         const positionsBuffer = new StorageBuffer(
             engine,
