@@ -19,8 +19,9 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
-import type { HeightMap2x4 } from "./types";
+import type { HeightMap1x1, HeightMap2x4 } from "./types";
 
+import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
 import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
 import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
 import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
@@ -29,6 +30,18 @@ import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
 import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
 import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
 import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+
+export async function loadMarsHeightMap1x1(
+    scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<HeightMap1x1> {
+    const marsHeightMap1x1Promise = loadTextureAsync("MarsHeightMap_1x1", marsHeightMap1x1, scene, progressMonitor);
+
+    return {
+        type: "1x1",
+        texture: await marsHeightMap1x1Promise,
+    };
+}
 
 export async function loadMarsHeightMapHighResolution(
     scene: Scene,

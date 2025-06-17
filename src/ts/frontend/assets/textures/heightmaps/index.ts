@@ -15,16 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { HeightMap1x1, HeightMap2x4 } from "./types";
 
-export type HeightMap1x1 = {
-    type: "1x1";
-    texture: Texture;
+export type HeightMaps = {
+    mars1x1: Readonly<HeightMap1x1>;
+    mars2x4: Readonly<HeightMap2x4>;
 };
-
-export type HeightMap2x4 = {
-    type: "2x4";
-    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
-};
-
-export type HeightMap = HeightMap1x1 | HeightMap2x4;
