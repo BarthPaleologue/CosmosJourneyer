@@ -57,6 +57,7 @@ import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughn
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
+import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
 import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
 import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
 import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
@@ -160,6 +161,7 @@ export type HeightMap2x4 = {
 export type HeightMap = HeightMap1x1 | HeightMap2x4;
 
 export type HeightMaps = {
+    mars1x1: Readonly<HeightMap1x1>;
     mars2x4: Readonly<HeightMap2x4>;
 };
 
@@ -322,6 +324,8 @@ export async function loadTextures(
     const marsHeightMapPromise_1_2 = loadTextureAsync("MarsHeightMap_1_2", marsHeightMap_1_2);
     const marsHeightMapPromise_1_3 = loadTextureAsync("MarsHeightMap_1_3", marsHeightMap_1_3);
 
+    const marsHeightMapPromise1x1 = loadTextureAsync("MarsHeightMap1x1", marsHeightMap1x1);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -399,6 +403,10 @@ export async function loadTextures(
             uranus: await uranusRingsTexturePromise,
         },
         heightMaps: {
+            mars1x1: {
+                type: "1x1",
+                texture: await marsHeightMapPromise1x1,
+            },
             mars2x4: {
                 type: "2x4",
                 textures: [
