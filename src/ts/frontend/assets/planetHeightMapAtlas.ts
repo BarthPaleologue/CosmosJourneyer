@@ -38,7 +38,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
             case "earth":
             case "moon":
             case "mars":
-                return this.heightMaps.mars2x4;
+                return this.heightMaps.mars1x1;
         }
     }
 }
