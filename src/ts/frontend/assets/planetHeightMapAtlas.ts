@@ -15,28 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
-export const ProceduralTerrainModelSchema = z.object({
-    type: z.literal("procedural"),
-});
+import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
-export type ProceduralTerrainModel = z.infer<typeof ProceduralTerrainModelSchema>;
+export interface IPlanetHeightMapAtlas {
+    getHeightMap(key: CustomTerrainModel["id"]): Texture;
+}
 
-export const CustomTerrainModelSchema = z.object({
-    type: z.literal("custom"),
-    id: z.enum(["mercury", "venus", "earth", "moon", "mars"]),
-    heightRange: z.object({
-        min: z.number(),
-        max: z.number(),
-    }),
-});
-
-export type CustomTerrainModel = z.infer<typeof CustomTerrainModelSchema>;
-
-export const TerrainModelSchema = z.discriminatedUnion("type", [
-    ProceduralTerrainModelSchema,
-    CustomTerrainModelSchema,
-]);
-
-export type TerrainModel = z.infer<typeof TerrainModelSchema>;
+export class PlanetHeightMapAtlasMock implements IPlanetHeightMapAtlas {
+    getHeightMap(): Texture {
+        return new Texture(null, null);
+    }
+}
