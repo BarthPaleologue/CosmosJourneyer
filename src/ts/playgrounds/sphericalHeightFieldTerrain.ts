@@ -26,6 +26,8 @@ import {
     WebGPUEngine,
 } from "@babylonjs/core";
 
+import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
@@ -74,7 +76,11 @@ export async function createSphericalHeightFieldTerrain(
     material.metallic = 0.0;
     material.roughness = 1.0;
 
-    const terrain = new SphericalHeightFieldTerrain(earthRadius, material, scene);
+    const terrainModel: TerrainModel = {
+        type: "procedural",
+    };
+
+    const terrain = new SphericalHeightFieldTerrain(earthRadius, terrainModel, material, scene);
 
     const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
 
