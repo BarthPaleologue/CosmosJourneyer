@@ -57,6 +57,14 @@ import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughn
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
+import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
+import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
+import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
+import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.jpg";
+import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
+import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
+import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
+import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
@@ -139,6 +147,22 @@ export type RingsTextures = {
     uranus: Texture;
 };
 
+export type HeightMap1x1 = {
+    type: "1x1";
+    texture: Texture;
+};
+
+export type HeightMap2x4 = {
+    type: "2x4";
+    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
+};
+
+export type HeightMap = HeightMap1x1 | HeightMap2x4;
+
+export type HeightMaps = {
+    mars2x4: Readonly<HeightMap2x4>;
+};
+
 export type Textures = {
     readonly terrains: Readonly<AllTerrainTextures>;
     readonly water: Readonly<WaterTextures>;
@@ -146,6 +170,7 @@ export type Textures = {
     readonly materials: Readonly<AllMaterialTextures>;
     readonly gasPlanet: Readonly<GasPlanetTextures>;
     readonly rings: Readonly<RingsTextures>;
+    readonly heightMaps: HeightMaps;
     readonly environment: {
         readonly milkyWay: CubeTexture;
     };
@@ -288,6 +313,15 @@ export async function loadTextures(
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
+    const marsHeightMapPromise_0_0 = loadTextureAsync("MarsHeightMap_0_0", marsHeightMap_0_0);
+    const marsHeightMapPromise_0_1 = loadTextureAsync("MarsHeightMap_0_1", marsHeightMap_0_1);
+    const marsHeightMapPromise_0_2 = loadTextureAsync("MarsHeightMap_0_2", marsHeightMap_0_2);
+    const marsHeightMapPromise_0_3 = loadTextureAsync("MarsHeightMap_0_3", marsHeightMap_0_3);
+    const marsHeightMapPromise_1_0 = loadTextureAsync("MarsHeightMap_1_0", marsHeightMap_1_0);
+    const marsHeightMapPromise_1_1 = loadTextureAsync("MarsHeightMap_1_1", marsHeightMap_1_1);
+    const marsHeightMapPromise_1_2 = loadTextureAsync("MarsHeightMap_1_2", marsHeightMap_1_2);
+    const marsHeightMapPromise_1_3 = loadTextureAsync("MarsHeightMap_1_3", marsHeightMap_1_3);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -363,6 +397,25 @@ export async function loadTextures(
         rings: {
             saturn: await saturnRingsTexturePromise,
             uranus: await uranusRingsTexturePromise,
+        },
+        heightMaps: {
+            mars2x4: {
+                type: "2x4",
+                textures: [
+                    [
+                        await marsHeightMapPromise_0_0,
+                        await marsHeightMapPromise_0_1,
+                        await marsHeightMapPromise_0_2,
+                        await marsHeightMapPromise_0_3,
+                    ],
+                    [
+                        await marsHeightMapPromise_1_0,
+                        await marsHeightMapPromise_1_1,
+                        await marsHeightMapPromise_1_2,
+                        await marsHeightMapPromise_1_3,
+                    ],
+                ],
+            },
         },
         environment: {
             milkyWay: await milkyWayPromise,
