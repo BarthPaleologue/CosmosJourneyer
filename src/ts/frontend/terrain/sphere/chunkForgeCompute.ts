@@ -200,6 +200,12 @@ export class ChunkForgeCompute {
                 break;
             }
 
+            const heightMap = textureAtlas.getHeightMap(nextTask.terrainModel.id);
+            if (heightMap.type !== "1x1") {
+                console.error(`Unsupported height map type: ${heightMap.type}`);
+                continue;
+            }
+
             const positions = availableComputer.dispatch(
                 nextTask.positionOnCube,
                 nextTask.positionOnSphere,
@@ -210,7 +216,7 @@ export class ChunkForgeCompute {
                 {
                     maxHeight: nextTask.terrainModel.heightRange.max,
                     minHeight: nextTask.terrainModel.heightRange.min,
-                    heightMap: textureAtlas.getHeightMap(nextTask.terrainModel.id),
+                    heightMap: heightMap,
                 },
                 this.engine,
             );
