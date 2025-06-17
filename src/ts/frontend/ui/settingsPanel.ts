@@ -27,17 +27,25 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");
     if (settingsPanel === null) throw new Error("#settings does not exist!");
 
-    const volumeSection = document.createElement("div");
-    volumeSection.classList.add("settings-section");
+    const audioSection = document.createElement("div");
+    audioSection.classList.add("settings-section");
 
     const volumeTitle = document.createElement("h3");
-    volumeTitle.textContent = i18n.t("Music Volume");
-    volumeSection.appendChild(volumeTitle);
+    volumeTitle.textContent = i18n.t("sidePanel:audioSettings");
+    volumeTitle.style.fontFamily = "Nasalization, sans-serif";
+    audioSection.appendChild(volumeTitle);
 
     const sliderContainer = document.createElement("div");
     sliderContainer.style.display = "flex";
     sliderContainer.style.alignItems = "center";
     sliderContainer.style.gap = "10px";
+    sliderContainer.style.fontFamily = "Nasalization, sans-serif";
+
+    const sliderLabel = document.createElement("label");
+    sliderLabel.textContent = i18n.t("sidePanel:musicVolume");
+    sliderLabel.style.fontFamily = "Nasalization, sans-serif";
+    sliderLabel.style.minWidth = "120px";
+    sliderContainer.appendChild(sliderLabel);
 
     const slider = document.createElement("input");
     slider.type = "range";
@@ -48,14 +56,15 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
 
     const percentage = document.createElement("span");
     percentage.textContent = (parseFloat(slider.value) * 100).toFixed(0) + "%";
+    percentage.style.fontFamily = "Nasalization, sans-serif";
     percentage.style.color = "#ffffff";
     percentage.style.backgroundColor = "#000000";
     percentage.style.padding = "2px 8px";
     percentage.style.borderRadius = "4px";
     percentage.style.fontWeight = "bold";
 
-    slider.addEventListener("input", (e) => {
-        const volume = parseFloat((e.target as HTMLInputElement).value);
+    slider.addEventListener("input", () => {
+        const volume = parseFloat(slider.value);
         percentage.textContent = (volume * 100).toFixed(0) + "%";
         musicConductor.setSoundtrackVolume(volume);
     });
@@ -63,8 +72,8 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     sliderContainer.appendChild(slider);
     sliderContainer.appendChild(percentage);
 
-    volumeSection.appendChild(sliderContainer);
-    settingsPanel.appendChild(volumeSection);
+    audioSection.appendChild(sliderContainer);
+    settingsPanel.appendChild(audioSection);
 
     void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
         InputMaps.forEach((inputMap) => {
