@@ -99,7 +99,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     // inverse trigonometric functions to get the height map pixel
     let theta = acos(sphere_up.y);
     let phi = atan2(sphere_up.z, sphere_up.x);
-    let u = (phi + PI) / (2.0 * PI);
+    let u = 1.0 - (phi + PI) / (2.0 * PI);
     let v = (theta) / PI;
 
     let heightMapSample : vec4<f32> = textureSampleLevel(heightMap, heightMapSampler, vec2<f32>(u, v), 0.0);
