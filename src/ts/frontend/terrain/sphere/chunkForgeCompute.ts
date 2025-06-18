@@ -32,8 +32,8 @@ import { type Direction } from "@/utils/direction";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
+import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
-import { SphericalTextureHeightFieldBuilder } from "./sphericalTextureHeightFieldBuilder";
 
 type HeightFieldTask = {
     onFinish: (output: ChunkForgeOutput) => void;
@@ -75,7 +75,7 @@ export type ChunkForgeOutput = {
 
 export class ChunkForgeCompute {
     private readonly availableProceduralHeightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
-    private readonly availableTextureHeightFieldComputers: Array<SphericalTextureHeightFieldBuilder> = [];
+    private readonly availableTextureHeightFieldComputers: Array<SphericalHeightFieldBuilder1x1> = [];
     private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
 
     private readonly gridIndicesBufferCpu: Uint32Array;
@@ -93,7 +93,7 @@ export class ChunkForgeCompute {
 
     private constructor(
         proceduralHeightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
-        textureHeightFieldComputers: ReadonlyArray<SphericalTextureHeightFieldBuilder>,
+        textureHeightFieldComputers: ReadonlyArray<SphericalHeightFieldBuilder1x1>,
         normalComputers: ReadonlyArray<SquareGridNormalComputer>,
         gridIndicesBufferCpu: Uint32Array,
         gridIndicesBuffer: StorageBuffer,
@@ -113,12 +113,12 @@ export class ChunkForgeCompute {
 
     static async New(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
         const heightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
-        const textureHeightFieldComputers: Array<SphericalTextureHeightFieldBuilder> = [];
+        const textureHeightFieldComputers: Array<SphericalHeightFieldBuilder1x1> = [];
         const normalComputers: Array<SquareGridNormalComputer> = [];
 
         for (let i = 0; i < nbComputeShaders; i++) {
             heightFieldComputers.push(await SphericalProceduralHeightFieldBuilder.New(engine));
-            textureHeightFieldComputers.push(await SphericalTextureHeightFieldBuilder.New(engine));
+            textureHeightFieldComputers.push(await SphericalHeightFieldBuilder1x1.New(engine));
             normalComputers.push(await SquareGridNormalComputer.New(engine));
         }
 
