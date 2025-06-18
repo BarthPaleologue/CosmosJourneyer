@@ -39,24 +39,7 @@ struct TerrainModel {
 
 #include "./getVertexPositionOnCube.wgsl";
 
-/**
- * Maps a position on the cube to a point on the unit sphere.
- * @see https://catlikecoding.com/unity/tutorials/cube-sphere/
- */
-fn map_cube_to_unit_sphere(position_on_cube: vec3<f32>) -> vec3<f32> {
-    /*let p = position_on_cube / (params.sphere_radius);
-    let x2 = p.x*p.x;
-    let y2 = p.y*p.y;
-    let z2 = p.z*p.z;
-
-    return vec3(
-        p.x * sqrt(1.0 - 0.5*(y2+z2) + (y2*z2)/3.0),
-        p.y * sqrt(1.0 - 0.5*(z2+x2) + (z2*x2)/3.0),
-        p.z * sqrt(1.0 - 0.5*(x2+y2) + (x2*y2)/3.0)
-    );*/
-
-    return normalize(position_on_cube);
-}
+#include "./mapCubeToUnitSphere.wgsl";
 
 fn remap(value: f32, old_min: f32, old_max: f32, new_min: f32, new_max: f32) -> f32 {
     return new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min);
