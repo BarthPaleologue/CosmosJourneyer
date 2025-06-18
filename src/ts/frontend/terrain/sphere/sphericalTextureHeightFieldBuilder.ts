@@ -28,7 +28,7 @@ import { type HeightMap1x1 } from "@/frontend/assets/textures/heightmaps/types";
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
 
-import heightMapComputeSource from "@shaders/compute/terrain/sphericalTextureHeightField.wgsl";
+import heightMapComputeSource from "@shaders/compute/terrain/sphericalHeightFieldTexture1x1.wgsl";
 
 export class SphericalTextureHeightFieldBuilder {
     private readonly computeShader: ComputeShader;
