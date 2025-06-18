@@ -43,6 +43,8 @@ struct TerrainModel {
 
 #include "../utils/remap.wgsl";
 
+#include "../utils/sphereToUv.wgsl";
+
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
@@ -55,14 +57,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset);
 
     let sphere_up = map_cube_to_unit_sphere(vertex_position_on_cube);
-    
-    // inverse trigonometric functions to get the height map pixel
-    let theta = acos(sphere_up.y);
-    let phi = atan2(sphere_up.z, sphere_up.x);
-    let u = 1.0 - (phi + PI) / (2.0 * PI);
-    let v = (theta) / PI;
 
-    let heightMapSample : vec4<f32> = textureSampleLevel(heightMap, heightMapSampler, vec2<f32>(u, v), 0.0);
+    var uv = sphere_to_uv(sphere_up);
+    uv.x = 1.0 - uv.x; // Flip the x coordinate to match the texture coordinates
+
+    let heightMapSample : vec4<f32> = textureSampleLevel(heightMap, heightMapSampler, uv, 0.0);
     
     let vertex_position_on_sphere = sphere_up * params.sphere_radius;
 
