@@ -33,28 +33,7 @@ struct Params {
 
 #include "../noise/erosionNoise3D.wgsl";
 
-fn get_vertex_position_on_cube(chunk_position_on_cube: vec3<f32>, direction: u32, offset: vec2<f32>) -> vec3<f32> {
-    switch (direction) {
-        case 0: { // UP
-            return chunk_position_on_cube + vec3<f32>(offset.x, 0.0, offset.y);
-        }
-        case 1: { // DOWN
-            return chunk_position_on_cube + vec3<f32>(offset.y, 0.0, offset.x);
-        }
-        case 2: { // LEFT
-            return chunk_position_on_cube + vec3<f32>(0.0, offset.x, offset.y);
-        }
-        case 3: { // RIGHT
-            return chunk_position_on_cube + vec3<f32>(0.0, offset.y, offset.x);
-        }
-        case 4: { // FORWARD
-            return chunk_position_on_cube + vec3<f32>(offset.x, offset.y, 0.0);
-        }
-        default: { // BACKWARD
-            return chunk_position_on_cube + vec3<f32>(offset.y, offset.x, 0.0);
-        }
-    }
-}
+#include "./getVertexPositionOnCube.wgsl";
 
 /**
  * Maps a position on the cube to a point on the unit sphere.
