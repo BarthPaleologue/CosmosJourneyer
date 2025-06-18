@@ -18,6 +18,8 @@
 import type { HeightMap1x1, HeightMap2x4 } from "./types";
 
 export type HeightMaps = {
+    earth1x1: Readonly<HeightMap1x1>;
+    earth2x4: Readonly<HeightMap2x4>;
     mars1x1: Readonly<HeightMap1x1>;
     mars2x4: Readonly<HeightMap2x4>;
 };
