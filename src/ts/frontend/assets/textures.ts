@@ -56,6 +56,15 @@ import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal
 import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
+import earthHeightMap2x4_0_0 from "@assets/sol/textures/earthHeightMap2x4/0_0.png";
+import earthHeightMap2x4_0_1 from "@assets/sol/textures/earthHeightMap2x4/0_1.png";
+import earthHeightMap2x4_0_2 from "@assets/sol/textures/earthHeightMap2x4/0_2.png";
+import earthHeightMap2x4_0_3 from "@assets/sol/textures/earthHeightMap2x4/0_3.png";
+import earthHeightMap2x4_1_0 from "@assets/sol/textures/earthHeightMap2x4/1_0.png";
+import earthHeightMap2x4_1_1 from "@assets/sol/textures/earthHeightMap2x4/1_1.png";
+import earthHeightMap2x4_1_2 from "@assets/sol/textures/earthHeightMap2x4/1_2.png";
+import earthHeightMap2x4_1_3 from "@assets/sol/textures/earthHeightMap2x4/1_3.png";
+import earthHeightMap1x1 from "@assets/sol/textures/earthHeightMap8k.png";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
 import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
@@ -161,6 +170,8 @@ export type HeightMap2x4 = {
 export type HeightMap = HeightMap1x1 | HeightMap2x4;
 
 export type HeightMaps = {
+    earth1x1: Readonly<HeightMap1x1>;
+    earth2x4: Readonly<HeightMap2x4>;
     mars1x1: Readonly<HeightMap1x1>;
     mars2x4: Readonly<HeightMap2x4>;
 };
@@ -326,6 +337,17 @@ export async function loadTextures(
 
     const marsHeightMapPromise1x1 = loadTextureAsync("MarsHeightMap1x1", marsHeightMap1x1);
 
+    const earthHeightMapPromise_0_0 = loadTextureAsync("EarthHeightMap_0_0", earthHeightMap2x4_0_0);
+    const earthHeightMapPromise_0_1 = loadTextureAsync("EarthHeightMap_0_1", earthHeightMap2x4_0_1);
+    const earthHeightMapPromise_0_2 = loadTextureAsync("EarthHeightMap_0_2", earthHeightMap2x4_0_2);
+    const earthHeightMapPromise_0_3 = loadTextureAsync("EarthHeightMap_0_3", earthHeightMap2x4_0_3);
+    const earthHeightMapPromise_1_0 = loadTextureAsync("EarthHeightMap_1_0", earthHeightMap2x4_1_0);
+    const earthHeightMapPromise_1_1 = loadTextureAsync("EarthHeightMap_1_1", earthHeightMap2x4_1_1);
+    const earthHeightMapPromise_1_2 = loadTextureAsync("EarthHeightMap_1_2", earthHeightMap2x4_1_2);
+    const earthHeightMapPromise_1_3 = loadTextureAsync("EarthHeightMap_1_3", earthHeightMap2x4_1_3);
+
+    const earthHeightMapPromise1x1 = loadTextureAsync("EarthHeightMap1x1", earthHeightMap1x1);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -421,6 +443,27 @@ export async function loadTextures(
                         await marsHeightMapPromise_1_1,
                         await marsHeightMapPromise_1_2,
                         await marsHeightMapPromise_1_3,
+                    ],
+                ],
+            },
+            earth1x1: {
+                type: "1x1",
+                texture: await earthHeightMapPromise1x1,
+            },
+            earth2x4: {
+                type: "2x4",
+                textures: [
+                    [
+                        await earthHeightMapPromise_0_0,
+                        await earthHeightMapPromise_0_1,
+                        await earthHeightMapPromise_0_2,
+                        await earthHeightMapPromise_0_3,
+                    ],
+                    [
+                        await earthHeightMapPromise_1_0,
+                        await earthHeightMapPromise_1_1,
+                        await earthHeightMapPromise_1_2,
+                        await earthHeightMapPromise_1_3,
                     ],
                 ],
             },
