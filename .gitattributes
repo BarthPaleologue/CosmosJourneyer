@@ -1,7 +1,14 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 tests/e2e/**/*.png filter=lfs diff=lfs merge=lfs -text
-src/asset/sol/textures/marsHeightMap2x4/** filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/1_2.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/1_3.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/0_0.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/0_1.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/0_2.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/0_3.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/1_0.jpg filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/marsHeightMap2x4/1_1.jpg filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/marsHeightMap1x1.jpg filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap2x4/0_1.png filter=lfs diff=lfs merge=lfs -text
