@@ -30,7 +30,7 @@ import { retry } from "@/utils/retry";
 
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalHeightFieldTexture1x1.wgsl";
 
-export class SphericalTextureHeightFieldBuilder {
+export class SphericalHeightFieldBuilder1x1 {
     private readonly computeShader: ComputeShader;
 
     private readonly paramsBuffer: UniformBuffer;
@@ -67,7 +67,7 @@ export class SphericalTextureHeightFieldBuilder {
         this.computeShader.setTextureSampler("heightMapSampler", heightMapSampler);
     }
 
-    static async New(engine: WebGPUEngine): Promise<SphericalTextureHeightFieldBuilder> {
+    static async New(engine: WebGPUEngine): Promise<SphericalHeightFieldBuilder1x1> {
         const computeShader = new ComputeShader(
             "sphericalHeightMapTextureComputeShader",
             engine,
@@ -85,7 +85,7 @@ export class SphericalTextureHeightFieldBuilder {
 
         await retry(() => computeShader.isReady(), 1000, 10);
 
-        return new SphericalTextureHeightFieldBuilder(computeShader, engine);
+        return new SphericalHeightFieldBuilder1x1(computeShader, engine);
     }
 
     dispatch(
@@ -124,8 +124,8 @@ export class SphericalTextureHeightFieldBuilder {
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
         this.computeShader.dispatch(
-            nbVerticesPerRow / SphericalTextureHeightFieldBuilder.WORKGROUP_SIZE[0],
-            nbVerticesPerRow / SphericalTextureHeightFieldBuilder.WORKGROUP_SIZE[1],
+            nbVerticesPerRow / SphericalHeightFieldBuilder1x1.WORKGROUP_SIZE[0],
+            nbVerticesPerRow / SphericalHeightFieldBuilder1x1.WORKGROUP_SIZE[1],
             1,
         );
 
