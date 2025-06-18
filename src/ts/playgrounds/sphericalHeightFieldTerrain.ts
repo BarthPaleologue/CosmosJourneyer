@@ -29,19 +29,21 @@ import {
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { PlanetHeightMapAtlasMock } from "@/frontend/assets/planetHeightMapAtlas";
+import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
+import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
 export async function createSphericalHeightFieldTerrain(
     engine: WebGPUEngine,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
+
+    const heightMaps = await loadHeightMaps(scene, progressMonitor);
 
     const earthRadius = 6_371e3; // Average radius of Earth in meters
 
@@ -80,14 +82,19 @@ export async function createSphericalHeightFieldTerrain(
     material.roughness = 1.0;
 
     const terrainModel: TerrainModel = {
-        type: "procedural",
+        type: "custom",
+        heightRange: {
+            min: 0,
+            max: 100e3,
+        },
+        id: "earth",
     };
 
     const terrain = new SphericalHeightFieldTerrain(earthRadius, terrainModel, material, scene);
 
     const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
 
-    const heightMapAtlas = new PlanetHeightMapAtlasMock();
+    const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
