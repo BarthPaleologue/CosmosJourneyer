@@ -35,12 +35,12 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
     getHeightMap(key: CustomTerrainModel["id"]): HeightMap {
         switch (key) {
             case "earth":
-                return this.heightMaps.earth1x1;
+                return this.heightMaps.earth2x4;
             case "mercury":
             case "venus":
             case "moon":
             case "mars":
-                return this.heightMaps.mars1x1;
+                return this.heightMaps.mars2x4;
         }
     }
 }

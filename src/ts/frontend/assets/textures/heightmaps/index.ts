@@ -18,13 +18,15 @@
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
-import { loadEarthHeightMap1x1 } from "./earth";
-import { loadMarsHeightMap1x1 } from "./mars";
-import type { HeightMap1x1 } from "./types";
+import { loadEarthHeightMap1x1, loadEarthHeightMap2x4 } from "./earth";
+import { loadMarsHeightMap1x1, loadMarsHeightMapHighResolution } from "./mars";
+import type { HeightMap1x1, HeightMap2x4 } from "./types";
 
 export type HeightMaps = {
     earth1x1: Readonly<HeightMap1x1>;
+    earth2x4: Readonly<HeightMap2x4>;
     mars1x1: Readonly<HeightMap1x1>;
+    mars2x4: Readonly<HeightMap2x4>;
 };
 
 export async function loadHeightMaps(
@@ -33,7 +35,9 @@ export async function loadHeightMaps(
 ): Promise<HeightMaps> {
     const heightMaps: HeightMaps = {
         earth1x1: await loadEarthHeightMap1x1(scene, progressMonitor),
+        earth2x4: await loadEarthHeightMap2x4(scene, progressMonitor),
         mars1x1: await loadMarsHeightMap1x1(scene, progressMonitor),
+        mars2x4: await loadMarsHeightMapHighResolution(scene, progressMonitor),
     };
 
     return heightMaps;

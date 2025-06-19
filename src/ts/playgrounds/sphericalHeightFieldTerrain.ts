@@ -85,23 +85,23 @@ export async function createSphericalHeightFieldTerrain(
         type: "custom",
         heightRange: {
             min: 0,
-            max: 100e3,
+            max: 9e3,
         },
         id: "earth",
     };
 
     const terrain = new SphericalHeightFieldTerrain(earthRadius, terrainModel, material, scene);
 
-    const chunkForge = await ChunkForgeCompute.New(6, 64, engine);
-
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps);
+
+    const chunkForge = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
         terrain.update(camera.globalPosition, material, chunkForge);
-        chunkForge.update(heightMapAtlas);
+        chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
