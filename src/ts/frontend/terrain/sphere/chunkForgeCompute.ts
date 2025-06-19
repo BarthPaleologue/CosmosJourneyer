@@ -36,9 +36,11 @@ import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
+import { WorkerPool } from "./workerPool";
 
 type HeightFieldTask = {
     onFinish: (output: ChunkForgeOutput) => void;
+    id: string;
     positionOnCube: Vector3;
     positionOnSphere: Vector3;
     size: number;
@@ -62,13 +64,15 @@ type Custom2x4HeightFieldTask = HeightFieldTask & {
 
 type NormalTask = {
     onFinish: (output: ChunkForgeOutput) => void;
-    positions: StorageBuffer;
+    id: string;
+    positions: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
 type ApplyTask = {
     onFinish: (output: ChunkForgeOutput) => void;
-    positions: StorageBuffer;
-    normals: StorageBuffer;
+    id: string;
+    positions: { gpu: StorageBuffer; cpu: Float32Array };
+    normals: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
 export type ChunkForgeOutput = {
@@ -80,21 +84,52 @@ export type ChunkForgeOutput = {
     };
 };
 
-export class ChunkForgeCompute {
-    private readonly availableHeightFieldProceduralComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
-    private readonly availableHeightField1x1Computers: Array<SphericalHeightFieldBuilder1x1> = [];
-    private readonly availableHeightField2x4Computers: Array<SphericalHeightFieldBuilder2x4> = [];
+type ProceduralHeightFieldComputePool = WorkerPool<
+    ProceduralHeightFieldTask,
+    SphericalProceduralHeightFieldBuilder,
+    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
+>;
 
-    private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
+type Custom1x1HeightFieldComputePool = WorkerPool<
+    Custom1x1HeightFieldTask,
+    SphericalHeightFieldBuilder1x1,
+    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
+>;
+
+type Custom2x4HeightFieldComputePool = WorkerPool<
+    Custom2x4HeightFieldTask,
+    SphericalHeightFieldBuilder2x4,
+    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
+>;
+
+type NormalComputePool = WorkerPool<
+    NormalTask,
+    SquareGridNormalComputer,
+    {
+        normals: { gpu: StorageBuffer; cpu: Float32Array };
+        positions: { gpu: StorageBuffer; cpu: Float32Array };
+        id: string;
+        onFinish: (output: ChunkForgeOutput) => void;
+    }
+>;
+
+type ChunkCache = {
+    positions: Map<string, { gpu: StorageBuffer; cpu: Float32Array }>;
+    normals: Map<string, { gpu: StorageBuffer; cpu: Float32Array }>;
+};
+
+export class ChunkForgeCompute {
+    private readonly proceduralHeightFieldComputePool: ProceduralHeightFieldComputePool;
+    private readonly custom1x1HeightFieldComputePool: Custom1x1HeightFieldComputePool;
+    private readonly custom2x4HeightFieldComputePool: Custom2x4HeightFieldComputePool;
+
+    private readonly normalComputePool: NormalComputePool;
 
     private readonly gridIndicesBufferCpu: Uint32Array;
     private readonly gridIndicesBuffer: StorageBuffer;
 
-    private readonly proceduralHeightFieldQueue: Array<ProceduralHeightFieldTask> = [];
-    private readonly custom1x1HeightFieldQueue: Array<Custom1x1HeightFieldTask> = [];
-    private readonly custom2x4HeightFieldQueue: Array<Custom2x4HeightFieldTask> = [];
+    private readonly cache: ChunkCache;
 
-    private readonly normalQueue: Array<NormalTask> = [];
     private readonly applyQueue: Array<ApplyTask> = [];
 
     private readonly engine: WebGPUEngine;
@@ -105,26 +140,30 @@ export class ChunkForgeCompute {
 
     private constructor(
         computers: {
-            heightFieldProcedural: ReadonlyArray<SphericalProceduralHeightFieldBuilder>;
-            heightField1x1: ReadonlyArray<SphericalHeightFieldBuilder1x1>;
-            heightField2x4: ReadonlyArray<SphericalHeightFieldBuilder2x4>;
-            normal: ReadonlyArray<SquareGridNormalComputer>;
+            heightFieldProcedural: ProceduralHeightFieldComputePool;
+            heightField1x1: Custom1x1HeightFieldComputePool;
+            heightField2x4: Custom2x4HeightFieldComputePool;
+            normal: NormalComputePool;
         },
         gridIndicesBufferCpu: Uint32Array,
         gridIndicesBuffer: StorageBuffer,
+        cache: ChunkCache,
         rowVertexCount: number,
         heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ) {
-        this.availableHeightFieldProceduralComputers.push(...computers.heightFieldProcedural);
-        this.availableHeightField1x1Computers.push(...computers.heightField1x1);
-        this.availableHeightField2x4Computers.push(...computers.heightField2x4);
-        this.availableNormalComputers.push(...computers.normal);
+        this.proceduralHeightFieldComputePool = computers.heightFieldProcedural;
+        this.custom1x1HeightFieldComputePool = computers.heightField1x1;
+        this.custom2x4HeightFieldComputePool = computers.heightField2x4;
+
+        this.normalComputePool = computers.normal;
 
         this.gridIndicesBufferCpu = gridIndicesBufferCpu;
         this.gridIndicesBuffer = gridIndicesBuffer;
 
         this.heightMapAtlas = heightMapAtlas;
+
+        this.cache = cache;
 
         this.rowVertexCount = rowVertexCount;
         this.engine = engine;
@@ -136,17 +175,194 @@ export class ChunkForgeCompute {
         heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ) {
-        const heightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
-        const textureHeightFieldComputers: Array<SphericalHeightFieldBuilder1x1> = [];
-        const textureHeightField2x4Computers: Array<SphericalHeightFieldBuilder2x4> = [];
-        const normalComputers: Array<SquareGridNormalComputer> = [];
+        const cache: ChunkCache = {
+            positions: new Map(),
+            normals: new Map(),
+        };
 
-        for (let i = 0; i < nbComputeShaders; i++) {
-            heightFieldComputers.push(await SphericalProceduralHeightFieldBuilder.New(engine));
-            textureHeightFieldComputers.push(await SphericalHeightFieldBuilder1x1.New(engine));
-            textureHeightField2x4Computers.push(await SphericalHeightFieldBuilder2x4.New(engine));
-            normalComputers.push(await SquareGridNormalComputer.New(engine));
-        }
+        const proceduralHeightFieldComputePool: ProceduralHeightFieldComputePool = await WorkerPool.New(
+            nbComputeShaders,
+            () => {
+                return SphericalProceduralHeightFieldBuilder.New(engine);
+            },
+            async (worker, task) => {
+                const cachedValue = cache.positions.get(task.id);
+                if (cachedValue !== undefined) {
+                    return {
+                        id: task.id,
+                        gpu: cachedValue.gpu,
+                        cpu: cachedValue.cpu,
+                        onFinish: task.onFinish,
+                    };
+                }
+
+                const positions = worker.dispatch(
+                    task.positionOnCube,
+                    task.positionOnSphere,
+                    rowVertexCount,
+                    task.direction,
+                    task.sphereRadius,
+                    task.size,
+                    engine,
+                );
+
+                const positionBufferView = await positions.read();
+
+                const positionsCpu = new Float32Array(positionBufferView.buffer);
+
+                cache.positions.set(task.id, {
+                    gpu: positions,
+                    cpu: positionsCpu,
+                });
+
+                return {
+                    id: task.id,
+                    gpu: positions,
+                    cpu: positionsCpu,
+                    onFinish: task.onFinish,
+                };
+            },
+        );
+
+        const custom1x1HeightFieldComputePool: Custom1x1HeightFieldComputePool = await WorkerPool.New(
+            nbComputeShaders,
+            () => {
+                return SphericalHeightFieldBuilder1x1.New(engine);
+            },
+            async (worker, task) => {
+                const cachedValue = cache.positions.get(task.id);
+                if (cachedValue !== undefined) {
+                    return {
+                        id: task.id,
+                        gpu: cachedValue.gpu,
+                        cpu: cachedValue.cpu,
+                        onFinish: task.onFinish,
+                    };
+                }
+
+                const positions = worker.dispatch(
+                    task.positionOnCube,
+                    task.positionOnSphere,
+                    rowVertexCount,
+                    task.direction,
+                    task.sphereRadius,
+                    task.size,
+                    {
+                        maxHeight: task.heightRange.max,
+                        minHeight: task.heightRange.min,
+                        heightMap: task.heightMap,
+                    },
+                    engine,
+                );
+
+                const positionBufferView = await positions.read();
+
+                const positionsCpu = new Float32Array(positionBufferView.buffer);
+
+                cache.positions.set(task.id, {
+                    gpu: positions,
+                    cpu: positionsCpu,
+                });
+
+                return {
+                    id: task.id,
+                    gpu: positions,
+                    cpu: positionsCpu,
+                    onFinish: task.onFinish,
+                };
+            },
+        );
+
+        const custom2x4HeightFieldComputePool: Custom2x4HeightFieldComputePool = await WorkerPool.New(
+            nbComputeShaders,
+            () => {
+                return SphericalHeightFieldBuilder2x4.New(engine);
+            },
+            async (worker, task) => {
+                const cachedValue = cache.positions.get(task.id);
+                if (cachedValue !== undefined) {
+                    return {
+                        id: task.id,
+                        gpu: cachedValue.gpu,
+                        cpu: cachedValue.cpu,
+                        onFinish: task.onFinish,
+                    };
+                }
+
+                const positions = worker.dispatch(
+                    task.positionOnCube,
+                    task.positionOnSphere,
+                    rowVertexCount,
+                    task.direction,
+                    task.sphereRadius,
+                    task.size,
+                    {
+                        maxHeight: task.heightRange.max,
+                        minHeight: task.heightRange.min,
+                        heightMap: task.heightMap,
+                    },
+                    engine,
+                );
+
+                const positionBufferView = await positions.read();
+
+                const positionsCpu = new Float32Array(positionBufferView.buffer);
+
+                cache.positions.set(task.id, {
+                    gpu: positions,
+                    cpu: positionsCpu,
+                });
+
+                return {
+                    id: task.id,
+                    gpu: positions,
+                    cpu: positionsCpu,
+                    onFinish: task.onFinish,
+                };
+            },
+        );
+
+        const normalComputePool: NormalComputePool = await WorkerPool.New(
+            nbComputeShaders,
+            () => {
+                return SquareGridNormalComputer.New(engine);
+            },
+            async (worker, task) => {
+                const cachedValue = cache.normals.get(task.id);
+                if (cachedValue !== undefined) {
+                    return {
+                        id: task.id,
+                        normals: {
+                            gpu: cachedValue.gpu,
+                            cpu: cachedValue.cpu,
+                        },
+                        positions: task.positions,
+                        onFinish: task.onFinish,
+                    };
+                }
+
+                const normals = worker.dispatch(rowVertexCount, task.positions.gpu, engine);
+
+                const normalBufferView = await normals.read();
+
+                const normalsCpu = new Float32Array(normalBufferView.buffer);
+
+                cache.normals.set(task.id, {
+                    gpu: normals,
+                    cpu: normalsCpu,
+                });
+
+                return {
+                    id: task.id,
+                    normals: {
+                        gpu: normals,
+                        cpu: normalsCpu,
+                    },
+                    positions: task.positions,
+                    onFinish: task.onFinish,
+                };
+            },
+        );
 
         const gridIndicesComputer = await SquareGridIndicesComputer.New(engine);
 
@@ -158,13 +374,14 @@ export class ChunkForgeCompute {
 
         return new ChunkForgeCompute(
             {
-                heightFieldProcedural: heightFieldComputers,
-                heightField1x1: textureHeightFieldComputers,
-                heightField2x4: textureHeightField2x4Computers,
-                normal: normalComputers,
+                heightFieldProcedural: proceduralHeightFieldComputePool,
+                heightField1x1: custom1x1HeightFieldComputePool,
+                heightField2x4: custom2x4HeightFieldComputePool,
+                normal: normalComputePool,
             },
             gridIndexBufferCpu,
             gridIndicesBuffer,
+            cache,
             rowVertexCount,
             heightMapAtlas,
             engine,
@@ -173,6 +390,7 @@ export class ChunkForgeCompute {
 
     addBuildTask(
         onFinish: (output: ChunkForgeOutput) => void,
+        id: string,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
         direction: Direction,
@@ -182,6 +400,7 @@ export class ChunkForgeCompute {
     ): void {
         const buildTask = {
             onFinish,
+            id,
             positionOnCube,
             positionOnSphere,
             direction,
@@ -191,7 +410,7 @@ export class ChunkForgeCompute {
 
         switch (terrainModel.type) {
             case "procedural":
-                this.proceduralHeightFieldQueue.push({ ...buildTask, terrainModel });
+                this.proceduralHeightFieldComputePool.addTask({ ...buildTask, terrainModel });
                 break;
             case "custom":
                 this.addCustomHeightFieldTask(buildTask, terrainModel);
@@ -203,14 +422,14 @@ export class ChunkForgeCompute {
         const heightMap = this.heightMapAtlas.getHeightMap(terrainModel.id);
         switch (heightMap.type) {
             case "1x1":
-                this.custom1x1HeightFieldQueue.push({
+                this.custom1x1HeightFieldComputePool.addTask({
                     ...baseTask,
                     heightRange: terrainModel.heightRange,
                     heightMap: heightMap,
                 });
                 break;
             case "2x4":
-                this.custom2x4HeightFieldQueue.push({
+                this.custom2x4HeightFieldComputePool.addTask({
                     ...baseTask,
                     heightRange: terrainModel.heightRange,
                     heightMap: heightMap,
@@ -220,98 +439,57 @@ export class ChunkForgeCompute {
     }
 
     updateProcedural() {
-        for (const availableComputer of this.availableHeightFieldProceduralComputers) {
-            const nextTask = this.proceduralHeightFieldQueue.shift();
-            if (nextTask === undefined) {
-                break;
-            }
-
-            const positions = availableComputer.dispatch(
-                nextTask.positionOnCube,
-                nextTask.positionOnSphere,
-                this.rowVertexCount,
-                nextTask.direction,
-                nextTask.sphereRadius,
-                nextTask.size,
-                this.engine,
-            );
-
-            this.normalQueue.push({
-                onFinish: nextTask.onFinish,
-                positions,
+        this.proceduralHeightFieldComputePool.update();
+        const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
+        for (const output of proceduralHeightFieldOutputs) {
+            this.normalComputePool.addTask({
+                onFinish: output.onFinish,
+                id: output.id,
+                positions: {
+                    gpu: output.gpu,
+                    cpu: output.cpu,
+                },
             });
         }
     }
 
     updateCustom() {
-        for (const availableComputer of this.availableHeightField2x4Computers) {
-            const nextTask = this.custom2x4HeightFieldQueue.shift();
-            if (nextTask === undefined) {
-                break;
-            }
-
-            const positions = availableComputer.dispatch(
-                nextTask.positionOnCube,
-                nextTask.positionOnSphere,
-                this.rowVertexCount,
-                nextTask.direction,
-                nextTask.sphereRadius,
-                nextTask.size,
-                {
-                    maxHeight: nextTask.heightRange.max,
-                    minHeight: nextTask.heightRange.min,
-                    heightMap: nextTask.heightMap,
+        this.custom2x4HeightFieldComputePool.update();
+        const custom2x4HeightFieldOutputs = this.custom2x4HeightFieldComputePool.consumeOutputs();
+        for (const output of custom2x4HeightFieldOutputs) {
+            this.normalComputePool.addTask({
+                onFinish: output.onFinish,
+                id: output.id,
+                positions: {
+                    gpu: output.gpu,
+                    cpu: output.cpu,
                 },
-                this.engine,
-            );
-
-            this.normalQueue.push({
-                onFinish: nextTask.onFinish,
-                positions,
             });
         }
 
-        for (const availableComputer of this.availableHeightField1x1Computers) {
-            const nextTask = this.custom1x1HeightFieldQueue.shift();
-            if (nextTask === undefined) {
-                break;
-            }
-
-            const positions = availableComputer.dispatch(
-                nextTask.positionOnCube,
-                nextTask.positionOnSphere,
-                this.rowVertexCount,
-                nextTask.direction,
-                nextTask.sphereRadius,
-                nextTask.size,
-                {
-                    maxHeight: nextTask.heightRange.max,
-                    minHeight: nextTask.heightRange.min,
-                    heightMap: nextTask.heightMap,
+        this.custom1x1HeightFieldComputePool.update();
+        const custom1x1HeightFieldOutputs = this.custom1x1HeightFieldComputePool.consumeOutputs();
+        for (const output of custom1x1HeightFieldOutputs) {
+            this.normalComputePool.addTask({
+                onFinish: output.onFinish,
+                id: output.id,
+                positions: {
+                    gpu: output.gpu,
+                    cpu: output.cpu,
                 },
-                this.engine,
-            );
-
-            this.normalQueue.push({
-                onFinish: nextTask.onFinish,
-                positions,
             });
         }
     }
 
     updateNormals() {
-        for (const availableComputer of this.availableNormalComputers) {
-            const nextTask = this.normalQueue.shift();
-            if (nextTask === undefined) {
-                break;
-            }
-
-            const normals = availableComputer.dispatch(this.rowVertexCount, nextTask.positions, this.engine);
-
+        this.normalComputePool.update();
+        const normalOutputs = this.normalComputePool.consumeOutputs();
+        for (const output of normalOutputs) {
             this.applyQueue.push({
-                onFinish: nextTask.onFinish,
-                positions: nextTask.positions,
-                normals,
+                onFinish: output.onFinish,
+                id: output.id,
+                positions: output.positions,
+                normals: output.normals,
             });
         }
     }
@@ -323,7 +501,7 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            void this.runApplyTask(nextTask);
+            this.runApplyTask(nextTask);
         }
     }
 
@@ -334,22 +512,19 @@ export class ChunkForgeCompute {
         this.applyAllReady();
     }
 
-    private async runApplyTask(task: ApplyTask) {
+    private runApplyTask(task: ApplyTask) {
         const { onFinish, positions, normals } = task;
 
-        const positionBufferView = await positions.read();
-        const normalBufferView = await normals.read();
-
         const vertexData = new VertexData();
-        vertexData.positions = new Float32Array(positionBufferView.buffer);
+        vertexData.positions = positions.cpu;
         vertexData.indices = this.gridIndicesBufferCpu;
-        vertexData.normals = new Float32Array(normalBufferView.buffer);
+        vertexData.normals = normals.cpu;
 
         onFinish({
             cpu: vertexData,
             gpu: {
-                positions,
-                normals,
+                positions: positions.gpu,
+                normals: normals.gpu,
                 indices: this.gridIndicesBuffer,
             },
         });
