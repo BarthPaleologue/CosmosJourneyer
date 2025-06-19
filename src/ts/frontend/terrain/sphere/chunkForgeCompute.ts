@@ -27,12 +27,14 @@ import {
 } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
+import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures/heightmaps/types";
 
 import { type Direction } from "@/utils/direction";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
+import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 
 type HeightFieldTask = {
@@ -42,15 +44,20 @@ type HeightFieldTask = {
     size: number;
     direction: Direction;
     sphereRadius: number;
-    terrainModel: TerrainModel;
 };
 
 type ProceduralHeightFieldTask = HeightFieldTask & {
     terrainModel: ProceduralTerrainModel;
 };
 
-type TextureHeightFieldTask = HeightFieldTask & {
-    terrainModel: CustomTerrainModel;
+type Custom1x1HeightFieldTask = HeightFieldTask & {
+    heightRange: { min: number; max: number };
+    heightMap: HeightMap1x1;
+};
+
+type Custom2x4HeightFieldTask = HeightFieldTask & {
+    heightRange: { min: number; max: number };
+    heightMap: HeightMap2x4;
 };
 
 type NormalTask = {
@@ -74,51 +81,70 @@ export type ChunkForgeOutput = {
 };
 
 export class ChunkForgeCompute {
-    private readonly availableProceduralHeightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
-    private readonly availableTextureHeightFieldComputers: Array<SphericalHeightFieldBuilder1x1> = [];
+    private readonly availableHeightFieldProceduralComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
+    private readonly availableHeightField1x1Computers: Array<SphericalHeightFieldBuilder1x1> = [];
+    private readonly availableHeightField2x4Computers: Array<SphericalHeightFieldBuilder2x4> = [];
+
     private readonly availableNormalComputers: Array<SquareGridNormalComputer> = [];
 
     private readonly gridIndicesBufferCpu: Uint32Array;
     private readonly gridIndicesBuffer: StorageBuffer;
 
     private readonly proceduralHeightFieldQueue: Array<ProceduralHeightFieldTask> = [];
-    private readonly textureHeightFieldQueue: Array<TextureHeightFieldTask> = [];
+    private readonly custom1x1HeightFieldQueue: Array<Custom1x1HeightFieldTask> = [];
+    private readonly custom2x4HeightFieldQueue: Array<Custom2x4HeightFieldTask> = [];
 
     private readonly normalQueue: Array<NormalTask> = [];
     private readonly applyQueue: Array<ApplyTask> = [];
 
     private readonly engine: WebGPUEngine;
 
+    private readonly heightMapAtlas: IPlanetHeightMapAtlas;
+
     readonly rowVertexCount: number;
 
     private constructor(
-        proceduralHeightFieldComputers: ReadonlyArray<SphericalProceduralHeightFieldBuilder>,
-        textureHeightFieldComputers: ReadonlyArray<SphericalHeightFieldBuilder1x1>,
-        normalComputers: ReadonlyArray<SquareGridNormalComputer>,
+        computers: {
+            heightFieldProcedural: ReadonlyArray<SphericalProceduralHeightFieldBuilder>;
+            heightField1x1: ReadonlyArray<SphericalHeightFieldBuilder1x1>;
+            heightField2x4: ReadonlyArray<SphericalHeightFieldBuilder2x4>;
+            normal: ReadonlyArray<SquareGridNormalComputer>;
+        },
         gridIndicesBufferCpu: Uint32Array,
         gridIndicesBuffer: StorageBuffer,
         rowVertexCount: number,
+        heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ) {
-        this.availableProceduralHeightFieldComputers.push(...proceduralHeightFieldComputers);
-        this.availableTextureHeightFieldComputers.push(...textureHeightFieldComputers);
-        this.availableNormalComputers.push(...normalComputers);
+        this.availableHeightFieldProceduralComputers.push(...computers.heightFieldProcedural);
+        this.availableHeightField1x1Computers.push(...computers.heightField1x1);
+        this.availableHeightField2x4Computers.push(...computers.heightField2x4);
+        this.availableNormalComputers.push(...computers.normal);
 
         this.gridIndicesBufferCpu = gridIndicesBufferCpu;
         this.gridIndicesBuffer = gridIndicesBuffer;
+
+        this.heightMapAtlas = heightMapAtlas;
 
         this.rowVertexCount = rowVertexCount;
         this.engine = engine;
     }
 
-    static async New(nbComputeShaders: number, rowVertexCount: number, engine: WebGPUEngine) {
+    static async New(
+        nbComputeShaders: number,
+        rowVertexCount: number,
+        heightMapAtlas: IPlanetHeightMapAtlas,
+        engine: WebGPUEngine,
+    ) {
         const heightFieldComputers: Array<SphericalProceduralHeightFieldBuilder> = [];
         const textureHeightFieldComputers: Array<SphericalHeightFieldBuilder1x1> = [];
+        const textureHeightField2x4Computers: Array<SphericalHeightFieldBuilder2x4> = [];
         const normalComputers: Array<SquareGridNormalComputer> = [];
 
         for (let i = 0; i < nbComputeShaders; i++) {
             heightFieldComputers.push(await SphericalProceduralHeightFieldBuilder.New(engine));
             textureHeightFieldComputers.push(await SphericalHeightFieldBuilder1x1.New(engine));
+            textureHeightField2x4Computers.push(await SphericalHeightFieldBuilder2x4.New(engine));
             normalComputers.push(await SquareGridNormalComputer.New(engine));
         }
 
@@ -131,12 +157,16 @@ export class ChunkForgeCompute {
         const gridIndexBufferCpu = new Uint32Array(gridIndexBufferView.buffer);
 
         return new ChunkForgeCompute(
-            heightFieldComputers,
-            textureHeightFieldComputers,
-            normalComputers,
+            {
+                heightFieldProcedural: heightFieldComputers,
+                heightField1x1: textureHeightFieldComputers,
+                heightField2x4: textureHeightField2x4Computers,
+                normal: normalComputers,
+            },
             gridIndexBufferCpu,
             gridIndicesBuffer,
             rowVertexCount,
+            heightMapAtlas,
             engine,
         );
     }
@@ -157,20 +187,40 @@ export class ChunkForgeCompute {
             direction,
             size,
             sphereRadius,
-        };
+        } satisfies HeightFieldTask;
 
         switch (terrainModel.type) {
             case "procedural":
                 this.proceduralHeightFieldQueue.push({ ...buildTask, terrainModel });
                 break;
             case "custom":
-                this.textureHeightFieldQueue.push({ ...buildTask, terrainModel });
+                this.addCustomHeightFieldTask(buildTask, terrainModel);
+                break;
+        }
+    }
+
+    private addCustomHeightFieldTask(baseTask: HeightFieldTask, terrainModel: CustomTerrainModel): void {
+        const heightMap = this.heightMapAtlas.getHeightMap(terrainModel.id);
+        switch (heightMap.type) {
+            case "1x1":
+                this.custom1x1HeightFieldQueue.push({
+                    ...baseTask,
+                    heightRange: terrainModel.heightRange,
+                    heightMap: heightMap,
+                });
+                break;
+            case "2x4":
+                this.custom2x4HeightFieldQueue.push({
+                    ...baseTask,
+                    heightRange: terrainModel.heightRange,
+                    heightMap: heightMap,
+                });
                 break;
         }
     }
 
     updateProcedural() {
-        for (const availableComputer of this.availableProceduralHeightFieldComputers) {
+        for (const availableComputer of this.availableHeightFieldProceduralComputers) {
             const nextTask = this.proceduralHeightFieldQueue.shift();
             if (nextTask === undefined) {
                 break;
@@ -193,17 +243,11 @@ export class ChunkForgeCompute {
         }
     }
 
-    updateCustom(textureAtlas: IPlanetHeightMapAtlas) {
-        for (const availableComputer of this.availableTextureHeightFieldComputers) {
-            const nextTask = this.textureHeightFieldQueue.shift();
+    updateCustom() {
+        for (const availableComputer of this.availableHeightField2x4Computers) {
+            const nextTask = this.custom2x4HeightFieldQueue.shift();
             if (nextTask === undefined) {
                 break;
-            }
-
-            const heightMap = textureAtlas.getHeightMap(nextTask.terrainModel.id);
-            if (heightMap.type !== "1x1") {
-                console.error(`Unsupported height map type: ${heightMap.type}`);
-                continue;
             }
 
             const positions = availableComputer.dispatch(
@@ -214,9 +258,36 @@ export class ChunkForgeCompute {
                 nextTask.sphereRadius,
                 nextTask.size,
                 {
-                    maxHeight: nextTask.terrainModel.heightRange.max,
-                    minHeight: nextTask.terrainModel.heightRange.min,
-                    heightMap: heightMap,
+                    maxHeight: nextTask.heightRange.max,
+                    minHeight: nextTask.heightRange.min,
+                    heightMap: nextTask.heightMap,
+                },
+                this.engine,
+            );
+
+            this.normalQueue.push({
+                onFinish: nextTask.onFinish,
+                positions,
+            });
+        }
+
+        for (const availableComputer of this.availableHeightField1x1Computers) {
+            const nextTask = this.custom1x1HeightFieldQueue.shift();
+            if (nextTask === undefined) {
+                break;
+            }
+
+            const positions = availableComputer.dispatch(
+                nextTask.positionOnCube,
+                nextTask.positionOnSphere,
+                this.rowVertexCount,
+                nextTask.direction,
+                nextTask.sphereRadius,
+                nextTask.size,
+                {
+                    maxHeight: nextTask.heightRange.max,
+                    minHeight: nextTask.heightRange.min,
+                    heightMap: nextTask.heightMap,
                 },
                 this.engine,
             );
@@ -256,9 +327,9 @@ export class ChunkForgeCompute {
         }
     }
 
-    update(heightMapAtlas: IPlanetHeightMapAtlas) {
+    update() {
         this.updateProcedural();
-        this.updateCustom(heightMapAtlas);
+        this.updateCustom();
         this.updateNormals();
         this.applyAllReady();
     }
