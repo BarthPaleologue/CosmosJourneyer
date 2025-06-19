@@ -218,6 +218,7 @@ export class SphericalHeightFieldChunk {
                     this.status = ChunkLoadingStatus.COMPLETED;
                     this.mesh.setEnabled(true);
                 },
+                this.mesh.name,
                 this.positionOnCube,
                 this.mesh.position,
                 this.direction,
