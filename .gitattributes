@@ -19,3 +19,4 @@ src/asset/sol/textures/earthHeightMap2x4/1_1.png filter=lfs diff=lfs merge=lfs -
 src/asset/sol/textures/earthHeightMap2x4/1_2.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap2x4/1_3.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap2x4/0_0.png filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/moonHeightMap8k.png filter=lfs diff=lfs merge=lfs -text
