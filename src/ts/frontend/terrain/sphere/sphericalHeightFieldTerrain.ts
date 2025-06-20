@@ -35,8 +35,8 @@ export class SphericalHeightFieldTerrain implements Transformable {
 
     private readonly sides: FixedLengthArray<SphericalHeightFieldChunk, 6>;
 
-    constructor(sphereRadius: number, model: TerrainModel, material: Material, scene: Scene) {
-        this.transform = new TransformNode("SphericalHeightFieldTerrain", scene);
+    constructor(id: string, sphereRadius: number, model: TerrainModel, material: Material, scene: Scene) {
+        this.transform = new TransformNode(id, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
         const indices: ChunkIndices = {

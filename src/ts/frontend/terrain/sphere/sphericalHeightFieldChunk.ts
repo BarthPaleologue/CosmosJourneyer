@@ -76,7 +76,7 @@ export class SphericalHeightFieldChunk {
         material: Material,
         scene: Scene,
     ) {
-        this.mesh = new Mesh(`SphericalHeightFieldSide[${direction};${JSON.stringify(indices)}]`, scene);
+        this.mesh = new Mesh(`${parent.name}Chunk[${direction};${JSON.stringify(indices)}]`, scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
         this.mesh.material = material;
