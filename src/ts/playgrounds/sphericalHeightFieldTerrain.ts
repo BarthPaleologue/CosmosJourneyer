@@ -90,7 +90,13 @@ export async function createSphericalHeightFieldTerrain(
         id: "earth",
     };
 
-    const terrain = new SphericalHeightFieldTerrain(earthRadius, terrainModel, material, scene);
+    const terrain = new SphericalHeightFieldTerrain(
+        "SphericalHeightFieldTerrain",
+        earthRadius,
+        terrainModel,
+        material,
+        scene,
+    );
 
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps);
 
