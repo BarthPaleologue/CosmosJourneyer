@@ -107,6 +107,11 @@ export class SphericalHeightFieldChunk {
     }
 
     setVertexData(vertexData: ChunkForgeOutput, rowVertexCount: number, engine: AbstractEngine) {
+        // see https://forum.babylonjs.com/t/how-to-share-webgpu-index-buffer-between-meshes/58902/2
+        vertexData.gpu.positions.getBuffer().references++;
+        vertexData.gpu.normals.getBuffer().references++;
+        vertexData.gpu.indices.getBuffer().references++;
+
         const positionsVertexBuffer = new VertexBuffer(
             engine,
             vertexData.gpu.positions.getBuffer(),
@@ -128,7 +133,6 @@ export class SphericalHeightFieldChunk {
         );
         this.mesh.setVerticesBuffer(normalsVertexBuffer);
 
-        vertexData.gpu.indices.getBuffer().references++;
         this.mesh.setIndexBuffer(
             vertexData.gpu.indices.getBuffer(),
             rowVertexCount * rowVertexCount,
