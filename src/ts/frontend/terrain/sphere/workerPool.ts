@@ -91,4 +91,10 @@ export class WorkerPool<TTask, TWorker, TOutput> {
 
         return result;
     }
+
+    public reset() {
+        this.tasks.length = 0;
+        this.outputs.length = 0;
+        this.currentWorkLoad.clear();
+    }
 }

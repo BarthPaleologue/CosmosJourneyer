@@ -486,6 +486,18 @@ export class ChunkForgeCompute {
         this.applyAllReady();
     }
 
+    public reset() {
+        this.proceduralHeightFieldComputePool.reset();
+        this.custom1x1HeightFieldComputePool.reset();
+        this.custom2x4HeightFieldComputePool.reset();
+        this.normalComputePool.reset();
+
+        this.cache.positions.clear();
+        this.cache.normals.clear();
+
+        this.applyQueue.length = 0;
+    }
+
     private runApplyTask(task: ApplyTask) {
         const { onFinish, positions, normals } = task;
 
