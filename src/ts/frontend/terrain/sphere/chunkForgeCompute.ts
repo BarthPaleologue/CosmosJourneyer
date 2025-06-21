@@ -117,14 +117,14 @@ export class ChunkForgeCompute {
 
     private readonly normalComputePool: NormalComputePool;
 
-    private readonly gridIndicesBufferCpu: Uint32Array;
-    private readonly gridIndicesBuffer: StorageBuffer;
+    private readonly gridIndices: {
+        gpu: StorageBuffer;
+        cpu: Uint32Array;
+    };
 
     private readonly cache: ChunkCache;
 
     private readonly applyQueue: Array<ApplyTask> = [];
-
-    private readonly engine: WebGPUEngine;
 
     private readonly heightMapAtlas: IPlanetHeightMapAtlas;
 
@@ -137,12 +137,13 @@ export class ChunkForgeCompute {
             heightField2x4: Custom2x4HeightFieldComputePool;
             normal: NormalComputePool;
         },
-        gridIndicesBufferCpu: Uint32Array,
-        gridIndicesBuffer: StorageBuffer,
+        indices: {
+            gpu: StorageBuffer;
+            cpu: Uint32Array;
+        },
         cache: ChunkCache,
         rowVertexCount: number,
         heightMapAtlas: IPlanetHeightMapAtlas,
-        engine: WebGPUEngine,
     ) {
         this.proceduralHeightFieldComputePool = computers.heightFieldProcedural;
         this.custom1x1HeightFieldComputePool = computers.heightField1x1;
@@ -150,15 +151,13 @@ export class ChunkForgeCompute {
 
         this.normalComputePool = computers.normal;
 
-        this.gridIndicesBufferCpu = gridIndicesBufferCpu;
-        this.gridIndicesBuffer = gridIndicesBuffer;
+        this.gridIndices = indices;
 
         this.heightMapAtlas = heightMapAtlas;
 
         this.cache = cache;
 
         this.rowVertexCount = rowVertexCount;
-        this.engine = engine;
     }
 
     static async New(
@@ -383,12 +382,13 @@ export class ChunkForgeCompute {
                 heightField2x4: custom2x4HeightFieldComputePool,
                 normal: normalComputePool,
             },
-            gridIndexBufferCpu,
-            gridIndicesBuffer,
+            {
+                gpu: gridIndicesBuffer,
+                cpu: gridIndexBufferCpu,
+            },
             cache,
             rowVertexCount,
             heightMapAtlas,
-            engine,
         );
     }
 
@@ -503,7 +503,7 @@ export class ChunkForgeCompute {
 
         const vertexData = new VertexData();
         vertexData.positions = positions.cpu;
-        vertexData.indices = this.gridIndicesBufferCpu;
+        vertexData.indices = this.gridIndices.cpu;
         vertexData.normals = normals.cpu;
 
         onFinish({
@@ -511,7 +511,7 @@ export class ChunkForgeCompute {
             gpu: {
                 positions: positions.gpu,
                 normals: normals.gpu,
-                indices: this.gridIndicesBuffer,
+                indices: this.gridIndices.gpu,
             },
         });
     }
