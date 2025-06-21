@@ -29,6 +29,7 @@ import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMat
 
 import { ItemPool } from "@/utils/itemPool";
 
+import { HeightMap1x1, HeightMap2x4 } from "./heightMaps";
 import { LandingPadTexturePool } from "./landingPadTexturePool";
 
 import butterflyTexture from "@assets/butterfly.webp";
@@ -157,23 +158,11 @@ export type RingsTextures = {
     uranus: Texture;
 };
 
-export type HeightMap1x1 = {
-    type: "1x1";
-    texture: Texture;
-};
-
-export type HeightMap2x4 = {
-    type: "2x4";
-    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
-};
-
-export type HeightMap = HeightMap1x1 | HeightMap2x4;
-
 export type HeightMaps = {
     earth1x1: Readonly<HeightMap1x1>;
-    earth2x4: Readonly<HeightMap2x4>;
+    earth2x4: Readonly<HeightMap2x4<ImageBitmap>>;
     mars1x1: Readonly<HeightMap1x1>;
-    mars2x4: Readonly<HeightMap2x4>;
+    mars2x4: Readonly<HeightMap2x4<ImageBitmap>>;
 };
 
 export type Textures = {
@@ -222,6 +211,15 @@ export async function loadTextures(
             progressCallback(++loadedCount, totalCount, texture.name);
             return texture;
         });
+    };
+
+    const loadImageBitmap = async (url: string): Promise<ImageBitmap> => {
+        totalCount++;
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const bitmap = await createImageBitmap(blob);
+        progressCallback(++loadedCount, totalCount, url);
+        return bitmap;
     };
 
     const loadCubeTextureAsync = (name: string, url: string): Promise<CubeTexture> => {
@@ -326,25 +324,25 @@ export async function loadTextures(
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
-    const marsHeightMapPromise_0_0 = loadTextureAsync("MarsHeightMap_0_0", marsHeightMap_0_0);
-    const marsHeightMapPromise_0_1 = loadTextureAsync("MarsHeightMap_0_1", marsHeightMap_0_1);
-    const marsHeightMapPromise_0_2 = loadTextureAsync("MarsHeightMap_0_2", marsHeightMap_0_2);
-    const marsHeightMapPromise_0_3 = loadTextureAsync("MarsHeightMap_0_3", marsHeightMap_0_3);
-    const marsHeightMapPromise_1_0 = loadTextureAsync("MarsHeightMap_1_0", marsHeightMap_1_0);
-    const marsHeightMapPromise_1_1 = loadTextureAsync("MarsHeightMap_1_1", marsHeightMap_1_1);
-    const marsHeightMapPromise_1_2 = loadTextureAsync("MarsHeightMap_1_2", marsHeightMap_1_2);
-    const marsHeightMapPromise_1_3 = loadTextureAsync("MarsHeightMap_1_3", marsHeightMap_1_3);
+    const marsHeightMapPromise_0_0 = loadImageBitmap(marsHeightMap_0_0);
+    const marsHeightMapPromise_0_1 = loadImageBitmap(marsHeightMap_0_1);
+    const marsHeightMapPromise_0_2 = loadImageBitmap(marsHeightMap_0_2);
+    const marsHeightMapPromise_0_3 = loadImageBitmap(marsHeightMap_0_3);
+    const marsHeightMapPromise_1_0 = loadImageBitmap(marsHeightMap_1_0);
+    const marsHeightMapPromise_1_1 = loadImageBitmap(marsHeightMap_1_1);
+    const marsHeightMapPromise_1_2 = loadImageBitmap(marsHeightMap_1_2);
+    const marsHeightMapPromise_1_3 = loadImageBitmap(marsHeightMap_1_3);
 
     const marsHeightMapPromise1x1 = loadTextureAsync("MarsHeightMap1x1", marsHeightMap1x1);
 
-    const earthHeightMapPromise_0_0 = loadTextureAsync("EarthHeightMap_0_0", earthHeightMap2x4_0_0);
-    const earthHeightMapPromise_0_1 = loadTextureAsync("EarthHeightMap_0_1", earthHeightMap2x4_0_1);
-    const earthHeightMapPromise_0_2 = loadTextureAsync("EarthHeightMap_0_2", earthHeightMap2x4_0_2);
-    const earthHeightMapPromise_0_3 = loadTextureAsync("EarthHeightMap_0_3", earthHeightMap2x4_0_3);
-    const earthHeightMapPromise_1_0 = loadTextureAsync("EarthHeightMap_1_0", earthHeightMap2x4_1_0);
-    const earthHeightMapPromise_1_1 = loadTextureAsync("EarthHeightMap_1_1", earthHeightMap2x4_1_1);
-    const earthHeightMapPromise_1_2 = loadTextureAsync("EarthHeightMap_1_2", earthHeightMap2x4_1_2);
-    const earthHeightMapPromise_1_3 = loadTextureAsync("EarthHeightMap_1_3", earthHeightMap2x4_1_3);
+    const earthHeightMapPromise_0_0 = loadImageBitmap(earthHeightMap2x4_0_0);
+    const earthHeightMapPromise_0_1 = loadImageBitmap(earthHeightMap2x4_0_1);
+    const earthHeightMapPromise_0_2 = loadImageBitmap(earthHeightMap2x4_0_2);
+    const earthHeightMapPromise_0_3 = loadImageBitmap(earthHeightMap2x4_0_3);
+    const earthHeightMapPromise_1_0 = loadImageBitmap(earthHeightMap2x4_1_0);
+    const earthHeightMapPromise_1_1 = loadImageBitmap(earthHeightMap2x4_1_1);
+    const earthHeightMapPromise_1_2 = loadImageBitmap(earthHeightMap2x4_1_2);
+    const earthHeightMapPromise_1_3 = loadImageBitmap(earthHeightMap2x4_1_3);
 
     const earthHeightMapPromise1x1 = loadTextureAsync("EarthHeightMap1x1", earthHeightMap1x1);
 
