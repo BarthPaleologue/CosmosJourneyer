@@ -99,7 +99,9 @@ export async function createSphericalHeightFieldTerrain(
         scene,
     );
 
-    const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps);
+    const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps, scene);
+
+    heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {
