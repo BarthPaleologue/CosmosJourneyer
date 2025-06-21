@@ -37,7 +37,7 @@ import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 import { WorkerPool } from "./workerPool";
 
-type ChunkId = string;
+export type ChunkId = `${string}->d${Direction}->l${number}->[x${number};y${number}]`;
 
 type HeightFieldTask = {
     id: ChunkId;
@@ -52,13 +52,15 @@ type ProceduralHeightFieldTask = HeightFieldTask & {
     terrainModel: ProceduralTerrainModel;
 };
 
-type Custom1x1HeightFieldTask = HeightFieldTask & {
+type CustomHeightFieldTask = HeightFieldTask & {
     heightRange: { min: number; max: number };
+};
+
+type Custom1x1HeightFieldTask = CustomHeightFieldTask & {
     heightMap: HeightMap1x1;
 };
 
-type Custom2x4HeightFieldTask = HeightFieldTask & {
-    heightRange: { min: number; max: number };
+type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
     heightMap: HeightMap2x4;
 };
 
@@ -67,9 +69,7 @@ type NormalTask = {
     positions: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
-type ApplyTask = {
-    id: ChunkId;
-    positions: { gpu: StorageBuffer; cpu: Float32Array };
+type ApplyTask = NormalTask & {
     normals: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
@@ -389,7 +389,7 @@ export class ChunkForgeCompute {
     }
 
     public addBuildTask(
-        id: string,
+        id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
         direction: Direction,

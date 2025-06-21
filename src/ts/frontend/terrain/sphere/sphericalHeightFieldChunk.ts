@@ -28,7 +28,7 @@ import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 import { Direction, getQuaternionFromDirection } from "@/utils/direction";
 import { FixedLengthArray } from "@/utils/types";
 
-import { ChunkForgeCompute, ChunkForgeFinalOutput, ChunkForgeOutput } from "./chunkForgeCompute";
+import { ChunkForgeCompute, ChunkForgeFinalOutput, ChunkForgeOutput, ChunkId } from "./chunkForgeCompute";
 
 const ChunkLoadingState = {
     NOT_STARTED: 0,
@@ -45,6 +45,8 @@ export type ChunkIndices = {
 };
 
 export class SphericalHeightFieldChunk {
+    readonly id: ChunkId;
+
     readonly mesh: Mesh;
 
     private readonly direction: Direction;
@@ -76,7 +78,9 @@ export class SphericalHeightFieldChunk {
         material: Material,
         scene: Scene,
     ) {
-        this.mesh = new Mesh(`${parent.name}Chunk[${direction};${JSON.stringify(indices)}]`, scene);
+        this.id = `${parent.name}->d${direction}->l${indices.lod}->[x${indices.x};y${indices.y}]`;
+
+        this.mesh = new Mesh(this.id, scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
         this.mesh.material = material;
@@ -213,7 +217,7 @@ export class SphericalHeightFieldChunk {
             return;
         }
 
-        const cachedVertexData = chunkForge.getOutput(this.mesh.name);
+        const cachedVertexData = chunkForge.getOutput(this.id);
         if (cachedVertexData !== undefined) {
             if (cachedVertexData.type === "chunkForgePendingOutput") {
                 return;
@@ -228,7 +232,7 @@ export class SphericalHeightFieldChunk {
         this.loadingState = ChunkLoadingState.IN_PROGRESS;
 
         chunkForge.addBuildTask(
-            this.mesh.name,
+            this.id,
             this.positionOnCube,
             this.mesh.position,
             this.direction,
