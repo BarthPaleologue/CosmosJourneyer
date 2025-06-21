@@ -225,7 +225,7 @@ export class SphericalHeightFieldChunk {
 
         this.loadingState = "in_progress";
 
-        chunkForge.addBuildTask(
+        chunkForge.pushTask(
             this.id,
             this.positionOnCube,
             this.mesh.position,

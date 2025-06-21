@@ -113,6 +113,10 @@ type ChunkCache = {
     normals: Map<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
 };
 
+/**
+ * ChunkForgeCompute is responsible for creating vertex data for spherical height field terrain chunks.
+ * This implementation uses WebGPU compute shaders.
+ */
 export class ChunkForgeCompute {
     private readonly proceduralHeightFieldComputePool: ProceduralHeightFieldComputePool;
     private readonly custom1x1HeightFieldComputePool: Custom1x1HeightFieldComputePool;
@@ -135,7 +139,15 @@ export class ChunkForgeCompute {
 
     readonly rowVertexCount: PowerOfTwo;
 
-    static async New(
+    /**
+     * Creates a new instance of ChunkForgeCompute.
+     * @param nbComputeShaders The number of compute shaders that can be dispatched in parallel.
+     * @param rowVertexCount The number of vertices in a row of the height field.
+     * @param heightMapAtlas The atlas providing height maps for custom terrain models.
+     * @param engine A WebGPUEngine instance to use for GPU operations.
+     * @returns A promise wrapping a Result containing the ChunkForgeCompute instance or an error.
+     */
+    public static async New(
         nbComputeShaders: number,
         rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
@@ -149,7 +161,7 @@ export class ChunkForgeCompute {
         }
     }
 
-    static async NewUnsafe(
+    private static async NewUnsafe(
         nbComputeShaders: number,
         rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
@@ -379,7 +391,17 @@ export class ChunkForgeCompute {
         this.rowVertexCount = rowVertexCount;
     }
 
-    public addBuildTask(
+    /**
+     * Adds a new task to the forge.
+     * @param id The unique id of the chunk
+     * @param positionOnCube The position of the chunk on the cube
+     * @param positionOnSphere The position of the chunk on the spherized cube
+     * @param direction The cube side direction
+     * @param size The size of the chunk in meters
+     * @param sphereRadius The radius of the sphere in meters
+     * @param terrainModel The model to use for the terrain generation.
+     */
+    public pushTask(
         id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
@@ -467,12 +489,18 @@ export class ChunkForgeCompute {
         }
     }
 
+    /**
+     * Assigns tasks to available compute shaders and processes the results.
+     */
     public update() {
         this.updatePositions();
         this.updateNormals();
         this.applyAllReady();
     }
 
+    /**
+     * Empties the forge, resetting all compute pools and clearing the cache.
+     */
     public reset() {
         this.proceduralHeightFieldComputePool.reset();
         this.custom1x1HeightFieldComputePool.reset();
@@ -487,6 +515,10 @@ export class ChunkForgeCompute {
         this.applyQueue.length = 0;
     }
 
+    /**
+     * @param id The unique id of the chunk to retrieve the output for.
+     * @returns The output stored in the forge for the given chunk. Will be undefined if the chunk has not been added to the forge yet.
+     */
     public getOutput(id: ChunkId): ChunkForgeOutput | undefined {
         return this.outputs.get(id);
     }
