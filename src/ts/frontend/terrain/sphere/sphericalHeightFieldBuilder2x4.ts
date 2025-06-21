@@ -19,11 +19,12 @@ import { StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { ComputeShader } from "@babylonjs/core/Compute/computeShader";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { TextureSampler } from "@babylonjs/core/Materials/Textures/textureSampler";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { type HeightMap2x4 } from "@/frontend/assets/textures/heightmaps/types";
+import { type HeightMap2x4 } from "@/frontend/assets/heightMaps";
 
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
@@ -105,7 +106,7 @@ export class SphericalHeightFieldBuilder2x4 {
         sphereRadius: number,
         size: number,
         terrainModel: {
-            heightMap: HeightMap2x4;
+            heightMap: HeightMap2x4<Texture>;
             minHeight: number;
             maxHeight: number;
         },

@@ -23,7 +23,7 @@ import { TextureSampler } from "@babylonjs/core/Materials/Textures/textureSample
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { type HeightMap1x1 } from "@/frontend/assets/textures/heightmaps/types";
+import { type HeightMap1x1 } from "@/frontend/assets/heightMaps";
 
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";

@@ -17,6 +17,7 @@
 
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import {
@@ -25,8 +26,8 @@ import {
     type TerrainModel,
 } from "@/backend/universe/orbitalObjects/terrainModel";
 
+import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/heightMaps";
 import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures/heightmaps/types";
 
 import { type Direction } from "@/utils/direction";
 import { err, ok, type PowerOfTwo, type Result } from "@/utils/types";
@@ -62,7 +63,7 @@ type Custom1x1HeightFieldTask = CustomHeightFieldTask & {
 };
 
 type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
-    heightMap: HeightMap2x4;
+    heightMap: HeightMap2x4<Texture>;
 };
 
 type NormalTask = {
@@ -502,12 +503,39 @@ export class ChunkForgeCompute {
      * Empties the forge, resetting all compute pools and clearing the cache.
      */
     public reset() {
+        const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
+        for (const output of proceduralHeightFieldOutputs) {
+            output.positions.gpu.dispose();
+        }
         this.proceduralHeightFieldComputePool.reset();
+
+        const custom1x1HeightFieldOutputs = this.custom1x1HeightFieldComputePool.consumeOutputs();
+        for (const output of custom1x1HeightFieldOutputs) {
+            output.positions.gpu.dispose();
+        }
         this.custom1x1HeightFieldComputePool.reset();
+
+        const custom2x4HeightFieldOutputs = this.custom2x4HeightFieldComputePool.consumeOutputs();
+        for (const output of custom2x4HeightFieldOutputs) {
+            output.positions.gpu.dispose();
+        }
         this.custom2x4HeightFieldComputePool.reset();
+
+        const normalOutputs = this.normalComputePool.consumeOutputs();
+        for (const output of normalOutputs) {
+            output.normals.gpu.dispose();
+            output.positions.gpu.dispose();
+        }
         this.normalComputePool.reset();
 
+        for (const cachedPosition of this.cache.positions.values()) {
+            cachedPosition.gpu.dispose();
+        }
         this.cache.positions.clear();
+
+        for (const cachedNormal of this.cache.normals.values()) {
+            cachedNormal.gpu.dispose();
+        }
         this.cache.normals.clear();
 
         this.outputs.clear();
