@@ -35,13 +35,7 @@ import {
     type ChunkId,
 } from "./chunkForgeCompute";
 
-const ChunkLoadingState = {
-    NOT_STARTED: 0,
-    IN_PROGRESS: 1,
-    COMPLETED: 2,
-} as const;
-
-type ChunkLoadingState = (typeof ChunkLoadingState)[keyof typeof ChunkLoadingState];
+type ChunkLoadingState = "not_started" | "in_progress" | "completed";
 
 export type ChunkIndices = {
     x: number;
@@ -50,9 +44,9 @@ export type ChunkIndices = {
 };
 
 export class SphericalHeightFieldChunk {
-    readonly id: ChunkId;
+    private readonly id: ChunkId;
 
-    readonly mesh: Mesh;
+    private readonly mesh: Mesh;
 
     private readonly direction: Direction;
 
@@ -60,9 +54,9 @@ export class SphericalHeightFieldChunk {
 
     private readonly size: number;
 
-    private loadingState: ChunkLoadingState = ChunkLoadingState.NOT_STARTED;
+    private loadingState: ChunkLoadingState = "not_started";
 
-    private indices: ChunkIndices;
+    private readonly indices: ChunkIndices;
 
     private children: FixedLengthArray<SphericalHeightFieldChunk, 4> | null = null;
 
@@ -92,7 +86,7 @@ export class SphericalHeightFieldChunk {
 
         this.parent = parent;
 
-        this.indices = indices;
+        this.indices = { ...indices };
 
         this.terrainModel = terrainModel;
 
@@ -115,7 +109,7 @@ export class SphericalHeightFieldChunk {
         this.size = (radius * 2) / 2 ** indices.lod;
     }
 
-    setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
+    private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
         // see https://forum.babylonjs.com/t/how-to-share-webgpu-index-buffer-between-meshes/58902/2
         vertexData.positions.gpu.getBuffer().references++;
         vertexData.normals.gpu.getBuffer().references++;
@@ -218,7 +212,7 @@ export class SphericalHeightFieldChunk {
     }
 
     private updateLoadingState(chunkForge: ChunkForgeCompute) {
-        if (this.loadingState === ChunkLoadingState.COMPLETED) {
+        if (this.loadingState === "completed") {
             return;
         }
 
@@ -229,12 +223,12 @@ export class SphericalHeightFieldChunk {
             }
 
             this.setVertexData(cachedVertexData, chunkForge.rowVertexCount, this.mesh.getScene().getEngine());
-            this.loadingState = ChunkLoadingState.COMPLETED;
+            this.loadingState = "completed";
             this.mesh.setEnabled(true);
             return;
         }
 
-        this.loadingState = ChunkLoadingState.IN_PROGRESS;
+        this.loadingState = "in_progress";
 
         chunkForge.addBuildTask(
             this.id,
@@ -247,7 +241,7 @@ export class SphericalHeightFieldChunk {
         );
     }
 
-    update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
+    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
         this.updateLoadingState(chunkForge);
 
         const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
@@ -266,7 +260,7 @@ export class SphericalHeightFieldChunk {
                 child.dispose();
             }
             this.children = null;
-            this.loadingState = ChunkLoadingState.COMPLETED;
+            this.loadingState = "completed";
             this.mesh.setEnabled(true);
         }
 
@@ -274,15 +268,12 @@ export class SphericalHeightFieldChunk {
             child.update(cameraPosition, material, chunkForge);
         }
 
-        if (
-            this.children !== null &&
-            this.children.every((child) => child.loadingState === ChunkLoadingState.COMPLETED)
-        ) {
+        if (this.children !== null && this.children.every((child) => child.loadingState === "completed")) {
             this.mesh.setEnabled(false);
         }
     }
 
-    dispose(): void {
+    public dispose(): void {
         this.mesh.dispose();
         this.children?.forEach((child) => {
             child.dispose();
