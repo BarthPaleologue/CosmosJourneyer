@@ -29,6 +29,7 @@ import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtl
 import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures/heightmaps/types";
 
 import { type Direction } from "@/utils/direction";
+import { err, ok, type Result } from "@/utils/types";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
@@ -134,37 +135,21 @@ export class ChunkForgeCompute {
 
     readonly rowVertexCount: number;
 
-    private constructor(
-        computers: {
-            heightFieldProcedural: ProceduralHeightFieldComputePool;
-            heightField1x1: Custom1x1HeightFieldComputePool;
-            heightField2x4: Custom2x4HeightFieldComputePool;
-            normal: NormalComputePool;
-        },
-        indices: {
-            gpu: StorageBuffer;
-            cpu: Uint32Array;
-        },
-        cache: ChunkCache,
+    static async New(
+        nbComputeShaders: number,
         rowVertexCount: number,
         heightMapAtlas: IPlanetHeightMapAtlas,
-    ) {
-        this.proceduralHeightFieldComputePool = computers.heightFieldProcedural;
-        this.custom1x1HeightFieldComputePool = computers.heightField1x1;
-        this.custom2x4HeightFieldComputePool = computers.heightField2x4;
-
-        this.normalComputePool = computers.normal;
-
-        this.gridIndices = indices;
-
-        this.heightMapAtlas = heightMapAtlas;
-
-        this.cache = cache;
-
-        this.rowVertexCount = rowVertexCount;
+        engine: WebGPUEngine,
+    ): Promise<Result<ChunkForgeCompute, unknown>> {
+        try {
+            return ok(await ChunkForgeCompute.NewUnsafe(nbComputeShaders, rowVertexCount, heightMapAtlas, engine));
+        } catch (error) {
+            console.error("Failed to create ChunkForgeCompute:", error);
+            return err(error);
+        }
     }
 
-    static async New(
+    static async NewUnsafe(
         nbComputeShaders: number,
         rowVertexCount: number,
         heightMapAtlas: IPlanetHeightMapAtlas,
@@ -362,6 +347,36 @@ export class ChunkForgeCompute {
             rowVertexCount,
             heightMapAtlas,
         );
+    }
+
+    private constructor(
+        computers: {
+            heightFieldProcedural: ProceduralHeightFieldComputePool;
+            heightField1x1: Custom1x1HeightFieldComputePool;
+            heightField2x4: Custom2x4HeightFieldComputePool;
+            normal: NormalComputePool;
+        },
+        indices: {
+            gpu: StorageBuffer;
+            cpu: Uint32Array;
+        },
+        cache: ChunkCache,
+        rowVertexCount: number,
+        heightMapAtlas: IPlanetHeightMapAtlas,
+    ) {
+        this.proceduralHeightFieldComputePool = computers.heightFieldProcedural;
+        this.custom1x1HeightFieldComputePool = computers.heightField1x1;
+        this.custom2x4HeightFieldComputePool = computers.heightField2x4;
+
+        this.normalComputePool = computers.normal;
+
+        this.gridIndices = indices;
+
+        this.heightMapAtlas = heightMapAtlas;
+
+        this.cache = cache;
+
+        this.rowVertexCount = rowVertexCount;
     }
 
     public addBuildTask(
