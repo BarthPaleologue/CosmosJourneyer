@@ -48,7 +48,7 @@ export class WorkerPool<TTask, TWorker, TOutput> {
         return new WorkerPool<TTask, TWorker, TOutput>(workers, dispatchWorker);
     }
 
-    public push(...tasks: Array<TTask>) {
+    public push(...tasks: ReadonlyArray<TTask>) {
         this.tasks.push(...tasks);
     }
 
