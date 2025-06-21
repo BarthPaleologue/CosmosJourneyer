@@ -87,20 +87,12 @@ export type ChunkForgeOutput = {
 type ProceduralHeightFieldComputePool = WorkerPool<
     ProceduralHeightFieldTask,
     SphericalProceduralHeightFieldBuilder,
-    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
+    NormalTask
 >;
 
-type Custom1x1HeightFieldComputePool = WorkerPool<
-    Custom1x1HeightFieldTask,
-    SphericalHeightFieldBuilder1x1,
-    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
->;
+type Custom1x1HeightFieldComputePool = WorkerPool<Custom1x1HeightFieldTask, SphericalHeightFieldBuilder1x1, NormalTask>;
 
-type Custom2x4HeightFieldComputePool = WorkerPool<
-    Custom2x4HeightFieldTask,
-    SphericalHeightFieldBuilder2x4,
-    { gpu: StorageBuffer; cpu: Float32Array; id: string; onFinish: (output: ChunkForgeOutput) => void }
->;
+type Custom2x4HeightFieldComputePool = WorkerPool<Custom2x4HeightFieldTask, SphericalHeightFieldBuilder2x4, NormalTask>;
 
 type NormalComputePool = WorkerPool<
     NormalTask,
@@ -190,8 +182,10 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        gpu: cachedValue.gpu,
-                        cpu: cachedValue.cpu,
+                        positions: {
+                            gpu: cachedValue.gpu,
+                            cpu: cachedValue.cpu,
+                        },
                         onFinish: task.onFinish,
                     };
                 }
@@ -217,8 +211,10 @@ export class ChunkForgeCompute {
 
                 return {
                     id: task.id,
-                    gpu: positions,
-                    cpu: positionsCpu,
+                    positions: {
+                        gpu: positions,
+                        cpu: positionsCpu,
+                    },
                     onFinish: task.onFinish,
                 };
             },
@@ -234,8 +230,10 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        gpu: cachedValue.gpu,
-                        cpu: cachedValue.cpu,
+                        positions: {
+                            gpu: cachedValue.gpu,
+                            cpu: cachedValue.cpu,
+                        },
                         onFinish: task.onFinish,
                     };
                 }
@@ -266,8 +264,10 @@ export class ChunkForgeCompute {
 
                 return {
                     id: task.id,
-                    gpu: positions,
-                    cpu: positionsCpu,
+                    positions: {
+                        gpu: positions,
+                        cpu: positionsCpu,
+                    },
                     onFinish: task.onFinish,
                 };
             },
@@ -283,8 +283,10 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        gpu: cachedValue.gpu,
-                        cpu: cachedValue.cpu,
+                        positions: {
+                            gpu: cachedValue.gpu,
+                            cpu: cachedValue.cpu,
+                        },
                         onFinish: task.onFinish,
                     };
                 }
@@ -315,8 +317,10 @@ export class ChunkForgeCompute {
 
                 return {
                     id: task.id,
-                    gpu: positions,
-                    cpu: positionsCpu,
+                    positions: {
+                        gpu: positions,
+                        cpu: positionsCpu,
+                    },
                     onFinish: task.onFinish,
                 };
             },
@@ -442,14 +446,7 @@ export class ChunkForgeCompute {
         this.proceduralHeightFieldComputePool.update();
         const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
         for (const output of proceduralHeightFieldOutputs) {
-            this.normalComputePool.addTask({
-                onFinish: output.onFinish,
-                id: output.id,
-                positions: {
-                    gpu: output.gpu,
-                    cpu: output.cpu,
-                },
-            });
+            this.normalComputePool.addTask(output);
         }
     }
 
@@ -457,27 +454,13 @@ export class ChunkForgeCompute {
         this.custom2x4HeightFieldComputePool.update();
         const custom2x4HeightFieldOutputs = this.custom2x4HeightFieldComputePool.consumeOutputs();
         for (const output of custom2x4HeightFieldOutputs) {
-            this.normalComputePool.addTask({
-                onFinish: output.onFinish,
-                id: output.id,
-                positions: {
-                    gpu: output.gpu,
-                    cpu: output.cpu,
-                },
-            });
+            this.normalComputePool.addTask(output);
         }
 
         this.custom1x1HeightFieldComputePool.update();
         const custom1x1HeightFieldOutputs = this.custom1x1HeightFieldComputePool.consumeOutputs();
         for (const output of custom1x1HeightFieldOutputs) {
-            this.normalComputePool.addTask({
-                onFinish: output.onFinish,
-                id: output.id,
-                positions: {
-                    gpu: output.gpu,
-                    cpu: output.cpu,
-                },
-            });
+            this.normalComputePool.addTask(output);
         }
     }
 
