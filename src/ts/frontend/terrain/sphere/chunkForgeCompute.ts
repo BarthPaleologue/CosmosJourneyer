@@ -29,7 +29,7 @@ import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtl
 import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures/heightmaps/types";
 
 import { type Direction } from "@/utils/direction";
-import { err, ok, type Result } from "@/utils/types";
+import { err, ok, type PowerOfTwo, type Result } from "@/utils/types";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
@@ -133,11 +133,11 @@ export class ChunkForgeCompute {
 
     private readonly heightMapAtlas: IPlanetHeightMapAtlas;
 
-    readonly rowVertexCount: number;
+    readonly rowVertexCount: PowerOfTwo;
 
     static async New(
         nbComputeShaders: number,
-        rowVertexCount: number,
+        rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ): Promise<Result<ChunkForgeCompute, unknown>> {
@@ -151,7 +151,7 @@ export class ChunkForgeCompute {
 
     static async NewUnsafe(
         nbComputeShaders: number,
-        rowVertexCount: number,
+        rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ) {
@@ -361,7 +361,7 @@ export class ChunkForgeCompute {
             cpu: Uint32Array;
         },
         cache: ChunkCache,
-        rowVertexCount: number,
+        rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
     ) {
         this.proceduralHeightFieldComputePool = computers.heightFieldProcedural;
