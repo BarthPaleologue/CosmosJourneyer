@@ -48,8 +48,8 @@ export class WorkerPool<TTask, TWorker, TOutput> {
         return new WorkerPool<TTask, TWorker, TOutput>(workers, dispatchWorker);
     }
 
-    public addTask(task: TTask) {
-        this.tasks.push(task);
+    public push(...tasks: Array<TTask>) {
+        this.tasks.push(...tasks);
     }
 
     public update() {
