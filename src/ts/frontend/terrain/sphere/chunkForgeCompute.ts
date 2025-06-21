@@ -467,7 +467,12 @@ export class ChunkForgeCompute {
                 break;
             }
 
-            this.runApplyTask(nextTask);
+            this.outputs.set(nextTask.id, {
+                type: "chunkForgeFinalOutput",
+                positions: nextTask.positions,
+                normals: nextTask.normals,
+                indices: this.gridIndices,
+            });
         }
     }
 
@@ -493,16 +498,5 @@ export class ChunkForgeCompute {
 
     public getOutput(id: ChunkId): ChunkForgeOutput | undefined {
         return this.outputs.get(id);
-    }
-
-    private runApplyTask(task: ApplyTask) {
-        const { positions, normals } = task;
-
-        this.outputs.set(task.id, {
-            type: "chunkForgeFinalOutput",
-            positions,
-            normals,
-            indices: this.gridIndices,
-        });
     }
 }
