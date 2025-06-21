@@ -392,7 +392,7 @@ export class ChunkForgeCompute {
         );
     }
 
-    addBuildTask(
+    public addBuildTask(
         onFinish: (output: ChunkForgeOutput) => void,
         id: string,
         positionOnCube: Vector3,
@@ -442,13 +442,11 @@ export class ChunkForgeCompute {
         }
     }
 
-    updateProcedural() {
+    private updatePositions() {
         this.proceduralHeightFieldComputePool.update();
         const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
         this.normalComputePool.push(...proceduralHeightFieldOutputs);
-    }
 
-    updateCustom() {
         this.custom2x4HeightFieldComputePool.update();
         const custom2x4HeightFieldOutputs = this.custom2x4HeightFieldComputePool.consumeOutputs();
         this.normalComputePool.push(...custom2x4HeightFieldOutputs);
@@ -458,7 +456,7 @@ export class ChunkForgeCompute {
         this.normalComputePool.push(...custom1x1HeightFieldOutputs);
     }
 
-    updateNormals() {
+    private updateNormals() {
         this.normalComputePool.update();
         const normalOutputs = this.normalComputePool.consumeOutputs();
         for (const output of normalOutputs) {
@@ -471,7 +469,7 @@ export class ChunkForgeCompute {
         }
     }
 
-    applyAllReady() {
+    private applyAllReady() {
         while (this.applyQueue.length > 0) {
             const nextTask = this.applyQueue.shift();
             if (nextTask === undefined) {
@@ -482,9 +480,8 @@ export class ChunkForgeCompute {
         }
     }
 
-    update() {
-        this.updateProcedural();
-        this.updateCustom();
+    public update() {
+        this.updatePositions();
         this.updateNormals();
         this.applyAllReady();
     }
