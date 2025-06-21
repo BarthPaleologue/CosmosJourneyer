@@ -185,14 +185,11 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: {
-                            gpu: cachedValue.gpu,
-                            cpu: cachedValue.cpu,
-                        },
+                        positions: cachedValue,
                     };
                 }
 
-                const positions = worker.dispatch(
+                const positionsGpu = worker.dispatch(
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
@@ -202,21 +199,18 @@ export class ChunkForgeCompute {
                     engine,
                 );
 
-                const positionBufferView = await positions.read();
+                const positionBufferView = await positionsGpu.read();
 
-                const positionsCpu = new Float32Array(positionBufferView.buffer);
+                const positions = {
+                    gpu: positionsGpu,
+                    cpu: new Float32Array(positionBufferView.buffer),
+                };
 
-                cache.positions.set(task.id, {
-                    gpu: positions,
-                    cpu: positionsCpu,
-                });
+                cache.positions.set(task.id, positions);
 
                 return {
                     id: task.id,
-                    positions: {
-                        gpu: positions,
-                        cpu: positionsCpu,
-                    },
+                    positions,
                 };
             },
         );
@@ -231,14 +225,11 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: {
-                            gpu: cachedValue.gpu,
-                            cpu: cachedValue.cpu,
-                        },
+                        positions: cachedValue,
                     };
                 }
 
-                const positions = worker.dispatch(
+                const positionsGpu = worker.dispatch(
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
@@ -253,21 +244,18 @@ export class ChunkForgeCompute {
                     engine,
                 );
 
-                const positionBufferView = await positions.read();
+                const positionBufferView = await positionsGpu.read();
 
-                const positionsCpu = new Float32Array(positionBufferView.buffer);
+                const positions = {
+                    gpu: positionsGpu,
+                    cpu: new Float32Array(positionBufferView.buffer),
+                };
 
-                cache.positions.set(task.id, {
-                    gpu: positions,
-                    cpu: positionsCpu,
-                });
+                cache.positions.set(task.id, positions);
 
                 return {
                     id: task.id,
-                    positions: {
-                        gpu: positions,
-                        cpu: positionsCpu,
-                    },
+                    positions,
                 };
             },
         );
@@ -282,14 +270,11 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: {
-                            gpu: cachedValue.gpu,
-                            cpu: cachedValue.cpu,
-                        },
+                        positions: cachedValue,
                     };
                 }
 
-                const positions = worker.dispatch(
+                const positionsGpu = worker.dispatch(
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
@@ -304,21 +289,18 @@ export class ChunkForgeCompute {
                     engine,
                 );
 
-                const positionBufferView = await positions.read();
+                const positionBufferView = await positionsGpu.read();
 
-                const positionsCpu = new Float32Array(positionBufferView.buffer);
+                const positions = {
+                    gpu: positionsGpu,
+                    cpu: new Float32Array(positionBufferView.buffer),
+                };
 
-                cache.positions.set(task.id, {
-                    gpu: positions,
-                    cpu: positionsCpu,
-                });
+                cache.positions.set(task.id, positions);
 
                 return {
                     id: task.id,
-                    positions: {
-                        gpu: positions,
-                        cpu: positionsCpu,
-                    },
+                    positions,
                 };
             },
         );
@@ -333,31 +315,25 @@ export class ChunkForgeCompute {
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        normals: {
-                            gpu: cachedValue.gpu,
-                            cpu: cachedValue.cpu,
-                        },
+                        normals: cachedValue,
                         positions: task.positions,
                     };
                 }
 
-                const normals = worker.dispatch(rowVertexCount, task.positions.gpu, engine);
+                const normalsGpu = worker.dispatch(rowVertexCount, task.positions.gpu, engine);
 
-                const normalBufferView = await normals.read();
+                const normalBufferView = await normalsGpu.read();
 
-                const normalsCpu = new Float32Array(normalBufferView.buffer);
+                const normals = {
+                    gpu: normalsGpu,
+                    cpu: new Float32Array(normalBufferView.buffer),
+                };
 
-                cache.normals.set(task.id, {
-                    gpu: normals,
-                    cpu: normalsCpu,
-                });
+                cache.normals.set(task.id, normals);
 
                 return {
                     id: task.id,
-                    normals: {
-                        gpu: normals,
-                        cpu: normalsCpu,
-                    },
+                    normals,
                     positions: task.positions,
                 };
             },
