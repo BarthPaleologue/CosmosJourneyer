@@ -16,40 +16,127 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
-import type { HeightMaps } from "./textures/heightmaps";
-import type { HeightMap } from "./textures/heightmaps/types";
+import { type Result } from "@/utils/types";
 
+import { disposeHeightMap1x1, disposeHeightMap2x4, loadHeightMap2x4ToGpu, type HeightMap } from "./heightMaps";
+import { type HeightMaps } from "./textures/heightmaps";
+
+/**
+ * Interface for objects that can provide height maps for planets.
+ */
 export interface IPlanetHeightMapAtlas {
+    /**
+     * Synchronously load height maps corresponding to the given keys into GPU memory.
+     * @param keys An iterable of planet IDs for which to load height maps.
+     */
+    loadHeightMapsToGpu(keys: Iterable<CustomTerrainModel["id"]>): void;
+
+    /**
+     * @param key The key of the height map to retrieve.
+     * @returns The height map corresponding to the given key.
+     */
     getHeightMap(key: CustomTerrainModel["id"]): HeightMap;
+
+    /**
+     * Restores the initial state of the height map atlas.
+     * This will release all GPU resources acquired by calling `loadHeightMapsToGpu`.
+     */
+    reset(): void;
 }
 
 export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
     private readonly heightMaps: HeightMaps;
-    constructor(heightMaps: HeightMaps) {
+
+    private higherResolutionHeightMaps: Record<string, HeightMap> = {};
+
+    private readonly scene: Scene;
+
+    constructor(heightMaps: HeightMaps, scene: Scene) {
         this.heightMaps = heightMaps;
+        this.scene = scene;
+    }
+
+    loadHeightMapsToGpu(keys: Iterable<CustomTerrainModel["id"]>): void {
+        for (const key of keys) {
+            const result = this.preloadHeightMap(key);
+            if (result === undefined) {
+                continue;
+            }
+
+            if (!result.success) {
+                console.error(`Failed to preload height map for ${key}:`, result.error);
+                continue;
+            }
+
+            this.higherResolutionHeightMaps[key] = result.value;
+        }
+    }
+
+    private preloadHeightMap(key: CustomTerrainModel["id"]): Result<HeightMap, unknown> | undefined {
+        switch (key) {
+            case "mercury":
+                return;
+            case "venus":
+                return;
+            case "earth":
+                return loadHeightMap2x4ToGpu(key, this.heightMaps.earth2x4, this.scene);
+            case "moon":
+                return;
+            case "mars":
+                return loadHeightMap2x4ToGpu(key, this.heightMaps.mars2x4, this.scene);
+        }
+    }
+
+    reset(): void {
+        for (const heightMap of Object.values(this.higherResolutionHeightMaps)) {
+            switch (heightMap.type) {
+                case "2x4":
+                    disposeHeightMap2x4(heightMap);
+                    break;
+                case "1x1":
+                    disposeHeightMap1x1(heightMap);
+                    break;
+            }
+        }
+
+        this.higherResolutionHeightMaps = {};
     }
 
     getHeightMap(key: CustomTerrainModel["id"]): HeightMap {
+        const higherResolutionHeightMap = this.higherResolutionHeightMaps[key];
+        if (higherResolutionHeightMap !== undefined) {
+            return higherResolutionHeightMap;
+        }
+
         switch (key) {
             case "earth":
-                return this.heightMaps.earth2x4;
+                return this.heightMaps.earth1x1;
             case "mercury":
             case "venus":
             case "moon":
             case "mars":
-                return this.heightMaps.mars2x4;
+                return this.heightMaps.mars1x1;
         }
     }
 }
 
 export class PlanetHeightMapAtlasMock implements IPlanetHeightMapAtlas {
+    loadHeightMapsToGpu(): Promise<void> {
+        return Promise.resolve();
+    }
+
     getHeightMap(): HeightMap {
         return {
             type: "1x1",
             texture: new Texture(null, null),
         };
+    }
+
+    reset(): void {
+        // No-op for mock implementation
     }
 }

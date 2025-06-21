@@ -28,12 +28,7 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
-import {
-    type ChunkForgeCompute,
-    type ChunkForgeFinalOutput,
-    type ChunkForgeOutput,
-    type ChunkId,
-} from "./chunkForgeCompute";
+import { type ChunkForgeCompute, type ChunkForgeFinalOutput, type ChunkId } from "./chunkForgeCompute";
 
 type ChunkLoadingState = "not_started" | "in_progress" | "completed";
 
@@ -64,7 +59,7 @@ export class SphericalHeightFieldChunk {
 
     private readonly positionOnCube: Vector3;
 
-    private vertexData: ChunkForgeOutput | null = null;
+    private vertexData: ChunkForgeFinalOutput | null = null;
 
     private readonly terrainModel: TerrainModel;
 
@@ -111,6 +106,7 @@ export class SphericalHeightFieldChunk {
 
     private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
         // see https://forum.babylonjs.com/t/how-to-share-webgpu-index-buffer-between-meshes/58902/2
+        // the reference counter is automatically decremented when calling dispose on the mesh
         vertexData.positions.gpu.getBuffer().references++;
         vertexData.normals.gpu.getBuffer().references++;
         vertexData.indices.gpu.getBuffer().references++;
