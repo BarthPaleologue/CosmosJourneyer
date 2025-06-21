@@ -18,7 +18,6 @@
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
 import {
     type CustomTerrainModel,
@@ -38,9 +37,10 @@ import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 import { WorkerPool } from "./workerPool";
 
+type ChunkId = string;
+
 type HeightFieldTask = {
-    onFinish: (output: ChunkForgeOutput) => void;
-    id: string;
+    id: ChunkId;
     positionOnCube: Vector3;
     positionOnSphere: Vector3;
     size: number;
@@ -63,26 +63,37 @@ type Custom2x4HeightFieldTask = HeightFieldTask & {
 };
 
 type NormalTask = {
-    onFinish: (output: ChunkForgeOutput) => void;
-    id: string;
+    id: ChunkId;
     positions: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
 type ApplyTask = {
-    onFinish: (output: ChunkForgeOutput) => void;
-    id: string;
+    id: ChunkId;
     positions: { gpu: StorageBuffer; cpu: Float32Array };
     normals: { gpu: StorageBuffer; cpu: Float32Array };
 };
 
-export type ChunkForgeOutput = {
-    cpu: VertexData;
-    gpu: {
-        positions: StorageBuffer;
-        normals: StorageBuffer;
-        indices: StorageBuffer;
+export type ChunkForgePendingOutput = {
+    type: "chunkForgePendingOutput";
+};
+
+export type ChunkForgeFinalOutput = {
+    type: "chunkForgeFinalOutput";
+    positions: {
+        gpu: StorageBuffer;
+        cpu: Float32Array;
+    };
+    normals: {
+        gpu: StorageBuffer;
+        cpu: Float32Array;
+    };
+    indices: {
+        gpu: StorageBuffer;
+        cpu: Uint32Array;
     };
 };
+
+export type ChunkForgeOutput = ChunkForgeFinalOutput | ChunkForgePendingOutput;
 
 type ProceduralHeightFieldComputePool = WorkerPool<
     ProceduralHeightFieldTask,
@@ -94,20 +105,11 @@ type Custom1x1HeightFieldComputePool = WorkerPool<Custom1x1HeightFieldTask, Sphe
 
 type Custom2x4HeightFieldComputePool = WorkerPool<Custom2x4HeightFieldTask, SphericalHeightFieldBuilder2x4, NormalTask>;
 
-type NormalComputePool = WorkerPool<
-    NormalTask,
-    SquareGridNormalComputer,
-    {
-        normals: { gpu: StorageBuffer; cpu: Float32Array };
-        positions: { gpu: StorageBuffer; cpu: Float32Array };
-        id: string;
-        onFinish: (output: ChunkForgeOutput) => void;
-    }
->;
+type NormalComputePool = WorkerPool<NormalTask, SquareGridNormalComputer, ApplyTask>;
 
 type ChunkCache = {
-    positions: Map<string, { gpu: StorageBuffer; cpu: Float32Array }>;
-    normals: Map<string, { gpu: StorageBuffer; cpu: Float32Array }>;
+    positions: Map<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
+    normals: Map<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
 };
 
 export class ChunkForgeCompute {
@@ -123,6 +125,8 @@ export class ChunkForgeCompute {
     };
 
     private readonly cache: ChunkCache;
+
+    private readonly outputs: Map<ChunkId, ChunkForgeOutput> = new Map();
 
     private readonly applyQueue: Array<ApplyTask> = [];
 
@@ -185,7 +189,6 @@ export class ChunkForgeCompute {
                             gpu: cachedValue.gpu,
                             cpu: cachedValue.cpu,
                         },
-                        onFinish: task.onFinish,
                     };
                 }
 
@@ -214,7 +217,6 @@ export class ChunkForgeCompute {
                         gpu: positions,
                         cpu: positionsCpu,
                     },
-                    onFinish: task.onFinish,
                 };
             },
         );
@@ -233,7 +235,6 @@ export class ChunkForgeCompute {
                             gpu: cachedValue.gpu,
                             cpu: cachedValue.cpu,
                         },
-                        onFinish: task.onFinish,
                     };
                 }
 
@@ -267,7 +268,6 @@ export class ChunkForgeCompute {
                         gpu: positions,
                         cpu: positionsCpu,
                     },
-                    onFinish: task.onFinish,
                 };
             },
         );
@@ -286,7 +286,6 @@ export class ChunkForgeCompute {
                             gpu: cachedValue.gpu,
                             cpu: cachedValue.cpu,
                         },
-                        onFinish: task.onFinish,
                     };
                 }
 
@@ -320,7 +319,6 @@ export class ChunkForgeCompute {
                         gpu: positions,
                         cpu: positionsCpu,
                     },
-                    onFinish: task.onFinish,
                 };
             },
         );
@@ -340,7 +338,6 @@ export class ChunkForgeCompute {
                             cpu: cachedValue.cpu,
                         },
                         positions: task.positions,
-                        onFinish: task.onFinish,
                     };
                 }
 
@@ -362,7 +359,6 @@ export class ChunkForgeCompute {
                         cpu: normalsCpu,
                     },
                     positions: task.positions,
-                    onFinish: task.onFinish,
                 };
             },
         );
@@ -393,7 +389,6 @@ export class ChunkForgeCompute {
     }
 
     public addBuildTask(
-        onFinish: (output: ChunkForgeOutput) => void,
         id: string,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
@@ -402,8 +397,11 @@ export class ChunkForgeCompute {
         sphereRadius: number,
         terrainModel: TerrainModel,
     ): void {
+        this.outputs.set(id, {
+            type: "chunkForgePendingOutput",
+        });
+
         const buildTask = {
-            onFinish,
             id,
             positionOnCube,
             positionOnSphere,
@@ -459,14 +457,7 @@ export class ChunkForgeCompute {
     private updateNormals() {
         this.normalComputePool.update();
         const normalOutputs = this.normalComputePool.consumeOutputs();
-        for (const output of normalOutputs) {
-            this.applyQueue.push({
-                onFinish: output.onFinish,
-                id: output.id,
-                positions: output.positions,
-                normals: output.normals,
-            });
-        }
+        this.applyQueue.push(...normalOutputs);
     }
 
     private applyAllReady() {
@@ -495,24 +486,23 @@ export class ChunkForgeCompute {
         this.cache.positions.clear();
         this.cache.normals.clear();
 
+        this.outputs.clear();
+
         this.applyQueue.length = 0;
     }
 
+    public getOutput(id: ChunkId): ChunkForgeOutput | undefined {
+        return this.outputs.get(id);
+    }
+
     private runApplyTask(task: ApplyTask) {
-        const { onFinish, positions, normals } = task;
+        const { positions, normals } = task;
 
-        const vertexData = new VertexData();
-        vertexData.positions = positions.cpu;
-        vertexData.indices = this.gridIndices.cpu;
-        vertexData.normals = normals.cpu;
-
-        onFinish({
-            cpu: vertexData,
-            gpu: {
-                positions: positions.gpu,
-                normals: normals.gpu,
-                indices: this.gridIndices.gpu,
-            },
+        this.outputs.set(task.id, {
+            type: "chunkForgeFinalOutput",
+            positions,
+            normals,
+            indices: this.gridIndices,
         });
     }
 }
