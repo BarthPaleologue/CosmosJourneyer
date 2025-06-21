@@ -101,7 +101,12 @@ export async function createSphericalHeightFieldTerrain(
 
     const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps);
 
-    const chunkForge = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
+    const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
+    if (!chunkForgeResult.success) {
+        throw new Error(`Failed to create chunk forge: ${String(chunkForgeResult.error)}`);
+    }
+
+    const chunkForge = chunkForgeResult.value;
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
