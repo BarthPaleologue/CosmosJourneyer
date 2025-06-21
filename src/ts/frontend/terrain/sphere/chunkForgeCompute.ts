@@ -414,7 +414,7 @@ export class ChunkForgeCompute {
 
         switch (terrainModel.type) {
             case "procedural":
-                this.proceduralHeightFieldComputePool.addTask({ ...buildTask, terrainModel });
+                this.proceduralHeightFieldComputePool.push({ ...buildTask, terrainModel });
                 break;
             case "custom":
                 this.addCustomHeightFieldTask(buildTask, terrainModel);
@@ -426,14 +426,14 @@ export class ChunkForgeCompute {
         const heightMap = this.heightMapAtlas.getHeightMap(terrainModel.id);
         switch (heightMap.type) {
             case "1x1":
-                this.custom1x1HeightFieldComputePool.addTask({
+                this.custom1x1HeightFieldComputePool.push({
                     ...baseTask,
                     heightRange: terrainModel.heightRange,
                     heightMap: heightMap,
                 });
                 break;
             case "2x4":
-                this.custom2x4HeightFieldComputePool.addTask({
+                this.custom2x4HeightFieldComputePool.push({
                     ...baseTask,
                     heightRange: terrainModel.heightRange,
                     heightMap: heightMap,
@@ -445,23 +445,17 @@ export class ChunkForgeCompute {
     updateProcedural() {
         this.proceduralHeightFieldComputePool.update();
         const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
-        for (const output of proceduralHeightFieldOutputs) {
-            this.normalComputePool.addTask(output);
-        }
+        this.normalComputePool.push(...proceduralHeightFieldOutputs);
     }
 
     updateCustom() {
         this.custom2x4HeightFieldComputePool.update();
         const custom2x4HeightFieldOutputs = this.custom2x4HeightFieldComputePool.consumeOutputs();
-        for (const output of custom2x4HeightFieldOutputs) {
-            this.normalComputePool.addTask(output);
-        }
+        this.normalComputePool.push(...custom2x4HeightFieldOutputs);
 
         this.custom1x1HeightFieldComputePool.update();
         const custom1x1HeightFieldOutputs = this.custom1x1HeightFieldComputePool.consumeOutputs();
-        for (const output of custom1x1HeightFieldOutputs) {
-            this.normalComputePool.addTask(output);
-        }
+        this.normalComputePool.push(...custom1x1HeightFieldOutputs);
     }
 
     updateNormals() {
