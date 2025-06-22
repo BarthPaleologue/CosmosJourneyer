@@ -86,9 +86,9 @@ export async function createSphericalHeightFieldTerrain(
         type: "custom",
         heightRange: {
             min: 0,
-            max: 9e3,
+            max: 90e3,
         },
-        id: "earth",
+        id: "mars",
     };
 
     const terrain = new SphericalHeightFieldTerrain(
@@ -101,7 +101,7 @@ export async function createSphericalHeightFieldTerrain(
 
     const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps, scene);
 
-    heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
+    await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {

@@ -63,7 +63,7 @@ type Custom1x1HeightFieldTask = CustomHeightFieldTask & {
 };
 
 type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
-    heightMap: HeightMap2x4<Texture>;
+    heightMap: HeightMap2x4;
 };
 
 type NormalTask = {

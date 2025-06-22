@@ -77,3 +77,8 @@ export type PowerOfTwo =
     | 268_435_456
     | 536_870_912
     | 1_073_741_824;
+
+export function assertUnreachable(param: never): never {
+    console.error(param);
+    throw new Error(`Unreachable code reached with parameter: ${String(param)}`);
+}
