@@ -15,9 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { loadTextureFromUrl } from "@/utils/loading";
 import { err, ok, type Result } from "@/utils/types";
 
 export type HeightMap1x1 = {
@@ -25,46 +26,81 @@ export type HeightMap1x1 = {
     texture: Texture;
 };
 
-export type HeightMap2x4<TTexture> = {
+export type HeightMap2x4 = {
     type: "2x4";
-    textures: [[TTexture, TTexture, TTexture, TTexture], [TTexture, TTexture, TTexture, TTexture]];
+    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
 };
 
-export type HeightMap = HeightMap1x1 | HeightMap2x4<Texture>;
+export type HeightMap = HeightMap1x1 | HeightMap2x4;
 
-export function loadBitmapOnGpu(name: string, input: ImageBitmap, scene: Scene): Texture {
-    return new Texture(name, scene, false, false, undefined, undefined, undefined, input);
-}
-
-export function loadHeightMap2x4ToGpu(
+export async function loadHeightMap2x4FromUrlsToGpu(
     name: string,
-    input: HeightMap2x4<ImageBitmap>,
+    urls: [[string, string, string, string], [string, string, string, string]],
     scene: Scene,
-): Result<HeightMap2x4<Texture>, unknown> {
-    try {
-        return ok({
-            type: "2x4",
-            textures: [
-                [
-                    loadBitmapOnGpu(`${name}_0_0`, input.textures[0][0], scene),
-                    loadBitmapOnGpu(`${name}_0_1`, input.textures[0][1], scene),
-                    loadBitmapOnGpu(`${name}_0_2`, input.textures[0][2], scene),
-                    loadBitmapOnGpu(`${name}_0_3`, input.textures[0][3], scene),
-                ],
-                [
-                    loadBitmapOnGpu(`${name}_1_0`, input.textures[1][0], scene),
-                    loadBitmapOnGpu(`${name}_1_1`, input.textures[1][1], scene),
-                    loadBitmapOnGpu(`${name}_1_2`, input.textures[1][2], scene),
-                    loadBitmapOnGpu(`${name}_1_3`, input.textures[1][3], scene),
-                ],
-            ],
-        });
-    } catch (error) {
-        return err(error);
+): Promise<Result<HeightMap2x4, Array<Error>>> {
+    const loadingPromises: Array<Promise<Result<Texture, Error>>> = [];
+    for (const [i, row] of urls.entries()) {
+        for (const [j, url] of row.entries()) {
+            loadingPromises.push(loadTextureFromUrl(`${name}_${i}_${j}`, url, scene));
+        }
     }
+
+    const results = await Promise.all(loadingPromises);
+
+    const failures: Array<Error> = [];
+    const textures = results
+        .map((result) => {
+            if (result.success) {
+                return result.value;
+            } else {
+                failures.push(result.error);
+                return;
+            }
+        })
+        .filter((texture) => texture !== undefined);
+
+    if (failures.length > 0) {
+        for (const texture of textures) {
+            texture.dispose();
+        }
+
+        return err(failures);
+    }
+
+    const texture00 = textures[0];
+    const texture01 = textures[1];
+    const texture02 = textures[2];
+    const texture03 = textures[3];
+    const texture10 = textures[4];
+    const texture11 = textures[5];
+    const texture12 = textures[6];
+    const texture13 = textures[7];
+    if (
+        texture00 === undefined ||
+        texture01 === undefined ||
+        texture02 === undefined ||
+        texture03 === undefined ||
+        texture10 === undefined ||
+        texture11 === undefined ||
+        texture12 === undefined ||
+        texture13 === undefined
+    ) {
+        for (const texture of textures) {
+            texture.dispose();
+        }
+        return err([new Error("One or more textures failed to load.")]);
+    }
+
+    return ok({
+        type: "2x4",
+        textures: [
+            [texture00, texture01, texture02, texture03],
+            [texture10, texture11, texture12, texture13],
+        ],
+    });
 }
 
-export function disposeHeightMap2x4(heightMap: HeightMap2x4<Texture>): void {
+export function disposeHeightMap2x4(heightMap: HeightMap2x4): void {
     for (const row of heightMap.textures) {
         for (const texture of row) {
             texture.dispose();
