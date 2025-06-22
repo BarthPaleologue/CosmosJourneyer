@@ -71,7 +71,6 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     percentage.style.borderRadius = "4px";
     percentage.style.fontWeight = "bold";
     percentage.style.fontSize = "1em";
-    percentage.style.marginLeft = "4px";
 
     slider.addEventListener("input", () => {
         const volume = parseFloat(slider.value);
