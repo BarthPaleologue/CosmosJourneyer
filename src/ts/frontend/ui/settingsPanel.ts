@@ -46,10 +46,10 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     sliderLabel.style.fontFamily = "Nasalization, sans-serif";
     sliderLabel.style.minWidth = "80px";
     sliderLabel.style.flexGrow = "1";
-    sliderLabel.style.color = "#fff"; // add
+    sliderLabel.style.color = "#fff";
     sliderLabel.style.fontWeight = "bold";
     sliderLabel.style.letterSpacing = "1px";
-    sliderLabel.style.fontSize = "1.1em"; // add
+    sliderLabel.style.fontSize = "1.1em";
     sliderContainer.appendChild(sliderLabel);
 
     const slider = document.createElement("input");
@@ -58,20 +58,20 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     slider.max = "1";
     slider.step = "0.05";
     slider.value = musicConductor.getVolume().toString();
-    slider.style.flexGrow = "1"; // add
+    slider.style.flexGrow = "1";
     slider.style.margin = "0 10px";
-    slider.style.accentColor = "#ffffff"; // add
+    slider.style.accentColor = "#ffffff";
 
     const percentage = document.createElement("span");
     percentage.textContent = (parseFloat(slider.value) * 100).toFixed(0) + "%";
     percentage.style.fontFamily = "Nasalization, sans-serif";
-    percentage.style.color = "#fff"; // add
-    percentage.style.backgroundColor = "#1a1a1a"; // add
+    percentage.style.color = "#fff";
+    percentage.style.backgroundColor = "#1a1a1a";
     percentage.style.padding = "2px 8px";
     percentage.style.borderRadius = "4px";
     percentage.style.fontWeight = "bold";
-    percentage.style.fontSize = "1em"; // add
-    percentage.style.marginLeft = "4px"; // add
+    percentage.style.fontSize = "1em";
+    percentage.style.marginLeft = "4px";
 
     slider.addEventListener("input", () => {
         const volume = parseFloat(slider.value);
