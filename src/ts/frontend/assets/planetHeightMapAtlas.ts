@@ -20,10 +20,29 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
-import { type Result } from "@/utils/types";
+import { assertUnreachable, type Result } from "@/utils/types";
 
-import { disposeHeightMap1x1, disposeHeightMap2x4, loadHeightMap2x4ToGpu, type HeightMap } from "./heightMaps";
+import { disposeHeightMap1x1, disposeHeightMap2x4, loadHeightMap2x4FromUrlsToGpu, type HeightMap } from "./heightMaps";
 import { type HeightMaps } from "./textures/heightmaps";
+
+import earthHeightMap2x4_0_0 from "@assets/sol/textures/earthHeightMap2x4/0_0.png";
+import earthHeightMap2x4_0_1 from "@assets/sol/textures/earthHeightMap2x4/0_1.png";
+import earthHeightMap2x4_0_2 from "@assets/sol/textures/earthHeightMap2x4/0_2.png";
+import earthHeightMap2x4_0_3 from "@assets/sol/textures/earthHeightMap2x4/0_3.png";
+import earthHeightMap2x4_1_0 from "@assets/sol/textures/earthHeightMap2x4/1_0.png";
+import earthHeightMap2x4_1_1 from "@assets/sol/textures/earthHeightMap2x4/1_1.png";
+import earthHeightMap2x4_1_2 from "@assets/sol/textures/earthHeightMap2x4/1_2.png";
+import earthHeightMap2x4_1_3 from "@assets/sol/textures/earthHeightMap2x4/1_3.png";
+import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
+import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
+import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
+import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.jpg";
+import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
+import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
+import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
+import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+
+type HeightMapId = CustomTerrainModel["id"];
 
 /**
  * Interface for objects that can provide height maps for planets.
@@ -33,13 +52,13 @@ export interface IPlanetHeightMapAtlas {
      * Synchronously load height maps corresponding to the given keys into GPU memory.
      * @param keys An iterable of planet IDs for which to load height maps.
      */
-    loadHeightMapsToGpu(keys: Iterable<CustomTerrainModel["id"]>): void;
+    loadHeightMapsToGpu(keys: Iterable<HeightMapId>): Promise<Array<Result<HeightMap, Array<Error>>>>;
 
     /**
      * @param key The key of the height map to retrieve.
      * @returns The height map corresponding to the given key.
      */
-    getHeightMap(key: CustomTerrainModel["id"]): HeightMap;
+    getHeightMap(key: HeightMapId): HeightMap;
 
     /**
      * Restores the initial state of the height map atlas.
@@ -60,34 +79,61 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
         this.scene = scene;
     }
 
-    loadHeightMapsToGpu(keys: Iterable<CustomTerrainModel["id"]>): void {
+    async loadHeightMapsToGpu(keys: Iterable<HeightMapId>) {
+        // load the height maps in parallel
+        const promises: Array<Promise<Result<HeightMap, Array<Error>>>> = [];
         for (const key of keys) {
-            const result = this.preloadHeightMap(key);
-            if (result === undefined) {
+            const promise = this.preloadHeightMap(key);
+            if (promise === undefined) {
                 continue;
             }
 
-            if (!result.success) {
-                console.error(`Failed to preload height map for ${key}:`, result.error);
-                continue;
-            }
-
-            this.higherResolutionHeightMaps[key] = result.value;
+            promises.push(promise);
         }
+
+        return Promise.all(promises);
     }
 
-    private preloadHeightMap(key: CustomTerrainModel["id"]): Result<HeightMap, unknown> | undefined {
+    private preloadHeightMap(key: HeightMapId): Promise<Result<HeightMap, Array<Error>>> | undefined {
         switch (key) {
             case "mercury":
                 return;
             case "venus":
                 return;
             case "earth":
-                return loadHeightMap2x4ToGpu(key, this.heightMaps.earth2x4, this.scene);
+                return loadHeightMap2x4FromUrlsToGpu(
+                    key,
+                    [
+                        [earthHeightMap2x4_0_0, earthHeightMap2x4_0_1, earthHeightMap2x4_0_2, earthHeightMap2x4_0_3],
+                        [earthHeightMap2x4_1_0, earthHeightMap2x4_1_1, earthHeightMap2x4_1_2, earthHeightMap2x4_1_3],
+                    ],
+                    this.scene,
+                ).then((result) => {
+                    if (result.success) {
+                        this.higherResolutionHeightMaps[key] = result.value;
+                    }
+
+                    return result;
+                });
             case "moon":
                 return;
             case "mars":
-                return loadHeightMap2x4ToGpu(key, this.heightMaps.mars2x4, this.scene);
+                return loadHeightMap2x4FromUrlsToGpu(
+                    key,
+                    [
+                        [marsHeightMap_0_0, marsHeightMap_0_1, marsHeightMap_0_2, marsHeightMap_0_3],
+                        [marsHeightMap_1_0, marsHeightMap_1_1, marsHeightMap_1_2, marsHeightMap_1_3],
+                    ],
+                    this.scene,
+                ).then((result) => {
+                    if (result.success) {
+                        this.higherResolutionHeightMaps[key] = result.value;
+                    }
+
+                    return result;
+                });
+            default:
+                return assertUnreachable(key);
         }
     }
 
@@ -100,13 +146,15 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                 case "1x1":
                     disposeHeightMap1x1(heightMap);
                     break;
+                default:
+                    assertUnreachable(heightMap);
             }
         }
 
         this.higherResolutionHeightMaps = {};
     }
 
-    getHeightMap(key: CustomTerrainModel["id"]): HeightMap {
+    getHeightMap(key: HeightMapId): HeightMap {
         const higherResolutionHeightMap = this.higherResolutionHeightMaps[key];
         if (higherResolutionHeightMap !== undefined) {
             return higherResolutionHeightMap;
@@ -120,13 +168,15 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
             case "moon":
             case "mars":
                 return this.heightMaps.mars1x1;
+            default:
+                return assertUnreachable(key);
         }
     }
 }
 
 export class PlanetHeightMapAtlasMock implements IPlanetHeightMapAtlas {
-    loadHeightMapsToGpu(): Promise<void> {
-        return Promise.resolve();
+    loadHeightMapsToGpu() {
+        return Promise.resolve([]);
     }
 
     getHeightMap(): HeightMap {

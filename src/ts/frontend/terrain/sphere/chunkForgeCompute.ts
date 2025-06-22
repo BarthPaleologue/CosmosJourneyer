@@ -17,7 +17,6 @@
 
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import {
@@ -63,7 +62,7 @@ type Custom1x1HeightFieldTask = CustomHeightFieldTask & {
 };
 
 type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
-    heightMap: HeightMap2x4<Texture>;
+    heightMap: HeightMap2x4;
 };
 
 type NormalTask = {
