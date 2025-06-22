@@ -106,7 +106,7 @@ export class SphericalHeightFieldBuilder2x4 {
         sphereRadius: number,
         size: number,
         terrainModel: {
-            heightMap: HeightMap2x4<Texture>;
+            heightMap: HeightMap2x4;
             minHeight: number;
             maxHeight: number;
         },
