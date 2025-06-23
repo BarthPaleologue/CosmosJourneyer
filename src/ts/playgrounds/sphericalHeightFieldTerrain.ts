@@ -88,7 +88,7 @@ export async function createSphericalHeightFieldTerrain(
             min: 0,
             max: 90e3,
         },
-        id: "mars",
+        id: "earth",
     };
 
     const terrain = new SphericalHeightFieldTerrain(
