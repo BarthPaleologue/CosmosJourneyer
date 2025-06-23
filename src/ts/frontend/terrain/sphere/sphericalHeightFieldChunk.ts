@@ -38,25 +38,40 @@ export type ChunkIndices = {
     lod: number;
 };
 
+/**
+ * Represents a chunk of a spherical height field terrain using a cube-sphere approach.
+ * The cube is easily subdivided into smaller chunks that can be projected on a sphere for a planet-like terrain.
+ * Each chunk corresponds to a square section of the terrain at a specific level of detail (LOD).
+ * The chunk is positioned on a sphere and can be subdivided into smaller chunks.
+ * Chunks rely on a ChunkForge to compute their vertex data asynchronously.
+ */
 export class SphericalHeightFieldChunk {
     private readonly id: ChunkId;
+    private readonly indices: ChunkIndices;
 
     private readonly mesh: Mesh;
 
     private readonly direction: Direction;
 
-    private readonly radius: number;
+    /**
+     * The radius of the underlying planet sphere in meters
+     */
+    private readonly sphereRadius: number;
 
-    private readonly size: number;
+    /**
+     * The size of one side of the chunk in meters.
+     */
+    private readonly sideLength: number;
 
     private loadingState: ChunkLoadingState = "not_started";
-
-    private readonly indices: ChunkIndices;
 
     private children: FixedLengthArray<SphericalHeightFieldChunk, 4> | null = null;
 
     private readonly parent: TransformNode;
 
+    /**
+     * The position of the chunk on the cube before normalization to the sphere shape
+     */
     private readonly positionOnCube: Vector3;
 
     private vertexData: ChunkForgeFinalOutput | null = null;
@@ -66,7 +81,7 @@ export class SphericalHeightFieldChunk {
     constructor(
         indices: ChunkIndices,
         direction: Direction,
-        radius: number,
+        sphereRadius: number,
         parent: TransformNode,
         terrainModel: TerrainModel,
         material: Material,
@@ -85,23 +100,20 @@ export class SphericalHeightFieldChunk {
 
         this.terrainModel = terrainModel;
 
-        this.mesh.position.x = -radius + (radius * 2 * indices.x) / 2 ** indices.lod;
-        this.mesh.position.y = -radius + (radius * 2 * indices.y) / 2 ** indices.lod;
-        this.mesh.position.x += radius / 2 ** indices.lod;
-        this.mesh.position.y += radius / 2 ** indices.lod;
-
-        this.mesh.position.z = radius;
+        this.mesh.position.x = -sphereRadius + (sphereRadius * 2 * (indices.x + 0.5)) / 2 ** indices.lod;
+        this.mesh.position.y = -sphereRadius + (sphereRadius * 2 * (indices.y + 0.5)) / 2 ** indices.lod;
+        this.mesh.position.z = sphereRadius;
 
         this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
         this.positionOnCube = this.mesh.position.clone();
 
-        this.mesh.position.normalize().scaleInPlace(radius);
+        this.mesh.position.normalize().scaleInPlace(sphereRadius);
 
         this.direction = direction;
-        this.radius = radius;
+        this.sphereRadius = sphereRadius;
 
-        this.size = (radius * 2) / 2 ** indices.lod;
+        this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
     }
 
     private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
@@ -202,8 +214,8 @@ export class SphericalHeightFieldChunk {
             this.positionOnCube,
             this.mesh.position,
             this.direction,
-            this.size,
-            this.radius,
+            this.sideLength,
+            this.sphereRadius,
             this.terrainModel,
         );
     }
@@ -212,11 +224,11 @@ export class SphericalHeightFieldChunk {
         this.updateLoadingState(chunkForge);
 
         const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
-        if (this.children === null && distanceSquared < (this.size * 2) ** 2) {
+        if (this.children === null && distanceSquared < (this.sideLength * 2) ** 2) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
                 this.direction,
-                this.radius,
+                this.sphereRadius,
                 this.parent,
                 this.terrainModel,
                 material,
@@ -225,7 +237,7 @@ export class SphericalHeightFieldChunk {
         } else if (
             this.loadingState === "completed" &&
             this.children !== null &&
-            distanceSquared >= (this.size * 2.5) ** 2
+            distanceSquared >= (this.sideLength * 2.5) ** 2
         ) {
             for (const child of this.children) {
                 child.dispose();
