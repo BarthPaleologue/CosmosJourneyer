@@ -31,8 +31,11 @@ import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtl
 import { type Direction } from "@/utils/direction";
 import { err, ok, type PowerOfTwo, type Result } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
+import { LRUMap } from "./lruMap";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
@@ -109,8 +112,8 @@ type Custom2x4HeightFieldComputePool = WorkerPool<Custom2x4HeightFieldTask, Sphe
 type NormalComputePool = WorkerPool<NormalTask, SquareGridNormalComputer, ApplyTask>;
 
 type ChunkCache = {
-    positions: Map<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
-    normals: Map<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
+    positions: LRUMap<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
+    normals: LRUMap<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
 };
 
 /**
@@ -131,7 +134,7 @@ export class ChunkForgeCompute {
 
     private readonly cache: ChunkCache;
 
-    private readonly outputs: Map<ChunkId, ChunkForgeOutput> = new Map();
+    private readonly outputs: Map<ChunkId, ChunkForgeOutput>;
 
     private readonly applyQueue: Array<ApplyTask> = [];
 
@@ -167,9 +170,22 @@ export class ChunkForgeCompute {
         heightMapAtlas: IPlanetHeightMapAtlas,
         engine: WebGPUEngine,
     ) {
+        const outputs = new Map<ChunkId, ChunkForgeOutput>();
         const cache: ChunkCache = {
-            positions: new Map(),
-            normals: new Map(),
+            positions: new LRUMap(Settings.MAX_CACHED_CHUNKS, (chunkId, positions) => {
+                positions.gpu.getBuffer().references--;
+                if (positions.gpu.getBuffer().references === 0) {
+                    positions.gpu.dispose();
+                }
+                outputs.delete(chunkId); // Remove from outputs when cache is cleared
+            }),
+            normals: new LRUMap(Settings.MAX_CACHED_CHUNKS, (chunkId, normals) => {
+                normals.gpu.getBuffer().references--;
+                if (normals.gpu.getBuffer().references === 0) {
+                    normals.gpu.dispose();
+                }
+                outputs.delete(chunkId); // Remove from outputs when cache is cleared
+            }),
         };
 
         const proceduralHeightFieldComputePool: ProceduralHeightFieldComputePool = await WorkerPool.New(
@@ -355,6 +371,7 @@ export class ChunkForgeCompute {
                 gpu: gridIndicesBuffer,
                 cpu: gridIndexBufferCpu,
             },
+            outputs,
             cache,
             rowVertexCount,
             heightMapAtlas,
@@ -372,6 +389,7 @@ export class ChunkForgeCompute {
             gpu: StorageBuffer;
             cpu: Uint32Array;
         },
+        outputs: Map<ChunkId, ChunkForgeOutput>,
         cache: ChunkCache,
         rowVertexCount: PowerOfTwo,
         heightMapAtlas: IPlanetHeightMapAtlas,
@@ -386,6 +404,7 @@ export class ChunkForgeCompute {
 
         this.heightMapAtlas = heightMapAtlas;
 
+        this.outputs = outputs;
         this.cache = cache;
 
         this.rowVertexCount = rowVertexCount;
@@ -527,14 +546,7 @@ export class ChunkForgeCompute {
         }
         this.normalComputePool.reset();
 
-        for (const cachedPosition of this.cache.positions.values()) {
-            cachedPosition.gpu.dispose();
-        }
         this.cache.positions.clear();
-
-        for (const cachedNormal of this.cache.normals.values()) {
-            cachedNormal.gpu.dispose();
-        }
         this.cache.normals.clear();
 
         this.outputs.clear();
