@@ -151,60 +151,32 @@ export class SphericalHeightFieldChunk {
         material: Material,
         scene: Scene,
     ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
-        return [
-            new SphericalHeightFieldChunk(
-                {
-                    x: indices.x * 2,
-                    y: indices.y * 2,
+        const childIndices: Array<ChunkIndices> = [];
+        for (let dy = 0; dy < 2; dy++) {
+            for (let dx = 0; dx < 2; dx++) {
+                childIndices.push({
+                    x: indices.x * 2 + dx,
+                    y: indices.y * 2 + dy,
                     lod: indices.lod + 1,
-                },
-                direction,
-                radius,
-                parent,
-                terrainModel,
-                material,
-                scene,
-            ),
-            new SphericalHeightFieldChunk(
-                {
-                    x: indices.x * 2 + 1,
-                    y: indices.y * 2,
-                    lod: indices.lod + 1,
-                },
-                direction,
-                radius,
-                parent,
-                terrainModel,
-                material,
-                scene,
-            ),
-            new SphericalHeightFieldChunk(
-                {
-                    x: indices.x * 2,
-                    y: indices.y * 2 + 1,
-                    lod: indices.lod + 1,
-                },
-                direction,
-                radius,
-                parent,
-                terrainModel,
-                material,
-                scene,
-            ),
-            new SphericalHeightFieldChunk(
-                {
-                    x: indices.x * 2 + 1,
-                    y: indices.y * 2 + 1,
-                    lod: indices.lod + 1,
-                },
-                direction,
-                radius,
-                parent,
-                terrainModel,
-                material,
-                scene,
-            ),
-        ];
+                });
+            }
+        }
+
+        const children = childIndices.map(
+            (childIndex) =>
+                new SphericalHeightFieldChunk(childIndex, direction, radius, parent, terrainModel, material, scene),
+        );
+
+        if (
+            children[0] === undefined ||
+            children[1] === undefined ||
+            children[2] === undefined ||
+            children[3] === undefined
+        ) {
+            throw new Error("Failed to create all children for SphericalHeightFieldChunk.");
+        }
+
+        return [children[0], children[1], children[2], children[3]];
     }
 
     private updateLoadingState(chunkForge: ChunkForgeCompute) {
