@@ -192,7 +192,6 @@ export class SphericalHeightFieldChunk {
 
             this.setVertexData(cachedVertexData, chunkForge.rowVertexCount, this.mesh.getScene().getEngine());
             this.loadingState = "completed";
-            this.mesh.setEnabled(true);
             return;
         }
 
@@ -223,12 +222,15 @@ export class SphericalHeightFieldChunk {
                 material,
                 this.mesh.getScene(),
             );
-        } else if (this.children !== null && distanceSquared >= (this.size * 2.5) ** 2) {
+        } else if (
+            this.loadingState === "completed" &&
+            this.children !== null &&
+            distanceSquared >= (this.size * 2.5) ** 2
+        ) {
             for (const child of this.children) {
                 child.dispose();
             }
             this.children = null;
-            this.loadingState = "completed";
             this.mesh.setEnabled(true);
         }
 
