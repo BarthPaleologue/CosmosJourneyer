@@ -20,7 +20,7 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { getRgbFromTemperature } from "@/utils/specrend";
 

@@ -27,7 +27,7 @@ import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsP
 import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
 import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 import { HeightMap1x1, HeightMap2x4 } from "./heightMaps";
 import { LandingPadTexturePool } from "./landingPadTexturePool";

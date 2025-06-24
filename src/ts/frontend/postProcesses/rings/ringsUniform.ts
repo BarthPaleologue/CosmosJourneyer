@@ -23,7 +23,7 @@ import { ProceduralRingsModel, RingsModel, TexturedRingsModel } from "@/backend/
 
 import { Textures } from "@/frontend/assets/textures";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { DeepReadonly } from "@/utils/types";
 
