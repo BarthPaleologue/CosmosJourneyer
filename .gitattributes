@@ -6,3 +6,4 @@ src/asset/sol/textures/marsHeightMap1x1.jpg filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthHeightMap2x4/*.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/moonHeightMap8k.png filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/moonHeightMap2x4/*.png filter=lfs diff=lfs merge=lfs -text
