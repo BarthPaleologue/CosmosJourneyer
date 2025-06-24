@@ -88,6 +88,7 @@ export class CreditsPanel {
             'Saturn rings from <a target="_blank" href="https://www.solarsystemscope.com/textures/">Solar System Scope</a>, licensed under Attribution 4.0 International license',
             'Uranus rings from <a target="_blank" href="https://planetpixelemporium.com/uranus.html">Planet Pixel Emporium</a>, licensed under the terms specified <a target="_blank" href="https://planetpixelemporium.com/planets.html">here</a>',
             'Mars height map from <a target="_blank" href="https://planetpixelemporium.com/mars5672.html">Planet Pixel Emporium</a>, licensed under the terms specified <a target="_blank" href="https://planetpixelemporium.com/planets.html">here</a>',
+            'Moon height map from <a target="_blank" href="https://svs.gsfc.nasa.gov/4720">NASA\'s Scientific Visualization Studio</a>',
         ];
 
         materialsCredits.forEach((credit) => {
