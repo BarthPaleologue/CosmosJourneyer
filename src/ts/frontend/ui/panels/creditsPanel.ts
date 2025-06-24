@@ -89,6 +89,7 @@ export class CreditsPanel {
             'Uranus rings from <a target="_blank" href="https://planetpixelemporium.com/uranus.html">Planet Pixel Emporium</a>, licensed under the terms specified <a target="_blank" href="https://planetpixelemporium.com/planets.html">here</a>',
             'Mars height map from <a target="_blank" href="https://planetpixelemporium.com/mars5672.html">Planet Pixel Emporium</a>, licensed under the terms specified <a target="_blank" href="https://planetpixelemporium.com/planets.html">here</a>',
             'Moon height map from <a target="_blank" href="https://svs.gsfc.nasa.gov/4720">NASA\'s Scientific Visualization Studio</a>',
+            'Earth height map from <a target="_blank" href="https://commons.wikimedia.org/wiki/File:World_elevation_map.png">Wikipedia Commons</a>, licensed under the Creative Commons <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">Attribution-Share Alike 4.0 International</a> license',
         ];
 
         materialsCredits.forEach((credit) => {
