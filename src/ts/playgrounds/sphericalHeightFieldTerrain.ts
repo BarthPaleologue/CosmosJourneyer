@@ -84,8 +84,8 @@ export async function createSphericalHeightFieldTerrain(
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
-            min: 0,
-            max: 90e3,
+            min: -11e3,
+            max: 8.5e3,
         },
         id: "earth",
     };
