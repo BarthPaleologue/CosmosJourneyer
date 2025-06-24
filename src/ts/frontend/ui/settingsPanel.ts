@@ -58,7 +58,6 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     slider.max = "1";
     slider.step = "0.05";
     slider.value = musicConductor.getVolume().toString();
-    slider.style.flexGrow = "1";
     slider.style.margin = "0 10px";
     slider.style.accentColor = "#ffffff";
 
