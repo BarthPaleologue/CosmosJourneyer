@@ -41,6 +41,14 @@ import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
 import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
 import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
 import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+import moonHeightMap_0_0 from "@assets/sol/textures/moonHeightMap2x4/0_0.png";
+import moonHeightMap_0_1 from "@assets/sol/textures/moonHeightMap2x4/0_1.png";
+import moonHeightMap_0_2 from "@assets/sol/textures/moonHeightMap2x4/0_2.png";
+import moonHeightMap_0_3 from "@assets/sol/textures/moonHeightMap2x4/0_3.png";
+import moonHeightMap_1_0 from "@assets/sol/textures/moonHeightMap2x4/1_0.png";
+import moonHeightMap_1_1 from "@assets/sol/textures/moonHeightMap2x4/1_1.png";
+import moonHeightMap_1_2 from "@assets/sol/textures/moonHeightMap2x4/1_2.png";
+import moonHeightMap_1_3 from "@assets/sol/textures/moonHeightMap2x4/1_3.png";
 
 type HeightMapId = CustomTerrainModel["id"];
 
@@ -116,7 +124,20 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                     return result;
                 });
             case "moon":
-                return;
+                return loadHeightMap2x4FromUrlsToGpu(
+                    key,
+                    [
+                        [moonHeightMap_0_0, moonHeightMap_0_1, moonHeightMap_0_2, moonHeightMap_0_3],
+                        [moonHeightMap_1_0, moonHeightMap_1_1, moonHeightMap_1_2, moonHeightMap_1_3],
+                    ],
+                    this.scene,
+                ).then((result) => {
+                    if (result.success) {
+                        this.higherResolutionHeightMaps[key] = result.value;
+                    }
+
+                    return result;
+                });
             case "mars":
                 return loadHeightMap2x4FromUrlsToGpu(
                     key,
