@@ -28,6 +28,7 @@ import {
     degreesToRadians,
 } from "@/utils/physics/unitConversions";
 
+import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
@@ -137,68 +138,7 @@ export function getSolSystemModel(): StarSystemModel {
         seed: 0,
     };
 
-    const earth: TelluricPlanetModel = {
-        id: "earth",
-        name: "Earth",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 6_371e3,
-        mass: 5.972e24,
-        axialTilt: degreesToRadians(23.44),
-        siderealDaySeconds: 60 * 60 * 24,
-        waterAmount: 1,
-        temperature: {
-            min: celsiusToKelvin(-50),
-            max: celsiusToKelvin(50),
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 149_597_870e3,
-            eccentricity: 0.0167,
-            inclination: degreesToRadians(0),
-            longitudeOfAscendingNode: degreesToRadians(0),
-            argumentOfPeriapsis: degreesToRadians(114.20783),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_frequency: 1,
-            continents_fragmentation: 0.65,
-
-            bumps_frequency: 30,
-
-            max_bump_height: 1.5e3,
-            max_mountain_height: 10e3,
-            continent_base_height: 10e3 * 1.9,
-
-            mountains_frequency: 360,
-        },
-        rings: null,
-        atmosphere: {
-            seaLevelPressure: barToPascal(1),
-            greenHouseEffectFactor: 0.5,
-            gasMix: [
-                ["N2", 0.78],
-                ["O2", 0.21],
-                ["Ar", 0.01],
-            ],
-        },
-        clouds: {
-            layerRadius: 6_371e3 + 30e3,
-            smoothness: 0.7,
-            specularPower: 2,
-            frequency: 4,
-            detailFrequency: 12,
-            coverage: 0.5,
-            sharpness: 2.5,
-            color: { r: 0.8, g: 0.8, b: 0.8 },
-            worleySpeed: 0.0005,
-            detailSpeed: 0.003,
-        },
-        ocean: {
-            depth: 10e3,
-        },
-        seed: 0,
-    };
+    const earth = getEarthModel([sun.id]);
 
     const moon: TelluricSatelliteModel = {
         id: "moon",
