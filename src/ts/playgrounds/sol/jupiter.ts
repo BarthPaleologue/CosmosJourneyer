@@ -26,7 +26,7 @@ import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmos
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 import { enablePhysics } from "../utils";
 

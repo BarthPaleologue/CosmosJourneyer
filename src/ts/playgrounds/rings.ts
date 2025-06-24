@@ -27,7 +27,7 @@ import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProces
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,

@@ -27,7 +27,7 @@ import {
 
 import { type Textures } from "@/frontend/assets/textures";
 
-import { type ItemPool } from "@/utils/itemPool";
+import { type ItemPool } from "@/utils/dataStructures/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { type DeepReadonly } from "@/utils/types";
 
