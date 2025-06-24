@@ -40,8 +40,8 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { Cullable } from "@/utils/cullable";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { Direction } from "@/utils/direction";
-import { ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 

@@ -17,7 +17,7 @@
 
 import { expect, test } from "vitest";
 
-import { PriorityQueue } from "@/utils/priorityQueue";
+import { PriorityQueue } from "./priorityQueue";
 
 test("PriorityList", () => {
     const queue = new PriorityQueue<number>((a, b) => a > b);

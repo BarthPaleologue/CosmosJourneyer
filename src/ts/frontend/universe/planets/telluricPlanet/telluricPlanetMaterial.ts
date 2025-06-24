@@ -32,8 +32,8 @@ import {
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { ItemPool } from "@/utils/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { DeepReadonly } from "@/utils/types";
 
