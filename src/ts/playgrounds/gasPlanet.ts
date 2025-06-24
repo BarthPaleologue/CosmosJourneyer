@@ -31,7 +31,7 @@ import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { Settings } from "@/settings";
 
-import { ItemPool } from "../utils/itemPool";
+import { ItemPool } from "../utils/dataStructures/itemPool";
 import { enablePhysics } from "./utils";
 
 export async function createGasPlanetScene(

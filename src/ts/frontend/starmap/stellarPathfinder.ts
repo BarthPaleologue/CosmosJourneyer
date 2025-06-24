@@ -21,8 +21,8 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { wrapVector3 } from "@/utils/algebra";
+import { PriorityQueue } from "@/utils/dataStructures/priorityQueue";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
-import { PriorityQueue } from "@/utils/priorityQueue";
 import { err, ok, type Result } from "@/utils/types";
 
 type Node = {

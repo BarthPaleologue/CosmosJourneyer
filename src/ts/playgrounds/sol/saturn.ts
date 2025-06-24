@@ -30,7 +30,7 @@ import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 import { enablePhysics } from "../utils";
 

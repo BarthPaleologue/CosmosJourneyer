@@ -28,6 +28,7 @@ import {
 import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/heightMaps";
 import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 
+import { LRUMap } from "@/utils/dataStructures/lruMap";
 import { type Direction } from "@/utils/direction";
 import { err, ok, type PowerOfTwo, type Result } from "@/utils/types";
 
@@ -35,7 +36,6 @@ import { Settings } from "@/settings";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
-import { LRUMap } from "./lruMap";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
