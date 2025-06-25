@@ -21,15 +21,11 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import {
-    astronomicalUnitToMeters,
-    barToPascal,
-    celsiusToKelvin,
-    degreesToRadians,
-} from "@/utils/physics/unitConversions";
+import { astronomicalUnitToMeters, barToPascal, degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
+import { getMarsModel } from "./mars";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
 
@@ -181,56 +177,7 @@ export function getSolSystemModel(): StarSystemModel {
         seed: 0,
     };
 
-    const mars: TelluricPlanetModel = {
-        id: "mars",
-        name: "Mars",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 3_389.5e3,
-        mass: 6.4171e23,
-        axialTilt: degreesToRadians(25.19),
-        siderealDaySeconds: 60 * 60 * 24 * 1.027,
-        waterAmount: 0,
-        temperature: {
-            min: celsiusToKelvin(-140),
-            max: celsiusToKelvin(20),
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 227_939_200e3,
-            eccentricity: 0.0934,
-            inclination: degreesToRadians(1.85),
-            longitudeOfAscendingNode: degreesToRadians(49.558),
-            argumentOfPeriapsis: degreesToRadians(286.502),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: {
-            seaLevelPressure: barToPascal(0.006),
-            greenHouseEffectFactor: 0.1,
-            gasMix: [
-                ["CO2", 0.95],
-                ["N2", 0.03],
-                ["Ar", 0.01],
-                ["O2", 0.01],
-            ],
-        },
-        rings: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const mars: TelluricPlanetModel = getMarsModel([sun.id]);
 
     const jupiter = getJupiterModel([sun.id]);
 

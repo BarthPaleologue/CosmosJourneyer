@@ -39,6 +39,7 @@ import { createRingsScene } from "./rings";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
 import { createEarthScene } from "./sol/earth";
 import { createJupiterScene } from "./sol/jupiter";
+import { createMarsScene } from "./sol/mars";
 import { createSaturnScene } from "./sol/saturn";
 import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
@@ -92,6 +93,7 @@ export class PlaygroundRegistry {
         ["terrain", createTerrainScene],
         ["sphericalTerrain", createSphericalHeightFieldTerrain],
         ["earth", createEarthScene],
+        ["mars", createMarsScene],
     ]);
 
     register(
