@@ -238,7 +238,6 @@ export class StarMap implements View {
         this.starMapCenterPosition = Vector3.Zero();
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.6 }, this.scene);
-        this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
         this.starTemplate.hasVertexAlpha = true;
@@ -254,7 +253,6 @@ export class StarMap implements View {
         this.starTemplate.material = starMaterial;
 
         this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.8 }, this.scene);
-        this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
         this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
 
@@ -413,7 +411,7 @@ export class StarMap implements View {
         );
     }
 
-    public translateCameraBackToOrigin(camera: Camera) {
+    private translateCameraBackToOrigin(camera: Camera) {
         const translationToOrigin = camera.globalPosition.negate();
         this.controls.getTransform().position.addInPlace(translationToOrigin);
         this.controls.getActiveCamera().getViewMatrix(true);
@@ -568,7 +566,7 @@ export class StarMap implements View {
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = starSystemModel.stellarObjects[0];
 
-        const instanceName = JSON.stringify(starSystemCoordinates);
+        const instanceName = `${starSystemModel.name} Billboard instance`;
 
         let instance: InstancedMesh | null = null;
         let recycled = false;
@@ -590,6 +588,7 @@ export class StarMap implements View {
         }
 
         const initializedInstance = instance;
+        initializedInstance.billboardMode = Mesh.BILLBOARDMODE_ALL;
 
         this.coordinatesToInstanceMap.set(JSON.stringify(starSystemCoordinates), initializedInstance);
         this.instanceToCoordinatesMap.set(initializedInstance, JSON.stringify(starSystemCoordinates));

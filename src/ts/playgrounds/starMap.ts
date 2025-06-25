@@ -20,11 +20,14 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
+import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { StarMap } from "@/frontend/starmap/starMap";
+
+import { jsonSafeParse } from "@/utils/json";
 
 import { initI18n } from "@/i18n";
 
@@ -44,6 +47,20 @@ export async function createStarMapScene(
 
     const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase, soundPlayerMock);
     starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
+
+    // Get system coordinates from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const customSystemCoordinates = urlParams.get("systemCoordinates");
+
+    // If system parameter was provided, focus on the specified system
+    if (customSystemCoordinates !== null) {
+        const systemCoordinates = jsonSafeParse(decodeURIComponent(customSystemCoordinates));
+        if (systemCoordinates === null) {
+            throw new Error("Invalid system coordinates json provided in URL parameters.");
+        }
+
+        starMap.focusOnSystem(StarSystemCoordinatesSchema.parse(systemCoordinates), true);
+    }
 
     progressCallback(1, "Loaded star map");
 
