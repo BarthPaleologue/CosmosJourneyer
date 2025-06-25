@@ -411,7 +411,7 @@ export class StarMap implements View {
         );
     }
 
-    public translateCameraBackToOrigin(camera: Camera) {
+    private translateCameraBackToOrigin(camera: Camera) {
         const translationToOrigin = camera.globalPosition.negate();
         this.controls.getTransform().position.addInPlace(translationToOrigin);
         this.controls.getActiveCamera().getViewMatrix(true);
