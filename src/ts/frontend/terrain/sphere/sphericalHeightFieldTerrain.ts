@@ -27,7 +27,7 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 import { Direction } from "@/utils/direction";
 import { FixedLengthArray } from "@/utils/types";
 
-import { ChunkForgeCompute } from "./chunkForgeCompute";
+import { ChunkForge } from "./chunkForge";
 import { ChunkIndices, SphericalHeightFieldChunk } from "./sphericalHeightFieldChunk";
 
 export class SphericalHeightFieldTerrain implements Transformable {
@@ -107,7 +107,7 @@ export class SphericalHeightFieldTerrain implements Transformable {
         return this.transform;
     }
 
-    update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
+    update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
         for (const side of this.sides) {
             side.update(cameraPosition, material, chunkForge);
         }
