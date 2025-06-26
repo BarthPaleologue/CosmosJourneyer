@@ -78,7 +78,7 @@ export async function createEarthScene(
     const depthRenderer = scene.enableDepthRenderer(null, true, true);
     depthRenderer.clearColor.set(0, 0, 0, 1);
 
-    const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(earthRadius * 10), scene);
+    const light = new PointLight("light", new Vector3(10, 2, -10).normalize().scale(earthRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
 
     const gizmo = new LightGizmo();
@@ -100,7 +100,7 @@ export async function createEarthScene(
         type: "custom",
         heightRange: {
             min: -11e3,
-            max: 8.5e3,
+            max: 8.6e3,
         },
         id: "earth",
     };
