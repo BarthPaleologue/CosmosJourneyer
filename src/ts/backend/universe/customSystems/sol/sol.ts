@@ -26,6 +26,7 @@ import { astronomicalUnitToMeters, barToPascal, degreesToRadians } from "@/utils
 import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
 import { getMarsModel } from "./mars";
+import { getMoonModel } from "./moon";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
 
@@ -136,46 +137,7 @@ export function getSolSystemModel(): StarSystemModel {
 
     const earth = getEarthModel([sun.id]);
 
-    const moon: TelluricSatelliteModel = {
-        id: "moon",
-        name: "Moon",
-        type: OrbitalObjectType.TELLURIC_SATELLITE,
-        radius: 1_737.1e3,
-        mass: 7.342e22,
-        axialTilt: degreesToRadians(6.68),
-        siderealDaySeconds: 60 * 60 * 24 * 27.322,
-        waterAmount: 0,
-        temperature: {
-            min: 100,
-            max: 100,
-        },
-        orbit: {
-            parentIds: [earth.id],
-            semiMajorAxis: 384_400e3,
-            eccentricity: 0.0549,
-            inclination: degreesToRadians(5.145),
-            longitudeOfAscendingNode: degreesToRadians(125.08),
-            argumentOfPeriapsis: degreesToRadians(318.15),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const moon: TelluricSatelliteModel = getMoonModel([earth.id]);
 
     const mars: TelluricPlanetModel = getMarsModel([sun.id]);
 
