@@ -19,13 +19,8 @@ import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import {
-    type CustomTerrainModel,
-    type ProceduralTerrainModel,
-    type TerrainModel,
-} from "@/backend/universe/orbitalObjects/terrainModel";
+import { type CustomTerrainModel, type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
-import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/heightMaps";
 import { type IPlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 
 import { LRUMap } from "@/utils/dataStructures/lruMap";
@@ -36,37 +31,19 @@ import { Settings } from "@/settings";
 
 import { SquareGridIndicesComputer } from "../squareGridIndexComputer";
 import { SquareGridNormalComputer } from "../squareGridNormalComputer";
+import {
+    type ChunkForge,
+    type ChunkForgeOutput,
+    type ChunkId,
+    type Custom1x1HeightFieldTask,
+    type Custom2x4HeightFieldTask,
+    type HeightFieldTask,
+    type ProceduralHeightFieldTask,
+} from "./chunkForge";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 import { WorkerPool } from "./workerPool";
-
-export type ChunkId = `${string}->d${Direction}->l${number}->[x${number};y${number}]`;
-
-type HeightFieldTask = {
-    id: ChunkId;
-    positionOnCube: Vector3;
-    positionOnSphere: Vector3;
-    size: number;
-    direction: Direction;
-    sphereRadius: number;
-};
-
-type ProceduralHeightFieldTask = HeightFieldTask & {
-    terrainModel: ProceduralTerrainModel;
-};
-
-type CustomHeightFieldTask = HeightFieldTask & {
-    heightRange: { min: number; max: number };
-};
-
-type Custom1x1HeightFieldTask = CustomHeightFieldTask & {
-    heightMap: HeightMap1x1;
-};
-
-type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
-    heightMap: HeightMap2x4;
-};
 
 type NormalTask = {
     id: ChunkId;
@@ -76,28 +53,6 @@ type NormalTask = {
 type ApplyTask = NormalTask & {
     normals: { gpu: StorageBuffer; cpu: Float32Array };
 };
-
-export type ChunkForgePendingOutput = {
-    type: "chunkForgePendingOutput";
-};
-
-export type ChunkForgeFinalOutput = {
-    type: "chunkForgeFinalOutput";
-    positions: {
-        gpu: StorageBuffer;
-        cpu: Float32Array;
-    };
-    normals: {
-        gpu: StorageBuffer;
-        cpu: Float32Array;
-    };
-    indices: {
-        gpu: StorageBuffer;
-        cpu: Uint32Array;
-    };
-};
-
-export type ChunkForgeOutput = ChunkForgeFinalOutput | ChunkForgePendingOutput;
 
 type ProceduralHeightFieldComputePool = WorkerPool<
     ProceduralHeightFieldTask,
@@ -120,7 +75,7 @@ type ChunkCache = {
  * ChunkForgeCompute is responsible for creating vertex data for spherical height field terrain chunks.
  * This implementation uses WebGPU compute shaders.
  */
-export class ChunkForgeCompute {
+export class ChunkForgeCompute implements ChunkForge {
     private readonly proceduralHeightFieldComputePool: ProceduralHeightFieldComputePool;
     private readonly custom1x1HeightFieldComputePool: Custom1x1HeightFieldComputePool;
     private readonly custom2x4HeightFieldComputePool: Custom2x4HeightFieldComputePool;
@@ -411,14 +366,7 @@ export class ChunkForgeCompute {
     }
 
     /**
-     * Adds a new task to the forge.
-     * @param id The unique id of the chunk
-     * @param positionOnCube The position of the chunk on the cube
-     * @param positionOnSphere The position of the chunk on the spherized cube
-     * @param direction The cube side direction
-     * @param size The size of the chunk in meters
-     * @param sphereRadius The radius of the sphere in meters
-     * @param terrainModel The model to use for the terrain generation.
+     * @inheritdoc
      */
     public pushTask(
         id: ChunkId,
@@ -509,7 +457,7 @@ export class ChunkForgeCompute {
     }
 
     /**
-     * Assigns tasks to available compute shaders and processes the results.
+     * @inheritdoc
      */
     public update() {
         this.updatePositions();
@@ -518,7 +466,7 @@ export class ChunkForgeCompute {
     }
 
     /**
-     * Empties the forge, resetting all compute pools and clearing the cache.
+     * @inheritdoc
      */
     public reset() {
         const proceduralHeightFieldOutputs = this.proceduralHeightFieldComputePool.consumeOutputs();
@@ -555,8 +503,7 @@ export class ChunkForgeCompute {
     }
 
     /**
-     * @param id The unique id of the chunk to retrieve the output for.
-     * @returns The output stored in the forge for the given chunk. Will be undefined if the chunk has not been added to the forge yet.
+     * @inheritdoc
      */
     public getOutput(id: ChunkId): ChunkForgeOutput | undefined {
         return this.outputs.get(id);
