@@ -28,7 +28,7 @@ import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 import { Direction, getQuaternionFromDirection } from "@/utils/direction";
 import { FixedLengthArray } from "@/utils/types";
 
-import { ChunkForgeCompute, ChunkForgeFinalOutput, ChunkId } from "./chunkForgeCompute";
+import { ChunkForge, ChunkForgeFinalOutput, ChunkId } from "./chunkForge";
 
 type ChunkLoadingState = "not_started" | "in_progress" | "completed";
 
@@ -191,7 +191,7 @@ export class SphericalHeightFieldChunk {
         return [children[0], children[1], children[2], children[3]];
     }
 
-    private updateLoadingState(chunkForge: ChunkForgeCompute) {
+    private updateLoadingState(chunkForge: ChunkForge) {
         if (this.loadingState === "completed") {
             return;
         }
@@ -220,7 +220,7 @@ export class SphericalHeightFieldChunk {
         );
     }
 
-    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForgeCompute) {
+    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
         const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
