@@ -63,7 +63,7 @@ export async function createSphericalHeightFieldTerrain(
 
     scene.activeCamera = camera;
 
-    const light = new DirectionalLight("light", new Vector3(-5, 2, -10).normalize(), scene);
+    const light = new DirectionalLight("light", new Vector3(-5, 2, 10).normalize(), scene);
     light.position = new Vector3(0, 100, 0);
 
     const lightGizmo = new LightGizmo();
@@ -83,12 +83,7 @@ export async function createSphericalHeightFieldTerrain(
     material.roughness = 1.0;
 
     const terrainModel: TerrainModel = {
-        type: "custom",
-        heightRange: {
-            min: -11e3,
-            max: 8.5e3,
-        },
-        id: "earth",
+        type: "procedural",
     };
 
     const terrain = new SphericalHeightFieldTerrain(
@@ -100,8 +95,6 @@ export async function createSphericalHeightFieldTerrain(
     );
 
     const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps, scene);
-
-    await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {
