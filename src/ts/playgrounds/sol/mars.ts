@@ -32,7 +32,6 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";

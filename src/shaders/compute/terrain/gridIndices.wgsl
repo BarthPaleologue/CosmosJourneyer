@@ -34,11 +34,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
         let indexIndex = ((id.x - 1) + (id.y - 1) * (params.row_vertex_count - 1)) * 6;
 
         indices[indexIndex + 0] = index - 1;
-        indices[indexIndex + 1] = index;
-        indices[indexIndex + 2] = index - params.row_vertex_count - 1;
+        indices[indexIndex + 1] = index - params.row_vertex_count - 1;
+        indices[indexIndex + 2] = index;
 
         indices[indexIndex + 3] = index;
-        indices[indexIndex + 4] = index - params.row_vertex_count;
-        indices[indexIndex + 5] = index - params.row_vertex_count - 1;
+        indices[indexIndex + 4] = index - params.row_vertex_count - 1;
+        indices[indexIndex + 5] = index - params.row_vertex_count;
     }
 }

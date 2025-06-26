@@ -80,7 +80,6 @@ export async function createTerrainScene(
     const size = 8;
 
     const terrain = new Mesh("terrain", scene);
-    terrain.sideOrientation = Mesh.BACKSIDE;
 
     const generator = await PlanarProceduralHeightField.New(engine);
     const normalComputer = await SquareGridNormalComputer.New(engine);
