@@ -17,7 +17,6 @@
 
 import { StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import {
