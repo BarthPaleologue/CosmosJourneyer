@@ -46,6 +46,7 @@ export async function createMarsScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
+    scene.clearColor.set(0, 0, 0, 1);
 
     const heightMaps = await loadHeightMaps(scene, progressMonitor);
 
