@@ -51,6 +51,7 @@ export async function createEarthScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
+    scene.clearColor.set(0, 0, 0, 1);
 
     const textures = await loadTextures(scene, progressMonitor);
 
