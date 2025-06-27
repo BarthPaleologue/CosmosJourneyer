@@ -21,61 +21,20 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import {
-    astronomicalUnitToMeters,
-    barToPascal,
-    celsiusToKelvin,
-    degreesToRadians,
-} from "@/utils/physics/unitConversions";
+import { barToPascal, degreesToRadians } from "@/utils/physics/unitConversions";
 
+import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
+import { getMarsModel } from "./mars";
+import { getMercuryModel } from "./mercury";
+import { getMoonModel } from "./moon";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
 
 export function getSolSystemModel(): StarSystemModel {
     const sun = getSunModel();
 
-    const mercury: TelluricPlanetModel = {
-        id: "mercury",
-        name: "Mercury",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 2_439.7e3,
-        mass: 3.301e23,
-        axialTilt: degreesToRadians(0.034),
-        siderealDaySeconds: 60 * 60 * 24 * 58.646,
-        waterAmount: 0,
-        temperature: {
-            min: 437,
-            max: 437,
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: astronomicalUnitToMeters(0.38),
-            eccentricity: 0.2056,
-            p: 2,
-            inclination: degreesToRadians(7),
-            longitudeOfAscendingNode: degreesToRadians(48.331),
-            argumentOfPeriapsis: degreesToRadians(29.124),
-            initialMeanAnomaly: 0,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: null,
-        rings: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const mercury = getMercuryModel([sun.id]);
 
     const venus: TelluricPlanetModel = {
         id: "venus",
@@ -137,160 +96,11 @@ export function getSolSystemModel(): StarSystemModel {
         seed: 0,
     };
 
-    const earth: TelluricPlanetModel = {
-        id: "earth",
-        name: "Earth",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 6_371e3,
-        mass: 5.972e24,
-        axialTilt: degreesToRadians(23.44),
-        siderealDaySeconds: 60 * 60 * 24,
-        waterAmount: 1,
-        temperature: {
-            min: celsiusToKelvin(-50),
-            max: celsiusToKelvin(50),
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 149_597_870e3,
-            eccentricity: 0.0167,
-            inclination: degreesToRadians(0),
-            longitudeOfAscendingNode: degreesToRadians(0),
-            argumentOfPeriapsis: degreesToRadians(114.20783),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_frequency: 1,
-            continents_fragmentation: 0.65,
+    const earth = getEarthModel([sun.id]);
 
-            bumps_frequency: 30,
+    const moon: TelluricSatelliteModel = getMoonModel([earth.id]);
 
-            max_bump_height: 1.5e3,
-            max_mountain_height: 10e3,
-            continent_base_height: 10e3 * 1.9,
-
-            mountains_frequency: 360,
-        },
-        rings: null,
-        atmosphere: {
-            seaLevelPressure: barToPascal(1),
-            greenHouseEffectFactor: 0.5,
-            gasMix: [
-                ["N2", 0.78],
-                ["O2", 0.21],
-                ["Ar", 0.01],
-            ],
-        },
-        clouds: {
-            layerRadius: 6_371e3 + 30e3,
-            smoothness: 0.7,
-            specularPower: 2,
-            frequency: 4,
-            detailFrequency: 12,
-            coverage: 0.5,
-            sharpness: 2.5,
-            color: { r: 0.8, g: 0.8, b: 0.8 },
-            worleySpeed: 0.0005,
-            detailSpeed: 0.003,
-        },
-        ocean: {
-            depth: 10e3,
-        },
-        seed: 0,
-    };
-
-    const moon: TelluricSatelliteModel = {
-        id: "moon",
-        name: "Moon",
-        type: OrbitalObjectType.TELLURIC_SATELLITE,
-        radius: 1_737.1e3,
-        mass: 7.342e22,
-        axialTilt: degreesToRadians(6.68),
-        siderealDaySeconds: 60 * 60 * 24 * 27.322,
-        waterAmount: 0,
-        temperature: {
-            min: 100,
-            max: 100,
-        },
-        orbit: {
-            parentIds: [earth.id],
-            semiMajorAxis: 384_400e3,
-            eccentricity: 0.0549,
-            inclination: degreesToRadians(5.145),
-            longitudeOfAscendingNode: degreesToRadians(125.08),
-            argumentOfPeriapsis: degreesToRadians(318.15),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
-
-    const mars: TelluricPlanetModel = {
-        id: "mars",
-        name: "Mars",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 3_389.5e3,
-        mass: 6.4171e23,
-        axialTilt: degreesToRadians(25.19),
-        siderealDaySeconds: 60 * 60 * 24 * 1.027,
-        waterAmount: 0,
-        temperature: {
-            min: celsiusToKelvin(-140),
-            max: celsiusToKelvin(20),
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 227_939_200e3,
-            eccentricity: 0.0934,
-            inclination: degreesToRadians(1.85),
-            longitudeOfAscendingNode: degreesToRadians(49.558),
-            argumentOfPeriapsis: degreesToRadians(286.502),
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: {
-            seaLevelPressure: barToPascal(0.006),
-            greenHouseEffectFactor: 0.1,
-            gasMix: [
-                ["CO2", 0.95],
-                ["N2", 0.03],
-                ["Ar", 0.01],
-                ["O2", 0.01],
-            ],
-        },
-        rings: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const mars: TelluricPlanetModel = getMarsModel([sun.id]);
 
     const jupiter = getJupiterModel([sun.id]);
 

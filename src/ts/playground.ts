@@ -50,6 +50,10 @@ engine.useReverseDepthBuffer = true;
 engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();
 
+// empty render loop so compute shaders can return even without a scene rendering
+const computeUpdate = () => {};
+engine.runRenderLoop(computeUpdate);
+
 const urlParams = new URLSearchParams(window.location.search);
 const requestedScene = urlParams.get("scene") ?? "";
 
@@ -112,6 +116,7 @@ scene.onAfterRenderObservable.addOnce(() => {
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
+    engine.stopRenderLoop(computeUpdate);
     engine.runRenderLoop(() => {
         scene.render();
     });
