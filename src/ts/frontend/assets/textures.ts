@@ -29,7 +29,7 @@ import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMat
 
 import { ItemPool } from "@/utils/dataStructures/itemPool";
 
-import { HeightMap1x1, HeightMap2x4 } from "./heightMaps";
+import { HeightMap1x1 } from "./heightMaps";
 import { LandingPadTexturePool } from "./landingPadTexturePool";
 
 import butterflyTexture from "@assets/butterfly.webp";
@@ -193,15 +193,6 @@ export async function loadTextures(
             progressCallback(++loadedCount, totalCount, texture.name);
             return texture;
         });
-    };
-
-    const loadImageBitmap = async (url: string): Promise<ImageBitmap> => {
-        totalCount++;
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const bitmap = await createImageBitmap(blob);
-        progressCallback(++loadedCount, totalCount, url);
-        return bitmap;
     };
 
     const loadCubeTextureAsync = (name: string, url: string): Promise<CubeTexture> => {
