@@ -21,11 +21,12 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { astronomicalUnitToMeters, barToPascal, degreesToRadians } from "@/utils/physics/unitConversions";
+import { barToPascal, degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
 import { getMarsModel } from "./mars";
+import { getMercuryModel } from "./mercury";
 import { getMoonModel } from "./moon";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
@@ -33,47 +34,7 @@ import { getSunModel } from "./sun";
 export function getSolSystemModel(): StarSystemModel {
     const sun = getSunModel();
 
-    const mercury: TelluricPlanetModel = {
-        id: "mercury",
-        name: "Mercury",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 2_439.7e3,
-        mass: 3.301e23,
-        axialTilt: degreesToRadians(0.034),
-        siderealDaySeconds: 60 * 60 * 24 * 58.646,
-        waterAmount: 0,
-        temperature: {
-            min: 437,
-            max: 437,
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: astronomicalUnitToMeters(0.38),
-            eccentricity: 0.2056,
-            p: 2,
-            inclination: degreesToRadians(7),
-            longitudeOfAscendingNode: degreesToRadians(48.331),
-            argumentOfPeriapsis: degreesToRadians(29.124),
-            initialMeanAnomaly: 0,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: null,
-        rings: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const mercury = getMercuryModel([sun.id]);
 
     const venus: TelluricPlanetModel = {
         id: "venus",
