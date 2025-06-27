@@ -27,8 +27,9 @@ import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsP
 import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
 import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
+import { HeightMap1x1 } from "./heightMaps";
 import { LandingPadTexturePool } from "./landingPadTexturePool";
 
 import butterflyTexture from "@assets/butterfly.webp";
@@ -56,7 +57,10 @@ import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal
 import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
+import earthHeightMap1x1 from "@assets/sol/textures/earthHeightMap8k.png";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
+import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
+import mercuryHeightMap1x1 from "@assets/sol/textures/mercuryHeightMap8k.png";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
@@ -139,6 +143,12 @@ export type RingsTextures = {
     uranus: Texture;
 };
 
+export type HeightMaps = {
+    mercury1x1: Readonly<HeightMap1x1>;
+    earth1x1: Readonly<HeightMap1x1>;
+    mars1x1: Readonly<HeightMap1x1>;
+};
+
 export type Textures = {
     readonly terrains: Readonly<AllTerrainTextures>;
     readonly water: Readonly<WaterTextures>;
@@ -146,6 +156,7 @@ export type Textures = {
     readonly materials: Readonly<AllMaterialTextures>;
     readonly gasPlanet: Readonly<GasPlanetTextures>;
     readonly rings: Readonly<RingsTextures>;
+    readonly heightMaps: HeightMaps;
     readonly environment: {
         readonly milkyWay: CubeTexture;
     };
@@ -288,6 +299,10 @@ export async function loadTextures(
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
+    const mercuryHeightMapPromise1x1 = loadTextureAsync("MercuryHeightMap1x1", mercuryHeightMap1x1);
+    const marsHeightMapPromise1x1 = loadTextureAsync("MarsHeightMap1x1", marsHeightMap1x1);
+    const earthHeightMapPromise1x1 = loadTextureAsync("EarthHeightMap1x1", earthHeightMap1x1);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -363,6 +378,20 @@ export async function loadTextures(
         rings: {
             saturn: await saturnRingsTexturePromise,
             uranus: await uranusRingsTexturePromise,
+        },
+        heightMaps: {
+            mercury1x1: {
+                type: "1x1",
+                texture: await mercuryHeightMapPromise1x1,
+            },
+            mars1x1: {
+                type: "1x1",
+                texture: await marsHeightMapPromise1x1,
+            },
+            earth1x1: {
+                type: "1x1",
+                texture: await earthHeightMapPromise1x1,
+            },
         },
         environment: {
             milkyWay: await milkyWayPromise,
