@@ -41,6 +41,14 @@ import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
 import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
 import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
 import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+import mercuryHeightMap_0_0 from "@assets/sol/textures/mercuryHeightMap2x4/0_0.png";
+import mercuryHeightMap_0_1 from "@assets/sol/textures/mercuryHeightMap2x4/0_1.png";
+import mercuryHeightMap_0_2 from "@assets/sol/textures/mercuryHeightMap2x4/0_2.png";
+import mercuryHeightMap_0_3 from "@assets/sol/textures/mercuryHeightMap2x4/0_3.png";
+import mercuryHeightMap_1_0 from "@assets/sol/textures/mercuryHeightMap2x4/1_0.png";
+import mercuryHeightMap_1_1 from "@assets/sol/textures/mercuryHeightMap2x4/1_1.png";
+import mercuryHeightMap_1_2 from "@assets/sol/textures/mercuryHeightMap2x4/1_2.png";
+import mercuryHeightMap_1_3 from "@assets/sol/textures/mercuryHeightMap2x4/1_3.png";
 import moonHeightMap_0_0 from "@assets/sol/textures/moonHeightMap2x4/0_0.png";
 import moonHeightMap_0_1 from "@assets/sol/textures/moonHeightMap2x4/0_1.png";
 import moonHeightMap_0_2 from "@assets/sol/textures/moonHeightMap2x4/0_2.png";
@@ -105,7 +113,20 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
     private preloadHeightMap(key: HeightMapId): Promise<Result<HeightMap, Array<Error>>> | undefined {
         switch (key) {
             case "mercury":
-                return;
+                return loadHeightMap2x4FromUrlsToGpu(
+                    key,
+                    [
+                        [mercuryHeightMap_0_0, mercuryHeightMap_0_1, mercuryHeightMap_0_2, mercuryHeightMap_0_3],
+                        [mercuryHeightMap_1_0, mercuryHeightMap_1_1, mercuryHeightMap_1_2, mercuryHeightMap_1_3],
+                    ],
+                    this.scene,
+                ).then((result) => {
+                    if (result.success) {
+                        this.higherResolutionHeightMaps[key] = result.value;
+                    }
+
+                    return result;
+                });
             case "venus":
                 return;
             case "earth":
