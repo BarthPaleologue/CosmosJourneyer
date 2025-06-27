@@ -60,6 +60,7 @@ import skyBox from "@assets/skybox/milkyway.env";
 import earthHeightMap1x1 from "@assets/sol/textures/earthHeightMap8k.png";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
 import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
+import mercuryHeightMap1x1 from "@assets/sol/textures/mercuryHeightMap8k.png";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
 import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
@@ -143,6 +144,7 @@ export type RingsTextures = {
 };
 
 export type HeightMaps = {
+    mercury1x1: Readonly<HeightMap1x1>;
     earth1x1: Readonly<HeightMap1x1>;
     mars1x1: Readonly<HeightMap1x1>;
 };
@@ -297,6 +299,7 @@ export async function loadTextures(
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
 
+    const mercuryHeightMapPromise1x1 = loadTextureAsync("MercuryHeightMap1x1", mercuryHeightMap1x1);
     const marsHeightMapPromise1x1 = loadTextureAsync("MarsHeightMap1x1", marsHeightMap1x1);
     const earthHeightMapPromise1x1 = loadTextureAsync("EarthHeightMap1x1", earthHeightMap1x1);
 
@@ -377,6 +380,10 @@ export async function loadTextures(
             uranus: await uranusRingsTexturePromise,
         },
         heightMaps: {
+            mercury1x1: {
+                type: "1x1",
+                texture: await mercuryHeightMapPromise1x1,
+            },
             mars1x1: {
                 type: "1x1",
                 texture: await marsHeightMapPromise1x1,
