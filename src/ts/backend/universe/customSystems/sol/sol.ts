@@ -29,6 +29,7 @@ import { Settings } from "@/settings";
 import { getEarthModel } from "./earth";
 import { getJupiterModel } from "./jupiter";
 import { getMarsModel } from "./mars";
+import { getMercuryModel } from "./mercury";
 import { getMoonModel } from "./moon";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
@@ -36,47 +37,7 @@ import { getSunModel } from "./sun";
 export function getSolSystemModel(): StarSystemModel {
     const sun = getSunModel();
 
-    const mercury: TelluricPlanetModel = {
-        id: "mercury",
-        name: "Mercury",
-        type: OrbitalObjectType.TELLURIC_PLANET,
-        radius: 2_439.7e3,
-        mass: 3.301e23,
-        axialTilt: Tools.ToRadians(0.034),
-        siderealDaySeconds: 60 * 60 * 24 * 58.646,
-        waterAmount: 0,
-        temperature: {
-            min: 437,
-            max: 437,
-        },
-        orbit: {
-            parentIds: [sun.id],
-            semiMajorAxis: 0.38 * Settings.AU,
-            eccentricity: 0.2056,
-            p: 2,
-            inclination: Tools.ToRadians(7),
-            longitudeOfAscendingNode: Tools.ToRadians(48.331),
-            argumentOfPeriapsis: Tools.ToRadians(29.124),
-            initialMeanAnomaly: 0,
-        },
-        terrainSettings: {
-            continents_fragmentation: 0.1,
-            continents_frequency: 1,
-
-            bumps_frequency: 10,
-            max_bump_height: 15e3,
-
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
-
-            mountains_frequency: 0,
-        },
-        atmosphere: null,
-        rings: null,
-        clouds: null,
-        ocean: null,
-        seed: 0,
-    };
+    const mercury = getMercuryModel([sun.id]);
 
     const venus: TelluricPlanetModel = {
         id: "venus",
