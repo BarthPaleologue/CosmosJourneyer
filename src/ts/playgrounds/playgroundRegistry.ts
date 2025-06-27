@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene } from "@babylonjs/core";
+import { Scene, WebGPUEngine } from "@babylonjs/core";
 
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";
@@ -35,16 +35,22 @@ import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
+import { createEarthScene } from "./sol/earth";
 import { createJupiterScene } from "./sol/jupiter";
+import { createMarsScene } from "./sol/mars";
+import { createMercuryScene } from "./sol/mercury";
+import { createMoonScene } from "./sol/moon";
 import { createSaturnScene } from "./sol/saturn";
 import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSphericalHeightFieldTerrain } from "./sphericalHeightFieldTerrain";
 import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
+import { createTerrainScene } from "./terrain";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
@@ -52,7 +58,7 @@ import { createXrScene } from "./xr";
 export class PlaygroundRegistry {
     private readonly map: Map<
         string,
-        (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene>
+        (engine: WebGPUEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene>
     > = new Map([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
@@ -84,12 +90,18 @@ export class PlaygroundRegistry {
         ["warpTunnel", createWarpTunnelScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
+        ["terrain", createTerrainScene],
+        ["sphericalTerrain", createSphericalHeightFieldTerrain],
+        ["earth", createEarthScene],
+        ["mars", createMarsScene],
+        ["moon", createMoonScene],
+        ["mercury", createMercuryScene],
     ]);
 
     register(
         name: string,
         createScene: (
-            engine: AbstractEngine,
+            engine: WebGPUEngine,
             progressCallback: (progress: number, text: string) => void,
         ) => Promise<Scene>,
     ) {
@@ -98,7 +110,7 @@ export class PlaygroundRegistry {
 
     get(
         name: string,
-    ): (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
+    ): (engine: WebGPUEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }
 }
