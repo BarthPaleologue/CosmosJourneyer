@@ -19,9 +19,72 @@ import {
     vector2ToString,
 } from "@/utils/strings/inputControlsString";
 
-export function initSettingsPanel(): HTMLElement {
+import i18n from "@/i18n";
+
+import { MusicConductor } from "../audio/musicConductor";
+
+export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");
     if (settingsPanel === null) throw new Error("#settings does not exist!");
+
+    const audioSection = document.createElement("div");
+    audioSection.classList.add("settings-section");
+
+    const volumeTitle = document.createElement("h3");
+    volumeTitle.textContent = i18n.t("sidePanel:audioSettings");
+    volumeTitle.style.fontFamily = "Nasalization, sans-serif";
+    audioSection.appendChild(volumeTitle);
+
+    const sliderContainer = document.createElement("div");
+    sliderContainer.style.display = "flex";
+    sliderContainer.style.alignItems = "center";
+    sliderContainer.style.gap = "10px";
+    sliderContainer.style.fontFamily = "Nasalization, sans-serif";
+
+    const sliderLabel = document.createElement("label");
+    sliderLabel.textContent = i18n.t("sidePanel:musicVolume");
+    sliderLabel.style.fontFamily = "Nasalization, sans-serif";
+    sliderLabel.style.minWidth = "80px";
+    sliderLabel.style.flexGrow = "1";
+    sliderLabel.style.color = "#fff";
+    sliderLabel.style.fontWeight = "bold";
+    sliderLabel.style.letterSpacing = "1px";
+    sliderLabel.style.fontSize = "1.1em";
+    sliderContainer.appendChild(sliderLabel);
+
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "1";
+    slider.step = "0.05";
+    slider.value = musicConductor.getVolume().toString();
+    slider.style.margin = "0 10px";
+    slider.style.accentColor = "#ffffff";
+
+    const percentage = document.createElement("span");
+    percentage.textContent = (parseFloat(slider.value) * 100).toFixed(0) + "%";
+    percentage.style.fontFamily = "Nasalization, sans-serif";
+    percentage.style.color = "#fff";
+    percentage.style.backgroundColor = "#1a1a1a";
+    percentage.style.padding = "2px 8px";
+    percentage.style.borderRadius = "4px";
+    percentage.style.fontWeight = "bold";
+    percentage.style.fontSize = "1em";
+    percentage.style.marginLeft = "4px";
+    percentage.style.minWidth = "50px";
+    percentage.style.textAlign = "center";
+
+    slider.addEventListener("input", () => {
+        const volume = parseFloat(slider.value);
+        percentage.textContent = (volume * 100).toFixed(0) + "%";
+        musicConductor.setSoundtrackVolume(volume);
+    });
+
+    sliderContainer.appendChild(slider);
+    sliderContainer.appendChild(percentage);
+
+    audioSection.appendChild(sliderContainer);
+    settingsPanel.appendChild(audioSection);
 
     void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
         InputMaps.forEach((inputMap) => {

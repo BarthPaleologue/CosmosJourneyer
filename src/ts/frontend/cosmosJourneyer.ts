@@ -225,7 +225,12 @@ export class CosmosJourneyer {
         this.tutorialLayer = new TutorialLayer(this.soundPlayer);
         document.body.appendChild(this.tutorialLayer.root);
 
-        this.sidePanels = new SidePanels(this.starSystemDatabase, this.saveManager, this.soundPlayer);
+        this.sidePanels = new SidePanels(
+            this.starSystemDatabase,
+            this.saveManager,
+            this.soundPlayer,
+            this.musicConductor,
+        );
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: Save) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {

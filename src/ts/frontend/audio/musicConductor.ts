@@ -106,6 +106,9 @@ export class MusicConductor {
             this.currentMusic.setVolume(volume);
         }
     }
+    public getVolume(): number {
+        return this.volume;
+    }
 
     public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
         if (this.currentMusic !== null) {
