@@ -21,7 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { gcd } from "@/utils/math";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { DeepReadonly } from "@/utils/types";

@@ -9,20 +9,24 @@ export default defineConfig({
         launchOptions: {
             args: [
                 "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--use-gl=swiftshader", // software WebGL
+                "--headless=new",
+                "--enable-unsafe-webgpu",
+                "--enable-features=Vulkan",
+                "--use-angle=vulkan",
+                "--use-vulkan=swiftshader",
+                "--use-webgpu-adapter=swiftshader",
+                "--use-gpu-in-tests",
             ],
         },
         viewport: { width: 1280, height: 720 },
     },
-
+    timeout: 120_000, // 2 minutes
     expect: {
         toHaveScreenshot: {
             maxDiffPixelRatio: 0.03,
             threshold: 0.01,
         },
     },
-
     webServer: {
         command: "npm run serve:prod",
         url: "http://localhost:8080",

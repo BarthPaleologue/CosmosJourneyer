@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
+import { Color4, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -26,7 +26,7 @@ import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProces
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
-import { ItemPool } from "@/utils/itemPool";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,
@@ -50,7 +50,8 @@ export async function createRingsScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer();
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     const light = new PointLight("light1", new Vector3(-1, 0.5, -2).scaleInPlace(10 * scalingFactor), scene);

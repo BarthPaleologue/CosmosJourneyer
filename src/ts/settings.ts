@@ -22,7 +22,7 @@ export const Settings = {
 
     POWER_PLAY_SEED: 77,
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: 6000e3, // target is 6000e3
 
     EARTH_MASS: 5.972e24,
 
@@ -37,6 +37,8 @@ export const Settings = {
 
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
+
+    MAX_CACHED_CHUNKS: 5_000,
 
     CLOUD_LAYER_HEIGHT: 7e3,
     EARTH_ATMOSPHERE_THICKNESS: 100e3,
@@ -125,7 +127,7 @@ export const Settings = {
     TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000",
 
     QUALITY_CHARS: "FEDCBA",
-};
+} as const;
 
 export const CollisionMask = {
     ENVIRONMENT: 0b00000001,

@@ -18,7 +18,7 @@
 import "@styles/index.scss";
 import "@babylonjs/inspector";
 
-import { Engine, PhysicsViewer, Scene, Tools } from "@babylonjs/core";
+import { PhysicsViewer, Scene, Tools, WebGPUEngine } from "@babylonjs/core";
 
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 
@@ -40,10 +40,25 @@ const progressCallback = (progress01: number, text: string) => {
     loadingScreen.loadingUIText = text;
 };
 
-const engine = new Engine(canvas, true);
+const engine = new WebGPUEngine(canvas, {
+    antialias: true,
+    audioEngine: true,
+    useHighPrecisionMatrix: true,
+    doNotHandleContextLost: true,
+});
+
+await engine.initAsync(undefined, {
+    wasmPath: new URL("./utils/TWGSL/twgsl.wasm", import.meta.url).href,
+    jsPath: new URL("./utils/TWGSL/twgsl.js", import.meta.url).href,
+});
+
 engine.useReverseDepthBuffer = true;
 engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();
+
+// empty render loop so compute shaders can return even without a scene rendering
+const computeUpdate = () => {};
+engine.runRenderLoop(computeUpdate);
 
 const urlParams = new URLSearchParams(window.location.search);
 const requestedScene = urlParams.get("scene") ?? "";
@@ -81,6 +96,7 @@ if (urlParams.get("physicsViewer") !== null) {
 const maxFrameCounter = urlParams.get("freeze");
 const maxFrameCounterValue = Number(maxFrameCounter);
 if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
+    engine["getDeltaTime"] = () => 0; // Disable delta time to freeze the scene
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;
@@ -98,6 +114,7 @@ scene.onAfterRenderObservable.addOnce(() => {
 
 scene.executeWhenReady(() => {
     engine.loadingScreen.hideLoadingUI();
+    engine.stopRenderLoop(computeUpdate);
     engine.runRenderLoop(() => {
         scene.render();
     });
