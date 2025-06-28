@@ -300,7 +300,7 @@ export class SpaceStationLayer {
             this.onTakeOffObservable.notifyObservers();
         });
 
-        this.spaceshipDockPanel = new SpaceshipDockUI(player);
+        this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
     }
 
     private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: StarSystemDatabase) {

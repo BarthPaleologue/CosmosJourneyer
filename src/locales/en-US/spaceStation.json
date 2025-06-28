@@ -22,6 +22,7 @@
     "equippedComponent": "Equipped",
     "storeButton": "Store",
     "sellButton": "Sell",
+    "sellConfirmation": "Are you sure you want to sell this component for {{price}}?",
     "selectedComponent": "Selected",
     "buyEquipButton": "Buy & Equip",
     "equipButton": "Equip",

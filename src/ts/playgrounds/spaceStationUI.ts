@@ -90,5 +90,7 @@ export async function createSpaceStationUIScene(
     spaceStationUI.setStation(stationModel, [], player);
     spaceStationUI.setVisibility(true);
 
+    (window as Window & typeof globalThis & { player: Player }).player = player;
+
     return scene;
 }
