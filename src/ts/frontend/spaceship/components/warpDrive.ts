@@ -248,10 +248,10 @@ export class WarpDrive implements ReadonlyWarpDrive {
     }
 
     /**
-     * Returns the amount of fuel consumed by the warp drive to travel the given distance in light-years.
-     * @param distanceLY The distance to travel in light-years.
+     * Returns the amount of fuel consumed by the warp drive when traveling a given distance over one second.
+     * @param distanceLY The distance traveled in one second in light-years.
      */
-    public getFuelConsumption(distanceLY: number) {
-        return 2 * distanceLY;
+    public getFuelConsumptionRate(distanceLY: number) {
+        return 2 * distanceLY + 2 * Math.pow(distanceLY, 0.25);
     }
 }

@@ -677,7 +677,7 @@ export class Spaceship implements Transformable {
         }
 
         const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
-        const fuelToBurn = warpDrive?.getFuelConsumption(distanceTravelledLY) ?? 0;
+        const fuelToBurn = warpDrive?.getFuelConsumptionRate(distanceTravelledLY) ?? 0;
         if (fuelToBurn < this.getRemainingFuel()) {
             this.burnFuel(fuelToBurn);
         } else {
