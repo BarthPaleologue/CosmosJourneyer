@@ -31,7 +31,7 @@ export class SpaceshipDockUI {
 
     private readonly spaceshipOutfittingUI: SpaceshipOutfittingUI;
 
-    constructor(player: Player) {
+    constructor(player: Player, soundPlayer: ISoundPlayer) {
         this.root = document.createElement("div");
 
         const spaceshipH2 = document.createElement("h2");
@@ -49,7 +49,7 @@ export class SpaceshipDockUI {
         this.otherSpaceshipContainer = document.createElement("div");
         this.root.appendChild(this.otherSpaceshipContainer);
 
-        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player);
+        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player, soundPlayer);
     }
 
     public generate(player: Player, soundPlayer: ISoundPlayer) {
@@ -84,7 +84,7 @@ export class SpaceshipDockUI {
                 }
 
                 outfittingButton.classList.add("active");
-                this.spaceshipOutfittingUI.generate(currentSpaceship.getInternals(), player);
+                this.spaceshipOutfittingUI.generate(currentSpaceship.getInternals(), player, soundPlayer);
                 this.currentSpaceshipContainer.appendChild(this.spaceshipOutfittingUI.root);
             });
 

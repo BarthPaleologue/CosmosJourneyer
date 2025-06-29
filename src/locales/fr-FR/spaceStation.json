@@ -22,6 +22,7 @@
     "equippedComponent": "Équipé",
     "storeButton": "Stocker",
     "sellButton": "Vendre",
+    "sellConfirmation": "Êtes-vous sûr de vouloir vendre ce composant pour {{price}} ?",
     "selectedComponent": "Sélectionné",
     "buyEquipButton": "Acheter & Équiper",
     "equipButton": "Équiper",

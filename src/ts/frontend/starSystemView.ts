@@ -312,7 +312,7 @@ export class StarSystemView implements View {
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
 
-            const fuelForJump = warpDrive.getFuelConsumption(distanceLY);
+            const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
                 createNotification(
@@ -810,7 +810,7 @@ export class StarSystemView implements View {
                   ) / Settings.LIGHT_YEAR
                 : 0;
 
-        const fuelRequiredForJump = warpDrive?.getFuelConsumption(distanceLY) ?? 0;
+        const fuelRequiredForJump = warpDrive?.getHyperJumpFuelConsumption(distanceLY) ?? 0;
 
         this.spaceShipLayer.displayFuel(
             spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),

@@ -15,15 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getComponentTypeI18n, getComponentValue } from "@/backend/spaceship/serializedComponents/component";
+import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
+import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 
+import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { deserializeComponent } from "@/frontend/spaceship/components/component";
 import { ComponentSlot } from "@/frontend/spaceship/componentSlot";
 import { SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
 
 import i18n from "@/i18n";
+import { Settings } from "@/settings";
 
+import { promptModalBoolean } from "../dialogModal";
 import { ComponentBrowserUI } from "./componentBrowserUI";
 import { ComponentSpecUI } from "./componentSpecUI";
 
@@ -52,7 +56,7 @@ export class SpaceshipOutfittingUI {
 
     private activeSlot: ComponentSlot | null = null;
 
-    constructor(player: Player) {
+    constructor(player: Player, soundPlayer: ISoundPlayer) {
         this.root = document.createElement("div");
         this.root.className = "spaceshipOutfittingUI";
 
@@ -121,7 +125,7 @@ export class SpaceshipOutfittingUI {
         this.sellButton.style.flexGrow = "1";
         this.sellButton.innerText = i18n.t("spaceStation:sellButton");
         this.sellButton.disabled = true;
-        this.sellButton.addEventListener("click", () => {
+        this.sellButton.addEventListener("click", async () => {
             if (this.activeSlot === null) {
                 return;
             }
@@ -131,10 +135,25 @@ export class SpaceshipOutfittingUI {
                 return;
             }
 
+            soundPlayer.playNow(SoundType.CLICK);
+
+            const componentValue = getComponentValue(component.serialize());
+            const componentSellingPrice = componentValue * 0.75;
+
+            if (
+                !(await promptModalBoolean(
+                    i18n.t("spaceStation:sellConfirmation", {
+                        price: `${componentSellingPrice.toLocaleString()} ${Settings.CREDIT_SYMBOL}`,
+                    }),
+                    soundPlayer,
+                ))
+            ) {
+                return;
+            }
+
             this.activeSlot.setComponent(null);
 
-            const componentPrice = getComponentValue(component.serialize());
-            player.earn(componentPrice);
+            player.earn(componentSellingPrice);
 
             this.handleClickOnSlot(this.activeSlot, player);
         });
@@ -217,20 +236,20 @@ export class SpaceshipOutfittingUI {
         rowContainer2.appendChild(this.equipButton);
     }
 
-    generate(shipInternals: SpaceshipInternals, player: Player) {
+    generate(shipInternals: SpaceshipInternals, player: Player, soundPlayer: ISoundPlayer) {
         this.componentList.innerHTML = "";
 
         const primaryH2 = document.createElement("h2");
         primaryH2.innerText = i18n.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
-        const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive, player);
+        const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive, player, soundPlayer);
         this.componentList.appendChild(warpDriveSlot);
 
-        const thrustersSlot = this.createComponentSlotUI(shipInternals.primary.thrusters, player);
+        const thrustersSlot = this.createComponentSlotUI(shipInternals.primary.thrusters, player, soundPlayer);
         this.componentList.appendChild(thrustersSlot);
 
-        const fuelTankSlot = this.createComponentSlotUI(shipInternals.primary.fuelTank, player);
+        const fuelTankSlot = this.createComponentSlotUI(shipInternals.primary.fuelTank, player, soundPlayer);
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
@@ -238,17 +257,22 @@ export class SpaceshipOutfittingUI {
         this.componentList.appendChild(optionalH2);
 
         for (const componentSlot of shipInternals.optionals) {
-            const componentSlotUI = this.createComponentSlotUI(componentSlot, player);
+            const componentSlotUI = this.createComponentSlotUI(componentSlot, player, soundPlayer);
             this.componentList.appendChild(componentSlotUI);
         }
     }
 
-    private createComponentSlotUI(componentSlot: ComponentSlot, player: Player): HTMLElement {
+    private createComponentSlotUI(
+        componentSlot: ComponentSlot,
+        player: Player,
+        soundPlayer: ISoundPlayer,
+    ): HTMLElement {
         const slotUI = document.createElement("button");
         const component = componentSlot.getComponent();
         slotUI.textContent = component !== null ? getComponentTypeI18n(component.type) : i18n.t("components:emptySlot");
         slotUI.classList.add("componentSlot");
         slotUI.addEventListener("click", () => {
+            soundPlayer.playNow(SoundType.CLICK);
             this.handleClickOnSlot(componentSlot, player);
 
             if (this.activeSlotDiv !== null) {

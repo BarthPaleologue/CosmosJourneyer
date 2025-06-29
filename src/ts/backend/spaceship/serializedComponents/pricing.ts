@@ -15,21 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import { SerializedComponent } from "./component";
 
-import { Settings } from "@/settings";
-
-export const SerializedWarpDriveSchema = z.object({
-    type: z.literal("warpDrive"),
-    size: z.number(),
-    quality: z.number(),
-});
-
-export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
-
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
-    return {
-        maxSpeed: 5 * Settings.C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),
-    };
+export function getComponentValue(serializedComponent: SerializedComponent): number {
+    switch (serializedComponent.type) {
+        case "warpDrive":
+            return 20_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+        case "fuelScoop":
+            return 7_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+        case "fuelTank":
+            return 10_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+        case "discoveryScanner":
+            return 5_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+        case "thrusters":
+            return 15_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+    }
 }
