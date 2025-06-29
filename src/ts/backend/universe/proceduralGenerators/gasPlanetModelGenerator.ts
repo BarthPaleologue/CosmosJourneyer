@@ -21,6 +21,7 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { EarthSeaLevelPressure, JupiterMass } from "@/utils/physics/constants";
 import { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -73,7 +74,7 @@ export function newSeededGasPlanetModel(
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };
-    const mass = Settings.JUPITER_MASS * (radius / 69_911e3) ** 3;
+    const mass = JupiterMass * (radius / 69_911e3) ** 3;
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
     const siderealDaySeconds = (24 * 60 * 60) / 10;
 
@@ -106,7 +107,7 @@ export function newSeededGasPlanetModel(
         axialTilt,
         mass,
         atmosphere: {
-            pressure: Settings.EARTH_SEA_LEVEL_PRESSURE,
+            pressure: EarthSeaLevelPressure,
             greenHouseEffectFactor: 0.5,
         },
         rings: rings,

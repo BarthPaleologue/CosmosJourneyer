@@ -29,9 +29,8 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
-import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
-
-import { Settings } from "@/settings";
+import { EarthG } from "@/utils/physics/constants";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
@@ -87,10 +86,7 @@ export class CylinderHabitat implements Transformable {
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(
-            Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
-        );
+        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

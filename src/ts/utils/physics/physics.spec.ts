@@ -17,36 +17,16 @@
 
 import { describe, expect, test } from "vitest";
 
-import { Settings } from "@/settings";
-
 import {
-    celsiusToKelvin,
     computeMeanTemperature,
     estimateStarRadiusFromMass,
     getApparentGravityOnSpaceTether,
     getGravitationalLensFocalDistance,
-    getOrbitRadiusFromPeriod,
-    getRadiatedEnergyFlux,
     getRotationPeriodForArtificialGravity,
-    getSchwarzschildRadius,
-    getSphereRadiatedEnergyFlux,
-    getSphereTotalRadiatedEnergy,
     hasLiquidWater,
-    kelvinToCelsius,
     waterBoilingTemperature,
 } from "./physics";
-
-test("celsiusToKelvin", () => {
-    expect(celsiusToKelvin(0)).toBe(273.15);
-    expect(celsiusToKelvin(100)).toBe(373.15);
-    expect(celsiusToKelvin(-273.15)).toBe(0);
-});
-
-test("kelvinToCelsius", () => {
-    expect(kelvinToCelsius(0)).toBe(-273.15);
-    expect(kelvinToCelsius(273.15)).toBe(0);
-    expect(kelvinToCelsius(373.15)).toBe(100);
-});
+import { astronomicalUnitToMeters } from "./unitConversions";
 
 test("computeMeanTemperature", () => {
     const sunTemperature = 5778; // in Kelvin
@@ -107,8 +87,8 @@ test("gravitationalLensing", () => {
     const solarRadius = 6.9634e8; // in meters
 
     const focalLength = getGravitationalLensFocalDistance(solarMass, solarRadius);
-    expect(focalLength).toBeGreaterThan(530 * Settings.AU);
-    expect(focalLength).toBeLessThan(550 * Settings.AU);
+    expect(focalLength).toBeGreaterThan(astronomicalUnitToMeters(530));
+    expect(focalLength).toBeLessThan(astronomicalUnitToMeters(550));
 });
 
 describe("hasLiquidWater", () => {
@@ -168,44 +148,6 @@ test("getRotationPeriodForArtificialGravity", () => {
     expect(period).toBeLessThan(63 + 1);
 });
 
-describe("getSchwarzschildRadius", () => {
-    test("sun mass", () => {
-        const solarMass = 1.989e30; // in kg
-        const schwarzschildRadius = getSchwarzschildRadius(solarMass);
-
-        expect(schwarzschildRadius).toBeGreaterThan(2.95e3);
-        expect(schwarzschildRadius).toBeLessThan(3.05e3);
-    });
-
-    test("earth mass", () => {
-        const earthMass = 5.972e24;
-        const schwarzschildRadius = getSchwarzschildRadius(earthMass);
-
-        expect(schwarzschildRadius).toBeGreaterThan(8.85e-3);
-        expect(schwarzschildRadius).toBeLessThan(8.95e-3);
-    });
-});
-
-describe("getOrbitRadiusFromPeriod", () => {
-    test("earth orbit", () => {
-        const sunMass = 1.989e30; // in kg
-        const earthPeriod = 365.25 * 24 * 60 * 60; // in seconds
-        const earthOrbitRadius = getOrbitRadiusFromPeriod(earthPeriod, sunMass);
-
-        expect(earthOrbitRadius).toBeGreaterThan(1.49e11 - 1e9);
-        expect(earthOrbitRadius).toBeLessThan(1.49e11 + 1e9);
-    });
-
-    test("moon orbit", () => {
-        const earthMass = 5.972e24;
-        const moonPeriod = 27.3 * 24 * 60 * 60; // in seconds
-        const moonOrbitRadius = getOrbitRadiusFromPeriod(moonPeriod, earthMass);
-
-        expect(moonOrbitRadius).toBeGreaterThan(3.84e8 - 2e6);
-        expect(moonOrbitRadius).toBeLessThan(3.84e8 + 2e6);
-    });
-});
-
 describe("getApparentGravityOnSpaceTether", () => {
     test("earth geostationary orbit", () => {
         const earthMass = 5.972e24; // in kg
@@ -235,32 +177,5 @@ describe("getApparentGravityOnSpaceTether", () => {
             geostationaryOrbitRadius - 10_000e3,
         );
         expect(apparentGravityBelowGeoOrbit).toBeLessThan(0);
-    });
-});
-
-describe("Stefan-Boltzmann Law Functions", () => {
-    test("getRadiatedEnergyFlux should calculate the energy flux correctly", () => {
-        const temperature = 300; // in Kelvin
-        const expectedFlux = 5.67e-8 * temperature ** 4;
-        const flux = getRadiatedEnergyFlux(300);
-        expect(flux).toBeCloseTo(expectedFlux, 5);
-    });
-
-    test("getSphereTotalRadiatedEnergy should calculate the total radiated energy correctly", () => {
-        const temperature = 5778; // in Kelvin
-        const radius = 6.9634e8; // in meters
-        const expectedTotalEnergy = 5.67e-8 * temperature ** 4 * 4 * Math.PI * radius ** 2;
-        const totalEnergy = getSphereTotalRadiatedEnergy(temperature, radius);
-        expect(totalEnergy).toBeCloseTo(expectedTotalEnergy, 5);
-    });
-
-    test("getSphereRadiatedEnergyFlux should calculate the radiated energy flux at a distance correctly", () => {
-        const temperatureSun = 5778; // in Kelvin
-        const radiusSun = 6.9634e8; // in meters
-        const distanceSun = 1.496e11; // in meters
-        const expectedFluxAtDistance = 1360; // in W/m^2
-        const fluxAtDistance = getSphereRadiatedEnergyFlux(temperatureSun, radiusSun, distanceSun);
-        expect(fluxAtDistance).toBeGreaterThanOrEqual(expectedFluxAtDistance - 100);
-        expect(fluxAtDistance).toBeLessThanOrEqual(expectedFluxAtDistance + 100);
     });
 });

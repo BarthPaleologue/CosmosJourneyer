@@ -19,7 +19,8 @@ import { DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/dar
 import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { Settings } from "@/settings";
+import { EarthMass } from "@/utils/physics/constants";
+import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 
 export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
     return {
@@ -29,7 +30,7 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
         axialTilt: 0,
         siderealDaySeconds: 0,
         radius: 100e3,
-        mass: Settings.EARTH_MASS,
+        mass: EarthMass,
         orbit: {
             parentIds: [...parentIds],
             argumentOfPeriapsis: 0,
@@ -37,7 +38,7 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
             p: 1,
             inclination: 0,
             longitudeOfAscendingNode: 0,
-            semiMajorAxis: Settings.AU * 100,
+            semiMajorAxis: astronomicalUnitToMeters(100),
             initialMeanAnomaly: 0,
         },
     };

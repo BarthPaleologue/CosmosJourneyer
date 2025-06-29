@@ -36,6 +36,7 @@ import {
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { SystemTarget } from "@/utils/systemTarget";
 import { DeepReadonly, NonEmptyArray } from "@/utils/types";
 
@@ -457,12 +458,12 @@ export class StarSystemController {
         const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
         const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);
 
-        const distance =
-            Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition) * Settings.LIGHT_YEAR;
+        const distance = lightYearsToMeters(
+            Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition),
+        );
 
-        const direction = targetSystemUniversePosition
-            .subtract(currentSystemUniversePosition)
-            .scaleInPlace(Settings.LIGHT_YEAR / distance);
+        const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
+
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);

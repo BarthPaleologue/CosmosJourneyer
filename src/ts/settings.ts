@@ -24,17 +24,6 @@ export const Settings = {
 
     EARTH_RADIUS: 1000e3, // target is 6000e3
 
-    EARTH_MASS: 5.972e24,
-
-    MOON_MASS: 7.348e22,
-
-    JUPITER_MASS: 1.898e27,
-
-    /**
-     * The distance light travels in one year.
-     */
-    LIGHT_YEAR: 3e8 * 60 * 60 * 24 * 365.25,
-
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
 
@@ -70,45 +59,6 @@ export const Settings = {
      * Hydroponic agriculture can be 250% more productive than conventional agriculture.
      */
     HYDROPONIC_TO_CONVENTIONAL_RATIO: 3.5,
-
-    /**
-     * The speed of light in meters per second.
-     */
-    C: 299792458,
-
-    /**
-     * The gravitational constant in m^3 kg^-1 s^-2.
-     */
-    G: 6.6743e-11,
-
-    /**
-     * The astronomical unit in meters.
-     */
-    AU: 150e9,
-
-    CELSIUS_TO_KELVIN: 273.15,
-
-    BAR_TO_PASCAL: 100_000,
-
-    /**
-     * The sea level pressure on Earth in Pascals.
-     */
-    EARTH_SEA_LEVEL_PRESSURE: 101325,
-
-    /**
-     * The mass of the sun in kilograms.
-     */
-    SOLAR_MASS: 1.989e30,
-
-    /**
-     * The radius of the sun in meters.
-     */
-    SOLAR_RADIUS: 696340e3,
-
-    /**
-     * The gravitational acceleration in m/s^2.
-     */
-    G_EARTH: 9.81,
 
     FOV: Tools.ToRadians(60),
 

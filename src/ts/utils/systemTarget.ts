@@ -8,8 +8,8 @@ import { StarSystemModel } from "@/backend/universe/starSystemModel";
 import { ObjectTargetCursorType, Targetable } from "@/frontend/universe/architecture/targetable";
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
+import { lightYearsToMeters } from "./physics/unitConversions";
 import { DeepReadonly } from "./types";
 
 export class SystemTarget implements Targetable {
@@ -22,8 +22,8 @@ export class SystemTarget implements Targetable {
 
     readonly targetInfo = {
         type: ObjectTargetCursorType.STAR_SYSTEM,
-        minDistance: Settings.LIGHT_YEAR * 2,
-        maxDistance: Settings.LIGHT_YEAR * 0.2,
+        minDistance: lightYearsToMeters(2),
+        maxDistance: lightYearsToMeters(0.2),
     };
 
     constructor(systemModel: DeepReadonly<StarSystemModel>, referencePlanePosition: Vector3, scene: Scene) {

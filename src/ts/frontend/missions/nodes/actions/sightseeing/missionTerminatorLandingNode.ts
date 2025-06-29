@@ -27,10 +27,11 @@ import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/un
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { UniverseObjectId, universeObjectIdEquals } from "@/backend/universe/universeObjectId";
 
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
-import { CollisionMask, Settings } from "@/settings";
+import { CollisionMask } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
@@ -143,7 +144,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNode
     }
 
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
-        const distance = Vector3.Distance(
+        const distanceLy = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
@@ -155,7 +156,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNode
         return i18n.t("missions:sightseeing:describeTerminatorLanding", {
             objectName: objectModel.name,
             systemName: systemModel.name,
-            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy)) : i18n.t("missions:common:here"),
         });
     }
 

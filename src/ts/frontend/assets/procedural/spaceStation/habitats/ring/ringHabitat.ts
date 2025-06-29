@@ -30,9 +30,8 @@ import { Transformable } from "@/frontend/universe/architecture/transformable";
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
-import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
-
-import { Settings } from "@/settings";
+import { EarthG } from "@/utils/physics/constants";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
 import { MetalSectionMaterial } from "../../metalSectionMaterial";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
@@ -142,10 +141,7 @@ export class RingHabitat implements Transformable {
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.getTransform().rotate(
-            Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH),
-        );
+        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {

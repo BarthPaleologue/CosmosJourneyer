@@ -21,8 +21,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { CropType } from "@/utils/agriculture";
-
-import { Settings } from "@/settings";
+import { SolarMass, SolarRadius } from "@/utils/physics/constants";
 
 export function getLoneStarSystem(): StarSystemModel {
     return {
@@ -40,8 +39,8 @@ export function getLoneStarSystem(): StarSystemModel {
                 id: "loneStar",
                 name: "Lone Star",
                 type: OrbitalObjectType.STAR,
-                mass: Settings.SOLAR_MASS,
-                radius: Settings.SOLAR_RADIUS,
+                mass: SolarMass,
+                radius: SolarRadius,
                 blackBodyTemperature: 5778,
                 axialTilt: 0,
                 orbit: {
@@ -73,7 +72,7 @@ export function getLoneStarSystem(): StarSystemModel {
                 axialTilt: 0,
                 orbit: OrbitSchema.parse({
                     parentIds: ["loneStar"],
-                    semiMajorAxis: Settings.SOLAR_RADIUS * 10,
+                    semiMajorAxis: SolarRadius * 10,
                 }),
                 seed: 0,
                 faction: Faction.SATORI_CONCORD,

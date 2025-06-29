@@ -22,14 +22,17 @@ import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereMod
 import { CloudsModel, newCloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
-import { getOrbitalPeriod, Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
-import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
+import { EarthMass, EarthSeaLevelPressure, MoonMass } from "@/utils/physics/constants";
+import { getOrbitalPeriod } from "@/utils/physics/orbit";
+import { hasLiquidWater } from "@/utils/physics/physics";
+import { celsiusToKelvin } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 
@@ -57,19 +60,14 @@ export function newSeededTelluricSatelliteModel(
     let mass;
     if (isSatelliteOfTelluric) {
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
-        mass = Settings.MOON_MASS * (radius / 1_735e3) ** 3;
+        mass = MoonMass * (radius / 1_735e3) ** 3;
     } else {
         //FIXME: when Settings.Earth radius gets to 1:1 scale, change this value by a variable in settings
-        mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
+        mass = EarthMass * (radius / 6_371e3) ** 3;
     }
 
     let pressure = Math.max(
-        normalRandom(
-            Settings.EARTH_SEA_LEVEL_PRESSURE,
-            0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE,
-            rng,
-            GenerationSteps.PRESSURE,
-        ),
+        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
         0,
     );
     if (isSatelliteOfTelluric || radius <= 0.3 * Settings.EARTH_RADIUS) {
@@ -80,7 +78,7 @@ export function newSeededTelluricSatelliteModel(
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
     const maxTemperature =
-        minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
+        minTemperature + Math.exp(-pressure / EarthSeaLevelPressure) * randRangeInt(30, 200, rng, 81);
 
     const axialTilt = 0;
     let siderealDaySeconds = (60 * 60 * 24) / 10;
@@ -98,7 +96,7 @@ export function newSeededTelluricSatelliteModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE,
+              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / EarthSeaLevelPressure,
           }
         : null;
 
