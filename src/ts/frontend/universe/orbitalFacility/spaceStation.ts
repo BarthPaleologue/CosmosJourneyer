@@ -40,7 +40,7 @@ import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPa
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
-import { getSphereRadiatedEnergyFlux } from "@/utils/physics";
+import { getSphereRadiatedEnergyFlux } from "@/utils/physics/thermodynamics";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";

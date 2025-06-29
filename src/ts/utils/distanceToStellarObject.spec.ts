@@ -24,6 +24,7 @@ import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSyst
 import { Settings } from "@/settings";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
+import { AU, EarthMass, SolarMass, SolarRadius } from "./physics/constants";
 import { DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
@@ -55,8 +56,8 @@ describe("distanceToStellarObject", () => {
                 axialTilt: 0,
                 seed: 0,
                 siderealDaySeconds: 0,
-                radius: Settings.SOLAR_RADIUS,
-                mass: Settings.SOLAR_MASS,
+                radius: SolarRadius,
+                mass: SolarMass,
                 rings: null,
                 blackBodyTemperature: 5778,
             },
@@ -68,7 +69,7 @@ describe("distanceToStellarObject", () => {
                 name: "Planet",
                 orbit: {
                     p: 2,
-                    semiMajorAxis: Settings.AU,
+                    semiMajorAxis: AU,
                     parentIds: ["star"],
                     argumentOfPeriapsis: 0,
                     inclination: 0,
@@ -80,7 +81,7 @@ describe("distanceToStellarObject", () => {
                 seed: 0,
                 siderealDaySeconds: 0,
                 radius: Settings.EARTH_RADIUS * 10,
-                mass: Settings.EARTH_MASS * 10000,
+                mass: EarthMass * 10000,
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,

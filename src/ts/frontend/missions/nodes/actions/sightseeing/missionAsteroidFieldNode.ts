@@ -29,10 +29,10 @@ import { getObjectModelById } from "@/backend/universe/starSystemModel";
 import { UniverseObjectId, universeObjectIdEquals } from "@/backend/universe/universeObjectId";
 
 import { clamp } from "@/utils/math";
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
 import { MissionContext } from "../../../missionContext";
@@ -151,7 +151,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
     }
 
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
-        const distance = Vector3.Distance(
+        const distanceLy = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
@@ -163,7 +163,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
             systemName: systemModel.name,
-            distance: distance > 0 ? parseDistance(distance * Settings.LIGHT_YEAR) : i18n.t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy)) : i18n.t("missions:common:here"),
         });
     }
 

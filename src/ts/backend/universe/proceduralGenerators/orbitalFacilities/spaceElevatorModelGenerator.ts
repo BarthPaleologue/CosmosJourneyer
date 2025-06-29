@@ -26,7 +26,7 @@ import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates"
 
 import { CropType, CropTypes } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { getOrbitRadiusFromPeriod } from "@/utils/physics";
+import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { randomPieChart } from "@/utils/random";
 import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
 

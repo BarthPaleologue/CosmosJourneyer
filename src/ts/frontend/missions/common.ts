@@ -5,11 +5,11 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
 import { MissionContext } from "./missionContext";
 
@@ -46,14 +46,14 @@ export function getGoToSystemInstructions(
             );
         }
 
-        const distanceToNextSystem = Vector3.Distance(
+        const distanceToNextSystemLy = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates),
             currentSystemPosition,
         );
 
         return i18n.t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,
-            distance: parseDistance(distanceToNextSystem * Settings.LIGHT_YEAR),
+            distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy)),
             nbJumps: missionContext.currentItinerary.length - 1,
         });
     }

@@ -20,7 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -29,6 +29,8 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
+
+import { AU } from "@/utils/physics/constants";
 
 import { Settings } from "@/settings";
 
@@ -54,7 +56,7 @@ export async function createSpaceStationScene(
     camera.maxZ = Settings.EARTH_RADIUS * 1e5;
     camera.attachControl();
 
-    const distanceToStar = Settings.AU;
+    const distanceToStar = AU;
 
     defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
     defaultControls.getTransform().lookAt(Vector3.Zero());
@@ -71,28 +73,7 @@ export async function createSpaceStationScene(
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
     const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
 
-    const sunModel: StarModel = {
-        type: OrbitalObjectType.STAR,
-        id: "PGStar",
-        name: "PG Star",
-        blackBodyTemperature: 5778,
-        mass: Settings.SOLAR_MASS,
-        radius: Settings.SOLAR_RADIUS,
-        orbit: {
-            p: 2,
-            argumentOfPeriapsis: 0,
-            semiMajorAxis: 0,
-            eccentricity: 0,
-            longitudeOfAscendingNode: 0,
-            inclination: 0,
-            initialMeanAnomaly: 0,
-            parentIds: [],
-        },
-        siderealDaySeconds: 0,
-        axialTilt: 0,
-        seed: 0,
-        rings: null,
-    };
+    const sunModel: StarModel = getSunModel();
 
     const sun = new Star(sunModel, assets.textures, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);

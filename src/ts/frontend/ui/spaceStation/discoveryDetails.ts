@@ -18,7 +18,6 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 
@@ -27,6 +26,7 @@ import { Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
+import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 

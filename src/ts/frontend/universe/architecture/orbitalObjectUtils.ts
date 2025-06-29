@@ -18,7 +18,7 @@
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { getPointOnOrbit } from "@/backend/universe/orbitalObjects/orbit";
+import { getPointOnOrbit } from "@/utils/physics/orbit";
 
 import { OrbitalObject } from "./orbitalObject";
 

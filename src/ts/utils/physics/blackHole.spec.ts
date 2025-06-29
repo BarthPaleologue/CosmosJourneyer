@@ -15,23 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { expect, test } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { getSphereRadiatedEnergyFlux } from "@/utils/physics";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
+import { getSchwarzschildRadius } from "./blackHole";
 
-test("solarPanelSurfaceCalculation", () => {
-    // test with ISS data
-    const efficiency = 0.07;
-    const sunTemperature = 5778;
-    const sunExposure = 0.5;
-    const distanceToSun = 1.496e11;
-    const sunRadius = 6.9634e8;
-    const energyRequirement = 120000;
+describe("getSchwarzschildRadius", () => {
+    it("should be about 3km for the mass of our sun", () => {
+        const solarMass = 1.989e30;
+        const schwarzschildRadius = getSchwarzschildRadius(solarMass);
 
-    const solarFlux = getSphereRadiatedEnergyFlux(sunTemperature, sunRadius, distanceToSun) * sunExposure;
+        expect(schwarzschildRadius).toBeGreaterThan(2.95e3);
+        expect(schwarzschildRadius).toBeLessThan(3.05e3);
+    });
 
-    const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
-    expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);
-    expect(solarPanelSurface).toBeLessThanOrEqual(2600);
+    it("should be about the size of a grain of rice for earth mass", () => {
+        const earthMass = 5.972e24;
+        const schwarzschildRadius = getSchwarzschildRadius(earthMass);
+
+        expect(schwarzschildRadius).toBeGreaterThan(8.85e-3);
+        expect(schwarzschildRadius).toBeLessThan(8.95e-3);
+    });
 });

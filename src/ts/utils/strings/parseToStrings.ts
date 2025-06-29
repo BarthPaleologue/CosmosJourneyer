@@ -16,7 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
+
+import { C } from "../physics/constants";
+import { lightYearsToMeters, metersToLightSeconds, metersToLightYears } from "../physics/unitConversions";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1_000) {
@@ -26,10 +28,14 @@ export function parseSpeed(speed: number): string {
     } else if (speed < 20_000_000) {
         return `${(speed / 1_000_000).toFixed(2)} Mm/s`;
     } else {
-        return `${(speed / Settings.C).toFixed(2)} c`;
+        return `${(speed / C).toFixed(2)} c`;
     }
 }
 
+/**
+ * @param distance Distance in meters.
+ * @returns A string representing the distance in a human-readable format.
+ */
 export function parseDistance(distance: number): string {
     if (distance < 1_000) {
         return i18n.t("units:shortM", { value: distance.toFixed(0) });
@@ -37,11 +43,11 @@ export function parseDistance(distance: number): string {
         return i18n.t("units:shortKm", { value: (distance / 1_000).toFixed(2) });
     } else if (distance < 300_000_000) {
         return i18n.t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
-    } else if (distance < 0.1 * Settings.LIGHT_YEAR) {
-        return i18n.t("units:shortLs", { value: (distance / Settings.C).toFixed(2) });
+    } else if (distance < lightYearsToMeters(0.1)) {
+        return i18n.t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
     } else {
         return i18n.t("units:shortLy", {
-            value: (distance / Settings.LIGHT_YEAR).toFixed(2),
+            value: metersToLightYears(distance).toFixed(2),
         });
     }
 }

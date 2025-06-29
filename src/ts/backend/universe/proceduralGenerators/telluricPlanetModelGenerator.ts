@@ -30,7 +30,9 @@ import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricP
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
-import { celsiusToKelvin, hasLiquidWater } from "@/utils/physics";
+import { EarthMass, EarthSeaLevelPressure } from "@/utils/physics/constants";
+import { hasLiquidWater } from "@/utils/physics/physics";
+import { celsiusToKelvin } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 
@@ -45,15 +47,10 @@ export function newSeededTelluricPlanetModel(
     const radius = Math.max(0.3, normalRandom(1.0, 0.1, rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
 
     //TODO: make mass dependent on more physical properties like density
-    const mass = Settings.EARTH_MASS * (radius / 6_371e3) ** 3;
+    const mass = EarthMass * (radius / 6_371e3) ** 3;
 
     let pressure = Math.max(
-        normalRandom(
-            Settings.EARTH_SEA_LEVEL_PRESSURE,
-            0.2 * Settings.EARTH_SEA_LEVEL_PRESSURE,
-            rng,
-            GenerationSteps.PRESSURE,
-        ),
+        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
         0,
     );
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
@@ -70,7 +67,7 @@ export function newSeededTelluricPlanetModel(
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
     const maxTemperature =
-        minTemperature + Math.exp(-pressure / Settings.EARTH_SEA_LEVEL_PRESSURE) * randRangeInt(30, 200, rng, 81);
+        minTemperature + Math.exp(-pressure / EarthSeaLevelPressure) * randRangeInt(30, 200, rng, 81);
 
     const axialTilt = normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT);
     const siderealDaySeconds = (60 * 60 * 24) / 10;
@@ -80,7 +77,7 @@ export function newSeededTelluricPlanetModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / Settings.EARTH_SEA_LEVEL_PRESSURE,
+              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / EarthSeaLevelPressure,
           }
         : null;
 

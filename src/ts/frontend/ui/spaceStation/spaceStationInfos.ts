@@ -17,10 +17,10 @@
 
 import { factionToString } from "@/backend/society/factions";
 import { OrbitalFacilityModel, OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { getOrbitalPeriod } from "@/backend/universe/orbitalObjects/orbit";
 
 import { CropType, cropTypeToString } from "@/utils/agriculture";
 import { makeD3PieChart } from "@/utils/d3PieChart";
+import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { DeepReadonly } from "@/utils/types";
 
 export function generateInfoHTML(

@@ -75,6 +75,7 @@ import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neut
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
 import { SystemTarget } from "@/utils/systemTarget";
@@ -804,10 +805,12 @@ export class StarSystemView implements View {
 
         const distanceLY =
             target !== null
-                ? Vector3.Distance(
-                      this.spaceshipControls.getTransform().getAbsolutePosition(),
-                      target.getTransform().getAbsolutePosition(),
-                  ) / Settings.LIGHT_YEAR
+                ? metersToLightYears(
+                      Vector3.Distance(
+                          this.spaceshipControls.getTransform().getAbsolutePosition(),
+                          target.getTransform().getAbsolutePosition(),
+                      ),
+                  )
                 : 0;
 
         const fuelRequiredForJump = warpDrive?.getHyperJumpFuelConsumption(distanceLY) ?? 0;

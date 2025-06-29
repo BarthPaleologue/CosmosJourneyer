@@ -15,34 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Settings } from "@/settings";
-
-/**
- * Applies Stefan-Boltzmann law to calculate the energy flux of a black body.
- * @param temperatureKelvin The temperature of the black body in Kelvin.
- */
-export function getRadiatedEnergyFlux(temperatureKelvin: number) {
-    return 5.67e-8 * temperatureKelvin ** 4;
-}
-
-/**
- * Calculates the total radiated energy of a sphere of a given radius and temperature (typically a star) using the Stefan-Boltzmann law.
- * @param temperatureKelvin The temperature of the sphere in Kelvin.
- * @param radius The radius of the sphere in meters.
- */
-export function getSphereTotalRadiatedEnergy(temperatureKelvin: number, radius: number) {
-    return getRadiatedEnergyFlux(temperatureKelvin) * 4 * Math.PI * radius ** 2;
-}
-
-/**
- * Calculates the energy flux of received at a given distance from a sphere of a given radius and temperature (typically a star).
- * @param temperatureKelvin The temperature of the sphere in Kelvin.
- * @param radius The radius of the sphere in meters.
- * @param distance The distance from the sphere in meters.
- */
-export function getSphereRadiatedEnergyFlux(temperatureKelvin: number, radius: number, distance: number) {
-    return getSphereTotalRadiatedEnergy(temperatureKelvin, radius) / (4 * Math.PI * distance ** 2);
-}
+import { C, G, SolarMass, SolarRadius } from "./constants";
+import { celsiusToKelvin } from "./unitConversions";
 
 /**
  * Calculates the boiling point of water at a given pressure.
@@ -92,11 +66,11 @@ export function computeMeanTemperature(
  * @see https://en.wikipedia.org/wiki/Main_sequence#Sample_parameters
  */
 export function estimateStarRadiusFromMass(mass: number) {
-    const massInSolarUnits = mass / Settings.SOLAR_MASS;
+    const massInSolarUnits = mass / SolarMass;
 
     const estimatedRadiusInSolarUnits = Math.pow(massInSolarUnits, 0.78);
 
-    return estimatedRadiusInSolarUnits * Settings.SOLAR_RADIUS;
+    return estimatedRadiusInSolarUnits * SolarRadius;
 }
 
 /**
@@ -107,7 +81,7 @@ export function estimateStarRadiusFromMass(mass: number) {
  * @see https://astronomy.stackexchange.com/questions/33498/what-is-the-gravitational-lensing-focal-distance-of-a-white-dwarf-star
  */
 export function getGravitationalLensFocalDistance(mass: number, radius: number) {
-    return (Settings.C * radius) ** 2 / (4 * Settings.G * mass);
+    return (C * radius) ** 2 / (4 * G * mass);
 }
 
 /**
@@ -118,24 +92,6 @@ export function getGravitationalLensFocalDistance(mass: number, radius: number) 
 export function getRotationPeriodForArtificialGravity(radius: number, gravity: number): number {
     // g = v² / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
     return 2 * Math.PI * Math.sqrt(radius / gravity);
-}
-
-/**
- * Converts a temperature in Celsius to Kelvin
- * @param celsius The temperature in Celsius
- * @returns The temperature in Kelvin
- */
-export function celsiusToKelvin(celsius: number) {
-    return celsius + Settings.CELSIUS_TO_KELVIN;
-}
-
-/**
- * Converts a temperature in Kelvin to Celsius
- * @param kelvin The temperature in Kelvin
- * @returns The temperature in Celsius
- */
-export function kelvinToCelsius(kelvin: number) {
-    return kelvin - Settings.CELSIUS_TO_KELVIN;
 }
 
 /**
@@ -165,26 +121,6 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
 }
 
 /**
- * Returns the Schwarzschild radius of an object given its mass
- * @param mass The mass of the object in kilograms
- * @returns the Schwarzschild radius of the object in meters
- */
-export function getSchwarzschildRadius(mass: number): number {
-    return (2 * Settings.G * mass) / (Settings.C * Settings.C);
-}
-
-/**
- * Returns the orbital period of an object in seconds given its radius and the mass of the parent object
- * @param period The period of the orbit in seconds
- * @param parentMass The mass of the parent object in kilograms
- * @returns The radius of the orbit in meters
- */
-export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
-    const omega = (2 * Math.PI) / period;
-    return Math.cbrt((Settings.G * parentMass) / (omega * omega));
-}
-
-/**
  * Returns the apparent gravity on a space tether given its period, mass and distance
  * @param period The rotation period of the tether in seconds (typically the same as the parent object for a classic space elevator)
  * @param mass The mass of the parent object in kilograms
@@ -193,5 +129,5 @@ export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
  */
 export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
     const omega = (2 * Math.PI) / period;
-    return (-Settings.G * mass) / (distance * distance) + distance * omega * omega;
+    return (-G * mass) / (distance * distance) + distance * omega * omega;
 }

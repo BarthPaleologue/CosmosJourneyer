@@ -26,10 +26,9 @@ import { Player } from "@/frontend/player/player";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 import { DeepReadonly } from "@/utils/types";
-
-import { Settings } from "@/settings";
 
 import { MissionContainer } from "./missionContainer";
 
@@ -115,7 +114,7 @@ export function generateMissionsDom(
 
     contactStations.forEach(({ model: station, distance }) => {
         const stationP = document.createElement("p");
-        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(distance * Settings.LIGHT_YEAR)})`;
+        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(lightYearsToMeters(distance))})`;
         htmlRoot.appendChild(stationP);
     });
 

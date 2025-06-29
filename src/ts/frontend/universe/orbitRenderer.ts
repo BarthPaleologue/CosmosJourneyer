@@ -21,9 +21,9 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
-import { getOrbitalPeriod, getPointOnOrbitLocal } from "@/backend/universe/orbitalObjects/orbit";
-
 import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+
+import { getOrbitalPeriod, getPointOnOrbitLocal } from "@/utils/physics/orbit";
 
 export class OrbitRenderer {
     private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();

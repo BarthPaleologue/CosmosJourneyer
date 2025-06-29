@@ -33,10 +33,9 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { createRing } from "@/utils/geometry/ringBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
-import { getRotationPeriodForArtificialGravity } from "@/utils/physics";
+import { EarthG } from "@/utils/physics/constants";
+import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 import { DeepReadonly } from "@/utils/types";
-
-import { Settings } from "@/settings";
 
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
@@ -198,7 +197,7 @@ export class LandingBay {
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, Settings.G_EARTH * 0.1),
+            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG * 0.1),
         );
 
         this.landingPads.forEach((landingPad) => {

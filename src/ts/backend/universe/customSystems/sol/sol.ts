@@ -24,9 +24,7 @@ import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricP
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { celsiusToKelvin } from "@/utils/physics";
-
-import { Settings } from "@/settings";
+import { astronomicalUnitToMeters, barToPascal, celsiusToKelvin } from "@/utils/physics/unitConversions";
 
 import { getJupiterModel } from "./jupiter";
 import { getSaturnModel } from "./saturn";
@@ -50,7 +48,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 0.38 * Settings.AU,
+            semiMajorAxis: astronomicalUnitToMeters(0.38),
             eccentricity: 0.2056,
             p: 2,
             inclination: Tools.ToRadians(7),
@@ -114,7 +112,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         rings: null,
         atmosphere: {
-            pressure: 93 * Settings.BAR_TO_PASCAL,
+            pressure: barToPascal(93),
             greenHouseEffectFactor: 0.99,
         },
         clouds: {
@@ -170,7 +168,7 @@ export function getSolSystemModel(): StarSystemModel {
         },
         rings: null,
         atmosphere: {
-            pressure: 1 * Settings.BAR_TO_PASCAL,
+            pressure: barToPascal(1),
             greenHouseEffectFactor: 0.5,
         },
         clouds: {
@@ -268,7 +266,7 @@ export function getSolSystemModel(): StarSystemModel {
             mountains_frequency: 0,
         },
         atmosphere: {
-            pressure: 0.006 * Settings.BAR_TO_PASCAL,
+            pressure: barToPascal(0.006),
             greenHouseEffectFactor: 0.1,
         },
         rings: null,
@@ -304,7 +302,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "uranus",
         },
         atmosphere: {
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
+            pressure: barToPascal(0.1),
             greenHouseEffectFactor: 0.5,
         },
         rings: {
@@ -339,7 +337,7 @@ export function getSolSystemModel(): StarSystemModel {
             textureId: "neptune",
         },
         atmosphere: {
-            pressure: 0.1 * Settings.BAR_TO_PASCAL,
+            pressure: barToPascal(0.1),
             greenHouseEffectFactor: 0.7,
         },
         rings: null,
