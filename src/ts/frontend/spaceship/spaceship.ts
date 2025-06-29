@@ -51,7 +51,7 @@ import { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManag
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import { setEnabledBody } from "@/utils/havok";
 
-import { CollisionMask, Settings } from "@/settings";
+import { CollisionMask } from "@/settings";
 
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
@@ -676,8 +676,10 @@ export class Spaceship implements Transformable {
             this.setMainEngineThrottle(0);
         }
 
-        const distanceTravelledLY = (this.getSpeed() * deltaSeconds) / Settings.LIGHT_YEAR;
-        const fuelToBurn = warpDrive?.getFuelConsumptionRate(distanceTravelledLY) ?? 0;
+        const fuelToBurn =
+            warpDrive !== null && warpDrive.isEnabled()
+                ? deltaSeconds * warpDrive.getFuelConsumptionRate(this.getSpeed())
+                : deltaSeconds * this.mainEngineThrottle * 0.02;
         if (fuelToBurn < this.getRemainingFuel()) {
             this.burnFuel(fuelToBurn);
         } else {

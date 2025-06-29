@@ -17,7 +17,7 @@
 
 import { getWarpDriveSpec, SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
-import { clamp, lerpSmooth } from "@/utils/math";
+import { clamp, lerpSmooth, remap } from "@/utils/math";
 
 const enum WarpDriveState {
     /**
@@ -248,10 +248,18 @@ export class WarpDrive implements ReadonlyWarpDrive {
     }
 
     /**
-     * Returns the amount of fuel consumed by the warp drive when traveling a given distance over one second.
-     * @param distanceLY The distance traveled in one second in light-years.
+     * @param speed The speed of the warp drive in m/s.
+     * @returns the amount of fuel (L/s) consumed by the warp drive per second based on the current speed.
      */
-    public getFuelConsumptionRate(distanceLY: number) {
-        return 2 * distanceLY + 2 * Math.pow(distanceLY, 0.25);
+    public getFuelConsumptionRate(speed: number) {
+        const speed01 = remap(speed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed, 0, 1);
+        return 0.15 * (speed01 - 0.75) ** 2 + 0.08; // minimum of 0.08 L/s at 75% throttle
+    }
+
+    /**
+     * @returns the amount of fuel (L) consumed by the warp drive for a hyper jump of the given distance in light-years.
+     */
+    public getHyperJumpFuelConsumption(distanceLy: number): number {
+        return 2 * distanceLy;
     }
 }
