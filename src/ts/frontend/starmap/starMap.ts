@@ -35,6 +35,7 @@ import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPi
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { Itinerary, ItinerarySchema } from "@/backend/player/serializedPlayer";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -50,6 +51,7 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "@/fr
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
+import { DeepReadonly } from "@/utils/types";
 import { View } from "@/utils/view";
 
 import { Settings } from "@/settings";
@@ -352,9 +354,14 @@ export class StarMap implements View {
                         await alertModal(path.error.message, this.soundPlayer);
                         continue;
                     }
-                    this.drawPath(path.value);
 
-                    this.player.currentItinerary = path.value;
+                    const parsedItinerary = ItinerarySchema.safeParse(path.value);
+                    if (parsedItinerary.success) {
+                        this.drawPath(parsedItinerary.data);
+                        this.player.currentItinerary = parsedItinerary.data;
+                    } else {
+                        this.player.currentItinerary = null;
+                    }
 
                     const nextDestination = path.value[1];
 
@@ -388,7 +395,7 @@ export class StarMap implements View {
         window.StarMap = this;
     }
 
-    private drawPath(path: StarSystemCoordinates[]) {
+    private drawPath(path: DeepReadonly<Itinerary>) {
         const points = path.map((coordinates) => {
             return this.starSystemDatabase.getSystemGalacticPosition(coordinates);
         });
@@ -745,7 +752,9 @@ export class StarMap implements View {
     public attachControl() {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
-        this.drawPath(this.player.currentItinerary);
+        if (this.player.currentItinerary !== null) {
+            this.drawPath(this.player.currentItinerary);
+        }
     }
 
     public detachControl() {

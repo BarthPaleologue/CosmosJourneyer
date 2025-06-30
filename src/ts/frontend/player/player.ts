@@ -18,7 +18,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { CompletedTutorials, SerializedPlayer } from "@/backend/player/serializedPlayer";
+import { CompletedTutorials, Itinerary, SerializedPlayer } from "@/backend/player/serializedPlayer";
 import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship, SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
@@ -28,6 +28,8 @@ import { UniverseObjectId } from "@/backend/universe/universeObjectId";
 import { Mission } from "@/frontend/missions/mission";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 
+import { DeepReadonly } from "@/utils/types";
+
 export class Player {
     uuid: string;
     #name: string;
@@ -35,17 +37,17 @@ export class Player {
     creationDate: Date;
     timePlayedSeconds: number;
 
-    visitedSystemHistory: StarSystemCoordinates[] = [];
+    visitedSystemHistory: Array<DeepReadonly<StarSystemCoordinates>> = [];
 
     discoveries: {
-        local: SpaceDiscoveryData[];
-        uploaded: SpaceDiscoveryData[];
+        local: Array<DeepReadonly<SpaceDiscoveryData>>;
+        uploaded: Array<DeepReadonly<SpaceDiscoveryData>>;
     };
 
     private readonly visitedObjects: Set<string> = new Set();
 
-    currentItinerary: StarSystemCoordinates[];
-    systemBookmarks: StarSystemCoordinates[];
+    currentItinerary: DeepReadonly<Itinerary> | null;
+    systemBookmarks: Array<DeepReadonly<StarSystemCoordinates>>;
 
     currentMissions: Mission[] = [];
     completedMissions: Mission[] = [];
@@ -53,7 +55,7 @@ export class Player {
     serializedSpaceships: SerializedSpaceship[] = [];
     instancedSpaceships: Spaceship[] = [];
 
-    spareSpaceshipComponents: Set<SerializedComponent>;
+    spareSpaceshipComponents: Set<DeepReadonly<SerializedComponent>>;
 
     tutorials: CompletedTutorials;
 
@@ -137,7 +139,7 @@ export class Player {
                 timePlayedSeconds: 0,
                 visitedSystemHistory: [],
                 discoveries: { uploaded: [], local: [] },
-                currentItinerary: [],
+                currentItinerary: null,
                 systemBookmarks: [],
                 currentMissions: [],
                 completedMissions: [],
@@ -167,7 +169,7 @@ export class Player {
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
             visitedSystemHistory: player.visitedSystemHistory,
             discoveries: player.discoveries,
-            currentItinerary: player.currentItinerary,
+            currentItinerary: player.currentItinerary !== null ? [...player.currentItinerary] : null,
             systemBookmarks: player.systemBookmarks,
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize()),
@@ -200,7 +202,7 @@ export class Player {
             this.visitedObjects.add(objectId);
         });
 
-        this.currentItinerary = player.currentItinerary.map((system) => structuredClone(system));
+        this.currentItinerary = player.currentItinerary !== null ? [...player.currentItinerary] : null;
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
         this.currentMissions = player.currentMissions
             .map((mission) => Mission.Deserialize(mission.serialize(), starSystemDatabase))

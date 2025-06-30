@@ -19,7 +19,16 @@ export function getGoToSystemInstructions(
     keyboardLayout: Map<string, string>,
     starSystemDatabase: StarSystemDatabase,
 ): string {
-    const currentPlayerDestination = missionContext.currentItinerary.at(-1);
+    const itinerary = missionContext.currentItinerary;
+    if (itinerary === null) {
+        return i18n.t("missions:common:openStarMap", {
+            starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(
+                ` ${i18n.t("common:or")} `,
+            ),
+        });
+    }
+
+    const currentPlayerDestination = itinerary.at(-1);
     const isPlayerGoingToTargetSystem =
         currentPlayerDestination !== undefined &&
         starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
@@ -35,11 +44,8 @@ export function getGoToSystemInstructions(
             ),
         });
     } else {
-        const nextSystemCoordinates = missionContext.currentItinerary.at(1);
-        const nextSystemModel =
-            nextSystemCoordinates !== undefined
-                ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates)
-                : null;
+        const nextSystemCoordinates = itinerary[1];
+        const nextSystemModel = starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates);
         if (nextSystemModel === null) {
             return i18n.t("missions:common:corruptedItinerary");
         }
@@ -52,7 +58,7 @@ export function getGoToSystemInstructions(
         return i18n.t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,
             distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy)),
-            nbJumps: missionContext.currentItinerary.length - 1,
+            nbJumps: itinerary.length - 1,
         });
     }
 }

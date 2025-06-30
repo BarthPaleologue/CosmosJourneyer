@@ -15,6 +15,12 @@ export const CompletedTutorialsSchema = z.object({
 
 export type CompletedTutorials = z.infer<typeof CompletedTutorialsSchema>;
 
+export const ItinerarySchema = z
+    .tuple([StarSystemCoordinatesSchema, StarSystemCoordinatesSchema])
+    .rest(StarSystemCoordinatesSchema);
+
+export type Itinerary = z.infer<typeof ItinerarySchema>;
+
 export const SerializedPlayerSchema = z.object({
     uuid: z
         .string()
@@ -34,7 +40,7 @@ export const SerializedPlayerSchema = z.object({
             local: [],
             uploaded: [],
         }),
-    currentItinerary: z.array(StarSystemCoordinatesSchema).default([]),
+    currentItinerary: ItinerarySchema.nullable().catch(null),
     systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
     currentMissions: z.array(MissionSerializedSchema).default([]),
     completedMissions: z.array(MissionSerializedSchema).default([]),
