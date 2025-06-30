@@ -87,6 +87,7 @@ import { Settings } from "@/settings";
 
 import { AiPlayerControls } from "./player/aiPlayerControls";
 import { Player } from "./player/player";
+import { isScannerInRange } from "./spaceship/components/discoveryScanner";
 import { Transformable } from "./universe/architecture/transformable";
 import { TypedObject } from "./universe/architecture/typedObject";
 
@@ -757,18 +758,16 @@ export class StarSystemView implements View {
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
         );
 
-        const distanceToNearesetCelestialBody2 = Vector3.DistanceSquared(
-            nearestCelestialBody.getTransform().getAbsolutePosition(),
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-        );
-
         const spaceship = this.spaceshipControls.getSpaceship();
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
 
         if (
             shipDiscoveryScanner !== null &&
-            distanceToNearesetCelestialBody2 <
-                (nearestCelestialBody.getBoundingRadius() * shipDiscoveryScanner.relativeRange) ** 2
+            isScannerInRange(
+                shipDiscoveryScanner,
+                this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+                nearestCelestialBody,
+            )
         ) {
             const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
