@@ -3,6 +3,7 @@
     "openStarMap": "Appuyez sur {{starMapKey}} pour ouvrir la carte stellaire.",
     "travelToNextSystem": "Poursuivez votre voyage en passant par {{systemName}} ({{distance}}). Il reste {{nbJumps}} sauts avant d'arriver à destination.",
     "getCloserToTarget": "Approchez vous de {{objectName}}",
+    "corruptedItinerary": "L'itinéraire est corrompu. Ouvrez la carte stellaire pour tracer un nouveau parcours.",
     "here": "ici",
     "accept": "Accepter",
     "accepted": "Acceptée",

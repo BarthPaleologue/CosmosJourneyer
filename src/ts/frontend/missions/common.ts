@@ -41,9 +41,7 @@ export function getGoToSystemInstructions(
                 ? starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates)
                 : null;
         if (nextSystemModel === null) {
-            throw new Error(
-                "Next system model in itinerary is null and yet the player has an itinerary to the target system?!",
-            );
+            return i18n.t("missions:common:corruptedItinerary");
         }
 
         const distanceToNextSystemLy = Vector3.Distance(

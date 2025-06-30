@@ -3,6 +3,7 @@
     "openStarMap": "Press {{starMapKey}} to open the Star Map.",
     "travelToNextSystem": "Continue your journey by passing through {{systemName}} ({{distance}}). There are {{nbJumps}} jumps left before reaching your destination.",
     "getCloserToTarget": "Fly closer to {{objectName}}",
+    "corruptedItinerary": "The itinerary is corrupted. Open the star map to plot a new course.",
     "here": "here",
     "accept": "Accept",
     "accepted": "Accepted",
