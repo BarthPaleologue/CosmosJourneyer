@@ -38,3 +38,7 @@ export type NonEmptyArray<T> = [T, ...T[]];
 export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
     return arr.length > 0;
 }
+
+export function assertUnreachable(value: never): never {
+    throw new Error(`Unexpected value: ${String(value)}`);
+}

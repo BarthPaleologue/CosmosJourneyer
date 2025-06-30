@@ -15,10 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
 import {
     getDiscoveryScannerSpec,
     SerializedDiscoveryScanner,
 } from "@/backend/spaceship/serializedComponents/discoveryScanner";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+
+import { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
+
+import { assertUnreachable } from "@/utils/types";
 
 export class DiscoveryScanner {
     readonly type;
@@ -44,4 +51,39 @@ export class DiscoveryScanner {
             quality: this.quality,
         };
     }
+}
+
+export function isScannerInRange(scanner: DiscoveryScanner, playerPosition: Vector3, celestialBody: CelestialBody) {
+    let baseDistanceMultiplier: number;
+    const type = celestialBody.type;
+    switch (type) {
+        case OrbitalObjectType.TELLURIC_PLANET:
+        case OrbitalObjectType.TELLURIC_SATELLITE:
+        case OrbitalObjectType.GAS_PLANET:
+        case OrbitalObjectType.MANDELBULB:
+        case OrbitalObjectType.JULIA_SET:
+        case OrbitalObjectType.MANDELBOX:
+        case OrbitalObjectType.SIERPINSKI_PYRAMID:
+        case OrbitalObjectType.MENGER_SPONGE:
+        case OrbitalObjectType.DARK_KNIGHT:
+            baseDistanceMultiplier = 1;
+            break;
+        case OrbitalObjectType.STAR:
+            baseDistanceMultiplier = 10;
+            break;
+        case OrbitalObjectType.NEUTRON_STAR:
+            baseDistanceMultiplier = 70_000;
+            break;
+        case OrbitalObjectType.BLACK_HOLE:
+            baseDistanceMultiplier = 20;
+            break;
+        default:
+            assertUnreachable(type);
+    }
+
+    const totalMultiplier = baseDistanceMultiplier * scanner.relativeRange;
+
+    const distance2 = Vector3.DistanceSquared(playerPosition, celestialBody.getTransform().position);
+
+    return distance2 < (celestialBody.getBoundingRadius() * totalMultiplier) ** 2;
 }
