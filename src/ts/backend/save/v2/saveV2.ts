@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import { Itinerary, ItinerarySchema, SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -100,6 +100,12 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
         };
     }
 
+    const parsedItinerary = ItinerarySchema.safeParse(saveV1.player.currentItinerary);
+    let itinerary: Itinerary | null = null;
+    if (parsedItinerary.success) {
+        itinerary = parsedItinerary.data;
+    }
+
     return {
         timestamp: saveV1.timestamp,
         player: {
@@ -113,7 +119,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
                 local: [],
                 uploaded: [],
             },
-            currentItinerary: saveV1.player.currentItinerary,
+            currentItinerary: itinerary,
             systemBookmarks: saveV1.player.systemBookmarks,
             currentMissions: [],
             completedMissions: [],

@@ -66,10 +66,8 @@ export function isScannerInRange(scanner: DiscoveryScanner, playerPosition: Vect
         case OrbitalObjectType.SIERPINSKI_PYRAMID:
         case OrbitalObjectType.MENGER_SPONGE:
         case OrbitalObjectType.DARK_KNIGHT:
-            baseDistanceMultiplier = 1;
-            break;
         case OrbitalObjectType.STAR:
-            baseDistanceMultiplier = 10;
+            baseDistanceMultiplier = 1;
             break;
         case OrbitalObjectType.NEUTRON_STAR:
             baseDistanceMultiplier = 70_000;

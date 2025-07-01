@@ -958,7 +958,7 @@ export class CosmosJourneyer {
 
         this.engine.loadingScreen.hideLoadingUI();
 
-        if (this.player.currentItinerary[1] !== undefined) {
+        if (this.player.currentItinerary !== null) {
             this.starSystemView.setSystemAsTarget(this.player.currentItinerary[1]);
         }
     }

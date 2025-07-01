@@ -38,7 +38,7 @@ describe("SaveLocalBackend", () => {
                         timePlayedSeconds: 235,
                         visitedSystemHistory: [],
                         discoveries: { local: [], uploaded: [] },
-                        currentItinerary: [],
+                        currentItinerary: null,
                         systemBookmarks: [],
                         currentMissions: [],
                         completedMissions: [],

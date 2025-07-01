@@ -28,6 +28,7 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { ItinerarySchema } from "@/backend/player/serializedPlayer";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -633,22 +634,20 @@ export class StarSystemView implements View {
             this.targetCursorLayer.addObject(systemTarget);
         }
 
-        if (this.player.currentItinerary.length >= 2) {
+        if (this.player.currentItinerary !== null) {
             const targetCoordinates = this.player.currentItinerary[1];
-            if (
-                targetCoordinates !== undefined &&
-                starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)
-            ) {
+            if (starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)) {
                 // the current system was the first destination of the itinerary, we can remove the system before from the itinerary
-                this.player.currentItinerary.shift();
+                const newItinerary = ItinerarySchema.safeParse(this.player.currentItinerary.slice(1));
 
                 // now there are either one or more systems in the itinerary (including the current one)
-                if (this.player.currentItinerary[1] !== undefined && this.player.currentItinerary.length >= 2) {
+                if (newItinerary.success) {
                     // if there are more than 1, the journey continues to the next system
+                    this.player.currentItinerary = newItinerary.data;
                     this.setSystemAsTarget(this.player.currentItinerary[1]);
                 } else {
                     // if there is only one (the current system), the journey is over
-                    this.player.currentItinerary = [];
+                    this.player.currentItinerary = null;
                 }
             }
         }

@@ -18,9 +18,11 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { Itinerary } from "@/backend/player/serializedPlayer";
 
 import { StarSystemController } from "@/frontend/universe/starSystemController";
+
+import { DeepReadonly } from "@/utils/types";
 
 /**
  * Describes information used by mission nodes to update their state
@@ -33,7 +35,7 @@ export type MissionContext = {
     /**
      * The current itinerary of the player
      */
-    currentItinerary: StarSystemCoordinates[];
+    currentItinerary: DeepReadonly<Itinerary> | null;
     /**
      * The world position of the player
      */
