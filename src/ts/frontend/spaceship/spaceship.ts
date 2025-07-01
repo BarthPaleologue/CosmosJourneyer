@@ -463,7 +463,7 @@ export class Spaceship implements Transformable {
         const currentFuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
         if (
             Math.abs(currentFuelPercentage - 1) < 0.01 ||
-            distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 1.7
+            distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 2.3
         ) {
             if (this.isFuelScooping) {
                 this.isFuelScooping = false;
@@ -473,12 +473,16 @@ export class Spaceship implements Transformable {
             return;
         }
 
+        if (distanceToBody > this.nearestCelestialBody.getBoundingRadius() * 2.0) {
+            return;
+        }
+
         if (!this.isFuelScooping) {
             this.isFuelScooping = true;
             this.onFuelScoopStart.notifyObservers();
         }
 
-        let fuelAvailability;
+        let fuelAvailability: number;
         switch (this.nearestCelestialBody.model.type) {
             case OrbitalObjectType.STAR:
                 fuelAvailability = 1;
