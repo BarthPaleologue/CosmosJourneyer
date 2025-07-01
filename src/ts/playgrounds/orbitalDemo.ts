@@ -29,6 +29,7 @@ import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 
 export function createOrbitalDemoScene(
@@ -110,11 +111,11 @@ export function createOrbitalDemoScene(
     bodyToParents.set(earth, [sun]);
     bodyToParents.set(moon, [earth]);
 
-    const orbitRenderer = new OrbitRenderer();
+    const orbitRenderer = new OrbitRenderer(CreateGreasedLineHelper);
     orbitRenderer.setOrbitalObjects(bodies, scene);
     orbitRenderer.setVisibility(true);
 
-    const axisRenderer = new AxisRenderer();
+    const axisRenderer = new AxisRenderer(CreateGreasedLineHelper);
     axisRenderer.setVisibility(true);
     axisRenderer.setOrbitalObjects(bodies, scene);
 

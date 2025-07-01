@@ -15,22 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { CreateGreasedLine, GreasedLineBaseMesh } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
 import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 import { getOrbitalPeriod, getPointOnOrbitLocal } from "@/utils/physics/orbit";
 
+import { CreateLinesMeshFunction } from "./lineRendering";
+
 export class OrbitRenderer {
-    private orbitMeshes: Map<OrbitalObject, GreasedLineBaseMesh> = new Map();
+    private orbitMeshes: Map<OrbitalObject, Mesh> = new Map();
 
     private orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
 
     private _isVisible = false;
+
+    private readonly createOrbitMeshFromPoints: CreateLinesMeshFunction;
+
+    constructor(createOrbitMeshFromPoints: CreateLinesMeshFunction) {
+        this.createOrbitMeshFromPoints = createOrbitMeshFromPoints;
+    }
 
     setOrbitalObjects(orbitalObjects: ReadonlyArray<OrbitalObject>, scene: Scene) {
         this.reset();
@@ -66,18 +72,10 @@ export class OrbitRenderer {
             points.push(points[0]);
         }
 
-        const orbitMesh = CreateGreasedLine(
-            `${orbitalObject.getTransform().name}OrbitHelper`,
-            {
-                points: points,
-                updatable: false,
-            },
-            {
-                color: new Color3(0.4, 0.4, 0.4),
-                width: 5,
-                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
-                sizeAttenuation: true,
-            },
+        const orbitMesh = this.createOrbitMeshFromPoints(
+            `${orbitalObject.model.name}OrbitHelper`,
+            points,
+            { r: 0.4, g: 0.4, b: 0.4 },
             scene,
         );
         this.orbitMeshes.set(orbitalObject, orbitMesh);

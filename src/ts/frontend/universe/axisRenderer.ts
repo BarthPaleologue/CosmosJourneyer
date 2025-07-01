@@ -15,22 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { CreateGreasedLine, GreasedLineBaseMesh, GreasedLineMesh, GreasedLineRibbonMesh } from "@babylonjs/core/Meshes";
+import { Mesh } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 
 import { HasBoundingSphere } from "./architecture/hasBoundingSphere";
 import { Transformable } from "./architecture/transformable";
+import { CreateLinesMeshFunction } from "./lineRendering";
 
 /**
  * Visual helper designed to display the rotation axis of given objects
  */
 export class AxisRenderer {
-    private axisMeshes: (GreasedLineBaseMesh | GreasedLineMesh | GreasedLineRibbonMesh)[] = [];
+    private axisMeshes: Array<Mesh> = [];
 
     private _isVisible = false;
+
+    private readonly createAxisMeshFromPoints: CreateLinesMeshFunction;
+
+    constructor(createAxisMeshFromPoints: CreateLinesMeshFunction) {
+        this.createAxisMeshFromPoints = createAxisMeshFromPoints;
+    }
 
     /**
      * Disposes all previously created axis meshes by calling reset() and then creates new axis meshes for the given objects
@@ -48,21 +53,15 @@ export class AxisRenderer {
     }
 
     private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene) {
-        const rotationAxisHelper = CreateGreasedLine(
+        const points = [
+            new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
+            new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0),
+        ];
+
+        const rotationAxisHelper = this.createAxisMeshFromPoints(
             `${orbitalObject.getTransform().name}AxisHelper`,
-            {
-                points: [
-                    new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
-                    new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0),
-                ],
-                updatable: false,
-            },
-            {
-                color: new Color3(0.4, 0.4, 0.4),
-                width: 5,
-                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
-                sizeAttenuation: true,
-            },
+            points,
+            { r: 0.4, g: 0.4, b: 0.4 },
             scene,
         );
 
