@@ -91,6 +91,7 @@ import { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
 import { Transformable } from "./universe/architecture/transformable";
 import { TypedObject } from "./universe/architecture/typedObject";
+import { CreateLinesHelper } from "./universe/lineRendering";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -162,13 +163,13 @@ export class StarSystemView implements View {
      * A debug helper to display the orbits of the orbital objects
      * @private
      */
-    private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer();
+    private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer(CreateLinesHelper);
 
     /**
      * A debug helper to display the axes of the orbital objects
      * @private
      */
-    private readonly axisRenderer: AxisRenderer = new AxisRenderer();
+    private readonly axisRenderer: AxisRenderer = new AxisRenderer(CreateLinesHelper);
 
     /**
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
