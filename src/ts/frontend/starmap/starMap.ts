@@ -360,6 +360,13 @@ export class StarMap implements View {
                         this.drawPath(parsedItinerary.data);
                         this.player.currentItinerary = parsedItinerary.data;
                     } else {
+                        createNotification(
+                            NotificationOrigin.GENERAL,
+                            NotificationIntent.ERROR,
+                            `Failed to parse itinerary: ${parsedItinerary.error.message}`,
+                            5000,
+                            this.soundPlayer,
+                        );
                         this.player.currentItinerary = null;
                     }
 
