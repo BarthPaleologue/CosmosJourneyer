@@ -193,3 +193,87 @@ test("Loading a minimal save file", () => {
 
     expect(parsedSaveFile.success).toBe(true);
 });
+
+test("Loading a save file with a corrupted itinerary", () => {
+    const saveFile = {
+        timestamp: 1751299506929,
+        player: {
+            uuid: "9e95f25c-d38f-4fe3-a247-58b280266a28",
+            name: "Python",
+            balance: 10000,
+            creationDate: "2025-06-30T15:57:16.259Z",
+            timePlayedSeconds: 296,
+            visitedSystemHistory: [],
+            discoveries: {
+                local: [],
+                uploaded: [],
+            },
+            currentItinerary: [
+                {
+                    starSectorX: -3,
+                    starSectorY: -1,
+                    starSectorZ: 0,
+                    localX: 0.2960593378152975,
+                    localY: 0.2122889010758553,
+                    localZ: 0.45815722456116104,
+                },
+            ],
+            systemBookmarks: [],
+            currentMissions: [],
+            completedMissions: [],
+            spaceShips: [
+                {
+                    type: "WANDERER",
+                    id: "00f0c06d-866c-4da1-ad46-60003a69dc8f",
+                    name: "Wanderer",
+                    components: {
+                        primary: {
+                            warpDrive: { type: "warpDrive", size: 3, quality: 1 },
+                            thrusters: { type: "thrusters", size: 3, quality: 1 },
+                            fuelTank: { type: "fuelTank", size: 2, quality: 1, currentFuel01: 0.026808325384143895 },
+                        },
+                        optional: [
+                            null,
+                            { type: "fuelScoop", size: 2, quality: 1 },
+                            { type: "discoveryScanner", size: 2, quality: 1 },
+                        ],
+                    },
+                },
+            ],
+            spareSpaceshipComponents: [],
+            tutorials: {
+                flightCompleted: true,
+                stationLandingCompleted: false,
+                starMapCompleted: true,
+                fuelScoopingCompleted: true,
+            },
+        },
+        playerLocation: { type: "inSpaceship", shipId: "00f0c06d-866c-4da1-ad46-60003a69dc8f" },
+        shipLocations: {
+            "00f0c06d-866c-4da1-ad46-60003a69dc8f": {
+                type: "relative",
+                universeObjectId: {
+                    idInSystem: "[]->star0",
+                    systemCoordinates: {
+                        starSectorX: -2,
+                        starSectorY: -1,
+                        starSectorZ: 0,
+                        localX: 0.2630095518021889,
+                        localY: 0.4245715527444014,
+                        localZ: 0.22796505444122717,
+                    },
+                },
+                position: { x: -84266450.81146833, y: 21893872.773310743, z: 78314295.76911184 },
+                rotation: { x: 0.3085173879625557, y: 0.861318964882355, z: 0.2564123569737547, w: 0.3117681265816023 },
+            },
+        },
+    };
+
+    const parsedSaveFile = safeParseSave(saveFile, new StarSystemDatabase(getLoneStarSystem()));
+    if (!parsedSaveFile.success) {
+        throw new Error(`Failed to parse save file: ${parsedSaveFile.error.type}`);
+    }
+
+    expect(parsedSaveFile.success).toBe(true);
+    expect(parsedSaveFile.value.player.currentItinerary).toEqual(null);
+});
