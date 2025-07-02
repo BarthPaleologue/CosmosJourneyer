@@ -63,7 +63,7 @@ import { StarSectorView, vector3ToString, type BuildData } from "./starSectorVie
 import { StellarPathfinder } from "./stellarPathfinder";
 
 import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
-import starTexture from "@assets/textures/starParticle.png";
+import starTexturePath from "@assets/textures/starParticle.png";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -244,28 +244,40 @@ export class StarMap implements View {
         this.starTemplate.isVisible = false;
         this.starTemplate.hasVertexAlpha = true;
 
+        const starTexture = new Texture(starTexturePath, this.scene);
+
         const starMaterial = new StandardMaterial("starMaterial", this.scene);
-        starMaterial.emissiveTexture = new Texture(starTexture, this.scene);
-        starMaterial.opacityTexture = new Texture(starTexture, this.scene);
+        starMaterial.emissiveTexture = starTexture;
+        starMaterial.transparencyMode = 2;
+        starMaterial.opacityTexture = starTexture;
         starMaterial.opacityTexture.getAlphaFromRGB = true;
         starMaterial.emissiveColor = Color3.White();
         starMaterial.freeze();
 
-        this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.material = starMaterial;
+
+        this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
+
+        this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
+        this.starTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
 
         this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.8 }, this.scene);
         this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
 
         const blackHoleMaterial = new StandardMaterial("blackHoleMaterial", this.scene);
+        blackHoleMaterial.transparencyMode = 2;
         blackHoleMaterial.diffuseTexture = new Texture(blackHoleTexture, this.scene);
         blackHoleMaterial.diffuseTexture.hasAlpha = true;
         blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
         blackHoleMaterial.freeze();
 
-        this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.blackHoleTemplate.material = blackHoleMaterial;
+
+        this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
+
+        this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
+        this.blackHoleTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
 
         StarMap.FADE_OUT_ANIMATION.setKeys([
             {
