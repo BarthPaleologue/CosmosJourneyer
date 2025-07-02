@@ -1,10 +1,10 @@
-ARG PW_VERSION=1.52.0
+ARG PW_VERSION=1.53.2
 FROM mcr.microsoft.com/playwright:v${PW_VERSION}-jammy AS e2e
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm
-RUN pnpm install --frozen-lockfile && pnpm i -D @playwright/test@${PW_VERSION}
+RUN pnpm install --frozen-lockfile
 
 # copy sources and build your webpack bundle
 COPY . .
