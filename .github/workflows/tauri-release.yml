@@ -60,3 +60,4 @@ jobs:
                   releaseBody: "The new version of Cosmos Journeyer is online at https://barthpaleologue.github.io/CosmosJourneyer/ You can also install the app built using Tauri."
                   releaseDraft: true
                   prerelease: false
+                  args: ${{ matrix.args }}
