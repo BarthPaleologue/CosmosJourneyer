@@ -10,3 +10,4 @@ src/asset/sol/textures/moonHeightMap2x4/*.png filter=lfs diff=lfs merge=lfs -tex
 src/asset/sol/textures/mercuryHeightMap8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/mercuryHeightMap2x4/*.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/moonColor8k.png filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/moonNormalMap8k.png filter=lfs diff=lfs merge=lfs -text
