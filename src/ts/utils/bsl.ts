@@ -36,6 +36,7 @@
 
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
+import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
@@ -46,6 +47,7 @@ import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
+import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
 import { SmoothStepBlock } from "@babylonjs/core/Materials/Node/Blocks/smoothStepBlock";
@@ -64,7 +66,7 @@ import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/n
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
 import { type NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { type Matrix, type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
@@ -204,6 +206,24 @@ export function uniformFloat(
     return inputBlock.output;
 }
 
+/**
+ * Returns a uniform mat4x4 input block with the given name and value.
+ * @param name - The name of the input block.
+ * @param value - The matrix value.
+ * @param options - Optional target options.
+ */
+export function uniformMat4(
+    name: string,
+    value: Matrix,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const inputBlock = new InputBlock(name);
+    inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+    inputBlock.value = value;
+
+    return inputBlock.output;
+}
+
 export type TextureBlockOptions = TargetOptions & {
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
@@ -238,6 +258,7 @@ export function textureSample(
  * @param transformMat4 - The transformation matrix.
  * @param positionVec3 - The position vector.
  * @param options - Optional target options.
+ * @returns A vec4 representing the transformed position.
  */
 export function transformPosition(
     transformMat4: NodeMaterialConnectionPoint,
@@ -318,6 +339,24 @@ export function atan2(
 }
 
 /**
+ * Returns a normalized version of the input vector.
+ * @param input A vector to normalize.
+ * @param options Optional target options.
+ * @returns A new vector, normalized to unit length.
+ */
+export function normalize(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const normalizeBlock = new NormalizeBlock("normalize");
+    normalizeBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(normalizeBlock.input);
+
+    return normalizeBlock.output;
+}
+
+/**
  * Returns the length (magnitude) of a vector.
  * @param input - The input vector.
  * @param options - Optional target options.
@@ -332,6 +371,20 @@ export function length(
     input.connectTo(lengthBlock.value);
 
     return lengthBlock.output;
+}
+
+export function distance(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const distanceBlock = new DistanceBlock("distance");
+    distanceBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(distanceBlock.left);
+    right.connectTo(distanceBlock.right);
+
+    return distanceBlock.output;
 }
 
 /**
@@ -374,6 +427,24 @@ export function fract(
 ): NodeMaterialConnectionPoint {
     const fractBlock = new TrigonometryBlock("fract");
     fractBlock.operation = TrigonometryBlockOperations.Fract;
+    fractBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(fractBlock.input);
+
+    return fractBlock.output;
+}
+
+/**
+ * Computes acos(input).
+ * @param input - The input value.
+ * @param options - Optional target options.
+ */
+export function acos(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const fractBlock = new TrigonometryBlock("acos");
+    fractBlock.operation = TrigonometryBlockOperations.ArcCos;
     fractBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
     input.connectTo(fractBlock.input);
