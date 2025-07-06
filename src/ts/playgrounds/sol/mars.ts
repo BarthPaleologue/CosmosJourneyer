@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    Color3,
+    Axis,
     GizmoManager,
     Light,
     LightGizmo,
-    PBRMetallicRoughnessMaterial,
     PointLight,
     Scene,
+    Texture,
     Vector3,
     WebGPUEngine,
 } from "@babylonjs/core";
@@ -36,7 +36,11 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import marsAlbedoPath from "@assets/sol/textures/marsColor8k.png";
+import marsNormalPath from "@assets/sol/textures/marsNormalMap8k.png";
 
 export async function createMarsScene(
     engine: WebGPUEngine,
@@ -75,6 +79,7 @@ export async function createMarsScene(
 
     const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(marsRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -85,16 +90,16 @@ export async function createMarsScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const albedo = new Texture(marsAlbedoPath, scene);
+    const normal = new Texture(marsNormalPath, scene);
+
+    const material = new CustomPlanetMaterial(albedo, normal, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
             min: 0,
-            max: 22e3,
+            max: 8_201 + 21_241,
         },
         id: "mars",
     };
@@ -103,9 +108,10 @@ export async function createMarsScene(
         "SphericalHeightFieldTerrain",
         marsRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
+    terrain.getTransform().rotate(Axis.Y, Math.PI);
 
     const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps, scene);
 
@@ -132,13 +138,15 @@ export async function createMarsScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
     progressCallback(1, "Loaded terrain scene");

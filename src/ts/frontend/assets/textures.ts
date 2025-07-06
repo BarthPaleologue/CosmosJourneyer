@@ -59,7 +59,7 @@ import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metalli
 import skyBox from "@assets/skybox/milkyway.env";
 import earthHeightMap1x1 from "@assets/sol/textures/earthHeightMap8k.png";
 import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
-import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
+import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.png";
 import mercuryHeightMap1x1 from "@assets/sol/textures/mercuryHeightMap8k.png";
 import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
