@@ -16,13 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    Color3,
     GizmoManager,
     Light,
     LightGizmo,
-    PBRMetallicRoughnessMaterial,
     PointLight,
     Scene,
+    Texture,
     Vector3,
     type WebGPUEngine,
 } from "@babylonjs/core";
@@ -42,7 +41,11 @@ import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloud
 import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import earthColorMapPath from "@assets/sol/textures/earthColor8k.png";
+import earthNormalMapPath from "@assets/sol/textures/earthNormalMap8k.png";
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -81,6 +84,7 @@ export async function createEarthScene(
 
     const light = new PointLight("light", new Vector3(10, 2, -10).normalize().scale(earthRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -92,10 +96,10 @@ export async function createEarthScene(
     gizmoManager.usePointerToAttachGizmos = false;
     //gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const albedoMap = new Texture(earthColorMapPath, scene);
+    const normalMap = new Texture(earthNormalMapPath, scene);
+
+    const material = new CustomPlanetMaterial(albedoMap, normalMap, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
@@ -110,7 +114,7 @@ export async function createEarthScene(
         "SphericalHeightFieldTerrain",
         earthRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
 
@@ -160,7 +164,7 @@ export async function createEarthScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         ocean.update(deltaSeconds);
@@ -169,6 +173,8 @@ export async function createEarthScene(
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
     return scene;
