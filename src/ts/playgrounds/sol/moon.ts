@@ -92,7 +92,7 @@ export async function createMoonScene(
     const albedo = new Texture(moonAlbedoPath, scene);
     const normal = new Texture(moonNormalPath, scene);
 
-    const otherMaterial = new CustomPlanetMaterial(albedo, normal, scene);
+    const material = new CustomPlanetMaterial(albedo, normal, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
@@ -107,7 +107,7 @@ export async function createMoonScene(
         "SphericalHeightFieldTerrain",
         moonRadius,
         terrainModel,
-        otherMaterial.get(),
+        material.get(),
         scene,
     );
     terrain.getTransform().rotate(Axis.Y, Math.PI / 2);
@@ -127,7 +127,7 @@ export async function createMoonScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, otherMaterial.get(), chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
@@ -135,7 +135,7 @@ export async function createMoonScene(
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
-        otherMaterial.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
     return scene;
