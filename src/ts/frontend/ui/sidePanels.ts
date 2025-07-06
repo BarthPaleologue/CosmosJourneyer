@@ -48,29 +48,35 @@ export class SidePanels {
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
         this.loadSavePanel = loadSavePanel;
+        this.attachCloseButton(this.loadSavePanel);
 
         this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
         this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
         this.settingsPanel = initSettingsPanel(musicConductor);
+        this.attachCloseButton(this.settingsPanel);
 
         const tutorialsPanel = document.getElementById("tutorials");
         if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
         this.tutorialsPanel = tutorialsPanel;
+        this.attachCloseButton(this.tutorialsPanel);
         this.tutorialsPanelContent = new TutorialsPanelContent();
         this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
 
         const contributePanel = document.getElementById("contribute");
         if (contributePanel === null) throw new Error("#contribute does not exist!");
         this.contributePanel = contributePanel;
+        this.attachCloseButton(this.contributePanel);
 
         const creditsPanel = document.getElementById("credits");
         if (creditsPanel === null) throw new Error("#credits does not exist!");
         this.creditsPanel = creditsPanel;
+        this.attachCloseButton(this.creditsPanel);
 
         const aboutPanel = document.getElementById("about");
         if (aboutPanel === null) throw new Error("#about does not exist!");
         this.aboutPanel = aboutPanel;
+        this.attachCloseButton(this.aboutPanel);
     }
 
     private panelFromType(type: PanelType): HTMLElement {
@@ -99,10 +105,26 @@ export class SidePanels {
         return newPanel;
     }
 
+    private attachCloseButton(panel: HTMLElement): void {
+        if (panel.querySelector(".close-button")) {
+            return;
+        }
+        const closeButton = document.createElement("button");
+        closeButton.innerText = "X";
+        closeButton.className = "close-button";
+        closeButton.style.position = "absolute";
+        closeButton.style.top = "10px";
+        closeButton.style.right = "10px";
+        closeButton.style.zIndex = "1000";
+        closeButton.addEventListener("click", () => {
+            this.hideActivePanel();
+        });
+        panel.appendChild(closeButton);
+    }
+
     public toggleActivePanel(type: PanelType) {
         const newPanel = this.panelFromType(type);
         if (this.activeRightPanel === newPanel) {
-            this.hideActivePanel();
             return;
         }
 
