@@ -52,6 +52,7 @@ import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
+import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createTerrainScene } from "./terrain";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
@@ -85,6 +86,7 @@ export class PlaygroundRegistry {
         ["darkKnight", createDarkKnightScene],
         ["blackHole", createBlackHoleScene],
         ["gasPlanet", createGasPlanetScene],
+        ["telluricPlanet", createTelluricPlanetScene],
         ["jupiter", createJupiterScene],
         ["saturn", createSaturnScene],
         ["sol", createSolScene],
