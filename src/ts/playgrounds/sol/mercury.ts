@@ -16,13 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    Color3,
     GizmoManager,
     Light,
     LightGizmo,
-    PBRMetallicRoughnessMaterial,
     PointLight,
     Scene,
+    Texture,
     Vector3,
     type WebGPUEngine,
 } from "@babylonjs/core";
@@ -35,7 +34,11 @@ import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import mercuryColorMapPath from "@assets/sol/textures/mercuryColor8k.png";
+import mercuryNormalMapPath from "@assets/sol/textures/mercuryNormalMap8k.png";
 
 export async function createMercuryScene(
     engine: WebGPUEngine,
@@ -72,6 +75,7 @@ export async function createMercuryScene(
 
     const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(mercuryRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -82,15 +86,16 @@ export async function createMercuryScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const albedoMap = new Texture(mercuryColorMapPath, scene);
+    const normalMap = new Texture(mercuryNormalMapPath, scene);
+
+    const material = new CustomPlanetMaterial(albedoMap, normalMap, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
-            min: 0,
+            // see https://www.jhuapl.edu/news/news-releases/160506-messenger-first-global-topographic-model-mercury
+            min: -5_380,
             max: 4_480,
         },
         id: "mercury",
@@ -100,7 +105,7 @@ export async function createMercuryScene(
         "SphericalHeightFieldTerrain",
         mercuryRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
 
@@ -119,13 +124,15 @@ export async function createMercuryScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
     return scene;
