@@ -22,13 +22,8 @@ import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
 import {
-    acos,
-    add,
-    atan2,
     distance,
-    div,
     f,
-    merge,
     normalize,
     outputFragColor,
     outputVertexPosition,
@@ -36,7 +31,6 @@ import {
     perturbNormal,
     smoothstep,
     split,
-    sub,
     textureSample,
     transformDirection,
     transformPosition,
@@ -47,6 +41,7 @@ import {
     uniformWorld,
     vertexAttribute,
 } from "@/utils/bsl";
+import { unitSphereToUv } from "@/utils/bslExtensions";
 
 const UniformNames = {
     InversePlanetWorld: "inversePlanetWorld",
@@ -71,15 +66,7 @@ export class CustomPlanetMaterial {
 
         const positionPlanetSpace = transformPosition(inversePlanetWorld, positionW);
 
-        const positionPlanetSpaceNormalized = split(normalize(positionPlanetSpace));
-
-        const theta = acos(positionPlanetSpaceNormalized.y);
-        const phi = atan2(positionPlanetSpaceNormalized.z, positionPlanetSpaceNormalized.x);
-
-        const u = div(add(phi, f(Math.PI)), f(2.0 * Math.PI));
-        const v = div(theta, f(Math.PI));
-
-        const uv = merge(sub(f(1.0), u), sub(f(1.0), v), null, null).xyOut;
+        const uv = unitSphereToUv(normalize(positionPlanetSpace));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
