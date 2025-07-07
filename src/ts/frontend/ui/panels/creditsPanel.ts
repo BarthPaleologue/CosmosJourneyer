@@ -92,6 +92,7 @@ export class CreditsPanel {
             'Moon color and height map from <a target="_blank" href="https://svs.gsfc.nasa.gov/4720">NASA\'s Scientific Visualization Studio</a>',
             'Earth height map from <a target="_blank" href="https://commons.wikimedia.org/wiki/File:World_elevation_map.png">Wikipedia Commons</a>, licensed under the Creative Commons <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">Attribution-Share Alike 4.0 International</a> license',
             'Mercury height map from <a target="_blank" href="https://web.archive.org/web/20210330125010/https://astrogeology.usgs.gov/search/map/Mercury/Topography/MESSENGER/Mercury_Messenger_USGS_DEM_Global_665m_v2">USGS Astrogeology Science Center</a>',
+            'Mercury color map from the <a target="_blank" href="https://astrogeology.usgs.gov/search/map/mercury_messenger_mdis_basemap_md3_color_global_mosaic_665m">Applied Coherent Technology Corporation</a> published by USGS Astrogeology Science Center',
         ];
 
         materialsCredits.forEach((credit) => {

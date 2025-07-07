@@ -15,3 +15,5 @@ src/asset/sol/textures/moonColor8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/moonNormalMap8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthColor8k.png filter=lfs diff=lfs merge=lfs -text
 src/asset/sol/textures/earthNormalMap8k.png filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/mercuryNormalMap8k.png filter=lfs diff=lfs merge=lfs -text
+src/asset/sol/textures/mercuryColor8k.png filter=lfs diff=lfs merge=lfs -text
