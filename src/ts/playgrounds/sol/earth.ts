@@ -99,7 +99,11 @@ export async function createEarthScene(
     const albedoMap = new Texture(earthColorMapPath, scene);
     const normalMap = new Texture(earthNormalMapPath, scene);
 
-    const material = new CustomPlanetMaterial(albedoMap, normalMap, scene);
+    const material = new CustomPlanetMaterial(
+        { type: "texture_2d", texture: albedoMap },
+        { type: "texture_2d", texture: normalMap },
+        scene,
+    );
 
     const terrainModel: TerrainModel = {
         type: "custom",

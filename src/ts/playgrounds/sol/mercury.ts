@@ -89,7 +89,11 @@ export async function createMercuryScene(
     const albedoMap = new Texture(mercuryColorMapPath, scene);
     const normalMap = new Texture(mercuryNormalMapPath, scene);
 
-    const material = new CustomPlanetMaterial(albedoMap, normalMap, scene);
+    const material = new CustomPlanetMaterial(
+        { type: "texture_2d", texture: albedoMap },
+        { type: "texture_2d", texture: normalMap },
+        scene,
+    );
 
     const terrainModel: TerrainModel = {
         type: "custom",
