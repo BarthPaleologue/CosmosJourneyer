@@ -47,7 +47,7 @@ export class Tts implements ITts {
     private readonly voiceLines: SpeakerVoiceLines;
 
     private isPlaying = false;
-    private soundQueue: Array<Sound> = [];
+    private soundQueue: Set<Sound> = new Set();
 
     constructor(voiceLines: SpeakerVoiceLines) {
         this.voiceLines = voiceLines;
@@ -92,7 +92,7 @@ export class Tts implements ITts {
     }
 
     public enqueueSay(speaker: Speaker, line: VoiceLine) {
-        this.soundQueue.push(this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line));
+        this.soundQueue.add(this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line));
     }
 
     public update(): void {
@@ -100,10 +100,12 @@ export class Tts implements ITts {
             return;
         }
 
-        const nextSound = this.soundQueue.shift();
+        const nextSound = this.soundQueue.values().next().value;
         if (nextSound === undefined) {
             return;
         }
+
+        this.soundQueue.delete(nextSound);
 
         this.isPlaying = true;
         nextSound.play();
