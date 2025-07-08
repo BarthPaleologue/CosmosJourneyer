@@ -92,7 +92,11 @@ export async function createMarsScene(
     const albedo = new Texture(marsAlbedoPath, scene);
     const normal = new Texture(marsNormalPath, scene);
 
-    const material = new CustomPlanetMaterial(albedo, normal, scene);
+    const material = new CustomPlanetMaterial(
+        { type: "texture_2d", texture: albedo },
+        { type: "texture_2d", texture: normal },
+        scene,
+    );
 
     const terrainModel: TerrainModel = {
         type: "custom",

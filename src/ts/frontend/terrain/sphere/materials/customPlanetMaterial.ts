@@ -15,9 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -31,7 +29,7 @@ import {
     perturbNormal,
     smoothstep,
     split,
-    textureSample,
+    Target,
     transformDirection,
     transformPosition,
     uniformCameraPosition,
@@ -41,7 +39,7 @@ import {
     uniformWorld,
     vertexAttribute,
 } from "@/utils/bsl";
-import { unitSphereToUv } from "@/utils/bslExtensions";
+import { bslTextureSample2d, unitSphereToUv, type BslTexture2dUv } from "@/utils/bslExtensions";
 
 const UniformNames = {
     InversePlanetWorld: "inversePlanetWorld",
@@ -50,10 +48,8 @@ const UniformNames = {
 export class CustomPlanetMaterial {
     private readonly material: NodeMaterial;
 
-    constructor(albedoTexture: Texture, normalTexture: Texture, scene: Scene) {
+    constructor(albedoTexture: BslTexture2dUv, normalTexture: BslTexture2dUv, scene: Scene) {
         this.material = new NodeMaterial("CustomPlanetMaterial", scene);
-
-        this.material.mode = NodeMaterialModes.Material;
 
         const position = vertexAttribute("position");
         const normal = vertexAttribute("normal");
@@ -66,8 +62,6 @@ export class CustomPlanetMaterial {
 
         const positionPlanetSpace = transformPosition(inversePlanetWorld, positionW);
 
-        const uv = unitSphereToUv(normalize(positionPlanetSpace));
-
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
 
@@ -75,10 +69,12 @@ export class CustomPlanetMaterial {
 
         this.material.addOutputNode(vertexOutput);
 
-        const albedo = textureSample(albedoTexture, uv, {
+        const uv = unitSphereToUv(normalize(positionPlanetSpace, { target: Target.FRAG }));
+
+        const albedo = bslTextureSample2d(albedoTexture, uv, {
             convertToLinearSpace: true,
         });
-        const normalMap = textureSample(normalTexture, uv);
+        const normalMap = bslTextureSample2d(normalTexture, uv);
 
         const cameraPosition = uniformCameraPosition();
 
@@ -113,8 +109,9 @@ export class CustomPlanetMaterial {
         const inverseWorldBlock = this.material.getInputBlockByPredicate(
             (block) => block.name === UniformNames.InversePlanetWorld,
         );
-        if (!inverseWorldBlock) {
-            throw new Error(`Input block ${UniformNames.InversePlanetWorld} not found in material.`);
+        if (inverseWorldBlock === null) {
+            console.warn(`Input block ${UniformNames.InversePlanetWorld} not found in material.`);
+            return;
         }
         inverseWorldBlock.value = inverseWorld;
     }
