@@ -34,6 +34,7 @@
  * - They return the relevant output connection point
  */
 
+import { ModBlock } from "@babylonjs/core";
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
@@ -254,6 +255,32 @@ export function textureSample(
 }
 
 /**
+ * Samples a 2d texture array using the given UV coordinates, layer and optional properties.
+ * @param texture - The 2d texture array to sample.
+ * @param uv - The UV coordinates.
+ * @param layer - The layer index in the texture array.
+ * @param options - Optional properties for the texture block.
+ */
+export function texture2dArraySample(
+    texture: Texture,
+    uv: NodeMaterialConnectionPoint,
+    layer: NodeMaterialConnectionPoint,
+    options?: Partial<TextureBlockOptions>,
+) {
+    const textureBlock = new TextureBlock("texture2dArray");
+    textureBlock.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
+    textureBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
+    textureBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
+    textureBlock.disableLevelMultiplication = options?.disableLevelMultiplication ?? false;
+    textureBlock.texture = texture;
+
+    uv.connectTo(textureBlock.uv);
+    layer.connectTo(textureBlock.layer);
+
+    return textureBlock;
+}
+
+/**
  * Transforms a position vector using the given transformation matrix.
  * @param transformMat4 - The transformation matrix.
  * @param positionVec3 - The position vector.
@@ -414,6 +441,26 @@ export function remap(
     targetMax.connectTo(remapBlock.targetMax);
 
     return remapBlock.output;
+}
+
+/**
+ * Returns the modulus (remainder) of the left value divided by the right value.
+ * @param left - The left value (dividend).
+ * @param right - The right value (divisor).
+ * @param options - Optional target options.
+ */
+export function mod(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const modBlock = new ModBlock("mod");
+    modBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(modBlock.left);
+    right.connectTo(modBlock.right);
+
+    return modBlock.output;
 }
 
 /**
@@ -868,6 +915,36 @@ export function max(
     right.connectTo(maxBlock.right);
 
     return maxBlock.output;
+}
+
+/**
+ * Floors the input value to the nearest integer.
+ * @param input - The input value.
+ * @param options - Optional target options.
+ */
+export function floor(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const floorBlock = new TrigonometryBlock("floor");
+    floorBlock.operation = TrigonometryBlockOperations.Floor;
+    floorBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(floorBlock.input);
+
+    return floorBlock.output;
+}
+
+/**
+ * Ceils the input value to the nearest integer.
+ * @param input - The input value.
+ * @param options - Optional target options.
+ */
+export function ceil(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const ceilBlock = new TrigonometryBlock("ceil");
+    ceilBlock.operation = TrigonometryBlockOperations.Ceiling;
+    ceilBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(ceilBlock.input);
+
+    return ceilBlock.output;
 }
 
 /**
