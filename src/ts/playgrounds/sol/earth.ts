@@ -15,18 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PBRMetallicRoughnessMaterial,
-    PointLight,
-    Scene,
-    Texture,
-    Vector3,
-    WebGPUEngine,
-} from "@babylonjs/core";
+import { GizmoManager, Light, LightGizmo, PointLight, Scene, Texture, Vector3, WebGPUEngine } from "@babylonjs/core";
 
 import { getEarthModel } from "@/backend/universe/customSystems/sol/earth";
 import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -99,7 +88,11 @@ export async function createEarthScene(
     const albedoMap = new Texture(earthColorMapPath, scene);
     const normalMap = new Texture(earthNormalMapPath, scene);
 
-    const material = new CustomPlanetMaterial(albedoMap, normalMap, scene);
+    const material = new CustomPlanetMaterial(
+        { type: "texture_2d", texture: albedoMap },
+        { type: "texture_2d", texture: normalMap },
+        scene,
+    );
 
     const terrainModel: TerrainModel = {
         type: "custom",
