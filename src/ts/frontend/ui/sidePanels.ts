@@ -112,10 +112,6 @@ export class SidePanels {
         const closeButton = document.createElement("button");
         closeButton.innerText = "X";
         closeButton.className = "close-button";
-        closeButton.style.position = "absolute";
-        closeButton.style.top = "10px";
-        closeButton.style.right = "10px";
-        closeButton.style.zIndex = "1000";
         closeButton.addEventListener("click", () => {
             this.hideActivePanel();
         });

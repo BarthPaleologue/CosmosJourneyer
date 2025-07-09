@@ -187,13 +187,13 @@ h1 {
     border-radius: 3px;
     padding: 0;
     transition:
-        background 0.15s,
-        color 0.15s;
+        background variables.$transition-time,
+        color variables.$transition-time;
 }
 
 .close-button:hover,
 .close-button:focus {
-    background: #003b87;
+    background: var(--accent-color);
     color: #fff;
     outline: none;
 }
