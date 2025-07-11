@@ -37,7 +37,16 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import mercuryColorMapPath from "@assets/sol/textures/mercuryColor8k.png";
+import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+
+import mercuryColorMapPath_0_0 from "@assets/sol/textures/mercuryColorMap2x4/0_0.png";
+import mercuryColorMapPath_0_1 from "@assets/sol/textures/mercuryColorMap2x4/0_1.png";
+import mercuryColorMapPath_0_2 from "@assets/sol/textures/mercuryColorMap2x4/0_2.png";
+import mercuryColorMapPath_0_3 from "@assets/sol/textures/mercuryColorMap2x4/0_3.png";
+import mercuryColorMapPath_1_0 from "@assets/sol/textures/mercuryColorMap2x4/1_0.png";
+import mercuryColorMapPath_1_1 from "@assets/sol/textures/mercuryColorMap2x4/1_1.png";
+import mercuryColorMapPath_1_2 from "@assets/sol/textures/mercuryColorMap2x4/1_2.png";
+import mercuryColorMapPath_1_3 from "@assets/sol/textures/mercuryColorMap2x4/1_3.png";
 import mercuryNormalMapPath from "@assets/sol/textures/mercuryNormalMap8k.png";
 
 export async function createMercuryScene(
@@ -86,11 +95,33 @@ export async function createMercuryScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const albedoMap = new Texture(mercuryColorMapPath, scene);
+    const albedoResult = await createRawTexture2DArrayFromUrls(
+        [
+            mercuryColorMapPath_0_0,
+            mercuryColorMapPath_0_1,
+            mercuryColorMapPath_0_2,
+            mercuryColorMapPath_0_3,
+            mercuryColorMapPath_1_0,
+            mercuryColorMapPath_1_1,
+            mercuryColorMapPath_1_2,
+            mercuryColorMapPath_1_3,
+        ],
+        scene,
+        engine,
+    );
+    if (!albedoResult.success) {
+        throw new Error(`Failed to create albedo texture: ${String(albedoResult.error)}`);
+    }
+
+    const albedo = albedoResult.value;
+    const addressMode = Texture.CLAMP_ADDRESSMODE;
+    albedo.wrapU = addressMode;
+    albedo.wrapV = addressMode;
+    albedo.wrapR = addressMode;
     const normalMap = new Texture(mercuryNormalMapPath, scene);
 
     const material = new CustomPlanetMaterial(
-        { type: "texture_2d", texture: albedoMap },
+        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
         { type: "texture_2d", texture: normalMap },
         scene,
     );
