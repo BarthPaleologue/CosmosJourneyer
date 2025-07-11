@@ -44,7 +44,16 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import earthColorMapPath from "@assets/sol/textures/earthColor8k.png";
+import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+
+import earthColorMapPath_0_0 from "@assets/sol/textures/earthColorMap2x4/0_0.png";
+import earthColorMapPath_0_1 from "@assets/sol/textures/earthColorMap2x4/0_1.png";
+import earthColorMapPath_0_2 from "@assets/sol/textures/earthColorMap2x4/0_2.png";
+import earthColorMapPath_0_3 from "@assets/sol/textures/earthColorMap2x4/0_3.png";
+import earthColorMapPath_1_0 from "@assets/sol/textures/earthColorMap2x4/1_0.png";
+import earthColorMapPath_1_1 from "@assets/sol/textures/earthColorMap2x4/1_1.png";
+import earthColorMapPath_1_2 from "@assets/sol/textures/earthColorMap2x4/1_2.png";
+import earthColorMapPath_1_3 from "@assets/sol/textures/earthColorMap2x4/1_3.png";
 import earthNormalMapPath from "@assets/sol/textures/earthNormalMap8k.png";
 
 export async function createEarthScene(
@@ -95,12 +104,33 @@ export async function createEarthScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
     //gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+    const albedoResult = await createRawTexture2DArrayFromUrls(
+        [
+            earthColorMapPath_0_0,
+            earthColorMapPath_0_1,
+            earthColorMapPath_0_2,
+            earthColorMapPath_0_3,
+            earthColorMapPath_1_0,
+            earthColorMapPath_1_1,
+            earthColorMapPath_1_2,
+            earthColorMapPath_1_3,
+        ],
+        scene,
+        engine,
+    );
+    if (!albedoResult.success) {
+        throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+    }
 
-    const albedoMap = new Texture(earthColorMapPath, scene);
+    const albedo = albedoResult.value;
+    const addressMode = Texture.CLAMP_ADDRESSMODE;
+    albedo.wrapU = addressMode;
+    albedo.wrapV = addressMode;
+    albedo.wrapR = addressMode;
     const normalMap = new Texture(earthNormalMapPath, scene);
 
     const material = new CustomPlanetMaterial(
-        { type: "texture_2d", texture: albedoMap },
+        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
         { type: "texture_2d", texture: normalMap },
         scene,
     );
