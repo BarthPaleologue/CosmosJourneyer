@@ -40,7 +40,16 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import marsAlbedoPath from "@assets/sol/textures/marsColor8k.png";
+import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+
+import marsAlbedoPath_0_0 from "@assets/sol/textures/marsColorMap2x4/0_0.png";
+import marsAlbedoPath_0_1 from "@assets/sol/textures/marsColorMap2x4/0_1.png";
+import marsAlbedoPath_0_2 from "@assets/sol/textures/marsColorMap2x4/0_2.png";
+import marsAlbedoPath_0_3 from "@assets/sol/textures/marsColorMap2x4/0_3.png";
+import marsAlbedoPath_1_0 from "@assets/sol/textures/marsColorMap2x4/1_0.png";
+import marsAlbedoPath_1_1 from "@assets/sol/textures/marsColorMap2x4/1_1.png";
+import marsAlbedoPath_1_2 from "@assets/sol/textures/marsColorMap2x4/1_2.png";
+import marsAlbedoPath_1_3 from "@assets/sol/textures/marsColorMap2x4/1_3.png";
 import marsNormalPath from "@assets/sol/textures/marsNormalMap8k.png";
 
 export async function createMarsScene(
@@ -89,11 +98,33 @@ export async function createMarsScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const albedo = new Texture(marsAlbedoPath, scene);
+    const albedoResult = await createRawTexture2DArrayFromUrls(
+        [
+            marsAlbedoPath_0_0,
+            marsAlbedoPath_0_1,
+            marsAlbedoPath_0_2,
+            marsAlbedoPath_0_3,
+            marsAlbedoPath_1_0,
+            marsAlbedoPath_1_1,
+            marsAlbedoPath_1_2,
+            marsAlbedoPath_1_3,
+        ],
+        scene,
+        engine,
+    );
+    if (!albedoResult.success) {
+        throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+    }
+
+    const albedo = albedoResult.value;
+    const addressMode = Texture.CLAMP_ADDRESSMODE;
+    albedo.wrapU = addressMode;
+    albedo.wrapV = addressMode;
+    albedo.wrapR = addressMode;
     const normal = new Texture(marsNormalPath, scene);
 
     const material = new CustomPlanetMaterial(
-        { type: "texture_2d", texture: albedo },
+        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
         { type: "texture_2d", texture: normal },
         scene,
     );
