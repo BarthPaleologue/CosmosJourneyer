@@ -54,7 +54,14 @@ import earthColorMapPath_1_0 from "@assets/sol/textures/earthColorMap2x4/1_0.png
 import earthColorMapPath_1_1 from "@assets/sol/textures/earthColorMap2x4/1_1.png";
 import earthColorMapPath_1_2 from "@assets/sol/textures/earthColorMap2x4/1_2.png";
 import earthColorMapPath_1_3 from "@assets/sol/textures/earthColorMap2x4/1_3.png";
-import earthNormalMapPath from "@assets/sol/textures/earthNormalMap8k.png";
+import earthNormalMapPath_0_0 from "@assets/sol/textures/earthNormalMap2x4/0_0.png";
+import earthNormalMapPath_0_1 from "@assets/sol/textures/earthNormalMap2x4/0_1.png";
+import earthNormalMapPath_0_2 from "@assets/sol/textures/earthNormalMap2x4/0_2.png";
+import earthNormalMapPath_0_3 from "@assets/sol/textures/earthNormalMap2x4/0_3.png";
+import earthNormalMapPath_1_0 from "@assets/sol/textures/earthNormalMap2x4/1_0.png";
+import earthNormalMapPath_1_1 from "@assets/sol/textures/earthNormalMap2x4/1_1.png";
+import earthNormalMapPath_1_2 from "@assets/sol/textures/earthNormalMap2x4/1_2.png";
+import earthNormalMapPath_1_3 from "@assets/sol/textures/earthNormalMap2x4/1_3.png";
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -104,6 +111,7 @@ export async function createEarthScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
     //gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+
     const albedoResult = await createRawTexture2DArrayFromUrls(
         [
             earthColorMapPath_0_0,
@@ -127,11 +135,33 @@ export async function createEarthScene(
     albedo.wrapU = addressMode;
     albedo.wrapV = addressMode;
     albedo.wrapR = addressMode;
-    const normalMap = new Texture(earthNormalMapPath, scene);
+
+    const normalMapResult = await createRawTexture2DArrayFromUrls(
+        [
+            earthNormalMapPath_0_0,
+            earthNormalMapPath_0_1,
+            earthNormalMapPath_0_2,
+            earthNormalMapPath_0_3,
+            earthNormalMapPath_1_0,
+            earthNormalMapPath_1_1,
+            earthNormalMapPath_1_2,
+            earthNormalMapPath_1_3,
+        ],
+        scene,
+        engine,
+    );
+    if (!normalMapResult.success) {
+        throw new Error(`Failed to create normal map texture array: ${String(normalMapResult.error)}`);
+    }
+
+    const normalMap = normalMapResult.value;
+    normalMap.wrapU = addressMode;
+    normalMap.wrapV = addressMode;
+    normalMap.wrapR = addressMode;
 
     const material = new CustomPlanetMaterial(
         { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
-        { type: "texture_2d", texture: normalMap },
+        { type: "texture_2d_array_mosaic", array: normalMap, tileCount: { x: 4, y: 2 } },
         scene,
     );
 
