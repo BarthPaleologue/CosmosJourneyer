@@ -44,8 +44,10 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
+import { type BslTexture2dUv } from "@/utils/bslExtensions";
 import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
 
+import earthColorMap8k from "@assets/sol/textures/earthColor8k.png";
 import earthColorMapPath_0_0 from "@assets/sol/textures/earthColorMap2x4/0_0.png";
 import earthColorMapPath_0_1 from "@assets/sol/textures/earthColorMap2x4/0_1.png";
 import earthColorMapPath_0_2 from "@assets/sol/textures/earthColorMap2x4/0_2.png";
@@ -62,6 +64,7 @@ import earthNormalMapPath_1_0 from "@assets/sol/textures/earthNormalMap2x4/1_0.p
 import earthNormalMapPath_1_1 from "@assets/sol/textures/earthNormalMap2x4/1_1.png";
 import earthNormalMapPath_1_2 from "@assets/sol/textures/earthNormalMap2x4/1_2.png";
 import earthNormalMapPath_1_3 from "@assets/sol/textures/earthNormalMap2x4/1_3.png";
+import earthNormalMap8k from "@assets/sol/textures/earthNormalMap8k.png";
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -112,58 +115,83 @@ export async function createEarthScene(
     gizmoManager.usePointerToAttachGizmos = false;
     //gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const albedoResult = await createRawTexture2DArrayFromUrls(
-        [
-            earthColorMapPath_0_0,
-            earthColorMapPath_0_1,
-            earthColorMapPath_0_2,
-            earthColorMapPath_0_3,
-            earthColorMapPath_1_0,
-            earthColorMapPath_1_1,
-            earthColorMapPath_1_2,
-            earthColorMapPath_1_3,
-        ],
-        scene,
-        engine,
-    );
-    if (!albedoResult.success) {
-        throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: BslTexture2dUv;
+    let normalBslTexture: BslTexture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await createRawTexture2DArrayFromUrls(
+            [
+                earthColorMapPath_0_0,
+                earthColorMapPath_0_1,
+                earthColorMapPath_0_2,
+                earthColorMapPath_0_3,
+                earthColorMapPath_1_0,
+                earthColorMapPath_1_1,
+                earthColorMapPath_1_2,
+                earthColorMapPath_1_3,
+            ],
+            scene,
+            engine,
+        );
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+        }
+
+        const albedo = albedoResult.value;
+        const addressMode = Texture.CLAMP_ADDRESSMODE;
+        albedo.wrapU = addressMode;
+        albedo.wrapV = addressMode;
+        albedo.wrapR = addressMode;
+
+        const normalMapResult = await createRawTexture2DArrayFromUrls(
+            [
+                earthNormalMapPath_0_0,
+                earthNormalMapPath_0_1,
+                earthNormalMapPath_0_2,
+                earthNormalMapPath_0_3,
+                earthNormalMapPath_1_0,
+                earthNormalMapPath_1_1,
+                earthNormalMapPath_1_2,
+                earthNormalMapPath_1_3,
+            ],
+            scene,
+            engine,
+        );
+        if (!normalMapResult.success) {
+            throw new Error(`Failed to create normal map texture array: ${String(normalMapResult.error)}`);
+        }
+
+        const normalMap = normalMapResult.value;
+        normalMap.wrapU = addressMode;
+        normalMap.wrapV = addressMode;
+        normalMap.wrapR = addressMode;
+
+        albedoBslTexture = {
+            type: "texture_2d_array_mosaic",
+            array: albedo,
+            tileCount: { x: 4, y: 2 },
+        };
+
+        normalBslTexture = {
+            type: "texture_2d_array_mosaic",
+            array: normalMap,
+            tileCount: { x: 4, y: 2 },
+        };
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: new Texture(earthColorMap8k, scene),
+        };
+
+        normalBslTexture = {
+            type: "texture_2d",
+            texture: new Texture(earthNormalMap8k, scene),
+        };
     }
 
-    const albedo = albedoResult.value;
-    const addressMode = Texture.CLAMP_ADDRESSMODE;
-    albedo.wrapU = addressMode;
-    albedo.wrapV = addressMode;
-    albedo.wrapR = addressMode;
-
-    const normalMapResult = await createRawTexture2DArrayFromUrls(
-        [
-            earthNormalMapPath_0_0,
-            earthNormalMapPath_0_1,
-            earthNormalMapPath_0_2,
-            earthNormalMapPath_0_3,
-            earthNormalMapPath_1_0,
-            earthNormalMapPath_1_1,
-            earthNormalMapPath_1_2,
-            earthNormalMapPath_1_3,
-        ],
-        scene,
-        engine,
-    );
-    if (!normalMapResult.success) {
-        throw new Error(`Failed to create normal map texture array: ${String(normalMapResult.error)}`);
-    }
-
-    const normalMap = normalMapResult.value;
-    normalMap.wrapU = addressMode;
-    normalMap.wrapV = addressMode;
-    normalMap.wrapR = addressMode;
-
-    const material = new CustomPlanetMaterial(
-        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
-        { type: "texture_2d_array_mosaic", array: normalMap, tileCount: { x: 4, y: 2 } },
-        scene,
-    );
+    const material = new CustomPlanetMaterial(albedoBslTexture, normalBslTexture, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
