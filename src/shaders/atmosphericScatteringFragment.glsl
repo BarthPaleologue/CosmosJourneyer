@@ -122,7 +122,9 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     float g = atmosphere_mieAsymmetry;
     float g2 = g * g;
-    float phaseMie = ((3.0 * (1.0 - g2)) / (2.0 * (2.0 + g2))) * ((1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, 1.5));
+
+    // Cornette-Shanks phase function for Mie scattering
+    float phaseMie = (3.0 * (1.0 - g2) / (8.0 * PI * (2.0 + g2))) * (1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, 1.5);
 
     inScatteredRayleigh *= phaseRayleigh * atmosphere_rayleighCoeffs;
     inScatteredMie *= phaseMie * atmosphere_mieCoeffs;
