@@ -169,3 +169,31 @@ h1 {
         border-radius: 8px;
     }
 }
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+
+    padding: 0;
+    transition:
+        background variables.$transition-time,
+        color variables.$transition-time;
+}
+
+.close-button:hover,
+.close-button:focus {
+    background: var(--accent-color);
+    color: #fff;
+    outline: none;
+}
