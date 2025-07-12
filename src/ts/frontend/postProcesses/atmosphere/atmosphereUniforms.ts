@@ -92,11 +92,14 @@ export class AtmosphereUniforms {
         this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
         );
+
+        // https://playerunknownproductions.net/news/atmospheric-scattering
         this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.mieScatteringCoefficients = new Vector3(3.9e-6, 3.9e-6, 3.9e-6).scaleInPlace(
+        this.mieScatteringCoefficients = new Vector3(0.00002, 0.00002, 0.00002).scaleInPlace(
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
         );
-        this.mieAsymmetry = 0.8;
+        this.mieAsymmetry = 0.76;
+
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
             Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
