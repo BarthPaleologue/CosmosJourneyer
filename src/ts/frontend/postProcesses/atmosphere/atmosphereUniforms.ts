@@ -20,10 +20,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
-import { PresetBands } from "@/utils/physics/atmosphere/common";
 import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
 import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
 import { computeAtmospherePressureScaleHeight, getHeightForPressure } from "@/utils/physics/atmosphere/scaleHeight";
+import { PresetBands } from "@/utils/physics/constants";
 import { computeGravityAcceleration } from "@/utils/physics/gravity";
 import { type DeepReadonly } from "@/utils/types";
 

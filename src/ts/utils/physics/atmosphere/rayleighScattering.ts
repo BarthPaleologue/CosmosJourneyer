@@ -19,13 +19,8 @@ import { type Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
 import { type DeepReadonly } from "@/utils/types";
 
+import { Kb } from "../constants";
 import { getGasDepolarization, getGasRefractiveIndex } from "./gas";
-
-/**
- * Boltzmann constant, J K⁻¹
- * @see https://en.wikipedia.org/wiki/Boltzmann_constant
- */
-const K_B = 1.380_649e-23;
 
 /**
  * Loschmidt constant (number density at STP), m⁻³ at 273.15 K & 101 325 Pa.
@@ -70,7 +65,7 @@ export function computeRayleighBetaRGB(
 
     /* --- (2) Calculate actual molecular number density at given (P,T) --- */
     // This is the number of molecules per cubic meter at the specified pressure and temperature.
-    const N_actual = pressure / (K_B * temperature);
+    const N_actual = pressure / (Kb * temperature);
 
     /* --- (3) Compute β(λ) for each wavelength --- */
     // β (extinction coefficient) = N_actual * σ_molecular
