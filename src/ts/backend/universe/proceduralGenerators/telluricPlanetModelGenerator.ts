@@ -85,18 +85,28 @@ export function newSeededTelluricPlanetModel(
                   ["Ar", 0.01],
               ];
 
+    const aerosols =
+        ocean !== null
+            ? {
+                  tau550: 0.05,
+                  settlingCoefficient: 0.15,
+                  particleRadius: 0.5e-6,
+                  angstromExponent: 0.0,
+              }
+            : {
+                  tau550: 0.5,
+                  settlingCoefficient: 0.2,
+                  particleRadius: 1.0e-6,
+                  angstromExponent: 0.6,
+              };
+
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
                   seaLevelPressure: pressure,
                   greenHouseEffectFactor: 0.5,
                   gasMix,
-                  aerosols: {
-                      tau550: 0.05,
-                      angstromExponent: 0.0,
-                      particleRadius: 0.5e-6,
-                      settlingCoefficient: 0.15,
-                  },
+                  aerosols,
               }
             : null;
 
