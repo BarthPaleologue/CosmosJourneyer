@@ -58,7 +58,7 @@ export class AtmosphereUniforms {
      * Rayleigh scattering coefficients (red, green, blue)
      * @see https://sebh.github.io/publications/egsr2020.pdf (Hillaire 2020)
      */
-    rayleighScatteringCoefficients: Vector3;
+    rayleighScatteringCoefficients: [number, number, number];
 
     /**
      * Height falloff of mie scattering (bigger = slower decrease)
@@ -68,12 +68,12 @@ export class AtmosphereUniforms {
     /**
      * Mie scattering coefficients (red, green, blue)
      */
-    mieScatteringCoefficients: Vector3;
+    mieScatteringCoefficients: [number, number, number];
 
     /**
      * Mie scattering asymmetry factor (between -1 and 1)
      */
-    mieAsymmetry: number;
+    mieAsymmetry: [number, number, number];
 
     /**
      * Height of the ozone layer in meters above the planet surface
@@ -123,14 +123,14 @@ export class AtmosphereUniforms {
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
 
         this.rayleighHeight = rayleighScaleHeight;
-        this.rayleighScatteringCoefficients = Vector3.FromArray(rayleighScatteringCoefficients);
+        this.rayleighScatteringCoefficients = rayleighScatteringCoefficients;
 
         const mieScattering = computeSpectralMie(model.aerosols, rayleighScaleHeight, PresetBands.PHOTOPIC);
 
         this.mieHeight = mieScattering.aerosolScaleHeight;
-        this.mieScatteringCoefficients = Vector3.FromArray(mieScattering.betaRGB);
+        this.mieScatteringCoefficients = mieScattering.betaRGB;
 
-        this.mieAsymmetry = mieScattering.gRGB[1];
+        this.mieAsymmetry = mieScattering.gRGB;
 
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
@@ -144,10 +144,10 @@ export class AtmosphereUniforms {
     setUniforms(effect: Effect) {
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RADIUS, this.atmosphereRadius);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_HEIGHT, this.rayleighHeight);
-        effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, this.rayleighScatteringCoefficients);
+        effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, ...this.rayleighScatteringCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HEIGHT, this.mieHeight);
-        effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, this.mieScatteringCoefficients);
-        effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, this.mieAsymmetry);
+        effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, ...this.mieScatteringCoefficients);
+        effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, ...this.mieAsymmetry);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_HEIGHT, this.ozoneHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, this.ozoneAbsorptionCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_FALLOFF, this.ozoneFalloff);
