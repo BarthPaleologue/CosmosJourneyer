@@ -58,6 +58,15 @@ export function asymmetryFromSize(x: number, gInf = 0.9, x0 = 1.0, p = 1.5): num
     return gInf * (1 - Math.exp(-Math.pow(x / x0, p)));
 }
 
+/**
+ * @param particleRadius The effective radius of the aerosol particles in meters.
+ * @param wavelength The wavelength of light in meters.
+ * @returns The size parameter for Mie scattering, which is a dimensionless quantity defined as (2π * particleRadius) / wavelength.
+ */
+export function getMieSizeParameter(particleRadius: number, wavelength: number): number {
+    return (2 * Math.PI * particleRadius) / wavelength;
+}
+
 export interface SpectralMieResults {
     /** The aerosol scale height in meters. */
     aerosolScaleHeight: number;
@@ -89,11 +98,10 @@ export function computeSpectralMie(
         beta550 * (waveLengths[2] / 550e-9) ** -mieInputs.angstromExponent,
     ];
 
-    const numerator = 2 * Math.PI * mieInputs.particleRadius;
     const gRGB: [number, number, number] = [
-        asymmetryFromSize(numerator / waveLengths[0]),
-        asymmetryFromSize(numerator / waveLengths[1]),
-        asymmetryFromSize(numerator / waveLengths[2]),
+        asymmetryFromSize(getMieSizeParameter(mieInputs.particleRadius, waveLengths[0])),
+        asymmetryFromSize(getMieSizeParameter(mieInputs.particleRadius, waveLengths[1])),
+        asymmetryFromSize(getMieSizeParameter(mieInputs.particleRadius, waveLengths[2])),
     ];
 
     return { aerosolScaleHeight, betaRGB, gRGB };
