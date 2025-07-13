@@ -21,6 +21,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
 import { computeMeanMolecularWeight } from "@/utils/physics/atmosphere/gas";
+import { computeSpectralMie } from "@/utils/physics/atmosphere/mieScattering";
 import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScattering";
 import { computeAtmospherePressureScaleHeight, getHeightForPressure } from "@/utils/physics/atmosphere/scaleHeight";
 import { PresetBands } from "@/utils/physics/constants";
@@ -124,12 +125,12 @@ export class AtmosphereUniforms {
         this.rayleighHeight = rayleighScaleHeight;
         this.rayleighScatteringCoefficients = Vector3.FromArray(rayleighScatteringCoefficients);
 
-        // https://playerunknownproductions.net/news/atmospheric-scattering
-        this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.mieScatteringCoefficients = new Vector3(0.00002, 0.00002, 0.00002).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
-        );
-        this.mieAsymmetry = 0.76;
+        const mieScattering = computeSpectralMie(model.aerosols, rayleighScaleHeight, PresetBands.PHOTOPIC);
+
+        this.mieHeight = mieScattering.aerosolScaleHeight;
+        this.mieScatteringCoefficients = Vector3.FromArray(mieScattering.betaRGB);
+
+        this.mieAsymmetry = mieScattering.gRGB[1];
 
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(

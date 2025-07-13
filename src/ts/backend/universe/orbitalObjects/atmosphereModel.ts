@@ -34,4 +34,22 @@ export type AtmosphereModel = {
      * The sum of all fractions must add up to 1.0
      */
     gasMix: Array<[Gas, number]>;
+
+    /** Describes the aerosols in the atmosphere */
+    aerosols: {
+        /** Aerosol optical depth at 550nm */
+        tau550: number;
+
+        /** Between 0 and 1. Where 0 means complete settling and 1.0 means no settling. For Earth, typically 0.15 */
+        settlingCoefficient: number;
+
+        /** Effective radius of the aerosol particles in meters. */
+        particleRadius: number;
+
+        /**
+         * The Ångström exponent for the aerosol size distribution. A value of 0 means a flat β spectrum.
+         * @see https://en.wikipedia.org/wiki/Angstrom_exponent
+         */
+        angstromExponent: number;
+    };
 };
