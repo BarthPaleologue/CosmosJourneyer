@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { type AtmosphereModel, type Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
 import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
@@ -94,10 +94,15 @@ export function newSeededTelluricPlanetModel(
                   angstromExponent: 0.0,
               }
             : {
-                  tau550: 0.5,
-                  settlingCoefficient: 0.2,
-                  particleRadius: 1.0e-6,
-                  angstromExponent: 0.6,
+                  tau550: randRange(0.1, 2, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.TAU_550),
+                  settlingCoefficient: randRange(
+                      0.15,
+                      0.3,
+                      rng,
+                      GenerationSteps.ATMOSPHERE.AEROSOLS.SETTLING_COEFFICIENT,
+                  ),
+                  particleRadius: randRange(0.5e-6, 3e-6, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.PARTICLE_RADIUS),
+                  angstromExponent: randRange(0.0, 1.0, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.ANGSTROM_EXPONENT),
               };
 
     const atmosphere: AtmosphereModel | null =
