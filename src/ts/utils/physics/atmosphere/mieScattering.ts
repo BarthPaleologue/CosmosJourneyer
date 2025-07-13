@@ -19,7 +19,7 @@ import { type DeepReadonly } from "@/utils/types";
 
 /**
  * @param pressureScaleHeight The pressure scale height in meters.
- * @param settlingCoefficient The settling coefficient between 0 and 1, where 0 means no settling and 1 means complete settling. For Earth, this is typically around 0.15.
+ * @param settlingCoefficient The settling coefficient between 0 and 1, where 0 means complete settling and 1 means no settling. For Earth, this is typically around 0.15.
  * @returns The aerosol scale height based on the pressure scale height and the settling coefficient.
  */
 export function getAerosolScaleHeight(pressureScaleHeight: number, settlingCoefficient: number): number {
@@ -59,11 +59,17 @@ export function asymmetryFromSize(x: number, gInf = 0.9, x0 = 1.0, p = 1.5): num
 export interface SpectralMieInputs {
     /** Aerosol optical depth at 550nm */
     tau550: number;
+
     /** Between 0 and 1. Where 0 means complete settling and 1.0 means no settling. For Earth, typically 0.15 */
-    settlingFraction: number;
+    settlingCoefficient: number;
+
     /** Effective radius of the aerosol particles in meters. */
-    particleRadius: number; // effective radius [m]
-    /** The Ångström exponent for the aerosol size distribution. A value of 0 means a flat β spectrum. */
+    particleRadius: number;
+
+    /**
+     * The Ångström exponent for the aerosol size distribution. A value of 0 means a flat β spectrum.
+     * @see https://en.wikipedia.org/wiki/Angstrom_exponent
+     */
     angstromAlpha: number;
 }
 
@@ -90,7 +96,7 @@ export function computeSpectralMie(
     waveLengths: readonly [number, number, number],
 ): SpectralMieResults {
     const lambda = waveLengths;
-    const f = mieInputs.settlingFraction;
+    const f = mieInputs.settlingCoefficient;
     const alpha = mieInputs.angstromAlpha;
 
     // 1. scale heights
