@@ -21,12 +21,16 @@ import { PresetBands } from "../constants";
 import { betaFromAerosolOpticalDepth, computeSpectralMie, getAerosolScaleHeight } from "./mieScattering";
 import { computeAtmospherePressureScaleHeight } from "./scaleHeight";
 
-// ---------- Physical constants / baselines ----------
 // Earth constants
 const MOLAR_MASS_AIR = 0.02897; // kg·mol⁻¹
 const T_EARTH = 288.15; // K
 const G_EARTH = 9.80665; // m·s⁻²
-const TAU_EARTH = 0.05; // clear‑sky τ₅₅₀
+
+/**
+ * clear‑sky τ₅₅₀
+ * @see https://ramanathan.ucsd.edu/wp-content/uploads/sites/460/2017/10/pr87.pdf abstract
+ */
+const TAU_EARTH = 0.05;
 const F_SETTLE_E = 0.15; // settling fraction for continental aerosol
 const R_EFF_E = 0.5e-6; // 0.5µm sulphate aerosol
 
@@ -34,7 +38,12 @@ const R_EFF_E = 0.5e-6; // 0.5µm sulphate aerosol
 const G_MARS = 3.711; // m·s⁻²
 const T_MARS = 210; // K
 const MM_CO2 = 0.04401; // kg·mol⁻¹
-const TAU_MARS = 0.5; // τ₅₅₀ ~0.5
+
+/**
+ * τ₅₅₀
+ * @see https://ntrs.nasa.gov/api/citations/20150008268/downloads/20150008268.pdf (4.1. Seasonal variations of optical depth)
+ */
+const TAU_MARS = 0.5;
 const F_SETTLE_M = 1.0; // well‑mixed dust column
 const R_DUST = 1.0e-6; // 1µm effective radius
 const ALPHA_M = 0.6; // Ångström exponent
@@ -57,7 +66,7 @@ describe("computeSpectralMie Earth baseline (α≈0)", () => {
     const res = computeSpectralMie(
         {
             tau550: TAU_EARTH,
-            settlingFraction: F_SETTLE_E,
+            settlingCoefficient: F_SETTLE_E,
             particleRadius: R_EFF_E,
             angstromAlpha: 0.0,
         },
@@ -82,7 +91,7 @@ describe("computeSpectralMie Mars dusty sol (α=0.6)", () => {
     const mars = computeSpectralMie(
         {
             tau550: TAU_MARS,
-            settlingFraction: F_SETTLE_M,
+            settlingCoefficient: F_SETTLE_M,
             particleRadius: R_DUST,
             angstromAlpha: ALPHA_M,
         },
