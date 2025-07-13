@@ -67,6 +67,12 @@ export function getEarthModel(parentIds: ReadonlyArray<OrbitalObjectId>) {
                 ["O2", 0.21],
                 ["Ar", 0.01],
             ],
+            aerosols: {
+                tau550: 0.05,
+                settlingCoefficient: 0.15,
+                particleRadius: 0.5e-6,
+                angstromExponent: 0.0,
+            },
         },
         clouds: {
             layerRadius: 6_371e3 + 30e3,

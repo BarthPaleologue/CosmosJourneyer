@@ -66,6 +66,12 @@ export function getMarsModel(parentIds: ReadonlyArray<OrbitalObjectId>) {
                 ["Ar", 0.01],
                 ["O2", 0.01],
             ],
+            aerosols: {
+                tau550: 0.1,
+                settlingCoefficient: 1,
+                particleRadius: 1.0e-6,
+                angstromExponent: 0.6,
+            },
         },
         rings: null,
         clouds: null,

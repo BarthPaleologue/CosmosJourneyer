@@ -18,13 +18,14 @@
 import { describe, expect, it } from "vitest";
 
 import { Faction } from "@/backend/society/factions";
+import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { Settings } from "@/settings";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
-import { AU, EarthMass, SolarMass, SolarRadius } from "./physics/constants";
+import { SolarMass, SolarRadius } from "./physics/constants";
 import { type DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
@@ -62,41 +63,7 @@ describe("distanceToStellarObject", () => {
                 blackBodyTemperature: 5778,
             },
         ],
-        planets: [
-            {
-                type: OrbitalObjectType.GAS_PLANET,
-                id: "planet",
-                name: "Planet",
-                orbit: {
-                    p: 2,
-                    semiMajorAxis: AU,
-                    parentIds: ["star"],
-                    argumentOfPeriapsis: 0,
-                    inclination: 0,
-                    initialMeanAnomaly: 0,
-                    longitudeOfAscendingNode: 0,
-                    eccentricity: 0,
-                },
-                axialTilt: 0,
-                seed: 0,
-                siderealDaySeconds: 0,
-                radius: Settings.EARTH_RADIUS * 10,
-                mass: EarthMass * 10000,
-                rings: null,
-                atmosphere: {
-                    greenHouseEffectFactor: 1,
-                    seaLevelPressure: 100_000,
-                    gasMix: [
-                        ["H2", 0.9],
-                        ["He", 0.1],
-                    ],
-                },
-                colorPalette: {
-                    type: "textured",
-                    textureId: "jupiter",
-                },
-            },
-        ],
+        planets: [getJupiterModel(["star"])],
         satellites: [],
         anomalies: [],
         orbitalFacilities: [
@@ -107,7 +74,7 @@ describe("distanceToStellarObject", () => {
                 orbit: {
                     p: 2,
                     semiMajorAxis: Settings.EARTH_RADIUS * 30,
-                    parentIds: ["planet"],
+                    parentIds: ["jupiter"],
                     argumentOfPeriapsis: 0,
                     inclination: 0,
                     initialMeanAnomaly: 0,

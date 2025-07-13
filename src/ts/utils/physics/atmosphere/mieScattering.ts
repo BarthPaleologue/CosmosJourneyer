@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+
 import { type DeepReadonly } from "@/utils/types";
 
 /**
@@ -56,23 +58,6 @@ export function asymmetryFromSize(x: number, gInf = 0.9, x0 = 1.0, p = 1.5): num
     return gInf * (1 - Math.exp(-Math.pow(x / x0, p)));
 }
 
-export interface SpectralMieInputs {
-    /** Aerosol optical depth at 550nm */
-    tau550: number;
-
-    /** Between 0 and 1. Where 0 means complete settling and 1.0 means no settling. For Earth, typically 0.15 */
-    settlingCoefficient: number;
-
-    /** Effective radius of the aerosol particles in meters. */
-    particleRadius: number;
-
-    /**
-     * The Ångström exponent for the aerosol size distribution. A value of 0 means a flat β spectrum.
-     * @see https://en.wikipedia.org/wiki/Angstrom_exponent
-     */
-    angstromAlpha: number;
-}
-
 export interface SpectralMieResults {
     /** The aerosol scale height in meters. */
     aerosolScaleHeight: number;
@@ -91,13 +76,13 @@ export interface SpectralMieResults {
  * @returns Mie scattering's Cornette-Shanks parameters (β & g) for each RGB channel.
  */
 export function computeSpectralMie(
-    mieInputs: DeepReadonly<SpectralMieInputs>,
+    mieInputs: DeepReadonly<AtmosphereModel["aerosols"]>,
     atmosphereGasScaleHeight: number,
     waveLengths: readonly [number, number, number],
 ): SpectralMieResults {
     const lambda = waveLengths;
     const f = mieInputs.settlingCoefficient;
-    const alpha = mieInputs.angstromAlpha;
+    const alpha = mieInputs.angstromExponent;
 
     // 1. scale heights
     const Hg = atmosphereGasScaleHeight;
