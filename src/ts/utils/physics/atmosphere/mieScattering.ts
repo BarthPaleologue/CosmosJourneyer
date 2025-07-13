@@ -78,23 +78,23 @@ export interface SpectralMieResults {
 export function computeSpectralMie(
     mieInputs: DeepReadonly<AtmosphereModel["aerosols"]>,
     atmosphereGasScaleHeight: number,
-    waveLengths: readonly [number, number, number],
+    waveLengths: DeepReadonly<[number, number, number]>,
 ): SpectralMieResults {
-    const lambda = waveLengths;
-    const f = mieInputs.settlingCoefficient;
-    const alpha = mieInputs.angstromExponent;
+    const aerosolScaleHeight = getAerosolScaleHeight(atmosphereGasScaleHeight, mieInputs.settlingCoefficient);
 
-    // 1. scale heights
-    const Hg = atmosphereGasScaleHeight;
-    const Hm = getAerosolScaleHeight(Hg, f);
+    const beta550 = betaFromAerosolOpticalDepth(mieInputs.tau550, aerosolScaleHeight);
+    const betaRGB: [number, number, number] = [
+        beta550 * (waveLengths[0] / 550e-9) ** -mieInputs.angstromExponent,
+        beta550 * (waveLengths[1] / 550e-9) ** -mieInputs.angstromExponent,
+        beta550 * (waveLengths[2] / 550e-9) ** -mieInputs.angstromExponent,
+    ];
 
-    // 2. base β at 550nm and spectral version via Ångström law
-    const beta550 = betaFromAerosolOpticalDepth(mieInputs.tau550, Hm);
-    const betaRGB = lambda.map((λ) => beta550 * Math.pow(λ / 550e-9, -alpha)) as [number, number, number];
+    const numerator = 2 * Math.PI * mieInputs.particleRadius;
+    const gRGB: [number, number, number] = [
+        asymmetryFromSize(numerator / waveLengths[0]),
+        asymmetryFromSize(numerator / waveLengths[1]),
+        asymmetryFromSize(numerator / waveLengths[2]),
+    ];
 
-    // 3. asymmetry per λ using size parameter x = 2πr/λ
-    const xRGB = lambda.map((λ) => (2 * Math.PI * mieInputs.particleRadius) / λ);
-    const gRGB = xRGB.map((x) => asymmetryFromSize(x)) as [number, number, number];
-
-    return { aerosolScaleHeight: Hm, betaRGB, gRGB };
+    return { aerosolScaleHeight, betaRGB, gRGB };
 }
