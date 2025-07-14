@@ -185,5 +185,17 @@ export async function createMoonScene(
         material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
     return scene;
 }
