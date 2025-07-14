@@ -40,8 +40,10 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+import { type BslTexture2dUv } from "@/utils/bslExtensions";
+import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
 
+import marsAlbedoPath from "@assets/sol/textures/marsColor8k.png";
 import marsAlbedoPath_0_0 from "@assets/sol/textures/marsColorMap2x4/0_0.png";
 import marsAlbedoPath_0_1 from "@assets/sol/textures/marsColorMap2x4/0_1.png";
 import marsAlbedoPath_0_2 from "@assets/sol/textures/marsColorMap2x4/0_2.png";
@@ -98,36 +100,49 @@ export async function createMarsScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const albedoResult = await createRawTexture2DArrayFromUrls(
-        [
-            marsAlbedoPath_0_0,
-            marsAlbedoPath_0_1,
-            marsAlbedoPath_0_2,
-            marsAlbedoPath_0_3,
-            marsAlbedoPath_1_0,
-            marsAlbedoPath_1_1,
-            marsAlbedoPath_1_2,
-            marsAlbedoPath_1_3,
-        ],
-        scene,
-        engine,
-    );
-    if (!albedoResult.success) {
-        throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: BslTexture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await createRawTexture2DArrayFromUrls(
+            [
+                marsAlbedoPath_0_0,
+                marsAlbedoPath_0_1,
+                marsAlbedoPath_0_2,
+                marsAlbedoPath_0_3,
+                marsAlbedoPath_1_0,
+                marsAlbedoPath_1_1,
+                marsAlbedoPath_1_2,
+                marsAlbedoPath_1_3,
+            ],
+            scene,
+            engine,
+        );
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+        }
+
+        const albedo = albedoResult.value;
+        const addressMode = Texture.CLAMP_ADDRESSMODE;
+        albedo.wrapU = addressMode;
+        albedo.wrapV = addressMode;
+        albedo.wrapR = addressMode;
+
+        albedoBslTexture = {
+            type: "texture_2d_array_mosaic",
+            array: albedo,
+            tileCount: { x: 4, y: 2 },
+        };
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await createTextureAsync(marsAlbedoPath, scene),
+        };
     }
+    const normal = await createTextureAsync(marsNormalPath, scene);
 
-    const albedo = albedoResult.value;
-    const addressMode = Texture.CLAMP_ADDRESSMODE;
-    albedo.wrapU = addressMode;
-    albedo.wrapV = addressMode;
-    albedo.wrapR = addressMode;
-    const normal = new Texture(marsNormalPath, scene);
-
-    const material = new CustomPlanetMaterial(
-        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
-        { type: "texture_2d", texture: normal },
-        scene,
-    );
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
@@ -181,6 +196,18 @@ export async function createMarsScene(
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
         material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;
