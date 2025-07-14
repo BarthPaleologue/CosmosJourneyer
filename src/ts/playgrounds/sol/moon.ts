@@ -39,8 +39,10 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+import { type BslTexture2dUv } from "@/utils/bslExtensions";
+import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
 
+import moonAlbedoPath from "@assets/sol/textures/moonColor8k.png";
 import moonAlbedoPath_0_0 from "@assets/sol/textures/moonColorMap2x4/0_0.png";
 import moonAlbedoPath_0_1 from "@assets/sol/textures/moonColorMap2x4/0_1.png";
 import moonAlbedoPath_0_2 from "@assets/sol/textures/moonColorMap2x4/0_2.png";
@@ -98,43 +100,46 @@ export async function createMoonScene(
     gizmoManager.positionGizmoEnabled = true;
     gizmoManager.rotationGizmoEnabled = true;
 
-    const albedoResult = await createRawTexture2DArrayFromUrls(
-        [
-            moonAlbedoPath_0_0,
-            moonAlbedoPath_0_1,
-            moonAlbedoPath_0_2,
-            moonAlbedoPath_0_3,
-            moonAlbedoPath_1_0,
-            moonAlbedoPath_1_1,
-            moonAlbedoPath_1_2,
-            moonAlbedoPath_1_3,
-        ],
-        scene,
-        engine,
-    );
-    if (!albedoResult.success) {
-        throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: BslTexture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await createRawTexture2DArrayFromUrls(
+            [
+                moonAlbedoPath_0_0,
+                moonAlbedoPath_0_1,
+                moonAlbedoPath_0_2,
+                moonAlbedoPath_0_3,
+                moonAlbedoPath_1_0,
+                moonAlbedoPath_1_1,
+                moonAlbedoPath_1_2,
+                moonAlbedoPath_1_3,
+            ],
+            scene,
+            engine,
+        );
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+        }
+
+        const albedo = albedoResult.value;
+        const addressMode = Texture.CLAMP_ADDRESSMODE;
+        albedo.wrapU = addressMode;
+        albedo.wrapV = addressMode;
+        albedo.wrapR = addressMode;
+
+        albedoBslTexture = { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } };
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await createTextureAsync(moonAlbedoPath, scene),
+        };
     }
 
-    const albedo = albedoResult.value;
-    const addressMode = Texture.CLAMP_ADDRESSMODE;
-    albedo.wrapU = addressMode;
-    albedo.wrapV = addressMode;
-    albedo.wrapR = addressMode;
-    const normal = new Texture(moonNormalPath, scene);
+    const normal = await createTextureAsync(moonNormalPath, scene);
 
-    const material = new CustomPlanetMaterial(
-        {
-            type: "texture_2d_array_mosaic",
-            array: albedo,
-            tileCount: {
-                x: 4,
-                y: 2,
-            },
-        },
-        { type: "texture_2d", texture: normal },
-        scene,
-    );
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
