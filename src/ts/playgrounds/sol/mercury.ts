@@ -37,8 +37,10 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+import { type BslTexture2dUv } from "@/utils/bslExtensions";
+import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
 
+import mercuryColorMapPath from "@assets/sol/textures/mercuryColor8k.png";
 import mercuryColorMapPath_0_0 from "@assets/sol/textures/mercuryColorMap2x4/0_0.png";
 import mercuryColorMapPath_0_1 from "@assets/sol/textures/mercuryColorMap2x4/0_1.png";
 import mercuryColorMapPath_0_2 from "@assets/sol/textures/mercuryColorMap2x4/0_2.png";
@@ -95,36 +97,50 @@ export async function createMercuryScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const albedoResult = await createRawTexture2DArrayFromUrls(
-        [
-            mercuryColorMapPath_0_0,
-            mercuryColorMapPath_0_1,
-            mercuryColorMapPath_0_2,
-            mercuryColorMapPath_0_3,
-            mercuryColorMapPath_1_0,
-            mercuryColorMapPath_1_1,
-            mercuryColorMapPath_1_2,
-            mercuryColorMapPath_1_3,
-        ],
-        scene,
-        engine,
-    );
-    if (!albedoResult.success) {
-        throw new Error(`Failed to create albedo texture: ${String(albedoResult.error)}`);
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: BslTexture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await createRawTexture2DArrayFromUrls(
+            [
+                mercuryColorMapPath_0_0,
+                mercuryColorMapPath_0_1,
+                mercuryColorMapPath_0_2,
+                mercuryColorMapPath_0_3,
+                mercuryColorMapPath_1_0,
+                mercuryColorMapPath_1_1,
+                mercuryColorMapPath_1_2,
+                mercuryColorMapPath_1_3,
+            ],
+            scene,
+            engine,
+        );
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture: ${String(albedoResult.error)}`);
+        }
+
+        const albedo = albedoResult.value;
+        const addressMode = Texture.CLAMP_ADDRESSMODE;
+        albedo.wrapU = addressMode;
+        albedo.wrapV = addressMode;
+        albedo.wrapR = addressMode;
+
+        albedoBslTexture = {
+            type: "texture_2d_array_mosaic",
+            array: albedo,
+            tileCount: { x: 4, y: 2 },
+        };
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await createTextureAsync(mercuryColorMapPath, scene),
+        };
     }
 
-    const albedo = albedoResult.value;
-    const addressMode = Texture.CLAMP_ADDRESSMODE;
-    albedo.wrapU = addressMode;
-    albedo.wrapV = addressMode;
-    albedo.wrapR = addressMode;
     const normalMap = new Texture(mercuryNormalMapPath, scene);
 
-    const material = new CustomPlanetMaterial(
-        { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } },
-        { type: "texture_2d", texture: normalMap },
-        scene,
-    );
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normalMap }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
@@ -168,6 +184,18 @@ export async function createMercuryScene(
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
         material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;
