@@ -58,6 +58,14 @@ export async function loadImageBitmapArray(url: ReadonlyArray<string>): Promise<
     return ok(bitmaps);
 }
 
+export async function createTextureAsync(path: string, scene: Scene): Promise<Texture> {
+    return new Promise((resolve) => {
+        const texture = new Texture(path, scene, undefined, undefined, undefined, () => {
+            resolve(texture);
+        });
+    });
+}
+
 export async function createRawTexture2DArrayFromUrls(
     urls: ReadonlyArray<string>,
     scene: Scene,
