@@ -227,7 +227,7 @@ export class SphericalHeightFieldChunk implements Transformable {
     public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
-        const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
+        const distanceSquared = Vector3.DistanceSquared(this.getTransform().getAbsolutePosition(), cameraPosition);
         if (this.children === null && distanceSquared < (this.sideLength * 2) ** 2) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
@@ -236,28 +236,31 @@ export class SphericalHeightFieldChunk implements Transformable {
                 this.parent,
                 this.terrainModel,
                 material,
-                this.mesh.getScene(),
+                this.getTransform().getScene(),
             );
         } else if (
-            this.loadingState === "completed" &&
             this.children !== null &&
-            distanceSquared >= (this.sideLength * 2.5) ** 2
+            distanceSquared >= (this.sideLength * 2.5) ** 2 &&
+            this.getLoadingState() === "completed"
         ) {
             for (const child of this.children) {
                 child.dispose();
             }
             this.children = null;
-            this.mesh.setEnabled(true);
-        } else if (this.loadingState === "completed" && this.children === null) {
-            this.mesh.setEnabled(true);
         }
 
-        for (const child of this.children ?? []) {
-            child.update(cameraPosition, material, chunkForge);
-        }
+        if (this.children !== null) {
+            let areAllChildrenLoaded = true;
+            for (const child of this.children) {
+                child.update(cameraPosition, material, chunkForge);
+                if (child.getLoadingState() !== "completed") {
+                    areAllChildrenLoaded = false;
+                }
+            }
 
-        if (this.children !== null && this.children.every((child) => child.loadingState === "completed")) {
-            this.mesh.setEnabled(false);
+            this.getTransform().setEnabled(!areAllChildrenLoaded);
+        } else if (this.getLoadingState() === "completed") {
+            this.getTransform().setEnabled(true);
         }
     }
 
@@ -283,7 +286,7 @@ export class SphericalHeightFieldChunk implements Transformable {
     }
 
     public dispose(): void {
-        this.mesh.dispose();
+        this.getTransform().dispose();
         this.children?.forEach((child) => {
             child.dispose();
         });
