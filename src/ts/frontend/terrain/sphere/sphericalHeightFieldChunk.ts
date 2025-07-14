@@ -25,6 +25,8 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
+
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
@@ -45,7 +47,7 @@ export type ChunkIndices = {
  * The chunk is positioned on a sphere and can be subdivided into smaller chunks.
  * Chunks rely on a ChunkForge to compute their vertex data asynchronously.
  */
-export class SphericalHeightFieldChunk {
+export class SphericalHeightFieldChunk implements Transformable {
     private readonly id: ChunkId;
     private readonly indices: ChunkIndices;
 
@@ -114,6 +116,8 @@ export class SphericalHeightFieldChunk {
         this.sphereRadius = sphereRadius;
 
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
+
+        this.mesh.setEnabled(false);
     }
 
     private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
@@ -244,6 +248,8 @@ export class SphericalHeightFieldChunk {
             }
             this.children = null;
             this.mesh.setEnabled(true);
+        } else if (this.loadingState === "completed" && this.children === null) {
+            this.mesh.setEnabled(true);
         }
 
         for (const child of this.children ?? []) {
@@ -253,6 +259,27 @@ export class SphericalHeightFieldChunk {
         if (this.children !== null && this.children.every((child) => child.loadingState === "completed")) {
             this.mesh.setEnabled(false);
         }
+    }
+
+    public getTransform(): TransformNode {
+        return this.mesh;
+    }
+
+    public getLoadingState(): ChunkLoadingState {
+        return this.loadingState;
+    }
+
+    public getAllChildren(): Array<SphericalHeightFieldChunk> {
+        if (this.children === null) {
+            return [];
+        }
+
+        let children: Array<SphericalHeightFieldChunk> = [...this.children];
+        for (const child of this.children) {
+            children = children.concat(child.getAllChildren());
+        }
+
+        return children;
     }
 
     public dispose(): void {
