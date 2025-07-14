@@ -258,7 +258,19 @@ export async function createEarthScene(
         material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
-    progressCallback(1, "Loaded terrain scene");
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
+    progressCallback(1, "Loaded Earth scene");
 
     return scene;
 }
