@@ -206,8 +206,9 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
             case "earth":
                 return this.heightMaps.earth1x1;
             case "mercury":
-            case "venus":
+                return this.heightMaps.mercury1x1;
             case "moon":
+            case "venus":
             case "mars":
                 return this.heightMaps.mars1x1;
             default:
