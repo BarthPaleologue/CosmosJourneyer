@@ -79,6 +79,15 @@ export function getSolSystemModel(): StarSystemModel {
                 ["CO2", 0.96],
                 ["N2", 0.04],
             ],
+            aerosols: {
+                // see https://www.nasa.gov/wp-content/uploads/2019/04/niac_2019_phi_brandon_powerbeaming_tagged.pdf
+                // see https://link.springer.com/article/10.1007/s11214-025-01176-4
+                // see https://www.sciencedirect.com/science/article/abs/pii/S0019103511002624
+                tau550: 30,
+                angstromExponent: 0.1,
+                particleRadius: 1e-6,
+                settlingCoefficient: 0.3,
+            },
         },
         clouds: {
             layerRadius: 6_051.8e3 + 10e3,
@@ -136,6 +145,14 @@ export function getSolSystemModel(): StarSystemModel {
                 ["He", 0.15],
                 ["CH4", 0.02],
             ],
+            aerosols: {
+                // see https://www.sciencedirect.com/science/article/abs/pii/0019103586901478
+                // see https://www.ssec.wisc.edu/planetary/uranus/onlinedata/ura2012stis/ura_stis_analysis_supplement.pdf
+                tau550: 0.08,
+                angstromExponent: 0.9,
+                particleRadius: 1e-7,
+                settlingCoefficient: 1,
+            },
         },
         rings: {
             innerRadius: 50_724e3,
@@ -176,6 +193,13 @@ export function getSolSystemModel(): StarSystemModel {
                 ["He", 0.19],
                 ["CH4", 0.01],
             ],
+            aerosols: {
+                // see <https://www.researchgate.net/publication/341351962_Constraints_on_Neptune's_haze_structure_and_formation_from_VLT_observations_in_the_H-band>
+                tau550: 0.5,
+                angstromExponent: 1,
+                particleRadius: 2.4e-7,
+                settlingCoefficient: 1,
+            },
         },
         rings: null,
         seed: 0,

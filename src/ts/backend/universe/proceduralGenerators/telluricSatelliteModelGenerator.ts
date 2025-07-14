@@ -93,6 +93,12 @@ export function newSeededTelluricSatelliteModel(
                       ["O2", 0.21],
                       ["Ar", 0.01],
                   ],
+                  aerosols: {
+                      tau550: 0.05,
+                      angstromExponent: 0.0,
+                      particleRadius: 0.5e-6,
+                      settlingCoefficient: 0.15,
+                  },
               }
             : null;
 
