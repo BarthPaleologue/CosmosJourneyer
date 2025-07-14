@@ -113,6 +113,15 @@ export class SphericalHeightFieldTerrain implements Transformable {
         }
     }
 
+    getAllChunks(): Array<SphericalHeightFieldChunk> {
+        let chunks: Array<SphericalHeightFieldChunk> = [...this.sides];
+        for (const side of this.sides) {
+            chunks = chunks.concat(side.getAllChildren());
+        }
+
+        return chunks;
+    }
+
     dispose(): void {
         for (const side of this.sides) {
             side.dispose();
