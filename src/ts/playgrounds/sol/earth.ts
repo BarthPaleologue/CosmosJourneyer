@@ -45,7 +45,7 @@ import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/custom
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
 import { type BslTexture2dUv } from "@/utils/bslExtensions";
-import { createRawTexture2DArrayFromUrls } from "@/utils/texture";
+import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
 
 import earthColorMap8k from "@assets/sol/textures/earthColor8k.png";
 import earthColorMapPath_0_0 from "@assets/sol/textures/earthColorMap2x4/0_0.png";
@@ -182,12 +182,12 @@ export async function createEarthScene(
     } else {
         albedoBslTexture = {
             type: "texture_2d",
-            texture: new Texture(earthColorMap8k, scene),
+            texture: await createTextureAsync(earthColorMap8k, scene),
         };
 
         normalBslTexture = {
             type: "texture_2d",
-            texture: new Texture(earthNormalMap8k, scene),
+            texture: await createTextureAsync(earthNormalMap8k, scene),
         };
     }
 
