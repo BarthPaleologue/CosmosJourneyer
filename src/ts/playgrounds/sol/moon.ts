@@ -198,7 +198,7 @@ export async function createMoonScene(
         });
     });
 
-    progressCallback(1, "Loaded terrain scene");
+    progressCallback(1, "Loaded Moon scene");
 
     return scene;
 }
