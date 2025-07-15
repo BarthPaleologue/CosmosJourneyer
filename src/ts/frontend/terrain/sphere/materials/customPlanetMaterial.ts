@@ -39,7 +39,8 @@ import {
     uniformWorld,
     vertexAttribute,
 } from "@/utils/bsl";
-import { BslTexture2dUv, bslTextureSample2d, unitSphereToUv } from "@/utils/bslExtensions";
+import { bslTextureSample2d, unitSphereToUv } from "@/utils/bslExtensions";
+import { Texture2dUv } from "@/utils/texture";
 
 const UniformNames = {
     InversePlanetWorld: "inversePlanetWorld",
@@ -48,7 +49,7 @@ const UniformNames = {
 export class CustomPlanetMaterial {
     private readonly material: NodeMaterial;
 
-    constructor(albedoTexture: BslTexture2dUv, normalTexture: BslTexture2dUv, scene: Scene) {
+    constructor(albedoTexture: Texture2dUv, normalTexture: Texture2dUv, scene: Scene) {
         this.material = new NodeMaterial("CustomPlanetMaterial", scene);
 
         const position = vertexAttribute("position");

@@ -139,5 +139,28 @@ export async function createRawTexture2DArrayFromUrls(
         cleanupBitmaps();
     }
 
+    texArray.wrapU = Texture.CLAMP_ADDRESSMODE;
+    texArray.wrapV = Texture.CLAMP_ADDRESSMODE;
+    texArray.wrapR = Texture.CLAMP_ADDRESSMODE;
+
     return ok(texArray);
 }
+
+export type Texture2d = {
+    type: "texture_2d";
+    texture: Texture;
+};
+
+export type Texture2dArrayMosaic = {
+    type: "texture_2d_array_mosaic";
+    array: RawTexture2DArray;
+    tileCount: {
+        x: number;
+        y: number;
+    };
+};
+
+/**
+ * 2D texture sampler types that can be sampled using a simple UV coordinate.
+ */
+export type Texture2dUv = Texture2d | Texture2dArrayMosaic;

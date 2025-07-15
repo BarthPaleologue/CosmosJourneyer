@@ -17,8 +17,6 @@
 
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import { RawTexture2DArray } from "@babylonjs/core/Materials/Textures/rawTexture2DArray";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
 import {
     acos,
@@ -29,7 +27,6 @@ import {
     floor,
     fract,
     merge,
-    mod,
     mul,
     split,
     sub,
@@ -38,6 +35,7 @@ import {
     textureSample,
     vec2,
 } from "./bsl";
+import { Texture2dArrayMosaic, Texture2dUv } from "./texture";
 import { assertUnreachable } from "./types";
 
 export function unitSphereToUv(positionUnitSphere: NodeMaterialConnectionPoint) {
@@ -52,27 +50,8 @@ export function unitSphereToUv(positionUnitSphere: NodeMaterialConnectionPoint) 
     return merge(sub(f(1.0), u), sub(f(1.0), v), null, null).xyOut;
 }
 
-export type BslTexture2d = {
-    type: "texture_2d";
-    texture: Texture;
-};
-
-export type BslTexture2dArrayMosaic = {
-    type: "texture_2d_array_mosaic";
-    array: RawTexture2DArray;
-    tileCount: {
-        x: number;
-        y: number;
-    };
-};
-
-/**
- * 2D texture sampler types that can be sampled using a simple UV coordinate.
- */
-export type BslTexture2dUv = BslTexture2d | BslTexture2dArrayMosaic;
-
 export function bslTextureSample2d(
-    texture: BslTexture2dUv,
+    texture: Texture2dUv,
     uv: NodeMaterialConnectionPoint,
     options?: Partial<TextureBlockOptions>,
 ): TextureBlock {
@@ -88,7 +67,7 @@ export function bslTextureSample2d(
 }
 
 export function bslTexture2dArrayMosaicSample(
-    texture: BslTexture2dArrayMosaic,
+    texture: Texture2dArrayMosaic,
     uv: NodeMaterialConnectionPoint,
     options?: Partial<TextureBlockOptions>,
 ): TextureBlock {
