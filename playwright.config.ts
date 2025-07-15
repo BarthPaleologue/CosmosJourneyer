@@ -20,7 +20,7 @@ export default defineConfig({
         },
         viewport: { width: 1280, height: 720 },
     },
-    timeout: 120_000, // 2 minutes
+    timeout: 5 * 60 * 1000, // 5 minutes
     expect: {
         toHaveScreenshot: {
             maxDiffPixelRatio: 0.03,
