@@ -32,10 +32,10 @@ import { Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
 import { Asteroid, loadAsteroids } from "./asteroids";
+import { Characters, loadCharacters } from "./characters";
 import { loadAssetInContainerAsync } from "./utils";
 
 import bananaPath from "@assets/banana/banana.glb";
-import characterPath from "@assets/character/character.glb";
 import rockPath from "@assets/rock.glb";
 import wandererPath from "@assets/spaceship/wanderer.glb";
 import stationEnginePath from "@assets/SpaceStationParts/engine.glb";
@@ -48,7 +48,7 @@ export type Objects = {
     wanderer: Mesh;
     butterfly: Mesh;
     banana: Mesh;
-    character: Mesh;
+    characters: Readonly<Characters>;
     rock: Mesh;
     asteroids: ReadonlyArray<Asteroid>;
     tree: Mesh;
@@ -70,7 +70,7 @@ export async function loadObjects(
     // Start loading all mesh assets
     const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);
     const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
-    const characterPromise = loadAssetInContainerAsync("Character", characterPath, scene, progressMonitor);
+    const characterPromise = loadCharacters(scene, progressMonitor);
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
     const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
@@ -115,18 +115,6 @@ export async function loadObjects(
     }
 
     bananaContainer.addAllToScene();
-
-    const characterContainer = await characterPromise;
-    const character = characterContainer.rootNodes[0];
-    if (!(character instanceof Mesh)) {
-        throw new Error("Character root node is not a Mesh");
-    }
-    character.isVisible = false;
-    for (const mesh of character.getChildMeshes()) {
-        mesh.isVisible = false;
-    }
-
-    characterContainer.addAllToScene();
 
     const rockContainer = await rockPromise;
     const rock = rockContainer.meshes[1];
@@ -216,7 +204,7 @@ export async function loadObjects(
         tree,
         asteroids: await asteroidPromises,
         rock,
-        character,
+        characters: await characterPromise,
         banana,
         butterfly,
         grassBlades,

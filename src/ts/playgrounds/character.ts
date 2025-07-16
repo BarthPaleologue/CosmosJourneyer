@@ -31,7 +31,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
@@ -50,7 +50,7 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const characters = await loadCharacters(scene, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -61,7 +61,7 @@ export async function createCharacterDemoScene(
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
 
-    const characterObject = assets.objects.character.instantiateHierarchy(null);
+    const characterObject = characters.default.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
         throw new Error("Character object is null");
     }
