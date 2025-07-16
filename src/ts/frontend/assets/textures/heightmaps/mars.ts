@@ -21,15 +21,15 @@ import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
 import type { HeightMap1x1, HeightMap2x4 } from "./types";
 
-import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.jpg";
-import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
-import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
-import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
-import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.jpg";
-import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
-import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
-import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
-import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.png";
+import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.png";
+import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.png";
+import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.png";
+import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.png";
+import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.png";
+import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.png";
+import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.png";
+import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.png";
 
 export async function loadMarsHeightMap1x1(
     scene: Scene,

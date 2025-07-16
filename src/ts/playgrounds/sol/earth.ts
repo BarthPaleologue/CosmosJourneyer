@@ -15,17 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PBRMetallicRoughnessMaterial,
-    PointLight,
-    Scene,
-    Vector3,
-    type WebGPUEngine,
-} from "@babylonjs/core";
+import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getEarthModel } from "@/backend/universe/customSystems/sol/earth";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -34,6 +24,12 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadEarthAlbedo,
+    loadEarthHighResolutionAlbedo,
+    loadEarthHighResolutionNormal,
+    loadEarthNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/earth";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -42,7 +38,10 @@ import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloud
 import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -81,6 +80,7 @@ export async function createEarthScene(
 
     const light = new PointLight("light", new Vector3(10, 2, -10).normalize().scale(earthRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -92,10 +92,37 @@ export async function createEarthScene(
     gizmoManager.usePointerToAttachGizmos = false;
     //gizmoManager.attachToMesh(lightGizmo.attachedMesh);
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: Texture2dUv;
+    let normalBslTexture: Texture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await loadEarthHighResolutionAlbedo(scene, engine, progressMonitor);
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+        }
+
+        const normalMapResult = await loadEarthHighResolutionNormal(scene, engine, progressMonitor);
+        if (!normalMapResult.success) {
+            throw new Error(`Failed to create normal map texture array: ${String(normalMapResult.error)}`);
+        }
+
+        albedoBslTexture = albedoResult.value;
+        normalBslTexture = normalMapResult.value;
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await loadEarthAlbedo(scene, progressMonitor),
+        };
+
+        normalBslTexture = {
+            type: "texture_2d",
+            texture: await loadEarthNormal(scene, progressMonitor),
+        };
+    }
+
+    const material = new CustomPlanetMaterial(albedoBslTexture, normalBslTexture, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
@@ -110,7 +137,7 @@ export async function createEarthScene(
         "SphericalHeightFieldTerrain",
         earthRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
 
@@ -160,7 +187,7 @@ export async function createEarthScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         ocean.update(deltaSeconds);
@@ -169,6 +196,20 @@ export async function createEarthScene(
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;
