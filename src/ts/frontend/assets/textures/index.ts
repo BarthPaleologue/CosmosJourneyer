@@ -26,21 +26,14 @@ import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { GasPlanetTextures, loadGasPlanetTextures } from "./gasPlanet";
 import { AllMaterialTextures, loadMaterialTextures } from "./materials";
 import { loadRingsTextures, RingsTextures } from "./rings";
+import { AllTerrainTextures, loadTerrainTextures } from "./terrains";
 import { createTexturePools, TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import flareParticle from "@assets/flare.png";
-import grassAlbedoRoughnessMap from "@assets/grassMaterial/wispy-grass-meadow_albedo_roughness.webp";
-import grassNormalMetallicMap from "@assets/grassMaterial/wispy-grass-meadow_normal_metallic.webp";
-import snowAlbedoRoughnessMap from "@assets/iceMaterial/ice_field_albedo_roughness.webp";
-import snowNormalMetallicMap from "@assets/iceMaterial/ice_field_normal_metallic.webp";
 import empty from "@assets/oneBlackPixel.webp";
 import seamlessPerlin from "@assets/perlin.webp";
-import rockAlbedoRoughnessMap from "@assets/rockMaterial/layered-planetary_albedo_roughness.webp";
-import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal_metallic.webp";
-import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
-import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
 import cursorImage from "@assets/textures/hoveredCircle.png";
 import plumeParticle from "@assets/textures/plume.png";
@@ -48,17 +41,6 @@ import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
 import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
 
 // Define texture groups types
-export type TerrainTextures = {
-    normalMetallic: Texture;
-    albedoRoughness: Texture;
-};
-
-export type AllTerrainTextures = {
-    rock: TerrainTextures;
-    grass: TerrainTextures;
-    snow: TerrainTextures;
-    sand: TerrainTextures;
-};
 
 export type WaterTextures = {
     normalMap1: Texture;
@@ -100,59 +82,6 @@ export type Textures = {
  * @returns A promise resolving to the Textures object
  */
 export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
-    // Terrain textures
-    const rockNormalMetallicPromise = loadTextureAsync(
-        "RockNormalMetallicMap",
-        rockNormalMetallicMap,
-        scene,
-        progressMonitor,
-    );
-    const rockAlbedoRoughnessPromise = loadTextureAsync(
-        "RockAlbedoRoughnessMap",
-        rockAlbedoRoughnessMap,
-        scene,
-        progressMonitor,
-    );
-
-    const grassNormalMetallicPromise = loadTextureAsync(
-        "GrassNormalMetallicMap",
-        grassNormalMetallicMap,
-        scene,
-        progressMonitor,
-    );
-    const grassAlbedoRoughnessPromise = loadTextureAsync(
-        "GrassAlbedoRoughnessMap",
-        grassAlbedoRoughnessMap,
-        scene,
-        progressMonitor,
-    );
-
-    const snowNormalMetallicPromise = loadTextureAsync(
-        "SnowNormalMetallicMap",
-        snowNormalMetallicMap,
-        scene,
-        progressMonitor,
-    );
-    const snowAlbedoRoughnessPromise = loadTextureAsync(
-        "SnowAlbedoRoughness",
-        snowAlbedoRoughnessMap,
-        scene,
-        progressMonitor,
-    );
-
-    const sandNormalMetallicPromise = loadTextureAsync(
-        "SandNormalMetallicMap",
-        sandNormalMetallicMap,
-        scene,
-        progressMonitor,
-    );
-    const sandAlbedoRoughnessPromise = loadTextureAsync(
-        "SandAlbedoRoughnessMap",
-        sandAlbedoRoughnessMap,
-        scene,
-        progressMonitor,
-    );
-
     // Water textures
     const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
     const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
@@ -171,24 +100,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
 
     // Assemble and return the textures structure
     return {
-        terrains: {
-            rock: {
-                normalMetallic: await rockNormalMetallicPromise,
-                albedoRoughness: await rockAlbedoRoughnessPromise,
-            },
-            grass: {
-                normalMetallic: await grassNormalMetallicPromise,
-                albedoRoughness: await grassAlbedoRoughnessPromise,
-            },
-            snow: {
-                normalMetallic: await snowNormalMetallicPromise,
-                albedoRoughness: await snowAlbedoRoughnessPromise,
-            },
-            sand: {
-                normalMetallic: await sandNormalMetallicPromise,
-                albedoRoughness: await sandAlbedoRoughnessPromise,
-            },
-        },
+        terrains: await loadTerrainTextures(scene, progressMonitor),
         water: {
             normalMap1: await waterNormalMap1Promise,
             normalMap2: await waterNormalMap2Promise,
