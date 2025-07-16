@@ -22,15 +22,9 @@ import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
-import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
-import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
-
-import { ItemPool } from "@/utils/itemPool";
-
-import { LandingPadTexturePool } from "../landingPadTexturePool";
 import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { createTexturePools, TexturePools } from "./texturePools";
+import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
@@ -47,7 +41,7 @@ import grassNormalMetallicMap from "@assets/grassMaterial/wispy-grass-meadow_nor
 import snowAlbedoRoughnessMap from "@assets/iceMaterial/ice_field_albedo_roughness.webp";
 import snowNormalMetallicMap from "@assets/iceMaterial/ice_field_normal_metallic.webp";
 import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRoughness.webp";
-import metalPanelsAlbdeo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
+import metalPanelsAlbedo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsAmbientOcclusion from "@assets/metalPanelMaterial/sci-fi-panel1-ao.webp";
 import metalPanelsNormal from "@assets/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
 import empty from "@assets/oneBlackPixel.webp";
@@ -120,14 +114,6 @@ export type AllMaterialTextures = {
     tree: Pick<PBRTextures, "albedo">;
 };
 
-export type TexturePools = {
-    cloudsLut: ItemPool<CloudsLut>;
-    ringsPatternLut: ItemPool<RingsProceduralPatternLut>;
-    starMaterialLut: ItemPool<StarMaterialLut>;
-    telluricPlanetMaterialLut: ItemPool<TelluricPlanetMaterialLut>;
-    landingPad: LandingPadTexturePool;
-};
-
 export type GasPlanetTextures = {
     jupiter: Texture;
     saturn: Texture;
@@ -165,122 +151,171 @@ export type Textures = {
  * @returns A promise resolving to the Textures object
  */
 export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
-    const loadTextureAsync = (name: string, url: string): Promise<Texture> => {
-        progressMonitor?.startTask();
-        const loadingPromise = new Promise<Texture>((resolve) => {
-            const texture = new Texture(url, scene, false, false, undefined, () => {
-                resolve(texture);
-            });
-            texture.name = name;
-        });
-
-        return loadingPromise.then((texture) => {
-            progressMonitor?.completeTask();
-            return texture;
-        });
-    };
-
-    const loadCubeTextureAsync = (name: string, url: string): Promise<CubeTexture> => {
-        progressMonitor?.startTask();
-        const loadingPromise = new Promise<CubeTexture>((resolve) => {
-            const texture = CubeTexture.CreateFromPrefilteredData(url, scene);
-            texture.onLoadObservable.add(() => {
-                resolve(texture);
-            });
-            texture.name = name;
-        });
-
-        return loadingPromise.then((texture) => {
-            progressMonitor?.completeTask();
-            return texture;
-        });
-    };
-
     // Terrain textures
-    const rockNormalMetallicPromise = loadTextureAsync("RockNormalMetallicMap", rockNormalMetallicMap);
-    const rockAlbedoRoughnessPromise = loadTextureAsync("RockAlbedoRoughnessMap", rockAlbedoRoughnessMap);
+    const rockNormalMetallicPromise = loadTextureAsync(
+        "RockNormalMetallicMap",
+        rockNormalMetallicMap,
+        scene,
+        progressMonitor,
+    );
+    const rockAlbedoRoughnessPromise = loadTextureAsync(
+        "RockAlbedoRoughnessMap",
+        rockAlbedoRoughnessMap,
+        scene,
+        progressMonitor,
+    );
 
-    const grassNormalMetallicPromise = loadTextureAsync("GrassNormalMetallicMap", grassNormalMetallicMap);
-    const grassAlbedoRoughnessPromise = loadTextureAsync("GrassAlbedoRoughnessMap", grassAlbedoRoughnessMap);
+    const grassNormalMetallicPromise = loadTextureAsync(
+        "GrassNormalMetallicMap",
+        grassNormalMetallicMap,
+        scene,
+        progressMonitor,
+    );
+    const grassAlbedoRoughnessPromise = loadTextureAsync(
+        "GrassAlbedoRoughnessMap",
+        grassAlbedoRoughnessMap,
+        scene,
+        progressMonitor,
+    );
 
-    const snowNormalMetallicPromise = loadTextureAsync("SnowNormalMetallicMap", snowNormalMetallicMap);
-    const snowAlbedoRoughnessPromise = loadTextureAsync("SnowAlbedoRoughness", snowAlbedoRoughnessMap);
+    const snowNormalMetallicPromise = loadTextureAsync(
+        "SnowNormalMetallicMap",
+        snowNormalMetallicMap,
+        scene,
+        progressMonitor,
+    );
+    const snowAlbedoRoughnessPromise = loadTextureAsync(
+        "SnowAlbedoRoughness",
+        snowAlbedoRoughnessMap,
+        scene,
+        progressMonitor,
+    );
 
-    const sandNormalMetallicPromise = loadTextureAsync("SandNormalMetallicMap", sandNormalMetallicMap);
-    const sandAlbedoRoughnessPromise = loadTextureAsync("SandAlbedoRoughnessMap", sandAlbedoRoughnessMap);
+    const sandNormalMetallicPromise = loadTextureAsync(
+        "SandNormalMetallicMap",
+        sandNormalMetallicMap,
+        scene,
+        progressMonitor,
+    );
+    const sandAlbedoRoughnessPromise = loadTextureAsync(
+        "SandAlbedoRoughnessMap",
+        sandAlbedoRoughnessMap,
+        scene,
+        progressMonitor,
+    );
 
     // Water textures
-    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1);
-    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2);
+    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
+    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
 
     // Particle textures
-    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle);
-    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle);
+    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, scene, progressMonitor);
+    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, scene, progressMonitor);
 
     // UI textures
-    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture);
-    const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty);
+    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, scene, progressMonitor);
+    const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
     // Environment textures
-    const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin);
-    const milkyWayPromise = loadCubeTextureAsync("SkyBox", skyBox);
+    const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin, scene, progressMonitor);
+    const milkyWayPromise = loadCubeTextureAsync("SkyBox", skyBox, scene, progressMonitor);
 
     // Material textures
     // Solar Panel
-    const solarPanelAlbedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedo);
-    const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal);
+    const solarPanelAlbedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedo, scene, progressMonitor);
+    const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal, scene, progressMonitor);
     const solarPanelMetallicRoughnessPromise = loadTextureAsync(
         "SolarPanelMetallicRoughness",
         solarPanelMetallicRoughness,
+        scene,
+        progressMonitor,
     );
 
     // Space Station
-    const spaceStationAlbedoPromise = loadTextureAsync("SpaceStationAlbedo", spaceStationAlbedo);
-    const spaceStationNormalPromise = loadTextureAsync("SpaceStationNormal", spaceStationNormal);
+    const spaceStationAlbedoPromise = loadTextureAsync(
+        "SpaceStationAlbedo",
+        spaceStationAlbedo,
+        scene,
+        progressMonitor,
+    );
+    const spaceStationNormalPromise = loadTextureAsync(
+        "SpaceStationNormal",
+        spaceStationNormal,
+        scene,
+        progressMonitor,
+    );
     const spaceStationMetallicRoughnessPromise = loadTextureAsync(
         "SpaceStationMetallicRoughness",
         spaceStationMetallicRoughness,
+        scene,
+        progressMonitor,
     );
     const spaceStationAmbientOcclusionPromise = loadTextureAsync(
         "SpaceStationAmbientOcclusion",
         spaceStationAmbientOcclusion,
+        scene,
+        progressMonitor,
     );
 
     // Metal Panels
-    const metalPanelsAlbedoPromise = loadTextureAsync("MetalPanelsAlbedo", metalPanelsAlbdeo);
-    const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal);
+    const metalPanelsAlbedoPromise = loadTextureAsync("MetalPanelsAlbedo", metalPanelsAlbedo, scene, progressMonitor);
+    const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal, scene, progressMonitor);
     const metalPanelsMetallicRoughnessPromise = loadTextureAsync(
         "MetalPanelsMetallicRoughness",
         metalPanelsMetallicRoughness,
+        scene,
+        progressMonitor,
     );
     const metalPanelsAmbientOcclusionPromise = loadTextureAsync(
         "MetalPanelsAmbientOcclusion",
         metalPanelsAmbientOcclusion,
+        scene,
+        progressMonitor,
     );
 
-    const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath);
+    const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath, scene, progressMonitor);
 
     // Concrete
-    const concreteAlbedoPromise = loadTextureAsync("ConcreteAlbedo", concreteAlbedo);
-    const concreteNormalPromise = loadTextureAsync("ConcreteNormal", concreteNormal);
-    const concreteMetallicRoughnessPromise = loadTextureAsync("ConcreteMetallicRoughness", concreteMetallicRoughness);
-    const concreteAmbientOcclusionPromise = loadTextureAsync("ConcreteAmbientOcclusion", concreteAmbientOcclusion);
+    const concreteAlbedoPromise = loadTextureAsync("ConcreteAlbedo", concreteAlbedo, scene, progressMonitor);
+    const concreteNormalPromise = loadTextureAsync("ConcreteNormal", concreteNormal, scene, progressMonitor);
+    const concreteMetallicRoughnessPromise = loadTextureAsync(
+        "ConcreteMetallicRoughness",
+        concreteMetallicRoughness,
+        scene,
+        progressMonitor,
+    );
+    const concreteAmbientOcclusionPromise = loadTextureAsync(
+        "ConcreteAmbientOcclusion",
+        concreteAmbientOcclusion,
+        scene,
+        progressMonitor,
+    );
 
     // Crate
-    const crateAlbedoPromise = loadTextureAsync("CrateAlbedo", crateAlbedo);
-    const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal);
-    const crateMetallicRoughnessPromise = loadTextureAsync("CrateMetallicRoughness", crateMetallicRoughness);
-    const crateAmbientOcclusionPromise = loadTextureAsync("CrateAmbientOcclusion", crateAmbientOcclusion);
+    const crateAlbedoPromise = loadTextureAsync("CrateAlbedo", crateAlbedo, scene, progressMonitor);
+    const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal, scene, progressMonitor);
+    const crateMetallicRoughnessPromise = loadTextureAsync(
+        "CrateMetallicRoughness",
+        crateMetallicRoughness,
+        scene,
+        progressMonitor,
+    );
+    const crateAmbientOcclusionPromise = loadTextureAsync(
+        "CrateAmbientOcclusion",
+        crateAmbientOcclusion,
+        scene,
+        progressMonitor,
+    );
 
     // Gas giants texture
-    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath);
-    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath);
-    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath);
-    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath);
+    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath, scene, progressMonitor);
+    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath, scene, progressMonitor);
+    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath, scene, progressMonitor);
+    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath, scene, progressMonitor);
 
     // Rings texture
-    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath);
-    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath);
+    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, scene, progressMonitor);
+    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, scene, progressMonitor);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
@@ -369,15 +404,5 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         },
         empty: await emptyTexturePromise,
         pools: createTexturePools(scene),
-    };
-}
-
-export function createTexturePools(scene: Scene): TexturePools {
-    return {
-        cloudsLut: new ItemPool<CloudsLut>(() => new CloudsLut(scene)),
-        ringsPatternLut: new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene)),
-        starMaterialLut: new ItemPool<StarMaterialLut>(() => new StarMaterialLut(scene)),
-        telluricPlanetMaterialLut: new ItemPool<TelluricPlanetMaterialLut>(() => new TelluricPlanetMaterialLut(scene)),
-        landingPad: new LandingPadTexturePool(),
     };
 }
