@@ -19,6 +19,7 @@ import { AbstractEngine, Scene, Vector3 } from "@babylonjs/core";
 
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
@@ -35,7 +36,7 @@ import { enablePhysics } from "../utils";
 
 export async function createSolScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new UberScene(engine);
     scene.useRightHandedSystem = true;
@@ -45,9 +46,7 @@ export async function createSolScene(
 
     await initI18n();
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, lastItemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${lastItemName}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const scalingFactor = 6_000e3 * 11;
 
@@ -101,8 +100,6 @@ export async function createSolScene(
         starSystemController.update(deltaSeconds, chunkForge);
         targetCursorLayer.update(camera);
     });
-
-    progressCallback(1, "Sol scene loaded");
 
     return scene;
 }

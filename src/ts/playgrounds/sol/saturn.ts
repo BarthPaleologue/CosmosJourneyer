@@ -19,6 +19,7 @@ import { AbstractEngine, Light, PointLight, Scene, TransformNode, Vector3 } from
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -36,7 +37,7 @@ import { enablePhysics } from "../utils";
 
 export async function createSaturnScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -44,9 +45,7 @@ export async function createSaturnScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, itemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const scalingFactor = 6_000e3 * 16;
 
@@ -132,10 +131,8 @@ export async function createSaturnScene(
         planet.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
 
-        asteroidField?.update(camera.globalPosition, assets.objects, deltaSeconds);
+        asteroidField?.update(camera.globalPosition, assets.objects.asteroids, deltaSeconds);
     });
-
-    progressCallback(1, "Jupiter scene loaded");
 
     return scene;
 }

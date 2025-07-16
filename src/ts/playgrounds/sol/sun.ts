@@ -19,6 +19,7 @@ import { AbstractEngine, FreeCamera, Scene, Vector3 } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
@@ -30,7 +31,7 @@ import { enablePhysics } from "../utils";
 
 export async function createSunScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -38,9 +39,7 @@ export async function createSunScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures((loadedCount, totalCount, itemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     const scalingFactor = 6_000e3 * 150;
 
@@ -91,8 +90,6 @@ export async function createSunScene(
         controls.getTransform().position = Vector3.Zero();
         sun.getTransform().position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Sun scene loaded");
 
     return scene;
 }

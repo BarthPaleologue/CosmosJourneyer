@@ -21,22 +21,21 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { enablePhysics } from "./utils";
 
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    await loadRenderingAssets(scene, progressMonitor);
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
     camera.setTarget(Vector3.Zero());

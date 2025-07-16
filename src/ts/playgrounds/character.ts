@@ -30,7 +30,8 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
@@ -38,7 +39,7 @@ import { enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -49,9 +50,7 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const characters = await loadCharacters(scene, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -62,13 +61,20 @@ export async function createCharacterDemoScene(
     const shadowGenerator = new ShadowGenerator(1024, light);
     shadowGenerator.useBlurExponentialShadowMap = true;
 
-    const characterObject = assets.objects.character.instantiateHierarchy(null);
+    const characterObject = characters.default.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
         throw new Error("Character object is null");
     }
 
+    const groundRadius = 40;
+
     const character = new CharacterControls(characterObject, scene);
-    character.getTransform().position.y = 30;
+    character.getTransform().position.y = groundRadius;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("thirdPerson") !== null) {
+        character.setThirdPersonCameraActive();
+    }
 
     character.getActiveCamera().attachControl();
 
@@ -76,7 +82,7 @@ export async function createCharacterDemoScene(
 
     shadowGenerator.addShadowCaster(character.character);
 
-    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: 20 }, scene);
+    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
     new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
 

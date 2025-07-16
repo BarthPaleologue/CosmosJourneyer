@@ -21,6 +21,8 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
+import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+
 import cannotEngageWarpDriveSoundPath from "@assets/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
 import engagingWarpDriveSoundPath from "@assets/sound/voice/EngagingWarpDriveCharlotte.mp3";
 import fuelScoopingVoicePath from "@assets/sound/voice/FuelScoopingCharlotte.mp3";
@@ -51,13 +53,9 @@ export type SpeakerVoiceLines = {
     readonly charlotte: VoiceLines;
 };
 
-export async function loadVoiceLines(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-): Promise<SpeakerVoiceLines> {
-    let loadedCount = 0;
-    let totalCount = 0;
-
+export async function loadVoiceLines(progressMonitor: ILoadingProgressMonitor | null): Promise<SpeakerVoiceLines> {
     const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+        progressMonitor?.startTask();
         const loadingPromise = new Promise<Sound>((resolve) => {
             const sound = new Sound(
                 name,
@@ -69,10 +67,9 @@ export async function loadVoiceLines(
                 options,
             );
         });
-        totalCount++;
 
         return loadingPromise.then((sound) => {
-            progressCallback(++loadedCount, totalCount, sound.name);
+            progressMonitor?.completeTask();
             return sound;
         });
     };

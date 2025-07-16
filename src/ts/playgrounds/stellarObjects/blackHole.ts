@@ -21,6 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { translate } from "@/frontend/uberCore/transforms/basicTransform";
@@ -32,16 +33,14 @@ import { enablePhysics } from "../utils";
 
 export async function createBlackHoleScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures((loadedCount, totalCount) => {
-        progressCallback(loadedCount / totalCount, "Loading textures");
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000000;
@@ -80,8 +79,6 @@ export async function createBlackHoleScene(
             await defaultControls.getActiveCamera().getEngine().getRenderingCanvas()?.requestPointerLock();
         }
     });
-
-    progressCallback(1, "Black Hole Scene Loaded");
 
     return scene;
 }

@@ -21,20 +21,17 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
-import { enablePhysics } from "./utils";
-
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ) {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
-
-    await enablePhysics(scene);
 
     const defaultControls = new DefaultControls(scene);
 
@@ -43,9 +40,7 @@ export async function createHyperspaceTunnelDemo(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const textures = await loadTextures((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;

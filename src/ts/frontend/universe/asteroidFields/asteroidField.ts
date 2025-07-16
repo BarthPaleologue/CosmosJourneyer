@@ -19,7 +19,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { IDisposable, Scene } from "@babylonjs/core/scene";
 
-import { Objects } from "@/frontend/assets/objects";
+import { Asteroid } from "@/frontend/assets/objects/asteroids";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
@@ -81,7 +81,7 @@ export class AsteroidField implements IDisposable {
      * @param cameraWorldPosition The position of the camera in world space
      * @param deltaSeconds The seconds elapsed since last frame
      */
-    public update(cameraWorldPosition: Vector3, objects: Objects, deltaSeconds: number) {
+    public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number) {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);
@@ -105,7 +105,7 @@ export class AsteroidField implements IDisposable {
 
                 this.patches.delete(key);
             } else {
-                patch.update(cameraWorldPosition, objects, deltaSeconds);
+                patch.update(cameraWorldPosition, asteroids, deltaSeconds);
             }
         }
 
@@ -140,7 +140,7 @@ export class AsteroidField implements IDisposable {
                         this.patchThickness,
                         this.innerRadius,
                         this.outerRadius,
-                        objects.asteroids.length - 1,
+                        asteroids.length - 1,
                         this.rng,
                     );
                 const patch = new AsteroidPatch(

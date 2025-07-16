@@ -26,6 +26,7 @@ import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerator
 import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
 import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
 import { MandelboxPostProcess } from "@/frontend/postProcesses/anomalies/mandelboxPostProcess";
 import { MandelbulbPostProcess } from "@/frontend/postProcesses/anomalies/mandelbulbPostProcess";
@@ -36,7 +37,8 @@ import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -180,8 +182,6 @@ export async function createXrScene(
     scene.onBeforeCameraRenderObservable.add((camera) => {
         depthRenderer.getDepthMap().activeCamera = camera;
     });
-
-    progressCallback(1, "Loading complete");
 
     return scene;
 }

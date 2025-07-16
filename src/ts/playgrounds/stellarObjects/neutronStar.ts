@@ -22,6 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
@@ -36,16 +37,14 @@ import { enablePhysics } from "../utils";
 
 export async function createNeutronStarScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures((loadedCount, totalCount, itemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;
@@ -94,8 +93,6 @@ export async function createNeutronStarScene(
 
         matterJets.update(deltaSeconds);
     });
-
-    progressCallback(1, "Neutron Star Scene Loaded");
 
     return scene;
 }

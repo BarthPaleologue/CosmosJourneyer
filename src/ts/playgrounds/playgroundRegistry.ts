@@ -17,6 +17,8 @@
 
 import { AbstractEngine, Scene } from "@babylonjs/core";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";
 import { createMandelbulbScene } from "./anomalies/mandelbulb";
@@ -53,7 +55,7 @@ import { createXrScene } from "./xr";
 export class PlaygroundRegistry {
     private readonly map: Map<
         string,
-        (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene>
+        (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>
     > = new Map([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
@@ -90,17 +92,12 @@ export class PlaygroundRegistry {
 
     register(
         name: string,
-        createScene: (
-            engine: AbstractEngine,
-            progressCallback: (progress: number, text: string) => void,
-        ) => Promise<Scene>,
+        createScene: (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>,
     ) {
         this.map.set(name, createScene);
     }
 
-    get(
-        name: string,
-    ): (engine: AbstractEngine, progressCallback: (progress: number, text: string) => void) => Promise<Scene> {
+    get(name: string): (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }
 }

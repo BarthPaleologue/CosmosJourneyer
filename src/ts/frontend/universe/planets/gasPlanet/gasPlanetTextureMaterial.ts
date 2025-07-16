@@ -20,7 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { GasPlanetTextureId } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 
-import { GasPlanetTextures } from "@/frontend/assets/textures";
+import { GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
 
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,

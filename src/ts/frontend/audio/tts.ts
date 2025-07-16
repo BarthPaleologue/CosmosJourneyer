@@ -17,7 +17,7 @@
 
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { SpeakerVoiceLines, VoiceLines } from "@/frontend/assets/voiceLines";
+import { SpeakerVoiceLines, VoiceLines } from "@/frontend/assets/audio/voiceLines";
 
 export const enum Speaker {
     CHARLOTTE,

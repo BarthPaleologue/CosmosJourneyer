@@ -20,6 +20,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
 import { loadTextures } from "@/frontend/assets/textures";
@@ -28,13 +29,11 @@ import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/te
 
 export async function createGrassScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
-    const textures = await loadTextures((loadedCount, totalCount, lastItemName: string) => {
-        progressCallback(loadedCount / totalCount, `Loading ${lastItemName}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     // This creates and positions a free camera (non-mesh)
     const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);

@@ -25,6 +25,7 @@ import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/star
 import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
@@ -38,16 +39,14 @@ import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

@@ -17,7 +17,7 @@
 
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { Sounds } from "@/frontend/assets/sounds";
+import { Sounds } from "@/frontend/assets/audio/sounds";
 
 import { ISoundInstance, SoundInstance, SoundInstanceMock } from "./soundInstance";
 

@@ -19,6 +19,7 @@ import { AbstractEngine, Axis, Light, PointLight, Scene, Vector3 } from "@babylo
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -33,15 +34,13 @@ import { enablePhysics } from "../utils";
 
 export async function createJupiterScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const textures = await loadTextures((loadedCount, totalCount, itemName) => {
-        progressCallback(loadedCount / totalCount, `Loading ${itemName}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     await enablePhysics(scene);
 
@@ -94,8 +93,6 @@ export async function createJupiterScene(
         planet.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Jupiter scene loaded");
 
     return scene;
 }

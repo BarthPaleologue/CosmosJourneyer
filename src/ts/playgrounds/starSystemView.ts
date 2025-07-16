@@ -22,6 +22,7 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
@@ -38,7 +39,7 @@ import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     await initI18n();
 
@@ -57,9 +58,7 @@ export async function createStarSystemViewScene(
 
     const havokPlugin = await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const starSystemView = new StarSystemView(
         scene,

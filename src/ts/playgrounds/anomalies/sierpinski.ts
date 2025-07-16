@@ -19,12 +19,14 @@ import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core
 
 import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createSierpinskiScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -70,8 +72,6 @@ export function createSierpinskiScene(
     scene.onBeforeCameraRenderObservable.add((camera) => {
         depthRenderer.getDepthMap().activeCamera = camera;
     });
-
-    progressCallback(1, "Loading complete");
 
     return Promise.resolve(scene);
 }

@@ -116,8 +116,9 @@ export class LoadingScreen implements ILoadingScreen {
         this.loadingDiv.addEventListener("transitionend", onTransitionEnd);
     }
 
-    public setProgressPercentage(percentage: number) {
-        this.loadingUIText = `${i18next.t("common:loading")} ${percentage.toFixed(0)}%`;
+    public setProgress(startedCount: number, completedCount: number) {
+        const percentage = (completedCount / startedCount) * 100;
+        this.loadingUIText = `${i18next.t("common:loading")} (${completedCount}/${startedCount})`;
         this.progressBar?.style.setProperty("--progress", `${percentage}%`);
     }
 

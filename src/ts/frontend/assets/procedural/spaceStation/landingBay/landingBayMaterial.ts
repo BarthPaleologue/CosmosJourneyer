@@ -22,7 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 
-import { PBRTextures } from "@/frontend/assets/textures";
+import { PBRTextures } from "@/frontend/assets/textures/materials";
 
 import {
     abs,

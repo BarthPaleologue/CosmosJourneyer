@@ -26,7 +26,7 @@ import { centeredRand } from "extended-random";
 import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
-import { AllTerrainTextures } from "@/frontend/assets/textures";
+import { AllTerrainTextures } from "@/frontend/assets/textures/terrains";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,

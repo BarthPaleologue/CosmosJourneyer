@@ -21,6 +21,8 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
+import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+
 import menuHoverSoundPath from "@assets/sound/166186__drminky__menu-screen-mouse-over.mp3";
 import disableWarpDriveSoundPath from "@assets/sound/204418__nhumphrey__large-engine.mp3";
 import thrusterSoundPath from "@assets/sound/318688__limitsnap_creations__rocket-thrust-effect.mp3";
@@ -52,13 +54,9 @@ export type Sounds = {
     readonly error: Sound;
 };
 
-export async function loadSounds(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-): Promise<Sounds> {
-    let loadedCount = 0;
-    let totalCount = 0;
-
+export async function loadSounds(progressMonitor: ILoadingProgressMonitor | null): Promise<Sounds> {
     const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+        progressMonitor?.startTask();
         const loadingPromise = new Promise<Sound>((resolve) => {
             const sound = new Sound(
                 name,
@@ -70,10 +68,9 @@ export async function loadSounds(
                 options,
             );
         });
-        totalCount++;
 
         return loadingPromise.then((sound) => {
-            progressCallback(++loadedCount, totalCount, sound.name);
+            progressMonitor?.completeTask();
             return sound;
         });
     };

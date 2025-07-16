@@ -23,6 +23,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { StarMap } from "@/frontend/starmap/starMap";
@@ -33,7 +34,8 @@ import { initI18n } from "@/i18n";
 
 export async function createStarMapScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     await initI18n();
 
@@ -61,8 +63,6 @@ export async function createStarMapScene(
 
         starMap.focusOnSystem(StarSystemCoordinatesSchema.parse(systemCoordinates), true);
     }
-
-    progressCallback(1, "Loaded star map");
 
     return starMap.scene;
 }

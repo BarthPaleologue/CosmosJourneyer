@@ -697,7 +697,7 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const character = this.assets.objects.character.instantiateHierarchy(null);
+            const character = this.assets.objects.characters.default.instantiateHierarchy(null);
             if (!(character instanceof Mesh)) {
                 await alertModal("Character model is not a mesh!", this.soundPlayer);
             } else {

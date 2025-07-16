@@ -21,6 +21,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
@@ -31,7 +32,7 @@ import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -39,9 +40,7 @@ export async function createFlightDemoScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
