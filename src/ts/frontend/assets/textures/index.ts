@@ -24,6 +24,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { GasPlanetTextures, loadGasPlanetTextures } from "./gasPlanet";
+import { loadRingsTextures, RingsTextures } from "./rings";
 import { createTexturePools, TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
@@ -52,8 +53,6 @@ import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal
 import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
-import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
-import uranusRingsPath from "@assets/sol/textures/uranus_rings.png";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
@@ -109,11 +108,6 @@ export type AllMaterialTextures = {
     concrete: PBRTextures;
     crate: PBRTextures;
     tree: Pick<PBRTextures, "albedo">;
-};
-
-export type RingsTextures = {
-    saturn: Texture;
-    uranus: Texture;
 };
 
 export type Textures = {
@@ -297,10 +291,6 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         progressMonitor,
     );
 
-    // Rings texture
-    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, scene, progressMonitor);
-    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, scene, progressMonitor);
-
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -368,10 +358,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
             },
         },
         gasPlanet: await loadGasPlanetTextures(scene, progressMonitor),
-        rings: {
-            saturn: await saturnRingsTexturePromise,
-            uranus: await uranusRingsTexturePromise,
-        },
+        rings: await loadRingsTextures(scene, progressMonitor),
         environment: {
             milkyWay: await milkyWayPromise,
         },
