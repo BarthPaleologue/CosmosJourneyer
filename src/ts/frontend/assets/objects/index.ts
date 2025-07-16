@@ -19,7 +19,6 @@ import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import { LoadAssetContainerAsync } from "@babylonjs/core/Loading";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -37,6 +36,7 @@ import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
+import { loadAssetInContainerAsync } from "./utils";
 
 import asteroidPath from "@assets/asteroid/asteroid.glb";
 import asteroid2Path from "@assets/asteroid/asteroid2.glb";
@@ -74,25 +74,18 @@ export async function loadObjects(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Objects> {
-    const loadAssetInContainerAsync = async (name: string, url: string) => {
-        progressMonitor?.startTask();
-        const container = await LoadAssetContainerAsync(url, scene);
-        progressMonitor?.completeTask();
-        return container;
-    };
-
     // Start loading all mesh assets
-    const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath);
-    const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath);
-    const characterPromise = loadAssetInContainerAsync("Character", characterPath);
-    const rockPromise = loadAssetInContainerAsync("Rock", rockPath);
+    const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);
+    const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
+    const characterPromise = loadAssetInContainerAsync("Character", characterPath, scene, progressMonitor);
+    const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
     const asteroidPromises = [
-        loadAssetInContainerAsync("Asteroid1", asteroidPath),
-        loadAssetInContainerAsync("Asteroid2", asteroid2Path),
+        loadAssetInContainerAsync("Asteroid1", asteroidPath, scene, progressMonitor),
+        loadAssetInContainerAsync("Asteroid2", asteroid2Path, scene, progressMonitor),
     ];
-    const treePromise = loadAssetInContainerAsync("Tree", treePath);
-    const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath);
-    const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath);
+    const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
+    const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath, scene, progressMonitor);
+    const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath, scene, progressMonitor);
 
     const butterfly = createButterfly(scene);
     butterfly.isVisible = false;
