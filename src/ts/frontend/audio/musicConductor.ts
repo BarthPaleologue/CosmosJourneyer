@@ -21,7 +21,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { Musics } from "@/frontend/assets/musics";
+import { Musics } from "@/frontend/assets/audio/musics";
 import { StarSystemView } from "@/frontend/starSystemView";
 
 export class MusicConductor {

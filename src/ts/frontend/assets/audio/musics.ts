@@ -21,7 +21,7 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 import wanderingPath from "@assets/sound/music/455855__andrewkn__wandering.mp3";
 import atlanteanTwilightPath from "@assets/sound/music/Atlantean_Twilight.mp3";

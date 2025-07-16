@@ -17,7 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 
-import { AudioAssets, loadAudioAssets } from "./audioAssets";
+import { AudioAssets, loadAudioAssets } from "./audio";
 import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
 
