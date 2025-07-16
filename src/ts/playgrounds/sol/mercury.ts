@@ -15,26 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PBRMetallicRoughnessMaterial,
-    PointLight,
-    Scene,
-    Vector3,
-    WebGPUEngine,
-} from "@babylonjs/core";
+import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, WebGPUEngine } from "@babylonjs/core";
 
 import { getMercuryModel } from "@/backend/universe/customSystems/sol/mercury";
 import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
+import {
+    loadMercuryAlbedo,
+    loadMercuryHighResolutionAlbedo,
+    loadMercuryNormal,
+} from "@/frontend/assets/planetSurfaceTextures/mercury";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import { Texture2dUv } from "@/utils/texture";
 
 export async function createMercuryScene(
     engine: WebGPUEngine,
@@ -73,6 +71,7 @@ export async function createMercuryScene(
 
     const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(mercuryRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -83,15 +82,33 @@ export async function createMercuryScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: Texture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await loadMercuryHighResolutionAlbedo(scene, engine);
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture: ${String(albedoResult.error)}`);
+        }
+
+        albedoBslTexture = albedoResult.value;
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await loadMercuryAlbedo(scene),
+        };
+    }
+
+    const normalMap = await loadMercuryNormal(scene);
+
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normalMap }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
-            min: 0,
+            // see https://www.jhuapl.edu/news/news-releases/160506-messenger-first-global-topographic-model-mercury
+            min: -5_380,
             max: 4_480,
         },
         id: "mercury",
@@ -101,7 +118,7 @@ export async function createMercuryScene(
         "SphericalHeightFieldTerrain",
         mercuryRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
 
@@ -120,16 +137,30 @@ export async function createMercuryScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
-    progressCallback(1, "Loaded terrain scene");
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
+    progressCallback(1, "Loaded Mercury scene");
 
     return scene;
 }

@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    Color3,
+    Axis,
     GizmoManager,
+    HemisphericLight,
     Light,
     LightGizmo,
-    PBRMetallicRoughnessMaterial,
     PointLight,
     Scene,
     Vector3,
@@ -31,10 +31,18 @@ import { getMoonModel } from "@/backend/universe/customSystems/sol/moon";
 import { TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
+import {
+    loadMoonAlbedo,
+    loadMoonHighResolutionAlbedo,
+    loadMoonNormal,
+} from "@/frontend/assets/planetSurfaceTextures/moon";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import { Texture2dUv } from "@/utils/texture";
 
 export async function createMoonScene(
     engine: WebGPUEngine,
@@ -55,7 +63,7 @@ export async function createMoonScene(
 
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
-    controls.getTransform().position = new Vector3(0, 5, -10).normalize().scale(moonRadius * 3);
+    controls.getTransform().position = new Vector3(0, 0, -10).normalize().scale(moonRadius * 3);
     controls.getTransform().lookAt(Vector3.Zero());
     controls.speed = moonRadius / 3;
 
@@ -71,8 +79,12 @@ export async function createMoonScene(
     const depthRenderer = scene.enableDepthRenderer(null, true, true);
     depthRenderer.clearColor.set(0, 0, 0, 1);
 
-    const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(moonRadius * 10), scene);
+    const light = new PointLight("light", new Vector3(0, 0, -10).normalize().scale(moonRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
+
+    const ambient = new HemisphericLight("ambient", new Vector3(0, 1, 0), scene);
+    ambient.intensity = 0.001;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -80,19 +92,31 @@ export async function createMoonScene(
     const gizmoManager = new GizmoManager(scene);
     gizmoManager.positionGizmoEnabled = true;
     gizmoManager.rotationGizmoEnabled = true;
-    gizmoManager.boundingBoxGizmoEnabled = true;
-    gizmoManager.usePointerToAttachGizmos = false;
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: Texture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await loadMoonHighResolutionAlbedo(scene, engine);
+        if (!albedoResult.success) {
+            throw new Error(`Failed to load high-resolution albedo texture: ${String(albedoResult.error)}`);
+        }
+
+        albedoBslTexture = albedoResult.value;
+    } else {
+        albedoBslTexture = { type: "texture_2d", texture: await loadMoonAlbedo(scene) };
+    }
+
+    const normal = await loadMoonNormal(scene);
+
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
-            min: 0,
-            max: 5_300,
+            min: -9_178, // see https://en.wikipedia.org/wiki/Antoniadi_%28lunar_crater%29
+            max: 10_786, // see https://lunarnetworks.blogspot.com/2010/10/lroc-highest-point-on-moon.html
         },
         id: "moon",
     };
@@ -101,9 +125,10 @@ export async function createMoonScene(
         "SphericalHeightFieldTerrain",
         moonRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
+    terrain.getTransform().rotate(Axis.Y, Math.PI / 2);
 
     const heightMapAtlas = new PlanetHeightMapAtlas(textures.heightMaps, scene);
 
@@ -120,16 +145,30 @@ export async function createMoonScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
 
-    progressCallback(1, "Loaded terrain scene");
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
+    progressCallback(1, "Loaded Moon scene");
 
     return scene;
 }
