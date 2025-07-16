@@ -29,8 +29,8 @@ import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMat
 
 import { ItemPool } from "@/utils/itemPool";
 
-import { LandingPadTexturePool } from "./landingPadTexturePool";
-import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { LandingPadTexturePool } from "../landingPadTexturePool";
+import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
