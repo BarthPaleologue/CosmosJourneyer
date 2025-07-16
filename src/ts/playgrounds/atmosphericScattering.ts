@@ -19,13 +19,15 @@ import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -66,8 +68,6 @@ export function createAtmosphericScatteringScene(
         controls.getTransform().position = Vector3.Zero();
         sphere.position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Rings scene loaded");
 
     return Promise.resolve(scene);
 }

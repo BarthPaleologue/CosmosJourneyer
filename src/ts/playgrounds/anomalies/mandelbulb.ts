@@ -19,12 +19,14 @@ import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core
 
 import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { MandelbulbPostProcess } from "@/frontend/postProcesses/anomalies/mandelbulbPostProcess";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createMandelbulbScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -64,8 +66,6 @@ export function createMandelbulbScene(
     scene.onBeforeCameraRenderObservable.add((camera) => {
         depthRenderer.getDepthMap().activeCamera = camera;
     });
-
-    progressCallback(1, "Loading complete");
 
     return Promise.resolve(scene);
 }

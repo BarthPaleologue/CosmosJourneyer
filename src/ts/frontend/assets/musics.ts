@@ -21,6 +21,8 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+
 import wanderingPath from "@assets/sound/music/455855__andrewkn__wandering.mp3";
 import atlanteanTwilightPath from "@assets/sound/music/Atlantean_Twilight.mp3";
 import deepRelaxationPath from "@assets/sound/music/Deep_Relaxation.ogg";
@@ -51,13 +53,9 @@ export type Musics = {
     readonly soaring: Sound;
 };
 
-export async function loadMusics(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-): Promise<Musics> {
-    let loadedCount = 0;
-    let totalCount = 0;
-
+export async function loadMusics(progressMonitor: ILoadingProgressMonitor | null): Promise<Musics> {
     const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+        progressMonitor?.startTask();
         const loadingPromise = new Promise<Sound>((resolve) => {
             const sound = new Sound(
                 name,
@@ -69,10 +67,9 @@ export async function loadMusics(
                 options,
             );
         });
-        totalCount++;
 
         return loadingPromise.then((sound) => {
-            progressCallback(++loadedCount, totalCount, sound.name);
+            progressMonitor?.completeTask();
             return sound;
         });
     };

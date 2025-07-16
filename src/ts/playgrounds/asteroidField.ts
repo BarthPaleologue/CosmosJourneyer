@@ -26,6 +26,7 @@ import {
     Vector3,
 } from "@babylonjs/core";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
@@ -35,7 +36,7 @@ import { enablePhysics } from "./utils";
 
 export async function createAsteroidFieldScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -49,9 +50,7 @@ export async function createAsteroidFieldScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;

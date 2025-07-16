@@ -22,6 +22,7 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
@@ -36,7 +37,7 @@ import { enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -45,9 +46,7 @@ export async function createSpaceStationUIScene(
 
     await initI18n();
 
-    const assets = await loadRenderingAssets((current, total, name) => {
-        progressCallback(current / total, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

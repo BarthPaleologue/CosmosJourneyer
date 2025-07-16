@@ -80,6 +80,7 @@ import { View } from "@/utils/view";
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
+import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
@@ -490,9 +491,12 @@ export class CosmosJourneyer {
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
-        const assets = await loadAssets((loadedCount, totalCount) => {
-            loadingScreen.setProgressPercentage((loadedCount / totalCount) * 100);
-        }, mainScene);
+        const loadingProgressMonitor = new LoadingProgressMonitor();
+        loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
+            loadingScreen.setProgressPercentage((completedCount / startedCount) * 100);
+        });
+
+        const assets = await loadAssets(mainScene, loadingProgressMonitor);
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);

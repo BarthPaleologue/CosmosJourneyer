@@ -33,6 +33,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { Materials } from "./materials";
 import { createButterfly } from "./procedural/butterfly/butterfly";
 import { createGrassBlade } from "./procedural/grass/grassBlade";
@@ -71,16 +72,12 @@ export type Objects = {
 export async function loadObjects(
     materials: Materials,
     scene: Scene,
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Objects> {
-    let loadedCount = 0;
-    let totalCount = 0;
-
     const loadAssetInContainerAsync = async (name: string, url: string) => {
-        totalCount++;
-
+        progressMonitor?.startTask();
         const container = await LoadAssetContainerAsync(url, scene);
-        progressCallback(++loadedCount, totalCount, name);
+        progressMonitor?.completeTask();
         return container;
     };
 

@@ -21,6 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
@@ -30,7 +31,8 @@ import { ItemPool } from "@/utils/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -101,8 +103,6 @@ export async function createRingsScene(
         sphere.position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Rings scene loaded");
 
     return scene;
 }

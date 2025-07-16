@@ -30,6 +30,7 @@ import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMat
 import { ItemPool } from "@/utils/itemPool";
 
 import { LandingPadTexturePool } from "./landingPadTexturePool";
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
@@ -159,34 +160,28 @@ export type Textures = {
 
 /**
  * Loads all textures required by the game
- * @param progressCallback - Callback function for loading progress
- * @param enumerateCallback - Callback function to notify of total number of textures
  * @param scene - The scene to load textures into
+ * @param progressMonitor - The progress monitor to report loading progress
  * @returns A promise resolving to the Textures object
  */
-export async function loadTextures(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene,
-): Promise<Textures> {
-    let loadedCount = 0;
-    let totalCount = 0;
-
+export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
     const loadTextureAsync = (name: string, url: string): Promise<Texture> => {
+        progressMonitor?.startTask();
         const loadingPromise = new Promise<Texture>((resolve) => {
             const texture = new Texture(url, scene, false, false, undefined, () => {
                 resolve(texture);
             });
             texture.name = name;
         });
-        totalCount++;
 
         return loadingPromise.then((texture) => {
-            progressCallback(++loadedCount, totalCount, texture.name);
+            progressMonitor?.completeTask();
             return texture;
         });
     };
 
     const loadCubeTextureAsync = (name: string, url: string): Promise<CubeTexture> => {
+        progressMonitor?.startTask();
         const loadingPromise = new Promise<CubeTexture>((resolve) => {
             const texture = CubeTexture.CreateFromPrefilteredData(url, scene);
             texture.onLoadObservable.add(() => {
@@ -194,10 +189,9 @@ export async function loadTextures(
             });
             texture.name = name;
         });
-        totalCount++;
 
         return loadingPromise.then((texture) => {
-            progressCallback(++loadedCount, totalCount, texture.name);
+            progressMonitor?.completeTask();
             return texture;
         });
     };

@@ -19,6 +19,7 @@ import { MeshBuilder } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
@@ -26,7 +27,8 @@ import { enablePhysics } from "./utils";
 
 export async function createWarpTunnelScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -60,8 +62,6 @@ export async function createWarpTunnelScene(
 
         controls.getTransform().position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Warp tunnel scene loaded");
 
     return scene;
 }

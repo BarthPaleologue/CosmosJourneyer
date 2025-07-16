@@ -17,6 +17,7 @@
 
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { initMaterials, Materials } from "./materials";
 import { loadObjects, Objects } from "./objects";
 import { loadTextures, Textures } from "./textures";
@@ -28,16 +29,16 @@ export type RenderingAssets = {
 };
 
 export async function loadRenderingAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
     scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<RenderingAssets> {
-    const texturesPromise = loadTextures(progressCallback, scene);
+    const texturesPromise = loadTextures(scene, progressMonitor);
 
     const textures = await texturesPromise;
 
     const materials = initMaterials(textures, scene);
 
-    const objectsPromise = loadObjects(materials, scene, progressCallback);
+    const objectsPromise = loadObjects(materials, scene, progressMonitor);
 
     return {
         textures: textures,

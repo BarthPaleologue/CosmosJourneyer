@@ -19,6 +19,7 @@ import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "@/frontend/ui/tutorial/tutorials/flightTutorial";
@@ -30,7 +31,8 @@ import { initI18n } from "@/i18n";
 
 export async function createTutorialScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
@@ -65,8 +67,6 @@ export async function createTutorialScene(
             await tutorialLayer.setTutorial(new StarMapTutorial());
             break;
     }
-
-    progressCallback(1, "Loaded tutorial");
 
     return scene;
 }

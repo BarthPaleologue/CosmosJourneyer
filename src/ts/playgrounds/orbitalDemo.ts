@@ -24,6 +24,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
@@ -34,7 +35,8 @@ import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -148,8 +150,6 @@ export function createOrbitalDemoScene(
 
         orbitRenderer.update(referencePlaneRotation);
     });
-
-    progressCallback(1, "Loading complete");
 
     return Promise.resolve(scene);
 }

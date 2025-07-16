@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { loadMusics, Musics } from "./musics";
 import { loadSounds, Sounds } from "./sounds";
 import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
@@ -25,12 +26,10 @@ export type AudioAssets = {
     readonly speakerVoiceLines: SpeakerVoiceLines;
 };
 
-export async function loadAudioAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-): Promise<AudioAssets> {
-    const soundsPromise = loadSounds(progressCallback);
-    const musicsPromise = loadMusics(progressCallback);
-    const voiceLinesPromise = loadVoiceLines(progressCallback);
+export async function loadAudioAssets(progressMonitor: ILoadingProgressMonitor | null): Promise<AudioAssets> {
+    const soundsPromise = loadSounds(progressMonitor);
+    const musicsPromise = loadMusics(progressMonitor);
+    const voiceLinesPromise = loadVoiceLines(progressMonitor);
 
     return {
         sounds: await soundsPromise,

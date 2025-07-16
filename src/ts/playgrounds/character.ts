@@ -30,6 +30,7 @@ import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
@@ -38,7 +39,7 @@ import { enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
@@ -49,9 +50,7 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);

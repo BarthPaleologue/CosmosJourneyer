@@ -19,9 +19,12 @@ import { FreeCamera, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/c
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+
 export function createDefaultScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
@@ -48,8 +51,6 @@ export function createDefaultScene(
 
     // Our built-in 'ground' shape. Params: name, options, scene
     MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene);
-
-    progressCallback(1, "Loaded default scene");
 
     return Promise.resolve(scene);
 }

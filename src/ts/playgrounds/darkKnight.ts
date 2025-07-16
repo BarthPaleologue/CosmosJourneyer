@@ -19,20 +19,19 @@ import { AbstractEngine, HemisphericLight, Scene, Vector3 } from "@babylonjs/cor
 
 import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DarkKnight } from "@/frontend/universe/darkKnight";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const textures = await loadTextures((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const textures = await loadTextures(scene, progressMonitor);
 
     scene.environmentTexture = textures.environment.milkyWay;
 
@@ -71,8 +70,6 @@ export async function createDarkKnightScene(
         controls.getTransform().position = Vector3.Zero();
         darkKnight.getTransform().position.subtractInPlace(cameraPosition);
     });
-
-    progressCallback(1, "Rings scene loaded");
 
     return scene;
 }

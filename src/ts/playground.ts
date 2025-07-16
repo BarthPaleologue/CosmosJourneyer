@@ -22,6 +22,7 @@ import { Engine, PhysicsViewer, Scene, Tools } from "@babylonjs/core";
 
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 
+import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
 declare global {
@@ -35,10 +36,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const loadingScreen = new LoadingScreen(canvas);
-const progressCallback = (progress01: number, text: string) => {
-    loadingScreen.setProgressPercentage(progress01 * 100);
-    loadingScreen.loadingUIText = text;
-};
 
 const engine = new Engine(canvas, true);
 engine.useReverseDepthBuffer = true;
@@ -52,8 +49,17 @@ const playgroundRegistry = new PlaygroundRegistry();
 
 const sceneBuilder = playgroundRegistry.get(requestedScene);
 
-const scene = await sceneBuilder(engine, progressCallback);
+const loadingProgressMonitor = new LoadingProgressMonitor();
+loadingProgressMonitor.addProgressCallback((startedTaskCount, completedTaskCount) => {
+    const progress = completedTaskCount / startedTaskCount;
+    loadingScreen.setProgressPercentage(progress * 100);
+    loadingScreen.loadingUIText = `Loading ${requestedScene} (${Math.round(progress * 100)}%)`;
+});
+
+loadingProgressMonitor.startTask();
+const scene = await sceneBuilder(engine, loadingProgressMonitor);
 window.scene = scene;
+loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
     const inspectorRoot = document.createElement("div");

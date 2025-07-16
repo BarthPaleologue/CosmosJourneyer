@@ -22,6 +22,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "extended-random";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -35,16 +36,14 @@ import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets((loadedCount, totalCount, name) => {
-        progressCallback(loadedCount / totalCount, `Loading ${name}`);
-    }, scene);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
 

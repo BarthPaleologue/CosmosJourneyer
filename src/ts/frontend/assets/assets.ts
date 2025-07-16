@@ -18,6 +18,7 @@
 import { Scene } from "@babylonjs/core/scene";
 
 import { AudioAssets, loadAudioAssets } from "./audioAssets";
+import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
 
 export type Assets = {
@@ -25,12 +26,9 @@ export type Assets = {
     readonly rendering: Readonly<RenderingAssets>;
 };
 
-export async function loadAssets(
-    progressCallback: (loadedCount: number, totalCount: number, lastItemName: string) => void,
-    scene: Scene,
-): Promise<Assets> {
-    const audioAssetsPromise = loadAudioAssets(progressCallback);
-    const renderingAssetsPromise = loadRenderingAssets(progressCallback, scene);
+export async function loadAssets(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Assets> {
+    const audioAssetsPromise = loadAudioAssets(progressMonitor);
+    const renderingAssetsPromise = loadRenderingAssets(scene, progressMonitor);
 
     return {
         audio: await audioAssetsPromise,

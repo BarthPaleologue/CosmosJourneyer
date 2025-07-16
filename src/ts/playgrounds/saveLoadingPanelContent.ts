@@ -24,6 +24,7 @@ import { SaveManager } from "@/backend/save/saveManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
@@ -32,7 +33,8 @@ import { initI18n } from "@/i18n";
 
 export async function createSaveLoadingPanelContentScene(
     engine: AbstractEngine,
-    progressCallback: (progress: number, text: string) => void,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
@@ -56,8 +58,6 @@ export async function createSaveLoadingPanelContentScene(
     }
 
     saveLoadingPanelContent.populateCmdrList(starSystemDatabase, saveManager.value);
-
-    progressCallback(1, "Loaded save panel content playground");
 
     return scene;
 }
