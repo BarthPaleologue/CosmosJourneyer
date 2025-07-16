@@ -33,10 +33,10 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { Materials } from "./materials";
-import { createButterfly } from "./procedural/butterfly/butterfly";
-import { createGrassBlade } from "./procedural/grass/grassBlade";
+import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { Materials } from "../materials";
+import { createButterfly } from "../procedural/butterfly/butterfly";
+import { createGrassBlade } from "../procedural/grass/grassBlade";
 
 import asteroidPath from "@assets/asteroid/asteroid.glb";
 import asteroid2Path from "@assets/asteroid/asteroid2.glb";
