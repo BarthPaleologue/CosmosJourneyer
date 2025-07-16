@@ -66,8 +66,15 @@ export async function createCharacterDemoScene(
         throw new Error("Character object is null");
     }
 
+    const groundRadius = 40;
+
     const character = new CharacterControls(characterObject, scene);
-    character.getTransform().position.y = 30;
+    character.getTransform().position.y = groundRadius;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("thirdPerson") !== null) {
+        character.setThirdPersonCameraActive();
+    }
 
     character.getActiveCamera().attachControl();
 
@@ -75,7 +82,7 @@ export async function createCharacterDemoScene(
 
     shadowGenerator.addShadowCaster(character.character);
 
-    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: 20 }, scene);
+    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
     new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
 
