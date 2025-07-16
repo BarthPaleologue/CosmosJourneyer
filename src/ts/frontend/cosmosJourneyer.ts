@@ -493,7 +493,7 @@ export class CosmosJourneyer {
 
         const loadingProgressMonitor = new LoadingProgressMonitor();
         loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
-            loadingScreen.setProgressPercentage((completedCount / startedCount) * 100);
+            loadingScreen.setProgress(startedCount, completedCount);
         });
 
         const assets = await loadAssets(mainScene, loadingProgressMonitor);
@@ -589,10 +589,6 @@ export class CosmosJourneyer {
             this.elapsedSeconds += deltaSeconds;
 
             this.player.timePlayedSeconds += deltaSeconds;
-
-            (this.engine.loadingScreen as LoadingScreen).setProgressPercentage(
-                this.starSystemView.loader.getLoadingProgress() * 100,
-            );
 
             this.autoSaveTimerSeconds += deltaSeconds;
             if (this.autoSaveTimerSeconds >= this.autoSavePeriodSeconds) {

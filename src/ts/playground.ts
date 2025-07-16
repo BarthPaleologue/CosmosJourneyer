@@ -51,9 +51,8 @@ const sceneBuilder = playgroundRegistry.get(requestedScene);
 
 const loadingProgressMonitor = new LoadingProgressMonitor();
 loadingProgressMonitor.addProgressCallback((startedTaskCount, completedTaskCount) => {
-    const progress = completedTaskCount / startedTaskCount;
-    loadingScreen.setProgressPercentage(progress * 100);
-    loadingScreen.loadingUIText = `Loading ${requestedScene} (${Math.round(progress * 100)}%)`;
+    loadingScreen.setProgress(startedTaskCount, completedTaskCount);
+    loadingScreen.loadingUIText = `Loading ${requestedScene} (${completedTaskCount}/${startedTaskCount})`;
 });
 
 loadingProgressMonitor.startTask();
