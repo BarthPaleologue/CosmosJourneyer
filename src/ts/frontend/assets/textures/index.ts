@@ -84,17 +84,23 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
     const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin, scene, progressMonitor);
     const milkyWayPromise = loadCubeTextureAsync("SkyBox", skyBox, scene, progressMonitor);
 
+    const terrainTexturesPromise = loadTerrainTextures(scene, progressMonitor);
+    const particleTexturesPromise = loadParticleTextures(scene, progressMonitor);
+    const materialTexturesPromise = loadMaterialTextures(scene, progressMonitor);
+    const gasPlanetTexturesPromise = loadGasPlanetTextures(scene, progressMonitor);
+    const ringsTexturesPromise = loadRingsTextures(scene, progressMonitor);
+
     // Assemble and return the textures structure
     return {
-        terrains: await loadTerrainTextures(scene, progressMonitor),
+        terrains: await terrainTexturesPromise,
         water: {
             normalMap1: await waterNormalMap1Promise,
             normalMap2: await waterNormalMap2Promise,
         },
-        particles: await loadParticleTextures(scene, progressMonitor),
-        materials: await loadMaterialTextures(scene, progressMonitor),
-        gasPlanet: await loadGasPlanetTextures(scene, progressMonitor),
-        rings: await loadRingsTextures(scene, progressMonitor),
+        particles: await particleTexturesPromise,
+        materials: await materialTexturesPromise,
+        gasPlanet: await gasPlanetTexturesPromise,
+        rings: await ringsTexturesPromise,
         environment: {
             milkyWay: await milkyWayPromise,
         },
