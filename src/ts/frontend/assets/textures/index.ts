@@ -25,18 +25,16 @@ import { Scene } from "@babylonjs/core/scene";
 import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { GasPlanetTextures, loadGasPlanetTextures } from "./gasPlanet";
 import { AllMaterialTextures, loadMaterialTextures } from "./materials";
+import { loadParticleTextures, ParticleTextures } from "./particles";
 import { loadRingsTextures, RingsTextures } from "./rings";
 import { AllTerrainTextures, loadTerrainTextures } from "./terrains";
 import { createTexturePools, TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
-import butterflyTexture from "@assets/butterfly.webp";
-import flareParticle from "@assets/flare.png";
 import empty from "@assets/oneBlackPixel.webp";
 import seamlessPerlin from "@assets/perlin.webp";
 import skyBox from "@assets/skybox/milkyway.env";
 import cursorImage from "@assets/textures/hoveredCircle.png";
-import plumeParticle from "@assets/textures/plume.png";
 import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
 import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
 
@@ -45,12 +43,6 @@ import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
 export type WaterTextures = {
     normalMap1: Texture;
     normalMap2: Texture;
-};
-
-export type ParticleTextures = {
-    plume: Texture;
-    flare: Texture;
-    butterfly: Texture;
 };
 
 export type NoiseTextures = {
@@ -86,12 +78,6 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
     const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
     const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
 
-    // Particle textures
-    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, scene, progressMonitor);
-    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, scene, progressMonitor);
-
-    // UI textures
-    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, scene, progressMonitor);
     const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
     // Environment textures
@@ -105,11 +91,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
             normalMap1: await waterNormalMap1Promise,
             normalMap2: await waterNormalMap2Promise,
         },
-        particles: {
-            plume: await plumeParticlePromise,
-            flare: await flareTexturePromise,
-            butterfly: await butterflyPromise,
-        },
+        particles: await loadParticleTextures(scene, progressMonitor),
         materials: await loadMaterialTextures(scene, progressMonitor),
         gasPlanet: await loadGasPlanetTextures(scene, progressMonitor),
         rings: await loadRingsTextures(scene, progressMonitor),
