@@ -20,7 +20,7 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { PBRTextures } from "@/frontend/assets/textures";
+import { PBRTextures } from "@/frontend/assets/textures/materials";
 
 import * as BSL from "@/utils/bsl";
 
