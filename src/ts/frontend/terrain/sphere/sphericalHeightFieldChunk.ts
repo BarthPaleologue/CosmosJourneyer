@@ -25,6 +25,8 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
+
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
@@ -45,7 +47,7 @@ export type ChunkIndices = {
  * The chunk is positioned on a sphere and can be subdivided into smaller chunks.
  * Chunks rely on a ChunkForge to compute their vertex data asynchronously.
  */
-export class SphericalHeightFieldChunk {
+export class SphericalHeightFieldChunk implements Transformable {
     private readonly id: ChunkId;
     private readonly indices: ChunkIndices;
 
@@ -114,6 +116,8 @@ export class SphericalHeightFieldChunk {
         this.sphereRadius = sphereRadius;
 
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
+
+        this.mesh.setEnabled(false);
     }
 
     private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
@@ -223,7 +227,7 @@ export class SphericalHeightFieldChunk {
     public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
-        const distanceSquared = Vector3.DistanceSquared(this.mesh.getAbsolutePosition(), cameraPosition);
+        const distanceSquared = Vector3.DistanceSquared(this.getTransform().getAbsolutePosition(), cameraPosition);
         if (this.children === null && distanceSquared < (this.sideLength * 2) ** 2) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
@@ -232,31 +236,57 @@ export class SphericalHeightFieldChunk {
                 this.parent,
                 this.terrainModel,
                 material,
-                this.mesh.getScene(),
+                this.getTransform().getScene(),
             );
         } else if (
-            this.loadingState === "completed" &&
             this.children !== null &&
-            distanceSquared >= (this.sideLength * 2.5) ** 2
+            distanceSquared >= (this.sideLength * 2.5) ** 2 &&
+            this.getLoadingState() === "completed"
         ) {
             for (const child of this.children) {
                 child.dispose();
             }
             this.children = null;
-            this.mesh.setEnabled(true);
         }
 
-        for (const child of this.children ?? []) {
-            child.update(cameraPosition, material, chunkForge);
-        }
+        if (this.children !== null) {
+            let areAllChildrenLoaded = true;
+            for (const child of this.children) {
+                child.update(cameraPosition, material, chunkForge);
+                if (child.getLoadingState() !== "completed") {
+                    areAllChildrenLoaded = false;
+                }
+            }
 
-        if (this.children !== null && this.children.every((child) => child.loadingState === "completed")) {
-            this.mesh.setEnabled(false);
+            this.getTransform().setEnabled(!areAllChildrenLoaded);
+        } else if (this.getLoadingState() === "completed") {
+            this.getTransform().setEnabled(true);
         }
     }
 
+    public getTransform(): TransformNode {
+        return this.mesh;
+    }
+
+    public getLoadingState(): ChunkLoadingState {
+        return this.loadingState;
+    }
+
+    public getAllChildren(): Array<SphericalHeightFieldChunk> {
+        if (this.children === null) {
+            return [];
+        }
+
+        let children: Array<SphericalHeightFieldChunk> = [...this.children];
+        for (const child of this.children) {
+            children = children.concat(child.getAllChildren());
+        }
+
+        return children;
+    }
+
     public dispose(): void {
-        this.mesh.dispose();
+        this.getTransform().dispose();
         this.children?.forEach((child) => {
             child.dispose();
         });

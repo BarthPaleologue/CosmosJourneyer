@@ -15,17 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PBRMetallicRoughnessMaterial,
-    PointLight,
-    Scene,
-    Vector3,
-    type WebGPUEngine,
-} from "@babylonjs/core";
+import { Axis, GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getMarsModel } from "@/backend/universe/customSystems/sol/mars";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -33,11 +23,19 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadMarsAlbedo,
+    loadMarsHighResolutionAlbedo,
+    loadMarsNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/mars";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
+import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createMarsScene(
     engine: WebGPUEngine,
@@ -74,6 +72,7 @@ export async function createMarsScene(
 
     const light = new PointLight("light", new Vector3(-5, 2, -10).normalize().scale(marsRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
+    light.intensity = 4;
 
     const gizmo = new LightGizmo();
     gizmo.light = light;
@@ -84,16 +83,32 @@ export async function createMarsScene(
     gizmoManager.boundingBoxGizmoEnabled = true;
     gizmoManager.usePointerToAttachGizmos = false;
 
-    const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
-    material.roughness = 1.0;
+    const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
+
+    let albedoBslTexture: Texture2dUv;
+
+    if (useHighQuality) {
+        const albedoResult = await loadMarsHighResolutionAlbedo(scene, engine, progressMonitor);
+        if (!albedoResult.success) {
+            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+        }
+
+        albedoBslTexture = albedoResult.value;
+    } else {
+        albedoBslTexture = {
+            type: "texture_2d",
+            texture: await loadMarsAlbedo(scene, progressMonitor),
+        };
+    }
+    const normal = await loadMarsNormal(scene, progressMonitor);
+
+    const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 
     const terrainModel: TerrainModel = {
         type: "custom",
         heightRange: {
             min: 0,
-            max: 22e3,
+            max: 8_201 + 21_241,
         },
         id: "mars",
     };
@@ -102,9 +117,10 @@ export async function createMarsScene(
         "SphericalHeightFieldTerrain",
         marsRadius,
         terrainModel,
-        material,
+        material.get(),
         scene,
     );
+    terrain.getTransform().rotate(Axis.Y, Math.PI);
 
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps, scene);
 
@@ -131,13 +147,27 @@ export async function createMarsScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera.globalPosition, material.get(), chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;

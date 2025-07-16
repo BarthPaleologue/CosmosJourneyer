@@ -113,6 +113,28 @@ export class SphericalHeightFieldTerrain implements Transformable {
         }
     }
 
+    getAllChunks(): Array<SphericalHeightFieldChunk> {
+        let chunks: Array<SphericalHeightFieldChunk> = [...this.sides];
+        for (const side of this.sides) {
+            chunks = chunks.concat(side.getAllChildren());
+        }
+
+        return chunks;
+    }
+
+    /**
+     * @returns true if all chunks are loaded and all leaf chunks are enabled, false otherwise.
+     */
+    isIdle() {
+        const chunks = this.getAllChunks();
+        const leafChunks = chunks.filter((chunk) => chunk.getAllChildren().length === 0);
+
+        return (
+            chunks.every((chunk) => chunk.getLoadingState() === "completed") &&
+            leafChunks.every((chunk) => chunk.getTransform().isEnabled())
+        );
+    }
+
     dispose(): void {
         for (const side of this.sides) {
             side.dispose();

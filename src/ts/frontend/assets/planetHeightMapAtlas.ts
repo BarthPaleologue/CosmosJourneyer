@@ -33,14 +33,14 @@ import earthHeightMap2x4_1_0 from "@assets/sol/textures/earthHeightMap2x4/1_0.pn
 import earthHeightMap2x4_1_1 from "@assets/sol/textures/earthHeightMap2x4/1_1.png";
 import earthHeightMap2x4_1_2 from "@assets/sol/textures/earthHeightMap2x4/1_2.png";
 import earthHeightMap2x4_1_3 from "@assets/sol/textures/earthHeightMap2x4/1_3.png";
-import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.jpg";
-import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.jpg";
-import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.jpg";
-import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.jpg";
-import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.jpg";
-import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.jpg";
-import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.jpg";
-import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.jpg";
+import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.png";
+import marsHeightMap_0_1 from "@assets/sol/textures/marsHeightMap2x4/0_1.png";
+import marsHeightMap_0_2 from "@assets/sol/textures/marsHeightMap2x4/0_2.png";
+import marsHeightMap_0_3 from "@assets/sol/textures/marsHeightMap2x4/0_3.png";
+import marsHeightMap_1_0 from "@assets/sol/textures/marsHeightMap2x4/1_0.png";
+import marsHeightMap_1_1 from "@assets/sol/textures/marsHeightMap2x4/1_1.png";
+import marsHeightMap_1_2 from "@assets/sol/textures/marsHeightMap2x4/1_2.png";
+import marsHeightMap_1_3 from "@assets/sol/textures/marsHeightMap2x4/1_3.png";
 import mercuryHeightMap_0_0 from "@assets/sol/textures/mercuryHeightMap2x4/0_0.png";
 import mercuryHeightMap_0_1 from "@assets/sol/textures/mercuryHeightMap2x4/0_1.png";
 import mercuryHeightMap_0_2 from "@assets/sol/textures/mercuryHeightMap2x4/0_2.png";
@@ -206,8 +206,9 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
             case "earth":
                 return this.heightMaps.earth1x1;
             case "mercury":
-            case "venus":
+                return this.heightMaps.mercury1x1;
             case "moon":
+            case "venus":
             case "mars":
                 return this.heightMaps.mars1x1;
             default:
