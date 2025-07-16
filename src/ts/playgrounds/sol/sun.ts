@@ -50,7 +50,7 @@ export async function createSunScene(
     controls.speed = scalingFactor;
     camera.maxZ *= scalingFactor;
 
-    scene.enableDepthRenderer(camera, false, true);
+    scene.enableDepthRenderer(camera, true, true);
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
     controls.getTransform().lookAt(Vector3.Zero());

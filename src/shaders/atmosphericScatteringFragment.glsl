@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-precision lowp float;
+precision highp float;
 
 #define DISABLE_UNIFORMITY_ANALYSIS
 
@@ -37,15 +37,13 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 #include "./utils/atmosphere.glsl";
 
-#include "./utils/remap.glsl";
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/rayIntersectSphere.glsl";
 
 // based on https://www.youtube.com/watch?v=DxfEbulyFcY by Sebastian Lague
 vec3 densityAtPoint(vec3 densitySamplePoint) {
-    float heightAboveSurface = length(densitySamplePoint - object_position) - object_radius;// actual height above surface
+    float heightAboveSurface = max(0.0, length(densitySamplePoint - object_position) - object_radius);// actual height above surface
 
     // rayleigh and mie
     vec3 density = vec3(exp(-heightAboveSurface / vec2(atmosphere_rayleighHeight, atmosphere_mieHeight)), 0.0);
@@ -59,7 +57,7 @@ vec3 densityAtPoint(vec3 densitySamplePoint) {
 
 vec3 opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
 
-    float stepSize = rayLength / (float(OPTICAL_DEPTH_POINTS) - 1.0);// ray length between sample points
+    float stepSize = rayLength / float(OPTICAL_DEPTH_POINTS);// ray length between sample points
 
     vec3 densitySamplePoint = rayOrigin;// that's where we start
     vec3 accumulatedOpticalDepth = vec3(0.0);
@@ -81,7 +79,7 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
 
     vec3 starDir = normalize(starPosition - object_position);// direction to the light source
 
-    float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0);// the ray length between sample points
+    float stepSize = rayLength / float(POINTS_FROM_CAMERA);// the ray length between sample points
 
     vec3 inScatteredRayleigh = vec3(0.0);
     vec3 inScatteredMie = vec3(0.0);
@@ -120,11 +118,11 @@ vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLen
     // https://glossary.ametsoc.org/wiki/Rayleigh_phase_function
     float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + costheta2);
 
-    float g = atmosphere_mieAsymmetry;
-    float g2 = g * g;
+    vec3 g = atmosphere_mieAsymmetry;
+    vec3 g2 = g * g;
 
     // Cornette-Shanks phase function for Mie scattering
-    float phaseMie = (3.0 * (1.0 - g2) / (8.0 * PI * (2.0 + g2))) * (1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, 1.5);
+    vec3 phaseMie = (3.0 * (1.0 - g2) / (8.0 * PI * (2.0 + g2))) * (1.0 + costheta2) / pow(1.0 + g2 - 2.0 * g * costheta, vec3(1.5));
 
     inScatteredRayleigh *= phaseRayleigh * atmosphere_rayleighCoeffs;
     inScatteredMie *= phaseMie * atmosphere_mieCoeffs;
@@ -162,12 +160,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
+
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     // Cohabitation avec le shader d'océan (un jour je merge)
     float waterImpact, waterEscape;

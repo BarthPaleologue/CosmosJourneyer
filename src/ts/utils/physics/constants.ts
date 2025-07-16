@@ -70,3 +70,16 @@ export const EarthG = 9.81;
  * The sea level pressure on Earth in Pascals.
  */
 export const EarthSeaLevelPressure = 101_325;
+
+/**
+ * Boltzmann constant, J K⁻¹
+ * @see https://en.wikipedia.org/wiki/Boltzmann_constant
+ */
+export const Kb = 1.380_649e-23;
+
+export const PresetBands = {
+    /**
+     * Default photopic RGB band-centres (metres)
+     */
+    PHOTOPIC: [650e-9, 550e-9, 450e-9],
+} as const;

@@ -39,8 +39,8 @@ import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { Cullable } from "@/utils/cullable";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
-import { ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { DeepReadonly } from "@/utils/types";
 
@@ -120,9 +120,12 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
 
         this.mesh.material = this.material;
 
-        const atmosphereThickness =
-            Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
-        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+        this.atmosphereUniforms = new AtmosphereUniforms(
+            this.getBoundingRadius(),
+            model.mass,
+            273, //TODO: do not hardcode temperature
+            model.atmosphere,
+        );
 
         if (this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);

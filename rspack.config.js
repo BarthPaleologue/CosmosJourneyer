@@ -115,7 +115,7 @@ export default defineConfig({
                 exclude: /node_modules/,
             },
             {
-                test: /\.(glsl|vs|fs|vert|frag|fx)$/,
+                test: /\.(glsl|vs|fs|vert|frag|fx|wgsl)$/,
                 loader: "ts-shader-loader",
                 exclude: /node_modules/,
             },

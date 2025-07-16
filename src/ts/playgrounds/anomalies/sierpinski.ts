@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+import { AbstractEngine, ArcRotateCamera, Color4, Scene, Vector3 } from "@babylonjs/core";
 
 import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
@@ -37,7 +37,8 @@ export function createSierpinskiScene(
     camera.wheelPrecision *= 100;
     camera.minZ = 0.01;
 
-    const depthRenderer = scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(
         "sierpinski",
