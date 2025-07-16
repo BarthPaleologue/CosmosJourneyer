@@ -131,7 +131,7 @@ export async function createSaturnScene(
         planet.getTransform().position.subtractInPlace(cameraPosition);
         light.position.subtractInPlace(cameraPosition);
 
-        asteroidField?.update(camera.globalPosition, assets.objects, deltaSeconds);
+        asteroidField?.update(camera.globalPosition, assets.objects.asteroids, deltaSeconds);
     });
 
     return scene;

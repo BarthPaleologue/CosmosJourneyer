@@ -381,7 +381,11 @@ export class StarSystemController {
         controls.update(deltaSeconds);
 
         for (const object of celestialBodies) {
-            object.asteroidField?.update(controls.getActiveCamera().globalPosition, this.assets.objects, deltaSeconds);
+            object.asteroidField?.update(
+                controls.getActiveCamera().globalPosition,
+                this.assets.objects.asteroids,
+                deltaSeconds,
+            );
         }
 
         for (const object of this.getPlanetaryMassObjects()) {

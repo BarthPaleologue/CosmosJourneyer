@@ -22,12 +22,7 @@ import "@babylonjs/core/Animations/animatable";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import {
-    PhysicsShape,
-    PhysicsShapeConvexHull,
-    PhysicsShapeMesh,
-    PhysicsShapeSphere,
-} from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
@@ -36,10 +31,9 @@ import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
+import { Asteroid, loadAsteroids } from "./asteroids";
 import { loadAssetInContainerAsync } from "./utils";
 
-import asteroidPath from "@assets/asteroid/asteroid.glb";
-import asteroid2Path from "@assets/asteroid/asteroid2.glb";
 import bananaPath from "@assets/banana/banana.glb";
 import characterPath from "@assets/character/character.glb";
 import rockPath from "@assets/rock.glb";
@@ -56,8 +50,7 @@ export type Objects = {
     banana: Mesh;
     character: Mesh;
     rock: Mesh;
-    asteroids: ReadonlyArray<Mesh>;
-    asteroidPhysicsShapes: ReadonlyArray<PhysicsShape>;
+    asteroids: ReadonlyArray<Asteroid>;
     tree: Mesh;
     sphericalTank: {
         mesh: Mesh;
@@ -79,10 +72,7 @@ export async function loadObjects(
     const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
     const characterPromise = loadAssetInContainerAsync("Character", characterPath, scene, progressMonitor);
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
-    const asteroidPromises = [
-        loadAssetInContainerAsync("Asteroid1", asteroidPath, scene, progressMonitor),
-        loadAssetInContainerAsync("Asteroid2", asteroid2Path, scene, progressMonitor),
-    ];
+    const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
     const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath, scene, progressMonitor);
     const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath, scene, progressMonitor);
@@ -152,54 +142,6 @@ export async function loadObjects(
     rock.isVisible = false;
 
     rockContainer.addAllToScene();
-
-    const asteroidContainers = await Promise.all(asteroidPromises);
-    const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1] as const;
-
-    const asteroids: Array<Mesh> = [];
-    const asteroidPhysicsShapes: Array<PhysicsShape> = [];
-
-    for (const container of asteroidContainers) {
-        const asteroid = container.meshes[1];
-        if (!(asteroid instanceof Mesh)) {
-            throw new Error("Asteroid root node is not a Mesh");
-        }
-
-        asteroid.setParent(null);
-        asteroid.scaling.scaleInPlace(100);
-        asteroid.bakeCurrentTransformIntoVertices();
-        asteroid.setEnabled(false);
-
-        asteroids.push(asteroid);
-
-        const physicsShape = new PhysicsShapeMesh(asteroid, scene);
-        physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        physicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-        asteroidPhysicsShapes.push(physicsShape);
-
-        for (const scaling of scalings) {
-            const asteroidClone = asteroid.clone(`asteroidClone${asteroids.length}`);
-            asteroidClone.makeGeometryUnique();
-            asteroidClone.setParent(null);
-            asteroidClone.scaling.scaleInPlace(scaling);
-            asteroidClone.bakeCurrentTransformIntoVertices();
-            asteroidClone.setEnabled(false);
-
-            asteroids.push(asteroidClone);
-
-            const physicsShapeClone = new PhysicsShapeMesh(asteroidClone, scene);
-            physicsShapeClone.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            physicsShapeClone.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
-            asteroidPhysicsShapes.push(physicsShapeClone);
-
-            container.addAllAssetsToContainer(asteroidClone);
-            container.removeAllFromScene();
-        }
-
-        container.addAllToScene();
-    }
 
     const treeContainer = await treePromise;
     const tree = treeContainer.meshes[0];
@@ -272,8 +214,7 @@ export async function loadObjects(
             shape: sphericalTankPhysicsShape,
         },
         tree,
-        asteroids,
-        asteroidPhysicsShapes,
+        asteroids: await asteroidPromises,
         rock,
         character,
         banana,

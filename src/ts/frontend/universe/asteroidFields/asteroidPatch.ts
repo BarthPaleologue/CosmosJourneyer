@@ -23,7 +23,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
-import { Objects } from "@/frontend/assets/objects";
+import { Asteroid } from "@/frontend/assets/objects/asteroids";
 
 export class AsteroidPatch {
     readonly parent: TransformNode;
@@ -80,7 +80,7 @@ export class AsteroidPatch {
         this.clearInstances();
     }
 
-    public update(controlsPosition: Vector3, objects: Objects, deltaSeconds: number): void {
+    public update(controlsPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number): void {
         this.instances.forEach((instance, index) => {
             const distanceToCamera = Vector3.Distance(controlsPosition, instance.getAbsolutePosition());
             const rotationAxis = this.rotationAxes[index];
@@ -90,7 +90,7 @@ export class AsteroidPatch {
                 throw new Error("Rotation axis, speed, or type index is undefined.");
             }
 
-            const shape = objects.asteroidPhysicsShapes[typeIndex];
+            const shape = asteroids[typeIndex]?.physicsShape;
             if (shape === undefined) {
                 throw new Error(`Asteroid physics shape for type index ${typeIndex} is undefined.`);
             }
@@ -136,7 +136,7 @@ export class AsteroidPatch {
                 throw new Error(`Type index for instance ${this.nbInstances} is undefined.`);
             }
 
-            const asteroid = objects.asteroids[typeIndex];
+            const asteroid = asteroids[typeIndex];
             if (asteroid === undefined) {
                 throw new Error(`Asteroid for type index ${typeIndex} is undefined.`);
             }
@@ -147,7 +147,7 @@ export class AsteroidPatch {
                 throw new Error(`Position or rotation for instance ${this.nbInstances} is undefined.`);
             }
 
-            const instance = asteroid.createInstance(`${this.parent.name}_AsteroidInstance${this.nbInstances}`);
+            const instance = asteroid.mesh.createInstance(`${this.parent.name}_AsteroidInstance${this.nbInstances}`);
             instance.position.copyFrom(position);
             instance.rotationQuaternion = rotation;
             instance.isPickable = false;

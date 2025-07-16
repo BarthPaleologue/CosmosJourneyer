@@ -27,7 +27,7 @@ import {
 } from "@babylonjs/core";
 
 import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
@@ -50,7 +50,7 @@ export async function createAsteroidFieldScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const asteroids = await loadAsteroids(scene, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;
@@ -60,8 +60,8 @@ export async function createAsteroidFieldScene(
 
     const scalingFactor = 500;
 
-    defaultControls.getTransform().position.z = -120 * scalingFactor;
-    defaultControls.getTransform().position.y = 5 * scalingFactor;
+    defaultControls.getTransform().position.z = -150 * scalingFactor;
+    defaultControls.getTransform().position.y = 3 * scalingFactor;
     defaultControls.speed *= scalingFactor;
     camera.maxZ *= scalingFactor;
 
@@ -69,8 +69,8 @@ export async function createAsteroidFieldScene(
 
     new PhysicsAggregate(sphere, PhysicsShapeType.SPHERE, { mass: 0 }, scene);
 
-    const beltRadius = 100 * scalingFactor;
-    const beltSpread = 20 * scalingFactor;
+    const beltRadius = 170 * scalingFactor;
+    const beltSpread = 100 * scalingFactor;
 
     AsteroidPatch.BATCH_SIZE = 10_000;
 
@@ -87,7 +87,7 @@ export async function createAsteroidFieldScene(
 
     scene.onBeforeRenderObservable.add(() => {
         defaultControls.update(engine.getDeltaTime() / 1000);
-        belt.update(defaultControls.getTransform().getAbsolutePosition(), assets.objects, engine.getDeltaTime() / 1000);
+        belt.update(defaultControls.getTransform().getAbsolutePosition(), asteroids, engine.getDeltaTime() / 1000);
     });
 
     return scene;
