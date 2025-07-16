@@ -23,6 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Scene } from "@babylonjs/core/scene";
 
 import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { GasPlanetTextures, loadGasPlanetTextures } from "./gasPlanet";
 import { createTexturePools, TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
@@ -51,12 +52,8 @@ import rockNormalMetallicMap from "@assets/rockMaterial/layered-planetary_normal
 import sandAlbedoRoughnessMap from "@assets/sandMaterial/wavy-sand_albedo_roughness.webp";
 import sandNormalMetallicMap from "@assets/sandMaterial/wavy-sand_normal_metallic.webp";
 import skyBox from "@assets/skybox/milkyway.env";
-import jupiterTexturePath from "@assets/sol/textures/jupiter.jpg";
-import neptuneTexturePath from "@assets/sol/textures/neptune.jpg";
 import saturnRingsPath from "@assets/sol/textures/saturn_rings.png";
-import saturnTexturePath from "@assets/sol/textures/saturn.jpg";
 import uranusRingsPath from "@assets/sol/textures/uranus_rings.png";
-import uranusTexturePath from "@assets/sol/textures/uranus.jpg";
 import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
 import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
 import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
@@ -112,13 +109,6 @@ export type AllMaterialTextures = {
     concrete: PBRTextures;
     crate: PBRTextures;
     tree: Pick<PBRTextures, "albedo">;
-};
-
-export type GasPlanetTextures = {
-    jupiter: Texture;
-    saturn: Texture;
-    uranus: Texture;
-    neptune: Texture;
 };
 
 export type RingsTextures = {
@@ -307,12 +297,6 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         progressMonitor,
     );
 
-    // Gas giants texture
-    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath, scene, progressMonitor);
-    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath, scene, progressMonitor);
-    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath, scene, progressMonitor);
-    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath, scene, progressMonitor);
-
     // Rings texture
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, scene, progressMonitor);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, scene, progressMonitor);
@@ -383,12 +367,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
                 albedo: treeAlbedo,
             },
         },
-        gasPlanet: {
-            jupiter: await jupiterTexturePromise,
-            saturn: await saturnTexturePromise,
-            uranus: await uranusTexturePromise,
-            neptune: await neptuneTexturePromise,
-        },
+        gasPlanet: await loadGasPlanetTextures(scene, progressMonitor),
         rings: {
             saturn: await saturnRingsTexturePromise,
             uranus: await uranusRingsTexturePromise,
