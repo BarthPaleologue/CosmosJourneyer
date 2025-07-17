@@ -17,7 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { getComponentTypeI18n, SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

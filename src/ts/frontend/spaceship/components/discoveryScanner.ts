@@ -19,11 +19,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import {
     getDiscoveryScannerSpec,
-    SerializedDiscoveryScanner,
+    type SerializedDiscoveryScanner,
 } from "@/backend/spaceship/serializedComponents/discoveryScanner";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
+import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 
 import { assertUnreachable } from "@/utils/types";
 

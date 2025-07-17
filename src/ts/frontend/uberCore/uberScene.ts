@@ -17,13 +17,13 @@
 
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
-import { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
+import { type DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Scene } from "@babylonjs/core/scene";
 
-import { Controls } from "./controls";
+import { type Controls } from "./controls";
 
 /**
  * A very thin wrapper around Babylon's Scene class to add some convenience methods.

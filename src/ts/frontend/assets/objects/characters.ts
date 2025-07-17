@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";
 
 import characterPath from "@assets/character/character.glb";

@@ -15,16 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type Effect } from "@babylonjs/core/Materials/effect";
+import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
 import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { getKerrMetricA } from "@/utils/physics/blackHole";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",

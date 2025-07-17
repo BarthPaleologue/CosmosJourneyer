@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Mesh } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Mesh } from "@babylonjs/core/Meshes";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { HasBoundingSphere } from "./architecture/hasBoundingSphere";
-import { Transformable } from "./architecture/transformable";
-import { CreateLinesMeshFunction } from "./lineRendering";
+import { type HasBoundingSphere } from "./architecture/hasBoundingSphere";
+import { type Transformable } from "./architecture/transformable";
+import { type CreateLinesMeshFunction } from "./lineRendering";
 
 /**
  * Visual helper designed to display the rotation axis of given objects

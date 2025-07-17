@@ -17,12 +17,12 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { FlyByState, MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
+import { FlyByState, type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { UniverseObjectId, universeObjectIdEquals } from "@/backend/universe/universeObjectId";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
@@ -31,8 +31,8 @@ import { parseDistance } from "@/utils/strings/parseToStrings";
 import i18n from "@/i18n";
 
 import { getGoToSystemInstructions } from "../../../common";
-import { MissionContext } from "../../../missionContext";
-import { MissionNode } from "../../missionNode";
+import { type MissionContext } from "../../../missionContext";
+import { type MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
 
 /**

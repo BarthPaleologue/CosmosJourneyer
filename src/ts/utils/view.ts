@@ -1,4 +1,4 @@
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 /**
  * A view is a super set of a scene. In order to prevent interactions between post-processes and the GUI, we actually

@@ -18,9 +18,9 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateCylinder, type Mesh } from "@babylonjs/core/Meshes";
+import { type Scene } from "@babylonjs/core/scene";
 
 export class ThickLines {
     private readonly name: string;

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { IDisposable } from "@babylonjs/core/scene";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type IDisposable } from "@babylonjs/core/scene";
 
 export interface IPatch extends IDisposable {
     /**

@@ -18,9 +18,9 @@
 import { TransformNode } from "@babylonjs/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ObjectTargetCursorType, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 
-import { ILandingPad, LandingPadManager, LandingPadSize, LandingRequest } from "./landingPadManager";
+import { LandingPadManager, LandingPadSize, type ILandingPad, type LandingRequest } from "./landingPadManager";
 
 vi.mock("@babylonjs/core");
 

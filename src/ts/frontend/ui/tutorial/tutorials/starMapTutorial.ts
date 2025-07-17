@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import type AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
+import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
-import { safeParseSave, Save } from "@/backend/save/saveFileData";
-import { SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { safeParseSave, type Save } from "@/backend/save/saveFileData";
+import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -32,12 +32,12 @@ import {
     dPadCompositeToString,
     pressInteractionToStrings,
 } from "@/utils/strings/inputControlsString";
-import { Result } from "@/utils/types";
+import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
-import { Tutorial } from "./tutorial";
+import { type Tutorial } from "./tutorial";
 
 import controlsImgSrc from "@assets/tutorials/starMapTutorial/controls.webp";
 import coverImgSrc from "@assets/tutorials/starMapTutorial/cover.webp";

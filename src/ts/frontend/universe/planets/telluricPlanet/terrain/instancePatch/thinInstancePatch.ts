@@ -17,9 +17,9 @@
 
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 
-import { IPatch } from "./iPatch";
+import { type IPatch } from "./iPatch";
 
 export class ThinInstancePatch implements IPatch {
     readonly matrixBuffer: Float32Array;

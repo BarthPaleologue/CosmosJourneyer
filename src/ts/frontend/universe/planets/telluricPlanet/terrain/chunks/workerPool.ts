@@ -17,7 +17,7 @@
 
 import { PriorityQueue } from "@/utils/priorityQueue";
 
-import { BuildTask } from "./taskTypes";
+import { type BuildTask } from "./taskTypes";
 
 /*export class BuildTaskQueue {
     array: ArrayBuffer

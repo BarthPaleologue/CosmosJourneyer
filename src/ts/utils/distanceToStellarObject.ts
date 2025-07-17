@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectModel, StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalObjectModel, type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { DeepReadonly } from "./types";
+import { type DeepReadonly } from "./types";
 
 export function getDistancesToStellarObjects(
     object: DeepReadonly<OrbitalObjectModel>,

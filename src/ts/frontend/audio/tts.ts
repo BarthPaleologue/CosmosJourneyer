@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
+import { type Sound } from "@babylonjs/core/Audio/sound";
 
-import { SpeakerVoiceLines, VoiceLines } from "@/frontend/assets/audio/voiceLines";
+import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
 
 export const enum Speaker {
     CHARLOTTE,

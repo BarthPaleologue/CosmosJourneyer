@@ -15,20 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Material } from "@babylonjs/core/Materials/material";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh, MeshBuilder } from "@babylonjs/core/Meshes";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { MeshBuilder, type Mesh } from "@babylonjs/core/Meshes";
+import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Scene } from "@babylonjs/core/scene";
+import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { createEnvironmentAggregate } from "@/utils/havok";
 

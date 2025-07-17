@@ -18,10 +18,10 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 
 import { findMinimumNewtonRaphson } from "../math";
-import { DeepReadonly } from "../types";
+import { type DeepReadonly } from "../types";
 import { G } from "./constants";
 
 export function getSemiMajorAxis(periapsis: number, apoapsis: number) {

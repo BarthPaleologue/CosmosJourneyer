@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 
-import { Direction, getQuaternionFromDirection } from "./direction";
+import { getQuaternionFromDirection, type Direction } from "./direction";
 
 /**
  * Returns the node position in plane space

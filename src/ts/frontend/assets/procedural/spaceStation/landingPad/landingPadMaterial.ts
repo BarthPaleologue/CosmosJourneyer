@@ -18,10 +18,10 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
-import { PBRTextures } from "@/frontend/assets/textures/materials";
+import { type LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 import {
     add,

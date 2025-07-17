@@ -17,12 +17,12 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 

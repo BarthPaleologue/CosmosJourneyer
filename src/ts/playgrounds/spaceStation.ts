@@ -15,17 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";

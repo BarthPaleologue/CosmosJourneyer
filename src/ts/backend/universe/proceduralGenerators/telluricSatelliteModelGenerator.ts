@@ -18,13 +18,13 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt } from "extended-random";
 
-import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
-import { CloudsModel, newCloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
-import { OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
+import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";

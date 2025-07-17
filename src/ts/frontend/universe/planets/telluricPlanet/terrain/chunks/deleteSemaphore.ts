@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PlanetChunk } from "./planetChunk";
+import { type PlanetChunk } from "./planetChunk";
 
 /**
  * The DeleteSemaphore is responsible to delete chunk only when replacements are created to avoid holes in the surface of planets

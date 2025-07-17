@@ -17,13 +17,13 @@
 
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { type TransformNode } from "@babylonjs/core/Meshes";
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { MissionContext } from "@/frontend/missions/missionContext";
-import { Player } from "@/frontend/player/player";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type MissionContext } from "@/frontend/missions/missionContext";
+import { type Player } from "@/frontend/player/player";
 
 import { smoothstep } from "@/utils/math";
 import { parseSpeed } from "@/utils/strings/parseToStrings";

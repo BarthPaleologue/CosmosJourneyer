@@ -15,15 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion } from "@babylonjs/core/Maths/math";
+import { type Quaternion } from "@babylonjs/core/Maths/math";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
-import { Asteroid } from "@/frontend/assets/objects/asteroids";
+import { type Asteroid } from "@/frontend/assets/objects/asteroids";
 
 export class AsteroidPatch {
     readonly parent: TransformNode;

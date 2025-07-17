@@ -1,8 +1,8 @@
-import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { ok, Result } from "@/utils/types";
+import { ok, type Result } from "@/utils/types";
 
-import { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
+import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
     readonly backends: EncyclopaediaGalactica[] = [];

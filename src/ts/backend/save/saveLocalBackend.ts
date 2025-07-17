@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { jsonSafeParse } from "@/utils/json";
-import { err, ok, Result } from "@/utils/types";
+import { err, ok, type Result } from "@/utils/types";
 
-import { CmdrSaves, parseSaveArray, Save, SavesSchema } from "./saveFileData";
-import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
-import { SaveBackend } from "./saveManager";
+import { parseSaveArray, SavesSchema, type CmdrSaves, type Save } from "./saveFileData";
+import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
+import { type SaveBackend } from "./saveManager";
 
 export class SaveLocalBackend implements SaveBackend {
     public static readonly SAVES_KEY = "saves";

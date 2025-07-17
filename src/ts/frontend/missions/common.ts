@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
@@ -11,7 +11,7 @@ import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 
-import { MissionContext } from "./missionContext";
+import { type MissionContext } from "./missionContext";
 
 export function getGoToSystemInstructions(
     missionContext: MissionContext,

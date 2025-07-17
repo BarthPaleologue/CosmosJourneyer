@@ -21,11 +21,11 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import {
     LandMissionState,
-    MissionTerminatorLandingNodeSerialized,
+    type MissionTerminatorLandingNodeSerialized,
 } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { UniverseObjectId, universeObjectIdEquals } from "@/backend/universe/universeObjectId";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
@@ -34,8 +34,8 @@ import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
-import { MissionContext } from "../../../missionContext";
-import { MissionNode } from "../../missionNode";
+import { type MissionContext } from "../../../missionContext";
+import { type MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
 
 /**

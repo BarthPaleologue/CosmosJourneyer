@@ -19,18 +19,18 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalObjectModel } from "./orbitalObjects/index";
+import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
-import { getObjectModelById, StarSystemModel } from "./starSystemModel";
+import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
 
 /**
  * The StarSystemDatabase defines the content of the universe.

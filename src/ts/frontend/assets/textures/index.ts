@@ -18,17 +18,17 @@
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
 
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
+import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { GasPlanetTextures, loadGasPlanetTextures } from "./gasPlanet";
-import { AllMaterialTextures, loadMaterialTextures } from "./materials";
-import { loadParticleTextures, ParticleTextures } from "./particles";
-import { loadRingsTextures, RingsTextures } from "./rings";
-import { AllTerrainTextures, loadTerrainTextures } from "./terrains";
-import { createTexturePools, TexturePools } from "./texturePools";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadGasPlanetTextures, type GasPlanetTextures } from "./gasPlanet";
+import { loadMaterialTextures, type AllMaterialTextures } from "./materials";
+import { loadParticleTextures, type ParticleTextures } from "./particles";
+import { loadRingsTextures, type RingsTextures } from "./rings";
+import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
+import { createTexturePools, type TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 
 import empty from "@assets/oneBlackPixel.webp";

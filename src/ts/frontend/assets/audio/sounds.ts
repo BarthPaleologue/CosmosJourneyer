@@ -18,10 +18,10 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
+import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 import menuHoverSoundPath from "@assets/sound/166186__drminky__menu-screen-mouse-over.mp3";
 import disableWarpDriveSoundPath from "@assets/sound/204418__nhumphrey__large-engine.mp3";

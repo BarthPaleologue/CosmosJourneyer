@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { CanHaveRings } from "./canHaveRings";
-import { OrbitalObjectBase } from "./orbitalObjectBase";
-import { Targetable } from "./targetable";
+import { type CanHaveRings } from "./canHaveRings";
+import { type OrbitalObjectBase } from "./orbitalObjectBase";
+import { type Targetable } from "./targetable";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings)

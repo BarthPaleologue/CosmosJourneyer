@@ -18,15 +18,15 @@
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { translate } from "@/frontend/uberCore/transforms/basicTransform";
-import { UberScene } from "@/frontend/uberCore/uberScene";
+import { type UberScene } from "@/frontend/uberCore/uberScene";
 import {
     getOrbitalPosition,
     getRotationAngle,
@@ -38,22 +38,22 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { SystemTarget } from "@/utils/systemTarget";
-import { DeepReadonly, NonEmptyArray } from "@/utils/types";
+import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import {
-    Anomaly,
-    CelestialBody,
-    OrbitalFacility,
-    OrbitalObject,
-    Planet,
-    StellarObject,
+    type Anomaly,
+    type CelestialBody,
+    type OrbitalFacility,
+    type OrbitalObject,
+    type Planet,
+    type StellarObject,
 } from "./architecture/orbitalObject";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
-import { ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
+import { type ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
 import { StarFieldBox } from "./starFieldBox";
-import { StarSystemLoader } from "./starSystemLoader";
+import { type StarSystemLoader } from "./starSystemLoader";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.

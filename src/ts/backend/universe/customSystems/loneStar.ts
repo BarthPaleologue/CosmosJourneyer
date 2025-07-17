@@ -18,7 +18,7 @@
 import { Faction } from "@/backend/society/factions";
 import { OrbitSchema } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { CropType } from "@/utils/agriculture";
 import { SolarMass, SolarRadius } from "@/utils/physics/constants";

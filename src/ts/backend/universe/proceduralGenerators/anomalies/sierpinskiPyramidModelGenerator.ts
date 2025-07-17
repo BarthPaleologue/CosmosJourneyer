@@ -19,9 +19,9 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRange } from "extended-random";
 
-import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
-import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
+import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { GenerationSteps } from "@/utils/generationSteps";

@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { AiSpaceshipControls } from "@/frontend/spaceship/aiSpaceshipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 

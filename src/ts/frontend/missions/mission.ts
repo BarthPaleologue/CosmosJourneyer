@@ -15,16 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionSerialized, MissionType } from "@/backend/missions/missionSerialized";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import i18n from "@/i18n";
 
-import { MissionContext } from "./missionContext";
+import { type MissionContext } from "./missionContext";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { MissionNode } from "./nodes/missionNode";
+import { type MissionNode } from "./nodes/missionNode";
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.

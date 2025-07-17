@@ -18,11 +18,11 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { ProceduralRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { type ProceduralRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import ringsPatternLutCode from "@shaders/textures/ringsPatternLUT.glsl";
 

@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { type PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { Scene } from "@babylonjs/core/scene";
+import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 

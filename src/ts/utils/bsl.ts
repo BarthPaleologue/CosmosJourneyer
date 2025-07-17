@@ -62,9 +62,9 @@ import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
-import { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { type NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,

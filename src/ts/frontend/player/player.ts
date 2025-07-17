@@ -17,18 +17,18 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { CompletedTutorials, Itinerary, SerializedPlayer } from "@/backend/player/serializedPlayer";
-import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { type CompletedTutorials, type Itinerary, type SerializedPlayer } from "@/backend/player/serializedPlayer";
+import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, type SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Mission } from "@/frontend/missions/mission";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { type Spaceship } from "@/frontend/spaceship/spaceship";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 export class Player {
     uuid: string;

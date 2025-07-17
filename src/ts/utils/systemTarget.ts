@@ -1,16 +1,16 @@
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, type Matrix } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { ObjectTargetCursorType, Targetable } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType, type Targetable } from "@/frontend/universe/architecture/targetable";
 
 import i18n from "@/i18n";
 
 import { lightYearsToMeters } from "./physics/unitConversions";
-import { DeepReadonly } from "./types";
+import { type DeepReadonly } from "./types";
 
 export class SystemTarget implements Targetable {
     readonly name: string;

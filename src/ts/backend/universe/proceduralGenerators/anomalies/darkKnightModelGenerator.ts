@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
-import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { type DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
+import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthMass } from "@/utils/physics/constants";

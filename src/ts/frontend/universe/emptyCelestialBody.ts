@@ -17,16 +17,16 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
-import { CelestialBodyBase } from "./architecture/celestialBody";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "./architecture/targetable";
+import { type CelestialBodyBase } from "./architecture/celestialBody";
+import { defaultTargetInfoCelestialBody, type TargetInfo } from "./architecture/targetable";
 
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
     readonly model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>;

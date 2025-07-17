@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
-import { Direction } from "@/utils/direction";
+import { type Direction } from "@/utils/direction";
 
-import { TaskType } from "./taskTypes";
+import { type TaskType } from "./taskTypes";
 
 export type WorkerData = {
     taskType: TaskType;

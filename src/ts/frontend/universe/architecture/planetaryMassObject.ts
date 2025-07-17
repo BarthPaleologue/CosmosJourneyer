@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { CelestialBodyBase } from "./celestialBody";
+import { type CelestialBodyBase } from "./celestialBody";
 
 export interface PlanetaryMassObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T> {
     updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void;

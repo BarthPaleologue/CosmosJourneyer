@@ -17,15 +17,15 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { OrbitalFacilityModel, OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

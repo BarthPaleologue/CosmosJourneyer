@@ -20,7 +20,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ShipType } from "../spaceship/serializedSpaceship";
 import { getLoneStarSystem } from "../universe/customSystems/loneStar";
 import { StarSystemDatabase } from "../universe/starSystemDatabase";
-import { CmdrSaves } from "./saveFileData";
+import { type CmdrSaves } from "./saveFileData";
 import { SaveLocalBackend } from "./saveLocalBackend";
 
 describe("SaveLocalBackend", () => {

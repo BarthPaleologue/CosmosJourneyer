@@ -17,12 +17,12 @@
 
 import { z } from "zod";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
-import { OrbitalObjectModel } from "./orbitalObjects/index";
+import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjects/orbitalObjectId";
 import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
-import { StarSystemModel } from "./starSystemModel";
+import { type StarSystemModel } from "./starSystemModel";
 
 export const UniverseObjectIdSchema = z.object({
     idInSystem: OrbitalObjectIdSchema,

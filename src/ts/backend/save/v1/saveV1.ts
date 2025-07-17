@@ -20,10 +20,10 @@ import { z } from "zod";
 import { CompletedTutorialsSchema } from "@/backend/player/serializedPlayer";
 import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 
-import { err, ok, Result } from "@/utils/types";
+import { err, ok, type Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";
-import { SaveLoadingError, SaveLoadingErrorType } from "../saveLoadingError";
+import { SaveLoadingErrorType, type SaveLoadingError } from "../saveLoadingError";
 
 export enum SystemObjectType {
     STELLAR_OBJECT,

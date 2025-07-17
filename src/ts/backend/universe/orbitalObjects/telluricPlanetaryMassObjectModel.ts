@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+import { type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
-import { AtmosphereModel } from "./atmosphereModel";
-import { OceanModel } from "./oceanModel";
-import { CelestialBodyModelBase } from "./orbitalObjectModelBase";
-import { OrbitalObjectType } from "./orbitalObjectType";
+import { type AtmosphereModel } from "./atmosphereModel";
+import { type OceanModel } from "./oceanModel";
+import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
+import { type OrbitalObjectType } from "./orbitalObjectType";
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
     readonly waterAmount: number;

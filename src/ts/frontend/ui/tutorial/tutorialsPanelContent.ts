@@ -23,7 +23,7 @@ import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { Tutorial } from "./tutorials/tutorial";
+import { type Tutorial } from "./tutorials/tutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;

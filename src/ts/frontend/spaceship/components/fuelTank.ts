@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getFuelTankSpecs, SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
+import { getFuelTankSpecs, type SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
 
 export class FuelTank {
     readonly type;

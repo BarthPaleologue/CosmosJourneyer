@@ -19,8 +19,8 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { Scene } from "@babylonjs/core/scene";
-import HavokPhysics, { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { type Scene } from "@babylonjs/core/scene";
+import HavokPhysics, { type HavokPhysicsWithBindings } from "@babylonjs/havok";
 
 export async function enablePhysics(scene: Scene, gravity = Vector3.Zero(), havokInstance?: HavokPhysicsWithBindings) {
     const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));

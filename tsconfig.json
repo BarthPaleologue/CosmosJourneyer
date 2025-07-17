@@ -37,6 +37,9 @@
         "isolatedModules": true,
         "skipLibCheck": true, // disable if you run into lib-type mismatches
         "resolveJsonModule": true,
+        "noUncheckedSideEffectImports": true,
+        "verbatimModuleSyntax": true,
+        "moduleDetection": "force",
 
         // Browser & ambient types
         "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],

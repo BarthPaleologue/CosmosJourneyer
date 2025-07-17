@@ -17,39 +17,39 @@
 
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { type PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
-import { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
+import { type PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 
-import { JuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModel";
-import { MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mandelboxModel";
-import { MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
-import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
-import { SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
+import { type JuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModel";
+import { type MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mandelboxModel";
+import { type MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
+import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
+import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { Textures } from "@/frontend/assets/textures";
-import { UberScene } from "@/frontend/uberCore/uberScene";
-import { CelestialBody, StellarObject } from "@/frontend/universe/architecture/orbitalObject";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { type Textures } from "@/frontend/assets/textures";
+import { type UberScene } from "@/frontend/uberCore/uberScene";
+import { type CelestialBody, type StellarObject } from "@/frontend/universe/architecture/orbitalObject";
+import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
+import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { type Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelboxPostProcess";
@@ -65,7 +65,7 @@ import { OceanPostProcess } from "./ocean/oceanPostProcess";
 import { PostProcessType } from "./postProcessTypes";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
-import { UpdatablePostProcess } from "./updatablePostProcess";
+import { type UpdatablePostProcess } from "./updatablePostProcess";
 import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
 /**

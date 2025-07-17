@@ -18,7 +18,7 @@
 import "@styles/index.scss";
 import "@babylonjs/inspector";
 
-import { Engine, PhysicsViewer, Scene, Tools } from "@babylonjs/core";
+import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
 
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 

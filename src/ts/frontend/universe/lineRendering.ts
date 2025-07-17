@@ -17,13 +17,13 @@
 
 import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Scene } from "@babylonjs/core/scene";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { RGBColor } from "@/utils/colors";
+import { type RGBColor } from "@/utils/colors";
 
 export type CreateLinesMeshFunction = (
     name: string,

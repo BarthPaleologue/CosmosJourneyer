@@ -15,30 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Scene } from "@babylonjs/core/scene";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Matrix } from "@babylonjs/core/Maths/math";
+import { type Scene } from "@babylonjs/core/scene";
 import { centeredRand } from "extended-random";
 
-import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
-import { AllTerrainTextures } from "@/frontend/assets/textures/terrains";
+import { type AllTerrainTextures } from "@/frontend/assets/textures/terrains";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { ItemPool } from "@/utils/itemPool";
+import { type ItemPool } from "@/utils/itemPool";
 import { createEmptyTexture } from "@/utils/proceduralTexture";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { ColorMode } from "./colorSettingsInterface";
-import { TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
+import { type TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 
 import surfaceMaterialFragment from "@shaders/telluricPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "@shaders/telluricPlanetMaterial/vertex.glsl";

@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { AudioAssets, loadAudioAssets } from "./audio";
-import { ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { loadRenderingAssets, RenderingAssets } from "./renderingAssets";
+import { loadAudioAssets, type AudioAssets } from "./audio";
+import { type ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { loadRenderingAssets, type RenderingAssets } from "./renderingAssets";
 
 export type Assets = {
     readonly audio: Readonly<AudioAssets>;
