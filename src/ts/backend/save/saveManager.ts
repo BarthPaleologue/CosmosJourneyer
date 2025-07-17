@@ -42,11 +42,25 @@ export interface SaveBackend {
     read(starSystemDatabase: StarSystemDatabase): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>>;
 }
 
+export interface ISaveManager {
+    /**
+     * Retrieves saves for a specific commander.
+     * @param cmdrId - The commander identifier string
+     * @returns The commander's saves, or undefined if none exist
+     */
+    getSavesForCmdr(cmdrId: string): Promise<CmdrSaves | undefined>;
+    deleteSaveForCmdr(cmdrUuid: string, save: Save): Promise<void>;
+    deleteCmdr(cmdrUuid: string): Promise<void>;
+    getCmdrUuids(): Promise<Array<string>>;
+    addManualSave(cmdrUuid: string, save: Save): Promise<boolean>;
+    addAutoSave(cmdrUuid: string, save: Save): Promise<boolean>;
+}
+
 /**
  * Manages save data for the game, handling reading, writing, and
  * retrieving commander-specific saves through a storage backend.
  */
-export class SaveManager {
+export class SaveManager implements ISaveManager {
     /**
      * The storage backend used for persisting save data
      * @private
@@ -97,13 +111,8 @@ export class SaveManager {
         return ok(new SaveManager(backend, savesMap));
     }
 
-    /**
-     * Retrieves saves for a specific commander.
-     * @param cmdrId - The commander identifier string
-     * @returns The commander's saves, or undefined if none exist
-     */
-    public getSavesForCmdr(cmdrId: string): CmdrSaves | undefined {
-        return this.saves.get(cmdrId);
+    public getSavesForCmdr(cmdrId: string): Promise<CmdrSaves | undefined> {
+        return Promise.resolve(this.saves.get(cmdrId));
     }
 
     /**
@@ -127,16 +136,16 @@ export class SaveManager {
         this.save();
     }
 
-    public deleteSaveForCmdr(cmdrUuid: string, save: Save): void {
+    public deleteSaveForCmdr(cmdrUuid: string, save: Save): Promise<void> {
         const cmdrSaves = this.saves.get(cmdrUuid);
         if (cmdrSaves === undefined) {
-            return;
+            return Promise.resolve();
         }
 
         const manualIndex = cmdrSaves.manual.findIndex((s) => s === save);
         if (manualIndex !== -1) {
             cmdrSaves.manual.splice(manualIndex, 1);
-            return;
+            return Promise.resolve();
         }
 
         const autoIndex = cmdrSaves.auto.findIndex((s) => s === save);
@@ -145,19 +154,23 @@ export class SaveManager {
         }
 
         this.save();
+
+        return Promise.resolve();
     }
 
-    public deleteCmdr(cmdrUuid: string): void {
+    public deleteCmdr(cmdrUuid: string): Promise<void> {
         this.saves.delete(cmdrUuid);
         this.save();
+
+        return Promise.resolve();
     }
 
-    public getCmdrUuids(): string[] {
-        return [...this.saves.keys()];
+    public getCmdrUuids(): Promise<string[]> {
+        return Promise.resolve([...this.saves.keys()]);
     }
 
-    public addManualSave(cmdrUuid: string, save: Save) {
-        const cmdrSaves = this.getSavesForCmdr(cmdrUuid) ?? { manual: [], auto: [] };
+    public async addManualSave(cmdrUuid: string, save: Save) {
+        const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
         cmdrSaves.manual.unshift(save);
 
         this.saves.set(cmdrUuid, cmdrSaves);
@@ -165,8 +178,8 @@ export class SaveManager {
         return this.save();
     }
 
-    public addAutoSave(cmdrUuid: string, save: Save) {
-        const cmdrSaves = this.getSavesForCmdr(cmdrUuid) ?? { manual: [], auto: [] };
+    public async addAutoSave(cmdrUuid: string, save: Save) {
+        const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
         cmdrSaves.auto.unshift(save);
 
         while (cmdrSaves.auto.length > Settings.MAX_AUTO_SAVES) {
