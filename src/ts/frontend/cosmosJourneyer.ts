@@ -347,7 +347,7 @@ export class CosmosJourneyer {
             });
         });
         this.pauseMenu.onSave.add(async () => {
-            const saveSuccess = await this.saveToLocalStorage();
+            const saveSuccess = await this.save();
             if (saveSuccess)
                 createNotification(
                     NotificationOrigin.GENERAL,
@@ -772,7 +772,7 @@ export class CosmosJourneyer {
         };
     }
 
-    public async saveToLocalStorage(): Promise<boolean> {
+    public async save(): Promise<boolean> {
         if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
         if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
             this.player.uuid = crypto.randomUUID();
