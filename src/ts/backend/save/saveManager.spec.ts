@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -121,8 +121,8 @@ describe("SaveManager", () => {
 
             expect(result.success).toBe(true);
             if (result.success) {
-                expect(result.value.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
-                expect(result.value.getSavesForCmdr("cmdr2")).toEqual(testSaves["cmdr2"]);
+                expect(await result.value.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
+                expect(await result.value.getSavesForCmdr("cmdr2")).toEqual(testSaves["cmdr2"]);
             }
         });
 
@@ -133,7 +133,7 @@ describe("SaveManager", () => {
 
             expect(result.success).toBe(true);
             if (result.success) {
-                expect(result.value.getSavesForCmdr("cmdr1")).toBeUndefined();
+                expect(await result.value.getSavesForCmdr("cmdr1")).toBeUndefined();
             }
         });
 
@@ -159,7 +159,7 @@ describe("SaveManager", () => {
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
-                expect(manager.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
+                expect(await manager.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
             }
         });
 
@@ -171,7 +171,7 @@ describe("SaveManager", () => {
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
-                expect(manager.getSavesForCmdr("nonexistent")).toBeUndefined();
+                expect(await manager.getSavesForCmdr("nonexistent")).toBeUndefined();
             }
         });
     });
@@ -208,11 +208,11 @@ describe("SaveManager", () => {
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(99999);
-                const originalLength = manager.getSavesForCmdr("cmdr1")?.manual.length ?? 0;
-                const saveResult = manager.addManualSave("cmdr1", newSave);
+                const originalLength = (await manager.getSavesForCmdr("cmdr1"))?.manual.length ?? 0;
+                const saveResult = await manager.addManualSave("cmdr1", newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = manager.getSavesForCmdr("cmdr1");
+                const cmdrSaves = await manager.getSavesForCmdr("cmdr1");
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.manual).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.manual[0]?.timestamp).toBe(99999); // Should be at the beginning (unshift)
@@ -231,10 +231,10 @@ describe("SaveManager", () => {
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(11111);
-                const saveResult = manager.addManualSave("newCmdr", newSave);
+                const saveResult = await manager.addManualSave("newCmdr", newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = manager.getSavesForCmdr("newCmdr");
+                const cmdrSaves = await manager.getSavesForCmdr("newCmdr");
                 expect(cmdrSaves?.manual).toHaveLength(1);
                 expect(cmdrSaves?.manual[0]).toEqual(newSave);
                 expect(cmdrSaves?.auto).toHaveLength(0);
@@ -251,13 +251,13 @@ describe("SaveManager", () => {
 
             if (result.success) {
                 const manager = result.value;
-                const originalLength = manager.getSavesForCmdr("cmdr1")?.manual.length ?? 0;
+                const originalLength = (await manager.getSavesForCmdr("cmdr1"))?.manual.length ?? 0;
                 const newSave = createTestSave(55555);
-                const saveResult = manager.addManualSave("cmdr1", newSave);
+                const saveResult = await manager.addManualSave("cmdr1", newSave);
 
                 expect(saveResult).toBe(false);
                 // Save should still be added to memory even if backend write fails
-                const cmdrSaves = manager.getSavesForCmdr("cmdr1");
+                const cmdrSaves = await manager.getSavesForCmdr("cmdr1");
                 expect(cmdrSaves?.manual).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.manual[0]?.timestamp).toBe(55555);
             }
@@ -296,11 +296,11 @@ describe("SaveManager", () => {
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(88888);
-                const originalLength = manager.getSavesForCmdr("cmdr2")?.auto.length ?? 0;
-                const saveResult = manager.addAutoSave("cmdr2", newSave);
+                const originalLength = (await manager.getSavesForCmdr("cmdr2"))?.auto.length ?? 0;
+                const saveResult = await manager.addAutoSave("cmdr2", newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = manager.getSavesForCmdr("cmdr2");
+                const cmdrSaves = await manager.getSavesForCmdr("cmdr2");
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.auto[0]?.timestamp).toBe(88888); // Should be at the beginning (unshift)
@@ -319,10 +319,10 @@ describe("SaveManager", () => {
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(22222);
-                const saveResult = manager.addAutoSave("newCmdr", newSave);
+                const saveResult = await manager.addAutoSave("newCmdr", newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = manager.getSavesForCmdr("newCmdr");
+                const cmdrSaves = await manager.getSavesForCmdr("newCmdr");
                 expect(cmdrSaves?.auto).toHaveLength(1);
                 expect(cmdrSaves?.auto[0]).toEqual(newSave);
                 expect(cmdrSaves?.manual).toHaveLength(0);
@@ -351,10 +351,10 @@ describe("SaveManager", () => {
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(6);
-                const saveResult = manager.addAutoSave("cmdr3", newSave);
+                const saveResult = await manager.addAutoSave("cmdr3", newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = manager.getSavesForCmdr("cmdr3");
+                const cmdrSaves = await manager.getSavesForCmdr("cmdr3");
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(5); // Should still be 5
                 expect(cmdrSaves?.auto[0]?.timestamp).toBe(6); // New save at beginning
@@ -375,11 +375,11 @@ describe("SaveManager", () => {
 
                 // Add 7 auto saves (more than the limit of 5)
                 for (let i = 1; i <= 7; i++) {
-                    const saveResult = manager.addAutoSave("testCmdr", createTestSave(i));
+                    const saveResult = await manager.addAutoSave("testCmdr", createTestSave(i));
                     expect(saveResult).toBe(true);
                 }
 
-                const cmdrSaves = manager.getSavesForCmdr("testCmdr");
+                const cmdrSaves = await manager.getSavesForCmdr("testCmdr");
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(5); // Should be limited to 5
 
@@ -408,13 +408,13 @@ describe("SaveManager", () => {
 
             if (result.success) {
                 const manager = result.value;
-                const originalLength = manager.getSavesForCmdr("cmdr2")?.auto.length ?? 0;
+                const originalLength = (await manager.getSavesForCmdr("cmdr2"))?.auto.length ?? 0;
                 const newSave = createTestSave(77777);
-                const saveResult = manager.addAutoSave("cmdr2", newSave);
+                const saveResult = await manager.addAutoSave("cmdr2", newSave);
 
                 expect(saveResult).toBe(false);
                 // Save should still be added to memory even if backend write fails
-                const cmdrSaves = manager.getSavesForCmdr("cmdr2");
+                const cmdrSaves = await manager.getSavesForCmdr("cmdr2");
                 expect(cmdrSaves?.auto).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.auto[0]?.timestamp).toBe(77777);
             }

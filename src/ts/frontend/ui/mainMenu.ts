@@ -144,8 +144,8 @@ export class MainMenu {
         const loadSaveButton = document.getElementById("loadSaveButton");
         if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
 
-        loadSaveButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+        loadSaveButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
 
         this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(() => {
@@ -155,38 +155,38 @@ export class MainMenu {
         const settingsButton = document.getElementById("settingsButton");
         if (settingsButton === null) throw new Error("#settingsButton does not exist!");
 
-        settingsButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+        settingsButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
 
         const tutorialsButton = document.getElementById("tutorialsButton");
         if (tutorialsButton === null) throw new Error("#tutorialsButton does not exist!");
 
-        tutorialsButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+        tutorialsButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
 
         const contributeButton = document.getElementById("contributeButton");
         if (contributeButton === null) throw new Error("#contributeButton does not exist!");
 
-        contributeButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
+        contributeButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
             this.onContributeObservable.notifyObservers();
         });
 
         const creditsButton = document.getElementById("creditsButton");
         if (creditsButton === null) throw new Error("#creditsButton does not exist!");
 
-        creditsButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.CREDITS);
+        creditsButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.CREDITS);
             this.onCreditsObservable.notifyObservers();
         });
 
         const aboutButton = document.getElementById("aboutButton");
         if (aboutButton === null) throw new Error("#aboutButton does not exist!");
 
-        aboutButton.addEventListener("click", () => {
-            this.sidePanels.toggleActivePanel(PanelType.ABOUT);
+        aboutButton.addEventListener("click", async () => {
+            await this.sidePanels.toggleActivePanel(PanelType.ABOUT);
             this.onAboutObservable.notifyObservers();
         });
     }

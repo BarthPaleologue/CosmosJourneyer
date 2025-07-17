@@ -102,14 +102,14 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
+    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
         this.cmdrList.innerHTML = "";
 
-        const cmdrUuids = saveManager.getCmdrUuids();
+        const cmdrUuids = await saveManager.getCmdrUuids();
 
         const flatSortedSaves: Map<string, Save[]> = new Map();
         for (const uuid of cmdrUuids) {
-            const cmdrSaves = saveManager.getSavesForCmdr(uuid);
+            const cmdrSaves = await saveManager.getSavesForCmdr(uuid);
             if (cmdrSaves === undefined) continue;
             flatSortedSaves.set(uuid, cmdrSaves.manual.concat(cmdrSaves.auto));
         }
@@ -126,8 +126,8 @@ export class SaveLoadingPanelContent {
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
-        cmdrUuids.forEach((cmdrUuid) => {
-            const cmdrSaves = saveManager.getSavesForCmdr(cmdrUuid);
+        for (const cmdrUuid of cmdrUuids) {
+            const cmdrSaves = await saveManager.getSavesForCmdr(cmdrUuid);
             if (cmdrSaves === undefined) {
                 return;
             }
@@ -272,7 +272,7 @@ export class SaveLoadingPanelContent {
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
-        });
+        }
     }
 
     private createSaveDiv(
@@ -398,13 +398,13 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
             if (!shouldProceed) return;
 
-            saveManager.deleteSaveForCmdr(save.player.uuid, save);
+            await saveManager.deleteSaveForCmdr(save.player.uuid, save);
 
-            const cmdrSaves = saveManager.getSavesForCmdr(save.player.uuid);
+            const cmdrSaves = await saveManager.getSavesForCmdr(save.player.uuid);
             if (cmdrSaves === undefined) return;
 
             if (cmdrSaves.auto.length === 0 && cmdrSaves.manual.length === 0) {
-                saveManager.deleteCmdr(save.player.uuid);
+                await saveManager.deleteCmdr(save.player.uuid);
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
