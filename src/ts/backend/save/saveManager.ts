@@ -19,6 +19,8 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { ok, type Result } from "@/utils/types";
 
+import { Settings } from "@/settings";
+
 import { type CmdrSaves, type Save } from "./saveFileData";
 import { type SaveLoadingError } from "./saveLoadingError";
 
@@ -108,7 +110,7 @@ export class SaveManager {
      * Persists the current saves to the storage backend.
      * @returns Boolean indicating success or failure of the save operation
      */
-    public save(): boolean {
+    private save(): boolean {
         const savesJson = Object.fromEntries(this.saves);
         return this.backend.write(savesJson);
     }
@@ -121,6 +123,8 @@ export class SaveManager {
 
         cmdrSaves.manual.forEach((save) => (save.player.name = newName));
         cmdrSaves.auto.forEach((save) => (save.player.name = newName));
+
+        this.save();
     }
 
     public deleteSaveForCmdr(cmdrUuid: string, save: Save): void {
@@ -139,17 +143,38 @@ export class SaveManager {
         if (autoIndex !== -1) {
             cmdrSaves.auto.splice(autoIndex, 1);
         }
+
+        this.save();
     }
 
     public deleteCmdr(cmdrUuid: string): void {
         this.saves.delete(cmdrUuid);
+        this.save();
     }
 
     public getCmdrUuids(): string[] {
         return [...this.saves.keys()];
     }
 
-    public setCmdrSaves(cmdrUuid: string, cmdrSaves: CmdrSaves): void {
+    public addManualSave(cmdrUuid: string, save: Save) {
+        const cmdrSaves = this.getSavesForCmdr(cmdrUuid) ?? { manual: [], auto: [] };
+        cmdrSaves.manual.unshift(save);
+
         this.saves.set(cmdrUuid, cmdrSaves);
+
+        return this.save();
+    }
+
+    public addAutoSave(cmdrUuid: string, save: Save) {
+        const cmdrSaves = this.getSavesForCmdr(cmdrUuid) ?? { manual: [], auto: [] };
+        cmdrSaves.auto.unshift(save);
+
+        while (cmdrSaves.auto.length > Settings.MAX_AUTO_SAVES) {
+            cmdrSaves.auto.pop(); // dequeue the oldest autosave
+        }
+
+        this.saves.set(cmdrUuid, cmdrSaves);
+
+        return this.save();
     }
 }
