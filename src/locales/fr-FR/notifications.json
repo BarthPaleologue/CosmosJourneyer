@@ -15,5 +15,6 @@
     "invalidStorageFormat": "Format de stockage invalide. Veuillez consulter la console pour plus d'informations.",
     "saveOk": "Sauvegardé avec succès dans le stockage local.",
     "cantSaveTutorial": "Impossible de sauvegarder pendant un tutoriel.",
-    "newDiscovery": "Découverte de {{objectName}}. Enregistrement des données effectuées."
+    "newDiscovery": "Découverte de {{objectName}}. Enregistrement des données effectuées.",
+    "unknownKeyboardLayout": "Impossible de détecter votre disposition de clavier. La disposition QWERTY sera utilisée par défaut."
 }

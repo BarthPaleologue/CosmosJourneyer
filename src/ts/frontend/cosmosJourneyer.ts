@@ -519,10 +519,7 @@ export class CosmosJourneyer {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
         if (keyboardLayoutMap === null) {
-            await alertModal(
-                "Your keyboard layout could not be detected. The QWERTY layout will be assumed by default.",
-                soundPlayer,
-            );
+            await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
         }
 
         const saveManagerCreateResult = await SaveManager.CreateAsync(new SaveLocalBackend(), starSystemDatabase);
