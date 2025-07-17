@@ -47,6 +47,8 @@ export default defineConfig([
             "@typescript-eslint/require-array-sort-compare": "error",
             "@typescript-eslint/strict-boolean-expressions": "error",
 
+            "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+
             "@typescript-eslint/no-misused-promises": [
                 "error",
                 {
