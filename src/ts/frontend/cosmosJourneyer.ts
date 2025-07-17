@@ -169,7 +169,6 @@ export class CosmosJourneyer {
         this.player = player;
         this.player.onNameChangedObservable.add((newName) => {
             this.saveManager.renameCmdr(this.player.uuid, newName);
-            this.saveManager.save();
         });
 
         this.starSystemDatabase = starSystemDatabase;
@@ -347,7 +346,7 @@ export class CosmosJourneyer {
             });
         });
         this.pauseMenu.onSave.add(async () => {
-            const saveSuccess = await this.save();
+            const saveSuccess = await this.createManualSave();
             if (saveSuccess)
                 createNotification(
                     NotificationOrigin.GENERAL,
@@ -772,7 +771,7 @@ export class CosmosJourneyer {
         };
     }
 
-    public async save(): Promise<boolean> {
+    public async createManualSave(): Promise<boolean> {
         if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
         if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
             this.player.uuid = crypto.randomUUID();
@@ -786,15 +785,9 @@ export class CosmosJourneyer {
         }
 
         const saveData = await this.generateSaveData();
-
-        // use player uuid as key to avoid overwriting other cmdr's save
         const uuid = saveData.player.uuid;
 
-        const cmdrSaves = this.saveManager.getSavesForCmdr(uuid) ?? { manual: [], auto: [] };
-        cmdrSaves.manual.unshift(saveData);
-
-        this.saveManager.setCmdrSaves(uuid, cmdrSaves);
-        return this.saveManager.save();
+        return this.saveManager.addManualSave(uuid, saveData);
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -815,15 +808,7 @@ export class CosmosJourneyer {
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
-        const cmdrSaves = this.saveManager.getSavesForCmdr(uuid) ?? { manual: [], auto: [saveData] };
-        cmdrSaves.auto.unshift(saveData); // enqueue the new autosave
-
-        while (cmdrSaves.auto.length > Settings.MAX_AUTO_SAVES) {
-            cmdrSaves.auto.pop(); // dequeue the oldest autosave
-        }
-
-        this.saveManager.setCmdrSaves(uuid, cmdrSaves);
-        this.saveManager.save();
+        this.saveManager.addAutoSave(uuid, saveData);
 
         this.autoSaveTimerSeconds = 0;
     }

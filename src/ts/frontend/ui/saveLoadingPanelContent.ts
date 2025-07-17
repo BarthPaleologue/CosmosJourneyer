@@ -233,8 +233,6 @@ export class SaveLoadingPanelContent {
                 saveManager.renameCmdr(cmdrUuid, newName);
 
                 cmdrName.innerText = newName;
-
-                saveManager.save();
             });
             cmdrHeaderButtons.appendChild(editNameButton);
 
@@ -411,8 +409,6 @@ export class SaveLoadingPanelContent {
             }
 
             saveDiv.remove();
-
-            saveManager.save();
         });
         saveButtons.appendChild(deleteButton);
 
