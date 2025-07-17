@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
+import { type MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
+import { type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import {
-    MissionAndNodeSerialized,
-    MissionNodeSerialized,
-    MissionOrNodeSerialized,
-    MissionSequenceNodeSerialized,
-    MissionXorNodeSerialized,
+    type MissionAndNodeSerialized,
+    type MissionNodeSerialized,
+    type MissionOrNodeSerialized,
+    type MissionSequenceNodeSerialized,
+    type MissionXorNodeSerialized,
 } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
@@ -35,7 +35,7 @@ import { MissionAndNode } from "./logic/missionAndNode";
 import { MissionOrNode } from "./logic/missionOrNode";
 import { MissionSequenceNode } from "./logic/missionSequenceNode";
 import { MissionXorNode } from "./logic/missionXorNode";
-import { MissionNode } from "./missionNode";
+import { type MissionNode } from "./missionNode";
 
 /**
  * Deserialize recursively a mission node.

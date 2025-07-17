@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, FreeCamera, Scene, Vector3 } from "@babylonjs/core";
+import { FreeCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";

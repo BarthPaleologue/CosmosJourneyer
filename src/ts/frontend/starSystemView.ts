@@ -17,35 +17,35 @@
 
 import "@babylonjs/core/Loading/loadingScreen";
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
-import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { ITts, Speaker, VoiceLine } from "@/frontend/audio/tts";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { Mission } from "@/frontend/missions/mission";
-import { MissionContext } from "@/frontend/missions/missionContext";
+import { type Mission } from "@/frontend/missions/mission";
+import { type MissionContext } from "@/frontend/missions/missionContext";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
@@ -57,17 +57,17 @@ import {
     setRotationQuaternion,
     translate,
 } from "@/frontend/uberCore/transforms/basicTransform";
-import { UberScene } from "@/frontend/uberCore/uberScene";
+import { type UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
-import { ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
+import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
@@ -80,17 +80,17 @@ import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
 import { SystemTarget } from "@/utils/systemTarget";
-import { DeepReadonly } from "@/utils/types";
-import { View } from "@/utils/view";
+import { type DeepReadonly } from "@/utils/types";
+import { type View } from "@/utils/view";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 import { AiPlayerControls } from "./player/aiPlayerControls";
-import { Player } from "./player/player";
+import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
-import { Transformable } from "./universe/architecture/transformable";
-import { TypedObject } from "./universe/architecture/typedObject";
+import { type Transformable } from "./universe/architecture/transformable";
+import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
 
 // register cosmos journeyer as part of window object

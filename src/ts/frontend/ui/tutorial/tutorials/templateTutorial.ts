@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { safeParseSave, Save } from "@/backend/save/saveFileData";
-import { SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { safeParseSave, type Save } from "@/backend/save/saveFileData";
+import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
-import { Result } from "@/utils/types";
+import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
-import { Tutorial } from "./tutorial";
+import { type Tutorial } from "./tutorial";
 
 import saveData from "@assets/tutorials/flightTutorial/save.json";
 import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";

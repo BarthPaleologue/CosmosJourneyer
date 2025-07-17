@@ -17,12 +17,12 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { PriorityQueue } from "@/utils/priorityQueue";
-import { err, ok, Result } from "@/utils/types";
+import { err, ok, type Result } from "@/utils/types";
 
 type Node = {
     coordinates: StarSystemCoordinates;

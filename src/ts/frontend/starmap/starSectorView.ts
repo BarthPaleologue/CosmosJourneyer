@@ -17,13 +17,13 @@
 
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

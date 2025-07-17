@@ -17,11 +17,11 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+import { type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 

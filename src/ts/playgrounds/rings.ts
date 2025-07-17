@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";

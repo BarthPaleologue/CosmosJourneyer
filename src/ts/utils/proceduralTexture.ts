@@ -18,7 +18,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 export function createEmptyTexture(scene: Scene) {
     const emptyTextureData = new Uint8Array([0, 0, 0, 0]); // RGBA

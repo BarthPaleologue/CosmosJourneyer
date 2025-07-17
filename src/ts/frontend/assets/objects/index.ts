@@ -23,16 +23,16 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeConvexHull, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { Materials } from "../materials";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
-import { Asteroid, loadAsteroids } from "./asteroids";
-import { Characters, loadCharacters } from "./characters";
+import { loadAsteroids, type Asteroid } from "./asteroids";
+import { loadCharacters, type Characters } from "./characters";
 import { loadAssetInContainerAsync } from "./utils";
 
 import bananaPath from "@assets/banana/banana.glb";

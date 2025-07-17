@@ -3,10 +3,10 @@ import { expect, test } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { DeepPartial } from "@/utils/types";
+import { type DeepPartial } from "@/utils/types";
 
 import { safeParseSave } from "../saveFileData";
-import { SaveV1 } from "./saveV1";
+import { type SaveV1 } from "./saveV1";
 
 test("Loading a correct save file", () => {
     const saveFileString: DeepPartial<SaveV1> = {

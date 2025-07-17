@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { OrbitalObjectType } from "../orbitalObjectType";
+import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectType } from "../orbitalObjectType";
 
 export type DarkKnightModel = CelestialBodyModelBase<OrbitalObjectType.DARK_KNIGHT>;

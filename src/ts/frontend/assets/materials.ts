@@ -18,12 +18,12 @@
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { ButterflyMaterial } from "./procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "./procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
-import { Textures } from "./textures";
+import { type Textures } from "./textures";
 
 export type Materials = {
     readonly butterfly: ButterflyMaterial;

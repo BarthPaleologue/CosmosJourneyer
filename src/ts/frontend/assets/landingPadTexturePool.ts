@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { Settings } from "@/settings";
 

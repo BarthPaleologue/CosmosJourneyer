@@ -19,26 +19,26 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { StarSystemView } from "@/frontend/starSystemView";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { type StarSystemView } from "@/frontend/starSystemView";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
 import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
-import { UberScene } from "@/frontend/uberCore/uberScene";
+import { type UberScene } from "@/frontend/uberCore/uberScene";
 
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 
 import packageInfo from "../../../../package.json";
-import { PanelType, SidePanels } from "./sidePanels";
+import { PanelType, type SidePanels } from "./sidePanels";
 
 export class MainMenu {
     readonly scene: UberScene;

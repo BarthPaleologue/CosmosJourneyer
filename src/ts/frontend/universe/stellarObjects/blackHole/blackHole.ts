@@ -17,19 +17,19 @@
 
 import { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
-import { StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { type StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
+import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 

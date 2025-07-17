@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom } from "extended-random";
 
 import { getFactionFromGalacticPosition } from "@/backend/society/factions";
-import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { CropType, CropTypes } from "@/utils/agriculture";
+import { CropTypes, type CropType } from "@/utils/agriculture";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";

@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
 
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";

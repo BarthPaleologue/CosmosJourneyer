@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 
-import { Itinerary } from "@/backend/player/serializedPlayer";
+import { type Itinerary } from "@/backend/player/serializedPlayer";
 
-import { StarSystemController } from "@/frontend/universe/starSystemController";
+import { type StarSystemController } from "@/frontend/universe/starSystemController";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 /**
  * Describes information used by mission nodes to update their state

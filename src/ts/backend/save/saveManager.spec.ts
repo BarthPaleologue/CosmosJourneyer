@@ -21,11 +21,11 @@ import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { err, ok, Result } from "@/utils/types";
+import { err, ok, type Result } from "@/utils/types";
 
-import { CmdrSaves } from "./saveFileData";
-import { SaveLoadingError, SaveLoadingErrorType } from "./saveLoadingError";
-import { SaveBackend, SaveManager } from "./saveManager";
+import { type CmdrSaves } from "./saveFileData";
+import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
+import { SaveManager, type SaveBackend } from "./saveManager";
 
 /**
  * Mock implementation of SaveBackend for testing

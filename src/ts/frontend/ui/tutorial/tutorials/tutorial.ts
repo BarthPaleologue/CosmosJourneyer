@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Save } from "@/backend/save/saveFileData";
-import { SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type Save } from "@/backend/save/saveFileData";
+import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { Result } from "@/utils/types";
+import { type Result } from "@/utils/types";
 
 export interface Tutorial {
     getTitle(): string;

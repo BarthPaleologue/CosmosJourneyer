@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DiscoveryScanner } from "./discoveryScanner";
-import { FuelScoop } from "./fuelScoop";
-import { FuelTank } from "./fuelTank";
+import { type DiscoveryScanner } from "./discoveryScanner";
+import { type FuelScoop } from "./fuelScoop";
+import { type FuelTank } from "./fuelTank";
 
 export type OptionalComponent = FuelTank | FuelScoop | DiscoveryScanner;

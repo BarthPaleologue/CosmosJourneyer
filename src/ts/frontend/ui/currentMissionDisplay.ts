@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { Mission } from "@/frontend/missions/mission";
-import { MissionContext } from "@/frontend/missions/missionContext";
-import { Player } from "@/frontend/player/player";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type Mission } from "@/frontend/missions/mission";
+import { type MissionContext } from "@/frontend/missions/missionContext";
+import { type Player } from "@/frontend/player/player";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";

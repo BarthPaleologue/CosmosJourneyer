@@ -15,19 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { type CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { type Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import { DarkKnight } from "../darkKnight";
-import { EmptyCelestialBody } from "../emptyCelestialBody";
-import { SpaceElevator } from "../orbitalFacility/spaceElevator";
-import { SpaceStation } from "../orbitalFacility/spaceStation";
-import { GasPlanet } from "../planets/gasPlanet/gasPlanet";
-import { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
+import { type DarkKnight } from "../darkKnight";
+import { type EmptyCelestialBody } from "../emptyCelestialBody";
+import { type SpaceElevator } from "../orbitalFacility/spaceElevator";
+import { type SpaceStation } from "../orbitalFacility/spaceStation";
+import { type GasPlanet } from "../planets/gasPlanet/gasPlanet";
+import { type TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 
 export type StellarObject = Star | NeutronStar | BlackHole;
 

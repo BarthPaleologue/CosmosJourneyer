@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Space } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { LocalDirection } from "../localDirections";
 

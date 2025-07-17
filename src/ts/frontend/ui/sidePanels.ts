@@ -1,9 +1,9 @@
-import { SaveManager } from "@/backend/save/saveManager";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type SaveManager } from "@/backend/save/saveManager";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import { MusicConductor } from "../audio/musicConductor";
+import { type MusicConductor } from "../audio/musicConductor";
 import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
 import { initSettingsPanel } from "./settingsPanel";
 import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";

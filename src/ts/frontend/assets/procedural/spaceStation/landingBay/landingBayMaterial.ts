@@ -18,11 +18,11 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 
-import { PBRTextures } from "@/frontend/assets/textures/materials";
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 import {
     abs,
@@ -52,7 +52,7 @@ import {
     vertexAttribute,
     xz,
 } from "@/utils/bsl";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -15,16 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
+import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 
 import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
@@ -33,9 +33,9 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-import { UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import mengerSpongeFragment from "@shaders/mengerSponge.glsl";
 

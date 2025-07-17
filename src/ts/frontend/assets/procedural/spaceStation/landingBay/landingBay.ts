@@ -18,16 +18,16 @@
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Scene } from "@babylonjs/core/scene";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { createRing } from "@/utils/geometry/ringBuilder";
@@ -35,7 +35,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { createEnvironmentAggregate } from "@/utils/havok";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";

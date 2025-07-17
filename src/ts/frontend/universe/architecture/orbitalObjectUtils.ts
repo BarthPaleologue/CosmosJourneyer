@@ -20,7 +20,7 @@ import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { getPointOnOrbit } from "@/utils/physics/orbit";
 
-import { OrbitalObject } from "./orbitalObject";
+import { type OrbitalObject } from "./orbitalObject";
 
 /**
  * Returns the position of the object on its orbit at a given time. This does not update the position of the object (see SetOrbitalPosition)

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import { OrbitalObjectType } from "../orbitalObjectType";
+import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectType } from "../orbitalObjectType";
 
 export type BlackHoleModel = OrbitalObjectModelBase<OrbitalObjectType.BLACK_HOLE> & {
     /**

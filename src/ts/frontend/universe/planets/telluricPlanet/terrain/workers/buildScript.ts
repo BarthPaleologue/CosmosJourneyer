@@ -19,8 +19,8 @@ import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-gen
 
 import { Settings } from "@/settings";
 
-import { ReturnedChunkData } from "../chunks/taskTypes";
-import { TransferBuildData } from "../chunks/workerDataTypes";
+import { type ReturnedChunkData } from "../chunks/taskTypes";
+import { type TransferBuildData } from "../chunks/workerDataTypes";
 
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;

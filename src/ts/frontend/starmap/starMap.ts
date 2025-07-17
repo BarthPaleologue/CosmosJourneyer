@@ -21,27 +21,27 @@ import "@babylonjs/core/Culling/ray";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { Scene } from "@babylonjs/core/scene";
 
-import { EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { Itinerary, ItinerarySchema } from "@/backend/player/serializedPlayer";
+import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type Player } from "@/frontend/player/player";
 import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
@@ -51,15 +51,15 @@ import { createNotification, NotificationIntent, NotificationOrigin } from "@/fr
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
-import { DeepReadonly } from "@/utils/types";
-import { View } from "@/utils/view";
+import { type DeepReadonly } from "@/utils/types";
+import { type View } from "@/utils/view";
 
 import { Settings } from "@/settings";
 
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";
-import { BuildData, StarSectorView, vector3ToString } from "./starSectorView";
+import { StarSectorView, vector3ToString, type BuildData } from "./starSectorView";
 import { StellarPathfinder } from "./stellarPathfinder";
 
 import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";

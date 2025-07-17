@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { factionToString } from "@/backend/society/factions";
-import { OrbitalFacilityModel, OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 
-import { CropType, cropTypeToString } from "@/utils/agriculture";
+import { cropTypeToString, type CropType } from "@/utils/agriculture";
 import { makeD3PieChart } from "@/utils/d3PieChart";
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,

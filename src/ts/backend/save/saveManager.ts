@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ok, Result } from "@/utils/types";
+import { ok, type Result } from "@/utils/types";
 
-import { CmdrSaves, Save } from "./saveFileData";
-import { SaveLoadingError } from "./saveLoadingError";
+import { type CmdrSaves, type Save } from "./saveFileData";
+import { type SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Interface defining the storage backend for save data.

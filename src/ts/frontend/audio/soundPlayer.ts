@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
+import { type Sound } from "@babylonjs/core/Audio/sound";
 
-import { Sounds } from "@/frontend/assets/audio/sounds";
+import { type Sounds } from "@/frontend/assets/audio/sounds";
 
-import { ISoundInstance, SoundInstance, SoundInstanceMock } from "./soundInstance";
+import { SoundInstance, SoundInstanceMock, type ISoundInstance } from "./soundInstance";
 
 export const enum SoundType {
     CLICK,

@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import { SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
-import { SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
+import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { type SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
+import { ShipType, type SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 
 import { DiscoveryScanner } from "./components/discoveryScanner";
 import { FuelScoop } from "./components/fuelScoop";
 import { FuelTank } from "./components/fuelTank";
-import { OptionalComponent } from "./components/optionalComponents";
+import { type OptionalComponent } from "./components/optionalComponents";
 import { Thrusters } from "./components/thrusters";
 import { WarpDrive } from "./components/warpDrive";
 import { ComponentSlot } from "./componentSlot";

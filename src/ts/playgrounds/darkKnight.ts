@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, HemisphericLight, Scene, Vector3 } from "@babylonjs/core";
+import { HemisphericLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DarkKnight } from "@/frontend/universe/darkKnight";

@@ -15,17 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Color3, Matrix } from "@babylonjs/core/Maths/math";
+import { Matrix, type Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { moveTowards } from "@/utils/math";
 

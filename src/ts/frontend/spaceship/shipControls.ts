@@ -16,19 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { ITts, Speaker, VoiceLine } from "@/frontend/audio/tts";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { Controls } from "@/frontend/uberCore/controls";
+import { type Controls } from "@/frontend/uberCore/controls";
 import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
 import {
@@ -40,10 +40,10 @@ import {
     yaw,
 } from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";

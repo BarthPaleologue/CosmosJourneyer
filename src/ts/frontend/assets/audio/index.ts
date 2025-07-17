@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { loadMusics, Musics } from "./musics";
-import { loadSounds, Sounds } from "./sounds";
-import { loadVoiceLines, SpeakerVoiceLines } from "./voiceLines";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadMusics, type Musics } from "./musics";
+import { loadSounds, type Sounds } from "./sounds";
+import { loadVoiceLines, type SpeakerVoiceLines } from "./voiceLines";
 
 export type AudioAssets = {
     readonly sounds: Sounds;

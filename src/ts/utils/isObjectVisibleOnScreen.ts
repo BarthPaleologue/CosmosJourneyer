@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
-import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 /**
  * Computes the angular size in radians of an object viewed by a camera

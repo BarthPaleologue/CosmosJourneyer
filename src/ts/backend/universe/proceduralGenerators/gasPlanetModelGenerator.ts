@@ -22,13 +22,13 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthSeaLevelPressure, JupiterMass } from "@/utils/physics/constants";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
-import { CelestialBodyModel } from "../orbitalObjects/index";
-import { Orbit } from "../orbitalObjects/orbit";
+import { type GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
+import { type CelestialBodyModel } from "../orbitalObjects/index";
+import { type Orbit } from "../orbitalObjects/orbit";
 import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
 import { newSeededRingsModel } from "../orbitalObjects/ringsModel";
 

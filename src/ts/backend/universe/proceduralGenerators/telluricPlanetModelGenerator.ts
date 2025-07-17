@@ -18,14 +18,14 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 
-import { AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
-import { CloudsModel, newCloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
-import { OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
+import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { newSeededRingsModel, RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
-import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { newSeededRingsModel, type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
+import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";

@@ -16,14 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { AnomalyModel, PlanetModel, StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type AnomalyModel, type PlanetModel, type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -31,10 +31,10 @@ import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neut
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
-import { DeepReadonly, isNonEmptyArray, NonEmptyArray } from "@/utils/types";
+import { isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 
-import { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
+import { type Anomaly, type OrbitalFacility, type Planet, type StellarObject } from "./architecture/orbitalObject";
 import { DarkKnight } from "./darkKnight";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
 import { SpaceElevator } from "./orbitalFacility/spaceElevator";

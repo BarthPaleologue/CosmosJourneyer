@@ -18,11 +18,11 @@
 import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type Player } from "@/frontend/player/player";
 import { deserializeComponent } from "@/frontend/spaceship/components/component";
-import { ComponentSlot } from "@/frontend/spaceship/componentSlot";
-import { SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
+import { type ComponentSlot } from "@/frontend/spaceship/componentSlot";
+import { type SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

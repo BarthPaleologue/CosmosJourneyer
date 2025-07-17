@@ -17,32 +17,32 @@
 
 import "@babylonjs/core/Engines/Extensions/engine.query";
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Material } from "@babylonjs/core/Materials/material";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode, VertexData } from "@babylonjs/core/Meshes";
+import { type TransformNode, type VertexData } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { getChunkPlaneSpacePositionFromPath } from "@/utils/chunkUtils";
-import { Cullable } from "@/utils/cullable";
-import { Direction, getQuaternionFromDirection } from "@/utils/direction";
+import { type Cullable } from "@/utils/cullable";
+import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
 
 import { InstancePatch } from "../instancePatch/instancePatch";
-import { IPatch } from "../instancePatch/iPatch";
+import { type IPatch } from "../instancePatch/iPatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 

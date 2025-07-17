@@ -18,13 +18,13 @@
 import "@babylonjs/core/Collisions/collisionCoordinator";
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { Controls } from "@/frontend/uberCore/controls";
+import { type Controls } from "@/frontend/uberCore/controls";
 
 import { lerpSmooth } from "@/utils/math";
 

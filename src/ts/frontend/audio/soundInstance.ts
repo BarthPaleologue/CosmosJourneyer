@@ -1,4 +1,4 @@
-import { Sound } from "@babylonjs/core/Audio/sound";
+import { type Sound } from "@babylonjs/core/Audio/sound";
 
 export interface ISoundInstance {
     play(): void;

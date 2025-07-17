@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, ArcRotateCamera, Scene, Vector3 } from "@babylonjs/core";
+import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 

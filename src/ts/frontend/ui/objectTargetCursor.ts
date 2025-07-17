@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
@@ -23,10 +23,10 @@ import { getAngularSize } from "@/utils/isObjectVisibleOnScreen";
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import { ObjectTargetCursorType, Targetable } from "../universe/architecture/targetable";
-import { Transformable } from "../universe/architecture/transformable";
-import { TypedObject } from "../universe/architecture/typedObject";
+import { type HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";
+import { type Transformable } from "../universe/architecture/transformable";
+import { type TypedObject } from "../universe/architecture/typedObject";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;

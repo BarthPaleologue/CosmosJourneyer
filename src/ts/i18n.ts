@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18next, { init, Resource, ResourceKey, ResourceLanguage, t } from "i18next";
+import i18next, { init, t, type Resource, type ResourceKey, type ResourceLanguage } from "i18next";
 import { z } from "zod";
 
 /**

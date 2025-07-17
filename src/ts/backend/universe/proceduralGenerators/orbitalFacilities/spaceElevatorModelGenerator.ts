@@ -15,16 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { getFactionFromGalacticPosition } from "@/backend/society/factions";
-import { PlanetModel } from "@/backend/universe/orbitalObjects/index";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
+import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { CropType, CropTypes } from "@/utils/agriculture";
+import { CropTypes, type CropType } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { randomPieChart } from "@/utils/random";

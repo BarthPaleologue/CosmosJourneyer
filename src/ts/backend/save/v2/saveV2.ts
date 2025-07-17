@@ -17,16 +17,16 @@
 
 import { z } from "zod";
 
-import { Itinerary, ItinerarySchema, SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import { ItinerarySchema, SerializedPlayerSchema, type Itinerary } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
-import { OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { UniverseCoordinates, UniverseCoordinatesSchema } from "@/utils/coordinates/universeCoordinates";
-import { DeepReadonly, ok, Result } from "@/utils/types";
+import { UniverseCoordinatesSchema, type UniverseCoordinates } from "@/utils/coordinates/universeCoordinates";
+import { ok, type DeepReadonly, type Result } from "@/utils/types";
 
-import { SaveLoadingError } from "../saveLoadingError";
-import { safeParseSaveV1, SaveV1, SystemObjectType } from "../v1/saveV1";
+import { type SaveLoadingError } from "../saveLoadingError";
+import { safeParseSaveV1, SystemObjectType, type SaveV1 } from "../v1/saveV1";
 
 export const SaveSchemaV2 = z.object({
     /** The timestamp when the save file was created. */

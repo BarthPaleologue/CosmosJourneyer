@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import { type PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 
 export interface UpdatablePostProcess extends PostProcess {
     /**

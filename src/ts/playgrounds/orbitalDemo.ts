@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -24,9 +24,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";

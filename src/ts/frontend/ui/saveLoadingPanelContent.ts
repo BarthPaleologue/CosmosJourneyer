@@ -1,16 +1,16 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { parseSaveFile } from "@/backend/save/saveFile";
-import { createUrlFromSave, Save } from "@/backend/save/saveFileData";
-import { SaveLoadingError, saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
-import { SaveManager } from "@/backend/save/saveManager";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
+import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
+import { type SaveManager } from "@/backend/save/saveManager";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
-import { Result } from "@/utils/types";
+import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 

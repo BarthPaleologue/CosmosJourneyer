@@ -15,13 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3, MeshBuilder, PBRMetallicRoughnessMaterial, SolidParticle, SolidParticleSystem } from "@babylonjs/core";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import {
+    Color3,
+    MeshBuilder,
+    PBRMetallicRoughnessMaterial,
+    SolidParticleSystem,
+    type SolidParticle,
+} from "@babylonjs/core";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";

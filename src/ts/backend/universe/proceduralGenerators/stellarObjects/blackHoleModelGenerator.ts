@@ -17,15 +17,15 @@
 
 import { normalRandom } from "extended-random";
 
-import { CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
-import { Orbit } from "@/backend/universe/orbitalObjects/orbit";
+import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getMassFromSchwarzschildRadius } from "@/utils/physics/blackHole";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 export function newSeededBlackHoleModel(
     id: string,

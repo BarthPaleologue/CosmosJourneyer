@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { type Color3 } from "@babylonjs/core/Maths/math.color";
 
-import { CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { OrbitalObjectType } from "../orbitalObjectType";
+import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectType } from "../orbitalObjectType";
 
 export type MengerSpongeModel = CelestialBodyModelBase<OrbitalObjectType.MENGER_SPONGE> & {
     readonly color: Color3;

@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Tools } from "@babylonjs/core/Misc/tools";
 
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
@@ -29,7 +29,7 @@ import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacil
 import { newSeededStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
 import { newSeededTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
 import { newSeededTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
-import { StarSystemModel } from "../starSystemModel";
+import { type StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {
     const systemName = "Alpha Testis";

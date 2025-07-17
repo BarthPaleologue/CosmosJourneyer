@@ -17,11 +17,11 @@
 
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 
-import { ChunkForge } from "./chunkForge";
-import { ApplyTask, BuildTask, ReturnedChunkDataSchema, TaskType } from "./taskTypes";
-import { TransferBuildData } from "./workerDataTypes";
+import { type ChunkForge } from "./chunkForge";
+import { ReturnedChunkDataSchema, TaskType, type ApplyTask, type BuildTask } from "./taskTypes";
+import { type TransferBuildData } from "./workerDataTypes";
 import { WorkerPool } from "./workerPool";
 
 export class ChunkForgeWorkers implements ChunkForge {

@@ -17,12 +17,12 @@
 
 import { z } from "zod";
 
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { encodeBase64 } from "@/utils/base64";
-import { Result } from "@/utils/types";
+import { type Result } from "@/utils/types";
 
-import { SaveLoadingError } from "./saveLoadingError";
+import { type SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 
 export const SaveSchema = SaveSchemaV2;

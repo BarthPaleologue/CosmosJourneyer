@@ -16,11 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { GasPlanetTextureId } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { type GasPlanetTextureId } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 
-import { GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
+import { type GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
 
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,

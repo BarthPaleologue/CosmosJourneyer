@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
-import { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/utils/algebra";
 

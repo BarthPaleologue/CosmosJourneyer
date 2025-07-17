@@ -16,22 +16,22 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Scene } from "@babylonjs/core/scene";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import { type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
-import { CelestialBodyBase } from "./architecture/celestialBody";
-import { ObjectTargetCursorType, TargetInfo } from "./architecture/targetable";
-import { AsteroidField } from "./asteroidFields/asteroidField";
+import { type CelestialBodyBase } from "./architecture/celestialBody";
+import { ObjectTargetCursorType, type TargetInfo } from "./architecture/targetable";
+import { type AsteroidField } from "./asteroidFields/asteroidField";
 
 export class DarkKnight implements CelestialBodyBase<OrbitalObjectType.DARK_KNIGHT> {
     readonly type: OrbitalObjectType.DARK_KNIGHT;

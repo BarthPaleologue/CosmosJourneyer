@@ -19,12 +19,12 @@ import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
@@ -32,7 +32,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { createUrlFromSave, Save } from "@/backend/save/saveFileData";
+import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
 import { SaveLocalBackend } from "@/backend/save/saveLocalBackend";
 import { SaveManager } from "@/backend/save/saveManager";
@@ -40,14 +40,14 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { Assets, loadAssets } from "@/frontend/assets/assets";
+import { loadAssets, type Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { ISoundPlayer, SoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
@@ -68,14 +68,14 @@ import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 
 import {
-    AtStationCoordinates,
-    RelativeCoordinates,
-    UniverseCoordinates,
+    type AtStationCoordinates,
+    type RelativeCoordinates,
+    type UniverseCoordinates,
 } from "@/utils/coordinates/universeCoordinates";
 import { hashArray } from "@/utils/hash";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
-import { View } from "@/utils/view";
+import { type View } from "@/utils/view";
 
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
@@ -85,7 +85,7 @@ import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
-import { Tutorial } from "./ui/tutorial/tutorials/tutorial";
+import { type Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
 const enum EngineState {
     UNINITIALIZED,

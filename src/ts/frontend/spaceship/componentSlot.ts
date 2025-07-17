@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Component } from "./components/component";
+import { type Component } from "./components/component";
 
 export class ComponentSlot {
     readonly maxSize: number;

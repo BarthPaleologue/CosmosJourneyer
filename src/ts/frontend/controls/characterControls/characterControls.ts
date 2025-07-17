@@ -17,22 +17,22 @@
 
 import "@babylonjs/core/Collisions/collisionCoordinator";
 
-import { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
-import { Skeleton } from "@babylonjs/core/Bones/skeleton";
+import { type AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
+import { type Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { Camera } from "@babylonjs/core/Cameras/camera";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { Scene } from "@babylonjs/core/scene";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { Controls } from "@/frontend/uberCore/controls";
+import { type Controls } from "@/frontend/uberCore/controls";
 import { setUpVector, translate } from "@/frontend/uberCore/transforms/basicTransform";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 
 import { CollisionMask, Settings } from "@/settings";

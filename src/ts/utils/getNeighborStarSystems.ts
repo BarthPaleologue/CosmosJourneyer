@@ -17,8 +17,8 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Settings } from "@/settings";
 

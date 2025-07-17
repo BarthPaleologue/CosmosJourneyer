@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Scene } from "@babylonjs/core/scene";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type Scene } from "@babylonjs/core/scene";
 
 import {
     setStellarObjectUniforms,

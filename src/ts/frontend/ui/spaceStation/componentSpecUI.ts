@@ -15,16 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getComponentTypeI18n, SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
-    SerializedDiscoveryScanner,
+    type SerializedDiscoveryScanner,
 } from "@/backend/spaceship/serializedComponents/discoveryScanner";
-import { getFuelScoopSpec, SerializedFuelScoop } from "@/backend/spaceship/serializedComponents/fuelScoop";
-import { getFuelTankSpecs, SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
+import { getFuelScoopSpec, type SerializedFuelScoop } from "@/backend/spaceship/serializedComponents/fuelScoop";
+import { getFuelTankSpecs, type SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
-import { getThrustersSpec, SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
-import { getWarpDriveSpec, SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
+import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
+import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

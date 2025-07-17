@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+import { type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
+import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
@@ -32,9 +32,9 @@ import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { ObjectTargetCursorType, Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
@@ -44,11 +44,11 @@ import { getSphereRadiatedEnergyFlux } from "@/utils/physics/thermodynamics";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { OrbitalFacilityBase } from "./orbitalFacility";
+import { type OrbitalFacilityBase } from "./orbitalFacility";
 
 export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
     readonly name: string;

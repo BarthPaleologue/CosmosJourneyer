@@ -15,23 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import { OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, UniverseObjectId } from "@/backend/universe/universeObjectId";
+import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { Player } from "@/frontend/player/player";
+import { type Player } from "@/frontend/player/player";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
-import { Mission } from "./mission";
+import { type Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**

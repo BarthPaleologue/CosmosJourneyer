@@ -17,8 +17,8 @@
 
 import { Tools } from "@babylonjs/core/Misc/tools";
 
-import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
+import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";

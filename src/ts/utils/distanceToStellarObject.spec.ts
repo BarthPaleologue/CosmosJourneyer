@@ -19,13 +19,13 @@ import { describe, expect, it } from "vitest";
 
 import { Faction } from "@/backend/society/factions";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { getObjectModelById, StarSystemModel } from "@/backend/universe/starSystemModel";
+import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { Settings } from "@/settings";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
 import { AU, EarthMass, SolarMass, SolarRadius } from "./physics/constants";
-import { DeepReadonly } from "./types";
+import { type DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
     const systemModel: DeepReadonly<StarSystemModel> = {

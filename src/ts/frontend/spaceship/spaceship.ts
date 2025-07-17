@@ -18,35 +18,39 @@
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type TransformNode } from "@babylonjs/core/Meshes";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import {
-    IPhysicsCollisionEvent,
     PhysicsMotionType,
     PhysicsShapeType,
+    type IPhysicsCollisionEvent,
 } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
-import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
-import { Scene } from "@babylonjs/core/scene";
+import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import { getDefaultSerializedSpaceship, SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
+import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import {
+    getDefaultSerializedSpaceship,
+    ShipType,
+    type SerializedSpaceship,
+} from "@/backend/spaceship/serializedSpaceship";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { ISoundInstance } from "@/frontend/audio/soundInstance";
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { type ISoundInstance } from "@/frontend/audio/soundInstance";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getForwardDirection, translate } from "@/frontend/uberCore/transforms/basicTransform";
-import { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
-import { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import { setEnabledBody } from "@/utils/havok";

@@ -1,4 +1,4 @@
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import informationIcon from "@assets/icons/information.webp";
 import explorationIcon from "@assets/icons/space-exploration.webp";

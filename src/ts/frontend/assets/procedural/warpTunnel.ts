@@ -20,15 +20,15 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { RangeToPercent } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { type TransformNode } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { SolidParticle } from "@babylonjs/core/Particles/solidParticle";
+import { type SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 //import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 
-import { Transformable } from "../../universe/architecture/transformable";
+import { type Transformable } from "../../universe/architecture/transformable";
 
 /**
  * @see https://playground.babylonjs.com/#GLZ1PX#1241 (SPS)

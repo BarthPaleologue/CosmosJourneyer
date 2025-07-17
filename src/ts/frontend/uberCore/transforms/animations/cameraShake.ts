@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { type ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 
 import { clamp } from "@/utils/math";
 
-import { CustomAnimation } from "./animation";
+import { type CustomAnimation } from "./animation";
 
 export class CameraShakeAnimation implements CustomAnimation {
     private elapsedSeconds = 0;

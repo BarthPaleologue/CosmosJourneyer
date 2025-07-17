@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractEngine,
     DirectionalLight,
     HemisphericLight,
     MeshBuilder,
@@ -24,9 +23,10 @@ import {
     PhysicsShapeType,
     Scene,
     Vector3,
+    type AbstractEngine,
 } from "@babylonjs/core";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";

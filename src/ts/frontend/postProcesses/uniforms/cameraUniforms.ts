@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Effect } from "@babylonjs/core/Materials/effect";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type Effect } from "@babylonjs/core/Materials/effect";
 
 export const CameraUniformNames = {
     CAMERA_POSITION: "camera_position",

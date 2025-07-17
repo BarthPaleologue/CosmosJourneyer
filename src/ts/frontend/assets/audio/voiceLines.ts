@@ -18,10 +18,10 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
+import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
 import { Sound } from "@babylonjs/core/Audio/sound";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 import cannotEngageWarpDriveSoundPath from "@assets/sound/voice/CannotEngageWarpDriveCharlotte.mp3";
 import engagingWarpDriveSoundPath from "@assets/sound/voice/EngagingWarpDriveCharlotte.mp3";

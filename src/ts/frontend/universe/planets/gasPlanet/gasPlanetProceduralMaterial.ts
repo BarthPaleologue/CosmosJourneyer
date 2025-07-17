@@ -15,19 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { GasPlanetProceduralColorPalette } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { type GasPlanetProceduralColorPalette } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";

@@ -6,7 +6,7 @@ import {
     Vector2InputControl,
 } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import Interaction from "@brianchirls/game-input/interactions/Interaction";
+import type Interaction from "@brianchirls/game-input/interactions/Interaction";
 
 import { InputMaps } from "@/frontend/inputs/inputMaps";
 
@@ -21,7 +21,7 @@ import {
 
 import i18n from "@/i18n";
 
-import { MusicConductor } from "../audio/musicConductor";
+import { type MusicConductor } from "../audio/musicConductor";
 
 export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
     const settingsPanel = document.getElementById("settingsPanel");

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { type TransformNode } from "@babylonjs/core/Meshes";
 
 /**
  * Describes all objects that can be moved around, rotated and scaled in the scene

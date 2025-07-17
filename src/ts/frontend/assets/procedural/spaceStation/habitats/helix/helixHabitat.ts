@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Material } from "@babylonjs/core/Materials/material";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Scene } from "@babylonjs/core/scene";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { Textures } from "@/frontend/assets/textures";
-import { Transformable } from "@/frontend/universe/architecture/transformable";
+import { type Textures } from "@/frontend/assets/textures";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { createHelix } from "@/utils/geometry/helixBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";

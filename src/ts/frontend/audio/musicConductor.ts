@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Sound } from "@babylonjs/core/Audio/sound";
+import { type Sound } from "@babylonjs/core/Audio/sound";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { Musics } from "@/frontend/assets/audio/musics";
-import { StarSystemView } from "@/frontend/starSystemView";
+import { type Musics } from "@/frontend/assets/audio/musics";
+import { type StarSystemView } from "@/frontend/starSystemView";
 
 export class MusicConductor {
     private currentMusic: Sound | null = null;

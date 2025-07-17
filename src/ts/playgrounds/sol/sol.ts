@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AbstractEngine, Scene, Vector3 } from "@babylonjs/core";
+import { Vector3, type AbstractEngine, type Scene } from "@babylonjs/core";
 
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";

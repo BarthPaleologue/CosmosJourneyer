@@ -15,31 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { Material } from "@babylonjs/core/Materials/material";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { Scene } from "@babylonjs/core/scene";
+import { type TransformNode } from "@babylonjs/core/Meshes";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
 import { getRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
-import { Cullable } from "@/utils/cullable";
-import { Direction } from "@/utils/direction";
+import { type Cullable } from "@/utils/cullable";
+import { type Direction } from "@/utils/direction";
 import { clamp } from "@/utils/math";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { ChunkForge } from "./chunkForge";
+import { type ChunkForge } from "./chunkForge";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { PlanetChunk } from "./planetChunk";
-import { BuildTask, TaskType } from "./taskTypes";
+import { TaskType, type BuildTask } from "./taskTypes";
 
 /**
  * A quadTree is defined recursively

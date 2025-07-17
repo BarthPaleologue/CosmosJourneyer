@@ -15,40 +15,40 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
-import { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
+import { type CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { type PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
+import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { Cullable } from "@/utils/cullable";
+import { type Cullable } from "@/utils/cullable";
 import { Direction } from "@/utils/direction";
-import { ItemPool } from "@/utils/itemPool";
+import { type ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { ChunkForge } from "./terrain/chunks/chunkForge";
+import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 
 export class TelluricPlanet

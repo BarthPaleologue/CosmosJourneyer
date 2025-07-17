@@ -15,34 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Camera } from "@babylonjs/core/Cameras/camera";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Material } from "@babylonjs/core/Materials/material";
+import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import { type Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type TransformNode } from "@babylonjs/core/Meshes";
+import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
+import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { Textures } from "@/frontend/assets/textures";
+import { type Textures } from "@/frontend/assets/textures";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
-import { defaultTargetInfoCelestialBody, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { type PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
+import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { Cullable } from "@/utils/cullable";
+import { type Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
-import { ItemPool } from "@/utils/itemPool";
+import { type ItemPool } from "@/utils/itemPool";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
-import { DeepReadonly } from "@/utils/types";
+import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { type Effect } from "@babylonjs/core/Materials/effect";
+import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { WaterTextures } from "@/frontend/assets/textures";
+import { type WaterTextures } from "@/frontend/assets/textures";
 
 const OceanUniformNames = {
     OCEAN_RADIUS: "ocean_radius",

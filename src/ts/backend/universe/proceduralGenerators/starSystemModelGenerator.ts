@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
-import { StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
@@ -30,16 +30,16 @@ import { isNonEmptyArray } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import {
-    AnomalyModel,
-    AnomalyType,
-    OrbitalFacilityModel,
-    PlanetModel,
-    StellarObjectModel,
+    type AnomalyModel,
+    type AnomalyType,
+    type OrbitalFacilityModel,
+    type PlanetModel,
+    type StellarObjectModel,
 } from "../orbitalObjects/index";
 import { createOrbitalObjectId } from "../orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
-import { TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
-import { StarSystemModel } from "../starSystemModel";
+import { type TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
+import { type StarSystemModel } from "../starSystemModel";
 import { newSeededJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
 import { newSeededMandelboxModel } from "./anomalies/mandelboxModelGenerator";
 import { newSeededMandelbulbModel } from "./anomalies/mandelbulbModelGenerator";

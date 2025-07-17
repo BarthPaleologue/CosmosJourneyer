@@ -17,9 +17,9 @@
 
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { PBRTextures } from "@/frontend/assets/textures/materials";
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 import {
     abs,

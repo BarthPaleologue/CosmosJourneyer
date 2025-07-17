@@ -1,10 +1,10 @@
-import { StarSystemCoordinates, starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
+import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { ISoundPlayer, SoundType } from "@/frontend/audio/soundPlayer";
+import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-import { Player } from "../player/player";
+import { type Player } from "../player/player";
 
 export class StarMapBookmarkButton {
     readonly rootNode: HTMLElement;

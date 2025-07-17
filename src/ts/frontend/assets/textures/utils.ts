@@ -17,9 +17,9 @@
 
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 export async function loadTextureAsync(
     name: string,

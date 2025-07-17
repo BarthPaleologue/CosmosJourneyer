@@ -17,7 +17,7 @@
 
 import { normalRandom, randRange } from "extended-random";
 
-import { RGBColor } from "@/utils/colors";
+import { type RGBColor } from "@/utils/colors";
 
 type RingsModelBase = {
     /**

@@ -1,7 +1,7 @@
 import { Tools } from "@babylonjs/core/Misc/tools";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
 export function getSunModel(): StarModel {
     return {

@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { FreeCamera, MeshBuilder, PointLight, StandardMaterial, type BaseTexture } from "@babylonjs/core";
+import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { enablePhysics } from "./utils";

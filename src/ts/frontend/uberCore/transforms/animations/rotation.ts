@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type TransformNode } from "@babylonjs/core/Meshes";
 
 import { clamp } from "@/utils/math";
 
 import { rotate } from "../basicTransform";
-import { CustomAnimation } from "./animation";
+import { type CustomAnimation } from "./animation";
 import { easeInOutInterpolation } from "./interpolations";
 
 export class TransformRotationAnimation implements CustomAnimation {

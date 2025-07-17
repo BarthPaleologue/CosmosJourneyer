@@ -17,8 +17,8 @@
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { SolidPlume } from "@/utils/solidPlume";
 
