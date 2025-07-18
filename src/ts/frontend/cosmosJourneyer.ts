@@ -32,10 +32,11 @@ import HavokPhysics from "@babylonjs/havok";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { type ISaveBackend } from "@/backend/save/saveBackend";
+import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
-import { SaveLocalBackend } from "@/backend/save/saveLocalBackend";
-import { SaveManager, type ISaveManager } from "@/backend/save/saveManager";
+import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
@@ -135,7 +136,7 @@ export class CosmosJourneyer {
 
     readonly starSystemDatabase: StarSystemDatabase;
 
-    readonly saveManager: ISaveManager;
+    readonly saveManager: ISaveBackend;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -158,7 +159,7 @@ export class CosmosJourneyer {
         starSystemView: StarSystemView,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager,
+        saveManager: SaveBackendSingleFile,
         soundPlayer: ISoundPlayer,
         tts: Tts,
     ) {
@@ -167,8 +168,8 @@ export class CosmosJourneyer {
         this.assets = assets;
 
         this.player = player;
-        this.player.onNameChangedObservable.add((newName) => {
-            this.createManualSave();
+        this.player.onNameChangedObservable.add(async () => {
+            await this.createManualSave();
         });
 
         this.starSystemDatabase = starSystemDatabase;
@@ -521,7 +522,11 @@ export class CosmosJourneyer {
             await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
         }
 
-        const saveManagerCreateResult = await SaveManager.CreateAsync(new SaveLocalBackend(), starSystemDatabase);
+        const saveManagerCreateResult = await SaveBackendSingleFile.CreateAsync(
+            new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
+            new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
+            starSystemDatabase,
+        );
         if (!saveManagerCreateResult.success) {
             await alertModal(saveLoadingErrorToI18nString(saveManagerCreateResult.error), soundPlayer);
             throw new Error("Failed to create save manager");
@@ -808,7 +813,7 @@ export class CosmosJourneyer {
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
-        this.saveManager.addAutoSave(uuid, saveData);
+        await this.saveManager.addAutoSave(uuid, saveData);
 
         this.autoSaveTimerSeconds = 0;
     }

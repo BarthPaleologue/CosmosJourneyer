@@ -1,13 +1,13 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type ISaveManager } from "@/backend/save/saveManager";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
+import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { type Result } from "@/utils/types";
@@ -16,7 +16,6 @@ import i18n from "@/i18n";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";
-import editIconPath from "@assets/icons/edit.webp";
 import expandIconPath from "@assets/icons/expand.webp";
 import shareIconPath from "@assets/icons/link.webp";
 import loadIconPath from "@assets/icons/play.webp";
@@ -102,7 +101,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveManager) {
+    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveBackend) {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -258,7 +257,7 @@ export class SaveLoadingPanelContent {
         save: Save,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: ISaveManager,
+        saveManager: ISaveBackend,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");

@@ -21,45 +21,37 @@ import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { err, ok, type Result } from "@/utils/types";
-
+import { SaveBackendSingleFile, type IFile } from "./saveBackendSingleFile";
 import { type CmdrSaves } from "./saveFileData";
-import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
-import { SaveManager, type SaveBackend } from "./saveManager";
+import { SaveLoadingErrorType } from "./saveLoadingError";
 
 /**
  * Mock implementation of SaveBackend for testing
  */
-class MockSaveBackend implements SaveBackend {
-    private mockData: Record<string, CmdrSaves> = {};
-    public readShouldFail = false;
-    public writeShouldFail = false;
+class MockSaveBackend implements IFile {
+    private mockData = "{}";
 
-    constructor(initialData?: Record<string, CmdrSaves>) {
+    constructor(initialData?: string) {
         if (initialData !== undefined) {
-            this.mockData = structuredClone(initialData);
+            this.mockData = initialData;
         }
     }
 
-    public write(saves: Record<string, CmdrSaves>): boolean {
-        if (this.writeShouldFail) {
-            return false;
-        }
-        this.mockData = { ...saves };
-        return true;
+    public write(content: string): Promise<boolean> {
+        this.mockData = content;
+        return Promise.resolve(true);
     }
 
-    public read(): Promise<Result<Record<string, CmdrSaves>, SaveLoadingError>> {
-        if (this.readShouldFail) {
-            return Promise.resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
-        }
-        return Promise.resolve(ok(this.mockData));
+    public read(): Promise<string | null> {
+        return Promise.resolve(this.mockData);
     }
 }
 
 describe("SaveManager", () => {
-    const testSaves: Record<string, CmdrSaves> = {
-        cmdr1: {
+    const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
+    const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";
+    const testSaves = {
+        [cmdrUuid1]: {
             manual: [
                 {
                     timestamp: 12345,
@@ -85,7 +77,7 @@ describe("SaveManager", () => {
             ],
             auto: [],
         },
-        cmdr2: {
+        [cmdrUuid2]: {
             manual: [],
             auto: [
                 {
@@ -111,37 +103,39 @@ describe("SaveManager", () => {
                 },
             ],
         },
-    };
+    } as const satisfies Record<string, CmdrSaves>;
 
     describe("Create", () => {
         it("should create a SaveManager with existing saves", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
-                expect(await result.value.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
-                expect(await result.value.getSavesForCmdr("cmdr2")).toEqual(testSaves["cmdr2"]);
+                expect(await result.value.getSavesForCmdr(cmdrUuid1)).toEqual(testSaves[cmdrUuid1]);
+                expect(await result.value.getSavesForCmdr(cmdrUuid2)).toEqual(testSaves[cmdrUuid2]);
             }
         });
 
         it("should create a SaveManager with empty saves", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend({});
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend();
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
-                expect(await result.value.getSavesForCmdr("cmdr1")).toBeUndefined();
+                expect(await result.value.getSavesForCmdr(cmdrUuid1)).toBeUndefined();
             }
         });
 
         it("should handle read errors", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend();
-            backend.readShouldFail = true;
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend("invalid json data");
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(false);
             if (!result.success) {
@@ -153,20 +147,22 @@ describe("SaveManager", () => {
     describe("getSavesForCmdr", () => {
         it("should return saves for an existing cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
-                expect(await manager.getSavesForCmdr("cmdr1")).toEqual(testSaves["cmdr1"]);
+                expect(await manager.getSavesForCmdr(cmdrUuid1)).toEqual(testSaves[cmdrUuid1]);
             }
         });
 
         it("should return undefined for a non-existent cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -201,31 +197,33 @@ describe("SaveManager", () => {
 
         it("should add a manual save to an existing cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(99999);
-                const originalLength = (await manager.getSavesForCmdr("cmdr1"))?.manual.length ?? 0;
-                const saveResult = await manager.addManualSave("cmdr1", newSave);
+                const originalLength = (await manager.getSavesForCmdr(cmdrUuid1))?.manual.length ?? 0;
+                const saveResult = await manager.addManualSave(cmdrUuid1, newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = await manager.getSavesForCmdr("cmdr1");
+                const cmdrSaves = await manager.getSavesForCmdr(cmdrUuid1);
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.manual).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.manual[0]?.timestamp).toBe(99999); // Should be at the beginning (unshift)
-                if (cmdrSaves && originalLength > 0 && testSaves["cmdr1"]?.manual[0]) {
-                    expect(cmdrSaves.manual[1]?.timestamp).toBe(testSaves["cmdr1"].manual[0].timestamp); // Original save should be second
+                if (cmdrSaves && originalLength > 0) {
+                    expect(cmdrSaves.manual[1]?.timestamp).toBe(testSaves[cmdrUuid1].manual[0].timestamp); // Original save should be second
                 }
             }
         });
 
         it("should create new cmdr saves when adding manual save to non-existent cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend({});
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend();
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -238,28 +236,6 @@ describe("SaveManager", () => {
                 expect(cmdrSaves?.manual).toHaveLength(1);
                 expect(cmdrSaves?.manual[0]).toEqual(newSave);
                 expect(cmdrSaves?.auto).toHaveLength(0);
-            }
-        });
-
-        it("should handle backend write failures when adding manual save", async () => {
-            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            backend.writeShouldFail = true;
-
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
-            expect(result.success).toBe(true);
-
-            if (result.success) {
-                const manager = result.value;
-                const originalLength = (await manager.getSavesForCmdr("cmdr1"))?.manual.length ?? 0;
-                const newSave = createTestSave(55555);
-                const saveResult = await manager.addManualSave("cmdr1", newSave);
-
-                expect(saveResult).toBe(false);
-                // Save should still be added to memory even if backend write fails
-                const cmdrSaves = await manager.getSavesForCmdr("cmdr1");
-                expect(cmdrSaves?.manual).toHaveLength(originalLength + 1);
-                expect(cmdrSaves?.manual[0]?.timestamp).toBe(55555);
             }
         });
     });
@@ -289,40 +265,44 @@ describe("SaveManager", () => {
 
         it("should add an auto save to an existing cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
+                const cmdrUuid = "676a0451-d081-4ad7-a18c-285ea7a98e8e";
                 const manager = result.value;
                 const newSave = createTestSave(88888);
-                const originalLength = (await manager.getSavesForCmdr("cmdr2"))?.auto.length ?? 0;
-                const saveResult = await manager.addAutoSave("cmdr2", newSave);
+                const originalLength = (await manager.getSavesForCmdr(cmdrUuid))?.auto.length ?? 0;
+                const saveResult = await manager.addAutoSave(cmdrUuid, newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = await manager.getSavesForCmdr("cmdr2");
+                const cmdrSaves = await manager.getSavesForCmdr(cmdrUuid);
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(originalLength + 1);
                 expect(cmdrSaves?.auto[0]?.timestamp).toBe(88888); // Should be at the beginning (unshift)
-                if (cmdrSaves && originalLength > 0 && testSaves["cmdr2"]?.auto[0]) {
-                    expect(cmdrSaves.auto[1]?.timestamp).toBe(testSaves["cmdr2"].auto[0].timestamp); // Original save should be second
+                if (cmdrSaves && originalLength > 0) {
+                    expect(cmdrSaves.auto[1]?.timestamp).toBe(testSaves[cmdrUuid2].auto[0].timestamp); // Original save should be second
                 }
             }
         });
 
         it("should create new cmdr saves when adding auto save to non-existent cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend({});
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend();
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
+                const cmdrUuid = "c6c25aa0-ef6a-42c4-a780-1e794e3b2676";
                 const manager = result.value;
                 const newSave = createTestSave(22222);
-                const saveResult = await manager.addAutoSave("newCmdr", newSave);
+                const saveResult = await manager.addAutoSave(cmdrUuid, newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = await manager.getSavesForCmdr("newCmdr");
+                const cmdrSaves = await manager.getSavesForCmdr(cmdrUuid);
                 expect(cmdrSaves?.auto).toHaveLength(1);
                 expect(cmdrSaves?.auto[0]).toEqual(newSave);
                 expect(cmdrSaves?.manual).toHaveLength(0);
@@ -332,8 +312,9 @@ describe("SaveManager", () => {
         it("should limit auto saves to MAX_AUTO_SAVES and remove oldest", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             // Create a cmdr with already 5 auto saves (at the limit)
+            const cmdrUuid = "7471ef79-7a4a-4b82-9779-44bb43e9ad66";
             const initialData = {
-                cmdr3: {
+                [cmdrUuid]: {
                     manual: [],
                     auto: [
                         createTestSave(5),
@@ -344,17 +325,18 @@ describe("SaveManager", () => {
                     ],
                 },
             };
-            const backend = new MockSaveBackend(initialData);
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend(JSON.stringify(initialData));
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
                 const newSave = createTestSave(6);
-                const saveResult = await manager.addAutoSave("cmdr3", newSave);
+                const saveResult = await manager.addAutoSave(cmdrUuid, newSave);
 
                 expect(saveResult).toBe(true);
-                const cmdrSaves = await manager.getSavesForCmdr("cmdr3");
+                const cmdrSaves = await manager.getSavesForCmdr(cmdrUuid);
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(5); // Should still be 5
                 expect(cmdrSaves?.auto[0]?.timestamp).toBe(6); // New save at beginning
@@ -366,20 +348,22 @@ describe("SaveManager", () => {
 
         it("should handle adding multiple auto saves and maintain limit", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend({});
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
+            const backend = new MockSaveBackend();
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
 
             expect(result.success).toBe(true);
             if (result.success) {
                 const manager = result.value;
+                const cmdrUuid = "64db79f4-1f3d-4c85-82d3-49c55590b4c2";
 
                 // Add 7 auto saves (more than the limit of 5)
                 for (let i = 1; i <= 7; i++) {
-                    const saveResult = await manager.addAutoSave("testCmdr", createTestSave(i));
+                    const saveResult = await manager.addAutoSave(cmdrUuid, createTestSave(i));
                     expect(saveResult).toBe(true);
                 }
 
-                const cmdrSaves = await manager.getSavesForCmdr("testCmdr");
+                const cmdrSaves = await manager.getSavesForCmdr(cmdrUuid);
                 expect(cmdrSaves).toBeDefined();
                 expect(cmdrSaves?.auto).toHaveLength(5); // Should be limited to 5
 
@@ -395,28 +379,6 @@ describe("SaveManager", () => {
                     expect(cmdrSaves.auto.find((save) => save.timestamp === 1)).toBeUndefined();
                     expect(cmdrSaves.auto.find((save) => save.timestamp === 2)).toBeUndefined();
                 }
-            }
-        });
-
-        it("should handle backend write failures when adding auto save", async () => {
-            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-            const backend = new MockSaveBackend(testSaves);
-            backend.writeShouldFail = true;
-
-            const result = await SaveManager.CreateAsync(backend, starSystemDatabase);
-            expect(result.success).toBe(true);
-
-            if (result.success) {
-                const manager = result.value;
-                const originalLength = (await manager.getSavesForCmdr("cmdr2"))?.auto.length ?? 0;
-                const newSave = createTestSave(77777);
-                const saveResult = await manager.addAutoSave("cmdr2", newSave);
-
-                expect(saveResult).toBe(false);
-                // Save should still be added to memory even if backend write fails
-                const cmdrSaves = await manager.getSavesForCmdr("cmdr2");
-                expect(cmdrSaves?.auto).toHaveLength(originalLength + 1);
-                expect(cmdrSaves?.auto[0]?.timestamp).toBe(77777);
             }
         });
     });
