@@ -3,7 +3,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type SaveManager } from "@/backend/save/saveManager";
+import { type ISaveManager } from "@/backend/save/saveManager";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -102,7 +102,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
+    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveManager) {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -219,27 +219,6 @@ export class SaveLoadingPanelContent {
             shareIcon.src = shareIconPath;
             shareButton.appendChild(shareIcon);
 
-            const editNameButton = document.createElement("button");
-            editNameButton.classList.add("icon", "large");
-            editNameButton.addEventListener("click", async () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
-                const newName = await promptModalString(
-                    i18n.t("sidePanel:cmdrNameChangePrompt"),
-                    latestSave.player.name,
-                    this.soundPlayer,
-                );
-                if (newName === null) return;
-
-                saveManager.renameCmdr(cmdrUuid, newName);
-
-                cmdrName.innerText = newName;
-            });
-            cmdrHeaderButtons.appendChild(editNameButton);
-
-            const editIcon = document.createElement("img");
-            editIcon.src = editIconPath;
-            editNameButton.appendChild(editIcon);
-
             const savesList = document.createElement("div");
 
             savesList.classList.add("savesList");
@@ -279,7 +258,7 @@ export class SaveLoadingPanelContent {
         save: Save,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager,
+        saveManager: ISaveManager,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
