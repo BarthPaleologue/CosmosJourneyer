@@ -1,4 +1,4 @@
-import { type SaveManager } from "@/backend/save/saveManager";
+import { type ISaveManager } from "@/backend/save/saveManager";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -34,11 +34,11 @@ export class SidePanels {
 
     private readonly starSystemDatabase: StarSystemDatabase;
 
-    private readonly saveManager: SaveManager;
+    private readonly saveManager: ISaveManager;
 
     constructor(
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager,
+        saveManager: ISaveManager,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
     ) {

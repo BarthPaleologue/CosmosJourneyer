@@ -35,7 +35,7 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
 import { SaveLocalBackend } from "@/backend/save/saveLocalBackend";
-import { SaveManager } from "@/backend/save/saveManager";
+import { SaveManager, type ISaveManager } from "@/backend/save/saveManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
@@ -135,7 +135,7 @@ export class CosmosJourneyer {
 
     readonly starSystemDatabase: StarSystemDatabase;
 
-    readonly saveManager: SaveManager;
+    readonly saveManager: ISaveManager;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -168,7 +168,7 @@ export class CosmosJourneyer {
 
         this.player = player;
         this.player.onNameChangedObservable.add((newName) => {
-            this.saveManager.renameCmdr(this.player.uuid, newName);
+            this.createManualSave();
         });
 
         this.starSystemDatabase = starSystemDatabase;
