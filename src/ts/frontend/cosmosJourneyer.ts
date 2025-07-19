@@ -763,6 +763,7 @@ export class CosmosJourneyer {
         }
 
         return {
+            uuid: crypto.randomUUID(),
             timestamp: Date.now(),
             player: Player.Serialize(this.player),
             playerLocation: {

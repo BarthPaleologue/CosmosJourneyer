@@ -29,6 +29,8 @@ import { type SaveLoadingError } from "../saveLoadingError";
 import { safeParseSaveV1, SystemObjectType, type SaveV1 } from "../v1/saveV1";
 
 export const SaveSchemaV2 = z.object({
+    uuid: z.string().default(() => crypto.randomUUID()),
+
     /** The timestamp when the save file was created. */
     timestamp: z.number().default(Date.now()),
 
@@ -107,6 +109,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
     }
 
     return {
+        uuid: crypto.randomUUID(),
         timestamp: saveV1.timestamp,
         player: {
             uuid: saveV1.player.uuid,

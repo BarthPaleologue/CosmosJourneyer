@@ -22,7 +22,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SaveBackendSingleFile, type IFile } from "./saveBackendSingleFile";
-import { type CmdrSaves } from "./saveFileData";
+import { type CmdrSaves, type Save } from "./saveFileData";
 import { SaveLoadingErrorType } from "./saveLoadingError";
 
 /**
@@ -54,6 +54,7 @@ describe("SaveManager", () => {
         [cmdrUuid1]: {
             manual: [
                 {
+                    uuid: "3e9bb421-7779-4c16-920f-42aeafd160aa",
                     timestamp: 12345,
                     player: SerializedPlayerSchema.parse({}),
                     playerLocation: {
@@ -81,6 +82,7 @@ describe("SaveManager", () => {
             manual: [],
             auto: [
                 {
+                    uuid: "b8c69a25-4aba-4358-b131-7949923e55f9",
                     timestamp: 67890,
                     player: SerializedPlayerSchema.parse({}),
                     playerLocation: {
@@ -104,6 +106,31 @@ describe("SaveManager", () => {
             ],
         },
     } as const satisfies Record<string, CmdrSaves>;
+
+    const createTestSave = (timestamp: number) => {
+        return {
+            uuid: crypto.randomUUID(),
+            timestamp,
+            player: SerializedPlayerSchema.parse({}),
+            playerLocation: {
+                type: "relative" as const,
+                rotation: { x: 0, y: 0, z: 0, w: 1 },
+                position: { x: 0, y: 0, z: 0 },
+                universeObjectId: {
+                    systemCoordinates: {
+                        starSectorX: 0,
+                        starSectorY: 0,
+                        starSectorZ: 0,
+                        localX: 0,
+                        localY: 0,
+                        localZ: 0,
+                    },
+                    idInSystem: "0",
+                },
+            },
+            shipLocations: {},
+        } satisfies Save;
+    };
 
     describe("Create", () => {
         it("should create a SaveManager with existing saves", async () => {
@@ -173,28 +200,6 @@ describe("SaveManager", () => {
     });
 
     describe("addManualSave", () => {
-        const createTestSave = (timestamp: number) => ({
-            timestamp,
-            player: SerializedPlayerSchema.parse({}),
-            playerLocation: {
-                type: "relative" as const,
-                rotation: { x: 0, y: 0, z: 0, w: 1 },
-                position: { x: 0, y: 0, z: 0 },
-                universeObjectId: {
-                    systemCoordinates: {
-                        starSectorX: 0,
-                        starSectorY: 0,
-                        starSectorZ: 0,
-                        localX: 0,
-                        localY: 0,
-                        localZ: 0,
-                    },
-                    idInSystem: "0",
-                },
-            },
-            shipLocations: {},
-        });
-
         it("should add a manual save to an existing cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
@@ -241,28 +246,6 @@ describe("SaveManager", () => {
     });
 
     describe("addAutoSave", () => {
-        const createTestSave = (timestamp: number) => ({
-            timestamp,
-            player: SerializedPlayerSchema.parse({}),
-            playerLocation: {
-                type: "relative" as const,
-                rotation: { x: 0, y: 0, z: 0, w: 1 },
-                position: { x: 0, y: 0, z: 0 },
-                universeObjectId: {
-                    systemCoordinates: {
-                        starSectorX: 0,
-                        starSectorY: 0,
-                        starSectorZ: 0,
-                        localX: 0,
-                        localY: 0,
-                        localZ: 0,
-                    },
-                    idInSystem: "0",
-                },
-            },
-            shipLocations: {},
-        });
-
         it("should add an auto save to an existing cmdr", async () => {
             const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
