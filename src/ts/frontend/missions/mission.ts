@@ -20,6 +20,8 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import type { DeepReadonly } from "@/utils/types";
+
 import i18n from "@/i18n";
 
 import { type MissionContext } from "./missionContext";
@@ -151,7 +153,10 @@ export class Mission {
         this.tree.updateState(context);
     }
 
-    static Deserialize(missionSerialized: MissionSerialized, starSystemDatabase: StarSystemDatabase): Mission | null {
+    static Deserialize(
+        missionSerialized: DeepReadonly<MissionSerialized>,
+        starSystemDatabase: StarSystemDatabase,
+    ): Mission | null {
         const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
         if (missionTree === null) {
             return null;
