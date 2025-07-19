@@ -10,7 +10,7 @@ import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
-import { type Result } from "@/utils/types";
+import { type DeepReadonly, type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
@@ -26,7 +26,7 @@ export class SaveLoadingPanelContent {
 
     readonly cmdrList: HTMLElement;
 
-    readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
+    readonly onLoadSaveObservable: Observable<DeepReadonly<Save>> = new Observable<DeepReadonly<Save>>();
 
     private readonly soundPlayer: ISoundPlayer;
 
@@ -106,7 +106,7 @@ export class SaveLoadingPanelContent {
 
         const cmdrUuids = await saveManager.getCmdrUuids();
 
-        const flatSortedSaves: Map<string, Save[]> = new Map();
+        const flatSortedSaves: Map<string, Array<DeepReadonly<Save>>> = new Map();
         for (const uuid of cmdrUuids) {
             const cmdrSaves = await saveManager.getSavesForCmdr(uuid);
             if (cmdrSaves === undefined) continue;
@@ -254,7 +254,7 @@ export class SaveLoadingPanelContent {
     }
 
     private createSaveDiv(
-        save: Save,
+        save: DeepReadonly<Save>,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
         saveManager: ISaveBackend,
