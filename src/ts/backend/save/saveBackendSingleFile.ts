@@ -18,7 +18,7 @@
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { jsonSafeParse } from "@/utils/json";
-import { err, ok, type Result } from "@/utils/types";
+import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
@@ -174,18 +174,18 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.backend.write(JSON.stringify(savesJson));
     }
 
-    public deleteSaveForCmdr(cmdrUuid: string, save: Save): Promise<boolean> {
+    public deleteSaveForCmdr(cmdrUuid: string, saveUuid: string): Promise<boolean> {
         const cmdrSaves = this.saves.get(cmdrUuid);
         if (cmdrSaves === undefined) {
             return Promise.resolve(false);
         }
 
-        const manualIndex = cmdrSaves.manual.findIndex((s) => s === save);
+        const manualIndex = cmdrSaves.manual.findIndex((s) => s.uuid === saveUuid);
         if (manualIndex !== -1) {
             cmdrSaves.manual.splice(manualIndex, 1);
         }
 
-        const autoIndex = cmdrSaves.auto.findIndex((s) => s === save);
+        const autoIndex = cmdrSaves.auto.findIndex((s) => s.uuid === saveUuid);
         if (autoIndex !== -1) {
             cmdrSaves.auto.splice(autoIndex, 1);
         }
@@ -202,7 +202,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return Promise.resolve([...this.saves.keys()]);
     }
 
-    public async addManualSave(cmdrUuid: string, save: Save) {
+    public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>) {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
         cmdrSaves.manual.unshift(save);
 
@@ -211,7 +211,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.save();
     }
 
-    public async addAutoSave(cmdrUuid: string, save: Save) {
+    public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>) {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
         cmdrSaves.auto.unshift(save);
 
@@ -222,5 +222,20 @@ export class SaveBackendSingleFile implements ISaveBackend {
         this.saves.set(cmdrUuid, cmdrSaves);
 
         return this.save();
+    }
+
+    public async importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean> {
+        let allSuccess = true;
+        for (const [cmdrUuid, cmdrSaves] of Object.entries(saves)) {
+            for (const manualSave of cmdrSaves.manual) {
+                allSuccess &&= await this.addManualSave(cmdrUuid, manualSave);
+            }
+
+            for (const autoSave of cmdrSaves.auto) {
+                allSuccess &&= await this.addAutoSave(cmdrUuid, autoSave);
+            }
+        }
+
+        return allSuccess;
     }
 }

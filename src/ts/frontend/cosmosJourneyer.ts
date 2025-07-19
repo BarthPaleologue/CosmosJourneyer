@@ -76,6 +76,7 @@ import {
 import { hashArray } from "@/utils/hash";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
+import type { DeepReadonly } from "@/utils/types";
 import { type View } from "@/utils/view";
 
 import i18n, { initI18n } from "@/i18n";
@@ -232,7 +233,7 @@ export class CosmosJourneyer {
             this.soundPlayer,
             this.musicConductor,
         );
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: Save) => {
+        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: DeepReadonly<Save>) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
                     await this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
@@ -877,7 +878,7 @@ export class CosmosJourneyer {
      * This will perform engine initialization if the engine is not initialized.
      * @param saveData The save file data to load
      */
-    public async loadSave(saveData: Save): Promise<void> {
+    public async loadSave(saveData: DeepReadonly<Save>): Promise<void> {
         const playerLocation = saveData.playerLocation;
 
         let locationToUse;

@@ -376,7 +376,7 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
             if (!shouldProceed) return;
 
-            await saveManager.deleteSaveForCmdr(save.player.uuid, save);
+            await saveManager.deleteSaveForCmdr(save.player.uuid, save.uuid);
 
             const cmdrSaves = await saveManager.getSavesForCmdr(save.player.uuid);
             if (cmdrSaves === undefined) return;

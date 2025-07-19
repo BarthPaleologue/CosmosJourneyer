@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@/utils/types";
+
 import type { CmdrSaves, Save } from "./saveFileData";
 
 export interface ISaveBackend {
@@ -24,9 +26,42 @@ export interface ISaveBackend {
      * @returns The commander's saves, or undefined if none exist
      */
     getSavesForCmdr(cmdrUuid: string): Promise<CmdrSaves | undefined>;
-    deleteSaveForCmdr(cmdrUuid: string, save: Save): Promise<boolean>;
+
+    /**
+     * Deletes the given save for the commander
+     * @param cmdrUuid The cmdr uuid
+     * @param saveUuid The uuid of the save to remove
+     */
+    deleteSaveForCmdr(cmdrUuid: string, saveUuid: string): Promise<boolean>;
+
+    /**
+     * Removes a commander and all its saves
+     * @param cmdrUuid The cmdr uuid
+     */
     deleteCmdr(cmdrUuid: string): Promise<boolean>;
+
+    /**
+     * @returns The uuids of all the commanders stored in the backend
+     */
     getCmdrUuids(): Promise<Array<string>>;
-    addManualSave(cmdrUuid: string, save: Save): Promise<boolean>;
-    addAutoSave(cmdrUuid: string, save: Save): Promise<boolean>;
+
+    /**
+     * Adds a new manual save to the backend for the given commander
+     * @param cmdrUuid The uuid of the commander
+     * @param save The save to add
+     */
+    addManualSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean>;
+
+    /**
+     * Adds a new auto save to the backend for the given commander
+     * @param cmdrUuid The uuid of the commander
+     * @param save The save to add
+     */
+    addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean>;
+
+    /**
+     * Imports the given saves in the backend
+     * @param saves The saves to import
+     */
+    importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean>;
 }
