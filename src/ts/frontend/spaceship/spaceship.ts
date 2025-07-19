@@ -54,6 +54,7 @@ import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPad
 
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import { setEnabledBody } from "@/utils/havok";
+import type { DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
 
@@ -135,7 +136,7 @@ export class Spaceship implements Transformable {
     readonly boundingExtent: Vector3;
 
     private constructor(
-        serializedSpaceShip: SerializedSpaceship,
+        serializedSpaceShip: DeepReadonly<SerializedSpaceship>,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
         assets: RenderingAssets,
@@ -741,7 +742,7 @@ export class Spaceship implements Transformable {
     }
 
     public static Deserialize(
-        serializedSpaceship: SerializedSpaceship,
+        serializedSpaceship: DeepReadonly<SerializedSpaceship>,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
         assets: RenderingAssets,
