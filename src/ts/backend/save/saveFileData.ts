@@ -41,9 +41,11 @@ export function safeParseSave(
     return safeParseSaveV2(json, starSystemDatabase);
 }
 
-export function createUrlFromSave(data: Save): URL | null {
+export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     const urlRoot = window.location.href.split("?")[0];
-    const saveString = encodeBase64(JSON.stringify(data));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { thumbnail, ...saveWithoutThumbnail } = save;
+    const saveString = encodeBase64(JSON.stringify(saveWithoutThumbnail));
     if (saveString === null) {
         return null;
     }
