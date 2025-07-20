@@ -64,4 +64,9 @@ export interface ISaveBackend {
      * @param saves The saves to import
      */
     importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean>;
+
+    /**
+     * @returns A record of commander's saves, where the key is the cmdr uuid
+     */
+    exportSaves(): Promise<Record<string, CmdrSaves>>;
 }
