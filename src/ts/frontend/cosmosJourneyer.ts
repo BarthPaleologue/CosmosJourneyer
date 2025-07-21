@@ -30,27 +30,17 @@ import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
-import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
-import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { OPFSFileSystem } from "@/backend/save/opfsFileSystem";
-import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { SaveBackendMultiFile } from "@/backend/save/saveBackendMultiFile";
-import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
+import type { ICosmosJourneyerBackend } from "@/backend";
+import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
-import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
-import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { registerCustomSystems } from "@/backend/universe/customSystems/registerCustomSystems";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { loadAssets, type Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
@@ -75,7 +65,6 @@ import {
     type RelativeCoordinates,
     type UniverseCoordinates,
 } from "@/utils/coordinates/universeCoordinates";
-import { hashArray } from "@/utils/hash";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
 import type { DeepReadonly } from "@/utils/types";
@@ -135,11 +124,7 @@ export class CosmosJourneyer {
 
     readonly player: Player;
 
-    readonly encyclopaedia: EncyclopaediaGalacticaManager;
-
-    readonly starSystemDatabase: StarSystemDatabase;
-
-    readonly saveManager: ISaveBackend;
+    readonly backend: ICosmosJourneyerBackend;
 
     /**
      * The number of seconds elapsed since the start of the engine
@@ -160,9 +145,7 @@ export class CosmosJourneyer {
         engine: AbstractEngine,
         assets: Assets,
         starSystemView: StarSystemView,
-        encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: StarSystemDatabase,
-        saveBackend: ISaveBackend,
+        backend: ICosmosJourneyerBackend,
         soundPlayer: ISoundPlayer,
         tts: Tts,
     ) {
@@ -175,13 +158,10 @@ export class CosmosJourneyer {
             await this.createManualSave();
         });
 
-        this.starSystemDatabase = starSystemDatabase;
+        this.backend = backend;
 
-        this.saveManager = saveBackend;
-
-        this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach(async (discovery) => {
-            await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+            await this.backend.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
 
         this.starSystemView = starSystemView;
@@ -212,8 +192,8 @@ export class CosmosJourneyer {
         this.starMap = new StarMap(
             this.player,
             this.engine,
-            this.encyclopaedia,
-            this.starSystemDatabase,
+            this.backend.encyclopaedia,
+            this.backend.universe,
             this.soundPlayer,
         );
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
@@ -230,8 +210,8 @@ export class CosmosJourneyer {
         document.body.appendChild(this.tutorialLayer.root);
 
         this.sidePanels = new SidePanels(
-            this.starSystemDatabase,
-            this.saveManager,
+            this.backend.universe,
+            this.backend.save,
             this.soundPlayer,
             this.musicConductor,
         );
@@ -246,7 +226,7 @@ export class CosmosJourneyer {
             });
         });
 
-        this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.starSystemDatabase, this.soundPlayer);
+        this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.backend.universe, this.soundPlayer);
         this.mainMenu.onStartObservable.add(async () => {
             await this.tutorialLayer.setTutorial(new FlightTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
@@ -420,6 +400,14 @@ export class CosmosJourneyer {
 
         const loadingScreen = new LoadingScreen(canvas);
 
+        const backendResult = await CosmosJourneyerBackendLocal.New();
+        if (!backendResult.success) {
+            await alertModal(backendResult.error.message, new SoundPlayerMock());
+            throw backendResult.error;
+        }
+
+        const backend = backendResult.value;
+
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
@@ -456,34 +444,7 @@ export class CosmosJourneyer {
         const havokInstance = await HavokPhysics();
         console.log(`Havok initialized`);
 
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-        registerCustomSystems(starSystemDatabase);
-
-        starSystemDatabase.registerGeneralPlugin(
-            (system) => {
-                return (
-                    hashArray([
-                        system.coordinates.starSectorX,
-                        system.coordinates.starSectorY,
-                        system.coordinates.starSectorZ,
-                        system.coordinates.localX,
-                        system.coordinates.localY,
-                        system.coordinates.localZ,
-                    ]) > 0.5
-                );
-            },
-            (system) => {
-                const stellarIds = system.stellarObjects.map((stellarObject) => stellarObject.id);
-                system.anomalies.push(generateDarkKnightModel(stellarIds));
-
-                return system;
-            },
-        );
-
-        const player = Player.Default(starSystemDatabase);
-
-        const encyclopaedia = new EncyclopaediaGalacticaManager();
-        encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(starSystemDatabase));
+        const player = Player.Default(backend.universe);
 
         const mainScene = new UberScene(engine);
 
@@ -510,8 +471,8 @@ export class CosmosJourneyer {
             player,
             engine,
             mainHavokPlugin,
-            encyclopaedia,
-            starSystemDatabase,
+            backend.encyclopaedia,
+            backend.universe,
             soundPlayer,
             tts,
             assets.rendering,
@@ -525,41 +486,7 @@ export class CosmosJourneyer {
             await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
         }
 
-        const legacySaveBackendResult = await SaveBackendSingleFile.CreateAsync(
-            new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
-            new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
-            starSystemDatabase,
-        );
-        if (!legacySaveBackendResult.success) {
-            await alertModal(saveLoadingErrorToI18nString(legacySaveBackendResult.error), soundPlayer);
-            throw new Error("Failed to create save manager");
-        }
-
-        const legacySaveBackend = legacySaveBackendResult.value;
-
-        let saveBackend: ISaveBackend = legacySaveBackend;
-        if (OPFSFileSystem.IsSupported()) {
-            const opfsFileSystem = await OPFSFileSystem.CreateAsync();
-            const opfsSaveBackend = await SaveBackendMultiFile.CreateAsync(opfsFileSystem, starSystemDatabase);
-            if (opfsSaveBackend.success) {
-                // migrate saves from the legacy save backend to the OPFS save backend
-                const saves = await legacySaveBackend.exportSaves();
-                await opfsSaveBackend.value.importSaves(saves);
-                saveBackend = opfsSaveBackend.value;
-            }
-        }
-
-        return new CosmosJourneyer(
-            player,
-            engine,
-            assets,
-            starSystemView,
-            encyclopaedia,
-            starSystemDatabase,
-            saveBackend,
-            soundPlayer,
-            tts,
-        );
+        return new CosmosJourneyer(player, engine, assets, starSystemView, backend, soundPlayer, tts);
     }
 
     public pause(): void {
@@ -810,7 +737,7 @@ export class CosmosJourneyer {
         const saveData = await this.generateSaveData();
         const uuid = saveData.player.uuid;
 
-        return this.saveManager.addManualSave(uuid, saveData);
+        return this.backend.save.addManualSave(uuid, saveData);
     }
 
     public setAutoSaveEnabled(isEnabled: boolean): void {
@@ -831,7 +758,7 @@ export class CosmosJourneyer {
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
         if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
-        await this.saveManager.addAutoSave(uuid, saveData);
+        await this.backend.save.addAutoSave(uuid, saveData);
 
         this.autoSaveTimerSeconds = 0;
     }
@@ -858,7 +785,7 @@ export class CosmosJourneyer {
             if (!this.mainMenu.isVisible()) {
                 await this.createAutoSave();
             }
-            const saveResult = tutorial.getSaveData(this.starSystemDatabase);
+            const saveResult = tutorial.getSaveData(this.backend.universe);
             if (!saveResult.success) {
                 console.error(saveResult.error);
                 await alertModal(
@@ -921,7 +848,7 @@ export class CosmosJourneyer {
             locationToUse = shipLocation;
         }
 
-        const systemModel = this.starSystemDatabase.getSystemModelFromCoordinates(
+        const systemModel = this.backend.universe.getSystemModelFromCoordinates(
             locationToUse.universeObjectId.systemCoordinates,
         );
 
@@ -933,10 +860,10 @@ export class CosmosJourneyer {
             return;
         }
 
-        const newPlayer = Player.Deserialize(saveData.player, this.starSystemDatabase);
-        this.player.copyFrom(newPlayer, this.starSystemDatabase);
+        const newPlayer = Player.Deserialize(saveData.player, this.backend.universe);
+        this.player.copyFrom(newPlayer, this.backend.universe);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
-            await this.encyclopaedia.contributeDiscoveryIfNew(discovery);
+            await this.backend.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
         await this.starSystemView.resetPlayer();
 

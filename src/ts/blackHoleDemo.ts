@@ -55,7 +55,7 @@ const starSystemModel: StarSystemModel = {
     orbitalFacilities: [],
 };
 
-engine.starSystemDatabase.registerCustomSystem(starSystemModel);
+engine.backend.universe.registerCustomSystem(starSystemModel);
 
 const starSystem = await starSystemView.loadStarSystem(starSystemModel);
 
