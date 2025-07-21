@@ -32,7 +32,9 @@ import HavokPhysics from "@babylonjs/havok";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { OPFSFileSystem } from "@/backend/save/opfsFileSystem";
 import { type ISaveBackend } from "@/backend/save/saveBackend";
+import { SaveBackendMultiFile } from "@/backend/save/saveBackendMultiFile";
 import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
@@ -160,7 +162,7 @@ export class CosmosJourneyer {
         starSystemView: StarSystemView,
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveBackendSingleFile,
+        saveBackend: ISaveBackend,
         soundPlayer: ISoundPlayer,
         tts: Tts,
     ) {
@@ -175,7 +177,7 @@ export class CosmosJourneyer {
 
         this.starSystemDatabase = starSystemDatabase;
 
-        this.saveManager = saveManager;
+        this.saveManager = saveBackend;
 
         this.encyclopaedia = encyclopaedia;
         this.player.discoveries.uploaded.forEach(async (discovery) => {
@@ -523,14 +525,28 @@ export class CosmosJourneyer {
             await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
         }
 
-        const saveManagerCreateResult = await SaveBackendSingleFile.CreateAsync(
+        const legacySaveBackendResult = await SaveBackendSingleFile.CreateAsync(
             new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
             new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
             starSystemDatabase,
         );
-        if (!saveManagerCreateResult.success) {
-            await alertModal(saveLoadingErrorToI18nString(saveManagerCreateResult.error), soundPlayer);
+        if (!legacySaveBackendResult.success) {
+            await alertModal(saveLoadingErrorToI18nString(legacySaveBackendResult.error), soundPlayer);
             throw new Error("Failed to create save manager");
+        }
+
+        const legacySaveBackend = legacySaveBackendResult.value;
+
+        let saveBackend: ISaveBackend = legacySaveBackend;
+        if (OPFSFileSystem.IsSupported()) {
+            const opfsFileSystem = await OPFSFileSystem.CreateAsync();
+            const opfsSaveBackend = await SaveBackendMultiFile.CreateAsync(opfsFileSystem, starSystemDatabase);
+            if (opfsSaveBackend.success) {
+                // migrate saves from the legacy save backend to the OPFS save backend
+                const saves = await legacySaveBackend.exportSaves();
+                await opfsSaveBackend.value.importSaves(saves);
+                saveBackend = opfsSaveBackend.value;
+            }
         }
 
         return new CosmosJourneyer(
@@ -540,7 +556,7 @@ export class CosmosJourneyer {
             starSystemView,
             encyclopaedia,
             starSystemDatabase,
-            saveManagerCreateResult.value,
+            saveBackend,
             soundPlayer,
             tts,
         );
