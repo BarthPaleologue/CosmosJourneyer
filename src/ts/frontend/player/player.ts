@@ -32,6 +32,7 @@ import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 import { Mission } from "@/frontend/missions/mission";
 import { type Spaceship } from "@/frontend/spaceship/spaceship";
 
+import { jsonSafeParse } from "@/utils/json";
 import { type DeepReadonly } from "@/utils/types";
 
 export class Player {
@@ -173,7 +174,8 @@ export class Player {
 
     public static Serialize(player: Player): SerializedPlayer {
         const mutableSerializedSpaceships = player.serializedSpaceships
-            .map((spaceship) => SerializedSpaceshipSchema.safeParse(JSON.stringify(spaceship)).data)
+            .map((spaceship) => jsonSafeParse(JSON.stringify(spaceship)))
+            .map((spaceship) => SerializedSpaceshipSchema.safeParse(spaceship).data)
             .filter((spaceship) => spaceship !== undefined);
 
         return {
