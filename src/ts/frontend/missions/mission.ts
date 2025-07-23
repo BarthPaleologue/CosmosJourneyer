@@ -157,16 +157,22 @@ export class Mission {
         missionSerialized: DeepReadonly<MissionSerialized>,
         starSystemDatabase: StarSystemDatabase,
     ): Mission | null {
-        const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
-        if (missionTree === null) {
+        try {
+            const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
+            if (missionTree === null) {
+                return null;
+            }
+
+            return new Mission(
+                missionTree,
+                missionSerialized.reward,
+                missionSerialized.missionGiver,
+                missionSerialized.type,
+            );
+        } catch (error) {
+            // Handle invalid mission data gracefully
+            console.warn("Failed to deserialize mission:", error);
             return null;
         }
-
-        return new Mission(
-            missionTree,
-            missionSerialized.reward,
-            missionSerialized.missionGiver,
-            missionSerialized.type,
-        );
     }
 }

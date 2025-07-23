@@ -80,22 +80,22 @@ export class Player {
 
         this.timePlayedSeconds = serializedPlayer.timePlayedSeconds;
 
-        this.visitedSystemHistory = [...serializedPlayer.visitedSystemHistory];
+        this.visitedSystemHistory = serializedPlayer.visitedSystemHistory.map((coords) => structuredClone(coords));
 
         this.discoveries = {
-            local: [...serializedPlayer.discoveries.local],
-            uploaded: [...serializedPlayer.discoveries.uploaded],
+            local: serializedPlayer.discoveries.local.map((discovery) => structuredClone(discovery)),
+            uploaded: serializedPlayer.discoveries.uploaded.map((discovery) => structuredClone(discovery)),
         };
 
-        this.discoveries.local.forEach((objectId) => {
-            this.visitedObjects.add(JSON.stringify(objectId));
+        this.discoveries.local.forEach((discovery) => {
+            this.visitedObjects.add(JSON.stringify(discovery.objectId));
         });
-        this.discoveries.uploaded.forEach((objectId) => {
-            this.visitedObjects.add(JSON.stringify(objectId));
+        this.discoveries.uploaded.forEach((discovery) => {
+            this.visitedObjects.add(JSON.stringify(discovery.objectId));
         });
 
         this.currentItinerary = structuredClone(serializedPlayer.currentItinerary);
-        this.systemBookmarks = [...serializedPlayer.systemBookmarks];
+        this.systemBookmarks = serializedPlayer.systemBookmarks.map((coords) => structuredClone(coords));
         this.currentMissions = serializedPlayer.currentMissions
             .map((mission) => Mission.Deserialize(mission, starSystemDatabase))
             .filter((mission) => mission !== null);
@@ -184,10 +184,13 @@ export class Player {
             balance: player.getBalance(),
             creationDate: player.creationDate.toISOString(),
             timePlayedSeconds: Math.round(player.timePlayedSeconds),
-            visitedSystemHistory: player.visitedSystemHistory,
-            discoveries: player.discoveries,
+            visitedSystemHistory: player.visitedSystemHistory.map((coords) => structuredClone(coords)),
+            discoveries: {
+                local: player.discoveries.local.map((discovery) => structuredClone(discovery)),
+                uploaded: player.discoveries.uploaded.map((discovery) => structuredClone(discovery)),
+            },
             currentItinerary: player.currentItinerary !== null ? [...player.currentItinerary] : null,
-            systemBookmarks: player.systemBookmarks,
+            systemBookmarks: player.systemBookmarks.map((coords) => structuredClone(coords)),
             currentMissions: player.currentMissions.map((mission) => mission.serialize()),
             completedMissions: player.completedMissions.map((mission) => mission.serialize()),
             spaceShips: mutableSerializedSpaceships.concat(
