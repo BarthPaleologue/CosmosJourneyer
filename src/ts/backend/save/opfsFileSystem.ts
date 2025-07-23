@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { err, ok, type Result } from "@/utils/types";
+
 import type { IFileSystem } from "./saveBackendMultiFile";
 
 declare global {
@@ -43,9 +45,18 @@ export class OPFSFileSystem implements IFileSystem {
      * Factory method to create an OPFSFileSystem instance.
      * @returns The created OPFSFileSystem instance
      */
-    public static async CreateAsync(): Promise<OPFSFileSystem> {
-        const rootHandle = await navigator.storage.getDirectory();
-        return new OPFSFileSystem(rootHandle);
+    public static async CreateAsync(): Promise<Result<OPFSFileSystem, unknown>> {
+        if (!OPFSFileSystem.IsSupported()) {
+            return err(new Error("OPFS is not supported in this browser"));
+        }
+
+        try {
+            const rootHandle = await navigator.storage.getDirectory();
+            return ok(new OPFSFileSystem(rootHandle));
+        } catch (error) {
+            console.error("Failed to create OPFSFileSystem:", error);
+            return err(error);
+        }
     }
 
     /**

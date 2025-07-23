@@ -77,9 +77,10 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
         );
 
         let saveBackend: ISaveBackend | undefined = undefined;
-        if (OPFSFileSystem.IsSupported()) {
-            const opfsFileSystem = await OPFSFileSystem.CreateAsync();
-            const opfsSaveBackend = await SaveBackendMultiFile.CreateAsync(opfsFileSystem, universeBackend);
+
+        const opfsFileSystemResult = await OPFSFileSystem.CreateAsync();
+        if (opfsFileSystemResult.success) {
+            const opfsSaveBackend = await SaveBackendMultiFile.CreateAsync(opfsFileSystemResult.value, universeBackend);
             if (opfsSaveBackend.success) {
                 if (legacySaveBackendResult.success) {
                     // migrate saves from the legacy save backend to the OPFS save backend
