@@ -20,6 +20,8 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import type { DeepReadonly } from "@/utils/types";
+
 import i18n from "@/i18n";
 
 import { type MissionContext } from "./missionContext";
@@ -151,17 +153,26 @@ export class Mission {
         this.tree.updateState(context);
     }
 
-    static Deserialize(missionSerialized: MissionSerialized, starSystemDatabase: StarSystemDatabase): Mission | null {
-        const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
-        if (missionTree === null) {
+    static Deserialize(
+        missionSerialized: DeepReadonly<MissionSerialized>,
+        starSystemDatabase: StarSystemDatabase,
+    ): Mission | null {
+        try {
+            const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
+            if (missionTree === null) {
+                return null;
+            }
+
+            return new Mission(
+                missionTree,
+                missionSerialized.reward,
+                missionSerialized.missionGiver,
+                missionSerialized.type,
+            );
+        } catch (error) {
+            // Handle invalid mission data gracefully
+            console.warn("Failed to deserialize mission:", error);
             return null;
         }
-
-        return new Mission(
-            missionTree,
-            missionSerialized.reward,
-            missionSerialized.missionGiver,
-            missionSerialized.type,
-        );
     }
 }

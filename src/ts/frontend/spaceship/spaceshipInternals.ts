@@ -19,6 +19,8 @@ import { type SerializedComponent } from "@/backend/spaceship/serializedComponen
 import { type SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
 import { ShipType, type SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 
+import type { DeepReadonly } from "@/utils/types";
+
 import { DiscoveryScanner } from "./components/discoveryScanner";
 import { FuelScoop } from "./components/fuelScoop";
 import { FuelTank } from "./components/fuelTank";
@@ -38,7 +40,7 @@ export class SpaceshipInternals {
 
     readonly optionals: ReadonlyArray<ComponentSlot>;
 
-    constructor(serializedSpaceship: SerializedSpaceship, unfitComponents: Set<SerializedComponent>) {
+    constructor(serializedSpaceship: DeepReadonly<SerializedSpaceship>, unfitComponents: Set<SerializedComponent>) {
         this.type = serializedSpaceship.type;
 
         const components = serializedSpaceship.components;

@@ -19,8 +19,8 @@ import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { SaveLocalBackend } from "@/backend/save/saveLocalBackend";
-import { SaveManager } from "@/backend/save/saveManager";
+import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
+import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
@@ -51,13 +51,17 @@ export async function createSaveLoadingPanelContentScene(
     saveLoadingPanelContent.htmlRoot.style.position = "absolute";
     document.body.appendChild(saveLoadingPanelContent.htmlRoot);
 
-    const saveManager = await SaveManager.CreateAsync(new SaveLocalBackend(), starSystemDatabase);
+    const saveManager = await SaveBackendSingleFile.CreateAsync(
+        new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
+        new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
+        starSystemDatabase,
+    );
     if (!saveManager.success) {
         await alertModal("Could not load saves", soundPlayer);
         return scene;
     }
 
-    saveLoadingPanelContent.populateCmdrList(starSystemDatabase, saveManager.value);
+    await saveLoadingPanelContent.populateCmdrList(starSystemDatabase, saveManager.value);
 
     return scene;
 }

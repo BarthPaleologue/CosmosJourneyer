@@ -33,6 +33,10 @@ export type DeepReadonly<T> = {
     readonly [K in keyof T]: DeepReadonly<T[K]>;
 };
 
+export type DeepMutable<T> = {
+    -readonly [K in keyof T]: DeepMutable<T[K]>;
+};
+
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
@@ -42,3 +46,10 @@ export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<
 export function assertUnreachable(value: never): never {
     throw new Error(`Unexpected value: ${String(value)}`);
 }
+
+/** Strict (non-distributive) type equality that even distinguishes `any`. */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export type StrictEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+
+/** Turns “should be true” into a compilation error when it’s not. */
+export type Assert<T extends true> = T;

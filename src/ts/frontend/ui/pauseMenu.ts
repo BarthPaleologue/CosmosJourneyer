@@ -76,21 +76,21 @@ export class PauseMenu {
 
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
-        this.contributeButton.addEventListener("click", () => {
+        this.contributeButton.addEventListener("click", async () => {
             soundPlayer.playNow(SoundType.CLICK);
-            this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
+            await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
-        this.tutorialsButton.addEventListener("click", () => {
+        this.tutorialsButton.addEventListener("click", async () => {
             soundPlayer.playNow(SoundType.CLICK);
-            this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+            await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
-        this.settingsButton.addEventListener("click", () => {
+        this.settingsButton.addEventListener("click", async () => {
             soundPlayer.playNow(SoundType.CLICK);
-            this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+            await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
-        this.loadButton.addEventListener("click", () => {
+        this.loadButton.addEventListener("click", async () => {
             soundPlayer.playNow(SoundType.CLICK);
-            this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+            await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());

@@ -1,22 +1,21 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type SaveManager } from "@/backend/save/saveManager";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
+import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
-import { type Result } from "@/utils/types";
+import { type DeepReadonly, type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";
-import editIconPath from "@assets/icons/edit.webp";
 import expandIconPath from "@assets/icons/expand.webp";
 import shareIconPath from "@assets/icons/link.webp";
 import loadIconPath from "@assets/icons/play.webp";
@@ -27,7 +26,7 @@ export class SaveLoadingPanelContent {
 
     readonly cmdrList: HTMLElement;
 
-    readonly onLoadSaveObservable: Observable<Save> = new Observable<Save>();
+    readonly onLoadSaveObservable: Observable<DeepReadonly<Save>> = new Observable<DeepReadonly<Save>>();
 
     private readonly soundPlayer: ISoundPlayer;
 
@@ -102,14 +101,14 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: SaveManager) {
+    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveBackend) {
         this.cmdrList.innerHTML = "";
 
-        const cmdrUuids = saveManager.getCmdrUuids();
+        const cmdrUuids = await saveManager.getCmdrUuids();
 
-        const flatSortedSaves: Map<string, Save[]> = new Map();
+        const flatSortedSaves: Map<string, Array<DeepReadonly<Save>>> = new Map();
         for (const uuid of cmdrUuids) {
-            const cmdrSaves = saveManager.getSavesForCmdr(uuid);
+            const cmdrSaves = await saveManager.getSavesForCmdr(uuid);
             if (cmdrSaves === undefined) continue;
             flatSortedSaves.set(uuid, cmdrSaves.manual.concat(cmdrSaves.auto));
         }
@@ -126,8 +125,8 @@ export class SaveLoadingPanelContent {
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
-        cmdrUuids.forEach((cmdrUuid) => {
-            const cmdrSaves = saveManager.getSavesForCmdr(cmdrUuid);
+        for (const cmdrUuid of cmdrUuids) {
+            const cmdrSaves = await saveManager.getSavesForCmdr(cmdrUuid);
             if (cmdrSaves === undefined) {
                 return;
             }
@@ -219,29 +218,6 @@ export class SaveLoadingPanelContent {
             shareIcon.src = shareIconPath;
             shareButton.appendChild(shareIcon);
 
-            const editNameButton = document.createElement("button");
-            editNameButton.classList.add("icon", "large");
-            editNameButton.addEventListener("click", async () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
-                const newName = await promptModalString(
-                    i18n.t("sidePanel:cmdrNameChangePrompt"),
-                    latestSave.player.name,
-                    this.soundPlayer,
-                );
-                if (newName === null) return;
-
-                saveManager.renameCmdr(cmdrUuid, newName);
-
-                cmdrName.innerText = newName;
-
-                saveManager.save();
-            });
-            cmdrHeaderButtons.appendChild(editNameButton);
-
-            const editIcon = document.createElement("img");
-            editIcon.src = editIconPath;
-            editNameButton.appendChild(editIcon);
-
             const savesList = document.createElement("div");
 
             savesList.classList.add("savesList");
@@ -274,14 +250,14 @@ export class SaveLoadingPanelContent {
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
-        });
+        }
     }
 
     private createSaveDiv(
-        save: Save,
+        save: DeepReadonly<Save>,
         isAutoSave: boolean,
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager,
+        saveManager: ISaveBackend,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
@@ -400,19 +376,17 @@ export class SaveLoadingPanelContent {
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
             if (!shouldProceed) return;
 
-            saveManager.deleteSaveForCmdr(save.player.uuid, save);
+            await saveManager.deleteSaveForCmdr(save.player.uuid, save.uuid);
 
-            const cmdrSaves = saveManager.getSavesForCmdr(save.player.uuid);
+            const cmdrSaves = await saveManager.getSavesForCmdr(save.player.uuid);
             if (cmdrSaves === undefined) return;
 
             if (cmdrSaves.auto.length === 0 && cmdrSaves.manual.length === 0) {
-                saveManager.deleteCmdr(save.player.uuid);
+                await saveManager.deleteCmdr(save.player.uuid);
                 saveDiv.parentElement?.parentElement?.remove();
             }
 
             saveDiv.remove();
-
-            saveManager.save();
         });
         saveButtons.appendChild(deleteButton);
 

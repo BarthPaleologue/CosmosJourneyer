@@ -1,4 +1,4 @@
-import { type SaveManager } from "@/backend/save/saveManager";
+import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -34,16 +34,16 @@ export class SidePanels {
 
     private readonly starSystemDatabase: StarSystemDatabase;
 
-    private readonly saveManager: SaveManager;
+    private readonly saveBackend: ISaveBackend;
 
     constructor(
         starSystemDatabase: StarSystemDatabase,
-        saveManager: SaveManager,
+        saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
     ) {
         this.starSystemDatabase = starSystemDatabase;
-        this.saveManager = saveManager;
+        this.saveBackend = saveManager;
 
         const loadSavePanel = document.getElementById("loadSavePanel");
         if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
@@ -118,14 +118,14 @@ export class SidePanels {
         panel.appendChild(closeButton);
     }
 
-    public toggleActivePanel(type: PanelType) {
+    public async toggleActivePanel(type: PanelType) {
         const newPanel = this.panelFromType(type);
         if (this.activeRightPanel === newPanel) {
             return;
         }
 
         if (type === PanelType.LOAD_SAVE) {
-            this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase, this.saveManager);
+            await this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase, this.saveBackend);
         }
 
         if (this.activeRightPanel !== null) {

@@ -20,7 +20,7 @@ import { z } from "zod";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { encodeBase64 } from "@/utils/base64";
-import { type Result } from "@/utils/types";
+import { type Assert, type DeepMutable, type DeepReadonly, type Result, type StrictEqual } from "@/utils/types";
 
 import { type SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
@@ -41,9 +41,11 @@ export function safeParseSave(
     return safeParseSaveV2(json, starSystemDatabase);
 }
 
-export function createUrlFromSave(data: Save): URL | null {
+export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     const urlRoot = window.location.href.split("?")[0];
-    const saveString = encodeBase64(JSON.stringify(data));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { thumbnail, ...saveWithoutThumbnail } = save;
+    const saveString = encodeBase64(JSON.stringify(saveWithoutThumbnail));
     if (saveString === null) {
         return null;
     }
@@ -86,6 +88,11 @@ export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
     auto: z.array(SaveSchema),
 });
 
-export type CmdrSaves = z.infer<typeof CmdrSavesDeepSchema>;
+export type CmdrSaves = {
+    manual: Array<DeepReadonly<Save>>;
+    auto: Array<DeepReadonly<Save>>;
+};
+
+export type CmdrSavesShapeIsStable = Assert<StrictEqual<DeepMutable<CmdrSaves>, z.infer<typeof CmdrSavesDeepSchema>>>;
 
 export const SavesSchema = z.record(z.string().uuid(), CmdrSavesShallowSchema);
