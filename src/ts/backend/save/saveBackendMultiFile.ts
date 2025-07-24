@@ -387,19 +387,20 @@ export class SaveBackendMultiFile implements ISaveBackend {
      * @inheritdoc
      */
     public async importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean> {
-        let allSuccess = true;
-
+        const promises: Array<Promise<boolean>> = [];
         for (const [cmdrUuid, cmdrSaves] of Object.entries(saves)) {
             for (const manualSave of cmdrSaves.manual) {
-                allSuccess &&= await this.addManualSave(cmdrUuid, manualSave);
+                promises.push(this.addManualSave(cmdrUuid, manualSave));
             }
 
             for (const autoSave of cmdrSaves.auto) {
-                allSuccess &&= await this.addAutoSave(cmdrUuid, autoSave);
+                promises.push(this.addAutoSave(cmdrUuid, autoSave));
             }
         }
 
-        return allSuccess;
+        const results = await Promise.all(promises);
+
+        return results.every((result) => result);
     }
 
     /**
