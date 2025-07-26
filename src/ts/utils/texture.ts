@@ -21,6 +21,8 @@ import { RawTexture2DArray } from "@babylonjs/core/Materials/Textures/rawTexture
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+
 import { err, ok, type Result } from "./types";
 
 export async function loadImageBitmap(url: string): Promise<Result<ImageBitmap, Error>> {
@@ -58,21 +60,16 @@ export async function loadImageBitmapArray(url: ReadonlyArray<string>): Promise<
     return ok(bitmaps);
 }
 
-export async function createTextureAsync(path: string, scene: Scene): Promise<Texture> {
-    return new Promise((resolve) => {
-        const texture = new Texture(path, scene, undefined, undefined, undefined, () => {
-            resolve(texture);
-        });
-    });
-}
-
 export async function createRawTexture2DArrayFromUrls(
     urls: ReadonlyArray<string>,
     scene: Scene,
     engine: WebGPUEngine,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Result<RawTexture2DArray, Error>> {
+    progressMonitor?.startTask();
     const bitMapsResult = await loadImageBitmapArray(urls);
     if (!bitMapsResult.success) {
+        progressMonitor?.completeTask();
         return bitMapsResult;
     }
 
@@ -81,10 +78,12 @@ export async function createRawTexture2DArrayFromUrls(
         for (const bmp of bitMaps) {
             bmp.close();
         }
+        progressMonitor?.completeTask();
     };
 
     const firstBitmap = bitMaps[0];
     if (firstBitmap === undefined) {
+        progressMonitor?.completeTask();
         return err(new Error("No image bitmaps were loaded. Please check the URLs."));
     }
 
@@ -139,5 +138,28 @@ export async function createRawTexture2DArrayFromUrls(
         cleanupBitmaps();
     }
 
+    texArray.wrapU = Texture.CLAMP_ADDRESSMODE;
+    texArray.wrapV = Texture.CLAMP_ADDRESSMODE;
+    texArray.wrapR = Texture.CLAMP_ADDRESSMODE;
+
     return ok(texArray);
 }
+
+export type Texture2d = {
+    type: "texture_2d";
+    texture: Texture;
+};
+
+export type Texture2dArrayMosaic = {
+    type: "texture_2d_array_mosaic";
+    array: RawTexture2DArray;
+    tileCount: {
+        x: number;
+        y: number;
+    };
+};
+
+/**
+ * 2D texture sampler types that can be sampled using a simple UV coordinate.
+ */
+export type Texture2dUv = Texture2d | Texture2dArrayMosaic;

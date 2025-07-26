@@ -15,16 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PointLight,
-    Scene,
-    Texture,
-    Vector3,
-    type WebGPUEngine,
-} from "@babylonjs/core";
+import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getMercuryModel } from "@/backend/universe/customSystems/sol/mercury";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -32,24 +23,17 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadMercuryAlbedo,
+    loadMercuryHighResolutionAlbedo,
+    loadMercuryNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/mercury";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { type BslTexture2dUv } from "@/utils/bslExtensions";
-import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
-
-import mercuryColorMapPath from "@assets/sol/textures/mercuryColor8k.png";
-import mercuryColorMapPath_0_0 from "@assets/sol/textures/mercuryColorMap2x4/0_0.png";
-import mercuryColorMapPath_0_1 from "@assets/sol/textures/mercuryColorMap2x4/0_1.png";
-import mercuryColorMapPath_0_2 from "@assets/sol/textures/mercuryColorMap2x4/0_2.png";
-import mercuryColorMapPath_0_3 from "@assets/sol/textures/mercuryColorMap2x4/0_3.png";
-import mercuryColorMapPath_1_0 from "@assets/sol/textures/mercuryColorMap2x4/1_0.png";
-import mercuryColorMapPath_1_1 from "@assets/sol/textures/mercuryColorMap2x4/1_1.png";
-import mercuryColorMapPath_1_2 from "@assets/sol/textures/mercuryColorMap2x4/1_2.png";
-import mercuryColorMapPath_1_3 from "@assets/sol/textures/mercuryColorMap2x4/1_3.png";
-import mercuryNormalMapPath from "@assets/sol/textures/mercuryNormalMap8k.png";
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createMercuryScene(
     engine: WebGPUEngine,
@@ -99,46 +83,23 @@ export async function createMercuryScene(
 
     const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
 
-    let albedoBslTexture: BslTexture2dUv;
+    let albedoBslTexture: Texture2dUv;
 
     if (useHighQuality) {
-        const albedoResult = await createRawTexture2DArrayFromUrls(
-            [
-                mercuryColorMapPath_0_0,
-                mercuryColorMapPath_0_1,
-                mercuryColorMapPath_0_2,
-                mercuryColorMapPath_0_3,
-                mercuryColorMapPath_1_0,
-                mercuryColorMapPath_1_1,
-                mercuryColorMapPath_1_2,
-                mercuryColorMapPath_1_3,
-            ],
-            scene,
-            engine,
-        );
+        const albedoResult = await loadMercuryHighResolutionAlbedo(scene, engine, progressMonitor);
         if (!albedoResult.success) {
             throw new Error(`Failed to create albedo texture: ${String(albedoResult.error)}`);
         }
 
-        const albedo = albedoResult.value;
-        const addressMode = Texture.CLAMP_ADDRESSMODE;
-        albedo.wrapU = addressMode;
-        albedo.wrapV = addressMode;
-        albedo.wrapR = addressMode;
-
-        albedoBslTexture = {
-            type: "texture_2d_array_mosaic",
-            array: albedo,
-            tileCount: { x: 4, y: 2 },
-        };
+        albedoBslTexture = albedoResult.value;
     } else {
         albedoBslTexture = {
             type: "texture_2d",
-            texture: await createTextureAsync(mercuryColorMapPath, scene),
+            texture: await loadMercuryAlbedo(scene, progressMonitor),
         };
     }
 
-    const normalMap = new Texture(mercuryNormalMapPath, scene);
+    const normalMap = await loadMercuryNormal(scene, progressMonitor);
 
     const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normalMap }, scene);
 
