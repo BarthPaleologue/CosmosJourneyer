@@ -23,6 +23,8 @@ import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
 import { retry } from "@/utils/retry";
 
+import { Settings } from "@/settings";
+
 import computeSource from "@shaders/compute/utils/squareGridComputeNormals.wgsl";
 
 export class SquareGridNormalComputer {
@@ -54,7 +56,7 @@ export class SquareGridNormalComputer {
             },
         );
 
-        await retry(() => computeShader.isReady(), 1000, 10);
+        await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
         return new SquareGridNormalComputer(computeShader, engine);
     }
