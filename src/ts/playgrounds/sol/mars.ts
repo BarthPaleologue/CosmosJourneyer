@@ -15,17 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Axis,
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PointLight,
-    Scene,
-    Texture,
-    Vector3,
-    type WebGPUEngine,
-} from "@babylonjs/core";
+import { Axis, GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getMarsModel } from "@/backend/universe/customSystems/sol/mars";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -33,6 +23,11 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadMarsAlbedo,
+    loadMarsHighResolutionAlbedo,
+    loadMarsNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/mars";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -40,19 +35,7 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { type BslTexture2dUv } from "@/utils/bslExtensions";
-import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
-
-import marsAlbedoPath from "@assets/sol/textures/marsColor8k.png";
-import marsAlbedoPath_0_0 from "@assets/sol/textures/marsColorMap2x4/0_0.png";
-import marsAlbedoPath_0_1 from "@assets/sol/textures/marsColorMap2x4/0_1.png";
-import marsAlbedoPath_0_2 from "@assets/sol/textures/marsColorMap2x4/0_2.png";
-import marsAlbedoPath_0_3 from "@assets/sol/textures/marsColorMap2x4/0_3.png";
-import marsAlbedoPath_1_0 from "@assets/sol/textures/marsColorMap2x4/1_0.png";
-import marsAlbedoPath_1_1 from "@assets/sol/textures/marsColorMap2x4/1_1.png";
-import marsAlbedoPath_1_2 from "@assets/sol/textures/marsColorMap2x4/1_2.png";
-import marsAlbedoPath_1_3 from "@assets/sol/textures/marsColorMap2x4/1_3.png";
-import marsNormalPath from "@assets/sol/textures/marsNormalMap8k.png";
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createMarsScene(
     engine: WebGPUEngine,
@@ -102,45 +85,22 @@ export async function createMarsScene(
 
     const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
 
-    let albedoBslTexture: BslTexture2dUv;
+    let albedoBslTexture: Texture2dUv;
 
     if (useHighQuality) {
-        const albedoResult = await createRawTexture2DArrayFromUrls(
-            [
-                marsAlbedoPath_0_0,
-                marsAlbedoPath_0_1,
-                marsAlbedoPath_0_2,
-                marsAlbedoPath_0_3,
-                marsAlbedoPath_1_0,
-                marsAlbedoPath_1_1,
-                marsAlbedoPath_1_2,
-                marsAlbedoPath_1_3,
-            ],
-            scene,
-            engine,
-        );
+        const albedoResult = await loadMarsHighResolutionAlbedo(scene, engine, progressMonitor);
         if (!albedoResult.success) {
             throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
         }
 
-        const albedo = albedoResult.value;
-        const addressMode = Texture.CLAMP_ADDRESSMODE;
-        albedo.wrapU = addressMode;
-        albedo.wrapV = addressMode;
-        albedo.wrapR = addressMode;
-
-        albedoBslTexture = {
-            type: "texture_2d_array_mosaic",
-            array: albedo,
-            tileCount: { x: 4, y: 2 },
-        };
+        albedoBslTexture = albedoResult.value;
     } else {
         albedoBslTexture = {
             type: "texture_2d",
-            texture: await createTextureAsync(marsAlbedoPath, scene),
+            texture: await loadMarsAlbedo(scene, progressMonitor),
         };
     }
-    const normal = await createTextureAsync(marsNormalPath, scene);
+    const normal = await loadMarsNormal(scene, progressMonitor);
 
     const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 

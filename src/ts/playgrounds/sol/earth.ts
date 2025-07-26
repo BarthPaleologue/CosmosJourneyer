@@ -15,16 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    GizmoManager,
-    Light,
-    LightGizmo,
-    PointLight,
-    Scene,
-    Texture,
-    Vector3,
-    type WebGPUEngine,
-} from "@babylonjs/core";
+import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getEarthModel } from "@/backend/universe/customSystems/sol/earth";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
@@ -33,6 +24,12 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadEarthAlbedo,
+    loadEarthHighResolutionAlbedo,
+    loadEarthHighResolutionNormal,
+    loadEarthNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/earth";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -44,27 +41,7 @@ import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { type BslTexture2dUv } from "@/utils/bslExtensions";
-import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
-
-import earthColorMap8k from "@assets/sol/textures/earthColor8k.png";
-import earthColorMapPath_0_0 from "@assets/sol/textures/earthColorMap2x4/0_0.png";
-import earthColorMapPath_0_1 from "@assets/sol/textures/earthColorMap2x4/0_1.png";
-import earthColorMapPath_0_2 from "@assets/sol/textures/earthColorMap2x4/0_2.png";
-import earthColorMapPath_0_3 from "@assets/sol/textures/earthColorMap2x4/0_3.png";
-import earthColorMapPath_1_0 from "@assets/sol/textures/earthColorMap2x4/1_0.png";
-import earthColorMapPath_1_1 from "@assets/sol/textures/earthColorMap2x4/1_1.png";
-import earthColorMapPath_1_2 from "@assets/sol/textures/earthColorMap2x4/1_2.png";
-import earthColorMapPath_1_3 from "@assets/sol/textures/earthColorMap2x4/1_3.png";
-import earthNormalMapPath_0_0 from "@assets/sol/textures/earthNormalMap2x4/0_0.png";
-import earthNormalMapPath_0_1 from "@assets/sol/textures/earthNormalMap2x4/0_1.png";
-import earthNormalMapPath_0_2 from "@assets/sol/textures/earthNormalMap2x4/0_2.png";
-import earthNormalMapPath_0_3 from "@assets/sol/textures/earthNormalMap2x4/0_3.png";
-import earthNormalMapPath_1_0 from "@assets/sol/textures/earthNormalMap2x4/1_0.png";
-import earthNormalMapPath_1_1 from "@assets/sol/textures/earthNormalMap2x4/1_1.png";
-import earthNormalMapPath_1_2 from "@assets/sol/textures/earthNormalMap2x4/1_2.png";
-import earthNormalMapPath_1_3 from "@assets/sol/textures/earthNormalMap2x4/1_3.png";
-import earthNormalMap8k from "@assets/sol/textures/earthNormalMap8k.png";
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -117,77 +94,31 @@ export async function createEarthScene(
 
     const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
 
-    let albedoBslTexture: BslTexture2dUv;
-    let normalBslTexture: BslTexture2dUv;
+    let albedoBslTexture: Texture2dUv;
+    let normalBslTexture: Texture2dUv;
 
     if (useHighQuality) {
-        const albedoResult = await createRawTexture2DArrayFromUrls(
-            [
-                earthColorMapPath_0_0,
-                earthColorMapPath_0_1,
-                earthColorMapPath_0_2,
-                earthColorMapPath_0_3,
-                earthColorMapPath_1_0,
-                earthColorMapPath_1_1,
-                earthColorMapPath_1_2,
-                earthColorMapPath_1_3,
-            ],
-            scene,
-            engine,
-        );
+        const albedoResult = await loadEarthHighResolutionAlbedo(scene, engine, progressMonitor);
         if (!albedoResult.success) {
             throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
         }
 
-        const albedo = albedoResult.value;
-        const addressMode = Texture.CLAMP_ADDRESSMODE;
-        albedo.wrapU = addressMode;
-        albedo.wrapV = addressMode;
-        albedo.wrapR = addressMode;
-
-        const normalMapResult = await createRawTexture2DArrayFromUrls(
-            [
-                earthNormalMapPath_0_0,
-                earthNormalMapPath_0_1,
-                earthNormalMapPath_0_2,
-                earthNormalMapPath_0_3,
-                earthNormalMapPath_1_0,
-                earthNormalMapPath_1_1,
-                earthNormalMapPath_1_2,
-                earthNormalMapPath_1_3,
-            ],
-            scene,
-            engine,
-        );
+        const normalMapResult = await loadEarthHighResolutionNormal(scene, engine, progressMonitor);
         if (!normalMapResult.success) {
             throw new Error(`Failed to create normal map texture array: ${String(normalMapResult.error)}`);
         }
 
-        const normalMap = normalMapResult.value;
-        normalMap.wrapU = addressMode;
-        normalMap.wrapV = addressMode;
-        normalMap.wrapR = addressMode;
-
-        albedoBslTexture = {
-            type: "texture_2d_array_mosaic",
-            array: albedo,
-            tileCount: { x: 4, y: 2 },
-        };
-
-        normalBslTexture = {
-            type: "texture_2d_array_mosaic",
-            array: normalMap,
-            tileCount: { x: 4, y: 2 },
-        };
+        albedoBslTexture = albedoResult.value;
+        normalBslTexture = normalMapResult.value;
     } else {
         albedoBslTexture = {
             type: "texture_2d",
-            texture: await createTextureAsync(earthColorMap8k, scene),
+            texture: await loadEarthAlbedo(scene, progressMonitor),
         };
 
         normalBslTexture = {
             type: "texture_2d",
-            texture: await createTextureAsync(earthNormalMap8k, scene),
+            texture: await loadEarthNormal(scene, progressMonitor),
         };
     }
 

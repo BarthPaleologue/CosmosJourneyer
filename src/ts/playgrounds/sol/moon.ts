@@ -23,7 +23,6 @@ import {
     LightGizmo,
     PointLight,
     Scene,
-    Texture,
     Vector3,
     type WebGPUEngine,
 } from "@babylonjs/core";
@@ -34,24 +33,17 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import {
+    loadMoonAlbedo,
+    loadMoonHighResolutionAlbedo,
+    loadMoonNormal,
+} from "@/frontend/assets/textures/planetSurfaceTextures/moon";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
-import { type BslTexture2dUv } from "@/utils/bslExtensions";
-import { createRawTexture2DArrayFromUrls, createTextureAsync } from "@/utils/texture";
-
-import moonAlbedoPath from "@assets/sol/textures/moonColor8k.png";
-import moonAlbedoPath_0_0 from "@assets/sol/textures/moonColorMap2x4/0_0.png";
-import moonAlbedoPath_0_1 from "@assets/sol/textures/moonColorMap2x4/0_1.png";
-import moonAlbedoPath_0_2 from "@assets/sol/textures/moonColorMap2x4/0_2.png";
-import moonAlbedoPath_0_3 from "@assets/sol/textures/moonColorMap2x4/0_3.png";
-import moonAlbedoPath_1_0 from "@assets/sol/textures/moonColorMap2x4/1_0.png";
-import moonAlbedoPath_1_1 from "@assets/sol/textures/moonColorMap2x4/1_1.png";
-import moonAlbedoPath_1_2 from "@assets/sol/textures/moonColorMap2x4/1_2.png";
-import moonAlbedoPath_1_3 from "@assets/sol/textures/moonColorMap2x4/1_3.png";
-import moonNormalPath from "@assets/sol/textures/moonNormalMap8k.png";
+import { type Texture2dUv } from "@/utils/texture";
 
 export async function createMoonScene(
     engine: WebGPUEngine,
@@ -102,42 +94,20 @@ export async function createMoonScene(
 
     const useHighQuality = new URLSearchParams(window.location.search).get("light") === null;
 
-    let albedoBslTexture: BslTexture2dUv;
+    let albedoBslTexture: Texture2dUv;
 
     if (useHighQuality) {
-        const albedoResult = await createRawTexture2DArrayFromUrls(
-            [
-                moonAlbedoPath_0_0,
-                moonAlbedoPath_0_1,
-                moonAlbedoPath_0_2,
-                moonAlbedoPath_0_3,
-                moonAlbedoPath_1_0,
-                moonAlbedoPath_1_1,
-                moonAlbedoPath_1_2,
-                moonAlbedoPath_1_3,
-            ],
-            scene,
-            engine,
-        );
+        const albedoResult = await loadMoonHighResolutionAlbedo(scene, engine, progressMonitor);
         if (!albedoResult.success) {
-            throw new Error(`Failed to create albedo texture array: ${String(albedoResult.error)}`);
+            throw new Error(`Failed to load high-resolution albedo texture: ${String(albedoResult.error)}`);
         }
 
-        const albedo = albedoResult.value;
-        const addressMode = Texture.CLAMP_ADDRESSMODE;
-        albedo.wrapU = addressMode;
-        albedo.wrapV = addressMode;
-        albedo.wrapR = addressMode;
-
-        albedoBslTexture = { type: "texture_2d_array_mosaic", array: albedo, tileCount: { x: 4, y: 2 } };
+        albedoBslTexture = albedoResult.value;
     } else {
-        albedoBslTexture = {
-            type: "texture_2d",
-            texture: await createTextureAsync(moonAlbedoPath, scene),
-        };
+        albedoBslTexture = { type: "texture_2d", texture: await loadMoonAlbedo(scene, progressMonitor) };
     }
 
-    const normal = await createTextureAsync(moonNormalPath, scene);
+    const normal = await loadMoonNormal(scene, progressMonitor);
 
     const material = new CustomPlanetMaterial(albedoBslTexture, { type: "texture_2d", texture: normal }, scene);
 
