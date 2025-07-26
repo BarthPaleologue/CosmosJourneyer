@@ -7,7 +7,7 @@ test("The star map playground renders correctly", async ({ page }) => {
         shotName: "baseline",
         scene: "starMap",
         flagToWait: "frozen",
-        urlParams: { freeze: 3 },
+        urlParams: { freeze: 5 },
     });
 });
 

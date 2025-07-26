@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis } from "@babylonjs/core";
+import { Axis, Color4 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -51,10 +51,12 @@ export async function createNeutronStarScene(
 
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
+    camera.maxZ = 0;
 
     scene.activeCamera = camera;
 
-    scene.enableDepthRenderer(camera, false, true);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     const neutronStarModel = newSeededNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, textures, scene);
