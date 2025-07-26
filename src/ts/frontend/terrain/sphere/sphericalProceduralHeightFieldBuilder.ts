@@ -25,6 +25,8 @@ import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
 
+import { Settings } from "@/settings";
+
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalProceduralHeightField.wgsl";
 
 export class SphericalProceduralHeightFieldBuilder {
@@ -63,7 +65,7 @@ export class SphericalProceduralHeightFieldBuilder {
             },
         );
 
-        await retry(() => computeShader.isReady(), 1000, 10);
+        await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
         return new SphericalProceduralHeightFieldBuilder(computeShader, engine);
     }
