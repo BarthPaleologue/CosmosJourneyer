@@ -15,12 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
+import {
+    GizmoManager,
+    Light,
+    LightGizmo,
+    Matrix,
+    PointLight,
+    Quaternion,
+    Scene,
+    Tools,
+    Vector3,
+    type WebGPUEngine,
+} from "@babylonjs/core";
 
 import { getEarthModel } from "@/backend/universe/customSystems/sol/earth";
+import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { loadIss } from "@/frontend/assets/objects/orbitalFacilities";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import {
@@ -41,8 +54,34 @@ import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { CustomPlanetMaterial } from "@/frontend/terrain/sphere/materials/customPlanetMaterial";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
+import { getOrbitalPosition } from "@/frontend/universe/architecture/orbitalObjectUtils";
+import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 
+import { getAllRootTransformNodes } from "@/utils/scene";
 import { type Texture2dUv } from "@/utils/texture";
+
+/**
+ * Build a LVLH → ECI (Earth‑Centered Inertial frame) rotation
+ * @param nadir The up direction in ECI frame (nadir) (e.g. the direction towards the center of the Earth)
+ * @param velocity The velocity vector in ECI frame (e.g. the direction of the spacecraft's velocity)
+ * @returns Quaternion representing the rotation from LVLH to ECI
+ */
+function buildLvlhMatrix(nadir: Vector3, velocity: Vector3): Quaternion {
+    const z = nadir; // nadir
+    const x = velocity.normalizeToNew(); // prograde
+    const y = Vector3.Cross(z, x).normalize();
+    return Quaternion.FromRotationMatrix(Matrix.FromXYZAxesToRef(x, y, z, new Matrix()));
+}
+
+/** ISS body quaternion in ECI (Earth‑Centered Inertial frame), optionally trimmed to Torque‑Equilibrium Attitude (TEA). */
+function issQuaternion(nadir: Vector3, velocity: Vector3): Quaternion {
+    const orientationQuaternion = buildLvlhMatrix(nadir, velocity);
+
+    // steady‑state TEA offsets (roll +0.9°, pitch –6°, yaw 0°)
+    const torqueEquilibriumAttitude = Quaternion.RotationYawPitchRoll(0, Tools.ToRadians(-6), Tools.ToRadians(0.9));
+
+    return torqueEquilibriumAttitude.multiply(orientationQuaternion);
+}
 
 export async function createEarthScene(
     engine: WebGPUEngine,
@@ -188,8 +227,63 @@ export async function createEarthScene(
     );
     camera.attachPostProcess(atmospherePostProcess);
 
+    const iss = (await loadIss(scene, progressMonitor)).instantiateHierarchy();
+    if (iss === null) {
+        throw new Error("Failed to load ISS model.");
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get("iss") !== null) {
+        controls.getTransform().parent = iss;
+        controls.getTransform().position = new Vector3(100, 0, -100);
+        controls.getTransform().lookAt(Vector3.Zero());
+        controls.speed = 10;
+    }
+
+    const earthOrbitalObject = new CustomOrbitalObject(terrain.getTransform(), {
+        id: "earth",
+        name: "Earth",
+        type: OrbitalObjectType.CUSTOM,
+        orbit: {
+            parentIds: [],
+            semiMajorAxis: 0,
+            eccentricity: 0,
+            inclination: 0,
+            longitudeOfAscendingNode: 0,
+            argumentOfPeriapsis: 0,
+            initialMeanAnomaly: 0,
+            p: 1,
+        },
+        mass: earthModel.mass, // kg
+        siderealDaySeconds: earthModel.siderealDaySeconds, // seconds
+        axialTilt: earthModel.axialTilt, // radians
+    });
+
+    const issOrbitalObject = new CustomOrbitalObject(iss, {
+        id: "iss",
+        name: "International Space Station",
+        type: OrbitalObjectType.CUSTOM,
+        orbit: {
+            parentIds: [],
+            semiMajorAxis: 6_771_000,
+            eccentricity: 0.0001,
+            inclination: 51.64 * (Math.PI / 180),
+            longitudeOfAscendingNode: 0,
+            argumentOfPeriapsis: 0,
+            initialMeanAnomaly: 0,
+            p: 2,
+        },
+        mass: 420_000, // kg
+        siderealDaySeconds: 0, // ISS does not rotate around its axis
+        axialTilt: 0, // ISS does not have an axial tilt
+    });
+
+    let elapsedSeconds = 0;
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
+        elapsedSeconds += deltaSeconds;
+
         controls.update(deltaSeconds);
 
         terrain.update(camera.globalPosition, material.get(), chunkForge);
@@ -197,10 +291,33 @@ export async function createEarthScene(
 
         ocean.update(deltaSeconds);
 
+        const issPosition = getOrbitalPosition(
+            issOrbitalObject,
+            [earthOrbitalObject],
+            Matrix.Identity(),
+            elapsedSeconds,
+        );
+        const dt = 10; // seconds
+        const issFuturePosition = getOrbitalPosition(
+            issOrbitalObject,
+            [earthOrbitalObject],
+            Matrix.Identity(),
+            elapsedSeconds + dt,
+        );
+        const vApprox = issFuturePosition.subtract(issPosition).scaleInPlace(1 / dt); // simple finite‑difference velocity
+        const nadir = terrain.getTransform().position.subtract(issPosition).normalize();
+        iss.rotationQuaternion = issQuaternion(nadir, vApprox);
+        iss.position = issPosition;
+
+        controls.getTransform().computeWorldMatrix(true);
+        camera.getViewMatrix(true);
+
         const cameraPosition = camera.globalPosition.clone();
-        terrain.getTransform().position.subtractInPlace(cameraPosition);
-        light.position.subtractInPlace(cameraPosition);
-        controls.getTransform().position.subtractInPlace(cameraPosition);
+        const rootNodes = getAllRootTransformNodes(scene);
+        for (const rootNode of rootNodes) {
+            rootNode.position.subtractInPlace(cameraPosition);
+            rootNode.computeWorldMatrix(true);
+        }
 
         material.setPlanetInverseWorld(terrain.getTransform().computeWorldMatrix(true).clone().invert());
     });
