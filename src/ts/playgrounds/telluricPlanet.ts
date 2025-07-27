@@ -23,7 +23,7 @@ import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGener
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
-import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";

@@ -30,7 +30,7 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";

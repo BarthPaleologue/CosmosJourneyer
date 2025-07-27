@@ -23,13 +23,13 @@ import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terra
 import { assertUnreachable, type Result } from "@/utils/types";
 
 import type { ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { type HeightMaps } from "./textures/heightmaps";
+import { type HeightMaps } from "./textures/heightMaps";
 import {
     disposeHeightMap1x1,
     disposeHeightMap2x4,
     loadHeightMap2x4FromUrlsToGpu,
     type HeightMap,
-} from "./textures/heightmaps/utils";
+} from "./textures/heightMaps/utils";
 
 import earthHeightMap2x4_0_0 from "@assets/sol/textures/earthHeightMap2x4/0_0.png";
 import earthHeightMap2x4_0_1 from "@assets/sol/textures/earthHeightMap2x4/0_1.png";
