@@ -23,10 +23,12 @@ import { TextureSampler } from "@babylonjs/core/Materials/Textures/textureSample
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { type HeightMap2x4 } from "@/frontend/assets/heightMaps";
+import { type HeightMap2x4 } from "@/frontend/assets/textures/heightMaps/utils";
 
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
+
+import { Settings } from "@/settings";
 
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalHeightFieldTexture2x4.wgsl";
 
@@ -92,7 +94,7 @@ export class SphericalHeightFieldBuilder2x4 {
             },
         );
 
-        await retry(() => computeShader.isReady(), 1000, 10);
+        await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
         return new SphericalHeightFieldBuilder2x4(computeShader, engine);
     }

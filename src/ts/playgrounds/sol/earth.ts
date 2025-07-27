@@ -22,14 +22,15 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { loadTextures } from "@/frontend/assets/textures";
-import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import {
     loadEarthAlbedo,
     loadEarthHighResolutionAlbedo,
     loadEarthHighResolutionNormal,
     loadEarthNormal,
 } from "@/frontend/assets/textures/planetSurfaceTextures/earth";
+import { createTexturePools } from "@/frontend/assets/textures/texturePools";
+import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
@@ -52,7 +53,9 @@ export async function createEarthScene(
     scene.defaultCursor = "default";
     scene.clearColor.set(0, 0, 0, 1);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const waterTextures = await loadWaterTextures(scene, progressMonitor);
+
+    const texturePools = createTexturePools(scene);
 
     const heightMaps = await loadHeightMaps(scene, progressMonitor);
 
@@ -143,7 +146,9 @@ export async function createEarthScene(
 
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps, scene);
 
-    await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
+    if (useHighQuality) {
+        await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id], progressMonitor);
+    }
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {
@@ -158,12 +163,12 @@ export async function createEarthScene(
         earthRadius,
         oceanUniforms,
         [light],
-        textures.water,
+        waterTextures,
         scene,
     );
     camera.attachPostProcess(ocean);
 
-    const cloudsUniforms = new CloudsUniforms(earthModel.clouds, textures.pools.cloudsLut, scene);
+    const cloudsUniforms = new CloudsUniforms(earthModel.clouds, texturePools.cloudsLut, scene);
     const cloudsPostProcess = new FlatCloudsPostProcess(
         terrain.getTransform(),
         earthRadius,

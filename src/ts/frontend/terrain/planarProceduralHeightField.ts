@@ -23,6 +23,8 @@ import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
 import { retry } from "@/utils/retry";
 
+import { Settings } from "@/settings";
+
 import heightMapComputeSource from "@shaders/compute/terrain/planarProceduralHeightField.wgsl";
 
 export class PlanarProceduralHeightField {
@@ -71,7 +73,7 @@ export class PlanarProceduralHeightField {
             },
         );
 
-        await retry(() => computeShader.isReady(), 1000, 10);
+        await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
         return new PlanarProceduralHeightField(computeShader, engine);
     }

@@ -23,6 +23,8 @@ import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 
 import { retry } from "@/utils/retry";
 
+import { Settings } from "@/settings";
+
 import gridIndicesComputeSource from "@shaders/compute/terrain/gridIndices.wgsl";
 
 export class SquareGridIndicesComputer {
@@ -54,7 +56,7 @@ export class SquareGridIndicesComputer {
             },
         );
 
-        await retry(() => computeShader.isReady(), 1000, 10);
+        await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
         return new SquareGridIndicesComputer(computeShader, engine);
     }

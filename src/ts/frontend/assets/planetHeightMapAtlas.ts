@@ -22,8 +22,14 @@ import { type CustomTerrainModel } from "@/backend/universe/orbitalObjects/terra
 
 import { assertUnreachable, type Result } from "@/utils/types";
 
-import { disposeHeightMap1x1, disposeHeightMap2x4, loadHeightMap2x4FromUrlsToGpu, type HeightMap } from "./heightMaps";
-import { type HeightMaps } from "./textures/heightmaps";
+import type { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { type HeightMaps } from "./textures/heightMaps";
+import {
+    disposeHeightMap1x1,
+    disposeHeightMap2x4,
+    loadHeightMap2x4FromUrlsToGpu,
+    type HeightMap,
+} from "./textures/heightMaps/utils";
 
 import earthHeightMap2x4_0_0 from "@assets/sol/textures/earthHeightMap2x4/0_0.png";
 import earthHeightMap2x4_0_1 from "@assets/sol/textures/earthHeightMap2x4/0_1.png";
@@ -68,7 +74,10 @@ export interface IPlanetHeightMapAtlas {
      * Synchronously load height maps corresponding to the given keys into GPU memory.
      * @param keys An iterable of planet IDs for which to load height maps.
      */
-    loadHeightMapsToGpu(keys: Iterable<HeightMapId>): Promise<Array<Result<HeightMap, Array<Error>>>>;
+    loadHeightMapsToGpu(
+        keys: Iterable<HeightMapId>,
+        progressMonitor: ILoadingProgressMonitor | null,
+    ): Promise<Array<Result<HeightMap, Array<Error>>>>;
 
     /**
      * @param key The key of the height map to retrieve.
@@ -95,11 +104,11 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
         this.scene = scene;
     }
 
-    async loadHeightMapsToGpu(keys: Iterable<HeightMapId>) {
+    async loadHeightMapsToGpu(keys: Iterable<HeightMapId>, progressMonitor: ILoadingProgressMonitor | null) {
         // load the height maps in parallel
         const promises: Array<Promise<Result<HeightMap, Array<Error>>>> = [];
         for (const key of keys) {
-            const promise = this.preloadHeightMap(key);
+            const promise = this.preloadHeightMap(key, progressMonitor);
             if (promise === undefined) {
                 continue;
             }
@@ -110,7 +119,10 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
         return Promise.all(promises);
     }
 
-    private preloadHeightMap(key: HeightMapId): Promise<Result<HeightMap, Array<Error>>> | undefined {
+    private preloadHeightMap(
+        key: HeightMapId,
+        progressMonitor: ILoadingProgressMonitor | null,
+    ): Promise<Result<HeightMap, Array<Error>>> | undefined {
         switch (key) {
             case "mercury":
                 return loadHeightMap2x4FromUrlsToGpu(
@@ -120,6 +132,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                         [mercuryHeightMap_1_0, mercuryHeightMap_1_1, mercuryHeightMap_1_2, mercuryHeightMap_1_3],
                     ],
                     this.scene,
+                    progressMonitor,
                 ).then((result) => {
                     if (result.success) {
                         this.higherResolutionHeightMaps[key] = result.value;
@@ -137,6 +150,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                         [earthHeightMap2x4_1_0, earthHeightMap2x4_1_1, earthHeightMap2x4_1_2, earthHeightMap2x4_1_3],
                     ],
                     this.scene,
+                    progressMonitor,
                 ).then((result) => {
                     if (result.success) {
                         this.higherResolutionHeightMaps[key] = result.value;
@@ -152,6 +166,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                         [moonHeightMap_1_0, moonHeightMap_1_1, moonHeightMap_1_2, moonHeightMap_1_3],
                     ],
                     this.scene,
+                    progressMonitor,
                 ).then((result) => {
                     if (result.success) {
                         this.higherResolutionHeightMaps[key] = result.value;
@@ -167,6 +182,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
                         [marsHeightMap_1_0, marsHeightMap_1_1, marsHeightMap_1_2, marsHeightMap_1_3],
                     ],
                     this.scene,
+                    progressMonitor,
                 ).then((result) => {
                     if (result.success) {
                         this.higherResolutionHeightMaps[key] = result.value;
@@ -208,6 +224,7 @@ export class PlanetHeightMapAtlas implements IPlanetHeightMapAtlas {
             case "mercury":
                 return this.heightMaps.mercury1x1;
             case "moon":
+                return this.heightMaps.moon1x1;
             case "venus":
             case "mars":
                 return this.heightMaps.mars1x1;

@@ -16,15 +16,28 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 
-export type HeightMap1x1 = {
-    type: "1x1";
-    texture: Texture;
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadTextureAsync } from "./utils";
+
+import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
+import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
+
+export type WaterTextures = {
+    normalMap1: Texture;
+    normalMap2: Texture;
 };
 
-export type HeightMap2x4 = {
-    type: "2x4";
-    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
-};
+export async function loadWaterTextures(
+    scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<WaterTextures> {
+    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
+    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
 
-export type HeightMap = HeightMap1x1 | HeightMap2x4;
+    return {
+        normalMap1: await waterNormalMap1Promise,
+        normalMap2: await waterNormalMap2Promise,
+    };
+}
