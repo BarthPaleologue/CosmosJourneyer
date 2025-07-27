@@ -19,7 +19,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
-import type { HeightMap1x1, HeightMap2x4 } from "./types";
+import type { HeightMap1x1, HeightMap2x4 } from "./utils";
 
 import marsHeightMap1x1 from "@assets/sol/textures/marsHeightMap1x1.png";
 import marsHeightMap_0_0 from "@assets/sol/textures/marsHeightMap2x4/0_0.png";

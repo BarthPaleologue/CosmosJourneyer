@@ -77,6 +77,8 @@ export const Settings = {
     TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000",
 
     QUALITY_CHARS: "FEDCBA",
+
+    COMPUTE_SHADER_READY_MAX_RETRY: 100_000,
 } as const;
 
 export const CollisionMask = {

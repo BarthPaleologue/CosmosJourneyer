@@ -47,7 +47,7 @@ export function unitSphereToUv(positionUnitSphere: NodeMaterialConnectionPoint) 
     const u = div(add(phi, f(Math.PI)), f(2.0 * Math.PI));
     const v = div(theta, f(Math.PI));
 
-    return merge(sub(f(1.0), u), sub(f(1.0), v), null, null).xyOut;
+    return merge(sub(f(1.0), u), v, null, null).xyOut;
 }
 
 export function bslTextureSample2d(
@@ -71,14 +71,10 @@ export function bslTexture2dArrayMosaicSample(
     uv: NodeMaterialConnectionPoint,
     options?: Partial<TextureBlockOptions>,
 ): TextureBlock {
-    const splitUv = split(uv);
-
-    const uvInvertedY = vec2(splitUv.x, sub(f(1.0), splitUv.y));
-
     const tileCountX = f(texture.tileCount.x);
     const tileCountY = f(texture.tileCount.y);
 
-    const uvScaled = mul(uvInvertedY, vec2(tileCountX, tileCountY));
+    const uvScaled = mul(uv, vec2(tileCountX, tileCountY));
 
     const { x: tileIndexX, y: tileIndexY } = split(floor(uvScaled));
 

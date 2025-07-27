@@ -19,6 +19,13 @@ export default defineConfig({
             ],
         },
         viewport: { width: 1280, height: 720 },
+        trace: {
+            mode: "retain-on-failure",
+            screenshots: false,
+            snapshots: false,
+            sources: false,
+            attachments: false,
+        },
     },
     timeout: 5 * 60 * 1000, // 5 minutes
     expect: {

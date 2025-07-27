@@ -20,7 +20,7 @@ import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type ProceduralTerrainModel, type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
-import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/heightMaps";
+import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures/heightMaps/utils";
 
 import { type Direction } from "@/utils/direction";
 

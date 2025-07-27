@@ -22,7 +22,7 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { loadHeightMaps } from "@/frontend/assets/textures/heightmaps";
+import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import {
     loadMercuryAlbedo,
     loadMercuryHighResolutionAlbedo,
@@ -123,7 +123,9 @@ export async function createMercuryScene(
 
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps, scene);
 
-    await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
+    if (useHighQuality) {
+        await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id], progressMonitor);
+    }
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {

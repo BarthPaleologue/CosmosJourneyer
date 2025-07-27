@@ -15,11 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { loadTextureFromUrl } from "@/utils/loading";
 import { err, ok, type Result } from "@/utils/types";
+
+import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import { loadTextureAsync } from "../utils";
 
 export type HeightMap1x1 = {
     type: "1x1";
@@ -37,35 +39,16 @@ export async function loadHeightMap2x4FromUrlsToGpu(
     name: string,
     urls: [[string, string, string, string], [string, string, string, string]],
     scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Result<HeightMap2x4, Array<Error>>> {
-    const loadingPromises: Array<Promise<Result<Texture, Error>>> = [];
+    const loadingPromises: Array<Promise<Texture>> = [];
     for (const [i, row] of urls.entries()) {
         for (const [j, url] of row.entries()) {
-            loadingPromises.push(loadTextureFromUrl(`${name}_${i}_${j}`, url, scene));
+            loadingPromises.push(loadTextureAsync(`${name}_${i}_${j}`, url, scene, progressMonitor));
         }
     }
 
-    const results = await Promise.all(loadingPromises);
-
-    const failures: Array<Error> = [];
-    const textures = results
-        .map((result) => {
-            if (result.success) {
-                return result.value;
-            } else {
-                failures.push(result.error);
-                return;
-            }
-        })
-        .filter((texture) => texture !== undefined);
-
-    if (failures.length > 0) {
-        for (const texture of textures) {
-            texture.dispose();
-        }
-
-        return err(failures);
-    }
+    const textures = await Promise.all(loadingPromises);
 
     const texture00 = textures[0];
     const texture01 = textures[1];
