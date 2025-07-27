@@ -124,7 +124,9 @@ export async function createMarsScene(
 
     const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps, scene);
 
-    await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id]);
+    if (useHighQuality) {
+        await heightMapAtlas.loadHeightMapsToGpu([terrainModel.id], progressMonitor);
+    }
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {

@@ -19,7 +19,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
-import { type HeightMap1x1 } from "./types";
+import { type HeightMap1x1 } from "./utils";
 
 import mercuryHeightMap1x1 from "@assets/sol/textures/mercuryHeightMap8k.png";
 
