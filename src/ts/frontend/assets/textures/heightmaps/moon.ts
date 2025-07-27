@@ -15,16 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 
-export type HeightMap1x1 = {
-    type: "1x1";
-    texture: Texture;
-};
+import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import { loadTextureAsync } from "../utils";
+import type { HeightMap1x1 } from "./utils";
 
-export type HeightMap2x4 = {
-    type: "2x4";
-    textures: [[Texture, Texture, Texture, Texture], [Texture, Texture, Texture, Texture]];
-};
+import moonHeightMap8kPath from "@assets/sol/textures/moonHeightMap8k.png";
 
-export type HeightMap = HeightMap1x1 | HeightMap2x4;
+export async function loadMoonHeightMap1x1(
+    scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<HeightMap1x1> {
+    const texture = loadTextureAsync("MoonHeightMap_1x1", moonHeightMap8kPath, scene, progressMonitor);
+
+    return {
+        type: "1x1",
+        texture: await texture,
+    };
+}
