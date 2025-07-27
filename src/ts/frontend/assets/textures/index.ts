@@ -31,19 +31,13 @@ import { loadRingsTextures, type RingsTextures } from "./rings";
 import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
 import { createTexturePools, type TexturePools } from "./texturePools";
 import { loadTextureAsync } from "./utils";
+import { loadWaterTextures, type WaterTextures } from "./water";
 
 import empty from "@assets/oneBlackPixel.webp";
 import seamlessPerlin from "@assets/perlin.webp";
 import cursorImage from "@assets/textures/hoveredCircle.png";
-import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
-import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
 
 // Define texture groups types
-
-export type WaterTextures = {
-    normalMap1: Texture;
-    normalMap2: Texture;
-};
 
 export type NoiseTextures = {
     seamlessPerlin: Texture;
@@ -74,10 +68,6 @@ export type Textures = {
  * @returns A promise resolving to the Textures object
  */
 export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
-    // Water textures
-    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
-    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
-
     const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
     const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin, scene, progressMonitor);
@@ -90,13 +80,12 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
     const gasPlanetTexturesPromise = loadGasPlanetTextures(scene, progressMonitor);
     const ringsTexturesPromise = loadRingsTextures(scene, progressMonitor);
 
+    const waterTexturesPormise = loadWaterTextures(scene, progressMonitor);
+
     // Assemble and return the textures structure
     return {
         terrains: await terrainTexturesPromise,
-        water: {
-            normalMap1: await waterNormalMap1Promise,
-            normalMap2: await waterNormalMap2Promise,
-        },
+        water: await waterTexturesPormise,
         particles: await particleTexturesPromise,
         materials: await materialTexturesPromise,
         gasPlanet: await gasPlanetTexturesPromise,
