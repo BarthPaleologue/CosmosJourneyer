@@ -73,6 +73,20 @@ export class CreditsPanel {
             panel.appendChild(p);
         });
 
+        const modelHeader = document.createElement("h3");
+        modelHeader.textContent = i18n.t("sidePanel:models");
+        panel.appendChild(modelHeader);
+
+        const modelCredits = [
+            'ISS Model from <a target="_blank" href="https://solarsystem.nasa.gov/gltf_embed/2378/">NASA\'s Solar System Exploration</a>',
+        ];
+
+        modelCredits.forEach((credit) => {
+            const p = document.createElement("p");
+            p.innerHTML = credit;
+            panel.appendChild(p);
+        });
+
         // Materials & Textures section
         const materialsHeader = document.createElement("h3");
         materialsHeader.textContent = i18n.t("sidePanel:materials");

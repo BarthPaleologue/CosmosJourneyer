@@ -34,7 +34,6 @@
  * - They return the relevant output connection point
  */
 
-import { ModBlock } from "@babylonjs/core";
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
@@ -47,6 +46,7 @@ import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
 import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
+import { ModBlock } from "@babylonjs/core/Materials/Node/Blocks/modBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
