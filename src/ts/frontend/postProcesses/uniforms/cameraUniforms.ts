@@ -21,20 +21,22 @@ import { type Effect } from "@babylonjs/core/Materials/effect";
 export const CameraUniformNames = {
     CAMERA_POSITION: "camera_position",
     CAMERA_PROJECTION: "camera_projection",
-    CAMERA_INVERSE_PROJECTION: "camera_inverseProjection",
     CAMERA_VIEW: "camera_view",
-    CAMERA_INVERSE_VIEW: "camera_inverseView",
+    CAMERA_INVERSE_PROJECTION_VIEW: "camera_inverseProjectionView",
     CAMERA_NEAR: "camera_near",
     CAMERA_FAR: "camera_far",
     CAMERA_FOV: "camera_fov",
 };
 
 export function setCameraUniforms(effect: Effect, camera: Camera): void {
+    const projection = camera.getProjectionMatrix();
+    const view = camera.getViewMatrix();
+
     effect.setVector3(CameraUniformNames.CAMERA_POSITION, camera.globalPosition);
-    effect.setMatrix(CameraUniformNames.CAMERA_PROJECTION, camera.getProjectionMatrix());
-    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_PROJECTION, camera.getProjectionMatrix().clone().invert());
+    effect.setMatrix(CameraUniformNames.CAMERA_PROJECTION, projection);
     effect.setMatrix(CameraUniformNames.CAMERA_VIEW, camera.getViewMatrix());
-    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_VIEW, camera.getViewMatrix().clone().invert());
+    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_PROJECTION_VIEW, view.multiply(projection).clone().invert());
+
     effect.setFloat(CameraUniformNames.CAMERA_NEAR, camera.minZ);
     effect.setFloat(CameraUniformNames.CAMERA_FAR, camera.maxZ);
     effect.setFloat(CameraUniformNames.CAMERA_FOV, camera.fov);

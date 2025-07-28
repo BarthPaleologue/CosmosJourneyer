@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Scene } from "@babylonjs/core";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
