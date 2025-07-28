@@ -15,18 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { expect, test } from "vitest";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { getTransformationQuaternion } from "@/utils/algebra";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadAssetInContainerAsync } from "./utils";
 
-test("getTransformationQuaternion", () => {
-    const from = new Vector3(0, 1, 0);
-    const to = new Vector3(0, 1, 0);
+import issModelPath from "@assets/sol/objects/iss.glb";
 
-    const quaternion2 = getTransformationQuaternion(from, to);
-    expect(quaternion2.x).to.equal(0);
-    expect(quaternion2.y).to.equal(0);
-    expect(quaternion2.z).to.equal(0);
-    expect(quaternion2.w).to.equal(1);
-});
+export async function loadIss(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Mesh> {
+    const container = await loadAssetInContainerAsync("ISS", issModelPath, scene, progressMonitor);
+
+    const iss = container.rootNodes[0];
+    if (!(iss instanceof Mesh)) {
+        throw new Error("ISS root node is not a Mesh");
+    }
+
+    iss.isVisible = false;
+    for (const mesh of iss.getChildMeshes()) {
+        mesh.isVisible = false;
+    }
+
+    container.addAllToScene();
+
+    return iss;
+}
