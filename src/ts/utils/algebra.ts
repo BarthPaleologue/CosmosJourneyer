@@ -18,13 +18,29 @@
 import { type Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import { clamp } from "./math";
+
 export function getTransformationQuaternion(from: Vector3, to: Vector3): Quaternion {
     if (from.equalsWithEpsilon(to)) {
         return Quaternion.Identity();
     }
-    const rotationAxis = Vector3.Cross(from, to);
-    const angle = Math.acos(Vector3.Dot(from, to));
-    return Quaternion.RotationAxis(rotationAxis, angle);
+
+    const crossProduct = Vector3.Cross(from, to);
+    if (crossProduct.lengthSquared() < 1e-8) {
+        let axis: Vector3;
+        if (Math.abs(from.x) < Math.abs(from.y)) {
+            axis = Math.abs(from.x) < Math.abs(from.z) ? new Vector3(1, 0, 0) : new Vector3(0, 0, 1);
+        } else {
+            axis = Math.abs(from.y) < Math.abs(from.z) ? new Vector3(0, 1, 0) : new Vector3(0, 0, 1);
+        }
+        axis = Vector3.Cross(from, axis).normalize();
+        return Quaternion.RotationAxis(axis, Math.PI);
+    }
+
+    const cosTheta = clamp(Vector3.Dot(from, to), -1, 1);
+    const theta = Math.acos(cosTheta);
+
+    return Quaternion.RotationAxis(crossProduct.normalize(), theta);
 }
 
 export function getDeltaQuaternion(from: Quaternion, to: Quaternion): Quaternion {
