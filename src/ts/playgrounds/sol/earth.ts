@@ -117,6 +117,10 @@ export async function createEarthScene(
 
     scene.activeCamera = camera;
 
+    engine.getRenderingCanvas()?.addEventListener("click", async () => {
+        await engine.getRenderingCanvas()?.requestPointerLock();
+    });
+
     const depthRenderer = scene.enableDepthRenderer(null, true, true);
     depthRenderer.clearColor.set(0, 0, 0, 1);
 
