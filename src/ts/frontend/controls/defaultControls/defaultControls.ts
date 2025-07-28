@@ -23,7 +23,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type Controls } from "@/frontend/uberCore/controls";
-import { LocalDirection } from "@/frontend/uberCore/localDirections";
 import {
     getForwardDirection,
     getRightDirection,
@@ -103,8 +102,17 @@ export class DefaultControls implements Controls {
         pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
         yaw(this.transform, this.rotationInertia.z * this.rotationSpeed * deltaSeconds);
 
-        const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
+        // world space
+        const localForward = Vector3.Forward(this.getTransform().getScene().useRightHandedSystem);
+        const cameraForward = this.camera.getDirection(localForward);
         const transformForward = getForwardDirection(this.transform);
+
+        const parent = this.getTransform().parent;
+        if (parent !== null) {
+            const parentInverseWorld = parent.getWorldMatrix().clone().invert();
+            Vector3.TransformNormalToRef(cameraForward, parentInverseWorld, cameraForward);
+            Vector3.TransformNormalToRef(transformForward, parentInverseWorld, transformForward);
+        }
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
