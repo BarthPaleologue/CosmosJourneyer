@@ -21,7 +21,7 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { TextureSampler } from "@babylonjs/core/Materials/Textures/textureSampler";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Matrix, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type HeightMap1x1 } from "@/frontend/assets/textures/heightMaps/utils";
 
@@ -50,8 +50,8 @@ export class SphericalHeightFieldBuilder1x1 {
         this.paramsBuffer.addUniform("size", 1);
         this.paramsBuffer.addUniform("direction", 1);
         this.paramsBuffer.addUniform("chunk_position_on_cube", 3);
+        this.paramsBuffer.addUniform("chunk_to_sphere_transform", 16);
         this.paramsBuffer.addUniform("sphere_radius", 1);
-        this.paramsBuffer.addUniform("chunk_position_on_sphere", 3);
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
@@ -92,7 +92,7 @@ export class SphericalHeightFieldBuilder1x1 {
 
     dispatch(
         chunkPositionOnCube: Vector3,
-        chunkPositionOnSphere: Vector3,
+        chunkToSphereTransform: Matrix,
         nbVerticesPerRow: number,
         direction: Direction,
         sphereRadius: number,
@@ -106,7 +106,7 @@ export class SphericalHeightFieldBuilder1x1 {
     ): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
-        this.paramsBuffer.updateVector3("chunk_position_on_sphere", chunkPositionOnSphere);
+        this.paramsBuffer.updateMatrix("chunk_to_sphere_transform", chunkToSphereTransform);
         this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
         this.paramsBuffer.updateUInt("direction", direction);
         this.paramsBuffer.updateFloat("size", size);

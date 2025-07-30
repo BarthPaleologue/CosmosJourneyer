@@ -20,8 +20,8 @@ struct Params {
     size : f32,
     direction: u32,
     chunk_position_on_cube : vec3<f32>,
+    chunk_to_sphere_transform : mat4x4<f32>,
     sphere_radius : f32,
-    chunk_position_on_sphere : vec3<f32>,
 };
 
 struct TerrainModel {
@@ -67,7 +67,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let elevation = remap(heightMapSample.r, 0.0, 1.0, terrainModel.min_height, terrainModel.max_height);
 
-    let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
+    let final_position = params.chunk_to_sphere_transform * vec4<f32>(vertex_position_on_sphere + sphere_up * elevation, 1.0);
 
     let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
     positions[index * 3 + 0] = final_position.x;
