@@ -1,6 +1,6 @@
 {
     "name": "cosmos-journeyer",
-    "version": "1.10.4-dev",
+    "version": "1.10.4",
     "engines": {
         "node": ">=18.0.0",
         "pnpm": ">=8.0.0"
