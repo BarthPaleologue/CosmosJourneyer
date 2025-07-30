@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+    Axis,
     BoundingInfo,
     Color3,
     DirectionalLight,
@@ -29,8 +30,11 @@ import {
     PhysicsMotionType,
     PhysicsShapeHeightField,
     PhysicsShapeType,
+    Quaternion,
     Scene,
     ShadowGenerator,
+    Space,
+    TransformNode,
     Vector3,
     VertexBuffer,
     VertexData,
@@ -129,8 +133,9 @@ export async function createTerrainScene(
         scene,
     );
 
-    const heightFieldBody = new PhysicsBody(terrain, PhysicsMotionType.STATIC, false, scene);
+    const heightFieldBody = new PhysicsBody(terrain, PhysicsMotionType.ANIMATED, false, scene);
     heightFieldBody.shape = heightFieldShape;
+    heightFieldBody.disablePreStep = false;
 
     const terrainMat = new PBRMetallicRoughnessMaterial("terrainMat", scene);
     terrainMat.baseColor = new Color3(0.5, 1.0, 0.5);
@@ -141,9 +146,17 @@ export async function createTerrainScene(
     terrain.receiveShadows = true;
     shadowGenerator.addShadowCaster(terrain);
 
+    const parent = new TransformNode("terrainParent", scene);
+    terrain.parent = parent;
+
+    let elapsedSeconds = 0;
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
+        elapsedSeconds += deltaSeconds;
         controls.update(deltaSeconds);
+
+        parent.position.y = Math.sin(elapsedSeconds) * 5;
+        terrain.rotationQuaternion = Quaternion.RotationAxis(Vector3.Forward(), Math.sin(elapsedSeconds * 0.5) * 0.3);
     });
 
     return scene;
