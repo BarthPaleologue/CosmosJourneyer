@@ -51,6 +51,9 @@ importers:
         specifier: ^3.25.46
         version: 3.25.46
     devDependencies:
+      '@babylonjs/node-editor':
+        specifier: ^8.10.0
+        version: 8.10.0(@babylonjs/core@8.10.0)(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)
       '@eslint/js':
         specifier: ^9.28.0
         version: 9.28.0
@@ -250,6 +253,13 @@ packages:
     resolution: {integrity: sha512-XqbOjQ51rO30K4Eyh3c1tl6dlKmQS75hqAy7QbHUIQrANz4HmdOc2wUYpXvkFSmiC55wMO/3+umwCc62tU3z3A==}
     peerDependencies:
       '@babylonjs/core': ^8.6.0
+
+  '@babylonjs/node-editor@8.10.0':
+    resolution: {integrity: sha512-VcJvgFOBTibxNGlfSoMfbO+LqZyOoP/DxpiU65KPut71EXUUe9ASMzLnoJdSSBDWCGOTvp6QLMJT+/LCvRhgXA==}
+    peerDependencies:
+      '@babylonjs/core': ^8.0.0
+      '@types/react': '>=16.7.3'
+      '@types/react-dom': '>=16.0.9'
 
   '@babylonjs/serializers@8.4.0':
     resolution: {integrity: sha512-ZOdwicpdv6lLPUZQOlP1UW54lSAEPazW831FoBupBTfYleXm5/YVQvHWC4IsuJ0qKjqGUg+L8jWc9tNxJSBQLQ==}
@@ -4316,6 +4326,12 @@ snapshots:
     dependencies:
       '@babylonjs/core': 8.10.0
 
+  '@babylonjs/node-editor@8.10.0(@babylonjs/core@8.10.0)(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)':
+    dependencies:
+      '@babylonjs/core': 8.10.0
+      '@types/react': 19.1.2
+      '@types/react-dom': 19.1.2(@types/react@19.1.2)
+
   '@babylonjs/serializers@8.4.0(@babylonjs/core@8.10.0)(babylonjs-gltf2interface@8.4.0)':
     dependencies:
       '@babylonjs/core': 8.10.0
@@ -6286,7 +6302,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.33.0(eslint@9.28.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.2)(eslint@9.28.0):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.33.0(eslint@9.28.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.2(eslint-plugin-import@2.31.0)(eslint@9.28.0))(eslint@9.28.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -6308,7 +6324,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.28.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.33.0(eslint@9.28.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.2)(eslint@9.28.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.33.0(eslint@9.28.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@4.4.2(eslint-plugin-import@2.31.0)(eslint@9.28.0))(eslint@9.28.0)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3

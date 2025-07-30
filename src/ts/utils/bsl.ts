@@ -38,6 +38,7 @@ import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
+import { LightBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/lightBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
@@ -62,6 +63,7 @@ import {
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
 import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
+import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDirectionBlock";
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
@@ -975,6 +977,64 @@ export function perturbNormal(
     bumpStrengthFloat.connectTo(perturbedNormal.strength);
 
     return perturbedNormal.output;
+}
+
+export function perturbNormalWithParallax(
+    uv: NodeMaterialConnectionPoint,
+    positionWorldVec3: NodeMaterialConnectionPoint,
+    normalWorldVec3: NodeMaterialConnectionPoint,
+    normalTexture: NodeMaterialConnectionPoint,
+    heightValue: NodeMaterialConnectionPoint,
+    viewDirection: NodeMaterialConnectionPoint,
+    parallaxScaleFloat: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): PerturbNormalBlock {
+    const perturbedNormal = new PerturbNormalBlock("Perturb normal with parallax");
+    perturbedNormal.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
+    perturbedNormal.useParallaxOcclusion = true;
+
+    uv.connectTo(perturbedNormal.uv);
+    positionWorldVec3.connectTo(perturbedNormal.worldPosition);
+    normalWorldVec3.connectTo(perturbedNormal.worldNormal);
+    normalTexture.connectTo(perturbedNormal.normalMapColor);
+    float(1.0).connectTo(perturbedNormal.strength);
+    parallaxScaleFloat.connectTo(perturbedNormal.parallaxScale);
+    viewDirection.connectTo(perturbedNormal.viewDirection);
+    heightValue.connectTo(perturbedNormal.parallaxHeight);
+
+    return perturbedNormal;
+}
+
+export function applyLights(
+    worldPosition: NodeMaterialConnectionPoint,
+    worldNormal: NodeMaterialConnectionPoint,
+    cameraPosition: NodeMaterialConnectionPoint,
+    diffuseColor: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const lightBlock = new LightBlock("Lights");
+    lightBlock.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
+
+    worldPosition.connectTo(lightBlock.worldPosition);
+    worldNormal.connectTo(lightBlock.worldNormal);
+    cameraPosition.connectTo(lightBlock.cameraPosition);
+    diffuseColor.connectTo(lightBlock.diffuseColor);
+
+    return lightBlock;
+}
+
+export function getViewDirection(
+    positionWorldVec3: NodeMaterialConnectionPoint,
+    cameraPositionVec3: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const viewDirectionBlock = new ViewDirectionBlock("View Direction");
+    viewDirectionBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    positionWorldVec3.connectTo(viewDirectionBlock.worldPosition);
+    cameraPositionVec3.connectTo(viewDirectionBlock.cameraPosition);
+
+    return viewDirectionBlock.output;
 }
 
 export type PBRMetallicRoughnessMaterialOptions = TargetOptions & {
