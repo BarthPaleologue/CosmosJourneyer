@@ -30,9 +30,11 @@ struct TerrainModel {
 }
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
-@group(0) @binding(1) var<uniform> params : Params;
-@group(0) @binding(2) var heightMapSampler : sampler;
-@group(0) @binding(3) var<uniform> terrainModel : TerrainModel;
+@group(0) @binding(1) var<storage, read_write> height_field : array<f32>;
+
+@group(2) @binding(0) var<uniform> params : Params;
+@group(2) @binding(1) var heightMapSampler : sampler;
+@group(2) @binding(2) var<uniform> terrainModel : TerrainModel;
 
 @group(1) @binding(0) var heightMap_0_0 : texture_2d<f32>;
 @group(1) @binding(1) var heightMap_0_1 : texture_2d<f32>;
@@ -118,4 +120,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     positions[index * 3 + 0] = final_position.x;
     positions[index * 3 + 1] = final_position.y;
     positions[index * 3 + 2] = final_position.z;
+
+    height_field[index] = elevation;
 }

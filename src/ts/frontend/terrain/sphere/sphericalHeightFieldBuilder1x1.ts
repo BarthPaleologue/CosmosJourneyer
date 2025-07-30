@@ -77,10 +77,11 @@ export class SphericalHeightFieldBuilder1x1 {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    params: { group: 0, binding: 1 },
-                    heightMap: { group: 0, binding: 2 },
-                    heightMapSampler: { group: 0, binding: 3 },
-                    terrainModel: { group: 0, binding: 4 },
+                    height_field: { group: 0, binding: 1 },
+                    params: { group: 1, binding: 0 },
+                    heightMap: { group: 1, binding: 1 },
+                    heightMapSampler: { group: 1, binding: 2 },
+                    terrainModel: { group: 1, binding: 3 },
                 },
             },
         );
@@ -103,7 +104,7 @@ export class SphericalHeightFieldBuilder1x1 {
             maxHeight: number;
         },
         engine: WebGPUEngine,
-    ): StorageBuffer {
+    ) {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
         this.paramsBuffer.updateMatrix("chunk_to_sphere_transform", chunkToSphereTransform);
@@ -125,12 +126,19 @@ export class SphericalHeightFieldBuilder1x1 {
         );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
+        const heightFieldBuffer = new StorageBuffer(
+            engine,
+            Float32Array.BYTES_PER_ELEMENT * nbVerticesPerRow * nbVerticesPerRow,
+            Constants.BUFFER_CREATIONFLAG_READWRITE,
+        );
+        this.computeShader.setStorageBuffer("height_field", heightFieldBuffer);
+
         this.computeShader.dispatch(
             nbVerticesPerRow / SphericalHeightFieldBuilder1x1.WORKGROUP_SIZE[0],
             nbVerticesPerRow / SphericalHeightFieldBuilder1x1.WORKGROUP_SIZE[1],
             1,
         );
 
-        return positionsBuffer;
+        return { positionsBuffer, heightFieldBuffer };
     }
 }

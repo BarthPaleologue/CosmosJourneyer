@@ -60,7 +60,8 @@ export class SphericalProceduralHeightFieldBuilder {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    params: { group: 0, binding: 1 },
+                    height_field: { group: 0, binding: 1 },
+                    params: { group: 1, binding: 0 },
                 },
             },
         );
@@ -78,7 +79,7 @@ export class SphericalProceduralHeightFieldBuilder {
         sphereRadius: number,
         size: number,
         engine: WebGPUEngine,
-    ): StorageBuffer {
+    ) {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
         this.paramsBuffer.updateMatrix("chunk_to_sphere_transform", chunkToSphereTransform);
@@ -94,12 +95,19 @@ export class SphericalProceduralHeightFieldBuilder {
         );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
+        const heightFieldBuffer = new StorageBuffer(
+            engine,
+            Float32Array.BYTES_PER_ELEMENT * nbVerticesPerRow * nbVerticesPerRow,
+            Constants.BUFFER_CREATIONFLAG_READWRITE,
+        );
+        this.computeShader.setStorageBuffer("height_field", heightFieldBuffer);
+
         this.computeShader.dispatch(
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[0],
             nbVerticesPerRow / SphericalProceduralHeightFieldBuilder.WORKGROUP_SIZE[1],
             1,
         );
 
-        return positionsBuffer;
+        return { positionsBuffer, heightFieldBuffer };
     }
 }

@@ -45,13 +45,19 @@ import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 import { WorkerPool } from "./workerPool";
 
+type GpuCpuBuffers = {
+    gpu: StorageBuffer;
+    cpu: Float32Array;
+};
+
 type NormalTask = {
     id: ChunkId;
-    positions: { gpu: StorageBuffer; cpu: Float32Array };
+    positions: GpuCpuBuffers;
+    heightField: GpuCpuBuffers;
 };
 
 type ApplyTask = NormalTask & {
-    normals: { gpu: StorageBuffer; cpu: Float32Array };
+    normals: GpuCpuBuffers;
 };
 
 type ProceduralHeightFieldComputePool = WorkerPool<
@@ -67,8 +73,8 @@ type Custom2x4HeightFieldComputePool = WorkerPool<Custom2x4HeightFieldTask, Sphe
 type NormalComputePool = WorkerPool<NormalTask, SquareGridNormalComputer, ApplyTask>;
 
 type ChunkCache = {
-    positions: LRUMap<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
-    normals: LRUMap<ChunkId, { gpu: StorageBuffer; cpu: Float32Array }>;
+    positionsHeightFields: LRUMap<ChunkId, { positions: GpuCpuBuffers; heightField: GpuCpuBuffers }>;
+    normals: LRUMap<ChunkId, GpuCpuBuffers>;
 };
 
 /**
@@ -127,10 +133,14 @@ export class ChunkForgeCompute implements ChunkForge {
     ) {
         const outputs = new Map<ChunkId, ChunkForgeOutput>();
         const cache: ChunkCache = {
-            positions: new LRUMap(Settings.MAX_CACHED_CHUNKS, (chunkId, positions) => {
+            positionsHeightFields: new LRUMap(Settings.MAX_CACHED_CHUNKS, (chunkId, { positions, heightField }) => {
                 positions.gpu.getBuffer().references--;
                 if (positions.gpu.getBuffer().references === 0) {
                     positions.gpu.dispose();
+                }
+                heightField.gpu.getBuffer().references--;
+                if (heightField.gpu.getBuffer().references === 0) {
+                    heightField.gpu.dispose();
                 }
                 outputs.delete(chunkId); // Remove from outputs when cache is cleared
             }),
@@ -149,15 +159,16 @@ export class ChunkForgeCompute implements ChunkForge {
                 return SphericalProceduralHeightFieldBuilder.New(engine);
             },
             async (worker, task) => {
-                const cachedValue = cache.positions.get(task.id);
+                const cachedValue = cache.positionsHeightFields.get(task.id);
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: cachedValue,
-                    };
+                        positions: cachedValue.positions,
+                        heightField: cachedValue.heightField,
+                    } satisfies NormalTask;
                 }
 
-                const positionsGpu = worker.dispatch(
+                const { positionsBuffer: positionsGpu, heightFieldBuffer: heightFieldGpu } = worker.dispatch(
                     task.positionOnCube,
                     task.chunkToSphereTransform,
                     rowVertexCount,
@@ -167,19 +178,29 @@ export class ChunkForgeCompute implements ChunkForge {
                     engine,
                 );
 
-                const positionBufferView = await positionsGpu.read();
+                const positionBufferViewPromise = positionsGpu.read();
+                const heightFieldBufferViewPromise = heightFieldGpu.read();
+
+                const positionBufferView = await positionBufferViewPromise;
+                const heightFieldBufferView = await heightFieldBufferViewPromise;
 
                 const positions = {
                     gpu: positionsGpu,
                     cpu: new Float32Array(positionBufferView.buffer),
                 };
 
-                cache.positions.set(task.id, positions);
+                const heightField = {
+                    gpu: heightFieldGpu,
+                    cpu: new Float32Array(heightFieldBufferView.buffer),
+                };
+
+                cache.positionsHeightFields.set(task.id, { positions, heightField });
 
                 return {
                     id: task.id,
                     positions,
-                };
+                    heightField,
+                } satisfies NormalTask;
             },
         );
 
@@ -189,15 +210,16 @@ export class ChunkForgeCompute implements ChunkForge {
                 return SphericalHeightFieldBuilder1x1.New(engine);
             },
             async (worker, task) => {
-                const cachedValue = cache.positions.get(task.id);
+                const cachedValue = cache.positionsHeightFields.get(task.id);
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: cachedValue,
-                    };
+                        positions: cachedValue.positions,
+                        heightField: cachedValue.heightField,
+                    } satisfies NormalTask;
                 }
 
-                const positionsGpu = worker.dispatch(
+                const { positionsBuffer: positionsGpu, heightFieldBuffer: heightFieldGpu } = worker.dispatch(
                     task.positionOnCube,
                     task.chunkToSphereTransform,
                     rowVertexCount,
@@ -212,19 +234,29 @@ export class ChunkForgeCompute implements ChunkForge {
                     engine,
                 );
 
-                const positionBufferView = await positionsGpu.read();
+                const positionBufferViewPromise = positionsGpu.read();
+                const heightFieldBufferViewPromise = heightFieldGpu.read();
+
+                const positionBufferView = await positionBufferViewPromise;
+                const heightFieldBufferView = await heightFieldBufferViewPromise;
 
                 const positions = {
                     gpu: positionsGpu,
                     cpu: new Float32Array(positionBufferView.buffer),
                 };
 
-                cache.positions.set(task.id, positions);
+                const heightField = {
+                    gpu: heightFieldGpu,
+                    cpu: new Float32Array(heightFieldBufferView.buffer),
+                };
+
+                cache.positionsHeightFields.set(task.id, { positions, heightField });
 
                 return {
                     id: task.id,
                     positions,
-                };
+                    heightField,
+                } satisfies NormalTask;
             },
         );
 
@@ -234,15 +266,16 @@ export class ChunkForgeCompute implements ChunkForge {
                 return SphericalHeightFieldBuilder2x4.New(engine);
             },
             async (worker, task) => {
-                const cachedValue = cache.positions.get(task.id);
+                const cachedValue = cache.positionsHeightFields.get(task.id);
                 if (cachedValue !== undefined) {
                     return {
                         id: task.id,
-                        positions: cachedValue,
-                    };
+                        positions: cachedValue.positions,
+                        heightField: cachedValue.heightField,
+                    } satisfies NormalTask;
                 }
 
-                const positionsGpu = worker.dispatch(
+                const { positionsBuffer: positionsGpu, heightFieldBuffer: heightFieldGpu } = worker.dispatch(
                     task.positionOnCube,
                     task.chunkToSphereTransform,
                     rowVertexCount,
@@ -257,19 +290,28 @@ export class ChunkForgeCompute implements ChunkForge {
                     engine,
                 );
 
-                const positionBufferView = await positionsGpu.read();
+                const positionBufferViewPromise = positionsGpu.read();
+                const heightFieldBufferViewPromise = heightFieldGpu.read();
+
+                const positionBufferView = await positionBufferViewPromise;
+                const heightFieldBufferView = await heightFieldBufferViewPromise;
 
                 const positions = {
                     gpu: positionsGpu,
                     cpu: new Float32Array(positionBufferView.buffer),
                 };
 
-                cache.positions.set(task.id, positions);
+                const heightField = {
+                    gpu: heightFieldGpu,
+                    cpu: new Float32Array(heightFieldBufferView.buffer),
+                };
+                cache.positionsHeightFields.set(task.id, { positions, heightField });
 
                 return {
                     id: task.id,
                     positions,
-                };
+                    heightField,
+                } satisfies NormalTask;
             },
         );
 
@@ -285,7 +327,8 @@ export class ChunkForgeCompute implements ChunkForge {
                         id: task.id,
                         normals: cachedValue,
                         positions: task.positions,
-                    };
+                        heightField: task.heightField,
+                    } satisfies ApplyTask;
                 }
 
                 const normalsGpu = worker.dispatch(rowVertexCount, task.positions.gpu, engine);
@@ -303,7 +346,8 @@ export class ChunkForgeCompute implements ChunkForge {
                     id: task.id,
                     normals,
                     positions: task.positions,
-                };
+                    heightField: task.heightField,
+                } satisfies ApplyTask;
             },
         );
 
@@ -452,6 +496,7 @@ export class ChunkForgeCompute implements ChunkForge {
             this.outputs.set(nextTask.id, {
                 type: "chunkForgeFinalOutput",
                 positions: nextTask.positions,
+                heightField: nextTask.heightField,
                 normals: nextTask.normals,
                 indices: this.gridIndices,
             });
@@ -496,7 +541,7 @@ export class ChunkForgeCompute implements ChunkForge {
         }
         this.normalComputePool.reset();
 
-        this.cache.positions.clear();
+        this.cache.positionsHeightFields.clear();
         this.cache.normals.clear();
 
         this.outputs.clear();

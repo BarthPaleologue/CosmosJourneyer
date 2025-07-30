@@ -62,6 +62,10 @@ export type ChunkForgeFinalOutput = {
         gpu: StorageBuffer;
         cpu: Float32Array;
     };
+    heightField: {
+        gpu: StorageBuffer;
+        cpu: Float32Array;
+    };
     normals: {
         gpu: StorageBuffer;
         cpu: Float32Array;
