@@ -17,6 +17,7 @@
 
 import "@styles/index.scss";
 import "@babylonjs/inspector";
+import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
 
