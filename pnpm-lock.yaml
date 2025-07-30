@@ -27,7 +27,7 @@ importers:
         specifier: ^8.10.0
         version: 8.10.0(@babylonjs/core@8.10.0)
       '@babylonjs/node-editor':
-        specifier: 8.10.0
+        specifier: ^8.10.0
         version: 8.10.0(@babylonjs/core@8.10.0)(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)
       '@brianchirls/game-input':
         specifier: ^0.1.1
