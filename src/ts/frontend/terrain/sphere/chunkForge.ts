@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Matrix, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type ProceduralTerrainModel, type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
@@ -30,6 +30,7 @@ export type HeightFieldTask = {
     id: ChunkId;
     positionOnCube: Vector3;
     positionOnSphere: Vector3;
+    chunkToSphereTransform: Matrix;
     size: number;
     direction: Direction;
     sphereRadius: number;
@@ -88,6 +89,7 @@ export interface ChunkForge {
         id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
+        chunkToSphereTransform: Matrix,
         direction: Direction,
         size: number,
         sphereRadius: number,

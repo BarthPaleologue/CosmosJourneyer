@@ -18,7 +18,7 @@
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Material } from "@babylonjs/core/Materials/material";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
@@ -27,6 +27,7 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
+import { getTransformationQuaternion } from "@/utils/algebra";
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
@@ -80,6 +81,11 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly terrainModel: TerrainModel;
 
+    /**
+     * Transformation matrix from the chunk's local space to the planet's local space.
+     */
+    private readonly chunkToPlanetTransform: Matrix;
+
     constructor(
         indices: ChunkIndices,
         direction: Direction,
@@ -106,11 +112,24 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.mesh.position.y = -sphereRadius + (sphereRadius * 2 * (indices.y + 0.5)) / 2 ** indices.lod;
         this.mesh.position.z = sphereRadius;
 
+        const initialPosition = this.mesh.position.clone();
+
         this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
         this.positionOnCube = this.mesh.position.clone();
 
         this.mesh.position.normalize().scaleInPlace(sphereRadius);
+
+        this.mesh.rotationQuaternion = getTransformationQuaternion(
+            initialPosition.normalizeToNew(),
+            this.mesh.position.normalizeToNew(),
+        );
+
+        this.chunkToPlanetTransform = Matrix.Compose(
+            Vector3.One(),
+            this.mesh.rotationQuaternion,
+            this.mesh.position,
+        ).invert();
 
         this.direction = direction;
         this.sphereRadius = sphereRadius;
@@ -217,6 +236,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             this.id,
             this.positionOnCube,
             this.mesh.position,
+            this.chunkToPlanetTransform,
             this.direction,
             this.sideLength,
             this.sphereRadius,

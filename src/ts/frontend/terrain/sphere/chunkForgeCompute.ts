@@ -17,7 +17,7 @@
 
 import { type StorageBuffer } from "@babylonjs/core/Buffers/storageBuffer";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type CustomTerrainModel, type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
@@ -159,7 +159,7 @@ export class ChunkForgeCompute implements ChunkForge {
 
                 const positionsGpu = worker.dispatch(
                     task.positionOnCube,
-                    task.positionOnSphere,
+                    task.chunkToSphereTransform,
                     rowVertexCount,
                     task.direction,
                     task.sphereRadius,
@@ -372,6 +372,7 @@ export class ChunkForgeCompute implements ChunkForge {
         id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
+        chunkToSphereTransform: Matrix,
         direction: Direction,
         size: number,
         sphereRadius: number,
@@ -385,6 +386,7 @@ export class ChunkForgeCompute implements ChunkForge {
             id,
             positionOnCube,
             positionOnSphere,
+            chunkToSphereTransform,
             direction,
             size,
             sphereRadius,
