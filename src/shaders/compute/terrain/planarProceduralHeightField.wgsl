@@ -18,14 +18,13 @@
 struct Params {
     nbVerticesPerRow : u32,
     size : f32,
-    octaves : i32,
-    lacunarity : f32,
-    persistence : f32,
-    scaleFactor : f32,
+    frequency : f32,
+    amplitude : f32,
 };
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
 @group(0) @binding(1) var<uniform> params : Params;
+@group(0) @binding(2) var<storage, read_write> heightField : array<f32>;
 
 #include "../utils/pi.wgsl";
 
@@ -46,9 +45,14 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     var vertex_position = vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
 
-    let elevation = mountain(vertex_position * 0.5, vec3f(0.0, 1.0, 0.0));
+    let elevation = mountain(vertex_position * params.frequency, vec3f(0.0, 1.0, 0.0)) * params.amplitude;
 
     positions[index * 3 + 0] = vertex_position.x;
     positions[index * 3 + 1] = elevation;
     positions[index * 3 + 2] = vertex_position.z;
+
+    // rotate 90 degrees around the Y axis
+    let index_heightField: u32 = id.x + (params.nbVerticesPerRow - 1 - id.y) * u32(params.nbVerticesPerRow);
+
+    heightField[index_heightField] = elevation;
 }

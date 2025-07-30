@@ -22,7 +22,13 @@ import {
     GizmoManager,
     LightGizmo,
     Mesh,
+    MeshBuilder,
     PBRMetallicRoughnessMaterial,
+    PhysicsAggregate,
+    PhysicsBody,
+    PhysicsMotionType,
+    PhysicsShapeHeightField,
+    PhysicsShapeType,
     Scene,
     ShadowGenerator,
     Vector3,
@@ -37,6 +43,8 @@ import { PlanarProceduralHeightField } from "@/frontend/terrain/planarProcedural
 import { SquareGridIndicesComputer } from "@/frontend/terrain/squareGridIndexComputer";
 import { SquareGridNormalComputer } from "@/frontend/terrain/squareGridNormalComputer";
 
+import { enablePhysics } from "./utils";
+
 export async function createTerrainScene(
     engine: WebGPUEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -45,6 +53,8 @@ export async function createTerrainScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
+
+    await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
     // This creates and positions a free camera (non-mesh)
     const controls = new DefaultControls(scene);
@@ -76,8 +86,13 @@ export async function createTerrainScene(
     shadowGenerator.usePercentageCloserFiltering = true;
     shadowGenerator.bias = 0.0001;
 
-    const nbVerticesPerRow = 1024;
-    const size = 8;
+    const nbVerticesPerRow = 64;
+    const size = 80;
+
+    const cube = MeshBuilder.CreateBox("cube", { size: 3 }, scene);
+    cube.position.y = 30;
+
+    new PhysicsAggregate(cube, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
     const terrain = new Mesh("terrain", scene);
 
@@ -85,47 +100,43 @@ export async function createTerrainScene(
     const normalComputer = await SquareGridNormalComputer.New(engine);
     const indexComputer = await SquareGridIndicesComputer.New(engine);
 
-    const positionBuffer = generator.dispatch(nbVerticesPerRow, size, engine);
-    const normalBuffer = normalComputer.dispatch(nbVerticesPerRow, positionBuffer, engine);
+    const { positionsBuffer, heightFieldBuffer } = generator.dispatch(nbVerticesPerRow, size, engine);
+    const normalBuffer = normalComputer.dispatch(nbVerticesPerRow, positionsBuffer, engine);
     const indexBuffer = indexComputer.dispatch(nbVerticesPerRow, engine);
 
-    const keepDataOnGPU = true;
+    const positionsVertexBuffer = new VertexBuffer(engine, positionsBuffer.getBuffer(), "position", false, false, 3);
+    terrain.setVerticesBuffer(positionsVertexBuffer);
 
-    if (keepDataOnGPU) {
-        const positionsVertexBuffer = new VertexBuffer(engine, positionBuffer.getBuffer(), "position", false, false, 3);
-        terrain.setVerticesBuffer(positionsVertexBuffer);
+    const normalsVertexBuffer = new VertexBuffer(engine, normalBuffer.getBuffer(), "normal", false, false, 3);
+    terrain.setVerticesBuffer(normalsVertexBuffer);
+    terrain.setBoundingInfo(new BoundingInfo(new Vector3(-size, -size, -size), new Vector3(size, size, size)));
 
-        const normalsVertexBuffer = new VertexBuffer(engine, normalBuffer.getBuffer(), "normal", false, false, 3);
-        terrain.setVerticesBuffer(normalsVertexBuffer);
-        terrain.setBoundingInfo(new BoundingInfo(new Vector3(-size, -size, -size), new Vector3(size, size, size)));
+    terrain.setIndexBuffer(
+        indexBuffer.getBuffer(),
+        nbVerticesPerRow * nbVerticesPerRow,
+        (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
+        true,
+    );
 
-        terrain.setIndexBuffer(
-            indexBuffer.getBuffer(),
-            nbVerticesPerRow * nbVerticesPerRow,
-            (nbVerticesPerRow - 1) * (nbVerticesPerRow - 1) * 6,
-            true,
-        );
-    } else {
-        const positionBufferView = await positionBuffer.read();
-        const indexBufferView = await indexBuffer.read();
-        const normalBufferView = await normalBuffer.read();
+    const heightField = await heightFieldBuffer.read();
 
-        const vertexData = new VertexData();
-        vertexData.positions = new Float32Array(positionBufferView.buffer);
-        vertexData.indices = new Uint32Array(indexBufferView.buffer);
-        vertexData.normals = new Float32Array(normalBufferView.buffer);
+    const heightFieldShape = new PhysicsShapeHeightField(
+        size,
+        size,
+        nbVerticesPerRow,
+        nbVerticesPerRow,
+        new Float32Array(heightField.buffer),
+        scene,
+    );
 
-        vertexData.applyToMesh(terrain);
-    }
+    const heightFieldBody = new PhysicsBody(terrain, PhysicsMotionType.STATIC, false, scene);
+    heightFieldBody.shape = heightFieldShape;
 
     const terrainMat = new PBRMetallicRoughnessMaterial("terrainMat", scene);
     terrainMat.baseColor = new Color3(0.5, 1.0, 0.5);
     terrainMat.metallic = 0.0;
     terrainMat.roughness = 0.8;
     terrain.material = terrainMat;
-
-    terrain.scaling.scaleInPlace(10);
-    terrain.scaling.y *= 2;
 
     terrain.receiveShadows = true;
     shadowGenerator.addShadowCaster(terrain);

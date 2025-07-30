@@ -35,26 +35,17 @@ export class PlanarProceduralHeightField {
     private static WORKGROUP_SIZE = [16, 16] as const;
 
     private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
-        const numOctaves = 2;
-        const lacunarity = 2.0;
-        const persistence = 0.5;
-        const initialScale = 0.5;
-
         this.computeShader = computeShader;
 
         this.paramsBuffer = new UniformBuffer(engine);
 
         this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
         this.paramsBuffer.addUniform("size", 1);
-        this.paramsBuffer.addUniform("octaves", 1);
-        this.paramsBuffer.addUniform("lacunarity", 1);
-        this.paramsBuffer.addUniform("persistence", 1);
-        this.paramsBuffer.addUniform("scaleFactor", 1);
+        this.paramsBuffer.addUniform("frequency", 1);
+        this.paramsBuffer.addUniform("amplitude", 1);
 
-        this.paramsBuffer.updateInt("octaves", numOctaves);
-        this.paramsBuffer.updateFloat("lacunarity", lacunarity);
-        this.paramsBuffer.updateFloat("persistence", persistence);
-        this.paramsBuffer.updateFloat("scaleFactor", initialScale);
+        this.paramsBuffer.updateFloat("frequency", 0.05);
+        this.paramsBuffer.updateFloat("amplitude", 10.0);
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
@@ -69,6 +60,7 @@ export class PlanarProceduralHeightField {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
                     params: { group: 0, binding: 1 },
+                    heightField: { group: 0, binding: 2 },
                 },
             },
         );
@@ -78,7 +70,7 @@ export class PlanarProceduralHeightField {
         return new PlanarProceduralHeightField(computeShader, engine);
     }
 
-    dispatch(nbVerticesPerRow: number, size: number, engine: WebGPUEngine): StorageBuffer {
+    dispatch(nbVerticesPerRow: number, size: number, engine: WebGPUEngine) {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
@@ -90,12 +82,19 @@ export class PlanarProceduralHeightField {
         );
         this.computeShader.setStorageBuffer("positions", positionsBuffer);
 
+        const heightFieldBuffer = new StorageBuffer(
+            engine,
+            Float32Array.BYTES_PER_ELEMENT * nbVerticesPerRow * nbVerticesPerRow,
+            Constants.BUFFER_CREATIONFLAG_READWRITE,
+        );
+        this.computeShader.setStorageBuffer("heightField", heightFieldBuffer);
+
         this.computeShader.dispatch(
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[0],
             nbVerticesPerRow / PlanarProceduralHeightField.WORKGROUP_SIZE[1],
             1,
         );
 
-        return positionsBuffer;
+        return { positionsBuffer, heightFieldBuffer };
     }
 }
