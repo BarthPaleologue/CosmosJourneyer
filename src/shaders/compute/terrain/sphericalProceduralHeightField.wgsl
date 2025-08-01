@@ -82,6 +82,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let filling_noise = remap(gradient_noise_3d_fbm(noise_sampling_point / 10e3, 10), -1.0, 1.0, 0.0, 1.0);
 
+    let ocean_depth = 30e3;
+
     let ocean_threshold = 0.55;
 
     let continent_smoothness = 0.01;
@@ -96,13 +98,13 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let fjord_noise_sharpened = smoothstep(0.0, fjord_width_threshold * remap(continent_fjord_mask, 0.0, 1.0, 0.3, 1.0), fjord_noise);
 
-    let fjord_elevation = 30e3 * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
+    let fjord_elevation = ocean_depth * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
 
     let mountain_elevation = 10e3 * mountain_noise * continent_sharp_mask * mountain_mask;
 
     let filling_elevation = 2e3 * filling_noise * continent_sharp_mask;
 
-    let continent_elevation = 30e3 * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
+    let continent_elevation = ocean_depth * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
     let elevation = continent_elevation + fjord_elevation + mountain_elevation + filling_elevation;
 
