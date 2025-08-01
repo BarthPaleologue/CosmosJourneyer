@@ -33,13 +33,18 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
-import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloudsPostProcess";
 import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 import { TelluricPlanetMaterial } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterial";
+
+import { addToWindow } from "./utils";
 
 export async function createTelluricPlanetScene(
     engine: WebGPUEngine,
@@ -94,6 +99,7 @@ export async function createTelluricPlanetScene(
         "Gas Planet",
         [],
     );
+    addToWindow("model", model);
 
     const material = new TelluricPlanetMaterial(
         model,
@@ -101,6 +107,7 @@ export async function createTelluricPlanetScene(
         textures.pools.telluricPlanetMaterialLut,
         scene,
     );
+    addToWindow("material", material);
 
     const terrainModel: TerrainModel = {
         type: "procedural",
@@ -108,7 +115,7 @@ export async function createTelluricPlanetScene(
 
     const terrain = new SphericalHeightFieldTerrain(
         "SphericalHeightFieldTerrain",
-        earthRadius,
+        model.radius,
         terrainModel,
         material,
         scene,
@@ -123,20 +130,47 @@ export async function createTelluricPlanetScene(
 
     const chunkForge = chunkForgeResult.value;
 
-    const oceanLevel = 30e3 - 100;
+    let ocean: OceanPostProcess | null = null;
+    if (model.ocean !== null) {
+        const oceanUniforms = new OceanUniforms(model.radius, model.ocean.depth);
 
-    const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
+        ocean = new OceanPostProcess(
+            terrain.getTransform(),
+            model.radius + model.ocean.depth,
+            oceanUniforms,
+            [light],
+            textures.water,
+            scene,
+        );
+        camera.attachPostProcess(ocean);
+    }
 
-    const waterTextures = await loadWaterTextures(scene, progressMonitor);
-    const ocean = new OceanPostProcess(
-        terrain.getTransform(),
-        earthRadius + oceanLevel,
-        oceanUniforms,
-        [light],
-        waterTextures,
-        scene,
-    );
-    camera.attachPostProcess(ocean);
+    let clouds: FlatCloudsPostProcess | null = null;
+    if (model.clouds !== null) {
+        const cloudsUniforms = new CloudsUniforms(model.clouds, textures.pools.cloudsLut, scene);
+
+        clouds = new FlatCloudsPostProcess(
+            terrain.getTransform(),
+            model.radius + (model.ocean?.depth ?? 0),
+            cloudsUniforms,
+            [light],
+            scene,
+        );
+        camera.attachPostProcess(clouds);
+    }
+
+    if (model.atmosphere !== null) {
+        const atmosphereUniforms = new AtmosphereUniforms(model.radius, model.mass, 298, model.atmosphere);
+
+        const atmosphere = new AtmosphericScatteringPostProcess(
+            terrain.getTransform(),
+            model.radius + (model.ocean?.depth ?? 0),
+            atmosphereUniforms,
+            [light],
+            scene,
+        );
+        camera.attachPostProcess(atmosphere);
+    }
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -151,7 +185,8 @@ export async function createTelluricPlanetScene(
 
         material.update(terrain.getTransform().computeWorldMatrix(true), [light]);
 
-        ocean.update(deltaSeconds);
+        ocean?.update(deltaSeconds);
+        clouds?.update(deltaSeconds);
     });
 
     return scene;
