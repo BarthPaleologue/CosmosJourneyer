@@ -28,3 +28,7 @@ export async function enablePhysics(scene: Scene, gravity = Vector3.Zero(), havo
 
     return havokPlugin;
 }
+
+export function addToWindow(key: string, value: unknown): void {
+    (window as Window & typeof globalThis & { [key: string]: unknown })[key] = value;
+}
