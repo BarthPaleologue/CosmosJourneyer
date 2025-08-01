@@ -133,7 +133,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
 
         this.beachSize = 100 + 50 * centeredRand(rng, 85);
         this.colorMode = ColorMode.DEFAULT;
-        this.steepSharpness = 2;
+        this.steepSharpness = 4;
 
         this.plainNormalMetallicMap = textures.grass.normalMetallic;
         this.plainAlbedoRoughnessMap = textures.grass.albedoRoughness;
