@@ -17,10 +17,13 @@
 
 import {
     Color3,
+    Color4,
     DirectionalLight,
     GizmoManager,
+    Light,
     LightGizmo,
     PBRMetallicRoughnessMaterial,
+    PointLight,
     Scene,
     Vector3,
     type WebGPUEngine,
@@ -31,7 +34,10 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
+import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
+import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
@@ -62,19 +68,15 @@ export async function createSphericalHeightFieldTerrain(
 
     scene.activeCamera = camera;
 
-    const light = new DirectionalLight("light", new Vector3(-5, 2, 10).normalize(), scene);
-    light.position = new Vector3(0, 100, 0);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
-    const lightGizmo = new LightGizmo();
-    lightGizmo.light = light;
-    lightGizmo.attachedMesh?.position.set(0, 20, 0);
+    const light = new PointLight("light", new Vector3(-5, 2, 10).scaleInPlace(earthRadius * -10), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
 
-    const gizmoManager = new GizmoManager(scene);
-    gizmoManager.positionGizmoEnabled = true;
-    gizmoManager.rotationGizmoEnabled = true;
-    gizmoManager.boundingBoxGizmoEnabled = true;
-    gizmoManager.usePointerToAttachGizmos = false;
-    gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+    const backLight = new PointLight("backLight", new Vector3(-5, 2, 10).scaleInPlace(earthRadius * 10), scene);
+    backLight.falloffType = Light.FALLOFF_STANDARD;
+    backLight.intensity = 0.2;
 
     const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
     material.baseColor = new Color3(0.5, 0.5, 0.5);
@@ -102,6 +104,21 @@ export async function createSphericalHeightFieldTerrain(
 
     const chunkForge = chunkForgeResult.value;
 
+    const oceanLevel = 30e3 - 100;
+
+    const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
+
+    const waterTextures = await loadWaterTextures(scene, progressMonitor);
+    const ocean = new OceanPostProcess(
+        terrain.getTransform(),
+        earthRadius + oceanLevel,
+        oceanUniforms,
+        [light, backLight],
+        waterTextures,
+        scene,
+    );
+    camera.attachPostProcess(ocean);
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
@@ -112,6 +129,8 @@ export async function createSphericalHeightFieldTerrain(
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+
+        ocean.update(deltaSeconds);
     });
 
     return scene;

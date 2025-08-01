@@ -15,7 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
+import {
+    Color4,
+    GizmoManager,
+    Light,
+    LightGizmo,
+    PointLight,
+    Scene,
+    Vector3,
+    type WebGPUEngine,
+} from "@babylonjs/core";
 
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
@@ -24,7 +33,10 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
+import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
+import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 import { TelluricPlanetMaterial } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterial";
@@ -58,6 +70,9 @@ export async function createTelluricPlanetScene(
     camera.attachControl();
 
     scene.activeCamera = camera;
+
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     const light = new PointLight("light", new Vector3(10, 2, -10).normalize().scale(earthRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
@@ -108,6 +123,21 @@ export async function createTelluricPlanetScene(
 
     const chunkForge = chunkForgeResult.value;
 
+    const oceanLevel = 30e3 - 100;
+
+    const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
+
+    const waterTextures = await loadWaterTextures(scene, progressMonitor);
+    const ocean = new OceanPostProcess(
+        terrain.getTransform(),
+        earthRadius + oceanLevel,
+        oceanUniforms,
+        [light],
+        waterTextures,
+        scene,
+    );
+    camera.attachPostProcess(ocean);
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
@@ -120,6 +150,8 @@ export async function createTelluricPlanetScene(
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
         material.update(terrain.getTransform().computeWorldMatrix(true), [light]);
+
+        ocean.update(deltaSeconds);
     });
 
     return scene;
