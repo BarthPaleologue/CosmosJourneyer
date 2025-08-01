@@ -84,9 +84,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let ocean_threshold = 0.55;
 
-    let continent_sharpness = 0.01;
+    let continent_smoothness = 0.01;
 
-    let continent_sharp_mask = smoothstep(ocean_threshold - continent_sharpness, ocean_threshold + continent_sharpness, continent_mask);
+    let continent_sharp_mask = smoothstep(ocean_threshold - continent_smoothness, ocean_threshold + continent_smoothness, continent_mask);
 
     let fjord_penetration = 0.06;
 
