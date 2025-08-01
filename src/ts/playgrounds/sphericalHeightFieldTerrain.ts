@@ -74,10 +74,6 @@ export async function createSphericalHeightFieldTerrain(
     const light = new PointLight("light", new Vector3(-5, 2, 10).scaleInPlace(earthRadius * -10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
 
-    const backLight = new PointLight("backLight", new Vector3(-5, 2, 10).scaleInPlace(earthRadius * 10), scene);
-    backLight.falloffType = Light.FALLOFF_STANDARD;
-    backLight.intensity = 0.2;
-
     const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
     material.baseColor = new Color3(0.5, 0.5, 0.5);
     material.metallic = 0.0;
@@ -104,16 +100,17 @@ export async function createSphericalHeightFieldTerrain(
 
     const chunkForge = chunkForgeResult.value;
 
-    const oceanLevel = 30e3 - 100;
+    const oceanLevel = 30e3;
 
     const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
+    oceanUniforms.depthModifier /= 4.0;
 
     const waterTextures = await loadWaterTextures(scene, progressMonitor);
     const ocean = new OceanPostProcess(
         terrain.getTransform(),
         earthRadius + oceanLevel,
         oceanUniforms,
-        [light, backLight],
+        [light],
         waterTextures,
         scene,
     );
