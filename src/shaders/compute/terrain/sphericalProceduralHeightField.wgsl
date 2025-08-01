@@ -70,7 +70,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let noise_sampling_point = vertex_position_on_sphere;
 
-    let continent_noise = gradient_noise_3d_fbm(noise_sampling_point / 3000e3, 7);
+    let continent_noise = gradient_noise_3d_fbm(noise_sampling_point / 3000e3, 10);
 
     let fjord_noise = abs(gradient_noise_3d_fbm(noise_sampling_point / 600e3, 3));
 
