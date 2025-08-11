@@ -111,7 +111,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
     /**
      * Creates a new SaveBackendMultiFile instance.
      * @param fileSystem - The file system interface to use
-     * @param universeBackend - The star system database for save validation
+     * @param universeBackend - The universe backend for save validation
      * @private
      */
     private constructor(fileSystem: IFileSystem, universeBackend: IUniverseBackend) {
@@ -122,7 +122,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
     /**
      * Factory method to create a SaveBackendMultiFile instance.
      * @param fileSystem - The file system interface to use
-     * @param universeBackend - The star system database for save validation
+     * @param universeBackend - The universe backend for save validation
      * @returns Result containing either the created SaveBackendMultiFile or an error
      */
     public static async CreateAsync(

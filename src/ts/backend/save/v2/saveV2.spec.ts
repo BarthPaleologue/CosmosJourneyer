@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type DeepPartial } from "@/utils/types";
 
@@ -9,7 +9,7 @@ import { safeParseSave } from "../saveFileData";
 import { type SaveV2 } from "./saveV2";
 
 test("Loading a correct save file", () => {
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
     if (fallbackStation === undefined) {
@@ -147,7 +147,7 @@ test("Loading a correct save file", () => {
 });
 
 test("Loading a minimal save file", () => {
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<SaveV2> = {
         player: {
@@ -269,7 +269,7 @@ test("Loading a save file with a corrupted itinerary", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFile, new StarSystemDatabase(getLoneStarSystem()));
+    const parsedSaveFile = safeParseSave(saveFile, new UniverseBackendLocal(getLoneStarSystem()));
     if (!parsedSaveFile.success) {
         throw new Error(`Failed to parse save file: ${parsedSaveFile.error.type}`);
     }

@@ -20,7 +20,7 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -43,7 +43,7 @@ export async function createStarSystemViewScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const universeBackend = new StarSystemDatabase(getAlphaTestisSystemModel());
+    const universeBackend = new UniverseBackendLocal(getAlphaTestisSystemModel());
 
     const player = Player.Default(universeBackend);
 

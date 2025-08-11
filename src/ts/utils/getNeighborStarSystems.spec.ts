@@ -20,12 +20,12 @@ import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
 
     const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 

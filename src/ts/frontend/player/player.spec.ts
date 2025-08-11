@@ -26,7 +26,7 @@ import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpa
 import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Player } from "./player";
@@ -35,7 +35,7 @@ describe("Player", () => {
     let universeBackend: IUniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         vi.clearAllMocks();
     });
 

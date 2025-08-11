@@ -23,7 +23,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -69,8 +69,8 @@ export async function createSpaceStationScene(
         localZ: 0,
     };
 
-    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
-    const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
+    const systemPosition = universeBackend.getSystemGalacticPosition(coordinates);
 
     const sunModel: StarModel = getSunModel();
 

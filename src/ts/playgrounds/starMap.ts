@@ -21,7 +21,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -39,7 +39,7 @@ export async function createStarMapScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
 
     const player = Player.Default(universeBackend);
 

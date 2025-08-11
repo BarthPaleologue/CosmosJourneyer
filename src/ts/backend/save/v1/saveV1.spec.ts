@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type DeepPartial } from "@/utils/types";
 
@@ -135,7 +135,7 @@ test("Loading a correct save file", () => {
         },
     };
 
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
@@ -176,7 +176,7 @@ test("Loading a minimal save file", () => {
         },
     };
 
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });

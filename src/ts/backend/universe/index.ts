@@ -26,11 +26,15 @@ import type { UniverseObjectId } from "./universeObjectId";
 
 export type SingleSystemModelPlugin = (systemModel: StarSystemModel) => StarSystemModel;
 
+/**
+ * The IUniverseBackend defines the content of the universe.
+ * It is responsible for generating star system models and system positions in the galaxy.
+ */
 export interface IUniverseBackend {
     getFallbackSystem: () => DeepReadonly<StarSystemModel>;
 
     /**
-     * Adds the given system to the database
+     * Adds the given system to the universe.
      * @param system The system to register
      */
     registerCustomSystem(system: StarSystemModel): void;
@@ -115,7 +119,7 @@ export interface IUniverseBackend {
     getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number): Array<Vector3>;
 
     /**
-     * Searches the database for the given id
+     * Searches the universe for the given id
      * @param universeObjectId The id to look for
      * @returns The model if it exists, null otherwise
      */

@@ -20,7 +20,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { SaveBackendMultiFile, type IFileSystem } from "./saveBackendMultiFile";
 import { type CmdrSaves, type Save } from "./saveFileData";
@@ -188,7 +188,7 @@ describe("SaveBackendMultiFile", () => {
 
     beforeEach(() => {
         fileSystem = new MockFileSystem();
-        universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     });
 
     describe("CreateAsync", () => {

@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { Mission } from "@/frontend/missions/mission";
 
@@ -27,7 +27,7 @@ import { StarMapTutorial } from "./starMapTutorial";
 
 describe("StarMapTutorial", () => {
     it("spawns near a space station", () => {
-        const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
         const saveDataResult = tutorial.getSaveData(universeBackend);
@@ -62,7 +62,7 @@ describe("StarMapTutorial", () => {
     });
 
     it("has correct mission objectives", () => {
-        const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
         const saveDataResult = tutorial.getSaveData(universeBackend);

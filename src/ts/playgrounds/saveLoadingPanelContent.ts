@@ -22,7 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
 import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -43,7 +43,7 @@ export async function createSaveLoadingPanelContentScene(
 
     await initI18n();
 
-    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
 
     const soundPlayer = new SoundPlayerMock();
 

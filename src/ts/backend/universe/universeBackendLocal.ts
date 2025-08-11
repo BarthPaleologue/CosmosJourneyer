@@ -33,11 +33,7 @@ import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
 import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
 
-/**
- * The StarSystemDatabase defines the content of the universe.
- * It is responsible for generating star system models and system positions in the galaxy.
- */
-export class StarSystemDatabase implements IUniverseBackend {
+export class UniverseBackendLocal implements IUniverseBackend {
     /**
      * Maps star sectors to the custom systems they contain.
      */
@@ -78,7 +74,7 @@ export class StarSystemDatabase implements IUniverseBackend {
 
     /**
      * Fallback system that is guaranteed to exist
-     * This can be useful for default mechanisms relying on finding a system in the database if nothing is found
+     * This can be useful for default mechanisms relying on finding a system in the universe if nothing is found
      */
     readonly fallbackSystem: DeepReadonly<StarSystemModel>;
 
@@ -283,7 +279,7 @@ export class StarSystemDatabase implements IUniverseBackend {
         for (const systemCoordinates of generatedSystemCoordinates) {
             const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
             if (systemModel === null) {
-                throw new Error("Generated system not found in the database!");
+                throw new Error("Generated system not found in the universe!");
             }
             generatedModels.push(systemModel);
         }

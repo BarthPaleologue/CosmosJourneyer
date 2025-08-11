@@ -19,13 +19,13 @@ import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { FlightTutorial } from "./flightTutorial";
 
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
-        const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new FlightTutorial();
 
         const saveDataResult = tutorial.getSaveData(universeBackend);

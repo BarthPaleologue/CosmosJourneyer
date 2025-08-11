@@ -20,7 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -51,9 +51,9 @@ export async function createSpaceStationUIScene(
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
 
-    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
 
-    const player = Player.Default(systemDatabase);
+    const player = Player.Default(universeBackend);
 
     const serializedSpaceship = player.serializedSpaceships.shift();
     if (serializedSpaceship === undefined) {
@@ -75,11 +75,11 @@ export async function createSpaceStationUIScene(
     camera.attachControl();
     scene.activeCamera = camera;
 
-    const systemModel = systemDatabase.fallbackSystem;
+    const systemModel = universeBackend.fallbackSystem;
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
-    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase, soundPlayer);
+    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, universeBackend, soundPlayer);
 
     const stationModel = systemModel.orbitalFacilities[0];
     if (stationModel === undefined) {
