@@ -117,7 +117,6 @@ export interface IUniverseBackend {
     /**
      * Searches the database for the given id
      * @param universeObjectId The id to look for
-     * @param starSystemDatabase The database to look in
      * @returns The model if it exists, null otherwise
      */
     getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null;

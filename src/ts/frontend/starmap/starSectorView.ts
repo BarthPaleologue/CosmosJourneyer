@@ -57,11 +57,11 @@ export class StarSectorView {
         position: Vector3;
     }>;
 
-    constructor(coordinates: Vector3, starSystemDatabase: IUniverseBackend) {
+    constructor(coordinates: Vector3, universeBackend: IUniverseBackend) {
         this.coordinates = coordinates;
         this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
 
-        const systemModels = starSystemDatabase.getSystemModelsInStarSector(
+        const systemModels = universeBackend.getSystemModelsInStarSector(
             this.coordinates.x,
             this.coordinates.y,
             this.coordinates.z,
@@ -69,7 +69,7 @@ export class StarSectorView {
         this.systems = systemModels.map((systemModel) => {
             return {
                 model: systemModel,
-                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates),
+                position: universeBackend.getSystemGalacticPosition(systemModel.coordinates),
             };
         });
     }

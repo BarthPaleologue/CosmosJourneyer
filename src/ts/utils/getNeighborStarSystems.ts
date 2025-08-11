@@ -25,9 +25,9 @@ import { Settings } from "@/settings";
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
-    starSystemDatabase: IUniverseBackend,
+    universeBackend: IUniverseBackend,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
-    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
+    const currentSystemPosition = universeBackend.getSystemGalacticPosition(starSystemCoordinates);
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
@@ -53,12 +53,8 @@ export function getNeighborStarSystemCoordinates(
     }
 
     return starSectorCoordinates.flatMap((starSector) => {
-        const starPositions = starSystemDatabase.getSystemPositionsInStarSector(
-            starSector.x,
-            starSector.y,
-            starSector.z,
-        );
-        const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
+        const starPositions = universeBackend.getSystemPositionsInStarSector(starSector.x, starSector.y, starSector.z);
+        const systemCoordinates = universeBackend.getSystemCoordinatesInStarSector(
             starSector.x,
             starSector.y,
             starSector.z,

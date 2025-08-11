@@ -51,7 +51,7 @@ export class SpaceShipLayer {
 
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
-    constructor(player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
+    constructor(player: Player, universeBackend: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.root = document.createElement("div");
         this.root.id = "helmetOverlay";
 
@@ -85,7 +85,7 @@ export class SpaceShipLayer {
         fuelIcon.alt = "Fuel canister icon";
         this.fuelIndicator.appendChild(fuelIcon);
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player, starSystemDatabase, soundPlayer);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, universeBackend, soundPlayer);
         this.root.appendChild(this.currentMissionDisplay.rootNode);
 
         this.cursor = document.createElement("div");
@@ -133,7 +133,7 @@ export class SpaceShipLayer {
         currentControls: TransformNode,
         missionContext: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget
@@ -153,7 +153,7 @@ export class SpaceShipLayer {
             this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
         }
 
-        this.currentMissionDisplay.update(missionContext, keyboardLayout, starSystemDatabase);
+        this.currentMissionDisplay.update(missionContext, keyboardLayout, universeBackend);
     }
 
     displaySpeed(shipThrottle: number, speed: number) {

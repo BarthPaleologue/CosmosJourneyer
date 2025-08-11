@@ -25,14 +25,14 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
 
-    const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
+    const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;
 
-        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, starSystemDatabase);
+        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, universeBackend);
         neighbors.forEach((neighbor) => {
             const { coordinates: starSystemCoordinates, position, distance } = neighbor;
             expect(position).toBeInstanceOf(Vector3);

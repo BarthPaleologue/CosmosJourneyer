@@ -64,20 +64,20 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
         this.hasCompletedLock = this.children.some((child) => child.isCompleted());
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
         return this.children
-            .map((child) => child.describe(originSystemCoordinates, starSystemDatabase))
+            .map((child) => child.describe(originSystemCoordinates, universeBackend))
             .join(` ${i18n.t("common:or")} `);
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
-            .map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase))
+            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
             .join(` ${i18n.t("common:or")} `);
     }
 

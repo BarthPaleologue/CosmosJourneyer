@@ -43,25 +43,25 @@ export async function createSaveLoadingPanelContentScene(
 
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
 
     const soundPlayer = new SoundPlayerMock();
 
-    const saveLoadingPanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
+    const saveLoadingPanelContent = new SaveLoadingPanelContent(universeBackend, soundPlayer);
     saveLoadingPanelContent.htmlRoot.style.position = "absolute";
     document.body.appendChild(saveLoadingPanelContent.htmlRoot);
 
     const saveManager = await SaveBackendSingleFile.CreateAsync(
         new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
         new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
-        starSystemDatabase,
+        universeBackend,
     );
     if (!saveManager.success) {
         await alertModal("Could not load saves", soundPlayer);
         return scene;
     }
 
-    await saveLoadingPanelContent.populateCmdrList(starSystemDatabase, saveManager.value);
+    await saveLoadingPanelContent.populateCmdrList(universeBackend, saveManager.value);
 
     return scene;
 }

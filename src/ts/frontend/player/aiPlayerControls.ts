@@ -30,13 +30,8 @@ export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(
-        starSystemDatabase: IUniverseBackend,
-        scene: Scene,
-        assets: RenderingAssets,
-        soundPlayer: ISoundPlayer,
-    ) {
-        this.player = Player.Default(starSystemDatabase);
+    constructor(universeBackend: IUniverseBackend, scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer) {
+        this.player = Player.Default(universeBackend);
         this.player.setName("AI");
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();

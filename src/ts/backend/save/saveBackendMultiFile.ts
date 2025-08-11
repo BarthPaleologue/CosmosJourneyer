@@ -103,7 +103,7 @@ interface CorruptedSave {
  */
 export class SaveBackendMultiFile implements ISaveBackend {
     private readonly fileSystem: IFileSystem;
-    private readonly starSystemDatabase: IUniverseBackend;
+    private readonly universeBackend: IUniverseBackend;
     private readonly corruptedSaves: CorruptedSave[] = [];
 
     private static readonly SAVES_DIR = "/saves";
@@ -111,28 +111,28 @@ export class SaveBackendMultiFile implements ISaveBackend {
     /**
      * Creates a new SaveBackendMultiFile instance.
      * @param fileSystem - The file system interface to use
-     * @param starSystemDatabase - The star system database for save validation
+     * @param universeBackend - The star system database for save validation
      * @private
      */
-    private constructor(fileSystem: IFileSystem, starSystemDatabase: IUniverseBackend) {
+    private constructor(fileSystem: IFileSystem, universeBackend: IUniverseBackend) {
         this.fileSystem = fileSystem;
-        this.starSystemDatabase = starSystemDatabase;
+        this.universeBackend = universeBackend;
     }
 
     /**
      * Factory method to create a SaveBackendMultiFile instance.
      * @param fileSystem - The file system interface to use
-     * @param starSystemDatabase - The star system database for save validation
+     * @param universeBackend - The star system database for save validation
      * @returns Result containing either the created SaveBackendMultiFile or an error
      */
     public static async CreateAsync(
         fileSystem: IFileSystem,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): Promise<Result<SaveBackendMultiFile, SaveLoadingError>> {
         try {
             // Ensure the saves directory exists
             await fileSystem.createDirectory(SaveBackendMultiFile.SAVES_DIR);
-            return ok(new SaveBackendMultiFile(fileSystem, starSystemDatabase));
+            return ok(new SaveBackendMultiFile(fileSystem, universeBackend));
         } catch (error) {
             console.error("Failed to create SaveBackendMultiFile:", error);
             // For file system initialization errors, we use INVALID_JSON as a generic failure
@@ -161,7 +161,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
             const saveJson = jsonSafeParse(content);
             if (!saveJson) throw new Error("Invalid JSON");
 
-            const saveResult = safeParseSave(saveJson, this.starSystemDatabase);
+            const saveResult = safeParseSave(saveJson, this.universeBackend);
             if (!saveResult.success) {
                 throw new Error(`Save validation failed: ${saveLoadingErrorToI18nString(saveResult.error)}`);
             }

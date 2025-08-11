@@ -17,7 +17,7 @@ export function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
-    starSystemDatabase: IUniverseBackend,
+    universeBackend: IUniverseBackend,
 ): string {
     const itinerary = missionContext.currentItinerary;
     if (itinerary === null) {
@@ -33,7 +33,7 @@ export function getGoToSystemInstructions(
         currentPlayerDestination !== undefined &&
         starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
-    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(
+    const currentSystemPosition = universeBackend.getSystemGalacticPosition(
         missionContext.currentSystem.model.coordinates,
     );
 
@@ -45,13 +45,13 @@ export function getGoToSystemInstructions(
         });
     } else {
         const nextSystemCoordinates = itinerary[1];
-        const nextSystemModel = starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates);
+        const nextSystemModel = universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
         if (nextSystemModel === null) {
             return i18n.t("missions:common:corruptedItinerary");
         }
 
         const distanceToNextSystemLy = Vector3.Distance(
-            starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates),
+            universeBackend.getSystemGalacticPosition(nextSystemModel.coordinates),
             currentSystemPosition,
         );
 

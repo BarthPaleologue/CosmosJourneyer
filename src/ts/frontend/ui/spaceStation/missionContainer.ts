@@ -28,7 +28,7 @@ import { AcceptMissionButton } from "./acceptMissionButton";
 export class MissionContainer {
     readonly rootNode: HTMLElement;
 
-    constructor(mission: Mission, player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
+    constructor(mission: Mission, player: Player, universeBackend: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.rootNode = document.createElement("div");
         this.rootNode.className = "missionItem";
 
@@ -41,7 +41,7 @@ export class MissionContainer {
         descriptionContainer.appendChild(missionH4);
 
         const missionP = document.createElement("p");
-        missionP.innerText = mission.describe(starSystemDatabase);
+        missionP.innerText = mission.describe(universeBackend);
         descriptionContainer.appendChild(missionP);
 
         const rewardP = document.createElement("p");

@@ -30,7 +30,7 @@ export class SaveLoadingPanelContent {
 
     private readonly soundPlayer: ISoundPlayer;
 
-    constructor(starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
+    constructor(universeBackend: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
 
@@ -73,7 +73,7 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            await this.loadSaveFile(file, starSystemDatabase);
+            await this.loadSaveFile(file, universeBackend);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -91,7 +91,7 @@ export class SaveLoadingPanelContent {
                     return;
                 }
 
-                await this.loadSaveFile(file, starSystemDatabase);
+                await this.loadSaveFile(file, universeBackend);
             };
             fileInput.click();
         });
@@ -101,7 +101,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(starSystemDatabase: IUniverseBackend, saveManager: ISaveBackend) {
+    async populateCmdrList(universeBackend: IUniverseBackend, saveManager: ISaveBackend) {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -225,12 +225,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.appendChild(savesList);
 
             allCmdrSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(
-                    save,
-                    cmdrSaves.auto.includes(save),
-                    starSystemDatabase,
-                    saveManager,
-                );
+                const saveDiv = this.createSaveDiv(save, cmdrSaves.auto.includes(save), universeBackend, saveManager);
                 savesList.appendChild(saveDiv);
             });
 
@@ -256,7 +251,7 @@ export class SaveLoadingPanelContent {
     private createSaveDiv(
         save: DeepReadonly<Save>,
         isAutoSave: boolean,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         saveManager: ISaveBackend,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
@@ -282,7 +277,7 @@ export class SaveLoadingPanelContent {
             throw new Error("Spaceship inside a spaceship is not supported yet");
         }
         const isLanded = locationToUse.type === "atStation";
-        const nearestObject = starSystemDatabase.getObjectModelByUniverseId(locationToUse.universeObjectId);
+        const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
@@ -397,11 +392,8 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async loadSaveFile(
-        file: File,
-        starSystemDatabase: IUniverseBackend,
-    ): Promise<Result<Save, SaveLoadingError>> {
-        const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
+    private async loadSaveFile(file: File, universeBackend: IUniverseBackend): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file, universeBackend);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
             await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error), this.soundPlayer);

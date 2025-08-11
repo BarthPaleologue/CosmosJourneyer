@@ -43,9 +43,9 @@ export async function createStarSystemViewScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getAlphaTestisSystemModel());
+    const universeBackend = new StarSystemDatabase(getAlphaTestisSystemModel());
 
-    const player = Player.Default(starSystemDatabase);
+    const player = Player.Default(universeBackend);
 
     const encyclopaediaManager = new EncyclopaediaGalacticaManager();
 
@@ -66,7 +66,7 @@ export async function createStarSystemViewScene(
         engine,
         havokPlugin,
         encyclopaediaManager,
-        starSystemDatabase,
+        universeBackend,
         soundPlayerMock,
         ttsMock,
         assets,
@@ -76,7 +76,7 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(starSystemDatabase.fallbackSystem);
+    await starSystemView.loadStarSystem(universeBackend.getFallbackSystem());
 
     starSystemView.initStarSystem();
 

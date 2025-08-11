@@ -156,7 +156,7 @@ class MockFileSystem implements IFileSystem {
 
 describe("SaveBackendMultiFile", () => {
     let fileSystem: MockFileSystem;
-    let starSystemDatabase: IUniverseBackend;
+    let universeBackend: IUniverseBackend;
 
     const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
     const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";
@@ -188,12 +188,12 @@ describe("SaveBackendMultiFile", () => {
 
     beforeEach(() => {
         fileSystem = new MockFileSystem();
-        starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        universeBackend = new StarSystemDatabase(getLoneStarSystem());
     });
 
     describe("CreateAsync", () => {
         it("should create a SaveBackendMultiFile successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -202,14 +202,14 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should ensure saves directory exists", async () => {
-            await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(await fileSystem.directoryExists("/saves")).toBe(true);
         });
     });
 
     describe("getSavesForCmdr", () => {
         it("should return undefined for non-existent commander", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -225,7 +225,7 @@ describe("SaveBackendMultiFile", () => {
             await fileSystem.createDirectory(`/saves/${cmdrUuid1}/manual`);
             await fileSystem.createDirectory(`/saves/${cmdrUuid1}/auto`);
 
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -251,7 +251,7 @@ describe("SaveBackendMultiFile", () => {
             await fileSystem.writeFile(`/saves/${cmdrUuid1}/manual/save2.json`, JSON.stringify(save2));
             await fileSystem.writeFile(`/saves/${cmdrUuid1}/auto/save3.json`, JSON.stringify(save3));
 
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -276,7 +276,7 @@ describe("SaveBackendMultiFile", () => {
             await fileSystem.createDirectory(`/saves/${cmdrUuid1}/manual`);
             await fileSystem.writeFile(`/saves/${cmdrUuid1}/manual/corrupted.json`, "invalid json");
 
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -307,7 +307,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("addManualSave", () => {
         it("should add a manual save successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -329,7 +329,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should refuse to add duplicate save", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -351,7 +351,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should create commander directories if they don't exist", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -373,7 +373,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("addAutoSave", () => {
         it("should add an auto save successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -395,7 +395,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should limit auto saves to MAX_AUTO_SAVES and remove oldest", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -430,7 +430,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should refuse to add duplicate save", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -454,7 +454,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("deleteSaveForCmdr", () => {
         it("should delete manual save successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -478,7 +478,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should delete auto save successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -502,7 +502,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should return false for non-existent save", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -515,7 +515,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("deleteCmdr", () => {
         it("should delete commander and all saves", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -544,7 +544,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("getCmdrUuids", () => {
         it("should return empty array when no commanders exist", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -555,7 +555,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should return all commander UUIDs", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -575,7 +575,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("importSaves", () => {
         it("should import saves successfully", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -609,7 +609,7 @@ describe("SaveBackendMultiFile", () => {
 
     describe("exportSaves", () => {
         it("should export all saves", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {
@@ -635,7 +635,7 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should return empty object when no saves exist", async () => {
-            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, starSystemDatabase);
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
             expect(result.success).toBe(true);
 
             if (result.success) {

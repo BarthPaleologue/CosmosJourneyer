@@ -50,8 +50,8 @@ import saveData from "@assets/tutorials/starMapTutorial/save.json";
 export class StarMapTutorial implements Tutorial {
     readonly coverImageSrc: string = coverImgSrc;
 
-    getSaveData(starSystemDatabase: IUniverseBackend): Result<Save, SaveLoadingError> {
-        return safeParseSave(saveData, starSystemDatabase);
+    getSaveData(universeBackend: IUniverseBackend): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData, universeBackend);
     }
 
     getTitle() {

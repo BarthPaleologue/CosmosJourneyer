@@ -19,7 +19,7 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 // import { getSolSystemModel } from "./sol";
 
-export function registerCustomSystems(starSystemDatabase: StarSystemDatabase) {
-    void starSystemDatabase;
-    // starSystemDatabase.registerCustomSystem(getSolSystemModel());
+export function registerCustomSystems(universeBackend: StarSystemDatabase) {
+    void universeBackend;
+    // universeBackend.registerCustomSystem(getSolSystemModel());
 }

@@ -62,18 +62,18 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
         this.hasCompletedLock = this.children.filter((child) => child.isCompleted()).length === 1;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" xor ");
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend)).join(" xor ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
-            .map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase))
+            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
             .join(" xor ");
     }
 

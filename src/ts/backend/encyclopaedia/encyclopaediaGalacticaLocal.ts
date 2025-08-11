@@ -21,10 +21,10 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
      */
     private readonly redundantDataPrice = 100;
 
-    private readonly starSystemDatabase: IUniverseBackend;
+    private readonly universeBackend: IUniverseBackend;
 
-    constructor(starSystemDatabase: IUniverseBackend) {
-        this.starSystemDatabase = starSystemDatabase;
+    constructor(universeBackend: IUniverseBackend) {
+        this.universeBackend = universeBackend;
     }
 
     public contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
@@ -70,11 +70,11 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = this.starSystemDatabase.getObjectModelByUniverseId(object);
+        const model = this.universeBackend.getObjectModelByUniverseId(object);
         if (model === null) {
             return err("Object model not found for object ID");
         }
-        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
+        const systemGalacticPosition = this.universeBackend.getSystemGalacticPosition(object.systemCoordinates);
 
         const distanceFromSolLy = systemGalacticPosition.length();
 

@@ -54,11 +54,8 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
-    public static New(
-        objectId: UniverseObjectId,
-        starSystemDatabase: IUniverseBackend,
-    ): MissionAsteroidFieldNode | null {
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(objectId.systemCoordinates);
+    public static New(objectId: UniverseObjectId, universeBackend: IUniverseBackend): MissionAsteroidFieldNode | null {
+        const systemModel = universeBackend.getSystemModelFromCoordinates(objectId.systemCoordinates);
         if (systemModel === null) {
             return null;
         }
@@ -150,13 +147,13 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
         const distanceLy = Vector3.Distance(
-            starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
-            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
+            universeBackend.getSystemGalacticPosition(originSystemCoordinates),
+            universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
-        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: objectModel or systemModel is null";
         }
@@ -170,13 +167,13 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
         }
 
-        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             return "ERROR: targetObject is null";
         }
@@ -187,7 +184,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase,
+                    universeBackend,
                 );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

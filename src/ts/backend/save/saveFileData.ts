@@ -35,9 +35,9 @@ export type Save = z.infer<typeof SaveSchema>;
  */
 export function safeParseSave(
     json: Record<string, unknown>,
-    starSystemDatabase: IUniverseBackend,
+    universeBackend: IUniverseBackend,
 ): Result<Save, SaveLoadingError> {
-    return safeParseSaveV2(json, starSystemDatabase);
+    return safeParseSaveV2(json, universeBackend);
 }
 
 export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
@@ -54,13 +54,13 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
 
 export function parseSaveArray(
     rawSaves: Record<string, unknown>[],
-    starSystemDatabase: IUniverseBackend,
+    universeBackend: IUniverseBackend,
 ): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
 
     for (const save of rawSaves) {
-        const result = safeParseSave(save, starSystemDatabase);
+        const result = safeParseSave(save, universeBackend);
         if (result.success) {
             validSaves.push(result.value);
         } else {

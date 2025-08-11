@@ -65,7 +65,7 @@ export class MainMenu {
     constructor(
         sidePanels: SidePanels,
         starSystemView: StarSystemView,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.sidePanels = sidePanels;
@@ -85,7 +85,7 @@ export class MainMenu {
             starSectorZ: 0,
         };
 
-        const system = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        const system = universeBackend.getSystemModelFromCoordinates(coordinates);
         if (system === null) {
             throw new Error("Cannot find system");
         }

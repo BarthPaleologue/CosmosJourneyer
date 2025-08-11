@@ -90,7 +90,7 @@ export class SpaceStationLayer {
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
@@ -161,7 +161,7 @@ export class SpaceStationLayer {
         this.explorationCenterPanel = new ExplorationCenterPanel(
             encyclopaedia,
             player,
-            starSystemDatabase,
+            universeBackend,
             this.soundPlayer,
         );
 
@@ -277,22 +277,22 @@ export class SpaceStationLayer {
 
         this.missionsButton.addEventListener("click", async () => {
             this.soundPlayer.playNow(SoundType.CLICK);
-            await this.setMainPanelState(MainPanelState.MISSIONS, player, starSystemDatabase);
+            await this.setMainPanelState(MainPanelState.MISSIONS, player, universeBackend);
         });
 
         this.spaceshipHangarButton.addEventListener("click", async () => {
             this.soundPlayer.playNow(SoundType.CLICK);
-            await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, starSystemDatabase);
+            await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, universeBackend);
         });
 
         this.explorationCenterButton.addEventListener("click", async () => {
             this.soundPlayer.playNow(SoundType.CLICK);
-            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, starSystemDatabase);
+            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, universeBackend);
         });
 
         this.infoButton.addEventListener("click", async () => {
             this.soundPlayer.playNow(SoundType.CLICK);
-            await this.setMainPanelState(MainPanelState.INFO, player, starSystemDatabase);
+            await this.setMainPanelState(MainPanelState.INFO, player, universeBackend);
         });
 
         this.takeOffButton.addEventListener("click", () => {
@@ -303,7 +303,7 @@ export class SpaceStationLayer {
         this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
     }
 
-    private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: IUniverseBackend) {
+    private async setMainPanelState(state: MainPanelState, player: Player, universeBackend: IUniverseBackend) {
         if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {
@@ -324,7 +324,7 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(
-                    generateMissionsDom(this.currentStation, player, starSystemDatabase, this.soundPlayer),
+                    generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer),
                 );
                 break;
             case MainPanelState.SPACE_SHIP:
@@ -336,7 +336,7 @@ export class SpaceStationLayer {
             case MainPanelState.EXPLORATION_CENTER:
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
-                await this.explorationCenterPanel.populate(starSystemDatabase);
+                await this.explorationCenterPanel.populate(universeBackend);
                 this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
             case MainPanelState.NONE:

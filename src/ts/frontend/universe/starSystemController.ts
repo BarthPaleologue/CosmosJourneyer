@@ -455,12 +455,9 @@ export class StarSystemController {
         this.scene.activeCamera?.getViewMatrix(true);
     }
 
-    addSystemTarget(
-        targetCoordinates: StarSystemCoordinates,
-        starSystemDatabase: IUniverseBackend,
-    ): SystemTarget | null {
-        const currentSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(this.model.coordinates);
-        const targetSystemUniversePosition = starSystemDatabase.getSystemGalacticPosition(targetCoordinates);
+    addSystemTarget(targetCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): SystemTarget | null {
+        const currentSystemUniversePosition = universeBackend.getSystemGalacticPosition(this.model.coordinates);
+        const targetSystemUniversePosition = universeBackend.getSystemGalacticPosition(targetCoordinates);
 
         const distance = lightYearsToMeters(
             Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition),
@@ -470,7 +467,7 @@ export class StarSystemController {
 
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(targetCoordinates);
         if (systemModel === null) {
             return null;
         }

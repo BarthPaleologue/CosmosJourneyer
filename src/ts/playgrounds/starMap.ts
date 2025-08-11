@@ -39,16 +39,16 @@ export async function createStarMapScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
 
-    const player = Player.Default(starSystemDatabase);
+    const player = Player.Default(universeBackend);
 
-    const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(starSystemDatabase);
+    const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(universeBackend);
 
     const soundPlayerMock = new SoundPlayerMock();
 
-    const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase, soundPlayerMock);
-    starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
+    const starMap = new StarMap(player, engine, encyclopaediaGalactica, universeBackend, soundPlayerMock);
+    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates);
 
     // Get system coordinates from URL parameters
     const urlParams = new URLSearchParams(window.location.search);

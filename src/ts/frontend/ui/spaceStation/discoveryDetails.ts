@@ -63,7 +63,7 @@ export class DiscoveryDetails {
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
@@ -112,13 +112,13 @@ export class DiscoveryDetails {
             player.discoveries.uploaded.push(this.currentDiscovery);
 
             this.onSellDiscovery.notifyObservers(this.currentDiscovery);
-            await this.setDiscovery(null, starSystemDatabase);
+            await this.setDiscovery(null, universeBackend);
         });
 
-        void this.setDiscovery(null, starSystemDatabase);
+        void this.setDiscovery(null, universeBackend);
     }
 
-    async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: IUniverseBackend) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null, universeBackend: IUniverseBackend) {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;
@@ -128,7 +128,7 @@ export class DiscoveryDetails {
             return;
         }
 
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(
+        const systemModel = universeBackend.getSystemModelFromCoordinates(
             this.currentDiscovery.objectId.systemCoordinates,
         );
 

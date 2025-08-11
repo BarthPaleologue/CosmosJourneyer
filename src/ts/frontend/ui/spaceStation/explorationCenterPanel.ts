@@ -57,7 +57,7 @@ export class ExplorationCenterPanel {
     constructor(
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.player = player;
@@ -120,7 +120,7 @@ export class ExplorationCenterPanel {
                 player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
                 player.discoveries.uploaded.push(discovery);
             }
-            await this.populate(starSystemDatabase);
+            await this.populate(universeBackend);
         });
         buttonHorizontalContainer.appendChild(this.sellAllButton);
 
@@ -148,7 +148,7 @@ export class ExplorationCenterPanel {
                 case ExplorationCenterFilter.UPLOADED_ONLY:
                 case ExplorationCenterFilter.ALL:
                     this.filter = discoveryListSelect.value;
-                    await this.populate(starSystemDatabase);
+                    await this.populate(universeBackend);
                     break;
                 default:
                     throw new Error("Invalid value of discoveryListSelect!");
@@ -166,9 +166,9 @@ export class ExplorationCenterPanel {
         this.discoveryList.classList.add("flex-column", "overflow-y-auto", "discoveryList");
         horizontalContainer.appendChild(this.discoveryList);
 
-        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase, this.soundPlayer);
+        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, universeBackend, this.soundPlayer);
         this.discoveryDetails.onSellDiscovery.add(async () => {
-            await this.populate(starSystemDatabase);
+            await this.populate(universeBackend);
         });
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
@@ -180,7 +180,7 @@ export class ExplorationCenterPanel {
         }
     }
 
-    async populate(starSystemDatabase: IUniverseBackend) {
+    async populate(universeBackend: IUniverseBackend) {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 
@@ -245,7 +245,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.appendChild(searchField);
 
         discoveries.forEach((discovery) => {
-            const objectModel = starSystemDatabase.getObjectModelByUniverseId(discovery.objectId);
+            const objectModel = universeBackend.getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
@@ -259,7 +259,7 @@ export class ExplorationCenterPanel {
                 this.selectedDiscovery = discoveryItem;
                 this.selectedDiscovery.classList.add("selected");
 
-                await this.discoveryDetails.setDiscovery(discovery, starSystemDatabase);
+                await this.discoveryDetails.setDiscovery(discovery, universeBackend);
             });
             this.discoveryToHtmlItem.set(discovery, discoveryItem);
             this.discoveryList.appendChild(discoveryItem);

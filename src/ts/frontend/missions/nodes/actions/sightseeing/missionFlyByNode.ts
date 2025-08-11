@@ -122,13 +122,13 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
         const distanceLy = Vector3.Distance(
-            starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
-            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
+            universeBackend.getSystemGalacticPosition(originSystemCoordinates),
+            universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
-        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
@@ -142,13 +142,13 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             return "ERROR: target object is null";
         }
@@ -159,7 +159,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase,
+                    universeBackend,
                 );
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

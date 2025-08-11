@@ -135,8 +135,8 @@ test("Loading a correct save file", () => {
         },
     };
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-    const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
+    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
 
@@ -176,7 +176,7 @@ test("Loading a minimal save file", () => {
         },
     };
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
-    const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
+    const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });

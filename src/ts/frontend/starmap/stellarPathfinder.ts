@@ -57,10 +57,10 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
-    private starSystemDatabase: IUniverseBackend;
+    private universeBackend: IUniverseBackend;
 
-    public constructor(starSystemDatabase: IUniverseBackend) {
-        this.starSystemDatabase = starSystemDatabase;
+    public constructor(universeBackend: IUniverseBackend) {
+        this.universeBackend = universeBackend;
     }
 
     /**
@@ -83,12 +83,12 @@ export class StellarPathfinder {
 
         this.startSystem = {
             coordinates: startSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates),
+            position: this.universeBackend.getSystemGalacticPosition(startSystemCoordinates),
         };
 
         this.targetSystem = {
             coordinates: targetSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates),
+            position: this.universeBackend.getSystemGalacticPosition(targetSystemCoordinates),
         };
 
         this.jumpRange = jumpRange;
@@ -113,7 +113,7 @@ export class StellarPathfinder {
         const stellarNeighbors = getNeighborStarSystemCoordinates(
             node.coordinates,
             this.jumpRange,
-            this.starSystemDatabase,
+            this.universeBackend,
         );
         return stellarNeighbors.map<{ node: Node; distance: number }>(({ coordinates, position, distance }) => {
             return {

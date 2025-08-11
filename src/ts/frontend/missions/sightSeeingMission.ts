@@ -44,14 +44,14 @@ export type SightSeeingTarget = {
     objectId: UniverseObjectId;
 };
 
-function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: IUniverseBackend): MissionNode | null {
+function generateMissionTree(target: SightSeeingTarget, universeBackend: IUniverseBackend): MissionNode | null {
     switch (target.type) {
         case MissionType.SIGHT_SEEING_FLY_BY:
             return new MissionFlyByNode(target.objectId);
         case MissionType.SIGHT_SEEING_TERMINATOR_LANDING:
             return new MissionTerminatorLandingNode(target.objectId);
         case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
-            return MissionAsteroidFieldNode.New(target.objectId, starSystemDatabase);
+            return MissionAsteroidFieldNode.New(target.objectId, universeBackend);
     }
 }
 
@@ -64,23 +64,21 @@ function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: IUni
 export function newSightSeeingMission(
     missionGiver: UniverseObjectId,
     target: SightSeeingTarget,
-    starSystemDatabase: IUniverseBackend,
+    universeBackend: IUniverseBackend,
 ): Mission | null {
-    const missionTree = generateMissionTree(target, starSystemDatabase);
+    const missionTree = generateMissionTree(target, universeBackend);
     if (missionTree === null) {
         return null;
     }
 
     const targetSystemCoordinates = target.objectId.systemCoordinates;
 
-    const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
-        missionGiver.systemCoordinates,
-    );
+    const missionGiverGalacticCoordinates = universeBackend.getSystemGalacticPosition(missionGiver.systemCoordinates);
 
-    const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);
+    const targetGalacticCoordinates = universeBackend.getSystemGalacticPosition(targetSystemCoordinates);
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-    const targetModel = starSystemDatabase.getObjectModelByUniverseId(target.objectId);
+    const targetModel = universeBackend.getObjectModelByUniverseId(target.objectId);
 
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));

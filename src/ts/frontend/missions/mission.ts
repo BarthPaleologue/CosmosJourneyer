@@ -75,9 +75,9 @@ export class Mission {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
-        return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
+        return this.tree.describeNextTask(context, keyboardLayout, universeBackend);
     }
 
     /**
@@ -121,8 +121,8 @@ export class Mission {
     /**
      * Returns a string describing the mission using the mission tree and the origin seed
      */
-    describe(starSystemDatabase: IUniverseBackend): string {
-        return this.tree.describe(this.missionGiver.systemCoordinates, starSystemDatabase);
+    describe(universeBackend: IUniverseBackend): string {
+        return this.tree.describe(this.missionGiver.systemCoordinates, universeBackend);
     }
 
     /**
@@ -155,10 +155,10 @@ export class Mission {
 
     static Deserialize(
         missionSerialized: DeepReadonly<MissionSerialized>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): Mission | null {
         try {
-            const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
+            const missionTree = deserializeMissionNode(missionSerialized.tree, universeBackend);
             if (missionTree === null) {
                 return null;
             }

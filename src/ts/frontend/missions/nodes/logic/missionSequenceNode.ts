@@ -83,19 +83,19 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
         this.activeChildIndex = index;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" then ");
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend)).join(" then ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         const activeChild = this.children[this.activeChildIndex];
         if (activeChild === undefined) return "Mission error: activeChildIndex out of bounds";
-        return activeChild.describeNextTask(context, keyboardLayout, starSystemDatabase);
+        return activeChild.describeNextTask(context, keyboardLayout, universeBackend);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

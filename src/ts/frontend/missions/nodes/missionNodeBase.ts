@@ -49,7 +49,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
      * Describes the node recursively.
      * @param originSystemCoordinates The seed of the system where the mission has been given.
      */
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string;
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string;
 
     /**
      * Describes the next task to be done in the mission subtree.
@@ -59,7 +59,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
     ): string;
 
     /**

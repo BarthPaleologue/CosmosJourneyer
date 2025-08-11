@@ -32,17 +32,17 @@ export class SidePanels {
     private readonly creditsPanel: HTMLElement;
     private readonly aboutPanel: HTMLElement;
 
-    private readonly starSystemDatabase: IUniverseBackend;
+    private readonly universeBackend: IUniverseBackend;
 
     private readonly saveBackend: ISaveBackend;
 
     constructor(
-        starSystemDatabase: IUniverseBackend,
+        universeBackend: IUniverseBackend,
         saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
     ) {
-        this.starSystemDatabase = starSystemDatabase;
+        this.universeBackend = universeBackend;
         this.saveBackend = saveManager;
 
         const loadSavePanel = document.getElementById("loadSavePanel");
@@ -50,7 +50,7 @@ export class SidePanels {
         this.loadSavePanel = loadSavePanel;
         this.attachCloseButton(this.loadSavePanel);
 
-        this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
+        this.loadSavePanelContent = new SaveLoadingPanelContent(universeBackend, soundPlayer);
         this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
 
         this.settingsPanel = initSettingsPanel(musicConductor);
@@ -125,7 +125,7 @@ export class SidePanels {
         }
 
         if (type === PanelType.LOAD_SAVE) {
-            await this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase, this.saveBackend);
+            await this.loadSavePanelContent.populateCmdrList(this.universeBackend, this.saveBackend);
         }
 
         if (this.activeRightPanel !== null) {
