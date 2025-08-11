@@ -19,6 +19,7 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
@@ -39,7 +40,7 @@ export async function createStarMapScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
+    const universeBackend: IUniverseBackend = new UniverseBackendLocal(getLoneStarSystem());
 
     const player = Player.Default(universeBackend);
 
@@ -48,7 +49,7 @@ export async function createStarMapScene(
     const soundPlayerMock = new SoundPlayerMock();
 
     const starMap = new StarMap(player, engine, encyclopaediaGalactica, universeBackend, soundPlayerMock);
-    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates);
+    starMap.setCurrentStarSystem(universeBackend.getFallbackSystem().coordinates);
 
     // Get system coordinates from URL parameters
     const urlParams = new URLSearchParams(window.location.search);

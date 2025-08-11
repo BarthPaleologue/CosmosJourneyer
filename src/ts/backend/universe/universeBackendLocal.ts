@@ -76,7 +76,7 @@ export class UniverseBackendLocal implements IUniverseBackend {
      * Fallback system that is guaranteed to exist
      * This can be useful for default mechanisms relying on finding a system in the universe if nothing is found
      */
-    readonly fallbackSystem: DeepReadonly<StarSystemModel>;
+    private readonly fallbackSystem: DeepReadonly<StarSystemModel>;
 
     constructor(fallbackSystem: StarSystemModel) {
         const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);

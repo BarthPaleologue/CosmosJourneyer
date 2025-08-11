@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
@@ -9,9 +10,9 @@ import { safeParseSave } from "../saveFileData";
 import { type SaveV2 } from "./saveV2";
 
 test("Loading a correct save file", () => {
-    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
+    const universeBackend: IUniverseBackend = new UniverseBackendLocal(getLoneStarSystem());
     const shipId = crypto.randomUUID();
-    const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
+    const fallbackStation = universeBackend.getFallbackSystem().orbitalFacilities[0];
     if (fallbackStation === undefined) {
         throw new Error("Fallback station is undefined!");
     }
@@ -98,7 +99,7 @@ test("Loading a correct save file", () => {
                     tree: {
                         type: 0,
                         objectId: {
-                            idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                            idInSystem: universeBackend.getFallbackSystem().stellarObjects[0].id,
                             systemCoordinates: {
                                 starSectorX: -3,
                                 starSectorY: -1,
@@ -124,8 +125,8 @@ test("Loading a correct save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    idInSystem: universeBackend.getFallbackSystem().stellarObjects[0].id,
+                    systemCoordinates: universeBackend.getFallbackSystem().coordinates,
                 },
                 position: {
                     x: -0.3993145315439042,
@@ -168,8 +169,8 @@ test("Loading a minimal save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    idInSystem: universeBackend.getFallbackSystem().stellarObjects[0].id,
+                    systemCoordinates: universeBackend.getFallbackSystem().coordinates,
                 },
                 position: {
                     x: 0,

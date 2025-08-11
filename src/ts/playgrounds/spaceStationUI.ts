@@ -19,6 +19,7 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
@@ -51,7 +52,7 @@ export async function createSpaceStationUIScene(
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
 
-    const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
+    const universeBackend: IUniverseBackend = new UniverseBackendLocal(getLoneStarSystem());
 
     const player = Player.Default(universeBackend);
 
@@ -75,7 +76,7 @@ export async function createSpaceStationUIScene(
     camera.attachControl();
     scene.activeCamera = camera;
 
-    const systemModel = universeBackend.fallbackSystem;
+    const systemModel = universeBackend.getFallbackSystem();
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
