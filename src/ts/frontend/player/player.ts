@@ -25,8 +25,8 @@ import {
     SerializedSpaceshipSchema,
     type SerializedSpaceship,
 } from "@/backend/spaceship/serializedSpaceship";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Mission } from "@/frontend/missions/mission";
@@ -70,7 +70,7 @@ export class Player {
     readonly onNameChangedObservable = new Observable<string>();
     readonly onBalanceChangedObservable = new Observable<number>();
 
-    private constructor(serializedPlayer: DeepReadonly<SerializedPlayer>, starSystemDatabase: StarSystemDatabase) {
+    private constructor(serializedPlayer: DeepReadonly<SerializedPlayer>, starSystemDatabase: IUniverseBackend) {
         this.uuid = serializedPlayer.uuid;
 
         this.#name = serializedPlayer.name;
@@ -138,7 +138,7 @@ export class Player {
         return true;
     }
 
-    public static Default(starSystemDatabase: StarSystemDatabase): Player {
+    public static Default(starSystemDatabase: IUniverseBackend): Player {
         return new Player(
             {
                 uuid: crypto.randomUUID(),
@@ -167,7 +167,7 @@ export class Player {
 
     public static Deserialize(
         serializedPlayer: DeepReadonly<SerializedPlayer>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): Player {
         return new Player(serializedPlayer, starSystemDatabase);
     }
@@ -205,7 +205,7 @@ export class Player {
      * Performs a deep copy of the player
      * @param player the player to copy from
      */
-    public copyFrom(player: Player, starSystemDatabase: StarSystemDatabase) {
+    public copyFrom(player: Player, starSystemDatabase: IUniverseBackend) {
         this.uuid = player.uuid;
         this.setName(player.getName());
         this.setBalance(player.getBalance());

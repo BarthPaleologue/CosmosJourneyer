@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import type { DeepReadonly } from "@/utils/types";
@@ -75,7 +75,7 @@ export class Mission {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): string {
         return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
     }
@@ -121,7 +121,7 @@ export class Mission {
     /**
      * Returns a string describing the mission using the mission tree and the origin seed
      */
-    describe(starSystemDatabase: StarSystemDatabase): string {
+    describe(starSystemDatabase: IUniverseBackend): string {
         return this.tree.describe(this.missionGiver.systemCoordinates, starSystemDatabase);
     }
 
@@ -155,7 +155,7 @@ export class Mission {
 
     static Deserialize(
         missionSerialized: DeepReadonly<MissionSerialized>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): Mission | null {
         try {
             const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);

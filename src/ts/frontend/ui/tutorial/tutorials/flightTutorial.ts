@@ -19,7 +19,7 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { StarSystemInputs } from "@/frontend//inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControlsInputs";
@@ -44,7 +44,7 @@ import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
-    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
+    getSaveData(starSystemDatabase: IUniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, starSystemDatabase);
     }
 

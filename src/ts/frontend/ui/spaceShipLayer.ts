@@ -19,7 +19,7 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -51,7 +51,7 @@ export class SpaceShipLayer {
 
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
-    constructor(player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.root = document.createElement("div");
         this.root.id = "helmetOverlay";
 
@@ -133,7 +133,7 @@ export class SpaceShipLayer {
         currentControls: TransformNode,
         missionContext: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ) {
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget

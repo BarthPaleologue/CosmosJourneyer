@@ -18,6 +18,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
@@ -155,7 +156,7 @@ class MockFileSystem implements IFileSystem {
 
 describe("SaveBackendMultiFile", () => {
     let fileSystem: MockFileSystem;
-    let starSystemDatabase: StarSystemDatabase;
+    let starSystemDatabase: IUniverseBackend;
 
     const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
     const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";

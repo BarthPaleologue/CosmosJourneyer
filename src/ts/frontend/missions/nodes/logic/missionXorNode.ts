@@ -17,8 +17,8 @@
 
 import { type MissionXorNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
@@ -62,14 +62,14 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
         this.hasCompletedLock = this.children.filter((child) => child.isCompleted()).length === 1;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
         return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" xor ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children

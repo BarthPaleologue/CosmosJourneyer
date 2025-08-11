@@ -18,8 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
+import type { IUniverseBackend } from "@/backend/universe";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Mission } from "./mission";
@@ -44,7 +44,7 @@ export type SightSeeingTarget = {
     objectId: UniverseObjectId;
 };
 
-function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: StarSystemDatabase): MissionNode | null {
+function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: IUniverseBackend): MissionNode | null {
     switch (target.type) {
         case MissionType.SIGHT_SEEING_FLY_BY:
             return new MissionFlyByNode(target.objectId);
@@ -64,7 +64,7 @@ function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: Star
 export function newSightSeeingMission(
     missionGiver: UniverseObjectId,
     target: SightSeeingTarget,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): Mission | null {
     const missionTree = generateMissionTree(target, starSystemDatabase);
     if (missionTree === null) {

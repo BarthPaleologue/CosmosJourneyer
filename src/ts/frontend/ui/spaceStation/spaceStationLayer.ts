@@ -18,8 +18,8 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
@@ -90,7 +90,7 @@ export class SpaceStationLayer {
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
@@ -303,7 +303,7 @@ export class SpaceStationLayer {
         this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
     }
 
-    private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: StarSystemDatabase) {
+    private async setMainPanelState(state: MainPanelState, player: Player, starSystemDatabase: IUniverseBackend) {
         if (this.mainPanelState === state) {
             this.mainPanelState = MainPanelState.NONE;
         } else {

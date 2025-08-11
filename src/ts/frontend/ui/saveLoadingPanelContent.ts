@@ -4,7 +4,7 @@ import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
@@ -30,7 +30,7 @@ export class SaveLoadingPanelContent {
 
     private readonly soundPlayer: ISoundPlayer;
 
-    constructor(starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
 
@@ -101,7 +101,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveBackend) {
+    async populateCmdrList(starSystemDatabase: IUniverseBackend, saveManager: ISaveBackend) {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -256,7 +256,7 @@ export class SaveLoadingPanelContent {
     private createSaveDiv(
         save: DeepReadonly<Save>,
         isAutoSave: boolean,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         saveManager: ISaveBackend,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
@@ -399,7 +399,7 @@ export class SaveLoadingPanelContent {
 
     private async loadSaveFile(
         file: File,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): Promise<Result<Save, SaveLoadingError>> {
         const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
         if (!saveFileDataResult.success) {

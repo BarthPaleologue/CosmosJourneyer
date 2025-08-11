@@ -19,9 +19,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { FlyByState, type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import type { IUniverseBackend } from "@/backend/universe";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
@@ -122,7 +122,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
         const distanceLy = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
@@ -142,7 +142,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");

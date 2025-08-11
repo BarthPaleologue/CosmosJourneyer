@@ -17,7 +17,7 @@
 
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
@@ -57,7 +57,7 @@ export class ExplorationCenterPanel {
     constructor(
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.player = player;
@@ -180,7 +180,7 @@ export class ExplorationCenterPanel {
         }
     }
 
-    async populate(starSystemDatabase: StarSystemDatabase) {
+    async populate(starSystemDatabase: IUniverseBackend) {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 

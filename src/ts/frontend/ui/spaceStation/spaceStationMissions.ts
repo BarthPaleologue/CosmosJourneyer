@@ -17,8 +17,8 @@
 
 import { uniformRandBool } from "extended-random";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
@@ -41,7 +41,7 @@ import { MissionContainer } from "./missionContainer";
 export function generateMissionsDom(
     stationModel: DeepReadonly<OrbitalFacilityModel>,
     player: Player,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
     soundPlayer: ISoundPlayer,
 ): HTMLDivElement {
     const starSystemModel = starSystemDatabase.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { jsonSafeParse } from "@/utils/json";
 import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
@@ -103,7 +103,7 @@ interface CorruptedSave {
  */
 export class SaveBackendMultiFile implements ISaveBackend {
     private readonly fileSystem: IFileSystem;
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
     private readonly corruptedSaves: CorruptedSave[] = [];
 
     private static readonly SAVES_DIR = "/saves";
@@ -114,7 +114,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
      * @param starSystemDatabase - The star system database for save validation
      * @private
      */
-    private constructor(fileSystem: IFileSystem, starSystemDatabase: StarSystemDatabase) {
+    private constructor(fileSystem: IFileSystem, starSystemDatabase: IUniverseBackend) {
         this.fileSystem = fileSystem;
         this.starSystemDatabase = starSystemDatabase;
     }
@@ -127,7 +127,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
      */
     public static async CreateAsync(
         fileSystem: IFileSystem,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): Promise<Result<SaveBackendMultiFile, SaveLoadingError>> {
         try {
             // Ensure the saves directory exists

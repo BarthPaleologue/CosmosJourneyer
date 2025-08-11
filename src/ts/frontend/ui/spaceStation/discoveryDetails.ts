@@ -18,7 +18,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -63,7 +63,7 @@ export class DiscoveryDetails {
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.soundPlayer = soundPlayer;
@@ -118,7 +118,7 @@ export class DiscoveryDetails {
         void this.setDiscovery(null, starSystemDatabase);
     }
 
-    async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: StarSystemDatabase) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: IUniverseBackend) {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;

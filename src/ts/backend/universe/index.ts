@@ -27,6 +27,8 @@ import type { UniverseObjectId } from "./universeObjectId";
 export type SingleSystemModelPlugin = (systemModel: StarSystemModel) => StarSystemModel;
 
 export interface IUniverseBackend {
+    getFallbackSystem: () => DeepReadonly<StarSystemModel>;
+
     /**
      * Adds the given system to the database
      * @param system The system to register

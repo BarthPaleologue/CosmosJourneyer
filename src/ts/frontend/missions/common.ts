@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
@@ -17,7 +17,7 @@ export function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): string {
     const itinerary = missionContext.currentItinerary;
     if (itinerary === null) {

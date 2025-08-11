@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { jsonSafeParse } from "@/utils/json";
 import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
@@ -81,7 +81,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
     public static async CreateAsync(
         mainFile: IFile,
         backupFile: IFile,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): Promise<Result<SaveBackendSingleFile, SaveLoadingError>> {
         const rawSaves = await mainFile.read();
         const rawBackupSaves = await backupFile.read();

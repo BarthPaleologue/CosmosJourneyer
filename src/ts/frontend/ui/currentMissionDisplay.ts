@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Mission } from "@/frontend/missions/mission";
@@ -47,7 +47,7 @@ export class CurrentMissionDisplay {
 
     private readonly player: Player;
 
-    constructor(player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.player = player;
 
         this.rootNode = document.createElement("div");
@@ -135,11 +135,7 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update(
-        context: MissionContext,
-        keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
-    ) {
+    public update(context: MissionContext, keyboardLayout: Map<string, string>, starSystemDatabase: IUniverseBackend) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;
 
@@ -166,7 +162,7 @@ export class CurrentMissionDisplay {
         if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
     }
 
-    public setNextMission(starSystemDatabase: StarSystemDatabase) {
+    public setNextMission(starSystemDatabase: IUniverseBackend) {
         if (this.activeMission === null) {
             return;
         }
@@ -188,7 +184,7 @@ export class CurrentMissionDisplay {
         this.setMission(nextMission, starSystemDatabase);
     }
 
-    public setPreviousMission(starSystemDatabase: StarSystemDatabase) {
+    public setPreviousMission(starSystemDatabase: IUniverseBackend) {
         if (this.activeMission === null) {
             return;
         }
@@ -212,7 +208,7 @@ export class CurrentMissionDisplay {
         this.setMission(previousMission, starSystemDatabase);
     }
 
-    private setMission(mission: Mission, starSystemDatabase: StarSystemDatabase) {
+    private setMission(mission: Mission, starSystemDatabase: IUniverseBackend) {
         this.activeMission = mission;
         this.missionPanelTitle.innerText = mission.getTypeString();
         this.missionPanelDescription.innerText = mission.describe(starSystemDatabase);

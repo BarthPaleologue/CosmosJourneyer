@@ -36,9 +36,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
+import type { IUniverseBackend } from "@/backend/universe";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
@@ -84,7 +84,7 @@ export class StarMap implements View {
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
 
     /**
      * The position of the center of the starmap in world space.
@@ -162,7 +162,7 @@ export class StarMap implements View {
         player: Player,
         engine: AbstractEngine,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.scene = new Scene(engine);

@@ -1,5 +1,5 @@
 import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
@@ -32,12 +32,12 @@ export class SidePanels {
     private readonly creditsPanel: HTMLElement;
     private readonly aboutPanel: HTMLElement;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
 
     private readonly saveBackend: ISaveBackend;
 
     constructor(
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,

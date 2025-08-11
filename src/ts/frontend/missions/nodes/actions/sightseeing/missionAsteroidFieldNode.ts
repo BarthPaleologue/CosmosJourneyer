@@ -22,9 +22,9 @@ import {
     type MissionAsteroidFieldNodeSerialized,
 } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import type { IUniverseBackend } from "@/backend/universe";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
@@ -56,7 +56,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     public static New(
         objectId: UniverseObjectId,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): MissionAsteroidFieldNode | null {
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(objectId.systemCoordinates);
         if (systemModel === null) {
@@ -150,7 +150,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
         const distanceLy = Vector3.Distance(
             starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
             starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
@@ -170,7 +170,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");

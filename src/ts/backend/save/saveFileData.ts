@@ -17,11 +17,10 @@
 
 import { z } from "zod";
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
 import { encodeBase64 } from "@/utils/base64";
 import { type Assert, type DeepMutable, type DeepReadonly, type Result, type StrictEqual } from "@/utils/types";
 
+import type { IUniverseBackend } from "../universe";
 import { type SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 
@@ -36,7 +35,7 @@ export type Save = z.infer<typeof SaveSchema>;
  */
 export function safeParseSave(
     json: Record<string, unknown>,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): Result<Save, SaveLoadingError> {
     return safeParseSaveV2(json, starSystemDatabase);
 }
@@ -55,7 +54,7 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
 
 export function parseSaveArray(
     rawSaves: Record<string, unknown>[],
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];

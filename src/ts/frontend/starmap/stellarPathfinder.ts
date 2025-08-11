@@ -17,8 +17,8 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { PriorityQueue } from "@/utils/priorityQueue";
@@ -57,9 +57,9 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
-    private starSystemDatabase: StarSystemDatabase;
+    private starSystemDatabase: IUniverseBackend;
 
-    public constructor(starSystemDatabase: StarSystemDatabase) {
+    public constructor(starSystemDatabase: IUniverseBackend) {
         this.starSystemDatabase = starSystemDatabase;
     }
 

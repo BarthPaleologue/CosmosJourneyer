@@ -23,6 +23,7 @@ import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { MissionType } from "@/backend/missions/missionSerialized";
 import { SerializedPlayerSchema, type SerializedPlayer } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import type { IUniverseBackend } from "@/backend/universe";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -31,7 +32,7 @@ import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 import { Player } from "./player";
 
 describe("Player", () => {
-    let starSystemDatabase: StarSystemDatabase;
+    let starSystemDatabase: IUniverseBackend;
 
     beforeEach(() => {
         starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
@@ -250,7 +251,7 @@ describe("Player", () => {
             const player = Player.Default(starSystemDatabase);
 
             // Get a valid space station from the fallback system for the mission giver
-            const fallbackSystem = starSystemDatabase.fallbackSystem;
+            const fallbackSystem = starSystemDatabase.getFallbackSystem();
             const spaceStation = fallbackSystem.orbitalFacilities[0];
             if (!spaceStation) {
                 throw new Error("No space station found in fallback system for test");

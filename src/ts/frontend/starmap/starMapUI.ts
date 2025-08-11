@@ -20,8 +20,8 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { factionToString } from "@/backend/society/factions";
+import type { IUniverseBackend } from "@/backend/universe";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -78,11 +78,11 @@ export class StarMapUI {
 
     private readonly player: Player;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
-    constructor(scene: Scene, player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(scene: Scene, player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
 

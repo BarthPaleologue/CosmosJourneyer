@@ -19,9 +19,9 @@ import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
@@ -44,7 +44,7 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 export function generateSightseeingMissions(
     spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
     starSystemModel: DeepReadonly<StarSystemModel>,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
     player: Player,
     timestampMillis: number,
 ): ReadonlyArray<Mission> {
@@ -97,7 +97,7 @@ function generateSightseeingMissionsInSystem(
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
     rng: (seed: number) => number,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -125,7 +125,7 @@ function generateAnomalyFlyByMissionsInSystem(
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
     rng: (seed: number) => number,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
     for (const [anomalyIndex, anomaly] of systemModel.anomalies.entries()) {
@@ -162,7 +162,7 @@ function generateAnomalyFlyByMissionsInSystem(
 function generateNeutronStarFlyByMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -192,7 +192,7 @@ function generateNeutronStarFlyByMissionsInSystem(
 function generateBlackHoleFlyByMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -222,7 +222,7 @@ function generateBlackHoleFlyByMissionsInSystem(
 function generateAsteroidFieldMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -255,7 +255,7 @@ function generateAsteroidFieldMissionsInSystem(
 function generateTerminatorLandingMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 

@@ -17,8 +17,8 @@
 
 import { type MissionAndNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import type { IUniverseBackend } from "@/backend/universe";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import i18n from "@/i18n";
 
@@ -64,7 +64,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
         this.hasCompletedLock = this.children.every((child) => child.isCompleted());
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: IUniverseBackend): string {
         return this.children
             .map((child) => child.describe(originSystemCoordinates, starSystemDatabase))
             .join(` ${i18n.t("common:and")} `);
@@ -73,7 +73,7 @@ export class MissionAndNode implements MissionNodeBase<MissionNodeType.AND> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children

@@ -29,9 +29,9 @@ import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
+import type { IUniverseBackend } from "@/backend/universe";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
@@ -129,7 +129,7 @@ export class StarSystemView implements View {
 
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
 
     /**
      * The BabylonJS scene, upgraded with some helper methods and properties
@@ -240,7 +240,7 @@ export class StarSystemView implements View {
         engine: AbstractEngine,
         havokPlugin: HavokPlugin,
         encyclopaedia: EncyclopaediaGalacticaManager,
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         assets: RenderingAssets,

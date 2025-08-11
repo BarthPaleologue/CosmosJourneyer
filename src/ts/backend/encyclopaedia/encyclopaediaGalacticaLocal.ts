@@ -2,11 +2,11 @@ import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanet
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
 
+import type { IUniverseBackend } from "../universe";
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
@@ -21,9 +21,9 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
      */
     private readonly redundantDataPrice = 100;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly starSystemDatabase: IUniverseBackend;
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
+    constructor(starSystemDatabase: IUniverseBackend) {
         this.starSystemDatabase = starSystemDatabase;
     }
 

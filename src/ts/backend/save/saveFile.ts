@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { jsonSafeParse } from "@/utils/json";
 import { err, type Result } from "@/utils/types";
@@ -25,7 +25,7 @@ import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError"
 
 export async function parseSaveFile(
     rawSaveFile: File,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();

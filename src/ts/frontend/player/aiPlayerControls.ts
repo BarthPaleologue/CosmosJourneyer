@@ -17,7 +17,7 @@
 
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -31,7 +31,7 @@ export class AiPlayerControls {
     readonly spaceshipControls: AiSpaceshipControls;
 
     constructor(
-        starSystemDatabase: StarSystemDatabase,
+        starSystemDatabase: IUniverseBackend,
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,

@@ -17,15 +17,15 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Settings } from "@/settings";
 
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
-    starSystemDatabase: StarSystemDatabase,
+    starSystemDatabase: IUniverseBackend,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
     const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
     const starSectorSize = Settings.STAR_SECTOR_SIZE;

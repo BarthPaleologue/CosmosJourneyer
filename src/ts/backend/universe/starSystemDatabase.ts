@@ -176,6 +176,13 @@ export class StarSystemDatabase implements IUniverseBackend {
     /**
      * @inheritdoc
      */
+    public getFallbackSystem(): DeepReadonly<StarSystemModel> {
+        return this.fallbackSystem;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public getSystemModelFromCoordinates(
         coordinates: DeepReadonly<StarSystemCoordinates>,
     ): DeepReadonly<StarSystemModel> | null {

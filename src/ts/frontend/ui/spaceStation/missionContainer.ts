@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Mission } from "@/frontend/missions/mission";
@@ -28,7 +28,7 @@ import { AcceptMissionButton } from "./acceptMissionButton";
 export class MissionContainer {
     readonly rootNode: HTMLElement;
 
-    constructor(mission: Mission, player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(mission: Mission, player: Player, starSystemDatabase: IUniverseBackend, soundPlayer: ISoundPlayer) {
         this.rootNode = document.createElement("div");
         this.rootNode.className = "missionItem";
 

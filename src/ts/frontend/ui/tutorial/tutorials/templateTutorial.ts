@@ -17,7 +17,7 @@
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import type { IUniverseBackend } from "@/backend/universe";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
@@ -34,7 +34,7 @@ import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 export class TemplateTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
-    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
+    getSaveData(starSystemDatabase: IUniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, starSystemDatabase);
     }
 

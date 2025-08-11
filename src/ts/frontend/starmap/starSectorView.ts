@@ -19,8 +19,8 @@ import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
+import type { IUniverseBackend } from "@/backend/universe";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type DeepReadonly } from "@/utils/types";
@@ -57,7 +57,7 @@ export class StarSectorView {
         position: Vector3;
     }>;
 
-    constructor(coordinates: Vector3, starSystemDatabase: StarSystemDatabase) {
+    constructor(coordinates: Vector3, starSystemDatabase: IUniverseBackend) {
         this.coordinates = coordinates;
         this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
 
