@@ -28,6 +28,7 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import type { IUniverseBackend, SingleSystemModelPlugin } from ".";
 import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
 import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
@@ -36,7 +37,7 @@ import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
  * The StarSystemDatabase defines the content of the universe.
  * It is responsible for generating star system models and system positions in the galaxy.
  */
-export class StarSystemDatabase {
+export class StarSystemDatabase implements IUniverseBackend {
     /**
      * Maps star sectors to the custom systems they contain.
      */
@@ -106,8 +107,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * Adds the given system to the database
-     * @param system The system to register
+     * @inheritdoc
      */
     public registerCustomSystem(system: StarSystemModel) {
         const sectorKey = this.starSectorToString(
@@ -145,14 +145,9 @@ export class StarSystemDatabase {
     }
 
     /**
-     * Register a plugin that modifies a single system.
-     * @param coordinates The coordinates of the system to modify.
-     * @param plugin The plugin to apply to the system.
+     * @inheritdoc
      */
-    public registerSinglePlugin(
-        coordinates: StarSystemCoordinates,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ) {
+    public registerSinglePlugin(coordinates: StarSystemCoordinates, plugin: SingleSystemModelPlugin) {
         this.coordinatesToSinglePlugins.set(JSON.stringify(coordinates), plugin);
     }
 
@@ -169,9 +164,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * Check if a system is in the human bubble.
-     * @param systemCoordinates The coordinates of the system to check.
-     * @returns true if the system is in the human bubble, false otherwise.
+     * @inheritdoc
      */
     public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
         const systemPosition = this.getSystemGalacticPosition(systemCoordinates);
@@ -181,10 +174,11 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param coordinates The coordinates of the system you want the model of.
-     * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
+     * @inheritdoc
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+    public getSystemModelFromCoordinates(
+        coordinates: DeepReadonly<StarSystemCoordinates>,
+    ): DeepReadonly<StarSystemModel> | null {
         if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
             return this.fallbackSystem;
         }
@@ -239,10 +233,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The coordinates of the systems in the given star sector.
+     * @inheritdoc
      */
     public getSystemCoordinatesInStarSector(
         sectorX: number,
@@ -271,10 +262,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns All system models (custom and generated) in the given star sector.
+     * @inheritdoc
      */
     public getSystemModelsInStarSector(
         sectorX: number,
@@ -309,11 +297,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param starSectorX
-     * @param starSectorY
-     * @param starSectorZ
-     * @param index The index of the generated system in the star sector.
-     * @returns The system coordinates of the system generated given the seed.
+     * @inheritdoc
      */
     public getSystemCoordinatesFromSeed(
         starSectorX: number,
@@ -340,11 +324,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param starSectorX
-     * @param starSectorY
-     * @param starSectorZ
-     * @param index The index of the generated system in the star sector.
-     * @returns The system model of the system generated given the seed, or null if the system is not found.
+     * @inheritdoc
      */
     public getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
         const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
@@ -352,10 +332,9 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param coordinates The coordinates of the system you want the position of.
-     * @returns The position of the given system in the galaxy.
+     * @inheritdoc
      */
-    public getSystemGalacticPosition(coordinates: StarSystemCoordinates) {
+    public getSystemGalacticPosition(coordinates: StarSystemCoordinates): Vector3 {
         return new Vector3(
             (coordinates.starSectorX + coordinates.localX) * Settings.STAR_SECTOR_SIZE,
             (coordinates.starSectorY + coordinates.localY) * Settings.STAR_SECTOR_SIZE,
@@ -432,10 +411,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The positions of all systems in the given star sector in galactic space.
+     * @inheritdoc
      */
     public getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
         const localPositions = this.getSystemLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
@@ -448,10 +424,7 @@ export class StarSystemDatabase {
     }
 
     /**
-     * Searches the database for the given id
-     * @param universeObjectId The id to look for
-     * @param starSystemDatabase The database to look in
-     * @returns The model if it exists, null otherwise
+     * @inheritdoc
      */
     public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
         const starSystemCoordinates = universeObjectId.systemCoordinates;
