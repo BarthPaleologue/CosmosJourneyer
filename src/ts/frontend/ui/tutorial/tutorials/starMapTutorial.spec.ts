@@ -26,11 +26,11 @@ import { Mission } from "@/frontend/missions/mission";
 import { StarMapTutorial } from "./starMapTutorial";
 
 describe("StarMapTutorial", () => {
-    it("spawns near a space station", () => {
+    it("spawns near a space station", async () => {
         const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = await tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -56,16 +56,16 @@ describe("StarMapTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const stationModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const stationModel = await universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(stationModel?.type).toBe(OrbitalObjectType.SPACE_STATION);
     });
 
-    it("has correct mission objectives", () => {
+    it("has correct mission objectives", async () => {
         const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = await tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");

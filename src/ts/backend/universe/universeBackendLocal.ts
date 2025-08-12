@@ -119,6 +119,8 @@ export class UniverseBackendLocal implements IUniverseBackend {
         }
 
         this.coordinatesToCustomSystems.set(JSON.stringify(system.coordinates), system);
+
+        return Promise.resolve();
     }
 
     /**
@@ -145,6 +147,7 @@ export class UniverseBackendLocal implements IUniverseBackend {
      */
     public registerSinglePlugin(coordinates: StarSystemCoordinates, plugin: SingleSystemModelPlugin) {
         this.coordinatesToSinglePlugins.set(JSON.stringify(coordinates), plugin);
+        return Promise.resolve();
     }
 
     /**
@@ -181,14 +184,14 @@ export class UniverseBackendLocal implements IUniverseBackend {
      */
     public getSystemModelFromCoordinates(
         coordinates: DeepReadonly<StarSystemCoordinates>,
-    ): DeepReadonly<StarSystemModel> | null {
+    ): Promise<DeepReadonly<StarSystemModel> | null> {
         if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
-            return this.fallbackSystem;
+            return Promise.resolve(this.fallbackSystem);
         }
 
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
-            return this.applyPlugins(customSystem);
+            return Promise.resolve(this.applyPlugins(customSystem));
         }
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
@@ -200,7 +203,7 @@ export class UniverseBackendLocal implements IUniverseBackend {
             starSystemCoordinatesEquals(coordinates, otherCoordinates),
         );
         if (index === -1) {
-            return null;
+            return Promise.resolve(null);
         }
 
         // init pseudo-random number generator
@@ -210,12 +213,14 @@ export class UniverseBackendLocal implements IUniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return this.applyPlugins(
-            newSeededStarSystemModel(
-                systemRng,
-                coordinates,
-                this.getSystemGalacticPosition(coordinates),
-                this.isSystemInHumanBubble(coordinates),
+        return Promise.resolve(
+            this.applyPlugins(
+                newSeededStarSystemModel(
+                    systemRng,
+                    coordinates,
+                    this.getSystemGalacticPosition(coordinates),
+                    this.isSystemInHumanBubble(coordinates),
+                ),
             ),
         );
     }
@@ -267,17 +272,17 @@ export class UniverseBackendLocal implements IUniverseBackend {
     /**
      * @inheritdoc
      */
-    public getSystemModelsInStarSector(
+    public async getSystemModelsInStarSector(
         sectorX: number,
         sectorY: number,
         sectorZ: number,
-    ): DeepReadonly<Array<StarSystemModel>> {
+    ): Promise<DeepReadonly<Array<StarSystemModel>>> {
         const generatedModels: DeepReadonly<StarSystemModel>[] = [];
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
         for (const systemCoordinates of generatedSystemCoordinates) {
-            const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
+            const systemModel = await this.getSystemModelFromCoordinates(systemCoordinates);
             if (systemModel === null) {
                 throw new Error("Generated system not found in the universe!");
             }
@@ -307,7 +312,7 @@ export class UniverseBackendLocal implements IUniverseBackend {
         starSectorY: number,
         starSectorZ: number,
         index: number,
-    ): StarSystemCoordinates {
+    ): Promise<StarSystemCoordinates> {
         const systemLocalPositions = this.getGeneratedLocalPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
         const systemLocalPosition = systemLocalPositions.at(index);
         if (systemLocalPosition === undefined) {
@@ -316,21 +321,21 @@ export class UniverseBackendLocal implements IUniverseBackend {
             );
         }
 
-        return {
+        return Promise.resolve({
             starSectorX: starSectorX,
             starSectorY: starSectorY,
             starSectorZ: starSectorZ,
             localX: systemLocalPosition.x,
             localY: systemLocalPosition.y,
             localZ: systemLocalPosition.z,
-        };
+        });
     }
 
     /**
      * @inheritdoc
      */
-    public getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
-        const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
+    public async getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
+        const coordinates = await this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
         return this.getSystemModelFromCoordinates(coordinates);
     }
 
@@ -429,9 +434,11 @@ export class UniverseBackendLocal implements IUniverseBackend {
     /**
      * @inheritdoc
      */
-    public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
+    public async getObjectModelByUniverseId(
+        universeObjectId: UniverseObjectId,
+    ): Promise<DeepReadonly<OrbitalObjectModel> | null> {
         const starSystemCoordinates = universeObjectId.systemCoordinates;
-        const starSystemModel = this.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = await this.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             return null;
         }

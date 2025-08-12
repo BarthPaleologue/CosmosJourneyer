@@ -8,7 +8,7 @@ import { type DeepPartial } from "@/utils/types";
 import { safeParseSave } from "../saveFileData";
 import { type SaveV1 } from "./saveV1";
 
-test("Loading a correct save file", () => {
+test("Loading a correct save file", async () => {
     const saveFileString: DeepPartial<SaveV1> = {
         version: "1.9.0",
         player: {
@@ -136,11 +136,11 @@ test("Loading a correct save file", () => {
     };
 
     const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = await safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
 
-test("Loading a minimal save file", () => {
+test("Loading a minimal save file", async () => {
     const saveFileString: DeepPartial<SaveV1> = {
         version: "1.9.0",
         player: {
@@ -177,6 +177,6 @@ test("Loading a minimal save file", () => {
     };
 
     const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = await safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });

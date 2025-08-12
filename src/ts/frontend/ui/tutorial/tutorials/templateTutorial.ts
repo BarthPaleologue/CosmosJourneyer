@@ -34,7 +34,7 @@ import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 export class TemplateTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
-    getSaveData(universeBackend: IUniverseBackend): Result<Save, SaveLoadingError> {
+    getSaveData(universeBackend: IUniverseBackend): Promise<Result<Save, SaveLoadingError>> {
         return safeParseSave(saveData, universeBackend);
     }
 

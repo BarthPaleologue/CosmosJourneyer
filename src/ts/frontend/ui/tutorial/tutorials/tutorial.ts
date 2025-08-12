@@ -26,7 +26,7 @@ export interface Tutorial {
     readonly coverImageSrc: string;
     getDescription(): string;
 
-    getSaveData(universeBackend: IUniverseBackend): Result<Save, SaveLoadingError>;
+    getSaveData(universeBackend: IUniverseBackend): Promise<Result<Save, SaveLoadingError>>;
 
     getContentPanelsHtml(): Promise<string[]>;
 }

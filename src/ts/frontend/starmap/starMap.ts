@@ -187,8 +187,8 @@ export class StarMap implements View {
         this.stellarPathfinder = new StellarPathfinder(universeBackend);
 
         this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer);
-        this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
-            this.focusOnSystem(starSystemCoordinates);
+        this.starMapUI.onSystemFocusObservable.add(async (starSystemCoordinates) => {
+            await this.focusOnSystem(starSystemCoordinates);
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
@@ -224,8 +224,8 @@ export class StarMap implements View {
             this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, jumpRange);
         });
 
-        StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
-            this.focusOnCurrentSystem();
+        StarMapInputs.map.focusOnCurrentSystem.on("complete", async () => {
+            await this.focusOnCurrentSystem();
         });
 
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getCameras());
@@ -335,7 +335,7 @@ export class StarMap implements View {
 
             this.acknowledgeCameraMovement();
 
-            this.updateStarSectors();
+            await this.updateStarSectors();
 
             // update pathfinder
             const pathfinderMaxIterations = 50_000;
@@ -438,20 +438,22 @@ export class StarMap implements View {
      * @param coordinates The coordinates of the sector
      * @param generateNow
      */
-    private registerStarSector(coordinates: Vector3, generateNow = false): StarSectorView {
+    private async registerStarSector(coordinates: Vector3, generateNow = false): Promise<StarSectorView> {
         const starSector = new StarSectorView(coordinates, this.universeBackend);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
         else {
             const data = starSector.generate();
-            for (const d of data) this.createInstance(d);
+            for (const d of data) {
+                await this.createInstance(d);
+            }
         }
 
         return starSector;
     }
 
-    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates) {
+    public async setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates) {
         this.currentSystemCoordinates = starSystemCoordinates;
         this.selectedSystemCoordinates = starSystemCoordinates;
 
@@ -463,11 +465,11 @@ export class StarMap implements View {
 
         if (this.loadedStarSectors.has(vector3ToString(sectorCoordinates))) {
             this.starMapUI.setCurrentSystem(starSystemCoordinates);
-            this.focusOnCurrentSystem();
+            await this.focusOnCurrentSystem();
             return;
         }
 
-        this.registerStarSector(sectorCoordinates, true);
+        await this.registerStarSector(sectorCoordinates, true);
         this.starMapUI.setCurrentSystem(starSystemCoordinates);
 
         const translation = sectorCoordinates
@@ -477,10 +479,10 @@ export class StarMap implements View {
         this.controls.getActiveCamera().getViewMatrix(true);
         this.acknowledgeCameraMovement();
 
-        this.focusOnCurrentSystem(true);
+        await this.focusOnCurrentSystem(true);
     }
 
-    private updateStarSectors() {
+    private async updateStarSectors() {
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) throw new Error("No active camera!");
         const activeCameraPosition = activeCamera.globalPosition;
@@ -547,13 +549,13 @@ export class StarMap implements View {
             );
             if (!activeCamera.isInFrustum(bb)) continue;
 
-            this.registerStarSector(coordinates);
+            await this.registerStarSector(coordinates);
         }
 
-        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.getSpeed()));
+        await this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.getSpeed()));
     }
 
-    private buildNextStars(n: number): void {
+    private async buildNextStars(n: number): Promise<void> {
         for (let i = 0; i < n; i++) {
             const data = this.starBuildStack.pop();
             if (data === undefined) return;
@@ -564,13 +566,13 @@ export class StarMap implements View {
                 continue;
             }
 
-            this.createInstance(data);
+            await this.createInstance(data);
         }
     }
 
-    private createInstance(data: BuildData) {
+    private async createInstance(data: BuildData) {
         const starSystemCoordinates = data.coordinates;
-        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = await this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
@@ -634,14 +636,14 @@ export class StarMap implements View {
         );
 
         initializedInstance.actionManager.registerAction(
-            new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
+            new ExecuteCodeAction(ActionManager.OnPickTrigger, async () => {
                 this.soundPlayer.playNow(SoundType.TARGET_LOCK);
 
                 this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
 
                 this.selectedSystemCoordinates = starSystemCoordinates;
 
-                this.focusOnSystem(starSystemCoordinates);
+                await this.focusOnSystem(starSystemCoordinates);
             }),
         );
 
@@ -655,12 +657,13 @@ export class StarMap implements View {
     public focusOnCurrentSystem(skipAnimation = false) {
         if (this.currentSystemCoordinates === null) {
             console.warn("No current system seed!");
-            return;
+            return Promise.resolve();
         }
-        this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
+
+        return this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
-    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
+    public async focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
         const starSystemPosition = this.universeBackend
             .getSystemGalacticPosition(starSystemCoordinates)
             .add(this.starMapCenterPosition);
@@ -719,7 +722,7 @@ export class StarMap implements View {
         }
 
         this.selectedSystemCoordinates = starSystemCoordinates;
-        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = await this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null)
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,

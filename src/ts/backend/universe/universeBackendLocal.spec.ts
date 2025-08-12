@@ -32,11 +32,11 @@ describe("UniverseBackendLocal", () => {
     });
 
     describe("registerCustomSystem", () => {
-        it("should add a custom system that can be retrieved", () => {
+        it("should add a custom system that can be retrieved", async () => {
             const customSystem = getSolSystemModel();
-            universeBackend.registerCustomSystem(customSystem);
+            await universeBackend.registerCustomSystem(customSystem);
 
-            const retrievedSystems = universeBackend.getSystemModelsInStarSector(
+            const retrievedSystems = await universeBackend.getSystemModelsInStarSector(
                 customSystem.coordinates.starSectorX,
                 customSystem.coordinates.starSectorY,
                 customSystem.coordinates.starSectorZ,
@@ -46,15 +46,15 @@ describe("UniverseBackendLocal", () => {
     });
 
     describe("registerSinglePlugin", () => {
-        it("should modify a system at specific coordinates", () => {
-            const coordinates: StarSystemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
+        it("should modify a system at specific coordinates", async () => {
+            const coordinates = await universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
             const plugin = (system: StarSystemModel) => {
                 system.name = "Modified System";
                 return system;
             };
 
-            universeBackend.registerSinglePlugin(coordinates, plugin);
-            const model = universeBackend.getSystemModelFromCoordinates(coordinates);
+            await universeBackend.registerSinglePlugin(coordinates, plugin);
+            const model = await universeBackend.getSystemModelFromCoordinates(coordinates);
             expect(model).not.toBeNull();
             expect(model?.name).toBe("Modified System");
         });

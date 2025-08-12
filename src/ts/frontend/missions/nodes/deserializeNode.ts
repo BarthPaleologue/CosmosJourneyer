@@ -43,10 +43,10 @@ import { type MissionNode } from "./missionNode";
  * Deserialize recursively a mission node.
  * @param missionNodeSerialized The serialized mission node.
  */
-export function deserializeMissionNode(
+export async function deserializeMissionNode(
     missionNodeSerialized: DeepReadonly<MissionNodeSerialized>,
     universeBackend: IUniverseBackend,
-): MissionNode | null {
+): Promise<MissionNode | null> {
     switch (missionNodeSerialized.type) {
         case MissionNodeType.AND:
             return deserializeMissionAndNode(missionNodeSerialized, universeBackend);
@@ -57,7 +57,7 @@ export function deserializeMissionNode(
         case MissionNodeType.SEQUENCE:
             return deserializeMissionSequenceNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.ASTEROID_FIELD:
-            return deserializeMissionAsteroidFieldNode(missionNodeSerialized, universeBackend);
+            return await deserializeMissionAsteroidFieldNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.FLY_BY:
             return deserializeMissionFlyByNode(missionNodeSerialized);
         case MissionNodeType.TERMINATOR_LANDING:
@@ -111,11 +111,11 @@ function deserializeMissionSequenceNode(
     return missionNode;
 }
 
-function deserializeMissionAsteroidFieldNode(
+async function deserializeMissionAsteroidFieldNode(
     serialized: DeepReadonly<MissionAsteroidFieldNodeSerialized>,
     universeBackend: IUniverseBackend,
-): MissionAsteroidFieldNode | null {
-    const missionNode = MissionAsteroidFieldNode.New(serialized.objectId, universeBackend);
+): Promise<MissionAsteroidFieldNode | null> {
+    const missionNode = await MissionAsteroidFieldNode.New(serialized.objectId, universeBackend);
     missionNode?.setState(serialized.state);
     return missionNode;
 }

@@ -122,13 +122,13 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): string {
+    async describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): Promise<string> {
         const distanceLy = Vector3.Distance(
             universeBackend.getSystemGalacticPosition(originSystemCoordinates),
             universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates),
         );
-        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
-        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = await universeBackend.getObjectModelByUniverseId(this.objectId);
+        const systemModel = await universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
@@ -139,23 +139,23 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         });
     }
 
-    describeNextTask(
+    async describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: IUniverseBackend,
-    ): string {
+    ): Promise<string> {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const targetObject = await universeBackend.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             return "ERROR: target object is null";
         }
 
         switch (this.state) {
             case FlyByState.NOT_IN_SYSTEM:
-                return getGoToSystemInstructions(
+                return await getGoToSystemInstructions(
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,

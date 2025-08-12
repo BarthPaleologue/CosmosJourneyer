@@ -24,10 +24,10 @@ import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 
-test("getNeighborStarSystemCoordinates", () => {
+test("getNeighborStarSystemCoordinates", async () => {
     const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
 
-    const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
+    const systemCoordinates = await universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;

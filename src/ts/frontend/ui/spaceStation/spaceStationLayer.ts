@@ -324,7 +324,7 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(
-                    generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer),
+                    await generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer),
                 );
                 break;
             case MainPanelState.SPACE_SHIP:

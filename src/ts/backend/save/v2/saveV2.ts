@@ -49,11 +49,11 @@ export const SaveSchemaV2 = z.object({
  */
 export type SaveV2 = z.infer<typeof SaveSchemaV2>;
 
-export function migrateV1ToV2(saveV1: SaveV1, universeBackend: IUniverseBackend): SaveV2 {
+export async function migrateV1ToV2(saveV1: SaveV1, universeBackend: IUniverseBackend): Promise<SaveV2> {
     const systemModel =
-        universeBackend.getSystemModelFromCoordinates(
+        (await universeBackend.getSystemModelFromCoordinates(
             saveV1.universeCoordinates.universeObjectId.starSystemCoordinates,
-        ) ?? universeBackend.getFallbackSystem();
+        )) ?? universeBackend.getFallbackSystem();
 
     let closestObject: DeepReadonly<OrbitalObjectModel> | undefined;
     let radius: number | undefined;
@@ -140,10 +140,10 @@ export function migrateV1ToV2(saveV1: SaveV1, universeBackend: IUniverseBackend)
     };
 }
 
-export function safeParseSaveV2(
+export async function safeParseSaveV2(
     json: Record<string, unknown>,
     universeBackend: IUniverseBackend,
-): Result<SaveV2, SaveLoadingError> {
+): Promise<Result<SaveV2, SaveLoadingError>> {
     const result = SaveSchemaV2.safeParse(json);
     if (result.success) {
         return ok(result.data);
@@ -151,7 +151,7 @@ export function safeParseSaveV2(
 
     const parseV1Result = safeParseSaveV1(json);
     if (parseV1Result.success) {
-        return ok(migrateV1ToV2(parseV1Result.value, universeBackend));
+        return ok(await migrateV1ToV2(parseV1Result.value, universeBackend));
     }
 
     return parseV1Result;

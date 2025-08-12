@@ -41,13 +41,13 @@ import { newSightSeeingMission } from "./sightSeeingMission";
  * @param player The player for which the missions are generated
  * @param timestampMillis The current timestamp in milliseconds
  */
-export function generateSightseeingMissions(
+export async function generateSightseeingMissions(
     spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
     starSystemModel: DeepReadonly<StarSystemModel>,
     universeBackend: IUniverseBackend,
     player: Player,
     timestampMillis: number,
-): ReadonlyArray<Mission> {
+): Promise<ReadonlyArray<Mission>> {
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60) % (24 * 30);
 
     const missions: Array<Mission> = [];
@@ -57,10 +57,10 @@ export function generateSightseeingMissions(
     const spaceStationUniverseId = getUniverseObjectId(spaceStationModel, starSystemModel);
 
     const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, universeBackend);
-    neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {
-        const neighborSystemModel = universeBackend.getSystemModelFromCoordinates(systemCoordinates);
+    for (const { coordinates: systemCoordinates, position: systemPosition, distance } of neighborSystems) {
+        const neighborSystemModel = await universeBackend.getSystemModelFromCoordinates(systemCoordinates);
         if (neighborSystemModel === null) {
-            return;
+            continue;
         }
 
         missions.push(
@@ -73,7 +73,7 @@ export function generateSightseeingMissions(
                 universeBackend,
             ),
         );
-    });
+    }
 
     missions.push(...generateAsteroidFieldMissionsInSystem(starSystemModel, spaceStationUniverseId, universeBackend));
 

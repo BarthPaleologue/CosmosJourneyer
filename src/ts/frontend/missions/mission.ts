@@ -76,7 +76,7 @@ export class Mission {
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: IUniverseBackend,
-    ): string {
+    ): Promise<string> {
         return this.tree.describeNextTask(context, keyboardLayout, universeBackend);
     }
 

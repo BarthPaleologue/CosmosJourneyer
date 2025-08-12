@@ -39,7 +39,7 @@ import stationServicesImageSrc from "@assets/tutorials/stationLandingTutorial/st
 export class StationLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = station1ImageSrc;
 
-    getSaveData(universeBackend: IUniverseBackend): Result<Save, SaveLoadingError> {
+    getSaveData(universeBackend: IUniverseBackend): Promise<Result<Save, SaveLoadingError>> {
         return safeParseSave(saveData, universeBackend);
     }
 

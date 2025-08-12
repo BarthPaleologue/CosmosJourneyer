@@ -455,7 +455,10 @@ export class StarSystemController {
         this.scene.activeCamera?.getViewMatrix(true);
     }
 
-    addSystemTarget(targetCoordinates: StarSystemCoordinates, universeBackend: IUniverseBackend): SystemTarget | null {
+    async addSystemTarget(
+        targetCoordinates: StarSystemCoordinates,
+        universeBackend: IUniverseBackend,
+    ): Promise<SystemTarget | null> {
         const currentSystemUniversePosition = universeBackend.getSystemGalacticPosition(this.model.coordinates);
         const targetSystemUniversePosition = universeBackend.getSystemGalacticPosition(targetCoordinates);
 
@@ -467,7 +470,7 @@ export class StarSystemController {
 
         Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
 
-        const systemModel = universeBackend.getSystemModelFromCoordinates(targetCoordinates);
+        const systemModel = await universeBackend.getSystemModelFromCoordinates(targetCoordinates);
         if (systemModel === null) {
             return null;
         }

@@ -224,10 +224,15 @@ export class SaveLoadingPanelContent {
             savesList.classList.add("hidden"); // Hidden by default
             cmdrDiv.appendChild(savesList);
 
-            allCmdrSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(save, cmdrSaves.auto.includes(save), universeBackend, saveManager);
+            for (const save of allCmdrSaves) {
+                const saveDiv = await this.createSaveDiv(
+                    save,
+                    cmdrSaves.auto.includes(save),
+                    universeBackend,
+                    saveManager,
+                );
                 savesList.appendChild(saveDiv);
-            });
+            }
 
             const expandIcon = document.createElement("img");
             expandIcon.src = expandIconPath;
@@ -248,12 +253,12 @@ export class SaveLoadingPanelContent {
         }
     }
 
-    private createSaveDiv(
+    private async createSaveDiv(
         save: DeepReadonly<Save>,
         isAutoSave: boolean,
         universeBackend: IUniverseBackend,
         saveManager: ISaveBackend,
-    ): HTMLElement {
+    ): Promise<HTMLElement> {
         const saveDiv = document.createElement("div");
         saveDiv.classList.add("saveContainer");
 
@@ -277,7 +282,7 @@ export class SaveLoadingPanelContent {
             throw new Error("Spaceship inside a spaceship is not supported yet");
         }
         const isLanded = locationToUse.type === "atStation";
-        const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
+        const nearestObject = await universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {

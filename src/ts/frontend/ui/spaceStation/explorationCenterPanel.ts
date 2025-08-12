@@ -244,8 +244,8 @@ export class ExplorationCenterPanel {
         });
         this.discoveryList.appendChild(searchField);
 
-        discoveries.forEach((discovery) => {
-            const objectModel = universeBackend.getObjectModelByUniverseId(discovery.objectId);
+        for (const discovery of discoveries) {
+            const objectModel = await universeBackend.getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
@@ -271,6 +271,6 @@ export class ExplorationCenterPanel {
             const discoveryDate = document.createElement("p");
             discoveryDate.textContent = new Date(discovery.discoveryTimestamp).toLocaleDateString();
             discoveryItem.appendChild(discoveryDate);
-        });
+        }
     }
 }

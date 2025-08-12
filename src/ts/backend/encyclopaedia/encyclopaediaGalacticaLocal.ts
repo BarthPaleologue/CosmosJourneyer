@@ -70,7 +70,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = this.universeBackend.getObjectModelByUniverseId(object);
+        const model = await this.universeBackend.getObjectModelByUniverseId(object);
         if (model === null) {
             return err("Object model not found for object ID");
         }

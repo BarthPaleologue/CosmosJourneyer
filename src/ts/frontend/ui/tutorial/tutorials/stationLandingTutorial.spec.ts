@@ -24,11 +24,11 @@ import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 import { StationLandingTutorial } from "./stationLandingTutorial";
 
 describe("StationLandingTutorial", () => {
-    it("spawns near a space station", () => {
+    it("spawns near a space station", async () => {
         const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new StationLandingTutorial();
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = await tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -54,7 +54,7 @@ describe("StationLandingTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const stationModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const stationModel = await universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(stationModel?.type).toBe(OrbitalObjectType.SPACE_STATION);
     });

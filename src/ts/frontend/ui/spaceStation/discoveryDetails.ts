@@ -128,7 +128,7 @@ export class DiscoveryDetails {
             return;
         }
 
-        const systemModel = universeBackend.getSystemModelFromCoordinates(
+        const systemModel = await universeBackend.getSystemModelFromCoordinates(
             this.currentDiscovery.objectId.systemCoordinates,
         );
 

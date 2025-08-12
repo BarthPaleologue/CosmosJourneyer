@@ -24,11 +24,11 @@ import { UniverseBackendLocal } from "@/backend/universe/universeBackendLocal";
 import { FlightTutorial } from "./flightTutorial";
 
 describe("flightTutorial", () => {
-    it("spawns inside of the rings of the planet", () => {
+    it("spawns inside of the rings of the planet", async () => {
         const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
         const tutorial = new FlightTutorial();
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = await tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -54,7 +54,7 @@ describe("flightTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const planetModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const planetModel = await universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(planetModel).not.toBe(null);
         if (planetModel === null) {

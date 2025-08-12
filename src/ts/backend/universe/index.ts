@@ -37,20 +37,23 @@ export interface IUniverseBackend {
      * Adds the given system to the universe.
      * @param system The system to register
      */
-    registerCustomSystem(system: StarSystemModel): void;
+    registerCustomSystem(system: StarSystemModel): Promise<void>;
 
     /**
      * Register a plugin that modifies a single system.
      * @param coordinates The coordinates of the system to modify.
      * @param plugin The plugin to apply to the system.
      */
-    registerSinglePlugin(coordinates: DeepReadonly<StarSystemCoordinates>, plugin: SingleSystemModelPlugin): void;
+    registerSinglePlugin(
+        coordinates: DeepReadonly<StarSystemCoordinates>,
+        plugin: SingleSystemModelPlugin,
+    ): Promise<void>;
 
     /**
      * @param coordinates The coordinates of the system you want the model of.
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null;
+    getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): Promise<DeepReadonly<StarSystemModel> | null>;
 
     /**
      * @param sectorX
@@ -74,7 +77,7 @@ export interface IUniverseBackend {
         sectorX: number,
         sectorY: number,
         sectorZ: number,
-    ): DeepReadonly<Array<StarSystemModel>>;
+    ): Promise<DeepReadonly<Array<StarSystemModel>>>;
 
     /**
      * @param starSectorX
@@ -88,7 +91,7 @@ export interface IUniverseBackend {
         starSectorY: number,
         starSectorZ: number,
         index: number,
-    ): StarSystemCoordinates;
+    ): Promise<StarSystemCoordinates>;
 
     /**
      * @param starSectorX
@@ -102,7 +105,7 @@ export interface IUniverseBackend {
         starSectorY: number,
         starSectorZ: number,
         index: number,
-    ): DeepReadonly<StarSystemModel> | null;
+    ): Promise<DeepReadonly<StarSystemModel> | null>;
 
     /**
      * @param coordinates The coordinates of the system you want the position of.
@@ -123,7 +126,7 @@ export interface IUniverseBackend {
      * @param universeObjectId The id to look for
      * @returns The model if it exists, null otherwise
      */
-    getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null;
+    getObjectModelByUniverseId(universeObjectId: UniverseObjectId): Promise<DeepReadonly<OrbitalObjectModel> | null>;
 
     /**
      * Check if a system is in the human bubble.

@@ -13,12 +13,12 @@ import i18n from "@/i18n";
 
 import { type MissionContext } from "./missionContext";
 
-export function getGoToSystemInstructions(
+export async function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
     universeBackend: IUniverseBackend,
-): string {
+): Promise<string> {
     const itinerary = missionContext.currentItinerary;
     if (itinerary === null) {
         return i18n.t("missions:common:openStarMap", {
@@ -45,7 +45,7 @@ export function getGoToSystemInstructions(
         });
     } else {
         const nextSystemCoordinates = itinerary[1];
-        const nextSystemModel = universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
+        const nextSystemModel = await universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
         if (nextSystemModel === null) {
             return i18n.t("missions:common:corruptedItinerary");
         }

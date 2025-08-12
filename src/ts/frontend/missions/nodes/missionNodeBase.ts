@@ -60,7 +60,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: IUniverseBackend,
-    ): string;
+    ): Promise<string>;
 
     /**
      * Returns the target systems of the subtree.

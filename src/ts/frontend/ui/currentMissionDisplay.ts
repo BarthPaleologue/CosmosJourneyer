@@ -135,7 +135,11 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update(context: MissionContext, keyboardLayout: Map<string, string>, universeBackend: IUniverseBackend) {
+    public async update(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        universeBackend: IUniverseBackend,
+    ) {
         const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
         this.buttonContainer.hidden = allMissions.length <= 1;
 
@@ -158,7 +162,7 @@ export class CurrentMissionDisplay {
 
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
-        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
+        const nextTaskText = await this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
         if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
     }
 

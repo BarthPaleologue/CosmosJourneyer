@@ -36,7 +36,7 @@ export type Save = z.infer<typeof SaveSchema>;
 export function safeParseSave(
     json: Record<string, unknown>,
     universeBackend: IUniverseBackend,
-): Result<Save, SaveLoadingError> {
+): Promise<Result<Save, SaveLoadingError>> {
     return safeParseSaveV2(json, universeBackend);
 }
 
@@ -52,15 +52,15 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
-export function parseSaveArray(
+export async function parseSaveArray(
     rawSaves: Record<string, unknown>[],
     universeBackend: IUniverseBackend,
-): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
+): Promise<{ validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] }> {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
 
     for (const save of rawSaves) {
-        const result = safeParseSave(save, universeBackend);
+        const result = await safeParseSave(save, universeBackend);
         if (result.success) {
             validSaves.push(result.value);
         } else {

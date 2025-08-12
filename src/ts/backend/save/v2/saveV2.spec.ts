@@ -9,7 +9,7 @@ import { type DeepPartial } from "@/utils/types";
 import { safeParseSave } from "../saveFileData";
 import { type SaveV2 } from "./saveV2";
 
-test("Loading a correct save file", () => {
+test("Loading a correct save file", async () => {
     const universeBackend: IUniverseBackend = new UniverseBackendLocal(getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const fallbackStation = universeBackend.getFallbackSystem().orbitalFacilities[0];
@@ -143,11 +143,11 @@ test("Loading a correct save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = await safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
 
-test("Loading a minimal save file", () => {
+test("Loading a minimal save file", async () => {
     const universeBackend = new UniverseBackendLocal(getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<SaveV2> = {
@@ -187,7 +187,7 @@ test("Loading a minimal save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = await safeParseSave(saveFileString, universeBackend);
     if (!parsedSaveFile.success) {
         console.log(parsedSaveFile.error);
     }
@@ -195,7 +195,7 @@ test("Loading a minimal save file", () => {
     expect(parsedSaveFile.success).toBe(true);
 });
 
-test("Loading a save file with a corrupted itinerary", () => {
+test("Loading a save file with a corrupted itinerary", async () => {
     const saveFile = {
         timestamp: 1751299506929,
         player: {
@@ -270,7 +270,7 @@ test("Loading a save file with a corrupted itinerary", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFile, new UniverseBackendLocal(getLoneStarSystem()));
+    const parsedSaveFile = await safeParseSave(saveFile, new UniverseBackendLocal(getLoneStarSystem()));
     if (!parsedSaveFile.success) {
         throw new Error(`Failed to parse save file: ${parsedSaveFile.error.type}`);
     }

@@ -85,7 +85,7 @@ export class MainMenu {
             starSectorZ: 0,
         };
 
-        const system = universeBackend.getSystemModelFromCoordinates(coordinates);
+        const system = await universeBackend.getSystemModelFromCoordinates(coordinates);
         if (system === null) {
             throw new Error("Cannot find system");
         }

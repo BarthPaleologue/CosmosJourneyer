@@ -36,7 +36,7 @@ import saveData from "@assets/tutorials/fuelScoopTutorial/save.json";
 export class FuelScoopTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
-    getSaveData(universeBackend: IUniverseBackend): Result<Save, SaveLoadingError> {
+    getSaveData(universeBackend: IUniverseBackend): Promise<Result<Save, SaveLoadingError>> {
         return safeParseSave(saveData, universeBackend);
     }
 

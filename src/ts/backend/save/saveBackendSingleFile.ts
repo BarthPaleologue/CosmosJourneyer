@@ -121,8 +121,8 @@ export class SaveBackendSingleFile implements ISaveBackend {
 
         // filter saves
         for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
-            const parsedManualSaves = parseSaveArray(cmdrSaves.manual, universeBackend);
-            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto, universeBackend);
+            const parsedManualSaves = await parseSaveArray(cmdrSaves.manual, universeBackend);
+            const parsedAutoSaves = await parseSaveArray(cmdrSaves.auto, universeBackend);
 
             correctSaves[cmdrUuid] = {
                 manual: parsedManualSaves.validSaves,

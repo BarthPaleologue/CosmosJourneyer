@@ -161,7 +161,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
             const saveJson = jsonSafeParse(content);
             if (!saveJson) throw new Error("Invalid JSON");
 
-            const saveResult = safeParseSave(saveJson, this.universeBackend);
+            const saveResult = await safeParseSave(saveJson, this.universeBackend);
             if (!saveResult.success) {
                 throw new Error(`Save validation failed: ${saveLoadingErrorToI18nString(saveResult.error)}`);
             }

@@ -289,9 +289,9 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.starSystemView.onInitStarSystem.add(() => {
+        this.starSystemView.onInitStarSystem.add(async () => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
+            await this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
         });
 
         this.starSystemView.spaceStationLayer.onTakeOffObservable.add(async () => {
@@ -577,7 +577,7 @@ export class CosmosJourneyer {
 
             const starMap = this.starMap;
             this.activeView = starMap;
-            starMap.focusOnCurrentSystem();
+            await starMap.focusOnCurrentSystem();
         } else {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
@@ -785,7 +785,7 @@ export class CosmosJourneyer {
             if (!this.mainMenu.isVisible()) {
                 await this.createAutoSave();
             }
-            const saveResult = tutorial.getSaveData(this.backend.universe);
+            const saveResult = await tutorial.getSaveData(this.backend.universe);
             if (!saveResult.success) {
                 console.error(saveResult.error);
                 await alertModal(
@@ -848,7 +848,7 @@ export class CosmosJourneyer {
             locationToUse = shipLocation;
         }
 
-        const systemModel = this.backend.universe.getSystemModelFromCoordinates(
+        const systemModel = await this.backend.universe.getSystemModelFromCoordinates(
             locationToUse.universeObjectId.systemCoordinates,
         );
 
