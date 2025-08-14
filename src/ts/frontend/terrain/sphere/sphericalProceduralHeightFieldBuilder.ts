@@ -22,6 +22,8 @@ import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { ProceduralTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
 
@@ -33,6 +35,8 @@ export class SphericalProceduralHeightFieldBuilder {
     private readonly computeShader: ComputeShader;
 
     private readonly paramsBuffer: UniformBuffer;
+
+    private readonly terrainModel: UniformBuffer;
 
     private static WORKGROUP_SIZE = [16, 16] as const;
 
@@ -50,6 +54,12 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+
+        this.terrainModel = new UniformBuffer(engine);
+        this.terrainModel.addUniform("continental_crust_elevation", 1);
+        this.terrainModel.update();
+
+        this.computeShader.setUniformBuffer("terrain_model", this.terrainModel);
     }
 
     static async New(engine: WebGPUEngine): Promise<SphericalProceduralHeightFieldBuilder> {
@@ -61,6 +71,7 @@ export class SphericalProceduralHeightFieldBuilder {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
                     params: { group: 0, binding: 1 },
+                    terrain_model: { group: 0, binding: 2 },
                 },
             },
         );
@@ -77,6 +88,7 @@ export class SphericalProceduralHeightFieldBuilder {
         direction: Direction,
         sphereRadius: number,
         size: number,
+        terrainModel: ProceduralTerrainModel,
         engine: WebGPUEngine,
     ): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
@@ -86,6 +98,9 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.updateUInt("direction", direction);
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
+
+        this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrustElevation);
+        this.terrainModel.update();
 
         const positionsBuffer = new StorageBuffer(
             engine,

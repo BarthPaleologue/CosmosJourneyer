@@ -24,8 +24,13 @@ struct Params {
     chunk_position_on_sphere : vec3<f32>,
 };
 
+struct TerrainModel {
+    continental_crust_elevation : f32,
+}
+
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
 @group(0) @binding(1) var<uniform> params : Params;
+@group(0) @binding(2) var<uniform> terrain_model : TerrainModel;
 
 #include "../utils/pi.wgsl";
 
@@ -84,7 +89,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let filling_noise = remap(gradient_noise_3d_fbm(noise_sampling_point / 10e3, 10), -1.0, 1.0, 0.0, 1.0);
 
-    let ocean_depth = 30e3;
+    let continental_crust_elevation = terrain_model.continental_crust_elevation;
 
     let ocean_threshold = 0.55;
 
@@ -100,7 +105,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let fjord_noise_sharpened = smoothstep(0.0, fjord_width_threshold * remap(continent_fjord_mask, 0.0, 1.0, 0.3, 1.0), fjord_noise);
 
-    let fjord_elevation = ocean_depth * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
+    let fjord_elevation = continental_crust_elevation * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
 
     let mountain_elevation = 10e3 * mountain_noise * continent_sharp_mask * mountain_mask;
 
@@ -108,7 +113,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let filling_elevation = 700 * filling_noise * continent_sharp_mask;
 
-    let continent_elevation = ocean_depth * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
+    let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
     let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + filling_elevation;
 
