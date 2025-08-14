@@ -109,10 +109,15 @@ export async function createTelluricPlanetScene(
     );
     addToWindow("material", material);
 
+    const terraceElevation = model.atmosphere !== null ? 1e3 : 0;
+
     const terrainModel: TerrainModel = {
         type: "procedural",
         continentalCrustElevation: model.ocean?.depth ?? 5e3,
-        mountainElevation: 10e3,
+        mountain: {
+            elevation: 10e3,
+            terraceElevation: terraceElevation,
+        },
     };
 
     const terrain = new SphericalHeightFieldTerrain(
