@@ -164,6 +164,7 @@ export class ChunkForgeCompute implements ChunkForge {
                     task.direction,
                     task.sphereRadius,
                     task.size,
+                    task.terrainModel,
                     engine,
                 );
 
