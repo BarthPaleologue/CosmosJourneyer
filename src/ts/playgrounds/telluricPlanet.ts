@@ -112,6 +112,7 @@ export async function createTelluricPlanetScene(
     const terrainModel: TerrainModel = {
         type: "procedural",
         continentalCrustElevation: (model.ocean?.depth ?? 5e3) - 200,
+        mountainElevation: 10e3,
     };
 
     const terrain = new SphericalHeightFieldTerrain(
