@@ -82,13 +82,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let mountain_noise = mountain(noise_sampling_point * 0.0001, sphere_up);
 
-    let mountain_mask = smoothstep(0.5, 0.6, remap(gradient_noise_3d_fbm(noise_sampling_point / 1000e3  + gradient_noise_3d(noise_sampling_point / 1000e3).yzw, 5), -1.0, 1.0, 0.0, 1.0));
+    let mountain_mask = 0.05 + 0.95 * smoothstep(0.5, 0.6, remap(gradient_noise_3d_fbm(noise_sampling_point / 1000e3  + gradient_noise_3d(noise_sampling_point / 1000e3).yzw, 5), -1.0, 1.0, 0.0, 1.0));
 
     let terrace_mask = smoothstep(0.4, 0.6, remap(gradient_noise_3d(noise_sampling_point / 2000e3).x, -1.0, 1.0, 0.0, 1.0));
 
     let continent_mask = remap(continent_noise, -1.0, 1.0, 0.0, 1.0);
-
-    let filling_noise = remap(gradient_noise_3d_fbm(noise_sampling_point / 10e3, 10), -1.0, 1.0, 0.0, 1.0);
 
     let continental_crust_elevation = terrain_model.continental_crust_elevation;
 
@@ -98,7 +96,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continent_sharp_mask = smoothstep(ocean_threshold - continent_smoothness, ocean_threshold + continent_smoothness, continent_mask);
 
-    let fjord_penetration = 0.06;
+    let fjord_penetration = 0.05;
 
     let continent_fjord_mask = continent_sharp_mask * (1.0 - smoothstep(ocean_threshold, ocean_threshold + fjord_penetration, continent_mask));
 
@@ -112,11 +110,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let terrace_elevation = 1e3 * step(5e3, mountain_elevation) * terrace_mask;
 
-    let filling_elevation = 700 * filling_noise * continent_sharp_mask;
-
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
-    let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + filling_elevation;
+    let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation;
 
     let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
 
