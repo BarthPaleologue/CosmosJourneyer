@@ -26,6 +26,7 @@ struct Params {
 
 struct TerrainModel {
     continental_crust_elevation : f32,
+    mountain_elevation : f32,
 }
 
 @group(0) @binding(0) var<storage, read_write> positions : array<f32>;
@@ -107,7 +108,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let fjord_elevation = continental_crust_elevation * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
 
-    let mountain_elevation = 10e3 * mountain_noise * continent_sharp_mask * mountain_mask;
+    let mountain_elevation = terrain_model.mountain_elevation * mountain_noise * continent_sharp_mask * mountain_mask;
 
     let terrace_elevation = 1e3 * step(5e3, mountain_elevation) * terrace_mask;
 

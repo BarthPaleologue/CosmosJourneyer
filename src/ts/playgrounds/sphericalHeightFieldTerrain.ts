@@ -82,6 +82,7 @@ export async function createSphericalHeightFieldTerrain(
     const terrainModel: TerrainModel = {
         type: "procedural",
         continentalCrustElevation: 5e3,
+        mountainElevation: 10e3,
     };
 
     const terrain = new SphericalHeightFieldTerrain(
