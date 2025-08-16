@@ -44,6 +44,8 @@ struct TerrainModel {
 
 #include "./mapCubeToUnitSphere.wgsl";
 
+#include "../noise/voronoiNoise3D.wgsl";
+
 fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
     var sample_position = p;
     var octave_amplitude = 1.0;
@@ -58,6 +60,18 @@ fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
     }
 
     return result / total_amplitude;
+}
+
+fn craters(p : vec3f) -> f32 {
+    let v = max(voronoi_noise_3d(p) * 4.0 + gradient_noise_3d_fbm(p * 4.0, 3) * 0.4, 0.0);
+
+    let central_bump = 0.8 * exp(-sqrt(v) * 10.0);
+
+    let border_slope = smoothstep(0.5, 0.7, v);
+
+    let slope_bump = 10.0 * pow(1.0 - smoothstep(0.0, 1.0, v), 2.0) + 1.0;
+
+    return central_bump + border_slope * slope_bump - 1.0;
 }
 
 @compute @workgroup_size(16,16,1)
@@ -115,7 +129,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
-    let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation;
+    let craters_elevation = 10e3 * craters(noise_sampling_point / 500e3) + 4e3 * craters(noise_sampling_point / 200e3);
+
+    let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
 
     let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
 
