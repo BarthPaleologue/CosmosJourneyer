@@ -80,7 +80,15 @@ fn gradient_noise_3d(x: vec3<f32>) -> vec4<f32> {
     );
 }
 
-
+// Approx inverse-CDF for single-octave gradient/Perlin-like noise remapped to [0,1].
+// Input:  p = desired coverage (e.g. 0.70 means 70% water)
+// Return: threshold t so that ~p of samples fall <= t for this noise.
+fn invert_noise_threshold(p: f32) -> f32 {
+    let k: f32 = 4.50;                 // sharpness 1.5..1.7 works well for 3D gradient noise
+    let x: f32 = clamp(p, 1e-6, 1.0-1e-6);
+    let l: f32 = log(x/(1.0 - x));     // logit
+    return 1.0 / (1.0 + exp(-l / k));  // logistic(logit(p)/k)
+}
 
 // code modified from https://www.shadertoy.com/view/4tB3RR
 // Name : Gavoronoise 3d
