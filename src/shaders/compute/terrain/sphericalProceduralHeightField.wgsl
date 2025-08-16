@@ -114,7 +114,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continental_crust_elevation = terrain_model.continental_crust_elevation;
 
-    let ocean_threshold = 0.55;
+    let ocean_threshold = invert_noise_threshold(0.7);
 
     let continent_smoothness = 0.01;
 
