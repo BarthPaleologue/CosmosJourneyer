@@ -107,8 +107,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let fjord_noise_sharpened = smoothstep(0.0, fjord_width_threshold * remap(continent_fjord_mask, 0.0, 1.0, 0.3, 1.0), fjord_noise);
 
-    let fjord_elevation = continental_crust_elevation * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
-
+    let fjord_elevation = (terrain_model.continental_crust_elevation + terrain_model.mountain_elevation) * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
+    
     let mountain_elevation = terrain_model.mountain_elevation * mountain_noise * continent_sharp_mask * mountain_mask;
 
     let terrace_elevation = terrain_model.mountain_terrace_elevation * step(5e3 + terrace_height_variation * 2e3, mountain_elevation) * terrace_mask;
