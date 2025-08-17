@@ -53,6 +53,8 @@ struct TerrainModel {
 
 #include "../utils/hash31.wgsl";
 
+#include "../utils/smootherstep.wgsl";
+
 fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
     var sample_position = p;
     var octave_amplitude = 1.0;
@@ -131,7 +133,7 @@ fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
 
     let fjord_penetration = 0.05;
 
-    let continent_fjord_mask = continent_sharp_mask * (1.0 - smoothstep(ocean_threshold, ocean_threshold + fjord_penetration, continent_mask));
+    let continent_fjord_mask = continent_sharp_mask * (1.0 - smootherstep(ocean_threshold, ocean_threshold + fjord_penetration, continent_mask));
 
     let fjord_width_threshold = 0.03;
 
