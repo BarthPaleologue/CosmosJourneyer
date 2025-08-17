@@ -81,6 +81,22 @@ fn craters(p : vec3f, sparsity: f32) -> f32 {
     return remap(central_hill + border_slope * slope_bump, 0.0, 1.0, -1.0, 0.0);
 }
 
+fn craters_fbm(p: vec3<f32>, sparsity: f32, octave_count: u32, lacunarity: f32, decay: f32) -> f32 {
+    var sample_position = p;
+    var octave_amplitude = 1.0;
+    var total_amplitude = 0.0;
+    var result = 0.0;
+    for(var i = 0u; i < octave_count; i+=1u) {
+        result += craters(sample_position, sparsity) * octave_amplitude;
+        total_amplitude += octave_amplitude;
+
+        sample_position *= lacunarity;
+        octave_amplitude /= decay;
+    }
+
+    return result / total_amplitude;
+}
+
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
@@ -136,7 +152,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
-    let craters_elevation = 6e3 * craters(noise_sampling_point / 500e3, 2.0) + 4e3 * craters(noise_sampling_point / 200e3, 2.0) + 2e3 * craters(noise_sampling_point / 100e3, 2.0);
+    let craters_elevation = 10e3 * craters_fbm(noise_sampling_point / 500e3, 2.0, 3, 2.0, 2.0);
 
     let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
 
