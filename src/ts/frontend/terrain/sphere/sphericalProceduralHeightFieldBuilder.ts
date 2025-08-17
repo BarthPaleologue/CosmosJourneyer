@@ -57,6 +57,7 @@ export class SphericalProceduralHeightFieldBuilder {
 
         this.terrainModel = new UniformBuffer(engine);
         this.terrainModel.addUniform("continental_crust_elevation", 1);
+        this.terrainModel.addUniform("continental_crust_fraction", 1);
         this.terrainModel.addUniform("mountain_elevation", 1);
         this.terrainModel.addUniform("mountain_terrace_elevation", 1);
         this.terrainModel.update();
@@ -101,7 +102,8 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.updateFloat("size", size);
         this.paramsBuffer.update();
 
-        this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrustElevation);
+        this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrust.elevation);
+        this.terrainModel.updateFloat("continental_crust_fraction", terrainModel.continentalCrust.fraction);
         this.terrainModel.updateFloat("mountain_elevation", terrainModel.mountain.elevation);
         this.terrainModel.updateFloat("mountain_terrace_elevation", terrainModel.mountain.terraceElevation);
         this.terrainModel.update();
