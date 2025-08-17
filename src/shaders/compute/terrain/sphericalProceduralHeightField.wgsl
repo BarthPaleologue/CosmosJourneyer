@@ -158,7 +158,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
-    let craters_elevation = 10e3 * craters_fbm(noise_sampling_point / 500e3, terrain_model.craters_sparsity, terrain_model.craters_octave_count, 2.0, 2.0);
+    let craters_elevation = 7e3 * craters_fbm(noise_sampling_point / 500e3, terrain_model.craters_sparsity, terrain_model.craters_octave_count, 2.0, 1.3);
 
     let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
 
