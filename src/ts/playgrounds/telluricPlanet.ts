@@ -111,12 +111,32 @@ export async function createTelluricPlanetScene(
 
     const terraceElevation = model.atmosphere !== null ? 1e3 : 0;
 
+    let cratersOctaveCount = 3;
+    let cratersSparsity = 2;
+    if (model.atmosphere !== null) {
+        // atmosphere prevent smaller rocks from reaching the surface
+        cratersOctaveCount -= 1;
+    }
+
+    let continentalCrustFraction = 1;
+
+    if (model.ocean !== null) {
+        // geological activity recycles craters
+        cratersOctaveCount -= 1;
+        cratersSparsity *= 5;
+        continentalCrustFraction = 0.3;
+    }
+
     const terrainModel: TerrainModel = {
         type: "procedural",
-        continentalCrust: { elevation: model.ocean?.depth ?? 5e3, fraction: 0.3 },
+        continentalCrust: { elevation: model.ocean?.depth ?? 5e3, fraction: continentalCrustFraction },
         mountain: {
             elevation: 10e3,
             terraceElevation: terraceElevation,
+        },
+        craters: {
+            octaveCount: cratersOctaveCount,
+            sparsity: cratersSparsity,
         },
     };
 

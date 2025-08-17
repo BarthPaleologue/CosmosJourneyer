@@ -27,6 +27,10 @@ export const ProceduralTerrainModelSchema = z.object({
         elevation: z.number(),
         terraceElevation: z.number(),
     }),
+    craters: z.object({
+        octaveCount: z.number().int(),
+        sparsity: z.number(),
+    }),
 });
 
 export type ProceduralTerrainModel = z.infer<typeof ProceduralTerrainModelSchema>;
