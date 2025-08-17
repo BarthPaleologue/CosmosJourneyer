@@ -113,9 +113,13 @@ export async function createTelluricPlanetScene(
 
     let cratersOctaveCount = 3;
     let cratersSparsity = 2;
+    let erosion = 0;
     if (model.atmosphere !== null) {
         // atmosphere prevent smaller rocks from reaching the surface
         cratersOctaveCount -= 1;
+
+        // assume past oceanic activity has eroded the surface
+        erosion = 1;
     }
 
     let continentalCrustFraction = 1;
@@ -134,6 +138,7 @@ export async function createTelluricPlanetScene(
         mountain: {
             elevation: 10e3,
             terraceElevation: terraceElevation,
+            erosion: erosion,
         },
         craters: {
             octaveCount: cratersOctaveCount,

@@ -121,7 +121,7 @@ fn erosion(p: vec3<f32>, dir: vec3<f32>) -> vec4<f32> {
 
 
 //Modified to have erosionscale and it to be 3D
-fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
+fn mountain(p: vec3<f32>, nor: vec3<f32>, erosion_amount: f32) -> f32 {
 
     var n: vec4<f32> = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var nf: f32 = 1.0;
@@ -130,6 +130,12 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
        n += gradient_noise_3d(p*nf)*na*vec4<f32>(1.0, nf, nf, nf);
        na *= 0.5;
        nf *= 2.0;
+    }
+
+    let noise_before_erosion_01 = smoothstep(-1.0, 1.0, n.x);
+
+    if(erosion_amount <= 0.0) {
+        return noise_before_erosion_01;
     }
     
     //take the curl of the normal to get the gradient facing down the slope
@@ -152,5 +158,5 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
     //remap height to [0,1] and add erosion
     //looks best when erosion amount is small
     //not sure about adding the normals together, but it looks okay
-    return (smoothstep(-1.0, 1.0, n.x)+h.x*0.01);
+    return noise_before_erosion_01 + h.x * 0.01 * erosion_amount;
 }
