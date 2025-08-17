@@ -141,7 +141,9 @@ fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
     
     let mountain_elevation = terrain_model.mountain_elevation * mountain_noise * continent_sharp_mask * mountain_mask;
 
-    let terrace_elevation = terrain_model.mountain_terrace_elevation * step(5e3 + terrace_height_variation * 2e3, mountain_elevation) * terrace_mask;
+    let terrace_height = 5e3 + terrace_height_variation * 2e3;
+
+    let terrace_elevation = terrain_model.mountain_terrace_elevation * smoothstep(terrace_height - 10.0, terrace_height + 10.0, mountain_elevation) * terrace_mask;
 
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
