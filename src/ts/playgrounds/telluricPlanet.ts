@@ -123,7 +123,7 @@ export async function createTelluricPlanetScene(
     if (model.ocean !== null) {
         // geological activity recycles craters
         cratersOctaveCount -= 1;
-        cratersSparsity *= 5;
+        cratersSparsity *= 2;
         continentalCrustFraction = 0.3;
     }
 
