@@ -86,6 +86,7 @@ export async function createSphericalHeightFieldTerrain(
         mountain: {
             elevation: 10e3,
             terraceElevation: 1e3,
+            erosion: 1,
         },
         craters: {
             octaveCount: 3,

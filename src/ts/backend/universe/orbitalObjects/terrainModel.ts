@@ -27,6 +27,7 @@ export const ProceduralTerrainModelSchema = z.object({
     mountain: z.object({
         elevation: z.number(),
         terraceElevation: z.number(),
+        erosion: z.number(),
     }),
     craters: z.object({
         octaveCount: z.number().int(),

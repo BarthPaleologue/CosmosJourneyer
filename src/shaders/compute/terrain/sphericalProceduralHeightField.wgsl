@@ -30,6 +30,7 @@ struct TerrainModel {
     continental_crust_fraction: f32,
     mountain_elevation : f32,
     mountain_terrace_elevation : f32,
+    mountain_erosion : f32,
     craters_octave_count : u32,
     craters_sparsity : f32,
 }
@@ -110,7 +111,7 @@ fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
 
     let fjord_noise = abs(gradient_noise_3d_fbm(noise_sampling_point / 600e3, 3));
 
-    let mountain_noise = mountain(noise_sampling_point * 0.0001, normalize(p));
+    let mountain_noise = mountain(noise_sampling_point * 0.0001, normalize(p), terrain_model.mountain_erosion);
 
     let mountain_mask = 0.05 + 0.95 * smoothstep(0.5, 0.6, remap(gradient_noise_3d_fbm(noise_sampling_point / 1000e3  + gradient_noise_3d(noise_sampling_point / 1000e3).yzw, 5), -1.0, 1.0, 0.0, 1.0));
 
