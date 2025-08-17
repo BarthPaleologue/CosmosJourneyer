@@ -103,28 +103,14 @@ fn craters_fbm(p: vec3<f32>, sparsity: f32, octave_count: u32, lacunarity: f32, 
     return result / total_amplitude;
 }
 
-@compute @workgroup_size(16,16,1)
-fn main(@builtin(global_invocation_id) id: vec3<u32>) {
-    if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
-        return; 
-    }
-
-    let vertex_offset_01 = vec2<f32>(f32(id.x), f32(id.y)) / f32(params.nbVerticesPerRow - 1);
-    let vertex_offset_centered = params.size * vec2<f32>(0.5 - vertex_offset_01.x, vertex_offset_01.y - 0.5);
-
-    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_centered);
-
-    let sphere_up = map_cube_to_unit_sphere(vertex_position_on_cube);
-
-    let vertex_position_on_sphere = sphere_up * params.sphere_radius;
-
-    let noise_sampling_point = vertex_position_on_sphere + (hash31(terrain_model.seed) - 0.5) * 1e8;
+fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
+    let noise_sampling_point = p + (hash31(terrain_model.seed) - 0.5) * 1e8;
 
     let continent_noise = gradient_noise_3d_fbm(noise_sampling_point / 3000e3, 10);
 
     let fjord_noise = abs(gradient_noise_3d_fbm(noise_sampling_point / 600e3, 3));
 
-    let mountain_noise = mountain(noise_sampling_point * 0.0001, sphere_up);
+    let mountain_noise = mountain(noise_sampling_point * 0.0001, normalize(p));
 
     let mountain_mask = 0.05 + 0.95 * smoothstep(0.5, 0.6, remap(gradient_noise_3d_fbm(noise_sampling_point / 1000e3  + gradient_noise_3d(noise_sampling_point / 1000e3).yzw, 5), -1.0, 1.0, 0.0, 1.0));
 
@@ -160,7 +146,25 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let craters_elevation = 7e3 * craters_fbm(noise_sampling_point / 500e3, terrain_model.craters_sparsity, terrain_model.craters_octave_count, 2.0, 1.3);
 
-    let elevation = continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
+    return continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
+}
+
+@compute @workgroup_size(16,16,1)
+fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+    if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
+        return; 
+    }
+
+    let vertex_offset_01 = vec2<f32>(f32(id.x), f32(id.y)) / f32(params.nbVerticesPerRow - 1);
+    let vertex_offset_centered = params.size * vec2<f32>(0.5 - vertex_offset_01.x, vertex_offset_01.y - 0.5);
+
+    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_centered);
+
+    let sphere_up = map_cube_to_unit_sphere(vertex_position_on_cube);
+
+    let vertex_position_on_sphere = sphere_up * params.sphere_radius;
+
+    let elevation = planet_height_field(vertex_position_on_sphere, terrain_model);
 
     let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
 
