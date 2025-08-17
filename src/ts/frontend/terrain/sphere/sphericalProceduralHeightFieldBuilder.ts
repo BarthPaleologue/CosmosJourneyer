@@ -60,6 +60,8 @@ export class SphericalProceduralHeightFieldBuilder {
         this.terrainModel.addUniform("continental_crust_fraction", 1);
         this.terrainModel.addUniform("mountain_elevation", 1);
         this.terrainModel.addUniform("mountain_terrace_elevation", 1);
+        this.terrainModel.addUniform("craters_octave_count", 1);
+        this.terrainModel.addUniform("craters_sparsity", 1);
         this.terrainModel.update();
 
         this.computeShader.setUniformBuffer("terrain_model", this.terrainModel);
@@ -106,6 +108,8 @@ export class SphericalProceduralHeightFieldBuilder {
         this.terrainModel.updateFloat("continental_crust_fraction", terrainModel.continentalCrust.fraction);
         this.terrainModel.updateFloat("mountain_elevation", terrainModel.mountain.elevation);
         this.terrainModel.updateFloat("mountain_terrace_elevation", terrainModel.mountain.terraceElevation);
+        this.terrainModel.updateUInt("craters_octave_count", terrainModel.craters.octaveCount);
+        this.terrainModel.updateFloat("craters_sparsity", terrainModel.craters.sparsity); // Default value, can be adjusted later
         this.terrainModel.update();
 
         const positionsBuffer = new StorageBuffer(

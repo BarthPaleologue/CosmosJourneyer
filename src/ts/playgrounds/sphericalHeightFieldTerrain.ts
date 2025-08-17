@@ -86,6 +86,10 @@ export async function createSphericalHeightFieldTerrain(
             elevation: 10e3,
             terraceElevation: 1e3,
         },
+        craters: {
+            octaveCount: 3,
+            sparsity: 2.0,
+        },
     };
 
     const terrain = new SphericalHeightFieldTerrain(
