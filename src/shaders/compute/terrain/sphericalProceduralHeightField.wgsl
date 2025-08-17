@@ -25,6 +25,7 @@ struct Params {
 };
 
 struct TerrainModel {
+    seed: f32,
     continental_crust_elevation : f32,
     continental_crust_fraction: f32,
     mountain_elevation : f32,
@@ -48,6 +49,8 @@ struct TerrainModel {
 #include "./mapCubeToUnitSphere.wgsl";
 
 #include "../noise/voronoiNoise3D.wgsl";
+
+#include "../utils/hash31.wgsl";
 
 fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
     var sample_position = p;
@@ -115,7 +118,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let vertex_position_on_sphere = sphere_up * params.sphere_radius;
 
-    let noise_sampling_point = vertex_position_on_sphere;
+    let noise_sampling_point = vertex_position_on_sphere + (hash31(terrain_model.seed) - 0.5) * 1e8;
 
     let continent_noise = gradient_noise_3d_fbm(noise_sampling_point / 3000e3, 10);
 

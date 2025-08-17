@@ -81,6 +81,7 @@ export async function createSphericalHeightFieldTerrain(
 
     const terrainModel: TerrainModel = {
         type: "procedural",
+        seed: 0,
         continentalCrust: { elevation: 5e3, fraction: 0.3 },
         mountain: {
             elevation: 10e3,
