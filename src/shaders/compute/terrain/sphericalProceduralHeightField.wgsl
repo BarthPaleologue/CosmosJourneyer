@@ -26,6 +26,7 @@ struct Params {
 
 struct TerrainModel {
     continental_crust_elevation : f32,
+    continental_crust_fraction: f32,
     mountain_elevation : f32,
     mountain_terrace_elevation : f32,
 }
@@ -130,7 +131,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let continental_crust_elevation = terrain_model.continental_crust_elevation;
 
-    let ocean_threshold = invert_noise_threshold(0.7);
+    let ocean_threshold = invert_noise_threshold(1.0 - terrain_model.continental_crust_fraction);
 
     let continent_smoothness = 0.01;
 
