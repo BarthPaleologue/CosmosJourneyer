@@ -129,6 +129,7 @@ export async function createTelluricPlanetScene(
 
     const terrainModel: TerrainModel = {
         type: "procedural",
+        seed: model.seed,
         continentalCrust: { elevation: model.ocean?.depth ?? 5e3, fraction: continentalCrustFraction },
         mountain: {
             elevation: 10e3,

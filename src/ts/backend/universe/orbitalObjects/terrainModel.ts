@@ -19,6 +19,7 @@ import { z } from "zod";
 
 export const ProceduralTerrainModelSchema = z.object({
     type: z.literal("procedural"),
+    seed: z.number(),
     continentalCrust: z.object({
         elevation: z.number(),
         fraction: z.number(),
