@@ -209,7 +209,7 @@ export async function createTelluricPlanetScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera, material, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
