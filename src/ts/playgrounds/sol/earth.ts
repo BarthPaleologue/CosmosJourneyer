@@ -290,7 +290,7 @@ export async function createEarthScene(
 
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material.get(), chunkForge);
+        terrain.update(camera, material.get(), chunkForge);
         chunkForge.update();
 
         ocean.update(deltaSeconds);
@@ -328,7 +328,7 @@ export async function createEarthScene(
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            terrain.update(camera, material.get(), chunkForge);
             chunkForge.update();
 
             if (terrain.isIdle()) {

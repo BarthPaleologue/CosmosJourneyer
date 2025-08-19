@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -227,10 +228,10 @@ export class SphericalHeightFieldChunk implements Transformable {
         );
     }
 
-    public updateSubdivision(cameraPosition: Vector3, material: Material) {
+    public updateSubdivision(camera: Camera, material: Material) {
         const planetInverseWorldMatrix = this.parent.getWorldMatrix().clone().invert();
 
-        const cameraPositionPlanetSpace = Vector3.TransformCoordinates(cameraPosition, planetInverseWorldMatrix);
+        const cameraPositionPlanetSpace = Vector3.TransformCoordinates(camera.globalPosition, planetInverseWorldMatrix);
 
         const cameraUpDirection = cameraPositionPlanetSpace.normalizeToNew();
 
@@ -279,15 +280,15 @@ export class SphericalHeightFieldChunk implements Transformable {
         }
     }
 
-    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
+    public update(camera: Camera, material: Material, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
-        this.updateSubdivision(cameraPosition, material);
+        this.updateSubdivision(camera, material);
 
         if (this.children !== null) {
             let areAllChildrenLoaded = true;
             for (const child of this.children) {
-                child.update(cameraPosition, material, chunkForge);
+                child.update(camera, material, chunkForge);
                 if (child.getLoadingState() !== "completed") {
                     areAllChildrenLoaded = false;
                 }
