@@ -28,7 +28,10 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
+import { clamp } from "@/utils/math";
 import { type FixedLengthArray } from "@/utils/types";
+
+import { Settings } from "@/settings";
 
 import { type ChunkForge, type ChunkForgeFinalOutput, type ChunkId } from "./chunkForge";
 
@@ -224,11 +227,41 @@ export class SphericalHeightFieldChunk implements Transformable {
         );
     }
 
-    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
-        this.updateLoadingState(chunkForge);
+    public updateSubdivision(cameraPosition: Vector3, material: Material) {
+        const planetInverseWorldMatrix = this.parent.getWorldMatrix().clone().invert();
 
-        const distanceSquared = Vector3.DistanceSquared(this.getTransform().getAbsolutePosition(), cameraPosition);
-        if (this.children === null && distanceSquared < (this.sideLength * 2) ** 2) {
+        const cameraPositionPlanetSpace = Vector3.TransformCoordinates(cameraPosition, planetInverseWorldMatrix);
+
+        const cameraUpDirection = cameraPositionPlanetSpace.normalizeToNew();
+
+        const cameraHeightAboveSphere = Vector3.Dot(cameraPositionPlanetSpace, cameraUpDirection) - this.sphereRadius;
+
+        const chunkGreatCircleDistance = Math.acos(
+            clamp(Vector3.Dot(this.getTransform().position.normalizeToNew(), cameraUpDirection), -1, 1),
+        );
+
+        const chunkGreatDistanceFactor = Math.max(
+            0.0,
+            chunkGreatCircleDistance - (8 * this.sideLength) / (2.0 * Math.PI * this.sphereRadius),
+        );
+        const observerDistanceFactor = Math.max(0.0, cameraHeightAboveSphere) / this.sphereRadius;
+
+        const minDepth = 0;
+
+        // max depth is minimal depth to get a certain minimum space between vertices
+        const maxDepth = Math.ceil(
+            Math.log2(
+                (2.0 * this.sphereRadius) / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION),
+            ),
+        );
+
+        let kernel = maxDepth;
+        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (maxDepth - minDepth)) * 0.8;
+        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (maxDepth - minDepth)) * 0.8;
+
+        const targetLOD = clamp(Math.floor(kernel), minDepth, maxDepth);
+
+        if (this.children === null && this.indices.lod < targetLOD) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
                 this.direction,
@@ -238,16 +271,18 @@ export class SphericalHeightFieldChunk implements Transformable {
                 material,
                 this.getTransform().getScene(),
             );
-        } else if (
-            this.children !== null &&
-            distanceSquared >= (this.sideLength * 2.5) ** 2 &&
-            this.getLoadingState() === "completed"
-        ) {
+        } else if (this.children !== null && this.indices.lod >= targetLOD && this.getLoadingState() === "completed") {
             for (const child of this.children) {
                 child.dispose();
             }
             this.children = null;
         }
+    }
+
+    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
+        this.updateLoadingState(chunkForge);
+
+        this.updateSubdivision(cameraPosition, material);
 
         if (this.children !== null) {
             let areAllChildrenLoaded = true;
