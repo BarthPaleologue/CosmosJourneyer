@@ -254,7 +254,13 @@ export class SphericalHeightFieldChunk implements Transformable {
         const T_SPLIT = 24; // split when sse >= 24 px
         const T_MERGE = 12; // merge when sse <= 12 px
 
-        if (this.children === null && sse >= T_SPLIT) {
+        const maxLod = Math.ceil(
+            Math.log2(
+                (2.0 * this.sphereRadius) / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION),
+            ),
+        );
+
+        if (this.children === null && sse >= T_SPLIT && this.indices.lod < maxLod) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
                 this.direction,
