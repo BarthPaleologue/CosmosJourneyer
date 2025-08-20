@@ -43,6 +43,12 @@ export type ChunkIndices = {
     lod: number;
 };
 
+type ChunkBounds = {
+    corners: FixedLengthArray<Vector3, 4>;
+    center: Vector3;
+    radius: number;
+};
+
 /**
  * Represents a chunk of a spherical height field terrain using a cube-sphere approach.
  * The cube is easily subdivided into smaller chunks that can be projected on a sphere for a planet-like terrain.
@@ -79,7 +85,11 @@ export class SphericalHeightFieldChunk implements Transformable {
      */
     private readonly positionOnCube: Vector3;
 
-    private vertexData: ChunkForgeFinalOutput | null = null;
+    private geometry: {
+        buffers: ChunkForgeFinalOutput;
+        boundsPlanetSpace: ChunkBounds;
+        error: number;
+    } | null = null;
 
     private readonly terrainModel: TerrainModel;
 
@@ -158,7 +168,55 @@ export class SphericalHeightFieldChunk implements Transformable {
             true,
         );
 
-        this.vertexData = vertexData;
+        const corners = SphericalHeightFieldChunk.GetChunkCornersPlanetSpace(
+            vertexData.positions.cpu,
+            rowVertexCount,
+            this.mesh.position,
+        );
+
+        const center = corners[0].add(corners[1]).add(corners[2]).add(corners[3]).scaleInPlace(0.25);
+
+        let radius = 0;
+        for (const p of corners) radius = Math.max(radius, Vector3.Distance(center, p));
+
+        // Curvature pad: interior of a spherical quad bows outward beyond corner chord.
+        // Use sagitta of an arc as a conservative pad. Edge is the largest edge of the quad.
+        const e01 = Vector3.Distance(corners[0], corners[1]);
+        const e13 = Vector3.Distance(corners[1], corners[3]);
+        const e32 = Vector3.Distance(corners[3], corners[2]);
+        const e20 = Vector3.Distance(corners[2], corners[0]);
+        const edge = Math.max(e01, e13, e32, e20);
+        const sagitta = (edge * edge) / (8 * this.sphereRadius); // sphere curvature only
+        radius += sagitta;
+
+        const geometricError = this.sideLength / (rowVertexCount - 1);
+
+        this.geometry = {
+            buffers: vertexData,
+            boundsPlanetSpace: {
+                corners,
+                center,
+                radius,
+            },
+            error: geometricError,
+        };
+    }
+
+    static GetChunkCornersPlanetSpace(
+        positions: Float32Array,
+        rowVertexCount: number,
+        chunkPositionPlanetSpace: Vector3,
+    ): FixedLengthArray<Vector3, 4> {
+        const idx = (row: number, col: number) => (row * rowVertexCount + col) * 3;
+
+        return [
+            Vector3.FromArray(positions, idx(0, 0)).addInPlace(chunkPositionPlanetSpace),
+            Vector3.FromArray(positions, idx(0, rowVertexCount - 1)).addInPlace(chunkPositionPlanetSpace),
+            Vector3.FromArray(positions, idx(rowVertexCount - 1, 0)).addInPlace(chunkPositionPlanetSpace),
+            Vector3.FromArray(positions, idx(rowVertexCount - 1, rowVertexCount - 1)).addInPlace(
+                chunkPositionPlanetSpace,
+            ),
+        ];
     }
 
     static Subdivide(
@@ -228,7 +286,7 @@ export class SphericalHeightFieldChunk implements Transformable {
     }
 
     public updateSubdivision(camera: Camera, material: Material) {
-        if (this.vertexData === null) {
+        if (this.geometry === null) {
             // do not merge children or subdivide self if chunk is not loaded
             return;
         }
@@ -241,17 +299,16 @@ export class SphericalHeightFieldChunk implements Transformable {
 
         const cameraPositionPlanetSpace = Vector3.TransformCoordinates(camera.globalPosition, planetInverseWorldMatrix);
 
-        const halfSideLength = this.sideLength / 2;
-        const halfDiagonal = Math.hypot(halfSideLength, halfSideLength);
+        const boundingSphereCenter = this.geometry.boundsPlanetSpace.center;
 
-        const boundingRadius = halfDiagonal + 20e3;
+        const boundingRadius = this.geometry.boundsPlanetSpace.radius;
 
         const distance = Math.max(
             1e-3,
-            cameraPositionPlanetSpace.subtract(this.getTransform().position).length() - boundingRadius,
+            cameraPositionPlanetSpace.subtract(boundingSphereCenter).length() - boundingRadius,
         );
 
-        const geometricError = this.sideLength / (this.vertexData.rowVertexCount - 1);
+        const geometricError = this.geometry.error;
 
         const screenSpaceError = (geometricError * projScale) / distance;
 
@@ -271,7 +328,7 @@ export class SphericalHeightFieldChunk implements Transformable {
         const maxLod = Math.ceil(
             Math.log2(
                 (2.0 * this.sphereRadius) /
-                    (Settings.MIN_DISTANCE_BETWEEN_VERTICES * (this.vertexData.rowVertexCount - 1)),
+                    (Settings.MIN_DISTANCE_BETWEEN_VERTICES * (this.geometry.buffers.rowVertexCount - 1)),
             ),
         );
 
