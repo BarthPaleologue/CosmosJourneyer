@@ -171,7 +171,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     let elevation = planet_height_field(vertex_position_on_sphere, terrain_model);
 
-    let final_position = vertex_position_on_sphere + sphere_up * elevation - params.chunk_position_on_sphere;
+    let final_position = (vertex_position_on_sphere - params.chunk_position_on_sphere) + sphere_up * elevation;
 
     let index: u32 = id.x + id.y * u32(params.nbVerticesPerRow);
     positions[index * 3 + 0] = final_position.x;
