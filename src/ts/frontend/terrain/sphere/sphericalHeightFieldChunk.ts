@@ -241,7 +241,10 @@ export class SphericalHeightFieldChunk implements Transformable {
 
         const cameraPositionPlanetSpace = Vector3.TransformCoordinates(camera.globalPosition, planetInverseWorldMatrix);
 
-        const boundingRadius = this.sideLength + 20e3;
+        const halfSideLength = this.sideLength / 2;
+        const halfDiagonal = Math.hypot(halfSideLength, halfSideLength);
+
+        const boundingRadius = halfDiagonal + 20e3;
 
         const distance = Math.max(
             1e-3,
@@ -256,9 +259,19 @@ export class SphericalHeightFieldChunk implements Transformable {
         const T_SPLIT = 24; // split when sse >= 24 px
         const T_MERGE = 12; // merge when sse <= 12 px
 
+        /*
+        const screenSpaceErrorMorphWindow = 8; // pixels
+        const morphFactor01 = clamp(
+            screenSpaceError - (T_SPLIT - screenSpaceErrorMorphWindow) / screenSpaceErrorMorphWindow,
+            0,
+            1,
+        );
+        */
+
         const maxLod = Math.ceil(
             Math.log2(
-                (2.0 * this.sphereRadius) / (Settings.MIN_DISTANCE_BETWEEN_VERTICES * Settings.VERTEX_RESOLUTION),
+                (2.0 * this.sphereRadius) /
+                    (Settings.MIN_DISTANCE_BETWEEN_VERTICES * (this.vertexData.rowVertexCount - 1)),
             ),
         );
 
