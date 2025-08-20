@@ -57,6 +57,7 @@ export type ChunkForgePendingOutput = {
 
 export type ChunkForgeFinalOutput = {
     type: "chunkForgeFinalOutput";
+    rowVertexCount: number;
     positions: {
         gpu: StorageBuffer;
         cpu: Float32Array;
