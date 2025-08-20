@@ -450,6 +450,7 @@ export class ChunkForgeCompute implements ChunkForge {
 
             this.outputs.set(nextTask.id, {
                 type: "chunkForgeFinalOutput",
+                rowVertexCount: this.rowVertexCount,
                 positions: nextTask.positions,
                 normals: nextTask.normals,
                 indices: this.gridIndices,

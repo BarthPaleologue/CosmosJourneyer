@@ -83,9 +83,6 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly terrainModel: TerrainModel;
 
-    /** The geometric error of the chunk in meters */
-    private readonly geometricError: number;
-
     constructor(
         indices: ChunkIndices,
         direction: Direction,
@@ -122,8 +119,6 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.sphereRadius = sphereRadius;
 
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
-
-        this.geometricError = this.sideLength / Settings.VERTEX_RESOLUTION;
 
         this.mesh.setEnabled(false);
     }
@@ -233,6 +228,11 @@ export class SphericalHeightFieldChunk implements Transformable {
     }
 
     public updateSubdivision(camera: Camera, material: Material) {
+        if (this.vertexData === null) {
+            // do not merge children or subdivide self if chunk is not loaded
+            return;
+        }
+
         const fovY = camera.fov;
         const viewportHeight = camera.viewport.height * camera.getEngine().getRenderHeight();
         const projScale = viewportHeight / (2 * Math.tan(fovY * 0.5));
@@ -248,7 +248,9 @@ export class SphericalHeightFieldChunk implements Transformable {
             cameraPositionPlanetSpace.subtract(this.getTransform().position).length() - boundingRadius,
         );
 
-        const sse = (this.geometricError * projScale) / distance;
+        const geometricError = this.sideLength / (this.vertexData.rowVertexCount - 1);
+
+        const screenSpaceError = (geometricError * projScale) / distance;
 
         // Hysteresis
         const T_SPLIT = 24; // split when sse >= 24 px
@@ -260,7 +262,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             ),
         );
 
-        if (this.children === null && sse >= T_SPLIT && this.indices.lod < maxLod) {
+        if (this.children === null && screenSpaceError >= T_SPLIT && this.indices.lod < maxLod) {
             this.children = SphericalHeightFieldChunk.Subdivide(
                 this.indices,
                 this.direction,
@@ -270,7 +272,7 @@ export class SphericalHeightFieldChunk implements Transformable {
                 material,
                 this.getTransform().getScene(),
             );
-        } else if (this.children !== null && sse <= T_MERGE && this.getLoadingState() === "completed") {
+        } else if (this.children !== null && screenSpaceError <= T_MERGE && this.getLoadingState() === "completed") {
             for (const child of this.children) {
                 child.dispose();
             }
