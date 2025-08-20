@@ -150,7 +150,7 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>, erosion_amount: f32) -> f32 {
     var h: vec4<f32> = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var a: f32 = 0.7*(smoothstep(0.3, 0.5, n.x*0.5+0.5)); //smooth the valleys
     var f: f32 = 1.0;
-    for (var i: i32 = 0; i < 5; i++) {
+    for (var i: i32 = 0; i < 4; i++) {
         h += erosion(p*erosionscale*f, dir+cross(h.yzw, normalize(p)))*a*vec4<f32>(1.0, f, f, f);
         a *= 0.6;
         f *= 2.0;
