@@ -116,7 +116,7 @@ export async function createSphericalHeightFieldTerrain(
     const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
     oceanUniforms.depthModifier /= 4.0;
 
-    const waterTextures = await loadWaterTextures(scene, progressMonitor);
+    /*const waterTextures = await loadWaterTextures(scene, progressMonitor);
     const ocean = new OceanPostProcess(
         terrain.getTransform(),
         earthRadius + oceanLevel,
@@ -125,7 +125,7 @@ export async function createSphericalHeightFieldTerrain(
         waterTextures,
         scene,
     );
-    camera.attachPostProcess(ocean);
+    camera.attachPostProcess(ocean);*/
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -138,7 +138,7 @@ export async function createSphericalHeightFieldTerrain(
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
-        ocean.update(deltaSeconds);
+        //ocean.update(deltaSeconds);
     });
 
     return scene;

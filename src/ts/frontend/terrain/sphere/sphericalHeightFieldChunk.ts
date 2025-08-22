@@ -279,6 +279,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             this.positionOnCube,
             this.mesh.position,
             this.direction,
+            this.indices,
             this.sideLength,
             this.sphereRadius,
             this.terrainModel,
