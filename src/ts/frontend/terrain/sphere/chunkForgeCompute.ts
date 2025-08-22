@@ -42,6 +42,7 @@ import {
 } from "./chunkForge";
 import { SphericalHeightFieldBuilder1x1 } from "./sphericalHeightFieldBuilder1x1";
 import { SphericalHeightFieldBuilder2x4 } from "./sphericalHeightFieldBuilder2x4";
+import type { ChunkIndices } from "./sphericalHeightFieldChunk";
 import { SphericalProceduralHeightFieldBuilder } from "./sphericalProceduralHeightFieldBuilder";
 import { WorkerPool } from "./workerPool";
 
@@ -161,6 +162,7 @@ export class ChunkForgeCompute implements ChunkForge {
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
+                    task.indices,
                     task.direction,
                     task.sphereRadius,
                     task.size,
@@ -374,6 +376,7 @@ export class ChunkForgeCompute implements ChunkForge {
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
         direction: Direction,
+        indices: ChunkIndices,
         size: number,
         sphereRadius: number,
         terrainModel: TerrainModel,
@@ -387,6 +390,7 @@ export class ChunkForgeCompute implements ChunkForge {
             positionOnCube,
             positionOnSphere,
             direction,
+            indices,
             size,
             sphereRadius,
         } satisfies HeightFieldTask;

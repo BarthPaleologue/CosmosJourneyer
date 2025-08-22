@@ -29,6 +29,8 @@ import { retry } from "@/utils/retry";
 
 import { Settings } from "@/settings";
 
+import type { ChunkIndices } from "./sphericalHeightFieldChunk";
+
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalProceduralHeightField.wgsl";
 
 export class SphericalProceduralHeightFieldBuilder {
@@ -50,7 +52,9 @@ export class SphericalProceduralHeightFieldBuilder {
         this.paramsBuffer.addUniform("direction", 1);
         this.paramsBuffer.addUniform("chunk_position_on_cube", 3);
         this.paramsBuffer.addUniform("sphere_radius", 1);
-        this.paramsBuffer.addUniform("chunk_position_on_sphere", 3);
+        this.paramsBuffer.addUniform("chunk_up", 3);
+        this.paramsBuffer.addUniform("chunk_indices", 2);
+        this.paramsBuffer.addUniform("chunk_lod", 1);
         this.paramsBuffer.update();
 
         this.computeShader.setUniformBuffer("params", this.paramsBuffer);
@@ -92,6 +96,7 @@ export class SphericalProceduralHeightFieldBuilder {
         chunkPositionOnCube: Vector3,
         chunkPositionOnSphere: Vector3,
         nbVerticesPerRow: number,
+        chunkIndices: ChunkIndices,
         direction: Direction,
         sphereRadius: number,
         size: number,
@@ -100,10 +105,12 @@ export class SphericalProceduralHeightFieldBuilder {
     ): StorageBuffer {
         this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
         this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
-        this.paramsBuffer.updateVector3("chunk_position_on_sphere", chunkPositionOnSphere);
+        this.paramsBuffer.updateVector3("chunk_up", chunkPositionOnSphere.normalizeToNew());
         this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
         this.paramsBuffer.updateUInt("direction", direction);
         this.paramsBuffer.updateFloat("size", size);
+        this.paramsBuffer.updateUInt2("chunk_indices", chunkIndices.x, chunkIndices.y);
+        this.paramsBuffer.updateUInt("chunk_lod", chunkIndices.lod);
         this.paramsBuffer.update();
 
         this.terrainModel.updateFloat("seed", terrainModel.seed);
