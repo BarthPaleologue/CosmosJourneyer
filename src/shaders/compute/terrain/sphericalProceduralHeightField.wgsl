@@ -43,6 +43,8 @@ struct ProceduralTerrainModel {
 
 #include "../utils/remap.wgsl";
 
+#include "../noise/gradientNoise3D.wgsl";
+
 #include "../noise/erosionNoise3D.wgsl";
 
 #include "./getVertexPositionOnCube.wgsl";
@@ -56,22 +58,6 @@ struct ProceduralTerrainModel {
 #include "../utils/hash31.wgsl";
 
 #include "../utils/smootherstep.wgsl";
-
-fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
-    var sample_position = p;
-    var octave_amplitude = 1.0;
-    var total_amplitude = 0.0;
-    var result = 0.0;
-    for(var i = 0u; i < octave_count; i+=1u) {
-        result += gradient_noise_3d(sample_position).x * octave_amplitude;
-        total_amplitude += octave_amplitude;
-
-        sample_position *= 2.0;
-        octave_amplitude /= 2.0;
-    }
-
-    return result / total_amplitude;
-}
 
 fn planet_height_field(p: vec3<f32>, terrain_model: ProceduralTerrainModel) -> f32 {
     let noise_sampling_point = p + (hash31(terrain_model.seed) - 0.5) * 1e8;
