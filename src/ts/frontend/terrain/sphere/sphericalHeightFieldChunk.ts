@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
-import type { Camera } from "@babylonjs/core/Cameras/camera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -291,7 +291,10 @@ export class SphericalHeightFieldChunk implements Transformable {
             return;
         }
 
-        const fovY = camera.fov;
+        const fovY =
+            camera.fovMode === Camera.FOVMODE_VERTICAL_FIXED
+                ? camera.fov
+                : (camera.fov * camera.viewport.height) / camera.viewport.width;
         const viewportHeight = camera.viewport.height * camera.getEngine().getRenderHeight();
         const projScale = viewportHeight / (2 * Math.tan(fovY * 0.5));
 
