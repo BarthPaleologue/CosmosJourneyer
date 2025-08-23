@@ -108,9 +108,9 @@ export class SphericalHeightFieldTerrain implements Transformable {
         return this.transform;
     }
 
-    update(camera: Camera, material: Material, chunkForge: ChunkForge) {
+    update(camera: Camera, chunkForge: ChunkForge) {
         for (const side of this.sides) {
-            side.update(camera, material, chunkForge);
+            side.update(camera, chunkForge);
         }
     }
 

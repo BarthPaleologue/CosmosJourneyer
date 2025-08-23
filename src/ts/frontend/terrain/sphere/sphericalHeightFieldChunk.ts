@@ -62,6 +62,8 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly mesh: Mesh;
 
+    private readonly material: Material;
+
     private readonly direction: Direction;
 
     /**
@@ -108,6 +110,8 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
         this.mesh.material = material;
+
+        this.material = material;
 
         this.parent = parent;
 
@@ -168,11 +172,19 @@ export class SphericalHeightFieldChunk implements Transformable {
             true,
         );
 
-        const corners = SphericalHeightFieldChunk.GetChunkCornersPlanetSpace(
-            vertexData.positions.cpu,
-            rowVertexCount,
-            this.mesh.position,
-        );
+        const corners: FixedLengthArray<Vector3, 4> = [
+            Vector3.FromArray(vertexData.positions.cpu),
+            Vector3.FromArray(vertexData.positions.cpu, (rowVertexCount - 1) * 3),
+            Vector3.FromArray(vertexData.positions.cpu, (rowVertexCount - 1) * rowVertexCount * 3),
+            Vector3.FromArray(
+                vertexData.positions.cpu,
+                ((rowVertexCount - 1) * rowVertexCount + (rowVertexCount - 1)) * 3,
+            ),
+        ];
+
+        for (const corner of corners) {
+            corner.addInPlace(this.mesh.position);
+        }
 
         const center = corners[0].add(corners[1]).add(corners[2]).add(corners[3]).scaleInPlace(0.25);
 
@@ -200,23 +212,6 @@ export class SphericalHeightFieldChunk implements Transformable {
             },
             error: geometricError,
         };
-    }
-
-    static GetChunkCornersPlanetSpace(
-        positions: Float32Array,
-        rowVertexCount: number,
-        chunkPositionPlanetSpace: Vector3,
-    ): FixedLengthArray<Vector3, 4> {
-        const idx = (row: number, col: number) => (row * rowVertexCount + col) * 3;
-
-        return [
-            Vector3.FromArray(positions, idx(0, 0)).addInPlace(chunkPositionPlanetSpace),
-            Vector3.FromArray(positions, idx(0, rowVertexCount - 1)).addInPlace(chunkPositionPlanetSpace),
-            Vector3.FromArray(positions, idx(rowVertexCount - 1, 0)).addInPlace(chunkPositionPlanetSpace),
-            Vector3.FromArray(positions, idx(rowVertexCount - 1, rowVertexCount - 1)).addInPlace(
-                chunkPositionPlanetSpace,
-            ),
-        ];
     }
 
     static Subdivide(
@@ -351,15 +346,15 @@ export class SphericalHeightFieldChunk implements Transformable {
         }
     }
 
-    public update(camera: Camera, material: Material, chunkForge: ChunkForge) {
+    public update(camera: Camera, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
-        this.updateSubdivision(camera, material);
+        this.updateSubdivision(camera, this.material);
 
         if (this.children !== null) {
             let areAllChildrenLoaded = true;
             for (const child of this.children) {
-                child.update(camera, material, chunkForge);
+                child.update(camera, chunkForge);
                 if (child.getLoadingState() !== "completed") {
                     areAllChildrenLoaded = false;
                 }
