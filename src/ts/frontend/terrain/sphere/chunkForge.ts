@@ -55,11 +55,11 @@ export type Custom2x4HeightFieldTask = CustomHeightFieldTask & {
 };
 
 export type ChunkForgePendingOutput = {
-    type: "chunkForgePendingOutput";
+    status: "pending";
 };
 
-export type ChunkForgeFinalOutput = {
-    type: "chunkForgeFinalOutput";
+export type ChunkForgeCompletedOutput = {
+    status: "completed";
     rowVertexCount: number;
     positions: {
         gpu: StorageBuffer;
@@ -75,7 +75,7 @@ export type ChunkForgeFinalOutput = {
     };
 };
 
-export type ChunkForgeOutput = ChunkForgeFinalOutput | ChunkForgePendingOutput;
+export type ChunkForgeOutput = ChunkForgeCompletedOutput | ChunkForgePendingOutput;
 
 export interface ChunkForge {
     /**

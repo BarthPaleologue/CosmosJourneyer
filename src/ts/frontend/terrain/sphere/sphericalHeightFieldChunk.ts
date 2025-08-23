@@ -33,7 +33,7 @@ import { type FixedLengthArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import { type ChunkForge, type ChunkForgeFinalOutput, type ChunkId } from "./chunkForge";
+import { type ChunkForge, type ChunkForgeCompletedOutput, type ChunkId } from "./chunkForge";
 
 type ChunkLoadingState = "not_started" | "in_progress" | "completed";
 
@@ -88,7 +88,7 @@ export class SphericalHeightFieldChunk implements Transformable {
     private readonly positionOnCube: Vector3;
 
     private geometry: {
-        buffers: ChunkForgeFinalOutput;
+        buffers: ChunkForgeCompletedOutput;
         boundsPlanetSpace: ChunkBounds;
         error: number;
     } | null = null;
@@ -141,7 +141,7 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.scene = scene;
     }
 
-    private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
+    private setVertexData(vertexData: ChunkForgeCompletedOutput, rowVertexCount: number, engine: AbstractEngine) {
         // see https://forum.babylonjs.com/t/how-to-share-webgpu-index-buffer-between-meshes/58902/2
         // the reference counter is automatically decremented when calling dispose on the mesh
         vertexData.positions.gpu.getBuffer().references++;
@@ -262,7 +262,7 @@ export class SphericalHeightFieldChunk implements Transformable {
 
         const cachedVertexData = chunkForge.getOutput(this.id);
         if (cachedVertexData !== undefined) {
-            if (cachedVertexData.type === "chunkForgePendingOutput") {
+            if (cachedVertexData.status === "pending") {
                 return;
             }
 
