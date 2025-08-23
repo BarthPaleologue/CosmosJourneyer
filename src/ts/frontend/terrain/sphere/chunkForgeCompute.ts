@@ -382,7 +382,7 @@ export class ChunkForgeCompute implements ChunkForge {
         terrainModel: TerrainModel,
     ): void {
         this.outputs.set(id, {
-            type: "chunkForgePendingOutput",
+            status: "pending",
         });
 
         const buildTask = {
@@ -453,7 +453,7 @@ export class ChunkForgeCompute implements ChunkForge {
             }
 
             this.outputs.set(nextTask.id, {
-                type: "chunkForgeFinalOutput",
+                status: "completed",
                 rowVertexCount: this.rowVertexCount,
                 positions: nextTask.positions,
                 normals: nextTask.normals,
