@@ -18,10 +18,7 @@
 import {
     Color3,
     Color4,
-    DirectionalLight,
-    GizmoManager,
     Light,
-    LightGizmo,
     PBRMetallicRoughnessMaterial,
     PointLight,
     Scene,
@@ -34,10 +31,7 @@ import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainMode
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
-import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
-import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
@@ -111,22 +105,6 @@ export async function createSphericalHeightFieldTerrain(
 
     const chunkForge = chunkForgeResult.value;
 
-    const oceanLevel = 30e3;
-
-    const oceanUniforms = new OceanUniforms(earthRadius, oceanLevel);
-    oceanUniforms.depthModifier /= 4.0;
-
-    /*const waterTextures = await loadWaterTextures(scene, progressMonitor);
-    const ocean = new OceanPostProcess(
-        terrain.getTransform(),
-        earthRadius + oceanLevel,
-        oceanUniforms,
-        [light],
-        waterTextures,
-        scene,
-    );
-    camera.attachPostProcess(ocean);*/
-
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
@@ -137,8 +115,6 @@ export async function createSphericalHeightFieldTerrain(
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
-
-        //ocean.update(deltaSeconds);
     });
 
     return scene;
