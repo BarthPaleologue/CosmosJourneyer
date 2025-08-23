@@ -92,7 +92,7 @@ export class SphericalProceduralHeightFieldBuilder {
         chunkPositionOnCube: Vector3,
         chunkPositionOnSphere: Vector3,
         nbVerticesPerRow: number,
-        direction: Direction,
+        faceIndex: Direction,
         sphereRadius: number,
         size: number,
         terrainModel: ProceduralTerrainModel,
@@ -102,7 +102,7 @@ export class SphericalProceduralHeightFieldBuilder {
         this.chunkBuffer.updateVector3("position_on_cube", chunkPositionOnCube);
         this.chunkBuffer.updateVector3("up_direction", chunkPositionOnSphere.normalizeToNew());
         this.chunkBuffer.updateFloat("distance_to_center", sphereRadius);
-        this.chunkBuffer.updateUInt("face_index", direction);
+        this.chunkBuffer.updateUInt("face_index", faceIndex);
         this.chunkBuffer.updateFloat("size", size);
         this.chunkBuffer.update();
 

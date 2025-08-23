@@ -64,7 +64,7 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly material: Material;
 
-    private readonly direction: Direction;
+    private readonly faceIndex: Direction;
 
     /**
      * The radius of the underlying planet sphere in meters
@@ -99,14 +99,14 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     constructor(
         indices: ChunkIndices,
-        direction: Direction,
+        faceIndex: Direction,
         sphereRadius: number,
         parent: TransformNode,
         terrainModel: TerrainModel,
         material: Material,
         scene: Scene,
     ) {
-        this.id = `${parent.name}->d${direction}->l${indices.lod}->[x${indices.x};y${indices.y}]`;
+        this.id = `${parent.name}->d${faceIndex}->l${indices.lod}->[x${indices.x};y${indices.y}]`;
 
         this.mesh = new Mesh(this.id, scene);
         this.mesh.isPickable = false;
@@ -125,13 +125,13 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.mesh.position.y = -sphereRadius + (sphereRadius * 2 * (indices.y + 0.5)) / 2 ** indices.lod;
         this.mesh.position.z = sphereRadius;
 
-        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
+        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(faceIndex));
 
         this.positionOnCube = this.mesh.position.clone();
 
         this.mesh.position.normalize().scaleInPlace(sphereRadius);
 
-        this.direction = direction;
+        this.faceIndex = faceIndex;
         this.sphereRadius = sphereRadius;
 
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
@@ -235,7 +235,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             (childIndex) =>
                 new SphericalHeightFieldChunk(
                     childIndex,
-                    this.direction,
+                    this.faceIndex,
                     this.sphereRadius,
                     this.parent,
                     this.terrainModel,
@@ -278,7 +278,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             this.id,
             this.positionOnCube,
             this.mesh.position,
-            this.direction,
+            this.faceIndex,
             this.sideLength,
             this.sphereRadius,
             this.terrainModel,

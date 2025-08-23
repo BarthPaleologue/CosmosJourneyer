@@ -31,7 +31,7 @@ export type HeightFieldTask = {
     positionOnCube: Vector3;
     positionOnSphere: Vector3;
     size: number;
-    direction: Direction;
+    faceIndex: Direction;
     sphereRadius: number;
 };
 
@@ -80,7 +80,7 @@ export interface ChunkForge {
      * @param id The unique id of the chunk
      * @param positionOnCube The position of the chunk on the cube
      * @param positionOnSphere The position of the chunk on the spherized cube
-     * @param direction The cube side direction
+     * @param faceIndex The cube side direction
      * @param size The size of the chunk in meters
      * @param sphereRadius The radius of the sphere in meters
      * @param terrainModel The model to use for the terrain generation.
@@ -89,7 +89,7 @@ export interface ChunkForge {
         id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
-        direction: Direction,
+        faceIndex: Direction,
         size: number,
         sphereRadius: number,
         terrainModel: TerrainModel,
