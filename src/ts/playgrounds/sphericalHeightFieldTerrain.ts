@@ -117,5 +117,17 @@ export async function createSphericalHeightFieldTerrain(
         controls.getTransform().position.subtractInPlace(cameraPosition);
     });
 
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera, chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
     return scene;
 }

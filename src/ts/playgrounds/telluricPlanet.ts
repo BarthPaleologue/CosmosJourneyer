@@ -222,5 +222,17 @@ export async function createTelluricPlanetScene(
         clouds?.update(deltaSeconds);
     });
 
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera, chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
+    });
+
     return scene;
 }
