@@ -24,7 +24,7 @@ struct Chunk {
     up_direction: vec3<f32>,
 };
 
-struct TerrainModel {
+struct ProceduralTerrainModel {
     seed: f32,
     continental_crust_elevation: f32,
     continental_crust_fraction: f32,
@@ -37,7 +37,7 @@ struct TerrainModel {
 
 @group(0) @binding(0) var<storage, read_write> positions: array<f32>;
 @group(0) @binding(1) var<uniform> chunk: Chunk;
-@group(0) @binding(2) var<uniform> terrain_model: TerrainModel;
+@group(0) @binding(2) var<uniform> terrain_model: ProceduralTerrainModel;
 
 #include "../utils/pi.wgsl";
 
@@ -73,7 +73,7 @@ fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
     return result / total_amplitude;
 }
 
-fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
+fn planet_height_field(p: vec3<f32>, terrain_model: ProceduralTerrainModel) -> f32 {
     let noise_sampling_point = p + (hash31(terrain_model.seed) - 0.5) * 1e8;
 
     let continent_noise = gradient_noise_3d_fbm(noise_sampling_point / 3000e3, 10);
