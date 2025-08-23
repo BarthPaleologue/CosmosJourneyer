@@ -15,31 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-struct Params {
-    nbVerticesPerRow : u32,
-    size : f32,
-    direction: u32,
-    chunk_position_on_cube : vec3<f32>,
-    sphere_radius : f32,
-    chunk_up : vec3<f32>,
-    chunk_indices : vec2<u32>,
-    chunk_lod : u32
+struct Chunk {
+    row_vertex_count: u32,
+    size: f32,
+    face_index: u32,
+    position_on_cube: vec3<f32>,
+    distance_to_center: f32,
+    up_direction: vec3<f32>,
+    indices: vec2<u32>,
+    lod: u32
 };
 
 struct TerrainModel {
     seed: f32,
-    continental_crust_elevation : f32,
+    continental_crust_elevation: f32,
     continental_crust_fraction: f32,
-    mountain_elevation : f32,
-    mountain_terrace_elevation : f32,
-    mountain_erosion : f32,
-    craters_octave_count : u32,
-    craters_sparsity : f32,
+    mountain_elevation: f32,
+    mountain_terrace_elevation: f32,
+    mountain_erosion: f32,
+    craters_octave_count: u32,
+    craters_sparsity: f32,
 }
 
-@group(0) @binding(0) var<storage, read_write> positions : array<f32>;
-@group(0) @binding(1) var<uniform> params : Params;
-@group(0) @binding(2) var<uniform> terrain_model : TerrainModel;
+@group(0) @binding(0) var<storage, read_write> positions: array<f32>;
+@group(0) @binding(1) var<uniform> chunk: Chunk;
+@group(0) @binding(2) var<uniform> terrain_model: TerrainModel;
 
 #include "../utils/pi.wgsl";
 
@@ -74,7 +74,6 @@ fn gradient_noise_3d_fbm(p: vec3<f32>, octave_count: u32) -> f32 {
 
     return result / total_amplitude;
 }
-
 
 fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
     let noise_sampling_point = p + (hash31(terrain_model.seed) - 0.5) * 1e8;
@@ -128,21 +127,21 @@ fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
 
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
-    if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
+    if (id.x >= chunk.row_vertex_count || id.y >= chunk.row_vertex_count) { 
         return;
     }
 
-    let vertex_offset_01 = vec2<f32>(f32(id.x), f32(id.y)) / f32(params.nbVerticesPerRow - 1u);
-    let vertex_offset_centered = params.size * vec2<f32>(0.5 - vertex_offset_01.x, vertex_offset_01.y - 0.5);
+    let vertex_offset_01 = vec2<f32>(f32(id.x), f32(id.y)) / f32(chunk.row_vertex_count - 1u);
+    let vertex_offset_centered = chunk.size * vec2<f32>(0.5 - vertex_offset_01.x, vertex_offset_01.y - 0.5);
 
-    let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_centered);
+    let vertex_position_on_cube = get_vertex_position_on_cube(chunk.position_on_cube, chunk.face_index, vertex_offset_centered);
     let vertex_up = normalize(vertex_position_on_cube);
 
-    let elevation = planet_height_field(vertex_up * params.sphere_radius, terrain_model);
+    let elevation = planet_height_field(vertex_up * chunk.distance_to_center, terrain_model);
 
-    let final_position = (vertex_up - params.chunk_up) * params.sphere_radius + vertex_up * elevation;
+    let final_position = (vertex_up - chunk.up_direction) * chunk.distance_to_center + vertex_up * elevation;
 
-    let index: u32 = id.x + id.y * params.nbVerticesPerRow;
+    let index: u32 = id.x + id.y * chunk.row_vertex_count;
     positions[index*3u + 0u] = final_position.x;
     positions[index*3u + 1u] = final_position.y;
     positions[index*3u + 2u] = final_position.z;
