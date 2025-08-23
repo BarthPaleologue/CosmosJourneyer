@@ -36,7 +36,7 @@ import heightMapComputeSource from "@shaders/compute/terrain/sphericalProcedural
 export class SphericalProceduralHeightFieldBuilder {
     private readonly computeShader: ComputeShader;
 
-    private readonly paramsBuffer: UniformBuffer;
+    private readonly chunkBuffer: UniformBuffer;
 
     private readonly terrainModel: UniformBuffer;
 
@@ -45,19 +45,19 @@ export class SphericalProceduralHeightFieldBuilder {
     private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
         this.computeShader = computeShader;
 
-        this.paramsBuffer = new UniformBuffer(engine);
+        this.chunkBuffer = new UniformBuffer(engine);
 
-        this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
-        this.paramsBuffer.addUniform("size", 1);
-        this.paramsBuffer.addUniform("direction", 1);
-        this.paramsBuffer.addUniform("chunk_position_on_cube", 3);
-        this.paramsBuffer.addUniform("sphere_radius", 1);
-        this.paramsBuffer.addUniform("chunk_up", 3);
-        this.paramsBuffer.addUniform("chunk_indices", 2);
-        this.paramsBuffer.addUniform("chunk_lod", 1);
-        this.paramsBuffer.update();
+        this.chunkBuffer.addUniform("row_vertex_count", 1);
+        this.chunkBuffer.addUniform("size", 1);
+        this.chunkBuffer.addUniform("face_index", 1);
+        this.chunkBuffer.addUniform("position_on_cube", 3);
+        this.chunkBuffer.addUniform("distance_to_center", 1);
+        this.chunkBuffer.addUniform("up_direction", 3);
+        this.chunkBuffer.addUniform("indices", 2);
+        this.chunkBuffer.addUniform("lod", 1);
+        this.chunkBuffer.update();
 
-        this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+        this.computeShader.setUniformBuffer("chunk", this.chunkBuffer);
 
         this.terrainModel = new UniformBuffer(engine);
         this.terrainModel.addUniform("seed", 1);
@@ -81,7 +81,7 @@ export class SphericalProceduralHeightFieldBuilder {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    params: { group: 0, binding: 1 },
+                    chunk: { group: 0, binding: 1 },
                     terrain_model: { group: 0, binding: 2 },
                 },
             },
@@ -103,15 +103,15 @@ export class SphericalProceduralHeightFieldBuilder {
         terrainModel: ProceduralTerrainModel,
         engine: WebGPUEngine,
     ): StorageBuffer {
-        this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
-        this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
-        this.paramsBuffer.updateVector3("chunk_up", chunkPositionOnSphere.normalizeToNew());
-        this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
-        this.paramsBuffer.updateUInt("direction", direction);
-        this.paramsBuffer.updateFloat("size", size);
-        this.paramsBuffer.updateUInt2("chunk_indices", chunkIndices.x, chunkIndices.y);
-        this.paramsBuffer.updateUInt("chunk_lod", chunkIndices.lod);
-        this.paramsBuffer.update();
+        this.chunkBuffer.updateUInt("row_vertex_count", nbVerticesPerRow);
+        this.chunkBuffer.updateVector3("position_on_cube", chunkPositionOnCube);
+        this.chunkBuffer.updateVector3("up_direction", chunkPositionOnSphere.normalizeToNew());
+        this.chunkBuffer.updateFloat("distance_to_center", sphereRadius);
+        this.chunkBuffer.updateUInt("face_index", direction);
+        this.chunkBuffer.updateFloat("size", size);
+        this.chunkBuffer.updateUInt2("indices", chunkIndices.x, chunkIndices.y);
+        this.chunkBuffer.updateUInt("lod", chunkIndices.lod);
+        this.chunkBuffer.update();
 
         this.terrainModel.updateFloat("seed", terrainModel.seed);
         this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrust.elevation);
