@@ -317,8 +317,8 @@ export class SphericalHeightFieldChunk implements Transformable {
         const screenSpaceError = (geometricError * projScale) / distance;
 
         // Hysteresis
-        const T_SPLIT = 24; // split when sse >= 24 px
-        const T_MERGE = 12; // merge when sse <= 12 px
+        const T_SPLIT = 16; // split when sse >= T_SPLIT px
+        const T_MERGE = 8; // merge when sse <= T_MERGE px
 
         /*
         const screenSpaceErrorMorphWindow = 8; // pixels
