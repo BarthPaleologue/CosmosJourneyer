@@ -156,16 +156,6 @@ fn planet_height_field(p: vec3<f32>, terrain_model: TerrainModel) -> f32 {
     return continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
 }
 
-// ---- stable relative displacement (fix: correct select predicate)
-fn chunk_relative_displacement(u0: vec3<f32>, u: vec3<f32>, R: f32) -> vec3<f32> {
-    let w = cross(u0, u);                 // |w| = sinθ
-    let tangent = cross(w, u0);           // = sinθ * dir  (no normalization)
-    let c = dot(u0, u);                   // = cosθ
-    let s2 = dot(w, w);                   // = sin²θ
-    let cm1 = select(-0.5 * dot(u - u0, u - u0), -0.5 * s2, c > 0.9999);  // select(f, t, cond) → t if cond is true
-    return R * (tangent + cm1 * u0);
-}
-
 @compute @workgroup_size(16,16,1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (id.x >= params.nbVerticesPerRow || id.y >= params.nbVerticesPerRow) { 
@@ -178,11 +168,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let vertex_position_on_cube = get_vertex_position_on_cube(params.chunk_position_on_cube, params.direction, vertex_offset_centered);
     let vertex_up = normalize(vertex_position_on_cube);
 
-    let vertex_position_on_chunk = chunk_relative_displacement(params.chunk_up, vertex_up, params.sphere_radius);
-
     let elevation = planet_height_field(vertex_up * params.sphere_radius, terrain_model);
 
-    let final_position = vertex_position_on_chunk + vertex_up * elevation;
+    let final_position = (vertex_up - params.chunk_up) * params.sphere_radius + vertex_up * elevation;
 
     let index: u32 = id.x + id.y * params.nbVerticesPerRow;
     positions[index*3u + 0u] = final_position.x;
