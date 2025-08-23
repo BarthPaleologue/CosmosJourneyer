@@ -22,8 +22,6 @@ struct Chunk {
     position_on_cube: vec3<f32>,
     distance_to_center: f32,
     up_direction: vec3<f32>,
-    indices: vec2<u32>,
-    lod: u32
 };
 
 struct TerrainModel {
