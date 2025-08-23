@@ -49,7 +49,6 @@ export class SphericalProceduralHeightFieldBuilder {
         this.chunkBuffer.addUniform("size", 1);
         this.chunkBuffer.addUniform("face_index", 1);
         this.chunkBuffer.addUniform("position_on_cube", 3);
-        this.chunkBuffer.addUniform("distance_to_center", 1);
         this.chunkBuffer.addUniform("up_direction", 3);
         this.chunkBuffer.update();
 
@@ -57,6 +56,7 @@ export class SphericalProceduralHeightFieldBuilder {
 
         this.terrainModel = new UniformBuffer(engine);
         this.terrainModel.addUniform("seed", 1);
+        this.terrainModel.addUniform("radius", 1);
         this.terrainModel.addUniform("continental_crust_elevation", 1);
         this.terrainModel.addUniform("continental_crust_fraction", 1);
         this.terrainModel.addUniform("mountain_elevation", 1);
@@ -101,12 +101,12 @@ export class SphericalProceduralHeightFieldBuilder {
         this.chunkBuffer.updateUInt("row_vertex_count", nbVerticesPerRow);
         this.chunkBuffer.updateVector3("position_on_cube", chunkPositionOnCube);
         this.chunkBuffer.updateVector3("up_direction", chunkPositionOnSphere.normalizeToNew());
-        this.chunkBuffer.updateFloat("distance_to_center", sphereRadius);
         this.chunkBuffer.updateUInt("face_index", faceIndex);
         this.chunkBuffer.updateFloat("size", size);
         this.chunkBuffer.update();
 
         this.terrainModel.updateFloat("seed", terrainModel.seed);
+        this.terrainModel.updateFloat("radius", sphereRadius);
         this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrust.elevation);
         this.terrainModel.updateFloat("continental_crust_fraction", terrainModel.continentalCrust.fraction);
         this.terrainModel.updateFloat("mountain_elevation", terrainModel.mountain.elevation);

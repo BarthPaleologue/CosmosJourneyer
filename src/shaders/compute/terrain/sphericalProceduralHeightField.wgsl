@@ -20,12 +20,12 @@ struct Chunk {
     size: f32,
     face_index: u32,
     position_on_cube: vec3<f32>,
-    distance_to_center: f32,
     up_direction: vec3<f32>,
 };
 
 struct ProceduralTerrainModel {
     seed: f32,
+    radius: f32,
     continental_crust_elevation: f32,
     continental_crust_fraction: f32,
     mountain_elevation: f32,
@@ -71,9 +71,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let vertex_position_on_cube = get_vertex_position_on_cube(chunk.position_on_cube, chunk.face_index, vertex_offset_centered);
     let vertex_up = normalize(vertex_position_on_cube);
 
-    let elevation = planet_height_field(vertex_up * chunk.distance_to_center, terrain_model);
+    let elevation = planet_height_field(vertex_up * terrain_model.radius, terrain_model);
 
-    let final_position = (vertex_up - chunk.up_direction) * chunk.distance_to_center + vertex_up * elevation;
+    let final_position = (vertex_up - chunk.up_direction) * terrain_model.radius + vertex_up * elevation;
 
     let index: u32 = id.x + id.y * chunk.row_vertex_count;
     positions[index*3u + 0u] = final_position.x;
