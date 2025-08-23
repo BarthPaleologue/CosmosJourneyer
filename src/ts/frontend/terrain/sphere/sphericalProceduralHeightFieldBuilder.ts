@@ -29,8 +29,6 @@ import { retry } from "@/utils/retry";
 
 import { Settings } from "@/settings";
 
-import type { ChunkIndices } from "./sphericalHeightFieldChunk";
-
 import heightMapComputeSource from "@shaders/compute/terrain/sphericalProceduralHeightField.wgsl";
 
 export class SphericalProceduralHeightFieldBuilder {
@@ -53,8 +51,6 @@ export class SphericalProceduralHeightFieldBuilder {
         this.chunkBuffer.addUniform("position_on_cube", 3);
         this.chunkBuffer.addUniform("distance_to_center", 1);
         this.chunkBuffer.addUniform("up_direction", 3);
-        this.chunkBuffer.addUniform("indices", 2);
-        this.chunkBuffer.addUniform("lod", 1);
         this.chunkBuffer.update();
 
         this.computeShader.setUniformBuffer("chunk", this.chunkBuffer);
@@ -96,7 +92,6 @@ export class SphericalProceduralHeightFieldBuilder {
         chunkPositionOnCube: Vector3,
         chunkPositionOnSphere: Vector3,
         nbVerticesPerRow: number,
-        chunkIndices: ChunkIndices,
         direction: Direction,
         sphereRadius: number,
         size: number,
@@ -109,8 +104,6 @@ export class SphericalProceduralHeightFieldBuilder {
         this.chunkBuffer.updateFloat("distance_to_center", sphereRadius);
         this.chunkBuffer.updateUInt("face_index", direction);
         this.chunkBuffer.updateFloat("size", size);
-        this.chunkBuffer.updateUInt2("indices", chunkIndices.x, chunkIndices.y);
-        this.chunkBuffer.updateUInt("lod", chunkIndices.lod);
         this.chunkBuffer.update();
 
         this.terrainModel.updateFloat("seed", terrainModel.seed);

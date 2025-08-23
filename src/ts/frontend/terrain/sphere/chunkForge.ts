@@ -24,8 +24,6 @@ import { type HeightMap1x1, type HeightMap2x4 } from "@/frontend/assets/textures
 
 import { type Direction } from "@/utils/direction";
 
-import type { ChunkIndices } from "./sphericalHeightFieldChunk";
-
 export type ChunkId = `${string}->d${Direction}->l${number}->[x${number};y${number}]`;
 
 export type HeightFieldTask = {
@@ -33,7 +31,6 @@ export type HeightFieldTask = {
     positionOnCube: Vector3;
     positionOnSphere: Vector3;
     size: number;
-    indices: ChunkIndices;
     direction: Direction;
     sphereRadius: number;
 };
@@ -84,7 +81,6 @@ export interface ChunkForge {
      * @param positionOnCube The position of the chunk on the cube
      * @param positionOnSphere The position of the chunk on the spherized cube
      * @param direction The cube side direction
-     * @param indices The indices of the chunk
      * @param size The size of the chunk in meters
      * @param sphereRadius The radius of the sphere in meters
      * @param terrainModel The model to use for the terrain generation.
@@ -94,7 +90,6 @@ export interface ChunkForge {
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
         direction: Direction,
-        indices: ChunkIndices,
         size: number,
         sphereRadius: number,
         terrainModel: TerrainModel,
