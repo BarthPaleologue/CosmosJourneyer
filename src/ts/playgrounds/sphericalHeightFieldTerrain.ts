@@ -131,7 +131,7 @@ export async function createSphericalHeightFieldTerrain(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera, material, chunkForge);
+        terrain.update(camera, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();

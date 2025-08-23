@@ -146,7 +146,7 @@ export async function createMoonScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera, material.get(), chunkForge);
+        terrain.update(camera, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
@@ -159,7 +159,7 @@ export async function createMoonScene(
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            terrain.update(camera, material.get(), chunkForge);
+            terrain.update(camera, chunkForge);
             chunkForge.update();
 
             if (terrain.isIdle()) {
