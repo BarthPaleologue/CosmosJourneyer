@@ -205,7 +205,8 @@ export class SphericalHeightFieldChunk implements Transformable {
         const sagitta = (edge * edge) / (8 * this.sphereRadius); // sphere curvature only
         radius += sagitta;
 
-        const geometricError = this.sideLength / (rowVertexCount - 1);
+        const geometricErrorMultiplier = 2;
+        const geometricError = (geometricErrorMultiplier * this.sideLength) / (rowVertexCount - 1);
 
         this.geometry = {
             buffers: vertexData,
