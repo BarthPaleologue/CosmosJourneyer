@@ -95,6 +95,8 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly terrainModel: TerrainModel;
 
+    private readonly scene: Scene;
+
     constructor(
         indices: ChunkIndices,
         direction: Direction,
@@ -135,6 +137,8 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
 
         this.mesh.setEnabled(false);
+
+        this.scene = scene;
     }
 
     private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
@@ -214,29 +218,29 @@ export class SphericalHeightFieldChunk implements Transformable {
         };
     }
 
-    static Subdivide(
-        indices: ChunkIndices,
-        direction: Direction,
-        radius: number,
-        parent: TransformNode,
-        terrainModel: TerrainModel,
-        material: Material,
-        scene: Scene,
-    ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
+    private subdivide(): void {
         const childIndices: Array<ChunkIndices> = [];
         for (let dy = 0; dy < 2; dy++) {
             for (let dx = 0; dx < 2; dx++) {
                 childIndices.push({
-                    x: indices.x * 2 + dx,
-                    y: indices.y * 2 + dy,
-                    lod: indices.lod + 1,
+                    x: this.indices.x * 2 + dx,
+                    y: this.indices.y * 2 + dy,
+                    lod: this.indices.lod + 1,
                 });
             }
         }
 
         const children = childIndices.map(
             (childIndex) =>
-                new SphericalHeightFieldChunk(childIndex, direction, radius, parent, terrainModel, material, scene),
+                new SphericalHeightFieldChunk(
+                    childIndex,
+                    this.direction,
+                    this.sphereRadius,
+                    this.parent,
+                    this.terrainModel,
+                    this.material,
+                    this.scene,
+                ),
         );
 
         if (
@@ -248,7 +252,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             throw new Error("Failed to create all children for SphericalHeightFieldChunk.");
         }
 
-        return [children[0], children[1], children[2], children[3]];
+        this.children = [children[0], children[1], children[2], children[3]];
     }
 
     private updateLoadingState(chunkForge: ChunkForge) {
@@ -281,7 +285,7 @@ export class SphericalHeightFieldChunk implements Transformable {
         );
     }
 
-    public updateSubdivision(camera: Camera, material: Material) {
+    public updateSubdivision(camera: Camera) {
         if (this.geometry === null) {
             // do not merge children or subdivide self if chunk is not loaded
             return;
@@ -329,15 +333,7 @@ export class SphericalHeightFieldChunk implements Transformable {
         );
 
         if (this.children === null && screenSpaceError >= T_SPLIT && this.indices.lod < maxLod) {
-            this.children = SphericalHeightFieldChunk.Subdivide(
-                this.indices,
-                this.direction,
-                this.sphereRadius,
-                this.parent,
-                this.terrainModel,
-                material,
-                this.getTransform().getScene(),
-            );
+            this.subdivide();
         } else if (this.children !== null && screenSpaceError <= T_MERGE && this.getLoadingState() === "completed") {
             for (const child of this.children) {
                 child.dispose();
@@ -349,7 +345,7 @@ export class SphericalHeightFieldChunk implements Transformable {
     public update(camera: Camera, chunkForge: ChunkForge) {
         this.updateLoadingState(chunkForge);
 
-        this.updateSubdivision(camera, this.material);
+        this.updateSubdivision(camera);
 
         if (this.children !== null) {
             let areAllChildrenLoaded = true;
