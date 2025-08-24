@@ -42,7 +42,12 @@ export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetT
 
 export type GasPlanetModel = CelestialBodyModelBase<OrbitalObjectType.GAS_PLANET> &
     HasSeed & {
-        atmosphere: AtmosphereModel;
+        atmosphere: AtmosphereModel & {
+            /**
+             * For gas giants, the surface is defined by the height at which the pressure is equal to 100,000 Pa (1 bar).
+             */
+            seaLevelPressure: 100_000;
+        };
         rings: RingsModel | null;
         colorPalette: GasPlanetColorPalette;
     };

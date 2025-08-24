@@ -20,8 +20,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { PriorityQueue } from "@/utils/dataStructures/priorityQueue";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
-import { PriorityQueue } from "@/utils/priorityQueue";
 import { err, ok, type Result } from "@/utils/types";
 
 type Node = {
