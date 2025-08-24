@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { RawTexture2DArray } from "@babylonjs/core/Materials/Textures/rawTexture2DArray";
+import { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -163,3 +165,34 @@ export type Texture2dArrayMosaic = {
  * 2D texture sampler types that can be sampled using a simple UV coordinate.
  */
 export type Texture2dUv = Texture2d | Texture2dArrayMosaic;
+
+export function createStorageTexture3D(
+    name: string,
+    dimensions: {
+        width: number;
+        height: number;
+        depth: number;
+    },
+    textureFormat: number,
+    scene: Scene,
+    options?: Partial<{ data: ArrayBufferView; samplingMode: number }>,
+): Texture {
+    const texture = new RawTexture3D(
+        options?.data ?? null,
+        dimensions.width,
+        dimensions.height,
+        dimensions.depth,
+        textureFormat,
+        scene,
+        false,
+        false,
+        options?.samplingMode ?? Constants.TEXTURE_NEAREST_SAMPLINGMODE,
+        Constants.TEXTURETYPE_FLOAT,
+        Constants.TEXTURE_CREATIONFLAG_STORAGE,
+    );
+    texture.name = name;
+    texture.wrapU = Constants.TEXTURE_WRAP_ADDRESSMODE;
+    texture.wrapV = Constants.TEXTURE_WRAP_ADDRESSMODE;
+
+    return texture;
+}

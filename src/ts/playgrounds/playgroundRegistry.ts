@@ -54,6 +54,7 @@ import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createTerrainScene } from "./terrain";
+import { createTexture3dPlayground } from "./texture3d";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
@@ -100,6 +101,7 @@ export class PlaygroundRegistry {
         ["mars", createMarsScene],
         ["moon", createMoonScene],
         ["mercury", createMercuryScene],
+        ["texture3d", createTexture3dPlayground],
     ]);
 
     register(
