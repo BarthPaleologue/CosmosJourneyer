@@ -15,7 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GizmoManager, Light, LightGizmo, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
+import {
+    Color4,
+    GizmoManager,
+    Light,
+    LightGizmo,
+    PointLight,
+    Scene,
+    Vector3,
+    type WebGPUEngine,
+} from "@babylonjs/core";
 
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
@@ -25,9 +34,17 @@ import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
 import { loadTextures } from "@/frontend/assets/textures";
 import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloudsPostProcess";
+import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
+import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 import { TelluricPlanetMaterial } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterial";
+
+import { addToWindow } from "./utils";
 
 export async function createTelluricPlanetScene(
     engine: WebGPUEngine,
@@ -59,6 +76,9 @@ export async function createTelluricPlanetScene(
 
     scene.activeCamera = camera;
 
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
+
     const light = new PointLight("light", new Vector3(10, 2, -10).normalize().scale(earthRadius * 10), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
     light.intensity = 4;
@@ -79,6 +99,7 @@ export async function createTelluricPlanetScene(
         "Gas Planet",
         [],
     );
+    addToWindow("model", model);
 
     const material = new TelluricPlanetMaterial(
         model,
@@ -86,14 +107,48 @@ export async function createTelluricPlanetScene(
         textures.pools.telluricPlanetMaterialLut,
         scene,
     );
+    addToWindow("material", material);
+
+    const terraceElevation = model.atmosphere !== null ? 1e3 : 0;
+
+    let cratersOctaveCount = 3;
+    let cratersSparsity = 2;
+    let erosion = 0;
+    if (model.atmosphere !== null) {
+        // atmosphere prevent smaller rocks from reaching the surface
+        cratersOctaveCount -= 1;
+
+        // assume past oceanic activity has eroded the surface
+        erosion = 1;
+    }
+
+    let continentalCrustFraction = 1;
+
+    if (model.ocean !== null) {
+        // geological activity recycles craters
+        cratersOctaveCount -= 1;
+        cratersSparsity *= 2;
+        continentalCrustFraction = 0.3;
+    }
 
     const terrainModel: TerrainModel = {
         type: "procedural",
+        seed: model.seed,
+        continentalCrust: { elevation: model.ocean?.depth ?? 5e3, fraction: continentalCrustFraction },
+        mountain: {
+            elevation: 10e3,
+            terraceElevation: terraceElevation,
+            erosion: erosion,
+        },
+        craters: {
+            octaveCount: cratersOctaveCount,
+            sparsity: cratersSparsity,
+        },
     };
 
     const terrain = new SphericalHeightFieldTerrain(
         "SphericalHeightFieldTerrain",
-        earthRadius,
+        model.radius,
         terrainModel,
         material,
         scene,
@@ -108,11 +163,53 @@ export async function createTelluricPlanetScene(
 
     const chunkForge = chunkForgeResult.value;
 
+    let ocean: OceanPostProcess | null = null;
+    if (model.ocean !== null) {
+        const oceanUniforms = new OceanUniforms(model.radius, model.ocean.depth);
+
+        ocean = new OceanPostProcess(
+            terrain.getTransform(),
+            model.radius + model.ocean.depth,
+            oceanUniforms,
+            [light],
+            textures.water,
+            scene,
+        );
+        camera.attachPostProcess(ocean);
+    }
+
+    let clouds: FlatCloudsPostProcess | null = null;
+    if (model.clouds !== null) {
+        const cloudsUniforms = new CloudsUniforms(model.clouds, textures.pools.cloudsLut, scene);
+
+        clouds = new FlatCloudsPostProcess(
+            terrain.getTransform(),
+            model.radius + (model.ocean?.depth ?? 0),
+            cloudsUniforms,
+            [light],
+            scene,
+        );
+        camera.attachPostProcess(clouds);
+    }
+
+    if (model.atmosphere !== null) {
+        const atmosphereUniforms = new AtmosphereUniforms(model.radius, model.mass, 298, model.atmosphere);
+
+        const atmosphere = new AtmosphericScatteringPostProcess(
+            terrain.getTransform(),
+            model.radius + (model.ocean?.depth ?? 0),
+            atmosphereUniforms,
+            [light],
+            scene,
+        );
+        camera.attachPostProcess(atmosphere);
+    }
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
@@ -120,6 +217,21 @@ export async function createTelluricPlanetScene(
         controls.getTransform().position.subtractInPlace(cameraPosition);
 
         material.update(terrain.getTransform().computeWorldMatrix(true), [light]);
+
+        ocean?.update(deltaSeconds);
+        clouds?.update(deltaSeconds);
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera, chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;

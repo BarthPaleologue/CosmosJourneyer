@@ -46,7 +46,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
 
     var vertex_position = vec3<f32>(params.size * x / f32(params.nbVerticesPerRow - 1) - params.size / 2.0, 0.0, params.size * y / f32(params.nbVerticesPerRow - 1) - params.size / 2.0);
 
-    let elevation = mountain(vertex_position * 0.5, vec3f(0.0, 1.0, 0.0));
+    let elevation = mountain(vertex_position * 0.5, vec3f(0.0, 1.0, 0.0), 1.0);
 
     positions[index * 3 + 0] = vertex_position.x;
     positions[index * 3 + 1] = elevation;
