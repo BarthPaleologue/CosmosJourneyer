@@ -41,7 +41,7 @@ fn planet_height_field(p: vec3<f32>, terrain_model: ProceduralTerrainModel) -> f
 
     let continent_smoothness = 0.01;
 
-    let continent_sharp_mask = smoothstep(ocean_threshold - continent_smoothness, ocean_threshold + continent_smoothness, continent_mask);
+    let continent_sharp_mask = smootherstep(ocean_threshold - continent_smoothness, ocean_threshold + continent_smoothness, continent_mask);
 
     let fjord_penetration = 0.05;
 
@@ -49,7 +49,7 @@ fn planet_height_field(p: vec3<f32>, terrain_model: ProceduralTerrainModel) -> f
 
     let fjord_width_threshold = 0.03;
 
-    let fjord_noise_sharpened = smoothstep(0.0, fjord_width_threshold * remap(continent_fjord_mask, 0.0, 1.0, 0.3, 1.0), fjord_noise);
+    let fjord_noise_sharpened = smootherstep(0.0, fjord_width_threshold * remap(continent_fjord_mask, 0.0, 1.0, 0.3, 1.0), fjord_noise);
 
     let fjord_elevation = (terrain_model.continental_crust_elevation + terrain_model.mountain_elevation) * remap(fjord_noise_sharpened, 0.0, 1.0, -1.0, 0.0) * continent_fjord_mask;
     
@@ -61,7 +61,7 @@ fn planet_height_field(p: vec3<f32>, terrain_model: ProceduralTerrainModel) -> f
 
     let continent_elevation = continental_crust_elevation * clamp(continent_sharp_mask + continent_mask, 0.0, 1.0);
 
-    let craters_elevation = 7e3 * (crater_noise - 1.0);
+    let craters_elevation = 10e3 * (crater_noise - 1.0);
 
     return continent_elevation + fjord_elevation + mountain_elevation + terrace_elevation + craters_elevation;
 }
