@@ -149,7 +149,7 @@ export async function createMarsScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material.get(), chunkForge);
+        terrain.update(camera, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
@@ -162,7 +162,7 @@ export async function createMarsScene(
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            terrain.update(camera.globalPosition, material.get(), chunkForge);
+            terrain.update(camera, chunkForge);
             chunkForge.update();
 
             if (terrain.isIdle()) {

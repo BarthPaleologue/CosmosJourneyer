@@ -17,10 +17,10 @@
 
 import {
     Color3,
-    DirectionalLight,
-    GizmoManager,
-    LightGizmo,
+    Color4,
+    Light,
     PBRMetallicRoughnessMaterial,
+    PointLight,
     Scene,
     Vector3,
     type WebGPUEngine,
@@ -29,21 +29,19 @@ import {
 import { type TerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { PlanetHeightMapAtlas } from "@/frontend/assets/planetHeightMapAtlas";
-import { loadHeightMaps } from "@/frontend/assets/textures/heightMaps";
+import { PlanetHeightMapAtlasMock } from "@/frontend/assets/planetHeightMapAtlas";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
 import { SphericalHeightFieldTerrain } from "@/frontend/terrain/sphere/sphericalHeightFieldTerrain";
 
 export async function createSphericalHeightFieldTerrain(
     engine: WebGPUEngine,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
-
-    const heightMaps = await loadHeightMaps(scene, progressMonitor);
 
     const earthRadius = 6_371e3; // Average radius of Earth in meters
 
@@ -62,27 +60,30 @@ export async function createSphericalHeightFieldTerrain(
 
     scene.activeCamera = camera;
 
-    const light = new DirectionalLight("light", new Vector3(-5, 2, 10).normalize(), scene);
-    light.position = new Vector3(0, 100, 0);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
-    const lightGizmo = new LightGizmo();
-    lightGizmo.light = light;
-    lightGizmo.attachedMesh?.position.set(0, 20, 0);
-
-    const gizmoManager = new GizmoManager(scene);
-    gizmoManager.positionGizmoEnabled = true;
-    gizmoManager.rotationGizmoEnabled = true;
-    gizmoManager.boundingBoxGizmoEnabled = true;
-    gizmoManager.usePointerToAttachGizmos = false;
-    gizmoManager.attachToMesh(lightGizmo.attachedMesh);
+    const light = new PointLight("light", new Vector3(-5, 2, 10).scaleInPlace(earthRadius * -10), scene);
+    light.falloffType = Light.FALLOFF_STANDARD;
 
     const material = new PBRMetallicRoughnessMaterial("terrainMaterial", scene);
     material.baseColor = new Color3(0.5, 0.5, 0.5);
     material.metallic = 0.0;
-    material.roughness = 1.0;
+    material.roughness = 0.6;
 
     const terrainModel: TerrainModel = {
         type: "procedural",
+        seed: 0,
+        continentalCrust: { elevation: 5e3, fraction: 0.3 },
+        mountain: {
+            elevation: 10e3,
+            terraceElevation: 1e3,
+            erosion: 1,
+        },
+        craters: {
+            octaveCount: 3,
+            sparsity: 2.0,
+        },
     };
 
     const terrain = new SphericalHeightFieldTerrain(
@@ -93,7 +94,7 @@ export async function createSphericalHeightFieldTerrain(
         scene,
     );
 
-    const heightMapAtlas = new PlanetHeightMapAtlas(heightMaps, scene);
+    const heightMapAtlas = new PlanetHeightMapAtlasMock();
 
     const chunkForgeResult = await ChunkForgeCompute.New(6, 64, heightMapAtlas, engine);
     if (!chunkForgeResult.success) {
@@ -106,12 +107,24 @@ export async function createSphericalHeightFieldTerrain(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        terrain.update(camera.globalPosition, material, chunkForge);
+        terrain.update(camera, chunkForge);
         chunkForge.update();
 
         const cameraPosition = camera.globalPosition.clone();
         terrain.getTransform().position.subtractInPlace(cameraPosition);
         controls.getTransform().position.subtractInPlace(cameraPosition);
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            terrain.update(camera, chunkForge);
+            chunkForge.update();
+
+            if (terrain.isIdle()) {
+                observer.remove();
+                resolve();
+            }
+        });
     });
 
     return scene;

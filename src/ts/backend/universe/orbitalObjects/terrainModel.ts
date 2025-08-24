@@ -19,6 +19,20 @@ import { z } from "zod";
 
 export const ProceduralTerrainModelSchema = z.object({
     type: z.literal("procedural"),
+    seed: z.number(),
+    continentalCrust: z.object({
+        elevation: z.number(),
+        fraction: z.number(),
+    }),
+    mountain: z.object({
+        elevation: z.number(),
+        terraceElevation: z.number(),
+        erosion: z.number(),
+    }),
+    craters: z.object({
+        octaveCount: z.number().int(),
+        sparsity: z.number(),
+    }),
 });
 
 export type ProceduralTerrainModel = z.infer<typeof ProceduralTerrainModelSchema>;

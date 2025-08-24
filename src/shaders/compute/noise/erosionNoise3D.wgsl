@@ -26,62 +26,6 @@
 
 const erosionscale: f32 = 4.0;
 
-// From https://www.shadertoy.com/view/4djSRW
-// Name : Hash without Sine
-// Author : Dave_Hoskins
-// License : MIT
-// Why not normal hash? Because terrible for planets, and that is what I am using this for.
-fn hash33(p3: vec3<f32>) -> vec3<f32> {
-	var p3_mod = fract(p3 * vec3<f32>(.1031, .1030, .0973));
-    p3_mod += dot(p3_mod, p3_mod.yxz+33.33);
-    return 1.0 - 2.0 * fract((p3_mod.xxy + p3_mod.yxx)*p3_mod.zyx);
-
-}
-
-
-// From https://www.shadertoy.com/view/4dffRH
-// Name : iq
-// License : MIT
-// Modified to remove the different settings, and use sineless hash.
-// return value noise (in x) and its derivatives (in yzw)
-fn gradient_noise_3d(x: vec3<f32>) -> vec4<f32> {
-    let i = floor(x);
-    let f = fract(x);
-    
-    // cubic interpolant
-    let u = f*f*(3.0-2.0*f);
-    let du = 6.0*f*(1.0-f);    
-    
-    // gradients
-    let ga = hash33(i+vec3<f32>(0.0,0.0,0.0));
-    let gb = hash33(i+vec3<f32>(1.0,0.0,0.0));
-    let gc = hash33(i+vec3<f32>(0.0,1.0,0.0));
-    let gd = hash33(i+vec3<f32>(1.0,1.0,0.0));
-    let ge = hash33(i+vec3<f32>(0.0,0.0,1.0));
-    let gf = hash33(i+vec3<f32>(1.0,0.0,1.0));
-    let gg = hash33(i+vec3<f32>(0.0,1.0,1.0));
-    let gh = hash33(i+vec3<f32>(1.0,1.0,1.0));
-
-    // projections
-    let va = dot(ga, f-vec3<f32>(0.0,0.0,0.0));
-    let vb = dot(gb, f-vec3<f32>(1.0,0.0,0.0));
-    let vc = dot(gc, f-vec3<f32>(0.0,1.0,0.0));
-    let vd = dot(gd, f-vec3<f32>(1.0,1.0,0.0));
-    let ve = dot(ge, f-vec3<f32>(0.0,0.0,1.0));
-    let vf = dot(gf, f-vec3<f32>(1.0,0.0,1.0));
-    let vg = dot(gg, f-vec3<f32>(0.0,1.0,1.0));
-    let vh = dot(gh, f-vec3<f32>(1.0,1.0,1.0));
-	
-    // interpolations
-    return vec4<f32>(
-        va + u.x*(vb-va) + u.y*(vc-va) + u.z*(ve-va) + u.x*u.y*(va-vb-vc+vd) + u.y*u.z*(va-vc-ve+vg) + u.z*u.x*(va-vb-ve+vf) + (-va+vb+vc-vd+ve-vf-vg+vh)*u.x*u.y*u.z,    // value
-        ga + u.x*(gb-ga) + u.y*(gc-ga) + u.z*(ge-ga) + u.x*u.y*(ga-gb-gc+gd) + u.y*u.z*(ga-gc-ge+gg) + u.z*u.x*(ga-gb-ge+gf) + (-ga+gb+gc-gd+ge-gf-gg+gh)*u.x*u.y*u.z +   // derivatives
-        du * (vec3<f32>(vb,vc,ve) - va + u.yzx*vec3<f32>(va-vb-vc+vd,va-vc-ve+vg,va-vb-ve+vf) + u.zxy*vec3<f32>(va-vb-ve+vf,va-vb-vc+vd,va-vc-ve+vg) + u.yzx*u.zxy*(-va+vb+vc-vd+ve-vf-vg+vh))
-    );
-}
-
-
-
 // code modified from https://www.shadertoy.com/view/4tB3RR
 // Name : Gavoronoise 3d
 // Author : guil
@@ -113,7 +57,7 @@ fn erosion(p: vec3<f32>, dir: vec3<f32>) -> vec4<f32> {
 
 
 //Modified to have erosionscale and it to be 3D
-fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
+fn mountain(p: vec3<f32>, nor: vec3<f32>, erosion_amount: f32) -> f32 {
 
     var n: vec4<f32> = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var nf: f32 = 1.0;
@@ -122,6 +66,12 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
        n += gradient_noise_3d(p*nf)*na*vec4<f32>(1.0, nf, nf, nf);
        na *= 0.5;
        nf *= 2.0;
+    }
+
+    let noise_before_erosion_01 = smoothstep(-1.0, 1.0, n.x);
+
+    if(erosion_amount <= 0.0) {
+        return noise_before_erosion_01;
     }
     
     //take the curl of the normal to get the gradient facing down the slope
@@ -136,7 +86,7 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
     var h: vec4<f32> = vec4<f32>(0.0, 0.0, 0.0, 0.0);
     var a: f32 = 0.7*(smoothstep(0.3, 0.5, n.x*0.5+0.5)); //smooth the valleys
     var f: f32 = 1.0;
-    for (var i: i32 = 0; i < 5; i++) {
+    for (var i: i32 = 0; i < 4; i++) {
         h += erosion(p*erosionscale*f, dir+cross(h.yzw, normalize(p)))*a*vec4<f32>(1.0, f, f, f);
         a *= 0.6;
         f *= 2.0;
@@ -144,5 +94,5 @@ fn mountain(p: vec3<f32>, nor: vec3<f32>) -> f32 {
     //remap height to [0,1] and add erosion
     //looks best when erosion amount is small
     //not sure about adding the normals together, but it looks okay
-    return (smoothstep(-1.0, 1.0, n.x)+h.x*0.01);
+    return noise_before_erosion_01 + h.x * 0.01 * erosion_amount;
 }

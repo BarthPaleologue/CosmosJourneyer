@@ -161,9 +161,10 @@ export class ChunkForgeCompute implements ChunkForge {
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
-                    task.direction,
+                    task.faceIndex,
                     task.sphereRadius,
                     task.size,
+                    task.terrainModel,
                     engine,
                 );
 
@@ -201,7 +202,7 @@ export class ChunkForgeCompute implements ChunkForge {
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
-                    task.direction,
+                    task.faceIndex,
                     task.sphereRadius,
                     task.size,
                     {
@@ -246,7 +247,7 @@ export class ChunkForgeCompute implements ChunkForge {
                     task.positionOnCube,
                     task.positionOnSphere,
                     rowVertexCount,
-                    task.direction,
+                    task.faceIndex,
                     task.sphereRadius,
                     task.size,
                     {
@@ -372,20 +373,20 @@ export class ChunkForgeCompute implements ChunkForge {
         id: ChunkId,
         positionOnCube: Vector3,
         positionOnSphere: Vector3,
-        direction: Direction,
+        faceIndex: Direction,
         size: number,
         sphereRadius: number,
         terrainModel: TerrainModel,
     ): void {
         this.outputs.set(id, {
-            type: "chunkForgePendingOutput",
+            status: "pending",
         });
 
         const buildTask = {
             id,
             positionOnCube,
             positionOnSphere,
-            direction,
+            faceIndex,
             size,
             sphereRadius,
         } satisfies HeightFieldTask;
@@ -448,7 +449,8 @@ export class ChunkForgeCompute implements ChunkForge {
             }
 
             this.outputs.set(nextTask.id, {
-                type: "chunkForgeFinalOutput",
+                status: "completed",
+                rowVertexCount: this.rowVertexCount,
                 positions: nextTask.positions,
                 normals: nextTask.normals,
                 indices: this.gridIndices,

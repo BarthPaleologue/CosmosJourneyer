@@ -52,7 +52,7 @@ void main() {
     float distanceToPlanet = max(0.0, length(cameraPosition - planetPosition) - planetRadius);
     vec3 planetNormalW = normalize(vPositionW - planetPosition);
 
-    vNormalW = mix(vNormalW, planetNormalW, 0.9 * smoothstep(20e3, 300e3, distanceToPlanet));
+    //vNormalW = mix(vNormalW, planetNormalW, 0.9 * smoothstep(20e3, 300e3, distanceToPlanet));
 
 	vPosition = chunkPositionPlanetSpace + position;
 

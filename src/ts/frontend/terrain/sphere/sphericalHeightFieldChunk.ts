@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -30,7 +31,9 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { type FixedLengthArray } from "@/utils/types";
 
-import { type ChunkForge, type ChunkForgeFinalOutput, type ChunkId } from "./chunkForge";
+import { Settings } from "@/settings";
+
+import { type ChunkForge, type ChunkForgeCompletedOutput, type ChunkId } from "./chunkForge";
 
 type ChunkLoadingState = "not_started" | "in_progress" | "completed";
 
@@ -38,6 +41,12 @@ export type ChunkIndices = {
     x: number;
     y: number;
     lod: number;
+};
+
+type ChunkBounds = {
+    corners: FixedLengthArray<Vector3, 4>;
+    center: Vector3;
+    radius: number;
 };
 
 /**
@@ -53,7 +62,9 @@ export class SphericalHeightFieldChunk implements Transformable {
 
     private readonly mesh: Mesh;
 
-    private readonly direction: Direction;
+    private readonly material: Material;
+
+    private readonly faceIndex: Direction;
 
     /**
      * The radius of the underlying planet sphere in meters
@@ -76,25 +87,33 @@ export class SphericalHeightFieldChunk implements Transformable {
      */
     private readonly positionOnCube: Vector3;
 
-    private vertexData: ChunkForgeFinalOutput | null = null;
+    private geometry: {
+        buffers: ChunkForgeCompletedOutput;
+        boundsPlanetSpace: ChunkBounds;
+        error: number;
+    } | null = null;
 
     private readonly terrainModel: TerrainModel;
 
+    private readonly scene: Scene;
+
     constructor(
         indices: ChunkIndices,
-        direction: Direction,
+        faceIndex: Direction,
         sphereRadius: number,
         parent: TransformNode,
         terrainModel: TerrainModel,
         material: Material,
         scene: Scene,
     ) {
-        this.id = `${parent.name}->d${direction}->l${indices.lod}->[x${indices.x};y${indices.y}]`;
+        this.id = `${parent.name}->d${faceIndex}->l${indices.lod}->[x${indices.x};y${indices.y}]`;
 
         this.mesh = new Mesh(this.id, scene);
         this.mesh.isPickable = false;
         this.mesh.parent = parent;
         this.mesh.material = material;
+
+        this.material = material;
 
         this.parent = parent;
 
@@ -106,21 +125,23 @@ export class SphericalHeightFieldChunk implements Transformable {
         this.mesh.position.y = -sphereRadius + (sphereRadius * 2 * (indices.y + 0.5)) / 2 ** indices.lod;
         this.mesh.position.z = sphereRadius;
 
-        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
+        this.mesh.position.applyRotationQuaternionInPlace(getQuaternionFromDirection(faceIndex));
 
         this.positionOnCube = this.mesh.position.clone();
 
         this.mesh.position.normalize().scaleInPlace(sphereRadius);
 
-        this.direction = direction;
+        this.faceIndex = faceIndex;
         this.sphereRadius = sphereRadius;
 
         this.sideLength = (sphereRadius * 2) / 2 ** indices.lod;
 
         this.mesh.setEnabled(false);
+
+        this.scene = scene;
     }
 
-    private setVertexData(vertexData: ChunkForgeFinalOutput, rowVertexCount: number, engine: AbstractEngine) {
+    private setVertexData(vertexData: ChunkForgeCompletedOutput, rowVertexCount: number, engine: AbstractEngine) {
         // see https://forum.babylonjs.com/t/how-to-share-webgpu-index-buffer-between-meshes/58902/2
         // the reference counter is automatically decremented when calling dispose on the mesh
         vertexData.positions.gpu.getBuffer().references++;
@@ -155,32 +176,72 @@ export class SphericalHeightFieldChunk implements Transformable {
             true,
         );
 
-        this.vertexData = vertexData;
+        const corners: FixedLengthArray<Vector3, 4> = [
+            Vector3.FromArray(vertexData.positions.cpu),
+            Vector3.FromArray(vertexData.positions.cpu, (rowVertexCount - 1) * 3),
+            Vector3.FromArray(vertexData.positions.cpu, (rowVertexCount - 1) * rowVertexCount * 3),
+            Vector3.FromArray(
+                vertexData.positions.cpu,
+                ((rowVertexCount - 1) * rowVertexCount + (rowVertexCount - 1)) * 3,
+            ),
+        ];
+
+        for (const corner of corners) {
+            corner.addInPlace(this.mesh.position);
+        }
+
+        const center = corners[0].add(corners[1]).add(corners[2]).add(corners[3]).scaleInPlace(0.25);
+
+        let radius = 0;
+        for (const p of corners) radius = Math.max(radius, Vector3.Distance(center, p));
+
+        // Curvature pad: interior of a spherical quad bows outward beyond corner chord.
+        // Use sagitta of an arc as a conservative pad. Edge is the largest edge of the quad.
+        const e01 = Vector3.Distance(corners[0], corners[1]);
+        const e13 = Vector3.Distance(corners[1], corners[3]);
+        const e32 = Vector3.Distance(corners[3], corners[2]);
+        const e20 = Vector3.Distance(corners[2], corners[0]);
+        const edge = Math.max(e01, e13, e32, e20);
+        const sagitta = (edge * edge) / (8 * this.sphereRadius); // sphere curvature only
+        radius += sagitta;
+
+        const geometricErrorMultiplier = 2;
+        const geometricError = (geometricErrorMultiplier * this.sideLength) / (rowVertexCount - 1);
+
+        this.geometry = {
+            buffers: vertexData,
+            boundsPlanetSpace: {
+                corners,
+                center,
+                radius,
+            },
+            error: geometricError,
+        };
     }
 
-    static Subdivide(
-        indices: ChunkIndices,
-        direction: Direction,
-        radius: number,
-        parent: TransformNode,
-        terrainModel: TerrainModel,
-        material: Material,
-        scene: Scene,
-    ): FixedLengthArray<SphericalHeightFieldChunk, 4> {
+    private subdivide(): void {
         const childIndices: Array<ChunkIndices> = [];
         for (let dy = 0; dy < 2; dy++) {
             for (let dx = 0; dx < 2; dx++) {
                 childIndices.push({
-                    x: indices.x * 2 + dx,
-                    y: indices.y * 2 + dy,
-                    lod: indices.lod + 1,
+                    x: this.indices.x * 2 + dx,
+                    y: this.indices.y * 2 + dy,
+                    lod: this.indices.lod + 1,
                 });
             }
         }
 
         const children = childIndices.map(
             (childIndex) =>
-                new SphericalHeightFieldChunk(childIndex, direction, radius, parent, terrainModel, material, scene),
+                new SphericalHeightFieldChunk(
+                    childIndex,
+                    this.faceIndex,
+                    this.sphereRadius,
+                    this.parent,
+                    this.terrainModel,
+                    this.material,
+                    this.scene,
+                ),
         );
 
         if (
@@ -192,7 +253,7 @@ export class SphericalHeightFieldChunk implements Transformable {
             throw new Error("Failed to create all children for SphericalHeightFieldChunk.");
         }
 
-        return [children[0], children[1], children[2], children[3]];
+        this.children = [children[0], children[1], children[2], children[3]];
     }
 
     private updateLoadingState(chunkForge: ChunkForge) {
@@ -202,7 +263,7 @@ export class SphericalHeightFieldChunk implements Transformable {
 
         const cachedVertexData = chunkForge.getOutput(this.id);
         if (cachedVertexData !== undefined) {
-            if (cachedVertexData.type === "chunkForgePendingOutput") {
+            if (cachedVertexData.status === "pending") {
                 return;
             }
 
@@ -217,42 +278,82 @@ export class SphericalHeightFieldChunk implements Transformable {
             this.id,
             this.positionOnCube,
             this.mesh.position,
-            this.direction,
+            this.faceIndex,
             this.sideLength,
             this.sphereRadius,
             this.terrainModel,
         );
     }
 
-    public update(cameraPosition: Vector3, material: Material, chunkForge: ChunkForge) {
-        this.updateLoadingState(chunkForge);
+    public updateSubdivision(camera: Camera) {
+        if (this.geometry === null) {
+            // do not merge children or subdivide self if chunk is not loaded
+            return;
+        }
 
-        const distanceSquared = Vector3.DistanceSquared(this.getTransform().getAbsolutePosition(), cameraPosition);
-        if (this.children === null && distanceSquared < (this.sideLength * 2) ** 2) {
-            this.children = SphericalHeightFieldChunk.Subdivide(
-                this.indices,
-                this.direction,
-                this.sphereRadius,
-                this.parent,
-                this.terrainModel,
-                material,
-                this.getTransform().getScene(),
-            );
-        } else if (
-            this.children !== null &&
-            distanceSquared >= (this.sideLength * 2.5) ** 2 &&
-            this.getLoadingState() === "completed"
-        ) {
+        const fovY =
+            camera.fovMode === Camera.FOVMODE_VERTICAL_FIXED
+                ? camera.fov
+                : (camera.fov * camera.viewport.height) / camera.viewport.width;
+        const viewportHeight = camera.viewport.height * camera.getEngine().getRenderHeight();
+        const projScale = viewportHeight / (2 * Math.tan(fovY * 0.5));
+
+        const planetInverseWorldMatrix = this.parent.getWorldMatrix().clone().invert();
+
+        const cameraPositionPlanetSpace = Vector3.TransformCoordinates(camera.globalPosition, planetInverseWorldMatrix);
+
+        const boundingSphereCenter = this.geometry.boundsPlanetSpace.center;
+
+        const boundingRadius = this.geometry.boundsPlanetSpace.radius;
+
+        const distance = Math.max(
+            1e-3,
+            cameraPositionPlanetSpace.subtract(boundingSphereCenter).length() - boundingRadius,
+        );
+
+        const geometricError = this.geometry.error;
+
+        const screenSpaceError = (geometricError * projScale) / distance;
+
+        // Hysteresis
+        const T_SPLIT = 16; // split when sse >= T_SPLIT px
+        const T_MERGE = 8; // merge when sse <= T_MERGE px
+
+        /*
+        const screenSpaceErrorMorphWindow = 8; // pixels
+        const morphFactor01 = clamp(
+            screenSpaceError - (T_SPLIT - screenSpaceErrorMorphWindow) / screenSpaceErrorMorphWindow,
+            0,
+            1,
+        );
+        */
+
+        const maxLod = Math.ceil(
+            Math.log2(
+                (2.0 * this.sphereRadius) /
+                    (Settings.MIN_DISTANCE_BETWEEN_VERTICES * (this.geometry.buffers.rowVertexCount - 1)),
+            ),
+        );
+
+        if (this.children === null && screenSpaceError >= T_SPLIT && this.indices.lod < maxLod) {
+            this.subdivide();
+        } else if (this.children !== null && screenSpaceError <= T_MERGE && this.getLoadingState() === "completed") {
             for (const child of this.children) {
                 child.dispose();
             }
             this.children = null;
         }
+    }
+
+    public update(camera: Camera, chunkForge: ChunkForge) {
+        this.updateLoadingState(chunkForge);
+
+        this.updateSubdivision(camera);
 
         if (this.children !== null) {
             let areAllChildrenLoaded = true;
             for (const child of this.children) {
-                child.update(cameraPosition, material, chunkForge);
+                child.update(camera, chunkForge);
                 if (child.getLoadingState() !== "completed") {
                     areAllChildrenLoaded = false;
                 }

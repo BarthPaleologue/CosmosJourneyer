@@ -22,6 +22,8 @@ import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { UniformBuffer } from "@babylonjs/core/Materials/uniformBuffer";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { ProceduralTerrainModel } from "@/backend/universe/orbitalObjects/terrainModel";
+
 import { type Direction } from "@/utils/direction";
 import { retry } from "@/utils/retry";
 
@@ -32,24 +34,39 @@ import heightMapComputeSource from "@shaders/compute/terrain/sphericalProcedural
 export class SphericalProceduralHeightFieldBuilder {
     private readonly computeShader: ComputeShader;
 
-    private readonly paramsBuffer: UniformBuffer;
+    private readonly chunkBuffer: UniformBuffer;
+
+    private readonly terrainModel: UniformBuffer;
 
     private static WORKGROUP_SIZE = [16, 16] as const;
 
     private constructor(computeShader: ComputeShader, engine: WebGPUEngine) {
         this.computeShader = computeShader;
 
-        this.paramsBuffer = new UniformBuffer(engine);
+        this.chunkBuffer = new UniformBuffer(engine);
 
-        this.paramsBuffer.addUniform("nbVerticesPerRow", 1);
-        this.paramsBuffer.addUniform("size", 1);
-        this.paramsBuffer.addUniform("direction", 1);
-        this.paramsBuffer.addUniform("chunk_position_on_cube", 3);
-        this.paramsBuffer.addUniform("sphere_radius", 1);
-        this.paramsBuffer.addUniform("chunk_position_on_sphere", 3);
-        this.paramsBuffer.update();
+        this.chunkBuffer.addUniform("row_vertex_count", 1);
+        this.chunkBuffer.addUniform("size", 1);
+        this.chunkBuffer.addUniform("face_index", 1);
+        this.chunkBuffer.addUniform("position_on_cube", 3);
+        this.chunkBuffer.addUniform("up_direction", 3);
+        this.chunkBuffer.update();
 
-        this.computeShader.setUniformBuffer("params", this.paramsBuffer);
+        this.computeShader.setUniformBuffer("chunk", this.chunkBuffer);
+
+        this.terrainModel = new UniformBuffer(engine);
+        this.terrainModel.addUniform("seed", 1);
+        this.terrainModel.addUniform("radius", 1);
+        this.terrainModel.addUniform("continental_crust_elevation", 1);
+        this.terrainModel.addUniform("continental_crust_fraction", 1);
+        this.terrainModel.addUniform("mountain_elevation", 1);
+        this.terrainModel.addUniform("mountain_terrace_elevation", 1);
+        this.terrainModel.addUniform("mountain_erosion", 1);
+        this.terrainModel.addUniform("craters_octave_count", 1);
+        this.terrainModel.addUniform("craters_sparsity", 1);
+        this.terrainModel.update();
+
+        this.computeShader.setUniformBuffer("terrain_model", this.terrainModel);
     }
 
     static async New(engine: WebGPUEngine): Promise<SphericalProceduralHeightFieldBuilder> {
@@ -60,7 +77,8 @@ export class SphericalProceduralHeightFieldBuilder {
             {
                 bindingsMapping: {
                     positions: { group: 0, binding: 0 },
-                    params: { group: 0, binding: 1 },
+                    chunk: { group: 0, binding: 1 },
+                    terrain_model: { group: 0, binding: 2 },
                 },
             },
         );
@@ -74,18 +92,29 @@ export class SphericalProceduralHeightFieldBuilder {
         chunkPositionOnCube: Vector3,
         chunkPositionOnSphere: Vector3,
         nbVerticesPerRow: number,
-        direction: Direction,
+        faceIndex: Direction,
         sphereRadius: number,
         size: number,
+        terrainModel: ProceduralTerrainModel,
         engine: WebGPUEngine,
     ): StorageBuffer {
-        this.paramsBuffer.updateUInt("nbVerticesPerRow", nbVerticesPerRow);
-        this.paramsBuffer.updateVector3("chunk_position_on_cube", chunkPositionOnCube);
-        this.paramsBuffer.updateVector3("chunk_position_on_sphere", chunkPositionOnSphere);
-        this.paramsBuffer.updateFloat("sphere_radius", sphereRadius);
-        this.paramsBuffer.updateUInt("direction", direction);
-        this.paramsBuffer.updateFloat("size", size);
-        this.paramsBuffer.update();
+        this.chunkBuffer.updateUInt("row_vertex_count", nbVerticesPerRow);
+        this.chunkBuffer.updateVector3("position_on_cube", chunkPositionOnCube);
+        this.chunkBuffer.updateVector3("up_direction", chunkPositionOnSphere.normalizeToNew());
+        this.chunkBuffer.updateUInt("face_index", faceIndex);
+        this.chunkBuffer.updateFloat("size", size);
+        this.chunkBuffer.update();
+
+        this.terrainModel.updateFloat("seed", terrainModel.seed);
+        this.terrainModel.updateFloat("radius", sphereRadius);
+        this.terrainModel.updateFloat("continental_crust_elevation", terrainModel.continentalCrust.elevation);
+        this.terrainModel.updateFloat("continental_crust_fraction", terrainModel.continentalCrust.fraction);
+        this.terrainModel.updateFloat("mountain_elevation", terrainModel.mountain.elevation);
+        this.terrainModel.updateFloat("mountain_terrace_elevation", terrainModel.mountain.terraceElevation);
+        this.terrainModel.updateFloat("mountain_erosion", terrainModel.mountain.erosion);
+        this.terrainModel.updateUInt("craters_octave_count", terrainModel.craters.octaveCount);
+        this.terrainModel.updateFloat("craters_sparsity", terrainModel.craters.sparsity); // Default value, can be adjusted later
+        this.terrainModel.update();
 
         const positionsBuffer = new StorageBuffer(
             engine,
