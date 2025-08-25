@@ -25,13 +25,15 @@ import {
     Scene,
     ShaderMaterial,
     Vector3,
-    type AbstractEngine,
+    type RawTexture3D,
+    type WebGPUEngine,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Slider, StackPanel } from "@babylonjs/gui";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
 import { createStorageTexture3D } from "@/utils/texture";
+import { Voronoi3dTextureGenerator } from "@/utils/textures/voronoi3d";
 
 const createSlider = (
     name: string,
@@ -50,8 +52,8 @@ const createSlider = (
     parent.addControl(slider);
 };
 
-export function createTexture3dPlayground(
-    engine: AbstractEngine,
+export async function createTexture3dPlayground(
+    engine: WebGPUEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
@@ -101,18 +103,34 @@ export function createTexture3dPlayground(
 
     advancedTexture.addControl(panelParent);
 
-    const data = new Float32Array(128 * 128 * 128 * 4);
-    for (let i = 0; i < data.length; i++) {
-        data[i] = Math.random();
-    }
+    const urlParams = new URLSearchParams(window.location.search);
 
-    const texture = createStorageTexture3D(
-        "testTexture",
-        { width: 16, height: 16, depth: 16 },
-        Constants.TEXTUREFORMAT_RGBA,
-        scene,
-        { data },
-    );
+    let texture: RawTexture3D;
+    if (urlParams.get("texture") === "voronoi") {
+        texture = createStorageTexture3D(
+            "voronoiTexture",
+            { width: 128, height: 128, depth: 128 },
+            Constants.TEXTUREFORMAT_RGBA,
+            scene,
+            { type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
+        );
+
+        const voronoi3dTextureGenerator = await Voronoi3dTextureGenerator.New(engine);
+        voronoi3dTextureGenerator.dispatch(texture);
+    } else {
+        const data = new Float32Array(128 * 128 * 128 * 4);
+        for (let i = 0; i < data.length; i++) {
+            data[i] = Math.random();
+        }
+
+        texture = createStorageTexture3D(
+            "testTexture",
+            { width: 16, height: 16, depth: 16 },
+            Constants.TEXTUREFORMAT_RGBA,
+            scene,
+            { data, type: Constants.TEXTURETYPE_FLOAT },
+        );
+    }
 
     Effect.ShadersStore["customVertexShader"] = `
         precision highp float;
@@ -184,5 +202,5 @@ export function createTexture3dPlayground(
         panel,
     );
 
-    return Promise.resolve(scene);
+    return scene;
 }

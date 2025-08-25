@@ -175,8 +175,8 @@ export function createStorageTexture3D(
     },
     textureFormat: number,
     scene: Scene,
-    options?: Partial<{ data: ArrayBufferView; samplingMode: number }>,
-): Texture {
+    options?: Partial<{ data: ArrayBufferView; samplingMode: number; type: number }>,
+): RawTexture3D {
     const texture = new RawTexture3D(
         options?.data ?? null,
         dimensions.width,
@@ -187,7 +187,7 @@ export function createStorageTexture3D(
         false,
         false,
         options?.samplingMode ?? Constants.TEXTURE_NEAREST_SAMPLINGMODE,
-        Constants.TEXTURETYPE_FLOAT,
+        options?.type ?? Constants.TEXTURETYPE_FLOAT,
         Constants.TEXTURE_CREATIONFLAG_STORAGE,
     );
     texture.name = name;
