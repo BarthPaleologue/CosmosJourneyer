@@ -56,6 +56,7 @@ import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createTerrainScene } from "./terrain";
 import { createTexture3dPlayground } from "./texture3d";
 import { createTutorialScene } from "./tutorial";
+import { createVolumetricCloudsPlayground } from "./volumetricClouds";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
 
@@ -102,6 +103,7 @@ export class PlaygroundRegistry {
         ["moon", createMoonScene],
         ["mercury", createMercuryScene],
         ["texture3d", createTexture3dPlayground],
+        ["volumetricClouds", createVolumetricCloudsPlayground],
     ]);
 
     register(
