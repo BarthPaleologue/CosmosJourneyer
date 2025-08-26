@@ -41,6 +41,21 @@ uniform int   steps;
 uniform vec3 boxMin;
 uniform vec3 boxMax;
 
+uniform float uShapeFreqMul;
+uniform float uErosionFreqMul;
+uniform float uErosionStrength;
+uniform float uWarpFreqMul;
+uniform float uWarpAmp;
+uniform float uCoverageFreqMul;
+uniform float uCoverageLo;
+uniform float uCoverageHi;
+uniform float uBaseSoftness;
+uniform float uTopSoftness;
+uniform float uAnvilStart;
+uniform float uAnvilSharpness;
+uniform float uAnvilSpread;
+uniform float uFlattenTop;
+
 // --- helpers ---
 vec3 getWorldRay(vec2 uv){
   vec2 ndc = uv * 2.0 - 1.0;
@@ -77,15 +92,42 @@ float heightProfile(float y) {
 }
 
 float densityAt(vec3 p){
-  float n = 1.0 - texture(uVoronoi, p * noiseScale + vec3(0.0, time*0.02, 0.0)).r;
-  float d = smoothstep(0.5, 0.8, n);
+  // Height in [0,1] inside the layer
+  float h = clamp((p.y - cloudBaseY) / max(1e-3, cloudTopY - cloudBaseY), 0.0, 1.0);
 
-  // low-frequency coverage (projected), controls where clouds exist
-  float covFreq = noiseScale * 0.12; // very low frequency
-  float c = 1.0 - texture(uVoronoi, vec3(p.x, 0.0, p.z) * covFreq + vec3(time*0.005)).r;
-  float coverage = smoothstep(0.6, 0.7, c);
+  // ----- Anvil shaping (wind shear + vertical flatten near top) -----
+  // push samples downwind near the top; keep your own sunDir for now, or set a custom shearDir uniform if you prefer
+  vec3 shearDir = normalize(vec3(sunDir.x, 0.0, sunDir.z)); // horizontal component only
+  float anvilT = pow(remap01(h, uAnvilStart, 1.0), uAnvilSharpness); // starts near top
+  p += shearDir * (uAnvilSpread * anvilT);                            // horizontal spread
+  // flatten vertical frequency at the top so tops look “anvily”
+  float yFreq = mix(1.0, uFlattenTop, anvilT);
+  vec3 shapeScaleVec   = vec3(noiseScale) * vec3(1.0, yFreq, 1.0);    // reduce Y freq near top
 
-  return coverage * d * heightProfile(p.y);
+  // ----- Domain warp to kill the Voronoi cell look -----
+  vec3 pw = p + warp3(p, noiseScale * uWarpFreqMul, uWarpAmp * (0.3 + 0.7*h)); // more warp higher up
+
+  // ----- Base shape (smooth) -----
+  // Use a smoothed / “billowized” version of your volume at low freq (acts like a Perlin-ish base)
+  float s0 = texture(uVoronoi, pw * shapeScaleVec * uShapeFreqMul + vec3(0.0, time*0.02, 0.0)).r;
+  // remap & soften: invert + billow = fewer hard ridges
+  float shape = 1.0 - abs(2.0*s0 - 1.0);                // billow
+  shape = smoothstep(0.35, 0.75, shape);                // threshold to blobby cloud masses
+
+  // ----- Erosion/detail (Worley at higher freq) -----
+  float e0 = texture(uVoronoi, pw * (noiseScale * uErosionFreqMul) + vec3(7.1, time*0.03, 3.3)).r;
+  float erosion = smoothstep(0.2, 0.8, e0);
+  // subtract “pockets” from the base shape (classic Perlin-Worley look)
+  float shaped = clamp(shape - (1.0 - erosion) * uErosionStrength, 0.0, 1.0);
+
+  // ----- Coverage (projected) -----
+  float c = 1.0 - texture(uVoronoi, vec3(p.x, 0.0, p.z) * (noiseScale * uCoverageFreqMul) + vec3(time*0.005)).r;
+  float coverage = smoothstep(uCoverageLo, uCoverageHi, c);
+
+  // ----- Height profile (base rise + soft top) -----
+  float profile = smoothstep(0.0, uBaseSoftness, h) * (1.0 - smoothstep(1.0 - uTopSoftness, 1.0, h));
+
+  return coverage * shaped * profile;
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
