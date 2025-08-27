@@ -63,16 +63,17 @@ export async function createVolumetricCloudsPlayground(
     voronoiTextureGenerator.dispatch(voronoiTexture);
 
     const dimensions = {
-        width: 500,
-        height: 500,
-        depth: 500,
+        width: 1,
+        height: 1,
+        depth: 1,
     };
 
     const cube = MeshBuilder.CreateBox("cube", dimensions, scene);
     cube.visibility = 0.01;
     cube.showBoundingBox = true;
 
-    const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 1000, Vector3.Zero(), scene);
+    const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 4, Vector3.Zero(), scene);
+    camera.wheelPrecision *= 100;
     camera.attachControl();
 
     const depthRenderer = scene.enableDepthRenderer(camera, true, true);
@@ -119,10 +120,10 @@ export async function createVolumetricCloudsPlayground(
         true,
     );
 
-    const lightDir = new Vector3(0.35, 0.7, 0.2).normalize();
+    const lightDir = new Vector3(0.35, 0.2, 0.2).normalize();
 
-    const sunDisk = MeshBuilder.CreateSphere("sunDisk", { diameter: 100 }, scene);
-    sunDisk.position = lightDir.scale(400);
+    const sunDisk = MeshBuilder.CreateSphere("sunDisk", { diameter: 0.5 }, scene);
+    sunDisk.position = lightDir.scale(5);
     const diskMaterial = new StandardMaterial("sunDiskMaterial", scene);
     diskMaterial.emissiveColor = new Color3(1, 1, 0.8);
     sunDisk.material = diskMaterial;
@@ -134,11 +135,11 @@ export async function createVolumetricCloudsPlayground(
         effect.setFloat("cloudBaseY", -70.0);
         effect.setFloat("cloudTopY", 70.0);
         effect.setFloat("density", 1.6);
-        effect.setFloat("noiseScale", 0.01);
+        effect.setFloat("noiseScale", 0.5);
         effect.setInt("steps", 64);
 
         effect.setVector3("cameraPos", camera.globalPosition);
-        effect.setVector3("sunDir", new Vector3(0.35, 0.7, 0.2).normalize());
+        effect.setVector3("sunDir", lightDir.negate());
 
         const invProj = Matrix.Invert(camera.getProjectionMatrix());
         const invView = Matrix.Invert(camera.getViewMatrix());

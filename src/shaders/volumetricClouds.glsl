@@ -67,14 +67,6 @@ vec3 getWorldRay(vec2 uv){
   return normalize(dirW);
 }
 
-float remap01(float x, float lo, float hi) { return clamp((x - lo) / max(1e-6, hi - lo), 0.0, 1.0); }
-
-// cheap 3D domain warp from the same volume (uses rgb as a pseudo vector)
-vec3 warp3(vec3 p, float freq, float amp){
-  vec3 w = texture(uVoronoi, p * freq + vec3(0.0, time*0.01, 1.7)).xyz; // 0..1
-  return (w * 2.0 - 1.0) * amp; // -amp..amp (world units)
-}
-
 float hgPhase(float c, float g){
   float gg = g*g;
   return (1.0 - gg) / (4.0*3.14159265 * pow(1.0 + gg - 2.0*g*c, 1.5));
@@ -87,14 +79,9 @@ float dualPhase(float c){
 }
 
 float densityAt(vec3 p){
-
-  // ----- Base shape (smooth) -----
-  // Use a smoothed / “billowized” version of your volume at low freq (acts like a Perlin-ish base)
-  float shape = 1.0 - texture(uVoronoi, p * noiseScale * uShapeFreqMul + vec3(0.0, time*0.02, 0.0)).r;
-  
-  shape = smoothstep(0.6, 0.75, shape);                // threshold to blobby cloud masses
-
-  return shape;
+  float shape = 1.0 - texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).r;
+  shape = smoothstep(0.7, 0.8, shape);
+  return shape * 5.0;
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
@@ -113,7 +100,7 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
 
 #include "./utils/remap.glsl";
 
-float rand(vec2 co){
+float rand(vec2 co) {
   return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
 }
 
@@ -138,21 +125,48 @@ void main(){
 
   float distanceThroughMedium = t1 - t0;
 
-  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1);
+  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1) * 0.0;
   vec3 samplePoint = ro + rd * (t0 + jitter);
 
   int viewRayStepCount = 64;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
   float transmittance = 1.0;
+  vec3 scatteredLight = vec3(0.0);
+  
   for (int i = 0; i < viewRayStepCount; i++) {
-    float t = t0 + float(i) * viewRayStepSize;
-    vec3 p = ro + rd * t;
+    float density = densityAt(samplePoint);
 
-    float density = 0.005 * densityAt(p);
-    transmittance *= (1.0 - density * viewRayStepSize);
+    if(density < 0.001) {
+      samplePoint += rd * viewRayStepSize;
+      continue;
+    }
+
+    // Light ray marching
+    int lightStepCount = 16;
+    float lightStepSize = 50.0; // distance to march toward light
+    vec3 lightSamplePoint = samplePoint;
+    float lightTransmittance = 1.0;
+    
+    for (int j = 0; j < lightStepCount; j++) {
+      lightSamplePoint += sunDir * lightStepSize;
+      float lightDensity = densityAt(lightSamplePoint);
+      lightTransmittance *= exp(-lightDensity * lightStepSize);
+    }
+    
+    // Phase function for scattering
+    float cosTheta = dot(rd, sunDir);
+    float phase = dualPhase(cosTheta);
+    
+    // Accumulate scattered light
+    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * density;
+    scatteredLight += lightContribution * transmittance * viewRayStepSize;
+    
+    
+    transmittance *= exp(-density * viewRayStepSize);
+    samplePoint += rd * viewRayStepSize;
   }
 
-  vec3 cloudColor = vec3(1.0);
+  vec3 cloudColor = scatteredLight + vec3(0.1, 0.2, 0.4) * 0.1; // ambient + scattered light
 
   float cloudOpacity = 1.0 - transmittance;
 
