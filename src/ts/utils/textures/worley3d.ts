@@ -23,16 +23,16 @@ import { Settings } from "@/settings";
 
 import { retry } from "../retry";
 
-import shaderCode from "@shaders/compute/textures/voronoi3d.wgsl";
+import shaderCode from "@shaders/compute/textures/worley3d.wgsl";
 
-export class Voronoi3dTextureGenerator {
+export class Worley3dTextureGenerator {
     private readonly computeShader: ComputeShader;
 
     private static readonly WORKGROUP_SIZE = [4, 4, 4] as const;
 
     static async New(engine: WebGPUEngine) {
         const computeShader = new ComputeShader(
-            "Voronoi3dTextureGenerator",
+            "Worley3dTextureGenerator",
             engine,
             { computeSource: shaderCode },
             {
@@ -44,7 +44,7 @@ export class Voronoi3dTextureGenerator {
 
         await retry(() => computeShader.isReady(), Settings.COMPUTE_SHADER_READY_MAX_RETRY, 10);
 
-        return new Voronoi3dTextureGenerator(computeShader);
+        return new Worley3dTextureGenerator(computeShader);
     }
 
     constructor(computeShader: ComputeShader) {
@@ -55,9 +55,9 @@ export class Voronoi3dTextureGenerator {
         this.computeShader.setStorageTexture("output_texture", storageTexture);
 
         this.computeShader.dispatch(
-            storageTexture.width / Voronoi3dTextureGenerator.WORKGROUP_SIZE[0],
-            storageTexture.height / Voronoi3dTextureGenerator.WORKGROUP_SIZE[1],
-            storageTexture.depth / Voronoi3dTextureGenerator.WORKGROUP_SIZE[2],
+            storageTexture.width / Worley3dTextureGenerator.WORKGROUP_SIZE[0],
+            storageTexture.height / Worley3dTextureGenerator.WORKGROUP_SIZE[1],
+            storageTexture.depth / Worley3dTextureGenerator.WORKGROUP_SIZE[2],
         );
     }
 }

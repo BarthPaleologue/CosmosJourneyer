@@ -33,7 +33,7 @@ import { AdvancedDynamicTexture, Slider, StackPanel } from "@babylonjs/gui";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
 import { createStorageTexture3D } from "@/utils/texture";
-import { Voronoi3dTextureGenerator } from "@/utils/textures/voronoi3d";
+import { Worley3dTextureGenerator } from "@/utils/textures/worley3d";
 
 const createSlider = (
     name: string,
@@ -115,7 +115,7 @@ export async function createTexture3dPlayground(
             { type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
         );
 
-        const voronoi3dTextureGenerator = await Voronoi3dTextureGenerator.New(engine);
+        const voronoi3dTextureGenerator = await Worley3dTextureGenerator.New(engine);
         voronoi3dTextureGenerator.dispatch(texture);
     } else {
         const data = new Float32Array(128 * 128 * 128 * 4);

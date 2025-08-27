@@ -32,7 +32,7 @@ import {
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
 import { createStorageTexture3D } from "@/utils/texture";
-import { Voronoi3dTextureGenerator } from "@/utils/textures/voronoi3d";
+import { Worley3dTextureGenerator } from "@/utils/textures/worley3d";
 
 import shaderCode from "@shaders/volumetricClouds.glsl";
 
@@ -44,7 +44,7 @@ export async function createVolumetricCloudsPlayground(
     const scene = new Scene(engine);
     scene.defaultCursor = "default";
 
-    const voronoiTextureGenerator = await Voronoi3dTextureGenerator.New(engine);
+    const voronoiTextureGenerator = await Worley3dTextureGenerator.New(engine);
 
     const voronoiTexture = createStorageTexture3D(
         "VoronoiTexture",
