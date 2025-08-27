@@ -62,12 +62,13 @@ export async function createVolumetricCloudsPlayground(
 
     const dimensions = {
         width: 500,
-        height: 200,
+        height: 500,
         depth: 500,
     };
 
     const cube = MeshBuilder.CreateBox("cube", dimensions, scene);
-    cube.visibility = 0.1;
+    cube.visibility = 0.01;
+    cube.showBoundingBox = true;
 
     const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 1000, Vector3.Zero(), scene);
     camera.attachControl();
