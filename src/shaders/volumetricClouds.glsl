@@ -86,11 +86,6 @@ float dualPhase(float c){
   return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
 }
 
-float heightProfile(float y) {
-  float h = clamp((y - cloudBaseY) / max(1e-3, cloudTopY - cloudBaseY), 0.0, 1.0);
-  return smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.92, 1.0, h));
-}
-
 float densityAt(vec3 p){
   // Height in [0,1] inside the layer
   float h = clamp((p.y - cloudBaseY) / max(1e-3, cloudTopY - cloudBaseY), 0.0, 1.0);
@@ -142,12 +137,14 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
+#include "./utils/worldFromUV.glsl";
+
 void main(){
-  vec4 sceneCol = texture2D(textureSampler, vUV);
-  float z = texture2D(depthSampler, vUV).r;
+  vec4 screenColor = texture2D(textureSampler, vUV);
+  float depth = texture2D(depthSampler, vUV).r;
 
   // Only draw where the scene left "sky"
-  if (z > 0.9995) { gl_FragColor = sceneCol; return; }
+  if (depth > 0.9995) { gl_FragColor = screenColor; return; }
 
   vec3 ro = cameraPos;
   vec3 rd = getWorldRay(vUV);
@@ -155,25 +152,22 @@ void main(){
   // ▶ Clip the march to the box
   float t0, t1;
   if (!intersectAABB(ro, rd, boxMin, boxMax, t0, t1)) {
-    gl_FragColor = sceneCol;
+    gl_FragColor = screenColor;
     return;
   }
 
-  if (t1 <= t0) { gl_FragColor = sceneCol; return; } 
+  if (t1 <= t0) { gl_FragColor = screenColor; return; } 
 
   // March only inside [t0, t1]
   const int MAX_STEPS = 96;
-  float g = 0.8;
   float stepLen = (t1 - t0) / float(steps);
   
-    float rnd = fract(sin(dot(vUV, vec2(12.9898,78.233))) * 43758.5453);
-    vec3  p = ro + rd * (t0 + (rnd + 0.5) * stepLen);
+  float rnd = fract(sin(dot(vUV, vec2(12.9898,78.233))) * 43758.5453);
+  vec3  p = ro + rd * (t0 + (rnd + 0.5) * stepLen);
 
-    const int   LIGHT_STEPS = 8;
-float lightLength = 0.6 * (cloudTopY - cloudBaseY); // ~60% of layer thickness
-float lStep       = lightLength / float(LIGHT_STEPS);
-
-const float LIGHT_STEP_SCALE = 2.0; // 2x view step is a good start
+  const int   LIGHT_STEPS = 8;
+  float lightLength = 0.6 * (cloudTopY - cloudBaseY); // ~60% of layer thickness
+  float lStep       = lightLength / float(LIGHT_STEPS);
 
   float T = 1.0;
   vec3  accum = vec3(0.0);
@@ -188,25 +182,24 @@ const float LIGHT_STEP_SCALE = 2.0; // 2x view step is a good start
     vec3  L  = normalize(sunDir);
     vec3  q  = p;
 
-// short light march toward the sun
-for (int j = 0; j < LIGHT_STEPS; ++j) {
-  // optional: avoid over-darkening once we exit the slab
-  if (q.y < cloudBaseY || q.y > cloudTopY) break;
+    // short light march toward the sun
+    for (int j = 0; j < LIGHT_STEPS; ++j) { 
+      // optional: avoid over-darkening once we exit the slab
+      if (q.y < cloudBaseY || q.y > cloudTopY) break;
 
-  float lrho = densityAt(q);
-  float lsigma_t = lrho * density;
-  Lt *= exp(-lsigma_t * lStep);
-  if (Lt < 0.01) break;
-  q += L * lStep;
-}
+      float lrho = densityAt(q);
+      float lsigma_t = lrho * density;
+      Lt *= exp(-lsigma_t * lStep);
+      if (Lt < 0.01) break;
+      q += L * lStep;
+    }
 
-// phase (incoming is -L, outgoing is rd)
-float phase = dualPhase(dot(rd, -L));
+    // phase (incoming is -L, outgoing is rd)
+    float phase = dualPhase(dot(rd, -L));
 
-// multi-scatter floor (prevents pitch black)
-Lt = max(Lt, 0.2);                // 0.15–0.3 is a good range
-float powder = 1.0 - exp(-sigma_t * 1.5);
-vec3  S = vec3(1.0) * rho * phase * powder * Lt;
+
+    float powder = 1.0 - exp(-sigma_t * 1.5);
+    vec3  S = vec3(1.0) * rho * phase * powder * Lt;
 
     accum += T * S * stepLen;
     T *= exp(-sigma_t * stepLen);
@@ -217,7 +210,7 @@ vec3  S = vec3(1.0) * rho * phase * powder * Lt;
 
   vec3 cloudRGB = accum;
   float alpha = 1.0 - T;
-  vec3 outRGB = mix(sceneCol.rgb, cloudRGB, alpha);
+  vec3 outRGB = mix(screenColor.rgb, cloudRGB, alpha);
 
   gl_FragColor = vec4(outRGB, 1.0);
 }
