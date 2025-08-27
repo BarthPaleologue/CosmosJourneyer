@@ -17,6 +17,7 @@
 
 import {
     ArcRotateCamera,
+    Color3,
     Color4,
     Constants,
     Effect,
@@ -24,6 +25,7 @@ import {
     MeshBuilder,
     PostProcess,
     Scene,
+    StandardMaterial,
     Texture,
     Vector3,
     type WebGPUEngine,
@@ -116,6 +118,14 @@ export async function createVolumetricCloudsPlayground(
         engine,
         true,
     );
+
+    const lightDir = new Vector3(0.35, 0.7, 0.2).normalize();
+
+    const sunDisk = MeshBuilder.CreateSphere("sunDisk", { diameter: 100 }, scene);
+    sunDisk.position = lightDir.scale(400);
+    const diskMaterial = new StandardMaterial("sunDiskMaterial", scene);
+    diskMaterial.emissiveColor = new Color3(1, 1, 0.8);
+    sunDisk.material = diskMaterial;
 
     pp.onApply = (effect) => {
         const t = performance.now() * 0.001;

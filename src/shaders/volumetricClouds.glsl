@@ -111,6 +111,12 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
 
 #include "./utils/worldFromUV.glsl";
 
+#include "./utils/remap.glsl";
+
+float rand(vec2 co){
+  return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main(){
   vec4 screenColor = texture2D(textureSampler, vUV);
   float depth = texture2D(depthSampler, vUV).r;
@@ -130,6 +136,25 @@ void main(){
 
   if (t1 <= t0) { gl_FragColor = screenColor; return; } 
 
-  float opacity = 1.0 - exp(-0.001*(t1 - t0));
-  gl_FragColor = vec4(mix(screenColor.rgb, vec3(1.0, 1.0, 1.0), opacity), 1.0);
+  float distanceThroughMedium = t1 - t0;
+
+  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1);
+  vec3 samplePoint = ro + rd * (t0 + jitter);
+
+  int viewRayStepCount = 64;
+  float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
+  float transmittance = 1.0;
+  for (int i = 0; i < viewRayStepCount; i++) {
+    float t = t0 + float(i) * viewRayStepSize;
+    vec3 p = ro + rd * t;
+
+    float density = 0.005 * densityAt(p);
+    transmittance *= (1.0 - density * viewRayStepSize);
+  }
+
+  vec3 cloudColor = vec3(1.0);
+
+  float cloudOpacity = 1.0 - transmittance;
+
+  gl_FragColor = vec4(mix(screenColor.rgb, cloudColor, cloudOpacity), 1.0);
 }
