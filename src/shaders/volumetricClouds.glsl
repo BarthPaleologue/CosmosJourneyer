@@ -125,11 +125,12 @@ void main(){
 
   float distanceThroughMedium = t1 - t0;
 
-  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1) * 0.2;
-  vec3 samplePoint = ro + rd * (t0 + jitter);
-
   int viewRayStepCount = 64;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
+
+  float jitter = rand(vUV) * viewRayStepSize;              // [0, stepSize)
+  vec3 samplePoint = ro + rd * (t0 + jitter);
+
   float transmittance = 1.0;
   vec3 scatteredLight = vec3(0.0);
 
@@ -139,7 +140,7 @@ void main(){
     float density = densityAt(samplePoint);
 
     float sigma_t = absorption * density;
-    float albedo = 0.9;
+    float albedo = 0.99;
     float sigma_s = sigma_t * albedo;
 
     if(density < 0.001) {
@@ -167,11 +168,12 @@ void main(){
     }
     
     // Phase function for scattering
-    float cosTheta = dot(-rd, sunDir);
-    float phase = dualPhase(cosTheta);
+    float cosTheta = dot(rd, sunDir);
+    float phase = 1.0; //dualPhase(cosTheta);
     
     // Accumulate scattered light
     vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * sigma_s;
+    scatteredLight += lightContribution * transmittance * viewRayStepSize;
 
     float powderK = 2.0;                                      // tweak 1–4
     float powder = 1.0 - pow(lightTransmittance, powderK);    // ≈ (1 - T^k)
@@ -180,6 +182,8 @@ void main(){
     
     transmittance *= exp(-sigma_t * viewRayStepSize);
     samplePoint += rd * viewRayStepSize;
+
+    if (transmittance < 1e-3) break;
   }
 
   vec3 outRgb = screenColor.rgb * transmittance + scatteredLight;

@@ -139,7 +139,7 @@ export async function createVolumetricCloudsPlayground(
         effect.setInt("steps", 64);
 
         effect.setVector3("cameraPos", camera.globalPosition);
-        effect.setVector3("sunDir", lightDir.negate());
+        effect.setVector3("sunDir", lightDir);
 
         const invProj = Matrix.Invert(camera.getProjectionMatrix());
         const invView = Matrix.Invert(camera.getViewMatrix());
