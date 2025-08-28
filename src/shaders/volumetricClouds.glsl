@@ -69,12 +69,12 @@ vec3 getWorldRay(vec2 uv){
 
 float hgPhase(float c, float g){
   float gg = g*g;
-  return (1.0 - gg) / (4.0*3.14159265 * pow(1.0 + gg - 2.0*g*c, 1.5));
+  return (1.0 - gg) / (pow(1.0 + gg - 2.0*g*c, 1.5));
 }
 float dualPhase(float c){
-  const float wF = 0.85;  // forward weight
-  const float gF = 0.85;  // forward anisotropy
-  const float gB = -0.2;  // mild backscatter
+  const float wF = 0.7;   // was 0.85
+const float gF = 0.75;  // was 0.85
+const float gB = -0.35; // was -0.2
   return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
 }
 
@@ -134,7 +134,7 @@ void main(){
   float transmittance = 1.0;
   vec3 scatteredLight = vec3(0.0);
 
-  float absorption = 3.0;
+  float absorption = 30.0;
   
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
@@ -169,15 +169,16 @@ void main(){
     
     // Phase function for scattering
     float cosTheta = dot(rd, sunDir);
-    float phase = 1.0; //dualPhase(cosTheta);
+    float phase = dualPhase(cosTheta);
     
     // Accumulate scattered light
     vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * sigma_s;
     scatteredLight += lightContribution * transmittance * viewRayStepSize;
 
-    float powderK = 2.0;                                      // tweak 1–4
-    float powder = 1.0 - pow(lightTransmittance, powderK);    // ≈ (1 - T^k)
-    vec3  Lpowder = lightContribution * powder * (sigma_s * 0.5);            // 0.5 = strength
+    // powder (multi-scatter-ish), *without* phase
+    float powderK = 2.0;
+    float powder  = 1.0 - pow(lightTransmittance, powderK);
+    vec3  Lpowder = vec3(1.0, 0.9, 0.8) * powder * (sigma_s * 0.5);
     scatteredLight += Lpowder * transmittance * viewRayStepSize;
     
     transmittance *= exp(-sigma_t * viewRayStepSize);
