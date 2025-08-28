@@ -73,15 +73,15 @@ float hgPhase(float c, float g){
 }
 float dualPhase(float c){
   const float wF = 0.85;  // forward weight
-  const float gF = 0.75;  // forward anisotropy
+  const float gF = 0.85;  // forward anisotropy
   const float gB = -0.2;  // mild backscatter
   return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
 }
 
 float densityAt(vec3 p){
   float shape = 1.0 - texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).r;
-  shape = smoothstep(0.7, 0.8, shape);
-  return shape * 5.0;
+  shape = smoothstep(0.5, 0.8, shape);
+  return shape;
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
@@ -125,16 +125,22 @@ void main(){
 
   float distanceThroughMedium = t1 - t0;
 
-  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1) * 0.0;
+  float jitter = remap(rand(vUV), 0.0, 1.0, -0.1, 0.1) * 0.2;
   vec3 samplePoint = ro + rd * (t0 + jitter);
 
   int viewRayStepCount = 64;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
   float transmittance = 1.0;
   vec3 scatteredLight = vec3(0.0);
+
+  float absorption = 3.0;
   
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
+
+    float sigma_t = absorption * density;
+    float albedo = 0.9;
+    float sigma_s = sigma_t * albedo;
 
     if(density < 0.001) {
       samplePoint += rd * viewRayStepSize;
@@ -143,32 +149,40 @@ void main(){
 
     // Light ray marching
     int lightStepCount = 16;
-    float lightStepSize = 50.0; // distance to march toward light
-    vec3 lightSamplePoint = samplePoint;
     float lightTransmittance = 1.0;
     
-    for (int j = 0; j < lightStepCount; j++) {
-      lightSamplePoint += sunDir * lightStepSize;
-      float lightDensity = densityAt(lightSamplePoint);
-      lightTransmittance *= exp(-lightDensity * lightStepSize);
+    float tL0, tL1;
+    if (intersectAABB(samplePoint, sunDir, boxMin, boxMax, tL0, tL1) && tL1 > 0.0) {
+      float lightStepSize = tL1 / float(lightStepCount);
+      vec3  lsp = samplePoint;
+      for (int j = 0; j < lightStepCount; ++j) {
+        lsp += sunDir * lightStepSize;
+        float ld = densityAt(lsp);
+        float lightSigma_t = absorption * ld;      // same scale as view σt
+        lightTransmittance *= exp(-lightSigma_t * lightStepSize);
+        if (lightTransmittance < 1e-3) break;
+      }
+    } else {
+      lightTransmittance = 1.0;
     }
     
     // Phase function for scattering
-    float cosTheta = dot(rd, sunDir);
+    float cosTheta = dot(-rd, sunDir);
     float phase = dualPhase(cosTheta);
     
     // Accumulate scattered light
-    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * density;
-    scatteredLight += lightContribution * transmittance * viewRayStepSize;
+    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * sigma_s;
+
+    float powderK = 2.0;                                      // tweak 1–4
+    float powder = 1.0 - pow(lightTransmittance, powderK);    // ≈ (1 - T^k)
+    vec3  Lpowder = lightContribution * powder * (sigma_s * 0.5);            // 0.5 = strength
+    scatteredLight += Lpowder * transmittance * viewRayStepSize;
     
-    
-    transmittance *= exp(-density * viewRayStepSize);
+    transmittance *= exp(-sigma_t * viewRayStepSize);
     samplePoint += rd * viewRayStepSize;
   }
 
-  vec3 cloudColor = scatteredLight + vec3(0.1, 0.2, 0.4) * 0.1; // ambient + scattered light
+  vec3 outRgb = screenColor.rgb * transmittance + scatteredLight;
 
-  float cloudOpacity = 1.0 - transmittance;
-
-  gl_FragColor = vec4(mix(screenColor.rgb, cloudColor, cloudOpacity), 1.0);
+  gl_FragColor = vec4(outRgb, 1.0);
 }
