@@ -139,7 +139,7 @@ void main(){
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
 
-    float sigma_t = absorption * density;
+    float sigma_t = extinction * density;
     float albedo = 0.99;
     float sigma_s = sigma_t * albedo;
 
@@ -159,7 +159,7 @@ void main(){
       for (int j = 0; j < lightStepCount; ++j) {
         lsp += sunDir * lightStepSize;
         float ld = densityAt(lsp);
-        float lightSigma_t = absorption * ld;      // same scale as view σt
+        float lightSigma_t = extinction * ld;      // same scale as view σt
         lightTransmittance *= exp(-lightSigma_t * lightStepSize);
         if (lightTransmittance < 1e-3) break;
       }
