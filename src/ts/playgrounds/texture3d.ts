@@ -33,6 +33,7 @@ import { AdvancedDynamicTexture, Slider, StackPanel } from "@babylonjs/gui";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
 import { createStorageTexture3D } from "@/utils/texture";
+import { Perlin3dTextureGenerator } from "@/utils/textures/perlin3d";
 import { Worley3dTextureGenerator } from "@/utils/textures/worley3d";
 
 const createSlider = (
@@ -117,6 +118,17 @@ export async function createTexture3dPlayground(
 
         const voronoi3dTextureGenerator = await Worley3dTextureGenerator.New(engine);
         voronoi3dTextureGenerator.dispatch(texture);
+    } else if (urlParams.get("texture") === "perlin") {
+        texture = createStorageTexture3D(
+            "perlinTexture",
+            { width: 128, height: 128, depth: 128 },
+            Constants.TEXTUREFORMAT_RGBA,
+            scene,
+            { type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
+        );
+
+        const perlin3dTextureGenerator = await Perlin3dTextureGenerator.New(engine);
+        perlin3dTextureGenerator.dispatch(texture);
     } else {
         const data = new Float32Array(128 * 128 * 128 * 4);
         for (let i = 0; i < data.length; i++) {
