@@ -34,6 +34,7 @@ import {
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
 import { createStorageTexture3D } from "@/utils/texture";
+import { Perlin3dTextureGenerator } from "@/utils/textures/perlin3d";
 import { Worley3dTextureGenerator } from "@/utils/textures/worley3d";
 
 import shaderCode from "@shaders/volumetricClouds.glsl";
@@ -46,10 +47,10 @@ export async function createVolumetricCloudsPlayground(
     const scene = new Scene(engine);
     scene.defaultCursor = "default";
 
-    const voronoiTextureGenerator = await Worley3dTextureGenerator.New(engine);
+    const worleyTextureGenerator = await Worley3dTextureGenerator.New(engine);
 
-    const voronoiTexture = createStorageTexture3D(
-        "VoronoiTexture",
+    const worleyTexture = createStorageTexture3D(
+        "WorleyTexture",
         {
             width: 128,
             height: 128,
@@ -60,7 +61,23 @@ export async function createVolumetricCloudsPlayground(
         { samplingMode: Constants.TEXTURE_TRILINEAR_SAMPLINGMODE, type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
     );
 
-    voronoiTextureGenerator.dispatch(voronoiTexture);
+    worleyTextureGenerator.dispatch(worleyTexture);
+
+    const perlinTextureGenerator = await Perlin3dTextureGenerator.New(engine);
+
+    const perlinTexture = createStorageTexture3D(
+        "PerlinTexture",
+        {
+            width: 128,
+            height: 128,
+            depth: 128,
+        },
+        Constants.TEXTUREFORMAT_RGBA,
+        scene,
+        { samplingMode: Constants.TEXTURE_TRILINEAR_SAMPLINGMODE, type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
+    );
+
+    perlinTextureGenerator.dispatch(perlinTexture);
 
     const dimensions = {
         width: 1,
@@ -111,7 +128,7 @@ export async function createVolumetricCloudsPlayground(
             "uAnvilSpread",
             "uFlattenTop",
         ],
-        ["uVoronoi", "depthSampler"],
+        ["worley", "perlin", "depthSampler"],
         1.0,
         camera,
         Texture.BILINEAR_SAMPLINGMODE,
@@ -145,7 +162,8 @@ export async function createVolumetricCloudsPlayground(
         effect.setMatrix("invProjection", invProj);
         effect.setMatrix("invView", invView);
 
-        effect.setTexture("uVoronoi", voronoiTexture);
+        effect.setTexture("worley", worleyTexture);
+        effect.setTexture("perlin", perlinTexture);
         effect.setTexture("depthSampler", depthRenderer.getDepthMap());
 
         effect.setVector3("boxMin", new Vector3(-dimensions.width / 2, -dimensions.height / 2, -dimensions.depth / 2)); // ▶

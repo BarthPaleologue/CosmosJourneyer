@@ -24,7 +24,8 @@ varying vec2 vUV;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform highp sampler3D uVoronoi;
+uniform highp sampler3D worley;
+uniform highp sampler3D perlin;
 
 uniform mat4 invProjection;
 uniform mat4 invView;
@@ -56,6 +57,10 @@ uniform float uAnvilSharpness;
 uniform float uAnvilSpread;
 uniform float uFlattenTop;
 
+#include "./utils/worldFromUV.glsl";
+
+#include "./utils/remap.glsl";
+
 // --- helpers ---
 vec3 getWorldRay(vec2 uv){
   vec2 ndc = uv * 2.0 - 1.0;
@@ -78,15 +83,22 @@ const float gB = -0.35; // was -0.2
   return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
 }
 
+float saturate(float x){ return clamp(x, 0.0, 1.0); }
+float remap01(float x, float lo, float hi){ return saturate((x - lo) / max(1e-5, hi - lo)); }
+float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
+
+
 float densityAt(vec3 p){
-  vec3 worleySample = texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).rgb;
+  // Low-freq sampling for base shape
+  vec3 baseCoord = p * noiseScale + vec3(0.0, time*0.02, 0.0);
+  vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
+  vec3 pS = texture(perlin, baseCoord).rgb;     // Perlin (3 octaves packed in RGB)
 
-  float worleyValue = worleySample.x * 0.625 + worleySample.y * 0.25 + worleySample.z * 0.125;
+  float wLow = triMix(wS);                      // 0..1
+  float pLow = triMix(pS);                      // 0..1
+  float invW = 1.0 - wLow;
 
-
-  float shape = 1.0 - worleyValue;
-  shape = smoothstep(0.6, 0.8, shape);
-  return shape;
+  return smoothstep(0.3, 0.7, pLow * invW);
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
@@ -101,9 +113,6 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
-#include "./utils/worldFromUV.glsl";
-
-#include "./utils/remap.glsl";
 
 float rand(vec2 co) {
   return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
