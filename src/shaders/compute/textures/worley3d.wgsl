@@ -45,24 +45,14 @@ fn rng3(seed: vec3<u32>) -> vec3<f32> {
     return vec3<f32>(v) * k;
 }
 
-@compute @workgroup_size(4, 4, 4)
-fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
-    let dims = textureDimensions(output_texture);
-    if (any(global_invocation_id >= dims)) { 
-        return; 
-    }
-
-    // Derived grid info.
-    let cellSize = max(CELL_SIZE, 1u);
+// Computes 3D Worley noise (F1 distance) for a given position and grid parameters.
+// Returns the normalized distance to the nearest feature point.
+fn worley3d(position: vec3<f32>, cellSize: u32, jitter: f32, tileCells: vec3<i32>) -> f32 {
     let cellSize3 = vec3<u32>(cellSize);
-
-    // Number of cells along each axis (>=1). Seamless period == dims if dims % CELL_SIZE == 0.
-    let tileCellsU = max(dims / cellSize3, vec3<u32>(1u));
-    let tileCellsI = vec3<i32>(tileCellsU);
-
+    
     // Current cell (integer) and local position within the cell [0,1)^3.
-    let cell = vec3<i32>(global_invocation_id / cellSize3);
-    let p_local = fract(vec3<f32>(global_invocation_id) / vec3<f32>(cellSize3));
+    let cell = vec3<i32>(position / vec3<f32>(cellSize3));
+    let p_local = fract(position / vec3<f32>(cellSize3));
 
     var min_d2: f32 = 1e30;
 
@@ -75,17 +65,17 @@ fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
 
                 // Wrap only for hashing (so randomness repeats across texture bounds).
                 let wrap_cell_u = vec3<u32>(
-                    u32(positive_modulo(neighbor_cell.x, tileCellsI.x)),
-                    u32(positive_modulo(neighbor_cell.y, tileCellsI.y)),
-                    u32(positive_modulo(neighbor_cell.z, tileCellsI.z))
+                    u32(positive_modulo(neighbor_cell.x, tileCells.x)),
+                    u32(positive_modulo(neighbor_cell.y, tileCells.y)),
+                    u32(positive_modulo(neighbor_cell.z, tileCells.z))
                 );
 
                 // Feature point inside the neighbor cell in [0,1)^3 with optional jitter.
                 let r = rng3(wrap_cell_u);
-                // Pure Voronoi uses full-range [0,1) positions. JITTER < 1.0 pulls toward the cell center.
-                let feature_local = mix(vec3<f32>(0.5), r, JITTER);
+                // Pure Voronoi uses full-range [0,1) positions. jitter < 1.0 pulls toward the cell center.
+                let feature_local = mix(vec3<f32>(0.5), r, jitter);
 
-                // Relative vector from current voxel's local position to the feature (in cell units).
+                // Relative vector from current position's local position to the feature (in cell units).
                 let rel = vec3<f32>(offset) + feature_local - p_local;
 
                 let d2 = dot(rel, rel);
@@ -98,7 +88,25 @@ fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
 
     // Normalize by sqrt(3) (max possible nearest distance in unit cube neighborhood).
     let inv_sqrt3 = 0.5773502691896258; // 1/sqrt(3)
-    let f1 = clamp(sqrt(min_d2) * inv_sqrt3, 0.0, 1.0);
+    return clamp(sqrt(min_d2) * inv_sqrt3, 0.0, 1.0);
+}
+
+@compute @workgroup_size(4, 4, 4)
+fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
+    let dims = textureDimensions(output_texture);
+    if (any(global_invocation_id >= dims)) { 
+        return; 
+    }
+
+    // Derived grid info.
+    let cellSize = max(CELL_SIZE, 1u);
+
+    // Number of cells along each axis (>=1). Seamless period == dims if dims % CELL_SIZE == 0.
+    let tileCellsU = max(dims / vec3<u32>(cellSize), vec3<u32>(1u));
+    let tileCellsI = vec3<i32>(tileCellsU);
+
+    // Compute worley noise for the current position
+    let f1 = worley3d(vec3<f32>(global_invocation_id), cellSize, JITTER, tileCellsI);
 
     // Write grayscale Voronoi F1 distance.
     let c = vec4<f32>(f1, f1, f1, 1.0);
