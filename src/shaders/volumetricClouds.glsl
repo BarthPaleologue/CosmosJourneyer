@@ -72,15 +72,15 @@ float hgPhase(float c, float g){
   return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*c, 1.5));
 }
 float dualPhase(float c){
-  const float wF = 0.7;   // was 0.85
-const float gF = 0.75;  // was 0.85
+  const float wF = 0.85;   // was 0.85
+const float gF = 0.85;  // was 0.85
 const float gB = -0.35; // was -0.2
   return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
 }
 
 float densityAt(vec3 p){
   float shape = 1.0 - texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).r;
-  shape = smoothstep(0.5, 0.8, shape);
+  shape = smoothstep(0.6, 0.8, shape);
   return shape;
 }
 
@@ -134,7 +134,7 @@ void main(){
   float transmittance = 1.0;
   vec3 scatteredLight = vec3(0.0);
 
-  float absorption = 30.0;
+  float extinction = 30.0;
   
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
@@ -154,8 +154,8 @@ void main(){
     
     float tL0, tL1;
     if (intersectAABB(samplePoint, sunDir, boxMin, boxMax, tL0, tL1) && tL1 > 0.0) {
-      float lightStepSize = tL1 / float(lightStepCount);
-      vec3  lsp = samplePoint;
+      float lightStepSize = (tL1 - tL0) / float(lightStepCount);
+      vec3  lsp = samplePoint + sunDir * max(0.0, tL0);
       for (int j = 0; j < lightStepCount; ++j) {
         lsp += sunDir * lightStepSize;
         float ld = densityAt(lsp);
@@ -183,6 +183,17 @@ void main(){
     float powder  = 1.0 - pow(lightTransmittance, powderK);
     vec3  Lpowder = vec3(1.0, 0.9, 0.8) * powder * sigma_s * powderStrength;
     scatteredLight += Lpowder * transmittance * viewRayStepSize;
+
+    vec3 skyColor = vec3(0.5, 0.7, 1.0);
+    float skyExposure = 0.5;
+    float skyOcclusion = 1.0;
+
+    float h = clamp((samplePoint.y - cloudBaseY) / max(1e-3, (cloudTopY - cloudBaseY)), 0.0, 1.0);
+    float skyHeight = smoothstep(0.0, 1.0, h);          // more sky toward the top
+    float skyOcc = 1.0 - exp(-skyOcclusion * density);  // local occlusion proxy
+
+    vec3 Lsky = skyColor * (skyExposure * skyHeight * skyOcc) * sigma_s;
+    scatteredLight += Lsky * transmittance * viewRayStepSize;
     
     transmittance *= exp(-sigma_t * viewRayStepSize);
     samplePoint += rd * viewRayStepSize;
