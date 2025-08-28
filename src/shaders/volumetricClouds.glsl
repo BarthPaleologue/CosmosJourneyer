@@ -179,8 +179,9 @@ void main(){
 
     // powder (multi-scatter-ish), *without* phase
     float powderK = 2.0;
+    float powderStrength = 0.5;
     float powder  = 1.0 - pow(lightTransmittance, powderK);
-    vec3  Lpowder = vec3(1.0, 0.9, 0.8) * powder * (sigma_s * 0.5);
+    vec3  Lpowder = vec3(1.0, 0.9, 0.8) * powder * sigma_s * powderStrength;
     scatteredLight += Lpowder * transmittance * viewRayStepSize;
     
     transmittance *= exp(-sigma_t * viewRayStepSize);
