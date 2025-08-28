@@ -69,7 +69,7 @@ vec3 getWorldRay(vec2 uv){
 
 float hgPhase(float c, float g){
   float gg = g*g;
-  return (1.0 - gg) / (pow(1.0 + gg - 2.0*g*c, 1.5));
+  return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*c, 1.5));
 }
 float dualPhase(float c){
   const float wF = 0.7;   // was 0.85
@@ -170,9 +170,11 @@ void main(){
     // Phase function for scattering
     float cosTheta = dot(rd, sunDir);
     float phase = dualPhase(cosTheta);
+
+    float cloudExposure = 10.0;
     
     // Accumulate scattered light
-    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * lightTransmittance * phase * sigma_s;
+    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * cloudExposure * lightTransmittance * phase * sigma_s;
     scatteredLight += lightContribution * transmittance * viewRayStepSize;
 
     // powder (multi-scatter-ish), *without* phase
