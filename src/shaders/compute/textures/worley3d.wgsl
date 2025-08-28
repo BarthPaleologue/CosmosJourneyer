@@ -105,10 +105,23 @@ fn main(@builtin(global_invocation_id) global_invocation_id: vec3<u32>) {
     let tileCellsU = max(dims / vec3<u32>(cellSize), vec3<u32>(1u));
     let tileCellsI = vec3<i32>(tileCellsU);
 
-    // Compute worley noise for the current position
-    let f1 = worley3d(vec3<f32>(global_invocation_id), cellSize, JITTER, tileCellsI);
+    // Compute worley noise at different frequencies for each channel
+    let position = vec3<f32>(global_invocation_id);
+    
+    // Red channel: base frequency (cellSize)
+    let f1_red = worley3d(position, cellSize, JITTER, tileCellsI);
+    
+    // Green channel: 2x frequency (cellSize/2)
+    let cellSize2 = max(cellSize / 2u, 1u);
+    let tileCells2 = max(dims / vec3<u32>(cellSize2), vec3<u32>(1u));
+    let f1_green = worley3d(position, cellSize2, JITTER, vec3<i32>(tileCells2));
+    
+    // Blue channel: 4x frequency (cellSize/4)
+    let cellSize4 = max(cellSize / 4u, 1u);
+    let tileCells4 = max(dims / vec3<u32>(cellSize4), vec3<u32>(1u));
+    let f1_blue = worley3d(position, cellSize4, JITTER, vec3<i32>(tileCells4));
 
-    // Write grayscale Voronoi F1 distance.
-    let c = vec4<f32>(f1, f1, f1, 1.0);
+    // Store different frequencies in RGB channels
+    let c = vec4<f32>(f1_red, f1_green, f1_blue, 1.0);
     textureStore(output_texture, vec3<i32>(global_invocation_id), c);
 }

@@ -79,7 +79,12 @@ const float gB = -0.35; // was -0.2
 }
 
 float densityAt(vec3 p){
-  float shape = 1.0 - texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).r;
+  vec3 worleySample = texture(uVoronoi, p * 0.5 + vec3(0.0, time*0.02, 0.0)).rgb;
+
+  float worleyValue = worleySample.x * 0.625 + worleySample.y * 0.25 + worleySample.z * 0.125;
+
+
+  float shape = 1.0 - worleyValue;
   shape = smoothstep(0.6, 0.8, shape);
   return shape;
 }
