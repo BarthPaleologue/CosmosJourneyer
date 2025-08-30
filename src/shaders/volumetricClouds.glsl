@@ -93,7 +93,7 @@ float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weigh
 
 float densityAt(vec3 p){
   // Low-freq sampling for base shape
-  vec3 baseCoord = p * noiseScale + vec3(0.0, time*0.02, 0.0);
+  vec3 baseCoord = p * noiseScale + vec3(time*0.02, 0.0, 0.0);
   vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
   vec3 pS = texture(perlin, baseCoord * 10.0).rgb;     // Perlin (3 octaves packed in RGB)
 
@@ -116,7 +116,7 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
-const float extinctionFactor = 300.0;
+const float lengthScale = 50.0;
 
 vec3 multipleOctaveScattering(float tau, float cosTheta){
   // emulate multi-scatter by layering attenuated lobes
@@ -126,7 +126,7 @@ vec3 multipleOctaveScattering(float tau, float cosTheta){
   float a = 1.0, b = 1.0;
   for (int o = 0; o < 4; ++o){
     float phase = dualPhase(cosTheta);
-    const vec3 EXTINCTION_MULT = extinctionFactor * vec3(0.8, 0.8, 1.0);
+    const vec3 EXTINCTION_MULT = vec3(0.8, 0.8, 1.0);
     vec3 T = exp(-tau * EXTINCTION_MULT * a);
     L += b * phase * T;
     a *= att; b *= contrib;
@@ -136,7 +136,7 @@ vec3 multipleOctaveScattering(float tau, float cosTheta){
 
 vec3 calculateLightEnergy(vec3 origin, float mu, float maxDistance){
   const int lightStepCount = 12;                      // keep your budget
-  float stepLen = maxDistance / float(lightStepCount);
+  float stepLen = maxDistance * lengthScale / float(lightStepCount);
 
   // jitter the light march with blue-noise too
   vec2 bnUV = vUV * (resolution / 128.0);
@@ -156,7 +156,7 @@ vec3 calculateLightEnergy(vec3 origin, float mu, float maxDistance){
   // ambient + sun (scale to taste)
   vec3 sunLight = vec3(50.0);
   vec3 ambient  = vec3(0.1);
-  vec3 powder   = vec3(1.0) - exp(-2.0 * extinctionFactor * tau * vec3(0.8,0.8,1.0)); // gentle boost
+  vec3 powder   = vec3(1.0) - exp(-2.0 * tau * vec3(0.8,0.8,1.0)); // gentle boost
 
   return ambient + sunLight * multipleOctaveScattering(tau, mu) * mix(2.0 * powder, vec3(1.0), clamp((mu+1.0)*0.5, 0.0, 1.0));
 }
@@ -206,7 +206,7 @@ void main(){
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
 
-    vec3 sigma_t = extinctionFactor * density * vec3(0.8, 0.8, 1.0);
+    vec3 sigma_t = density * vec3(0.8, 0.8, 1.0);
     float albedo = 0.99;
     vec3 sigma_s = sigma_t * albedo;
 
@@ -227,9 +227,9 @@ void main(){
     
     // Accumulate scattered light
     vec3 lightContribution = lightTransmittance * sigma_s;
-    scatteredLight += lightContribution * transmittance * viewRayStepSize;
+    scatteredLight += lightContribution * transmittance * viewRayStepSize * lengthScale;
 
-    transmittance *= exp(-sigma_t * viewRayStepSize);
+    transmittance *= exp(-sigma_t * viewRayStepSize * lengthScale);
     samplePoint += rd * viewRayStepSize;
     
     // early-out condition
