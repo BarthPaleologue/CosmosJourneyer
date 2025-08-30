@@ -26,7 +26,10 @@ uniform sampler2D depthSampler;
 
 uniform highp sampler3D worley;
 uniform highp sampler3D perlin;
+
 uniform sampler2D blueNoise2d;
+uniform int frame;
+uniform vec2 resolution;
 
 uniform mat4 invProjection;
 uniform mat4 invView;
@@ -113,6 +116,57 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
+const float extinctionFactor = 300.0;
+
+vec3 multipleOctaveScattering(float tau, float cosTheta){
+  // emulate multi-scatter by layering attenuated lobes
+  float att = 0.2;
+  float contrib = 0.2;
+  vec3  L = vec3(0.0);
+  float a = 1.0, b = 1.0;
+  for (int o = 0; o < 4; ++o){
+    float phase = dualPhase(cosTheta);
+    const vec3 EXTINCTION_MULT = extinctionFactor * vec3(0.8, 0.8, 1.0);
+    vec3 T = exp(-tau * EXTINCTION_MULT * a);
+    L += b * phase * T;
+    a *= att; b *= contrib;
+  }
+  return L;
+}
+
+vec3 calculateLightEnergy(vec3 origin, float mu, float maxDistance){
+  const int lightStepCount = 12;                      // keep your budget
+  float stepLen = maxDistance / float(lightStepCount);
+
+  // jitter the light march with blue-noise too
+  vec2 bnUV = vUV * (resolution / 128.0);
+  float bn  = texture2D(blueNoise2d, bnUV).g;
+  bn = fract(bn + float(frame % 64) * 0.7236068);     // another low-disc offset
+
+  float t = stepLen * bn;
+  float tau = 0.0;
+  for (int j = 0; j < lightStepCount; ++j){
+    vec3 lp = origin + sunDir * t;
+    //float sdf = sampleLowResCloudMap(lp);
+    float d   = densityAt(lp); //sampleHighResDetail(sdf, lp);
+    tau += d * stepLen;
+    t   += stepLen;
+  }
+
+  // ambient + sun (scale to taste)
+  vec3 sunLight = vec3(50.0);
+  vec3 ambient  = vec3(0.1);
+  vec3 powder   = vec3(1.0) - exp(-2.0 * extinctionFactor * tau * vec3(0.8,0.8,1.0)); // gentle boost
+
+  return ambient + sunLight * multipleOctaveScattering(tau, mu) * mix(2.0 * powder, vec3(1.0), clamp((mu+1.0)*0.5, 0.0, 1.0));
+}
+
+vec3 ACESFilm(vec3 x) {
+  // Narkowicz ACES fit
+  const float a=2.51, b=0.03, c=2.43, d=0.59, e=0.14;
+  return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0);
+}
+
 void main(){
   vec4 screenColor = texture2D(textureSampler, vUV);
   float depth = texture2D(depthSampler, vUV).r;
@@ -137,20 +191,24 @@ void main(){
   int viewRayStepCount = 32;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
 
-  float jitter = texture2D(blueNoise2d, vUV).r * viewRayStepSize;              // [0, stepSize)
+  // Tile blue-noise to screen; animate by a low-discrepancy offset
+  const float PHI = 1.61803398875;           // golden ratio
+  vec2 bnUV = vUV * (resolution / 128.0);     // assumes a 128x128 blue-noise tile
+  float bn = texture2D(blueNoise2d, bnUV).r;
+  bn = fract(bn + float(frame % 64) * (1.0 / PHI)); // temporal shuffle
+
+  float jitter = bn * viewRayStepSize;       // [0, stepSize)
   vec3 samplePoint = ro + rd * (t0 + jitter);
 
-  float transmittance = 1.0;
+  vec3 transmittance = vec3(1.0);
   vec3 scatteredLight = vec3(0.0);
-
-  float extinctionFactor = 30.0;
   
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
 
-    float sigma_t = extinctionFactor * density;
+    vec3 sigma_t = extinctionFactor * density * vec3(0.8, 0.8, 1.0);
     float albedo = 0.99;
-    float sigma_s = sigma_t * albedo;
+    vec3 sigma_s = sigma_t * albedo;
 
     if(density < 0.001) {
       samplePoint += rd * viewRayStepSize;
@@ -158,59 +216,27 @@ void main(){
     }
 
     // Light ray marching
-    int lightStepCount = 12;
-    float lightTransmittance = 1.0;
-    
+    vec3 lightTransmittance = vec3(1.0);
     float tL0, tL1;
     if (intersectAABB(samplePoint, sunDir, boxMin, boxMax, tL0, tL1) && tL1 > 0.0) {
-      float lightStepSize = (tL1 - tL0) / float(lightStepCount);
-      vec3  lsp = samplePoint + sunDir * max(0.0, tL0);
-      for (int j = 0; j < lightStepCount; ++j) {
-        lsp += sunDir * lightStepSize;
-        float ld = densityAt(lsp);
-        float lightSigma_t = extinctionFactor * ld;      // same scale as view σt
-        lightTransmittance *= exp(-lightSigma_t * lightStepSize);
-        if (lightTransmittance < 1e-3) break;
-      }
-    } else {
-      lightTransmittance = 1.0;
+      float startL  = max(0.0, tL0);
+      vec3  lOrigin = samplePoint + sunDir * startL;
+      float lLen    = max(0.0, tL1 - startL);
+      lightTransmittance = calculateLightEnergy(lOrigin, dot(rd, sunDir), lLen);
     }
     
-    // Phase function for scattering
-    float cosTheta = dot(rd, sunDir);
-    float phase = dualPhase(cosTheta);
-
-    float cloudExposure = 1.0;
-    
     // Accumulate scattered light
-    vec3 lightContribution = vec3(1.0, 0.9, 0.8) * cloudExposure * lightTransmittance * phase * sigma_s;
+    vec3 lightContribution = lightTransmittance * sigma_s;
     scatteredLight += lightContribution * transmittance * viewRayStepSize;
 
-    // powder (multi-scatter-ish), *without* phase
-    float powderK = 2.0;
-    float powderStrength = 0.5;
-    float powder  = 1.0 - pow(lightTransmittance, powderK);
-    vec3  Lpowder = vec3(1.0, 0.9, 0.8) * powder * sigma_s * powderStrength;
-    scatteredLight += Lpowder * transmittance * viewRayStepSize;
-
-    vec3 skyColor = vec3(0.5, 0.7, 1.0);
-    float skyExposure = 0.5;
-    float skyOcclusion = 1.0;
-
-    float h = clamp((samplePoint.y - cloudBaseY) / max(1e-3, (cloudTopY - cloudBaseY)), 0.0, 1.0);
-    float skyHeight = smoothstep(0.0, 1.0, h);          // more sky toward the top
-    float skyOcc = 1.0 - exp(-skyOcclusion * density);  // local occlusion proxy
-
-    vec3 Lsky = skyColor * (skyExposure * skyHeight * skyOcc) * sigma_s;
-    scatteredLight += Lsky * transmittance * viewRayStepSize;
-    
     transmittance *= exp(-sigma_t * viewRayStepSize);
     samplePoint += rd * viewRayStepSize;
-
-    if (transmittance < 1e-3) break;
+    
+    // early-out condition
+    if (max(max(transmittance.r, transmittance.g), transmittance.b) < 1e-3) break;
   }
 
-  vec3 outRgb = screenColor.rgb * transmittance + scatteredLight;
-
+  vec3 hdr = screenColor.rgb * transmittance + scatteredLight;
+  vec3 outRgb = ACESFilm(hdr);
   gl_FragColor = vec4(outRgb, 1.0);
 }

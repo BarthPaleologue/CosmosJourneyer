@@ -27,6 +27,7 @@ import {
     Scene,
     StandardMaterial,
     Texture,
+    Vector2,
     Vector3,
     type WebGPUEngine,
 } from "@babylonjs/core";
@@ -85,8 +86,8 @@ export async function createVolumetricCloudsPlayground(
     const blueNoiseTexture = createStorageTexture2D(
         "BlueNoiseTexture",
         {
-            width: engine.getRenderWidth(),
-            height: engine.getRenderHeight(),
+            width: 128,
+            height: 128,
         },
         Constants.TEXTUREFORMAT_RGBA,
         scene,
@@ -143,6 +144,8 @@ export async function createVolumetricCloudsPlayground(
             "uAnvilSharpness",
             "uAnvilSpread",
             "uFlattenTop",
+            "frame",
+            "resolution",
         ],
         ["worley", "perlin", "blueNoise2d", "depthSampler"],
         1.0,
@@ -160,8 +163,10 @@ export async function createVolumetricCloudsPlayground(
     diskMaterial.emissiveColor = new Color3(1, 1, 0.8);
     sunDisk.material = diskMaterial;
 
+    let frameIndex = 0;
     pp.onApply = (effect) => {
         const t = performance.now() * 0.001;
+        frameIndex++;
 
         effect.setFloat("time", t);
         effect.setFloat("cloudBaseY", -70.0);
@@ -204,6 +209,9 @@ export async function createVolumetricCloudsPlayground(
         effect.setFloat("uAnvilSharpness", 2.0);
         effect.setFloat("uAnvilSpread", 80.0); // world units
         effect.setFloat("uFlattenTop", 0.45);
+
+        effect.setInt("frame", frameIndex);
+        effect.setVector2("resolution", new Vector2(engine.getRenderWidth(), engine.getRenderHeight()));
     };
 
     return scene;
