@@ -91,7 +91,7 @@ export async function createVolumetricCloudsPlayground(
         },
         Constants.TEXTUREFORMAT_RGBA,
         scene,
-        { samplingMode: Constants.TEXTURE_TRILINEAR_SAMPLINGMODE, type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
+        { samplingMode: Constants.TEXTURE_NEAREST_SAMPLINGMODE, type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
     );
 
     blueNoiseTextureGenerator.dispatch(blueNoiseTexture);
