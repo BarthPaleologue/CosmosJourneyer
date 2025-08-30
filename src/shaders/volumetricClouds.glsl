@@ -26,6 +26,7 @@ uniform sampler2D depthSampler;
 
 uniform highp sampler3D worley;
 uniform highp sampler3D perlin;
+uniform sampler2D blueNoise2d;
 
 uniform mat4 invProjection;
 uniform mat4 invView;
@@ -76,10 +77,11 @@ float hgPhase(float cosTheta, float g){
   float gg = g*g;
   return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*cosTheta, 1.5));
 }
+
 float dualPhase(float cosTheta){
   const float wF = 0.7;   // was 0.85
-const float gF = 0.85;  // was 0.85
-const float gB = -0.35; // was -0.2
+  const float gF = 0.85;  // was 0.85
+  const float gB = -0.35; // was -0.2
   return mix(hgPhase(cosTheta, gB), hgPhase(cosTheta, gF), wF);
 }
 
@@ -111,11 +113,6 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
-
-float rand(vec2 co) {
-  return fract(sin(dot(co.xy, vec2(12.9898,78.233))) * 43758.5453);
-}
-
 void main(){
   vec4 screenColor = texture2D(textureSampler, vUV);
   float depth = texture2D(depthSampler, vUV).r;
@@ -140,18 +137,18 @@ void main(){
   int viewRayStepCount = 32;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
 
-  float jitter = rand(vUV) * viewRayStepSize;              // [0, stepSize)
+  float jitter = texture2D(blueNoise2d, vUV).r * viewRayStepSize;              // [0, stepSize)
   vec3 samplePoint = ro + rd * (t0 + jitter);
 
   float transmittance = 1.0;
   vec3 scatteredLight = vec3(0.0);
 
-  float extinction = 30.0;
+  float extinctionFactor = 30.0;
   
   for (int i = 0; i < viewRayStepCount; i++) {
     float density = densityAt(samplePoint);
 
-    float sigma_t = extinction * density;
+    float sigma_t = extinctionFactor * density;
     float albedo = 0.99;
     float sigma_s = sigma_t * albedo;
 
@@ -171,7 +168,7 @@ void main(){
       for (int j = 0; j < lightStepCount; ++j) {
         lsp += sunDir * lightStepSize;
         float ld = densityAt(lsp);
-        float lightSigma_t = extinction * ld;      // same scale as view σt
+        float lightSigma_t = extinctionFactor * ld;      // same scale as view σt
         lightTransmittance *= exp(-lightSigma_t * lightStepSize);
         if (lightTransmittance < 1e-3) break;
       }

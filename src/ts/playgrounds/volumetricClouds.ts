@@ -33,7 +33,8 @@ import {
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
-import { createStorageTexture3D } from "@/utils/texture";
+import { createStorageTexture2D, createStorageTexture3D } from "@/utils/texture";
+import { BlueNoise2dTextureGenerator } from "@/utils/textures/blueNoise2d";
 import { Perlin3dTextureGenerator } from "@/utils/textures/perlin3d";
 import { Worley3dTextureGenerator } from "@/utils/textures/worley3d";
 
@@ -78,6 +79,21 @@ export async function createVolumetricCloudsPlayground(
     );
 
     perlinTextureGenerator.dispatch(perlinTexture);
+
+    const blueNoiseTextureGenerator = await BlueNoise2dTextureGenerator.New(engine);
+
+    const blueNoiseTexture = createStorageTexture2D(
+        "BlueNoiseTexture",
+        {
+            width: engine.getRenderWidth(),
+            height: engine.getRenderHeight(),
+        },
+        Constants.TEXTUREFORMAT_RGBA,
+        scene,
+        { samplingMode: Constants.TEXTURE_TRILINEAR_SAMPLINGMODE, type: Constants.TEXTURETYPE_UNSIGNED_BYTE },
+    );
+
+    blueNoiseTextureGenerator.dispatch(blueNoiseTexture);
 
     const dimensions = {
         width: 1,
@@ -128,7 +144,7 @@ export async function createVolumetricCloudsPlayground(
             "uAnvilSpread",
             "uFlattenTop",
         ],
-        ["worley", "perlin", "depthSampler"],
+        ["worley", "perlin", "blueNoise2d", "depthSampler"],
         1.0,
         camera,
         Texture.BILINEAR_SAMPLINGMODE,
@@ -164,6 +180,7 @@ export async function createVolumetricCloudsPlayground(
 
         effect.setTexture("worley", worleyTexture);
         effect.setTexture("perlin", perlinTexture);
+        effect.setTexture("blueNoise2d", blueNoiseTexture);
         effect.setTexture("depthSampler", depthRenderer.getDepthMap());
 
         effect.setVector3("boxMin", new Vector3(-dimensions.width / 2, -dimensions.height / 2, -dimensions.depth / 2)); // ▶

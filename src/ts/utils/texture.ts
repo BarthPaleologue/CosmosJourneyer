@@ -18,6 +18,7 @@
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { type WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { RawTexture2DArray } from "@babylonjs/core/Materials/Textures/rawTexture2DArray";
 import { RawTexture3D } from "@babylonjs/core/Materials/Textures/rawTexture3D";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -182,6 +183,35 @@ export function createStorageTexture3D(
         dimensions.width,
         dimensions.height,
         dimensions.depth,
+        textureFormat,
+        scene,
+        false,
+        false,
+        options?.samplingMode ?? Constants.TEXTURE_NEAREST_SAMPLINGMODE,
+        options?.type ?? Constants.TEXTURETYPE_FLOAT,
+        Constants.TEXTURE_CREATIONFLAG_STORAGE,
+    );
+    texture.name = name;
+    texture.wrapU = Constants.TEXTURE_WRAP_ADDRESSMODE;
+    texture.wrapV = Constants.TEXTURE_WRAP_ADDRESSMODE;
+
+    return texture;
+}
+
+export function createStorageTexture2D(
+    name: string,
+    dimensions: {
+        width: number;
+        height: number;
+    },
+    textureFormat: number,
+    scene: Scene,
+    options?: Partial<{ data: ArrayBufferView; samplingMode: number; type: number }>,
+): RawTexture {
+    const texture = new RawTexture(
+        options?.data ?? null,
+        dimensions.width,
+        dimensions.height,
         textureFormat,
         scene,
         false,
