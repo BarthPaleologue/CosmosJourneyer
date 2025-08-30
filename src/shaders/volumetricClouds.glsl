@@ -72,19 +72,17 @@ vec3 getWorldRay(vec2 uv){
   return normalize(dirW);
 }
 
-float hgPhase(float c, float g){
+float hgPhase(float cosTheta, float g){
   float gg = g*g;
-  return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*c, 1.5));
+  return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*cosTheta, 1.5));
 }
-float dualPhase(float c){
-  const float wF = 0.85;   // was 0.85
+float dualPhase(float cosTheta){
+  const float wF = 0.7;   // was 0.85
 const float gF = 0.85;  // was 0.85
 const float gB = -0.35; // was -0.2
-  return wF * hgPhase(c, gF) + (1.0 - wF) * hgPhase(c, gB);
+  return mix(hgPhase(cosTheta, gB), hgPhase(cosTheta, gF), wF);
 }
 
-float saturate(float x){ return clamp(x, 0.0, 1.0); }
-float remap01(float x, float lo, float hi){ return saturate((x - lo) / max(1e-5, hi - lo)); }
 float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
 
 
@@ -92,13 +90,13 @@ float densityAt(vec3 p){
   // Low-freq sampling for base shape
   vec3 baseCoord = p * noiseScale + vec3(0.0, time*0.02, 0.0);
   vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
-  vec3 pS = texture(perlin, baseCoord).rgb;     // Perlin (3 octaves packed in RGB)
+  vec3 pS = texture(perlin, baseCoord * 10.0).rgb;     // Perlin (3 octaves packed in RGB)
 
   float wLow = triMix(wS);                      // 0..1
   float pLow = triMix(pS);                      // 0..1
   float invW = 1.0 - wLow;
 
-  return smoothstep(0.3, 0.7, pLow * invW);
+  return smoothstep(0.5, 0.7, invW - pLow * 0.3);
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
@@ -139,7 +137,7 @@ void main(){
 
   float distanceThroughMedium = t1 - t0;
 
-  int viewRayStepCount = 64;
+  int viewRayStepCount = 32;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
 
   float jitter = rand(vUV) * viewRayStepSize;              // [0, stepSize)
@@ -163,7 +161,7 @@ void main(){
     }
 
     // Light ray marching
-    int lightStepCount = 16;
+    int lightStepCount = 12;
     float lightTransmittance = 1.0;
     
     float tL0, tL1;
@@ -185,7 +183,7 @@ void main(){
     float cosTheta = dot(rd, sunDir);
     float phase = dualPhase(cosTheta);
 
-    float cloudExposure = 10.0;
+    float cloudExposure = 1.0;
     
     // Accumulate scattered light
     vec3 lightContribution = vec3(1.0, 0.9, 0.8) * cloudExposure * lightTransmittance * phase * sigma_s;
