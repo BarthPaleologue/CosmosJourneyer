@@ -81,11 +81,9 @@ float hgPhase(float cosTheta, float g){
   return (1.0 - gg) / (4.0 * 3.141592653589793 * pow(1.0 + gg - 2.0*g*cosTheta, 1.5));
 }
 
-float dualPhase(float cosTheta){
-  const float wF = 0.7;   // was 0.85
-  const float gF = 0.85;  // was 0.85
-  const float gB = -0.35; // was -0.2
-  return mix(hgPhase(cosTheta, gB), hgPhase(cosTheta, gF), wF);
+
+float dualHG_g(float cosTheta, float g, float w) {
+  return mix(hgPhase(cosTheta, -g), hgPhase(cosTheta,  g), w);
 }
 
 float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
@@ -119,17 +117,24 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
 const float lengthScale = 50.0;
 
 vec3 multipleOctaveScattering(float tau, float cosTheta){
-  // emulate multi-scatter by layering attenuated lobes
-  float att = 0.2;
-  float contrib = 0.2;
+  float attenuation       = 0.2;   // like target
+  float contribution      = 0.2;   // like target
+  float phaseAttenuation  = 0.5;   // like target
+  float c = 1.0;                   // anisotropy scaler per octave
+
   vec3  L = vec3(0.0);
   float a = 1.0, b = 1.0;
+
   for (int o = 0; o < 4; ++o){
-    float phase = dualPhase(cosTheta);
-    const vec3 EXTINCTION_MULT = vec3(0.8, 0.8, 1.0);
-    vec3 T = exp(-tau * EXTINCTION_MULT * a);
+    float g = 0.3 * c;                               // target: PhaseFunction(0.3 * c, mu)
+    float phase = dualHG_g(cosTheta, g, 0.7);        // target's DUAL_LOBE_WEIGHT ~0.7
+    vec3  T = exp(-tau * vec3(0.8, 0.8, 1.0) * a);   // RGB extinction (O(1) scale)
+
     L += b * phase * T;
-    a *= att; b *= contrib;
+
+    a *= attenuation;
+    b *= contribution;
+    c *= (1.0 - phaseAttenuation);                   // later octaves more isotropic
   }
   return L;
 }
