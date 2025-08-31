@@ -122,7 +122,7 @@ export async function createVolumetricCloudsPlayground(
         "cloudsPP",
         ["time", "cameraPos", "invProjection", "invView", "sunDir", "boxMin", "boxMax", "frame", "resolution"],
         ["worley", "perlin", "blueNoise2d", "depthSampler"],
-        1,
+        0.5,
         camera,
         Texture.BILINEAR_SAMPLINGMODE,
         engine,
