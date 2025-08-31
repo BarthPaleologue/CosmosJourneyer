@@ -125,27 +125,14 @@ float erosionDetail(vec3 p, float detailFreq, float invAtBase){
   return wBlend;
 }
 
-/*float densityAt(vec3 p) {
-  // Low-freq sampling for base shape
-  vec3 baseCoord = p * 0.01 + vec3(time*0.02, 0.0, 0.0);
-  vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
-  vec3 pS = texture(perlin, baseCoord * 10.0).rgb;     // Perlin (3 octaves packed in RGB)
-
-  float wLow = triMix(wS);                      // 0..1
-  float pLow = triMix(pS);                      // 0..1
-  float invW = 1.0 - wLow;
-
-  return smoothstep(0.5, 0.7, invW - pLow * 0.3) * heightMask(p, vec3(1.0));
-}*/
-
 const float noiseScale = 1.0 / 200.0;
-const float uWarpFreqMul = 0.0;
-const float uWarpAmp = 0.0;
+const float uWarpFreqMul = 0.8;
+const float uWarpAmp = 6.0;
 const float uShapeFreqMul = 1.2;
 const float uErosionStrength = 0.3;
 const float uErosionFreqMul = 1.0;
-const float uBaseSoftness = 0.3;
-const float uTopSoftness = 0.3;
+const float uBaseSoftness = 0.22;
+const float uTopSoftness = 0.15;
 
 const float uCoverageFreqMul  = 0.25;       // very low frequency field
 const float uCoverageLo       = 0.35;       // threshold window like Horizon
@@ -157,6 +144,12 @@ float coverageAt(vec2 xz) {
   float c = triMix(texture(perlin, vec3(xz * f + vec2(0.0, time*0.01), 0.0)).rgb);
   return clamp(c, 0.0, 1.0);
 }
+
+float coverageGate(float base, float cov){
+  // gate base by coverage: clouds vanish first where cov is low
+  return clamp(remap(base, 1.0 - cov, 1.0, 0.0, 1.0), 0.0, 1.0);
+}
+
 
 float densityAt(vec3 p){
   // wind & warp
@@ -172,9 +165,7 @@ float densityAt(vec3 p){
   float hMask    = heightMask(p, /*weights*/ vec3(0.6, 0.3, 0.1)); // tune or drive by weather
   float cov      = coverageAt(q.xz);
   // gate by coverage: push threshold up when coverage is low
-  float base     = basePW * hMask;
-  base = clamp(remap(base, 1.0 - cov, 1.0, 0.0, 1.0), 0.0, 1.0);
-
+  float base     = coverageGate(basePW * hMask, cov);
   if (base <= 0.0) return 0.0;
 
   // Edge-aware erosion detail
