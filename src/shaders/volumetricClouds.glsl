@@ -91,7 +91,7 @@ float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weigh
 
 float densityAt(vec3 p){
   // Low-freq sampling for base shape
-  vec3 baseCoord = p * noiseScale + vec3(time*0.02, 0.0, 0.0);
+  vec3 baseCoord = p * 0.01 + vec3(time*0.02, 0.0, 0.0);
   vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
   vec3 pS = texture(perlin, baseCoord * 10.0).rgb;     // Perlin (3 octaves packed in RGB)
 
@@ -114,7 +114,7 @@ bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out flo
   return t1 > t0;
 }
 
-const float lengthScale = 50.0;
+const float lengthScale = 1.0;
 
 vec3 multipleOctaveScattering(float tau, float cosTheta){
   float attenuation       = 0.2;   // like target

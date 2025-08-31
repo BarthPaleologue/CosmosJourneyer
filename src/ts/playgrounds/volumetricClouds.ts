@@ -20,6 +20,7 @@ import {
     Color3,
     Color4,
     Constants,
+    DirectionalLight,
     Effect,
     Matrix,
     MeshBuilder,
@@ -97,16 +98,18 @@ export async function createVolumetricCloudsPlayground(
     blueNoiseTextureGenerator.dispatch(blueNoiseTexture);
 
     const dimensions = {
-        width: 1,
-        height: 1,
-        depth: 1,
+        width: 200,
+        height: 50,
+        depth: 200,
     };
 
+    const volumeOffset = new Vector3(0, dimensions.height / 2, 0);
+
     const cube = MeshBuilder.CreateBox("cube", dimensions, scene);
+    cube.position.addInPlace(volumeOffset);
     cube.visibility = 0.01;
 
-    const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 4, Vector3.Zero(), scene);
-    camera.wheelPrecision *= 100;
+    const camera = new ArcRotateCamera("camera", Math.PI / 2, Math.PI / 4, 500, Vector3.Zero(), scene);
     camera.attachControl();
 
     const depthRenderer = scene.enableDepthRenderer(camera, true, true);
@@ -157,11 +160,18 @@ export async function createVolumetricCloudsPlayground(
 
     const lightDir = new Vector3(0.35, 0.2, 0.2).normalize();
 
-    const sunDisk = MeshBuilder.CreateSphere("sunDisk", { diameter: 0.5 }, scene);
-    sunDisk.position = lightDir.scale(5);
+    new DirectionalLight("directionalLight", lightDir.negate(), scene);
+
+    const sunDisk = MeshBuilder.CreateSphere("sunDisk", { diameter: 25 }, scene);
+    sunDisk.position = lightDir.scale(250);
     const diskMaterial = new StandardMaterial("sunDiskMaterial", scene);
     diskMaterial.emissiveColor = new Color3(1, 1, 0.8);
     sunDisk.material = diskMaterial;
+
+    const ground = MeshBuilder.CreateGround("ground", { width: 1000, height: 1000 }, scene);
+    const groundMaterial = new StandardMaterial("groundMaterial", scene);
+    groundMaterial.diffuseColor = new Color3(0.5, 0.5, 0.5);
+    ground.material = groundMaterial;
 
     let frameIndex = 0;
     pp.onApply = (effect) => {
@@ -188,8 +198,14 @@ export async function createVolumetricCloudsPlayground(
         effect.setTexture("blueNoise2d", blueNoiseTexture);
         effect.setTexture("depthSampler", depthRenderer.getDepthMap());
 
-        effect.setVector3("boxMin", new Vector3(-dimensions.width / 2, -dimensions.height / 2, -dimensions.depth / 2)); // ▶
-        effect.setVector3("boxMax", new Vector3(dimensions.width / 2, dimensions.height / 2, dimensions.depth / 2)); // ▶
+        effect.setVector3(
+            "boxMin",
+            new Vector3(-dimensions.width / 2, -dimensions.height / 2, -dimensions.depth / 2).addInPlace(volumeOffset),
+        ); // ▶
+        effect.setVector3(
+            "boxMax",
+            new Vector3(dimensions.width / 2, dimensions.height / 2, dimensions.depth / 2).addInPlace(volumeOffset),
+        ); // ▶
 
         effect.setFloat("uShapeFreqMul", 0.25);
         effect.setFloat("uErosionFreqMul", 2.0);
