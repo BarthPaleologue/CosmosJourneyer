@@ -37,29 +37,8 @@ uniform vec3 cameraPos;
 uniform vec3 sunDir;
 
 uniform float time;
-uniform float cloudBaseY;
-uniform float cloudTopY;
-uniform float density;
-uniform float noiseScale;
-uniform int   steps;
-
 uniform vec3 boxMin;
 uniform vec3 boxMax;
-
-uniform float uShapeFreqMul;
-uniform float uErosionFreqMul;
-uniform float uErosionStrength;
-uniform float uWarpFreqMul;
-uniform float uWarpAmp;
-uniform float uCoverageFreqMul;
-uniform float uCoverageLo;
-uniform float uCoverageHi;
-uniform float uBaseSoftness;
-uniform float uTopSoftness;
-uniform float uAnvilStart;
-uniform float uAnvilSharpness;
-uniform float uAnvilSpread;
-uniform float uFlattenTop;
 
 #include "./utils/worldFromUV.glsl";
 

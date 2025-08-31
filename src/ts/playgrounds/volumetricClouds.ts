@@ -120,36 +120,7 @@ export async function createVolumetricCloudsPlayground(
     const pp = new PostProcess(
         "CloudsPP",
         "cloudsPP",
-        [
-            "time",
-            "cloudBaseY",
-            "cloudTopY",
-            "density",
-            "noiseScale",
-            "steps",
-            "cameraPos",
-            "invProjection",
-            "invView",
-            "sunDir",
-            "boxMin",
-            "boxMax",
-            "uShapeFreqMul",
-            "uErosionFreqMul",
-            "uErosionStrength",
-            "uWarpFreqMul",
-            "uWarpAmp",
-            "uCoverageFreqMul",
-            "uCoverageLo",
-            "uCoverageHi",
-            "uBaseSoftness",
-            "uTopSoftness",
-            "uAnvilStart",
-            "uAnvilSharpness",
-            "uAnvilSpread",
-            "uFlattenTop",
-            "frame",
-            "resolution",
-        ],
+        ["time", "cameraPos", "invProjection", "invView", "sunDir", "boxMin", "boxMax", "frame", "resolution"],
         ["worley", "perlin", "blueNoise2d", "depthSampler"],
         1.0,
         camera,
@@ -179,11 +150,6 @@ export async function createVolumetricCloudsPlayground(
         frameIndex++;
 
         effect.setFloat("time", t);
-        effect.setFloat("cloudBaseY", -70.0);
-        effect.setFloat("cloudTopY", 70.0);
-        effect.setFloat("density", 1.6);
-        effect.setFloat("noiseScale", 0.5);
-        effect.setInt("steps", 64);
 
         effect.setVector3("cameraPos", camera.globalPosition);
         effect.setVector3("sunDir", lightDir);
@@ -206,25 +172,6 @@ export async function createVolumetricCloudsPlayground(
             "boxMax",
             new Vector3(dimensions.width / 2, dimensions.height / 2, dimensions.depth / 2).addInPlace(volumeOffset),
         ); // ▶
-
-        effect.setFloat("uShapeFreqMul", 0.25);
-        effect.setFloat("uErosionFreqMul", 2.0);
-        effect.setFloat("uErosionStrength", 0.55);
-
-        effect.setFloat("uWarpFreqMul", 0.6);
-        effect.setFloat("uWarpAmp", 12.0);
-
-        effect.setFloat("uCoverageFreqMul", 0.1);
-        effect.setFloat("uCoverageLo", 0.58);
-        effect.setFloat("uCoverageHi", 0.72);
-
-        effect.setFloat("uBaseSoftness", 0.08);
-        effect.setFloat("uTopSoftness", 0.1);
-
-        effect.setFloat("uAnvilStart", 0.65);
-        effect.setFloat("uAnvilSharpness", 2.0);
-        effect.setFloat("uAnvilSpread", 80.0); // world units
-        effect.setFloat("uFlattenTop", 0.45);
 
         effect.setInt("frame", frameIndex);
         effect.setVector2("resolution", new Vector2(engine.getRenderWidth(), engine.getRenderHeight()));
