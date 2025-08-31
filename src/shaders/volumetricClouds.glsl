@@ -65,7 +65,6 @@ float dualHG_g(float cosTheta, float g, float w) {
   return mix(hgPhase(cosTheta, -g), hgPhase(cosTheta,  g), w);
 }
 
-float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
 
 const float cloudBaseY = 0.0;
 const float cloudTopY = 50.0;
@@ -96,7 +95,37 @@ float heightMask(vec3 p, vec3 w) {
   return clamp(m, 0.0, 1.0);
 }
 
-float densityAt(vec3 p) {
+float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
+
+// Perlin-Worley: keep Perlin’s connectivity, add Worley “billow” via dilation
+float perlinWorley(vec3 p, float shapeFreq, float kPW){
+  vec3  c0 = p * shapeFreq;
+  float per = triMix(texture(perlin,  c0       ).rgb);        // 0..1
+  float wor = triMix(texture(worley,  c0       ).rgb);        // 0..1
+  float worInv = 1.0 - wor;                                  // billow
+  // Dilate Perlin by inverted Worley (center around 0 using -0.5)
+  float pw = per + (worInv - 0.5) * kPW;
+  return clamp(pw, 0.0, 1.0);
+}
+
+vec2 pseudoCurl(vec2 uv){
+  // cheap pseudo-curl from two shifted Perlin samples; replace later with a real curl texture
+  float n1 = triMix(texture(perlin, vec3(uv, 0.123)).rgb);
+  float n2 = triMix(texture(perlin, vec3(uv.yx*1.1 + 37.0, 0.456)).rgb);
+  vec2 g = vec2(n1 - 0.5, n2 - 0.5);
+  // make it divergence-free-ish: rotate 90°
+  return vec2(-g.y, g.x);
+}
+
+float erosionDetail(vec3 p, float detailFreq, float invAtBase){
+  float h = height01(p);
+  float wHi = triMix(texture(worley, p * detailFreq).rgb);   // 0..1
+  // invert near base for wisps (blend by invAtBase)
+  float wBlend = mix(wHi, 1.0 - wHi, invAtBase * (1.0 - h));
+  return wBlend;
+}
+
+/*float densityAt(vec3 p) {
   // Low-freq sampling for base shape
   vec3 baseCoord = p * 0.01 + vec3(time*0.02, 0.0, 0.0);
   vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
@@ -107,6 +136,57 @@ float densityAt(vec3 p) {
   float invW = 1.0 - wLow;
 
   return smoothstep(0.5, 0.7, invW - pLow * 0.3) * heightMask(p, vec3(1.0));
+}*/
+
+const float noiseScale = 1.0 / 200.0;
+const float uWarpFreqMul = 0.0;
+const float uWarpAmp = 0.0;
+const float uShapeFreqMul = 1.2;
+const float uErosionStrength = 0.3;
+const float uErosionFreqMul = 1.0;
+const float uBaseSoftness = 0.3;
+const float uTopSoftness = 0.3;
+
+const float uCoverageFreqMul  = 0.25;       // very low frequency field
+const float uCoverageLo       = 0.35;       // threshold window like Horizon
+const float uCoverageHi       = 0.65;
+
+float coverageAt(vec2 xz) {
+  // low-freq “weather” field (use your 3D Perlin as 2D by fixing Z)
+  float f = noiseScale * uCoverageFreqMul;
+  float c = triMix(texture(perlin, vec3(xz * f + vec2(0.0, time*0.01), 0.0)).rgb);
+  return clamp(c, 0.0, 1.0);
+}
+
+float densityAt(vec3 p){
+  // wind & warp
+  vec3  wind = vec3(time*0.02, 0.0, 0.0);
+  vec3  pwCoord = (p + wind) * noiseScale * uShapeFreqMul;
+
+  // Turbulence warp in XZ (Horizon uses 2D curl)
+  vec2  curl  = pseudoCurl(p.xz * uWarpFreqMul + time * 0.05) * uWarpAmp;
+  vec3  q     = p + vec3(curl.x, 0.0, curl.y);
+
+  // Base shape = Perlin-Worley * height profile * coverage
+  float basePW   = perlinWorley(pwCoord, 1.0, /*kPW*/ 0.6);
+  float hMask    = heightMask(p, /*weights*/ vec3(0.6, 0.3, 0.1)); // tune or drive by weather
+  float cov      = coverageAt(q.xz);
+  // gate by coverage: push threshold up when coverage is low
+  float base     = basePW * hMask;
+  base = clamp(remap(base, 1.0 - cov, 1.0, 0.0, 1.0), 0.0, 1.0);
+
+  if (base <= 0.0) return 0.0;
+
+  // Edge-aware erosion detail
+  float det = erosionDetail(q * noiseScale, /*detailFreq*/ 10.0 * uErosionFreqMul, /*invAtBase*/ 1.0);
+  // Horizon erodes by remapping base through detail
+  float d = clamp(remap(base, uErosionStrength * det, 1.0, 0.0, 1.0), 0.0, 1.0);
+
+  // (Optional) soft bottoms / tops (you already have uBaseSoftness/uTopSoftness)
+  float h = height01(p);
+  d *= smoothstep(0.0, uBaseSoftness, h) * (1.0 - smoothstep(1.0 - uTopSoftness, 1.0, h));
+
+  return d;
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
