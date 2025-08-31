@@ -98,9 +98,9 @@ export async function createVolumetricCloudsPlayground(
     blueNoiseTextureGenerator.dispatch(blueNoiseTexture);
 
     const dimensions = {
-        width: 200,
+        width: 500,
         height: 50,
-        depth: 200,
+        depth: 500,
     };
 
     const volumeOffset = new Vector3(0, dimensions.height / 2, 0);
