@@ -129,14 +129,55 @@ const float noiseScale = 1.0 / 200.0;
 const float uWarpFreqMul = 0.8;
 const float uWarpAmp = 6.0;
 const float uShapeFreqMul = 1.2;
-const float uErosionStrength = 0.3;
-const float uErosionFreqMul = 1.0;
 const float uBaseSoftness = 0.22;
 const float uTopSoftness = 0.15;
 
 const float uCoverageFreqMul  = 0.25;       // very low frequency field
-const float uCoverageLo       = 0.35;       // threshold window like Horizon
-const float uCoverageHi       = 0.65;
+
+
+// --- edge factor (only erode near surface of base shape)
+float edgeFactor(float base){    // base in [0..1]
+  // 0 at core, 1 at edge; widen/narrow with widths
+  const float e0 = 0.15, e1 = 0.65;
+  return 1.0 - smoothstep(e0, e1, base);
+}
+
+// --- 2D curl (divergence-free) to swirl detail (you can keep your pseudoCurl for now)
+vec2 curl2D(vec2 xz){
+  // simple gradient-of-Perlin rotated 90 degrees (cheap stand-in for precomputed curl)
+  float eps = 0.002;
+  float nL = triMix(texture(perlin, vec3(xz-vec2(eps,0.0), 0.0)).rgb);
+  float nR = triMix(texture(perlin, vec3(xz+vec2(eps,0.0), 0.0)).rgb);
+  float nD = triMix(texture(perlin, vec3(xz-vec2(0.0,eps), 0.0)).rgb);
+  float nU = triMix(texture(perlin, vec3(xz+vec2(0.0,eps), 0.0)).rgb);
+  vec2 grad = vec2(nR-nL, nU-nD);      // ∇n
+  return vec2(-grad.y, grad.x);         // rotate 90°
+}
+
+// --- high-freq detail Worley, inverted near base
+float detailErode(vec3 p, float h01){
+  // swirl detail with curl and add height-dependent wind shear
+  vec2 C = curl2D(p.xz * 0.15 + time*0.05) * 12.0;
+  float shear = mix(-8.0, 8.0, h01);                        // wind shear with height
+  vec3 pd = p + vec3(C.x, 0.0, C.y) + vec3(shear*h01, 0.0, 0.0);
+
+  // use higher frequency for detail
+  float wHi = triMix(texture(worley, pd * (noiseScale * 18.0)).rgb); // 0..1
+  float invNearBase = mix(1.0, -1.0, smoothstep(0.0, 0.25, h01));    // invert near base
+  float detail = 0.5 + 0.5 * invNearBase * (1.0 - 2.0 * wHi);        // centered detail
+  return clamp(detail, 0.0, 1.0);
+}
+
+float applyErosion(vec3 p, float base, float h01){
+  float edge = edgeFactor(base);
+  if (edge <= 0.0) return base;
+
+  float det  = detailErode(p, h01);
+  // stronger erosion near the top for cauliflower caps, lighter in the core:
+  float strength = mix(0.25, 0.55, smoothstep(0.5, 1.0, h01)); // tune
+  float eroded = base - strength * edge * (det);               // subtract only at edge
+  return clamp(eroded, 0.0, 1.0);
+}
 
 float coverageAt(vec2 xz) {
   // low-freq “weather” field (use your 3D Perlin as 2D by fixing Z)
@@ -156,6 +197,8 @@ float densityAt(vec3 p){
   vec3  wind = vec3(time*0.02, 0.0, 0.0);
   vec3  pwCoord = (p + wind) * noiseScale * uShapeFreqMul;
 
+  float h = height01(p);
+
   // Turbulence warp in XZ (Horizon uses 2D curl)
   vec2  curl  = pseudoCurl(p.xz * uWarpFreqMul + time * 0.05) * uWarpAmp;
   vec3  q     = p + vec3(curl.x, 0.0, curl.y);
@@ -169,12 +212,14 @@ float densityAt(vec3 p){
   if (base <= 0.0) return 0.0;
 
   // Edge-aware erosion detail
-  float det = erosionDetail(q * noiseScale, /*detailFreq*/ 10.0 * uErosionFreqMul, /*invAtBase*/ 1.0);
+  //float det = erosionDetail(q * noiseScale, /*detailFreq*/ 10.0 * uErosionFreqMul, /*invAtBase*/ 1.0);
   // Horizon erodes by remapping base through detail
-  float d = clamp(remap(base, uErosionStrength * det, 1.0, 0.0, 1.0), 0.0, 1.0);
+  //float d = clamp(remap(base, uErosionStrength * det, 1.0, 0.0, 1.0), 0.0, 1.0);
+
+  // edge-only erosion with curl-distorted detail (Horizon)
+  float d = applyErosion(p, base, h);
 
   // (Optional) soft bottoms / tops (you already have uBaseSoftness/uTopSoftness)
-  float h = height01(p);
   d *= smoothstep(0.0, uBaseSoftness, h) * (1.0 - smoothstep(1.0 - uTopSoftness, 1.0, h));
 
   return d;
