@@ -192,37 +192,33 @@ float coverageGate(float base, float cov){
 }
 
 
-float densityAt(vec3 p){
-  // wind & warp
-  vec3  wind = vec3(time*0.02, 0.0, 0.0);
-  vec3  pwCoord = (p + wind) * noiseScale * uShapeFreqMul;
+float baseDensity(vec3 p){
+  // winded coords but NO curl, NO high-freq work
+  vec3 wind = vec3(time*0.02, 0.0, 0.0);
+  vec3 pwCoord = (p + wind) * noiseScale * uShapeFreqMul;
 
+  float basePW = perlinWorley(pwCoord, 1.0, 0.6);
   float h = height01(p);
+  float hMask = heightMask(p, vec3(0.6, 0.3, 0.1));
+  float cov = coverageAt(p.xz);
+  float base = coverageGate(basePW * hMask, cov);
 
-  // Turbulence warp in XZ (Horizon uses 2D curl)
-  vec2  curl  = pseudoCurl(p.xz * uWarpFreqMul + time * 0.05) * uWarpAmp;
-  vec3  q     = p + vec3(curl.x, 0.0, curl.y);
+  // soft bottoms/tops (cheap)
+  base *= smoothstep(0.0, uBaseSoftness, h) * (1.0 - smoothstep(1.0 - uTopSoftness, 1.0, h));
+  return base;
+}
 
-  // Base shape = Perlin-Worley * height profile * coverage
-  float basePW   = perlinWorley(pwCoord, 1.0, /*kPW*/ 0.6);
-  float hMask    = heightMask(p, /*weights*/ vec3(0.6, 0.3, 0.1)); // tune or drive by weather
-  float cov      = coverageAt(q.xz);
-  // gate by coverage: push threshold up when coverage is low
-  float base     = coverageGate(basePW * hMask, cov);
-  if (base <= 0.0) return 0.0;
+float detailDensity(vec3 p, float base, float h){
+  // only now do curl + edge-only erosion
+  vec2 curl = pseudoCurl(p.xz * uWarpFreqMul + time * 0.05) * uWarpAmp;
+  vec3 q = p + vec3(curl.x, 0.0, curl.y);
+  return applyErosion(q, base, h);
+}
 
-  // Edge-aware erosion detail
-  //float det = erosionDetail(q * noiseScale, /*detailFreq*/ 10.0 * uErosionFreqMul, /*invAtBase*/ 1.0);
-  // Horizon erodes by remapping base through detail
-  //float d = clamp(remap(base, uErosionStrength * det, 1.0, 0.0, 1.0), 0.0, 1.0);
-
-  // edge-only erosion with curl-distorted detail (Horizon)
-  float d = applyErosion(p, base, h);
-
-  // (Optional) soft bottoms / tops (you already have uBaseSoftness/uTopSoftness)
-  d *= smoothstep(0.0, uBaseSoftness, h) * (1.0 - smoothstep(1.0 - uTopSoftness, 1.0, h));
-
-  return d;
+float densityAt(vec3 p){
+  float base = baseDensity(p);
+  if(base <= 0.0) return 0.0;
+  return detailDensity(p, base, height01(p));
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
