@@ -67,8 +67,36 @@ float dualHG_g(float cosTheta, float g, float w) {
 
 float triMix(vec3 v){ return v.x*0.625 + v.y*0.25 + v.z*0.125; } // octave weights
 
+const float cloudBaseY = 0.0;
+const float cloudTopY = 50.0;
 
-float densityAt(vec3 p){
+float height01(vec3 p) {
+  float h = (p.y - cloudBaseY) / max(1e-3, (cloudTopY - cloudBaseY));
+  return clamp(h, 0.0, 1.0);
+}
+
+// cumulus: round top, thinner near base
+float heightMaskCumulus(float h) { 
+  return smoothstep(0.05, 0.35, h) * (1.0 - smoothstep(0.75, 0.98, h)); 
+}
+
+// stratocumulus: flatter, mid-thickness
+float heightMaskStratoCu(float h) { 
+  return smoothstep(0.02, 0.20, h) * (1.0 - smoothstep(0.60, 0.90, h)); 
+}
+
+// stratus: biased to the bottom
+float heightMaskStratus(float h) { 
+  return 1.0 - smoothstep(0.15, 0.55, h); 
+}
+
+float heightMask(vec3 p, vec3 w) { 
+  float h = height01(p);
+  float m = w.x * heightMaskCumulus(h) + w.y * heightMaskStratoCu(h) + w.z * heightMaskStratus(h);
+  return clamp(m, 0.0, 1.0);
+}
+
+float densityAt(vec3 p) {
   // Low-freq sampling for base shape
   vec3 baseCoord = p * 0.01 + vec3(time*0.02, 0.0, 0.0);
   vec3 wS = texture(worley, baseCoord).rgb;     // Worley (3 octaves packed in RGB)
@@ -78,7 +106,7 @@ float densityAt(vec3 p){
   float pLow = triMix(pS);                      // 0..1
   float invW = 1.0 - wLow;
 
-  return smoothstep(0.5, 0.7, invW - pLow * 0.3);
+  return smoothstep(0.5, 0.7, invW - pLow * 0.3) * heightMask(p, vec3(1.0));
 }
 
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.

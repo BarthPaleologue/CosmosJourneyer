@@ -122,11 +122,10 @@ export async function createVolumetricCloudsPlayground(
         "cloudsPP",
         ["time", "cameraPos", "invProjection", "invView", "sunDir", "boxMin", "boxMax", "frame", "resolution"],
         ["worley", "perlin", "blueNoise2d", "depthSampler"],
-        1.0,
+        1,
         camera,
         Texture.BILINEAR_SAMPLINGMODE,
         engine,
-        true,
     );
 
     const lightDir = new Vector3(0.35, 0.2, 0.2).normalize();
