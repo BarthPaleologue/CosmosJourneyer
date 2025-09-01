@@ -347,10 +347,13 @@ void main(){
     }
     
     // Accumulate scattered light
-    vec3 lightContribution = lightTransmittance * sigma_s;
-    scatteredLight += lightContribution * transmittance * viewRayStepSize * lengthScale;
+    vec3 stepT = exp(-sigma_t * viewRayStepSize * lengthScale);
+    vec3 L     = lightTransmittance;                    // ambient+sun energy you computed
+    vec3 integ = sigma_s * (L - L * stepT) / max(sigma_t, vec3(1e-4));
 
-    transmittance *= exp(-sigma_t * viewRayStepSize * lengthScale);
+    scatteredLight += transmittance * integ;
+    transmittance  *= stepT;
+
     samplePoint += rd * viewRayStepSize;
     
     // early-out condition
