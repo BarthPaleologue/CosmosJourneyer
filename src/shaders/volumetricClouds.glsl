@@ -192,7 +192,7 @@ float coverageGate(float base, float cov){
 }
 
 
-float baseDensity(vec3 p){
+float getBaseDensity(vec3 p){
   // winded coords but NO curl, NO high-freq work
   vec3 wind = vec3(time*0.02, 0.0, 0.0);
   vec3 pwCoord = (p + wind) * noiseScale * uShapeFreqMul;
@@ -216,7 +216,7 @@ float detailDensity(vec3 p, float base, float h){
 }
 
 float densityAt(vec3 p){
-  float base = baseDensity(p);
+  float base = getBaseDensity(p);
   if(base <= 0.0) return 0.0;
   return detailDensity(p, base, height01(p));
 }
@@ -271,9 +271,13 @@ vec3 calculateLightEnergy(vec3 origin, float mu, float maxDistance){
   float tau = 0.0;
   for (int j = 0; j < lightStepCount; ++j){
     vec3 lp = origin + sunDir * t;
-    //float sdf = sampleLowResCloudMap(lp);
-    float d   = densityAt(lp); //sampleHighResDetail(sdf, lp);
-    tau += d * stepLen;
+
+    float density = getBaseDensity(lp);
+    if(density < 0.001) {
+      density = detailDensity(lp, density, height01(lp));
+    }
+
+    tau += density * stepLen;
     t   += stepLen;
   }
 
