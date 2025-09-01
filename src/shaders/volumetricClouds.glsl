@@ -215,12 +215,6 @@ float detailDensity(vec3 p, float base, float h){
   return applyErosion(q, base, h);
 }
 
-float densityAt(vec3 p){
-  float base = getBaseDensity(p);
-  if(base <= 0.0) return 0.0;
-  return detailDensity(p, base, height01(p));
-}
-
 // ▶ Ray–AABB intersection (slab method). Returns [t0, t1] if hit.
 bool intersectAABB(vec3 ro, vec3 rd, vec3 bmin, vec3 bmax, out float t0, out float t1){
   vec3 invD = 1.0 / rd;                  // INF is fine if any rd component is 0
@@ -329,16 +323,18 @@ void main(){
   vec3 scatteredLight = vec3(0.0);
   
   for (int i = 0; i < viewRayStepCount; i++) {
-    float density = densityAt(samplePoint);
-
-    vec3 sigma_t = density * vec3(0.8, 0.8, 1.0);
-    float albedo = 0.99;
-    vec3 sigma_s = sigma_t * albedo;
+    float density = getBaseDensity(samplePoint);
 
     if(density < 0.001) {
       samplePoint += rd * viewRayStepSize;
       continue;
     }
+
+    density = detailDensity(samplePoint, density, height01(samplePoint));
+
+    vec3 sigma_t = density * vec3(0.8, 0.8, 1.0);
+    float albedo = 0.99;
+    vec3 sigma_s = sigma_t * albedo;
 
     // Light ray marching
     vec3 lightTransmittance = vec3(1.0);
