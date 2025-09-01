@@ -162,7 +162,7 @@ float detailErode(vec3 p, float h01){
   vec3 pd = p + vec3(C.x, 0.0, C.y) + vec3(shear*h01, 0.0, 0.0);
 
   // use higher frequency for detail
-  float wHi = triMix(texture(worley, pd * (noiseScale * 18.0)).rgb); // 0..1
+  float wHi = triMix(texture(worley, pd * (noiseScale * 10.0)).rgb); // 0..1
   float invNearBase = mix(1.0, -1.0, smoothstep(0.0, 0.25, h01));    // invert near base
   float detail = 0.5 + 0.5 * invNearBase * (1.0 - 2.0 * wHi);        // centered detail
   return clamp(detail, 0.0, 1.0);
