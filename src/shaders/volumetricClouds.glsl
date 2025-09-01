@@ -253,36 +253,42 @@ vec3 multipleOctaveScattering(float tau, float cosTheta){
 }
 
 vec3 calculateLightEnergy(vec3 origin, float mu, float maxDistance){
-  const int lightStepCount = 12;                      // keep your budget
+  const int lightStepCount = 12;
   float stepLen = maxDistance * lengthScale / float(lightStepCount);
 
-  // jitter the light march with blue-noise too
+  // same jitter strategy
   vec2 bnUV = vUV * (resolution / 128.0);
-  float bn  = texture2D(blueNoise2d, bnUV).g;
-  bn = fract(bn + float(frame % 64) * 0.7236068);     // another low-disc offset
+  float bn  = fract(texture2D(blueNoise2d, bnUV).g + float(frame % 64) * 0.7236068);
 
   float t = stepLen * bn;
   float tau = 0.0;
   for (int j = 0; j < lightStepCount; ++j){
-    vec3 lp = origin + sunDir * t;
+    vec3 samplePoint = origin + sunDir * t;
 
-    float density = getBaseDensity(lp);
-    if(density < 0.001) {
-      density = detailDensity(lp, density, height01(lp));
+    // Start with cheap base density
+    float density = getBaseDensity(samplePoint);
+
+    // Only pay for detail when base suggests we're near/inside cloud
+    // (threshold ~ surface band; tweak 0.02 if too eager/lazy)
+    if (density > 0.02) {
+      density = detailDensity(samplePoint, density, height01(samplePoint));
     }
 
     tau += density * stepLen;
-    t   += stepLen;
+
+    // Early-out once transmittance is tiny
+    if (tau > 8.0) break;
+
+    t += stepLen;
   }
 
-  // ambient + sun (scale to taste)
   vec3 sunLight = vec3(50.0);
   vec3 ambient  = vec3(0.1);
-  vec3 powder   = vec3(1.0) - exp(-2.0 * tau * vec3(0.8,0.8,1.0)); // gentle boost
+  vec3 powder   = vec3(1.0) - exp(-2.0 * tau * vec3(0.8,0.8,1.0));
 
-  return ambient + sunLight * multipleOctaveScattering(tau, mu) * mix(2.0 * powder, vec3(1.0), clamp((mu+1.0)*0.5, 0.0, 1.0));
+  return ambient + sunLight * multipleOctaveScattering(tau, mu)
+       * mix(2.0 * powder, vec3(1.0), clamp((mu+1.0)*0.5, 0.0, 1.0));
 }
-
 vec3 ACESFilm(vec3 x) {
   // Narkowicz ACES fit
   const float a=2.51, b=0.03, c=2.43, d=0.59, e=0.14;
@@ -317,48 +323,51 @@ void main(){
   float bn = texture2D(blueNoise2d, bnUV).r;
 
   float jitter = bn * viewRayStepSize;       // [0, stepSize)
-  vec3 samplePoint = ro + rd * (t0 + jitter);
+  vec3 samplePoint = ro + rd * (t0 + jitter*0.2);
 
   vec3 transmittance = vec3(1.0);
   vec3 scatteredLight = vec3(0.0);
   
-  for (int i = 0; i < viewRayStepCount; i++) {
-    float density = getBaseDensity(samplePoint);
+  float rng = bn; // 0..1
 
-    if(density < 0.001) {
-      samplePoint += rd * viewRayStepSize;
-      continue;
-    }
+for (int i = 0; i < viewRayStepCount; i++) {
+  // --- per-step low-discrepancy jitter (decorrelates slices)
+  rng = fract(rng + 1.0 / 1.61803398875);   // golden-ratio sequence
+  float jitterSym = (rng - 0.5);            // -0.5..+0.5
+  float curStepLen = viewRayStepSize * (1.0 + 0.5 * jitterSym);  // ±25% around mean
 
-    density = detailDensity(samplePoint, density, height01(samplePoint));
-
-    vec3 sigma_t = density * vec3(0.8, 0.8, 1.0);
-    float albedo = 0.99;
-    vec3 sigma_s = sigma_t * albedo;
-
-    // Light ray marching
-    vec3 lightTransmittance = vec3(1.0);
-    float tL0, tL1;
-    if (intersectAABB(samplePoint, sunDir, boxMin, boxMax, tL0, tL1) && tL1 > 0.0) {
-      float startL  = max(0.0, tL0);
-      vec3  lOrigin = samplePoint + sunDir * startL;
-      float lLen    = max(0.0, tL1 - startL);
-      lightTransmittance = calculateLightEnergy(lOrigin, dot(rd, sunDir), lLen);
-    }
-    
-    // Accumulate scattered light
-    vec3 stepT = exp(-sigma_t * viewRayStepSize * lengthScale);
-    vec3 L     = lightTransmittance;                    // ambient+sun energy you computed
-    vec3 integ = sigma_s * (L - L * stepT) / max(sigma_t, vec3(1e-4));
-
-    scatteredLight += transmittance * integ;
-    transmittance  *= stepT;
-
-    samplePoint += rd * viewRayStepSize;
-    
-    // early-out condition
-    if (max(max(transmittance.r, transmittance.g), transmittance.b) < 1e-3) break;
+  float density = getBaseDensity(samplePoint);
+  if (density < 0.001) {
+    samplePoint += rd * curStepLen;
+    continue;
   }
+
+  density = detailDensity(samplePoint, density, height01(samplePoint));
+  vec3 sigma_t = density * vec3(0.8, 0.8, 1.0);
+  vec3 sigma_s = sigma_t * 0.99;
+
+  // Light ray marching (unchanged)
+  vec3 lightTransmittance = vec3(1.0);
+  float tL0, tL1;
+  if (intersectAABB(samplePoint, sunDir, boxMin, boxMax, tL0, tL1) && tL1 > 0.0) {
+    float startL  = max(0.0, tL0);
+    vec3  lOrigin = samplePoint + sunDir * startL;
+    float lLen    = max(0.0, tL1 - startL);
+    lightTransmittance = calculateLightEnergy(lOrigin, dot(rd, sunDir), lLen);
+  }
+
+  // --- analytic per-step integral with *curStepLen*
+  vec3 stepT      = exp(-sigma_t * curStepLen * lengthScale);
+  vec3 L          = lightTransmittance;                       // ambient+sun already inside
+  vec3 integScatt = sigma_s * (L - L * stepT) / max(sigma_t, vec3(1e-4));
+
+  scatteredLight += transmittance * integScatt;
+  transmittance  *= stepT;
+
+  samplePoint += rd * curStepLen;
+
+  if (max(max(transmittance.r, transmittance.g), transmittance.b) < 1e-3) break;
+}
 
   vec3 hdr = screenColor.rgb * transmittance + scatteredLight;
   vec3 outRgb = ACESFilm(hdr);
