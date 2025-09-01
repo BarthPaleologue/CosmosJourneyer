@@ -319,11 +319,8 @@ void main(){
   int viewRayStepCount = 32;
   float viewRayStepSize = distanceThroughMedium / float(viewRayStepCount);
 
-  // Tile blue-noise to screen; animate by a low-discrepancy offset
-  const float PHI = 1.61803398875;           // golden ratio
   vec2 bnUV = vUV * (resolution / 128.0);     // assumes a 128x128 blue-noise tile
   float bn = texture2D(blueNoise2d, bnUV).r;
-  bn = fract(bn + float(frame % 64) * (1.0 / PHI)); // temporal shuffle
 
   float jitter = bn * viewRayStepSize;       // [0, stepSize)
   vec3 samplePoint = ro + rd * (t0 + jitter);
