@@ -55,7 +55,7 @@ export async function createTelluricPlanetScene(
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "default";
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const heightMaps = await loadHeightMaps(scene, progressMonitor);
 
@@ -193,7 +193,14 @@ export async function createTelluricPlanetScene(
     }
 
     if (model.atmosphere !== null) {
-        const atmosphereUniforms = new AtmosphereUniforms(model.radius, model.mass, 298, model.atmosphere);
+        const atmosphereUniforms = new AtmosphereUniforms(
+            model.radius,
+            model.mass,
+            298,
+            model.atmosphere,
+            textures.generators.transmittanceLut,
+            scene,
+        );
 
         const atmosphere = new AtmosphericScatteringPostProcess(
             terrain.getTransform(),

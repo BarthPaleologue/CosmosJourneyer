@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, type AbstractEngine, type Scene } from "@babylonjs/core";
+import { Vector3, type Scene, type WebGPUEngine } from "@babylonjs/core";
 
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
@@ -35,7 +35,7 @@ import { Settings } from "@/settings";
 import { enablePhysics } from "../utils";
 
 export async function createSolScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new UberScene(engine);
@@ -46,7 +46,7 @@ export async function createSolScene(
 
     await initI18n();
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const scalingFactor = 6_000e3 * 11;
 

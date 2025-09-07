@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "./loadingProgressMonitor";
@@ -30,9 +31,10 @@ export type RenderingAssets = {
 
 export async function loadRenderingAssets(
     scene: Scene,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<RenderingAssets> {
-    const texturesPromise = loadTextures(scene, progressMonitor);
+    const texturesPromise = loadTextures(scene, engine, progressMonitor);
 
     const textures = await texturesPromise;
 

@@ -15,19 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color4, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Color4, MeshBuilder, PointLight, Vector3, type WebGPUEngine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { TransmittanceLutGenerator } from "@/frontend/postProcesses/atmosphere/atmosphereTransmittanceLut";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 
-export function createAtmosphericScatteringScene(
-    engine: AbstractEngine,
+export async function createAtmosphericScatteringScene(
+    engine: WebGPUEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
@@ -74,7 +74,15 @@ export function createAtmosphericScatteringScene(
         },
     };
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, earthMass, 298, atmosphereModel);
+    const transmittanceLutGenerator = await TransmittanceLutGenerator.New(engine);
+    const atmosphereUniforms = new AtmosphereUniforms(
+        scalingFactor,
+        earthMass,
+        298,
+        atmosphereModel,
+        transmittanceLutGenerator,
+        scene,
+    );
 
     const atmosphere = new AtmosphericScatteringPostProcess(sphere, scalingFactor, atmosphereUniforms, [light], scene);
     camera.attachPostProcess(atmosphere);
@@ -89,5 +97,5 @@ export function createAtmosphericScatteringScene(
         sphere.position.subtractInPlace(cameraPosition);
     });
 
-    return Promise.resolve(scene);
+    return scene;
 }

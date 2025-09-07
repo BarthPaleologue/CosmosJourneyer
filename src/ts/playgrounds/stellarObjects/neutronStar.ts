@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis, Color4 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Axis, Color4, type WebGPUEngine } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -36,7 +35,7 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { enablePhysics } from "../utils";
 
 export async function createNeutronStarScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -44,7 +43,7 @@ export async function createNeutronStarScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

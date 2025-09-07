@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { FreeCamera, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
@@ -30,7 +30,7 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 import { enablePhysics } from "../utils";
 
 export async function createSunScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -39,7 +39,7 @@ export async function createSunScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const scalingFactor = 6_000e3 * 150;
 

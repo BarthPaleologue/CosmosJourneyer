@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -32,7 +32,7 @@ import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHo
 import { enablePhysics } from "../utils";
 
 export async function createBlackHoleScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -40,7 +40,7 @@ export async function createBlackHoleScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000000;

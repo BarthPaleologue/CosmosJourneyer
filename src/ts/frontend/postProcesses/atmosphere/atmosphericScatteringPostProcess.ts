@@ -58,7 +58,7 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             ...atmosphereUniforms.getUniformNames(),
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames)];
+        const samplers: string[] = [...Object.values(SamplerUniformNames), ...atmosphereUniforms.getSamplerNames()];
 
         super(
             `${planetTransform.name}AtmospherePostProcess`,
@@ -90,6 +90,8 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             atmosphereUniforms.setUniforms(effect);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
+
+            atmosphereUniforms.setSamplerUniforms(effect);
         });
     }
 }

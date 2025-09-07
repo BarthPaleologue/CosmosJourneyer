@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -38,7 +38,7 @@ import { Settings } from "@/settings";
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -46,7 +46,7 @@ export async function createSpaceStationScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000;

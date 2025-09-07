@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -38,7 +38,7 @@ import { initI18n } from "@/i18n";
 import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     await initI18n();
@@ -58,7 +58,7 @@ export async function createStarSystemViewScene(
 
     const havokPlugin = await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const starSystemView = new StarSystemView(
         scene,

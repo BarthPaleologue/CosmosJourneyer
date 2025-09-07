@@ -45,6 +45,7 @@ import {
 import { createTexturePools } from "@/frontend/assets/textures/texturePools";
 import { loadWaterTextures } from "@/frontend/assets/textures/water";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { TransmittanceLutGenerator } from "@/frontend/postProcesses/atmosphere/atmosphereTransmittanceLut";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
@@ -221,7 +222,16 @@ export async function createEarthScene(
     );
     camera.attachPostProcess(cloudsPostProcess);
 
-    const atmosphereUniforms = new AtmosphereUniforms(earthRadius, earthModel.mass, 298, earthModel.atmosphere);
+    const transmittanceLutGenerator = await TransmittanceLutGenerator.New(engine);
+    const atmosphereUniforms = new AtmosphereUniforms(
+        earthRadius,
+        earthModel.mass,
+        298,
+        earthModel.atmosphere,
+        transmittanceLutGenerator,
+        scene,
+    );
+
     const atmospherePostProcess = new AtmosphericScatteringPostProcess(
         terrain.getTransform(),
         earthRadius,

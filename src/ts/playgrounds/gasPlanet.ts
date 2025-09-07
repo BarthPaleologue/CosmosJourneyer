@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
 
@@ -24,24 +24,22 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { Settings } from "@/settings";
 
-import { ItemPool } from "../utils/dataStructures/itemPool";
 import { enablePhysics } from "./utils";
 
 export async function createGasPlanetScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.clearColor.setAll(0);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     await enablePhysics(scene);
 
@@ -74,9 +72,7 @@ export async function createGasPlanetScene(
         [],
     );
 
-    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
-
-    const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
+    const planet = new GasPlanet(gasPlanetModel, textures, scene);
 
     const shadow = new ShadowPostProcess(
         planet.getTransform(),

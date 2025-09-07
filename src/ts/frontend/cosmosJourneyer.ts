@@ -460,7 +460,7 @@ export class CosmosJourneyer {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const assets = await loadAssets(mainScene, loadingProgressMonitor);
+        const assets = await loadAssets(mainScene, engine, loadingProgressMonitor);
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);

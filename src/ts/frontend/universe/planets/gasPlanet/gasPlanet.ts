@@ -71,12 +71,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
      * @param scene
      */
-    constructor(
-        model: DeepReadonly<GasPlanetModel>,
-        textures: Textures,
-        ringsLutPool: ItemPool<RingsProceduralPatternLut>,
-        scene: Scene,
-    ) {
+    public constructor(model: DeepReadonly<GasPlanetModel>, textures: Textures, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
@@ -125,6 +120,8 @@ export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_
             model.mass,
             273, //TODO: do not hardcode temperature
             model.atmosphere,
+            textures.generators.transmittanceLut,
+            scene,
         );
 
         if (this.model.rings !== null) {

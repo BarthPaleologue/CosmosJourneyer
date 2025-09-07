@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -36,7 +36,7 @@ import { initI18n } from "@/i18n";
 import { enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -46,7 +46,7 @@ export async function createSpaceStationUIScene(
 
     await initI18n();
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

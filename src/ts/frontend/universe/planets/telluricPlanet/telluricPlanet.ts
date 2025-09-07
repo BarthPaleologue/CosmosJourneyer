@@ -115,6 +115,8 @@ export class TelluricPlanet
                 this.model.mass,
                 this.model.temperature.max,
                 this.model.atmosphere,
+                assets.textures.generators.transmittanceLut,
+                scene,
             );
         } else {
             this.atmosphereUniforms = null;

@@ -29,6 +29,7 @@ import {
     loadMarsNormal,
 } from "@/frontend/assets/textures/planetSurfaceTextures/mars";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { TransmittanceLutGenerator } from "@/frontend/postProcesses/atmosphere/atmosphereTransmittanceLut";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { ChunkForgeCompute } from "@/frontend/terrain/sphere/chunkForgeCompute";
@@ -135,7 +136,16 @@ export async function createMarsScene(
 
     const chunkForge = chunkForgeResult.value;
 
-    const atmosphereUniforms = new AtmosphereUniforms(marsRadius, marsModel.mass, 298, marsModel.atmosphere);
+    const transmittanceLutGenerator = await TransmittanceLutGenerator.New(engine);
+    const atmosphereUniforms = new AtmosphereUniforms(
+        marsRadius,
+        marsModel.mass,
+        298,
+        marsModel.atmosphere,
+        transmittanceLutGenerator,
+        scene,
+    );
+
     const atmospherePostProcess = new AtmosphericScatteringPostProcess(
         terrain.getTransform(),
         marsRadius,

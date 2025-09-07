@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion, type WebGPUEngine } from "@babylonjs/core";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -35,7 +34,7 @@ import { CollisionMask } from "@/settings";
 import { enablePhysics } from "./utils";
 
 export async function createAutomaticLandingScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -43,7 +42,7 @@ export async function createAutomaticLandingScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
 

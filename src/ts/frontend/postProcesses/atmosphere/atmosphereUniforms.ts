@@ -15,8 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { type Effect } from "@babylonjs/core/Materials/effect";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
@@ -26,9 +28,12 @@ import { computeRayleighBetaRGB } from "@/utils/physics/atmosphere/rayleighScatt
 import { computeAtmospherePressureScaleHeight, getHeightForPressure } from "@/utils/physics/atmosphere/scaleHeight";
 import { PresetBands } from "@/utils/physics/constants";
 import { computeGravityAcceleration } from "@/utils/physics/gravity";
+import { createStorageTexture2D } from "@/utils/texture";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
+
+import type { TransmittanceLutGenerator } from "./atmosphereTransmittanceLut";
 
 const AtmosphereUniformNames = {
     ATMOSPHERE_RADIUS: "atmosphere_radius",
@@ -41,6 +46,10 @@ const AtmosphereUniformNames = {
     ATMOSPHERE_OZONE_COEFFS: "atmosphere_ozoneCoeffs",
     ATMOSPHERE_OZONE_FALLOFF: "atmosphere_ozoneFalloff",
     ATMOSPHERE_SUN_INTENSITY: "atmosphere_sunIntensity",
+};
+
+const AtmosphereSamplerNames = {
+    TRANSMITTANCE_LUT: "transmittance_lut",
 };
 
 export class AtmosphereUniforms {
@@ -84,7 +93,7 @@ export class AtmosphereUniforms {
      * Ozone absorption coefficients (red, green, blue)
      * @see https://sebh.github.io/publications/egsr2020.pdf (Hillaire 2020)
      */
-    ozoneAbsorptionCoefficients: Vector3;
+    ozoneAbsorptionCoefficients: [number, number, number];
 
     /**
      * Ozone absorption falloff around the ozone layer height (in meters)
@@ -96,7 +105,16 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
+    readonly transmittanceLut: RawTexture;
+
+    constructor(
+        planetBoundingRadius: number,
+        mass: number,
+        temperature: number,
+        model: DeepReadonly<AtmosphereModel>,
+        transmittanceLutGenerator: TransmittanceLutGenerator,
+        scene: Scene,
+    ) {
         const rayleighScatteringCoefficients = computeRayleighBetaRGB(
             model.gasMix,
             model.seaLevelPressure,
@@ -133,12 +151,41 @@ export class AtmosphereUniforms {
         this.mieAsymmetry = mieScattering.gRGB;
 
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
-        );
+        this.ozoneAbsorptionCoefficients = [
+            (0.6e-6 * Settings.EARTH_ATMOSPHERE_THICKNESS) / atmosphereThickness,
+            (1.8e-6 * Settings.EARTH_ATMOSPHERE_THICKNESS) / atmosphereThickness,
+            (0.085e-6 * Settings.EARTH_ATMOSPHERE_THICKNESS) / atmosphereThickness,
+        ];
         this.ozoneFalloff = (5e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
 
         this.lightIntensity = 15;
+
+        this.transmittanceLut = createStorageTexture2D(
+            "AtmosphereTransmittanceLut",
+            { width: 256, height: 64 },
+            Constants.TEXTUREFORMAT_RGBA,
+            scene,
+        );
+
+        transmittanceLutGenerator.dispatch(this.transmittanceLut, {
+            radius: {
+                min: planetBoundingRadius,
+                max: this.atmosphereRadius,
+            },
+            rayleighScattering: {
+                coefficients: this.rayleighScatteringCoefficients,
+                scaleHeight: this.rayleighHeight,
+            },
+            mieScattering: {
+                coefficients: this.mieScatteringCoefficients,
+                scaleHeight: this.mieHeight,
+            },
+            ozoneAbsorption: {
+                coefficients: this.ozoneAbsorptionCoefficients,
+                height: this.ozoneHeight,
+                falloff: this.ozoneFalloff,
+            },
+        });
     }
 
     setUniforms(effect: Effect) {
@@ -149,12 +196,20 @@ export class AtmosphereUniforms {
         effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, ...this.mieScatteringCoefficients);
         effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, ...this.mieAsymmetry);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_HEIGHT, this.ozoneHeight);
-        effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, this.ozoneAbsorptionCoefficients);
+        effect.setFloat3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, ...this.ozoneAbsorptionCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_FALLOFF, this.ozoneFalloff);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_SUN_INTENSITY, this.lightIntensity);
     }
 
+    setSamplerUniforms(effect: Effect) {
+        effect.setTexture(AtmosphereSamplerNames.TRANSMITTANCE_LUT, this.transmittanceLut);
+    }
+
     getUniformNames(): string[] {
         return Object.values(AtmosphereUniformNames);
+    }
+
+    getSamplerNames(): string[] {
+        return Object.values(AtmosphereSamplerNames);
     }
 }

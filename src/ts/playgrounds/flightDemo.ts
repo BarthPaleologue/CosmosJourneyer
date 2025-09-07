@@ -21,8 +21,8 @@ import {
     PBRMetallicRoughnessMaterial,
     SolidParticleSystem,
     type SolidParticle,
+    type WebGPUEngine,
 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -37,7 +37,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { enablePhysics } from "./utils";
 
 export async function createFlightDemoScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -46,7 +46,7 @@ export async function createFlightDemoScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();

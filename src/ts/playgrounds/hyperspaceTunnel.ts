@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { WebGPUEngine } from "@babylonjs/core";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -27,7 +27,7 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
 export async function createHyperspaceTunnelDemo(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ) {
     const scene = new Scene(engine);
@@ -38,7 +38,7 @@ export async function createHyperspaceTunnelDemo(
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
     directionalLight.intensity = 0.7;

@@ -15,9 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Scene } from "@babylonjs/core/scene";
+import { FreeCamera, MeshBuilder, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -28,12 +26,12 @@ import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPl
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
 export async function createGrassScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     // This creates and positions a free camera (non-mesh)
     const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);

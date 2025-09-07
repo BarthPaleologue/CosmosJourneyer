@@ -16,27 +16,26 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
-import { type Scene } from "@babylonjs/core/scene";
 
-import { loadAudioAssets, type AudioAssets } from "./audio";
-import { type ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { loadRenderingAssets, type RenderingAssets } from "./renderingAssets";
+import { TransmittanceLutGenerator } from "@/frontend/postProcesses/atmosphere/atmosphereTransmittanceLut";
 
-export type Assets = {
-    readonly audio: Readonly<AudioAssets>;
-    readonly rendering: Readonly<RenderingAssets>;
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+
+export type TextureGenerators = {
+    readonly transmittanceLut: TransmittanceLutGenerator;
 };
 
-export async function loadAssets(
-    scene: Scene,
+export async function createTextureGenerators(
     engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
-): Promise<Assets> {
-    const audioAssetsPromise = loadAudioAssets(progressMonitor);
-    const renderingAssetsPromise = loadRenderingAssets(scene, engine, progressMonitor);
+): Promise<TextureGenerators> {
+    progressMonitor?.startTask();
+    const transmittanceLutGeneratorPromise = TransmittanceLutGenerator.New(engine).then((generator) => {
+        progressMonitor?.completeTask();
+        return generator;
+    });
 
     return {
-        audio: await audioAssetsPromise,
-        rendering: await renderingAssetsPromise,
+        transmittanceLut: await transmittanceLutGeneratorPromise,
     };
 }

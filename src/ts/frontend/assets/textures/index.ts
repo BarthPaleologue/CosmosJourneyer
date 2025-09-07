@@ -18,6 +18,7 @@
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
 
+import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
@@ -28,6 +29,7 @@ import { loadMaterialTextures, type AllMaterialTextures } from "./materials";
 import { loadParticleTextures, type ParticleTextures } from "./particles";
 import { loadRingsTextures, type RingsTextures } from "./rings";
 import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
+import { createTextureGenerators, type TextureGenerators } from "./textureGenerators";
 import { createTexturePools, type TexturePools } from "./texturePools";
 import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
 import { loadWaterTextures, type WaterTextures } from "./water";
@@ -59,6 +61,7 @@ export type Textures = {
     };
     readonly empty: Texture;
     readonly pools: Readonly<TexturePools>;
+    readonly generators: Readonly<TextureGenerators>;
 };
 
 /**
@@ -67,7 +70,11 @@ export type Textures = {
  * @param progressMonitor - The progress monitor to report loading progress
  * @returns A promise resolving to the Textures object
  */
-export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
+export async function loadTextures(
+    scene: Scene,
+    engine: WebGPUEngine,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<Textures> {
     const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
     // Environment textures
@@ -81,6 +88,8 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
     const ringsTexturesPromise = loadRingsTextures(scene, progressMonitor);
 
     const waterTexturesPormise = loadWaterTextures(scene, progressMonitor);
+
+    const textureGeneratorsPromise = createTextureGenerators(engine, progressMonitor);
 
     // Assemble and return the textures structure
     return {
@@ -101,5 +110,6 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         },
         empty: await emptyTexturePromise,
         pools: createTexturePools(scene),
+        generators: await textureGeneratorsPromise,
     };
 }

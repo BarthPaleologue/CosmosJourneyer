@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Light, PointLight, Scene, TransformNode, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Light, PointLight, Scene, TransformNode, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
@@ -24,17 +24,14 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
-import { ItemPool } from "@/utils/dataStructures/itemPool";
-
 import { enablePhysics } from "../utils";
 
 export async function createSaturnScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -43,7 +40,7 @@ export async function createSaturnScene(
 
     await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, engine, progressMonitor);
 
     const scalingFactor = 6_000e3 * 16;
 
@@ -71,9 +68,7 @@ export async function createSaturnScene(
 
     const gasPlanetModel = getSaturnModel([]);
 
-    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
-
-    const planet = new GasPlanet(gasPlanetModel, assets.textures, ringsLutPool, scene);
+    const planet = new GasPlanet(gasPlanetModel, assets.textures, scene);
 
     let asteroidField: AsteroidField | null = null;
     if (gasPlanetModel.rings !== null) {

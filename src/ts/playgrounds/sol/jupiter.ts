@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis, Light, PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Axis, Light, PointLight, Scene, Vector3, type WebGPUEngine } from "@babylonjs/core";
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
@@ -23,22 +23,19 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-
-import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 import { enablePhysics } from "../utils";
 
 export async function createJupiterScene(
-    engine: AbstractEngine,
+    engine: WebGPUEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     await enablePhysics(scene);
 
@@ -64,9 +61,7 @@ export async function createJupiterScene(
 
     const gasPlanetModel = getJupiterModel([]);
 
-    const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
-
-    const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
+    const planet = new GasPlanet(gasPlanetModel, textures, scene);
 
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
