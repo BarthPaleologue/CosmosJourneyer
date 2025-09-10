@@ -52,7 +52,7 @@ export class ShipControls implements Controls {
     private spaceship: Spaceship;
 
     readonly thirdPersonCameraDefaultRadius = 60;
-    readonly thirdPersonCameraDefaultAlpha = -3.14 / 2;
+    readonly thirdPersonCameraDefaultAlpha = 3.14 / 2;
     readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
 
@@ -255,8 +255,20 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
         this.resetCameraHandler = () => {
-            quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, -3.14 / 2, 200);
-            quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, 3.14 / 2.2, 200);
+            quickAnimation(
+                this.thirdPersonCamera,
+                "alpha",
+                this.thirdPersonCamera.alpha,
+                this.thirdPersonCameraDefaultAlpha,
+                200,
+            );
+            quickAnimation(
+                this.thirdPersonCamera,
+                "beta",
+                this.thirdPersonCamera.beta,
+                this.thirdPersonCameraDefaultBeta,
+                200,
+            );
             quickAnimation(
                 this.thirdPersonCamera,
                 "radius",
@@ -348,7 +360,7 @@ export class ShipControls implements Controls {
                 const authority = 0.7;
 
                 const currentRoll = angularVelocity.dot(shipForward);
-                const targetRoll = -this.spaceship.maxRollSpeed * inputRoll;
+                const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
                 angularImpulse.addInPlace(shipForward.scale(authority * (targetRoll - currentRoll)));
 
                 const currentYaw = angularVelocity.dot(shipUp);
@@ -356,7 +368,7 @@ export class ShipControls implements Controls {
                 angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
                 const currentPitch = angularVelocity.dot(shipRight);
-                const targetPitch = this.spaceship.maxPitchSpeed * inputPitch;
+                const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
                 angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
