@@ -619,12 +619,12 @@ export class Spaceship implements Transformable {
                 if (Math.abs(speedDifference) > 2) {
                     if (speedDifference < 0) {
                         this.aggregate.body.applyForce(
-                            forwardDirection.scale(-this.thrusterForce),
+                            forwardDirection.scale(this.thrusterForce),
                             this.aggregate.body.getObjectCenterWorld(),
                         );
                     } else {
                         this.aggregate.body.applyForce(
-                            forwardDirection.scale(0.7 * this.thrusterForce),
+                            forwardDirection.scale(-0.7 * this.thrusterForce),
                             this.aggregate.body.getObjectCenterWorld(),
                         );
                     }
