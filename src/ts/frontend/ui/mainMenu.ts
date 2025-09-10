@@ -220,9 +220,7 @@ export class MainMenu {
 
         const starSystemController = this.starSystemView.getStarSystem();
 
-        const currentForward = this.controls
-            .getTransform()
-            .getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
+        const currentForward = this.controls.getTransform().forward;
 
         const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.idInSystem);
         const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);

@@ -339,19 +339,15 @@ export class ShipControls implements Controls {
                     spaceship.cancelLanding();
                 }
                 spaceship.aggregate.body.applyForce(
-                    this.getTransform()
-                        .getDirection(Vector3.Up())
-                        .scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.getTransform().up.scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
                     spaceship.aggregate.body.getObjectCenterWorld(),
                 );
             }
 
             if (!spaceship.isLanded()) {
-                const shipForward = this.getTransform().getDirection(
-                    Vector3.Forward(this.getTransform().getScene().useRightHandedSystem),
-                );
-                const shipUp = this.getTransform().getDirection(Vector3.Up());
-                const shipRight = this.getTransform().getDirection(Vector3.Right());
+                const shipForward = this.getTransform().forward;
+                const shipUp = this.getTransform().up;
+                const shipRight = this.getTransform().right;
 
                 const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
 

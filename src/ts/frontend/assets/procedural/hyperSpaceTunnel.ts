@@ -103,10 +103,8 @@ export class HyperSpaceTunnel implements Transformable {
             Space.LOCAL,
         );
 
-        const targetForward = this.parent.getDirection(Vector3.Forward(this.parent.getScene().useRightHandedSystem));
-        const currentForward = this.getTransform().getDirection(
-            Vector3.Forward(this.getTransform().getScene().useRightHandedSystem),
-        );
+        const targetForward = this.parent.forward;
+        const currentForward = this.getTransform().forward;
 
         if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
 
