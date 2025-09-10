@@ -46,7 +46,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { getForwardDirection, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -169,7 +169,7 @@ export class Spaceship implements Transformable {
             if (child.name.includes("mainThruster")) {
                 const mainThruster = new Thruster(
                     child,
-                    getForwardDirection(this.instanceRoot).negate(),
+                    this.instanceRoot.getDirection(Vector3.Forward(scene.useRightHandedSystem)).negate(),
                     this.aggregate,
                 );
                 this.mainThrusters.push(mainThruster);
@@ -341,7 +341,9 @@ export class Spaceship implements Transformable {
 
         return warpDrive !== null && warpDrive.isEnabled()
             ? warpDrive.getWarpSpeed()
-            : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
+            : this.aggregate.body
+                  .getLinearVelocity()
+                  .dot(this.getTransform().getDirection(Vector3.Forward(this.scene.useRightHandedSystem)));
     }
 
     public getThrottle(): number {
@@ -517,7 +519,9 @@ export class Spaceship implements Transformable {
             return;
         }
 
-        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(warpDrive.getWarpSpeed());
+        const warpSpeed = this.aggregate.transformNode
+            .getDirection(Vector3.Forward(this.scene.useRightHandedSystem))
+            .scale(warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
 
         const currentForwardSpeed = Vector3.Dot(
@@ -600,7 +604,7 @@ export class Spaceship implements Transformable {
 
         if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
-            const forwardDirection = getForwardDirection(this.getTransform());
+            const forwardDirection = this.getTransform().getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
             if (this.mainEngineThrottle !== 0) {
@@ -615,12 +619,12 @@ export class Spaceship implements Transformable {
                 if (Math.abs(speedDifference) > 2) {
                     if (speedDifference < 0) {
                         this.aggregate.body.applyForce(
-                            forwardDirection.scale(this.thrusterForce),
+                            forwardDirection.scale(-this.thrusterForce),
                             this.aggregate.body.getObjectCenterWorld(),
                         );
                     } else {
                         this.aggregate.body.applyForce(
-                            forwardDirection.scale(-0.7 * this.thrusterForce),
+                            forwardDirection.scale(0.7 * this.thrusterForce),
                             this.aggregate.body.getObjectCenterWorld(),
                         );
                     }

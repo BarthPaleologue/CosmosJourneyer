@@ -51,12 +51,7 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import {
-    getForwardDirection,
-    getRotationQuaternion,
-    setRotationQuaternion,
-    translate,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { getRotationQuaternion, setRotationQuaternion, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
@@ -331,7 +326,9 @@ export class StarSystemView implements View {
             }
 
             // first, align spaceship with target
-            const currentForward = getForwardDirection(shipControls.getTransform());
+            const currentForward = shipControls
+                .getTransform()
+                .getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
             const targetForward = target
                 .getTransform()
                 .getAbsolutePosition()
@@ -407,9 +404,10 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
                 translate(
                     characterControls.getTransform(),
-                    getForwardDirection(shipControls.getTransform()).scale(
-                        3 + shipControls.getSpaceship().boundingExtent.z / 2,
-                    ),
+                    shipControls
+                        .getTransform()
+                        .getDirection(Vector3.Forward(this.scene.useRightHandedSystem))
+                        .scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
                 );
 
                 setRotationQuaternion(

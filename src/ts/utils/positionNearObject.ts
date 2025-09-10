@@ -20,12 +20,7 @@ import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type Controls } from "@/frontend/uberCore/controls";
-import {
-    getUpwardDirection,
-    roll,
-    rotateAround,
-    setRotationQuaternion,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { roll, rotateAround, setRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
 import { type CanHaveRings } from "@/frontend/universe/architecture/canHaveRings";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -132,7 +127,7 @@ export function positionNearObjectWithStarVisible(
         const distBodyToStar = dirBodyToStar.length();
         dirBodyToStar.scaleInPlace(1 / distBodyToStar);
 
-        const upDirection = getUpwardDirection(object.getTransform());
+        const upDirection = object.getTransform().getDirection(Vector3.Up());
         const lateralDirection = Vector3.Cross(dirBodyToStar, upDirection);
 
         const displacement = nearestStar
@@ -190,7 +185,7 @@ export function positionNearObjectAsteroidField(
 
     const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
-    const upDirection = getUpwardDirection(body.getTransform());
+    const upDirection = body.getTransform().getDirection(Vector3.Up());
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
     return bodyPosition

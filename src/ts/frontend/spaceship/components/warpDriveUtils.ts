@@ -20,7 +20,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 export function canEngageWarpDrive(
@@ -51,7 +50,10 @@ export function canEngageWarpDrive(
 
     const inverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
     const relativePosition = Vector3.TransformCoordinates(shipPosition, inverseWorld);
-    const relativeForward = Vector3.TransformNormal(getForwardDirection(shipTransform), inverseWorld);
+    const relativeForward = Vector3.TransformNormal(
+        shipTransform.getDirection(Vector3.Forward(shipTransform.getScene().useRightHandedSystem)),
+        inverseWorld,
+    );
     const distanceAboveRings = relativePosition.y;
     const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
 
