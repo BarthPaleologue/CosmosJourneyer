@@ -1,0 +1,3 @@
+"use strict";(globalThis.webpackChunkcosmos_journeyer=globalThis.webpackChunkcosmos_journeyer||[]).push([["974"],{63673:function(e,r,t){t.r(r),t.d(r,{lodPixelShaderWGSL:()=>u});var a=t(66755);let o="lodPixelShader",m=`const GammaEncodePowerApprox=1.0/2.2;varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;uniform lod: f32;uniform gamma: i32;@fragment
+fn main(input: FragmentInputs)->FragmentOutputs {fragmentOutputs.color=textureSampleLevel(textureSampler,textureSamplerSampler,fragmentInputs.vUV,uniforms.lod);if (uniforms.gamma==0) {fragmentOutputs.color=vec4f(pow(fragmentOutputs.color.rgb,vec3f(GammaEncodePowerApprox)),fragmentOutputs.color.a);}}
+`;a.v.ShadersStoreWGSL[o]||(a.v.ShadersStoreWGSL[o]=m);let u={name:o,shader:m}}}]);
