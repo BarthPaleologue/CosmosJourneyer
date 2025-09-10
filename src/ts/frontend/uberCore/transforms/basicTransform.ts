@@ -59,11 +59,7 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
  * @param amount
  */
 export function roll(transformNode: TransformNode, amount: number): void {
-    rotate(
-        transformNode,
-        transformNode.getDirection(Vector3.Forward(transformNode.getScene().useRightHandedSystem)),
-        amount,
-    );
+    rotate(transformNode, transformNode.forward, amount);
 }
 
 /**
@@ -72,7 +68,7 @@ export function roll(transformNode: TransformNode, amount: number): void {
  * @param amount
  */
 export function pitch(transformNode: TransformNode, amount: number): void {
-    rotate(transformNode, transformNode.getDirection(Vector3.Left()), amount);
+    rotate(transformNode, transformNode.right, amount);
 }
 
 /**
@@ -81,7 +77,7 @@ export function pitch(transformNode: TransformNode, amount: number): void {
  * @param amount
  */
 export function yaw(transformNode: TransformNode, amount: number): void {
-    rotate(transformNode, transformNode.getDirection(Vector3.Up()), amount);
+    rotate(transformNode, transformNode.up, amount);
 }
 
 /* #endregion directions */

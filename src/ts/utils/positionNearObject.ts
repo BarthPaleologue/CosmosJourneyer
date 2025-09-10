@@ -127,7 +127,7 @@ export function positionNearObjectWithStarVisible(
         const distBodyToStar = dirBodyToStar.length();
         dirBodyToStar.scaleInPlace(1 / distBodyToStar);
 
-        const upDirection = object.getTransform().getDirection(Vector3.Up());
+        const upDirection = object.getTransform().up;
         const lateralDirection = Vector3.Cross(dirBodyToStar, upDirection);
 
         const displacement = nearestStar
@@ -185,7 +185,7 @@ export function positionNearObjectAsteroidField(
 
     const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
-    const upDirection = body.getTransform().getDirection(Vector3.Up());
+    const upDirection = body.getTransform().up;
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
     return bodyPosition

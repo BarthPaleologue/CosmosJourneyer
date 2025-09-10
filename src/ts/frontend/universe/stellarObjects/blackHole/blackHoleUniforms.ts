@@ -17,7 +17,6 @@
 
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
@@ -69,10 +68,7 @@ export class BlackHoleUniforms {
         effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
         effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, this.rotationPeriod);
         effect.setVector3(BlackHoleUniformNames.ROTATION_AXIS, blackHoleTransform.up);
-        effect.setVector3(
-            BlackHoleUniformNames.FORWARD_AXIS,
-            blackHoleTransform.getDirection(Vector3.Forward(blackHoleTransform.getScene().useRightHandedSystem)),
-        );
+        effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, blackHoleTransform.forward);
     }
 
     public setSamplers(effect: Effect) {

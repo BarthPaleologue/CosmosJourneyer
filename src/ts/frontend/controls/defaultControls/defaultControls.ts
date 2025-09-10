@@ -97,7 +97,7 @@ export class DefaultControls implements Controls {
         const localForward = Vector3.Forward(this.getTransform().getScene().useRightHandedSystem);
 
         const cameraForward = this.camera.getDirection(localForward);
-        const transformForward = this.getTransform().getDirection(localForward);
+        const transformForward = this.getTransform().forward;
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
@@ -130,18 +130,11 @@ export class DefaultControls implements Controls {
 
         const displacement = Vector3.Zero();
 
-        const forwardDisplacement = this.transform
-            .getDirection(localForward)
+        const forwardDisplacement = this.transform.forward
             .scale(this.speed * deltaSeconds)
             .scaleInPlace(this.inertia.z);
-        const upwardDisplacement = this.transform
-            .getDirection(Vector3.Up())
-            .scale(this.speed * deltaSeconds)
-            .scaleInPlace(this.inertia.y);
-        const rightDisplacement = this.transform
-            .getDirection(Vector3.Right())
-            .scale(this.speed * deltaSeconds)
-            .scaleInPlace(this.inertia.x);
+        const upwardDisplacement = this.transform.up.scale(this.speed * deltaSeconds).scaleInPlace(this.inertia.y);
+        const rightDisplacement = this.transform.right.scale(this.speed * deltaSeconds).scaleInPlace(this.inertia.x);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

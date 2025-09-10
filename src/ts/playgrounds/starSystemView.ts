@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Axis, Space } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -85,6 +86,7 @@ export async function createStarSystemViewScene(
         starSystemView.getStarSystem().getStellarObjects()[0],
         starSystemView.getStarSystem(),
     );
+    starSystemView.getSpaceshipControls().getTransform().rotate(Axis.Y, Math.PI, Space.LOCAL);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

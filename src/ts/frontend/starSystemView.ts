@@ -326,9 +326,7 @@ export class StarSystemView implements View {
             }
 
             // first, align spaceship with target
-            const currentForward = shipControls
-                .getTransform()
-                .getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
+            const currentForward = shipControls.getTransform().forward;
             const targetForward = target
                 .getTransform()
                 .getAbsolutePosition()
@@ -404,10 +402,7 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
                 translate(
                     characterControls.getTransform(),
-                    shipControls
-                        .getTransform()
-                        .getDirection(Vector3.Forward(this.scene.useRightHandedSystem))
-                        .scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
+                    shipControls.getTransform().forward.scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
                 );
 
                 setRotationQuaternion(
