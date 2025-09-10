@@ -8,7 +8,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type NoiseTextures } from "@/frontend/assets/textures";
-import { getForwardDirection, rotate } from "@/frontend/uberCore/transforms/basicTransform";
+import { rotate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
@@ -103,8 +103,10 @@ export class HyperSpaceTunnel implements Transformable {
             Space.LOCAL,
         );
 
-        const targetForward = getForwardDirection(this.parent);
-        const currentForward = getForwardDirection(this.getTransform());
+        const targetForward = this.parent.getDirection(Vector3.Forward(this.parent.getScene().useRightHandedSystem));
+        const currentForward = this.getTransform().getDirection(
+            Vector3.Forward(this.getTransform().getScene().useRightHandedSystem),
+        );
 
         if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
 

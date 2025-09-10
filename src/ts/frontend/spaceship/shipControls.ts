@@ -31,14 +31,7 @@ import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Controls } from "@/frontend/uberCore/controls";
 import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
-import {
-    getForwardDirection,
-    getRightDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    yaw,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { pitch, roll, yaw } from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -334,15 +327,19 @@ export class ShipControls implements Controls {
                     spaceship.cancelLanding();
                 }
                 spaceship.aggregate.body.applyForce(
-                    getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.getTransform()
+                        .getDirection(Vector3.Up())
+                        .scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
                     spaceship.aggregate.body.getObjectCenterWorld(),
                 );
             }
 
             if (!spaceship.isLanded()) {
-                const shipForward = getForwardDirection(this.getTransform());
-                const shipUp = getUpwardDirection(this.getTransform());
-                const shipRight = getRightDirection(this.getTransform());
+                const shipForward = this.getTransform().getDirection(
+                    Vector3.Forward(this.getTransform().getScene().useRightHandedSystem),
+                );
+                const shipUp = this.getTransform().getDirection(Vector3.Up());
+                const shipRight = this.getTransform().getDirection(Vector3.Right());
 
                 const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
 
@@ -351,7 +348,7 @@ export class ShipControls implements Controls {
                 const authority = 0.7;
 
                 const currentRoll = angularVelocity.dot(shipForward);
-                const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
+                const targetRoll = -this.spaceship.maxRollSpeed * inputRoll;
                 angularImpulse.addInPlace(shipForward.scale(authority * (targetRoll - currentRoll)));
 
                 const currentYaw = angularVelocity.dot(shipUp);
@@ -359,7 +356,7 @@ export class ShipControls implements Controls {
                 angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
                 const currentPitch = angularVelocity.dot(shipRight);
-                const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
+                const targetPitch = this.spaceship.maxPitchSpeed * inputPitch;
                 angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);

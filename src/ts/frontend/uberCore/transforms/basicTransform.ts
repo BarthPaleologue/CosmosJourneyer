@@ -19,8 +19,6 @@ import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { LocalDirection } from "../localDirections";
-
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
     transformNode.computeWorldMatrix(true);
@@ -54,54 +52,6 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
 }
 
 /* #region directions */
-
-/**
- * This is not equivalent to `transform.forward` as Cosmos Journeyer uses the right-handed coordinate system
- * @returns the forward vector of the given transform in world space
- */
-export function getForwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(LocalDirection.FORWARD);
-}
-
-/**
- *
- * @returns the unit vector pointing backward the player controller in world space
- */
-export function getBackwardDirection(transformNode: TransformNode): Vector3 {
-    return getForwardDirection(transformNode).negate();
-}
-
-/**
- *
- * @returns the unit vector pointing upward the player controller in world space
- */
-export function getUpwardDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(LocalDirection.UP);
-}
-
-/**
- *
- * @returns the unit vector pointing downward the player controler in world space
- */
-export function getDownwardDirection(transformNode: TransformNode): Vector3 {
-    return getUpwardDirection(transformNode).negate();
-}
-
-/**
- *
- * @returns the unit vector pointing to the right of the player controler in world space
- */
-export function getRightDirection(transformNode: TransformNode): Vector3 {
-    return getLeftDirection(transformNode).negate();
-}
-
-/**
- *
- * @returns the unit vector pointing to the left of the player controler in world space
- */
-export function getLeftDirection(transformNode: TransformNode): Vector3 {
-    return transformNode.getDirection(LocalDirection.LEFT);
-}
 
 /**
  *

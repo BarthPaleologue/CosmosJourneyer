@@ -29,7 +29,6 @@ import { type DefaultControls } from "@/frontend/controls/defaultControls/defaul
 import { type StarSystemView } from "@/frontend/starSystemView";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
-import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
 import { type UberScene } from "@/frontend/uberCore/uberScene";
 
 import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
@@ -221,7 +220,9 @@ export class MainMenu {
 
         const starSystemController = this.starSystemView.getStarSystem();
 
-        const currentForward = getForwardDirection(this.controls.getTransform());
+        const currentForward = this.controls
+            .getTransform()
+            .getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
 
         const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.idInSystem);
         const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
