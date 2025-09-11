@@ -54,8 +54,8 @@ export async function createWarpTunnelScene(
         controls.update(deltaSeconds);
 
         const anchorDisplacement = 2000;
-        anchor.position.z += anchorDisplacement * deltaSeconds;
-        controls.getTransform().position.z += anchorDisplacement * deltaSeconds;
+        anchor.position.z -= anchorDisplacement * deltaSeconds;
+        controls.getTransform().position.z -= anchorDisplacement * deltaSeconds;
 
         const cameraPosition = camera.globalPosition;
         anchor.position.subtractInPlace(cameraPosition);
