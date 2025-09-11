@@ -22,6 +22,7 @@ import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { DarkKnight } from "@/frontend/universe/darkKnight";
 
 export async function createDarkKnightScene(
@@ -59,7 +60,7 @@ export async function createDarkKnightScene(
     camera.maxZ *= scalingFactor;
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

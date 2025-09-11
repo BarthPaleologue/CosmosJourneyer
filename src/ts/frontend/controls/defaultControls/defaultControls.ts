@@ -50,6 +50,7 @@ export class DefaultControls implements Controls {
         this.camera.parent = this.transform;
         this.camera.speed = 0;
         this.camera.fov = Settings.FOV;
+        this.camera.rotationQuaternion = Quaternion.Identity();
     }
 
     public getCameras(): Camera[] {
@@ -134,7 +135,7 @@ export class DefaultControls implements Controls {
             .scale(this.speed * deltaSeconds)
             .scaleInPlace(this.inertia.z);
         const upwardDisplacement = this.transform.up.scale(this.speed * deltaSeconds).scaleInPlace(this.inertia.y);
-        const rightDisplacement = this.transform.right.scale(this.speed * deltaSeconds).scaleInPlace(this.inertia.x);
+        const rightDisplacement = this.transform.right.scale(-this.speed * deltaSeconds).scaleInPlace(this.inertia.x);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);
