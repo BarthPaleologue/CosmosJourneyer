@@ -364,7 +364,7 @@ export class ShipControls implements Controls {
                 angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
                 const currentPitch = angularVelocity.dot(shipRight);
-                const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
+                const targetPitch = this.spaceship.maxPitchSpeed * inputPitch;
                 angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);
