@@ -28,6 +28,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
@@ -58,7 +59,7 @@ export async function createSpaceStationScene(
     const distanceToStar = AU;
 
     defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
-    defaultControls.getTransform().lookAt(Vector3.Zero());
+    lookAt(defaultControls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     const coordinates = {
         starSectorX: 0,

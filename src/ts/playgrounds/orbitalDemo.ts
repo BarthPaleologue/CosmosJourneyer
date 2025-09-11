@@ -17,7 +17,7 @@
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
@@ -26,6 +26,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
@@ -122,26 +123,17 @@ export function createOrbitalDemoScene(
     axisRenderer.setOrbitalObjects(bodies, scene);
 
     const referencePlaneRotation = Matrix.Identity();
-    const referencePlaneDeltaRotation = Matrix.Identity();
 
     let elapsedSeconds = 0;
 
     defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 0, -10));
-    defaultControls.getTransform().lookAt(Vector3.Zero());
+    lookAt(defaultControls.getTransform(), sun.getTransform().position, scene.useRightHandedSystem);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
         elapsedSeconds += deltaSeconds;
         defaultControls.update(deltaSeconds);
-
-        Matrix.FromQuaternionToRef(
-            defaultControls.getTransform().rotationQuaternion?.clone().invertInPlace() ?? Quaternion.Identity(),
-            referencePlaneDeltaRotation,
-        );
-        defaultControls.getTransform().rotationQuaternion = Quaternion.Identity();
-        defaultControls.getTransform().computeWorldMatrix(true);
-        referencePlaneRotation.multiplyToRef(referencePlaneDeltaRotation, referencePlaneRotation);
 
         bodies.forEach((body) => {
             setOrbitalPosition(body, bodyToParents.get(body) ?? [], referencePlaneRotation, elapsedSeconds);

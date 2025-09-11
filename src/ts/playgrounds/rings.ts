@@ -26,6 +26,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { ItemPool } from "@/utils/itemPool";
 
@@ -47,7 +48,7 @@ export async function createRingsScene(
     camera.maxZ *= scalingFactor;
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 5, -10).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     // This attaches the camera to the canvas
     camera.attachControl();

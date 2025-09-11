@@ -24,7 +24,7 @@ import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
@@ -62,7 +62,7 @@ export async function createBlackHoleScene(
     camera.attachPostProcess(blackHolePostProcess);
 
     camera.maxZ = 1e12;
-    defaultControls.getTransform().lookAt(blackHole.getTransform().position);
+    lookAt(defaultControls.getTransform(), blackHole.getTransform().position, scene.useRightHandedSystem);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
