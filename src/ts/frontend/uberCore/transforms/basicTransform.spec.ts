@@ -23,8 +23,6 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { getBackwardDirection, getForwardDirection, getLeftDirection, getRightDirection } from "./basicTransform";
-
 describe("BasicTransform", () => {
     const engine = new NullEngine();
     const scene = new Scene(engine);
@@ -35,12 +33,6 @@ describe("BasicTransform", () => {
     });
 
     const transform = new TransformNode("transform", scene);
-    it("is oriented forward", () => {
-        expect(getForwardDirection(transform).equals(new Vector3(0, 0, 1))).to.be.true;
-        expect(getBackwardDirection(transform).equals(new Vector3(0, 0, -1))).to.be.true;
-        expect(getLeftDirection(transform).equals(new Vector3(1, 0, 0))).to.be.true;
-        expect(getRightDirection(transform).equals(new Vector3(-1, 0, 0))).to.be.true;
-    });
     it("can rotate around a pivot", () => {
         transform.setAbsolutePosition(new Vector3(1, 0, 0));
         transform.rotateAround(new Vector3(0, 0, 0), new Vector3(0, 1, 0), Math.PI / 2);

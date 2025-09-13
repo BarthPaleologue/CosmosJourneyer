@@ -157,7 +157,7 @@ export class LandingBay {
 
                 landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
 
-                landingPad.getTransform().rotate(Axis.Y, Math.PI / 2, Space.LOCAL);
+                landingPad.getTransform().rotate(Axis.Y, -Math.PI / 2, Space.LOCAL);
 
                 landingPad
                     .getTransform()

@@ -285,9 +285,9 @@ export class CharacterControls implements Controls {
             inverseTransform,
         );
 
-        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
+        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y - Math.PI, Space.LOCAL);
         this.getTransform().computeWorldMatrix(true);
-        this.firstPersonCamera.rotation.y = 0;
+        this.firstPersonCamera.rotation.y = Math.PI;
         this.firstPersonCamera.getViewMatrix(true);
 
         const character = this.getTransform();

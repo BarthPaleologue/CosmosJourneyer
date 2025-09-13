@@ -56,14 +56,14 @@ export async function createAutomaticLandingScene(
     ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
 
     const defaultControls = new DefaultControls(scene);
-    defaultControls.getTransform().position.copyFromFloats(0, 10, -50);
+    defaultControls.getTransform().position.copyFromFloats(0, 10, 75);
     defaultControls.speed *= 10;
 
     const camera = defaultControls.getActiveCamera();
     camera.minZ = 0.1;
     camera.attachControl();
 
-    new LandingPad(42, LandingPadSize.SMALL, assets, scene);
+    const landingPad = new LandingPad(42, LandingPadSize.SMALL, assets, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;
@@ -76,8 +76,8 @@ export async function createAutomaticLandingScene(
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 0.7;
 
-    //ship.engageLandingOnPad(landingPad);
-    ship.engageSurfaceLanding(ground);
+    ship.engageLandingOnPad(landingPad);
+    //ship.engageSurfaceLanding(ground);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;

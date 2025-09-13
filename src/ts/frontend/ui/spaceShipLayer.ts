@@ -146,7 +146,7 @@ export class SpaceShipLayer {
             );
 
             // set class of targetDot based on sign of directionLocal.z
-            this.targetDot.className = directionLocal.z > 0 ? "targetDot" : "targetDot behind";
+            this.targetDot.className = directionLocal.z < 0 ? "targetDot" : "targetDot behind";
 
             // set top and left of targetDot based on direction2D (use %)
             this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;

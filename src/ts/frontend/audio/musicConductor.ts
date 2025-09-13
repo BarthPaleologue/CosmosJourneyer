@@ -51,7 +51,7 @@ export class MusicConductor {
             throw new Error("Audio context is null");
         }
 
-        audioEngine.onAudioUnlockedObservable.add(() => {
+        audioEngine.onAudioUnlockedObservable.addOnce(() => {
             if (this.currentMusic !== null) {
                 const copy = this.currentMusic;
                 this.currentMusic = null;

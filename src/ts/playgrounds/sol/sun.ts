@@ -24,6 +24,7 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
@@ -52,11 +53,11 @@ export async function createSunScene(
     scene.enableDepthRenderer(camera, false, true);
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     // This is a fix for E2E testing: the starfield box does not render correctly if the camera target is zero
     if (camera instanceof FreeCamera) {
-        camera.setTarget(new Vector3(1e-3, 0, 1e-1));
+        camera.setTarget(new Vector3(-1e-3, 0, -1e-1));
     }
 
     // This attaches the camera to the canvas
