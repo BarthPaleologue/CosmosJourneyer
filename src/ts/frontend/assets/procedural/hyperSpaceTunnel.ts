@@ -11,6 +11,8 @@ import { type NoiseTextures } from "@/frontend/assets/textures";
 import { rotate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
+import { clamp } from "@/utils/math";
+
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "@shaders/warpConeMaterial/vertex.glsl";
 
@@ -47,9 +49,9 @@ export class HyperSpaceTunnel implements Transformable {
         const path: Vector3[] = [];
         const nbPoint = 100;
         const tunnelOffset = 500;
-        path.push(new Vector3(0, 0, -200));
+        path.push(new Vector3(0, 0, 200));
         for (let i = 0; i < nbPoint; i++) {
-            path.push(new Vector3(0, tunnelOffset * (i / nbPoint) ** 4, (800 * i) / nbPoint));
+            path.push(new Vector3(0, tunnelOffset * (i / nbPoint) ** 4, -(800 * i) / nbPoint));
         }
 
         this.hyperTunnel = MeshBuilder.CreateTube(
@@ -109,7 +111,7 @@ export class HyperSpaceTunnel implements Transformable {
         if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
 
         const rotationAxis = Vector3.Cross(currentForward, targetForward);
-        const theta = Math.acos(Vector3.Dot(currentForward, targetForward));
+        const theta = Math.acos(clamp(Vector3.Dot(currentForward, targetForward), -1, 1));
 
         rotate(this.hyperTunnel, rotationAxis, theta);
     }
