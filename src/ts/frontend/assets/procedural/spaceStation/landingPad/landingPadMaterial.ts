@@ -83,8 +83,8 @@ export class LandingPadMaterial extends NodeMaterial {
 
         // Fragment Shader
 
-        //float paintWeight = texture(numberTexture, vec2(1.0 - vUV.y, 1.0 - vUV.x + 0.01)).a;
-        const paintMaskUV = sub(f(1), vec2(uvSplit.y, sub(uvSplit.x, f(0.01))));
+        //float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x + 0.01)).a;
+        const paintMaskUV = vec2(uvSplit.y, add(uvSplit.x, f(0.01)));
         const paintWeight = textureSample(numberTexture, paintMaskUV).a;
 
         const paintAlbedo = vec(Vector3.One());
