@@ -23,16 +23,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type Controls } from "@/frontend/uberCore/controls";
-import { LocalDirection } from "@/frontend/uberCore/localDirections";
-import {
-    getForwardDirection,
-    getRightDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    translate,
-    yaw,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { pitch, roll, translate, yaw } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { getTransformationQuaternion } from "@/utils/algebra";
 import { lerpSmooth } from "@/utils/math";
@@ -59,6 +50,7 @@ export class DefaultControls implements Controls {
         this.camera.parent = this.transform;
         this.camera.speed = 0;
         this.camera.fov = Settings.FOV;
+        this.camera.rotationQuaternion = Quaternion.Identity();
     }
 
     public getCameras(): Camera[] {
@@ -103,8 +95,10 @@ export class DefaultControls implements Controls {
         pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
         yaw(this.transform, this.rotationInertia.z * this.rotationSpeed * deltaSeconds);
 
-        const cameraForward = this.camera.getDirection(LocalDirection.BACKWARD);
-        const transformForward = getForwardDirection(this.transform);
+        const localForward = Vector3.Forward(this.getTransform().getScene().useRightHandedSystem);
+
+        const cameraForward = this.camera.getDirection(localForward);
+        const transformForward = this.getTransform().forward;
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
@@ -137,15 +131,11 @@ export class DefaultControls implements Controls {
 
         const displacement = Vector3.Zero();
 
-        const forwardDisplacement = getForwardDirection(this.transform)
+        const forwardDisplacement = this.transform.forward
             .scale(this.speed * deltaSeconds)
             .scaleInPlace(this.inertia.z);
-        const upwardDisplacement = getUpwardDirection(this.transform)
-            .scale(this.speed * deltaSeconds)
-            .scaleInPlace(this.inertia.y);
-        const rightDisplacement = getRightDirection(this.transform)
-            .scale(this.speed * deltaSeconds)
-            .scaleInPlace(this.inertia.x);
+        const upwardDisplacement = this.transform.up.scale(this.speed * deltaSeconds).scaleInPlace(this.inertia.y);
+        const rightDisplacement = this.transform.right.scale(-this.speed * deltaSeconds).scaleInPlace(this.inertia.x);
 
         displacement.addInPlace(forwardDisplacement);
         displacement.addInPlace(upwardDisplacement);

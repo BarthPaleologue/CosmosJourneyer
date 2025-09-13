@@ -26,6 +26,7 @@ import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmos
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
@@ -56,7 +57,7 @@ export async function createSaturnScene(
     camera.maxZ *= scalingFactor;
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 2, -2).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     // This attaches the camera to the canvas
     camera.attachControl();

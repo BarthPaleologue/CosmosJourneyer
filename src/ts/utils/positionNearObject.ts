@@ -20,12 +20,7 @@ import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type Controls } from "@/frontend/uberCore/controls";
-import {
-    getUpwardDirection,
-    roll,
-    rotateAround,
-    setRotationQuaternion,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
 import { type CanHaveRings } from "@/frontend/universe/architecture/canHaveRings";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -104,7 +99,11 @@ export function positionNearObjectBrightSide(
     starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
     transformable.getTransform().setAbsolutePosition(Vector3.Zero());
 
-    transformable.getTransform().lookAt(object.getTransform().getAbsolutePosition());
+    lookAt(
+        transformable.getTransform(),
+        object.getTransform().getAbsolutePosition(),
+        transformable.getTransform().getScene().useRightHandedSystem,
+    );
 }
 
 export function positionNearObjectWithStarVisible(
@@ -132,7 +131,7 @@ export function positionNearObjectWithStarVisible(
         const distBodyToStar = dirBodyToStar.length();
         dirBodyToStar.scaleInPlace(1 / distBodyToStar);
 
-        const upDirection = getUpwardDirection(object.getTransform());
+        const upDirection = object.getTransform().up;
         const lateralDirection = Vector3.Cross(dirBodyToStar, upDirection);
 
         const displacement = nearestStar
@@ -164,7 +163,7 @@ export function positionNearObjectWithStarVisible(
         .getTransform()
         .getAbsolutePosition()
         .add(starDirection.scale(object.getBoundingRadius() * 4));
-    transformable.getTransform().lookAt(halfway);
+    lookAt(transformable.getTransform(), halfway, transformable.getTransform().getScene().useRightHandedSystem);
 
     transformable.getTransform().computeWorldMatrix(true);
 
@@ -190,7 +189,7 @@ export function positionNearObjectAsteroidField(
 
     const nearestStar = nearestObject(bodyPosition, starSystem.getStellarObjects());
     const dirToStar = bodyPosition.subtract(nearestStar.getTransform().getAbsolutePosition()).normalize();
-    const upDirection = getUpwardDirection(body.getTransform());
+    const upDirection = body.getTransform().up;
     const lateralDirection = Vector3.Cross(dirToStar, upDirection).normalize();
 
     return bodyPosition

@@ -121,7 +121,7 @@ export class WarpTunnel implements Transformable {
             const relativePosition = particle.position; //.subtract(this.parent.position);
             const localZ = relativePosition.z; //.dot(this.spaceshipForward);
 
-            if (localZ < -WarpTunnel.TUNNEL_LENGTH / 2) {
+            if (localZ > WarpTunnel.TUNNEL_LENGTH / 2) {
                 SPS.recycleParticle(particle);
                 this.nbParticlesAlive--;
                 return particle;
@@ -152,7 +152,7 @@ export class WarpTunnel implements Transformable {
         particle.position.addInPlace(this.tunnelAxis1.scale(r * Math.cos(theta)));
         particle.position.addInPlace(this.tunnelAxis2.scale(r * Math.sin(theta)));
         particle.position.addInPlace(this.particleDirection.scale(Math.random() * 10));
-        particle.position.z += WarpTunnel.TUNNEL_LENGTH / 2;
+        particle.position.z -= WarpTunnel.TUNNEL_LENGTH / 2;
 
         this.particleToDirection.set(particle, this.particleDirection.clone());
 
@@ -168,7 +168,7 @@ export class WarpTunnel implements Transformable {
 
     private updateGlobals() {
         this.particleRotationQuaternion.copyFrom(Quaternion.Identity());
-        this.particleDirection.copyFromFloats(0, 0, -1);
+        this.particleDirection.copyFromFloats(0, 0, 1);
 
         this.tunnelAxis1.copyFrom(this.particleDirection.add(new Vector3(Math.random(), Math.random(), Math.random())));
         this.tunnelAxis1.subtractInPlace(this.particleDirection.scale(this.tunnelAxis1.dot(this.particleDirection)));

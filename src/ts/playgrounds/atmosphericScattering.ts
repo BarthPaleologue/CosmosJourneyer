@@ -23,6 +23,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
@@ -41,7 +42,7 @@ export function createAtmosphericScatteringScene(
     camera.maxZ *= scalingFactor;
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     // This attaches the camera to the canvas
     camera.attachControl();

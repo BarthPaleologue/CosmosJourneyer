@@ -73,8 +73,6 @@ jobs:
                   context: .
                   tags: cosmos-journeyer-e2e:${{ github.sha }}
                   load: true # load into the runner’s daemon
-                  build-args: |
-                      PW_VERSION=1.52.0
 
               # ─────────── run Playwright
             - name: Run Playwright suite

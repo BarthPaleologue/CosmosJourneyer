@@ -31,14 +31,7 @@ import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Controls } from "@/frontend/uberCore/controls";
 import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
 import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
-import {
-    getForwardDirection,
-    getRightDirection,
-    getUpwardDirection,
-    pitch,
-    roll,
-    yaw,
-} from "@/frontend/uberCore/transforms/basicTransform";
+import { pitch, roll, yaw } from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -59,7 +52,7 @@ export class ShipControls implements Controls {
     private spaceship: Spaceship;
 
     readonly thirdPersonCameraDefaultRadius = 60;
-    readonly thirdPersonCameraDefaultAlpha = -3.14 / 2;
+    readonly thirdPersonCameraDefaultAlpha = 3.14 / 2;
     readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
 
@@ -262,8 +255,20 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
         this.resetCameraHandler = () => {
-            quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, -3.14 / 2, 200);
-            quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, 3.14 / 2.2, 200);
+            quickAnimation(
+                this.thirdPersonCamera,
+                "alpha",
+                this.thirdPersonCamera.alpha,
+                this.thirdPersonCameraDefaultAlpha,
+                200,
+            );
+            quickAnimation(
+                this.thirdPersonCamera,
+                "beta",
+                this.thirdPersonCamera.beta,
+                this.thirdPersonCameraDefaultBeta,
+                200,
+            );
             quickAnimation(
                 this.thirdPersonCamera,
                 "radius",
@@ -334,15 +339,15 @@ export class ShipControls implements Controls {
                     spaceship.cancelLanding();
                 }
                 spaceship.aggregate.body.applyForce(
-                    getUpwardDirection(this.getTransform()).scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.getTransform().up.scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
                     spaceship.aggregate.body.getObjectCenterWorld(),
                 );
             }
 
             if (!spaceship.isLanded()) {
-                const shipForward = getForwardDirection(this.getTransform());
-                const shipUp = getUpwardDirection(this.getTransform());
-                const shipRight = getRightDirection(this.getTransform());
+                const shipForward = this.getTransform().forward;
+                const shipUp = this.getTransform().up;
+                const shipRight = this.getTransform().right;
 
                 const angularVelocity = spaceship.aggregate.body.getAngularVelocity();
 
@@ -359,7 +364,7 @@ export class ShipControls implements Controls {
                 angularImpulse.addInPlace(shipUp.scale(authority * (targetYaw - currentYaw)));
 
                 const currentPitch = angularVelocity.dot(shipRight);
-                const targetPitch = -this.spaceship.maxPitchSpeed * inputPitch;
+                const targetPitch = this.spaceship.maxPitchSpeed * inputPitch;
                 angularImpulse.addInPlace(shipRight.scale(authority * (targetPitch - currentPitch)));
 
                 spaceship.aggregate.body.applyAngularImpulse(angularImpulse);

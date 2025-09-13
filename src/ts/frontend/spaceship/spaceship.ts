@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion } from "@babylonjs/core/Maths/math";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -46,7 +45,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { getForwardDirection, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -167,11 +166,7 @@ export class Spaceship implements Transformable {
         );
         for (const child of this.instanceRoot.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
-                const mainThruster = new Thruster(
-                    child,
-                    getForwardDirection(this.instanceRoot).negate(),
-                    this.aggregate,
-                );
+                const mainThruster = new Thruster(child, this.instanceRoot.forward.negate(), this.aggregate);
                 this.mainThrusters.push(mainThruster);
                 continue;
             }
@@ -194,11 +189,7 @@ export class Spaceship implements Transformable {
         this.warpTunnel = new WarpTunnel(scene);
         this.warpTunnel.getTransform().parent = this.getTransform();
 
-        this.hyperSpaceTunnel = new HyperSpaceTunnel(
-            this.getTransform().getDirection(Axis.Z),
-            scene,
-            assets.textures.noises,
-        );
+        this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().forward, scene, assets.textures.noises);
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
 
@@ -341,7 +332,7 @@ export class Spaceship implements Transformable {
 
         return warpDrive !== null && warpDrive.isEnabled()
             ? warpDrive.getWarpSpeed()
-            : this.aggregate.body.getLinearVelocity().dot(getForwardDirection(this.getTransform()));
+            : this.aggregate.body.getLinearVelocity().dot(this.getTransform().forward);
     }
 
     public getThrottle(): number {
@@ -517,13 +508,10 @@ export class Spaceship implements Transformable {
             return;
         }
 
-        const warpSpeed = getForwardDirection(this.aggregate.transformNode).scale(warpDrive.getWarpSpeed());
+        const warpSpeed = this.aggregate.transformNode.forward.scale(warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
 
-        const currentForwardSpeed = Vector3.Dot(
-            warpSpeed,
-            this.aggregate.transformNode.getDirection(Vector3.Forward(this.scene.useRightHandedSystem)),
-        );
+        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.forward);
 
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
@@ -600,7 +588,7 @@ export class Spaceship implements Transformable {
 
         if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
-            const forwardDirection = getForwardDirection(this.getTransform());
+            const forwardDirection = this.getTransform().getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
             if (this.mainEngineThrottle !== 0) {

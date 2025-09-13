@@ -52,8 +52,8 @@ import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import {
-    getForwardDirection,
     getRotationQuaternion,
+    lookAt,
     setRotationQuaternion,
     translate,
 } from "@/frontend/uberCore/transforms/basicTransform";
@@ -331,7 +331,7 @@ export class StarSystemView implements View {
             }
 
             // first, align spaceship with target
-            const currentForward = getForwardDirection(shipControls.getTransform());
+            const currentForward = shipControls.getTransform().forward;
             const targetForward = target
                 .getTransform()
                 .getAbsolutePosition()
@@ -407,9 +407,7 @@ export class StarSystemView implements View {
                 characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
                 translate(
                     characterControls.getTransform(),
-                    getForwardDirection(shipControls.getTransform()).scale(
-                        3 + shipControls.getSpaceship().boundingExtent.z / 2,
-                    ),
+                    shipControls.getTransform().forward.scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
                 );
 
                 setRotationQuaternion(
@@ -617,7 +615,11 @@ export class StarSystemView implements View {
             activeControls.getTransform().setAbsolutePosition(Vector3.Zero());
 
             // look at the first body
-            activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
+            lookAt(
+                activeControls.getTransform(),
+                firstBody.getTransform().getAbsolutePosition(),
+                this.scene.useRightHandedSystem,
+            );
         }
 
         const currentSpaceship = this.spaceshipControls?.getSpaceship();

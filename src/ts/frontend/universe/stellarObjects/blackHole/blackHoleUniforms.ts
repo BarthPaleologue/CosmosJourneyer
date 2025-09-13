@@ -21,8 +21,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
-import { getForwardDirection } from "@/frontend/uberCore/transforms/basicTransform";
-
 import { getKerrMetricA } from "@/utils/physics/blackHole";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -70,7 +68,7 @@ export class BlackHoleUniforms {
         effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
         effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, this.rotationPeriod);
         effect.setVector3(BlackHoleUniformNames.ROTATION_AXIS, blackHoleTransform.up);
-        effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, getForwardDirection(blackHoleTransform));
+        effect.setVector3(BlackHoleUniformNames.FORWARD_AXIS, blackHoleTransform.forward);
     }
 
     public setSamplers(effect: Effect) {

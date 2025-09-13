@@ -28,7 +28,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
@@ -80,7 +80,7 @@ export async function createNeutronStarScene(
     camera.attachPostProcess(lensFlare);
 
     camera.maxZ = 1e12;
-    defaultControls.getTransform().lookAt(neutronStar.getTransform().position);
+    lookAt(defaultControls.getTransform(), neutronStar.getTransform().position, scene.useRightHandedSystem);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;

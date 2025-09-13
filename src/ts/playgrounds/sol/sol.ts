@@ -23,6 +23,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { UberScene } from "@/frontend/uberCore/uberScene";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
@@ -76,7 +77,7 @@ export async function createSolScene(
     controls.getTransform().position = sun
         .getTransform()
         .position.add(new Vector3(0, 1, -2).scaleInPlace(sun.getBoundingRadius() * 7));
-    controls.getTransform().lookAt(sun.getTransform().position);
+    lookAt(controls.getTransform(), sun.getTransform().position, scene.useRightHandedSystem);
 
     const postProcessManager = new PostProcessManager(assets.textures, scene);
     postProcessManager.addCelestialBodies(

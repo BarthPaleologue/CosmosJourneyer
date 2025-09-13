@@ -24,6 +24,7 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
@@ -53,7 +54,7 @@ export async function createJupiterScene(
     camera.maxZ *= scalingFactor;
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
-    controls.getTransform().lookAt(Vector3.Zero());
+    lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     // This attaches the camera to the canvas
     camera.attachControl();
