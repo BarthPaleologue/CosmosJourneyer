@@ -45,7 +45,7 @@ import { type Player } from "@/frontend/player/player";
 import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
@@ -689,7 +689,7 @@ export class StarMap implements View {
 
         // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
-            this.controls.getTransform().lookAt(starSystemPosition);
+            lookAt(this.controls.getTransform(), starSystemPosition, this.scene.useRightHandedSystem);
             this.controls.getTransform().computeWorldMatrix(true);
         } else if (rotationAngle > 0.02) {
             const rotationAxis = Vector3.Cross(cameraDir, cameraToStarDir).normalize();

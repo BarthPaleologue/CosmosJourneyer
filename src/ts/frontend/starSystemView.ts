@@ -51,7 +51,12 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import { getRotationQuaternion, setRotationQuaternion, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import {
+    getRotationQuaternion,
+    lookAt,
+    setRotationQuaternion,
+    translate,
+} from "@/frontend/uberCore/transforms/basicTransform";
 import { type UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
@@ -610,7 +615,11 @@ export class StarSystemView implements View {
             activeControls.getTransform().setAbsolutePosition(Vector3.Zero());
 
             // look at the first body
-            activeControls.getTransform().lookAt(firstBody.getTransform().getAbsolutePosition());
+            lookAt(
+                activeControls.getTransform(),
+                firstBody.getTransform().getAbsolutePosition(),
+                this.scene.useRightHandedSystem,
+            );
         }
 
         const currentSpaceship = this.spaceshipControls?.getSpaceship();

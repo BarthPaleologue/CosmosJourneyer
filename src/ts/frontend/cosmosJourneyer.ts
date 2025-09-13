@@ -74,6 +74,7 @@ import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { lookAt } from "./uberCore/transforms/basicTransform";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
@@ -809,10 +810,11 @@ export class CosmosJourneyer {
                     this.starSystemView.scene.getActiveControls().getTransform().getAbsolutePosition(),
                 );
 
-            this.starSystemView
-                .getSpaceshipControls()
-                .getTransform()
-                .lookAt(targetObject.getTransform().getAbsolutePosition());
+            lookAt(
+                this.starSystemView.getSpaceshipControls().getTransform(),
+                targetObject.getTransform().getAbsolutePosition(),
+                this.starSystemView.scene.useRightHandedSystem,
+            );
         });
     }
 
