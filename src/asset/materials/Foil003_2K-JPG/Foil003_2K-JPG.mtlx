@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<materialx version="1.38" fileprefix="./">
+  <standard_surface ypos="-1.879310" name="Foil003_2K_JPG_StandardSurface" xpos="6.159420" type="surfaceshader">
+    <input value="0" name="specular" type="float" />
+    <input value="1" name="coat" type="float" />
+    <input value="1, 1, 1" name="coat_color" type="color3" />
+    <input value="1" name="base" type="float" />
+    <input nodename="Foil003_2K_JPG_Color" name="base_color" type="color3" />
+    <input value="1" nodename="Foil003_2K_JPG_Metalness" name="metalness" type="float" />
+    <input nodename="normalmap" name="normal" type="vector3" />
+    <input nodename="normalmap" name="coat_normal" type="vector3" />
+    <input nodename="Foil003_2K_JPG_Roughness" name="specular_roughness" type="float" />
+    <input nodename="Foil003_2K_JPG_Roughness" name="coat_roughness" type="float" />
+  </standard_surface>
+  <surfacematerial ypos="0.000000" name="Foil003_2K_JPG" xpos="8.695652" type="material">
+    <input nodename="Foil003_2K_JPG_StandardSurface" name="surfaceshader" type="surfaceshader" />
+    <input nodename="displacement" name="displacementshader" type="displacementshader" />
+  </surfacematerial>
+  <tiledimage ypos="-3.103448" name="Foil003_2K_JPG_Color" xpos="3.623188" type="color3">
+    <input value="Foil003_2K-JPG_Color.jpg" colorspace="srgb_texture" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <tiledimage ypos="5.163793" name="Foil003_2K_JPG_Displacement" xpos="3.623188" type="float">
+    <input value="Foil003_2K-JPG_Displacement.jpg" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <displacement ypos="1.879310" name="displacement" xpos="6.159420" type="displacementshader">
+    <input nodename="Foil003_2K_JPG_Displacement" name="displacement" type="float" />
+    <input value="1.0" name="scale" type="float" />
+  </displacement>
+  <tiledimage ypos="-1.758621" name="Foil003_2K_JPG_Metalness" xpos="3.623188" type="float">
+    <input value="Foil003_2K-JPG_Metalness.jpg" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <tiledimage ypos="0.879310" name="Foil003_2K_JPG_NormalGL" xpos="1.086957" type="vector3">
+    <input value="Foil003_2K-JPG_NormalGL.jpg" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+  <normalmap ypos="3.586207" name="normalmap" xpos="3.623188" type="vector3">
+    <input nodename="Foil003_2K_JPG_NormalGL" name="in" type="vector3" />
+    <input value="1.0" name="scale" type="float" />
+  </normalmap>
+  <tiledimage ypos="-0.413793" name="Foil003_2K_JPG_Roughness" xpos="3.623188" type="float">
+    <input value="Foil003_2K-JPG_Roughness.jpg" name="file" type="filename" />
+    <input value="1.0, 1.0" name="uvtiling" type="vector2" />
+  </tiledimage>
+</materialx>
