@@ -23,17 +23,17 @@ import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadEnvironmentTextures } from "./environment";
 import { loadGasPlanetTextures, type GasPlanetTextures } from "./gasPlanet";
 import { loadMaterialTextures, type AllMaterialTextures } from "./materials";
 import { loadParticleTextures, type ParticleTextures } from "./particles";
 import { loadRingsTextures, type RingsTextures } from "./rings";
 import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
 import { createTexturePools, type TexturePools } from "./texturePools";
-import { loadCubeTextureAsync, loadTextureAsync } from "./utils";
+import { loadTextureAsync } from "./utils";
 
 import empty from "@assets/oneBlackPixel.webp";
 import seamlessPerlin from "@assets/perlin.webp";
-import skyBox from "@assets/skybox/milkyway.env";
 import cursorImage from "@assets/textures/hoveredCircle.png";
 import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
 import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
@@ -80,9 +80,9 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
 
     const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
-    // Environment textures
     const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin, scene, progressMonitor);
-    const milkyWayPromise = loadCubeTextureAsync("SkyBox", skyBox, scene, progressMonitor);
+
+    const environmentPromise = loadEnvironmentTextures(scene, progressMonitor);
 
     const terrainTexturesPromise = loadTerrainTextures(scene, progressMonitor);
     const particleTexturesPromise = loadParticleTextures(scene, progressMonitor);
@@ -101,9 +101,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         materials: await materialTexturesPromise,
         gasPlanet: await gasPlanetTexturesPromise,
         rings: await ringsTexturesPromise,
-        environment: {
-            milkyWay: await milkyWayPromise,
-        },
+        environment: await environmentPromise,
         noises: {
             seamlessPerlin: await seamlessPerlinPromise,
         },
