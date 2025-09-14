@@ -44,6 +44,7 @@ import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSpaceTelescopeScene } from "./spaceTelescope";
 import { createStarMapScene } from "./starMap";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
@@ -88,6 +89,7 @@ export class PlaygroundRegistry {
         ["warpTunnel", createWarpTunnelScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
+        ["spaceTelescope", createSpaceTelescopeScene],
     ]);
 
     register(
