@@ -52,7 +52,7 @@ export async function createBlackHoleScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    new StarFieldBox(textures.environment.milkyWay, scene);
+    new StarFieldBox(textures.environment.milkyWay, 1000e3, scene);
 
     const blackHoleModel = newSeededBlackHoleModel("blackHole", 42, "Black Hole Demo", []);
     const blackHole = new BlackHole(blackHoleModel, textures.environment.milkyWay, scene);
