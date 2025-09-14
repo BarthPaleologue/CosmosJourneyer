@@ -18,8 +18,8 @@
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { loadTextureAsync } from "./utils";
+import { type ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import { loadTextureAsync } from "../utils";
 
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
 import crateAmbientOcclusion from "@assets/crateMaterial/space-crate1-ao.webp";
