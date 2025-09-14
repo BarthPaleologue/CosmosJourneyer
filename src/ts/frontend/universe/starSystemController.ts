@@ -113,7 +113,7 @@ export class StarSystemController {
         scene: UberScene,
     ) {
         this.scene = scene;
-        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
+        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, 1000e3, scene);
         this.model = model;
 
         this.assets = assets;
