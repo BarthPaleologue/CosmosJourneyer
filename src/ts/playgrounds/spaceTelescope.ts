@@ -29,12 +29,15 @@ import {
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
+import type { PrimaryMirrorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceTelescope/primaryMirror";
+
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { createInsulationSheetMaterial } from "@/frontend/assets/materials/insulationSheet";
+import { PrimaryMirror } from "@/frontend/assets/procedural/spaceTelescope/primaryMirror";
 import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
 import { loadFoilMaterialTextures } from "@/frontend/assets/textures/materials/foil";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, setUpVector } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { enablePhysics } from "./utils";
 
@@ -64,35 +67,17 @@ export async function createSpaceTelescopeScene(
 
     new DirectionalLight("light1", new Vector3(0, -1, 0), scene);
 
-    function parabola(x: number, z: number, focalLength: number): number {
-        return (x * x + z * z) / (4 * focalLength);
-    }
-
-    function parabolaNormal(x: number, z: number, focalLength: number): Vector3 {
-        const dx = x / (2 * focalLength);
-        const dz = z / (2 * focalLength);
-        const normal = Vector3.Up();
-        return normal.subtractFromFloatsToRef(dx, 0, dz, normal).normalize();
-    }
-
-    const mirrorMaterial = new PBRMetallicRoughnessMaterial("mirrorMaterial", scene);
-    mirrorMaterial.metallic = 1.0;
-    mirrorMaterial.roughness = 0.02;
-    mirrorMaterial.baseColor = new Color3(1, 0.7766, 0.3362); // gold-like
-
     const focalLength = 10;
 
     // Parameters
     const primaryMirrorRadius = 10;
-    const hexRadius = 0.28; // circumradius (same as before)
-    const hexHeight = 0.01;
 
     const telescope = new TransformNode("telescope", scene);
 
     const mainRig = new TransformNode("mainRig", scene);
     mainRig.parent = telescope;
 
-    const receptorRadius = hexRadius * 2;
+    const receptorRadius = 0.5;
     const receptor = MeshBuilder.CreateCylinder(
         "receptor",
         { diameter: receptorRadius * 2, diameterTop: receptorRadius * 1.0, height: 1, tessellation: 32 },
@@ -106,47 +91,27 @@ export async function createSpaceTelescopeScene(
     receptorMaterial.baseColor = new Color3(0.0, 0.0, 0.0);
     receptor.material = receptorMaterial;
 
-    // GAP control:
-    //  - 0.00 = tight touching (no visual gap)
-    //  - 0.005 ≈ realistic JWST-ish tiny gap (~0.5%)
-    //  - 0.05..0.15 = visible separation for visualization
-    const gapFraction = 0.08; // change this to tune spacing (8% here gives a clear visible gap)
+    const primaryMirrorModel = {
+        apertureRadius: primaryMirrorRadius,
+        shape: {
+            type: "conic",
+            focalLength: focalLength,
+            conicConstant: -1,
+        },
+        segmentation: {
+            type: "hexagonTiling",
+            tileRadius: 0.6,
+            gap: 0.05,
+        },
+    } satisfies PrimaryMirrorModel;
 
-    // Derived spacing for pointy-top hexes (scaled by gapFraction)
-    const spacingScale = 1 + gapFraction;
-    const horiz = 1.5 * hexRadius * spacingScale; // center-to-center horizontal spacing
-    const vert = Math.sqrt(3) * hexRadius * spacingScale; // center-to-center vertical spacing
+    const primaryMirror = new PrimaryMirror(primaryMirrorModel, receptorRadius * 1.2, scene);
+    primaryMirror.getTransform().parent = mainRig;
 
-    const qMax = Math.ceil(primaryMirrorRadius / horiz) + 1;
-    const rMax = Math.ceil(primaryMirrorRadius / vert) + 1;
-
-    const mirror = new TransformNode("mirror", scene);
-    mirror.parent = mainRig;
-
-    for (let q = -qMax; q <= qMax; q++) {
-        for (let r = -rMax; r <= rMax; r++) {
-            const xPos = hexRadius * 1.5 * q * spacingScale;
-            const zPos = hexRadius * Math.sqrt(3) * (r + q / 2) * spacingScale;
-
-            if (xPos * xPos + zPos * zPos < receptorRadius ** 2) continue;
-
-            if (xPos * xPos + zPos * zPos > (primaryMirrorRadius + hexRadius) ** 2) continue;
-
-            const y = parabola(xPos, zPos, focalLength);
-
-            const dot = MeshBuilder.CreateCylinder(
-                "hexTile",
-                { diameter: 2 * hexRadius, height: hexHeight, tessellation: 6 },
-                scene,
-            );
-            dot.position.set(xPos, y, zPos);
-            dot.material = mirrorMaterial;
-            dot.parent = mirror;
-
-            const normal = parabolaNormal(xPos, zPos, focalLength);
-            setUpVector(dot, normal);
-        }
-    }
+    const mirrorMaterial = new PBRMetallicRoughnessMaterial("mirrorMaterial", scene);
+    mirrorMaterial.metallic = 1.0;
+    mirrorMaterial.roughness = 0.02;
+    mirrorMaterial.baseColor = new Color3(1, 0.7766, 0.3362); // gold-like
 
     const secondaryMirrorRadius = 0.5;
 
@@ -173,6 +138,9 @@ export async function createSpaceTelescopeScene(
     secondaryMirrorShield.material = attachmentMaterial;
     secondaryMirrorShield.parent = mainRig;
 
+    const primaryMirrorBounds = primaryMirror.getTransform().getHierarchyBoundingVectors();
+    const primaryMirrorExtentY = (primaryMirrorBounds.max.y - primaryMirrorBounds.min.y) / 2;
+
     const attachmentWidth = primaryMirrorRadius * 1.2;
     const attachmentOrigin = new Vector3(0, -1, 0);
     const attachmentRadius = 0.1;
@@ -181,7 +149,7 @@ export async function createSpaceTelescopeScene(
         {
             path: [
                 attachmentOrigin,
-                new Vector3(-attachmentWidth, parabola(-primaryMirrorRadius, 0, focalLength), 0),
+                new Vector3(-attachmentWidth, primaryMirrorExtentY, 0),
                 secondaryMirror.position
                     .clone()
                     .addInPlaceFromFloats(-secondaryMirrorRadius - attachmentRadius, 0.1, 0),
