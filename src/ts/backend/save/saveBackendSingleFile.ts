@@ -32,7 +32,7 @@ import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError"
 export interface IFile {
     /**
      * Writes save data to the storage backend.
-     * @param saves - Record of commander saves, keyed by commander string
+     * @param content - JSON string containing all commander saves
      * @returns Boolean indicating success or failure of the write operation
      */
     write(content: string): Promise<boolean>;

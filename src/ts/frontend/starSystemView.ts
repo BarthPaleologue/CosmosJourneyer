@@ -232,7 +232,7 @@ export class StarSystemView implements View {
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
      * @param player The player object shared with the rest of the game
      * @param engine The BabylonJS engine
-     * @param havokInstance The Havok physics instance
+     * @param havokPlugin The Havok physics plugin instance
      */
     constructor(
         scene: UberScene,

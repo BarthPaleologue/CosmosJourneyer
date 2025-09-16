@@ -27,8 +27,8 @@ export class FuelTank {
     readonly quality: number;
 
     /**
-     * Creates an empty fuel tank with the given maximum fuel capacity.
-     * @param maxFuel The maximum fuel capacity of the tank.
+     * Creates a fuel tank based on serialized data.
+     * @param serializedFuelTank The serialized specification of the fuel tank.
      */
     constructor(serializedFuelTank: SerializedFuelTank) {
         this.type = serializedFuelTank.type;

@@ -100,9 +100,10 @@ export function getPointOnOrbit(
 }
 
 /**
- * Returns the multiplicative factor to transform the Euclidean orbit into a p-norm orbit for a given theta angle and p-norm
- * @param theta
- * @param p
+ * Returns the multiplicative factor to transform the Euclidean orbit into a p-norm orbit for the given coordinates and p-norm
+ * @param x The x-coordinate of the point along the orbit.
+ * @param y The y-coordinate of the point along the orbit.
+ * @param p The p-norm shaping the orbit.
  */
 export function computeLpFactor(x: number, y: number, p: number) {
     return 1 / (Math.abs(x) ** p + Math.abs(y) ** p) ** (1 / p);

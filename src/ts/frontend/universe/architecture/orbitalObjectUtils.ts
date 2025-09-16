@@ -27,7 +27,6 @@ import { type OrbitalObject } from "./orbitalObject";
  * @param object The object we want to compute the position of
  * @param parents
  * @param elapsedSeconds The time elapsed since the beginning of time in seconds
- * @constructor
  */
 export function getOrbitalPosition(
     object: OrbitalObject,
@@ -55,7 +54,6 @@ export function getOrbitalPosition(
  * @param object The object we want to update the position of
  * @param parents
  * @param elapsedSeconds The time elapsed since the beginning of time in seconds
- * @constructor
  */
 export function setOrbitalPosition(
     object: OrbitalObject,
@@ -76,7 +74,6 @@ export function setOrbitalPosition(
  * Computes the rotation angle of the object around its axis for a given time
  * @param object The object we want to compute the rotation of
  * @param deltaSeconds The time span in seconds
- * @constructor
  */
 export function getRotationAngle(object: OrbitalObject, deltaSeconds: number): number {
     if (object.model.siderealDaySeconds === 0) return 0;

@@ -579,7 +579,6 @@ export function vec4(
 /**
  * Splits a vec2/3/4 into its components.
  * @param inputVec - The input vec.
- * @param dim - The dimension of the input vector
  * @param options - Optional target options.
  */
 export function split(inputVec: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): VectorSplitterBlock {

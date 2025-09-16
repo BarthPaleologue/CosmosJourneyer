@@ -3,6 +3,7 @@
     "out": "doc",
     "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"],
     "theme": "typedoc-github-theme",
+    "sourceLinkTemplate": "https://github.com/BarthPaleologue/CosmosJourneyer/blob/{gitRevision}/{path}#L{line}",
 
     "entryPointStrategy": "expand",
     "entryPoints": ["src/ts"],
