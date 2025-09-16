@@ -69,7 +69,10 @@ const enum GenerationSteps {
 
 /**
  * Generates a new star system data model given a seed using a pseudo-random number generator.
- * @param seed The seed of the star system.
+ * @param systemRng The pseudo-random generator for the star system.
+ * @param coordinates The coordinates of the star system within the galaxy.
+ * @param position The position of the star system within its sector.
+ * @param isCivilized Whether the generated system should be considered civilized.
  * @returns The data model of the generated star system.
  */
 export function newSeededStarSystemModel(

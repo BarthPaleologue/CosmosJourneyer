@@ -56,8 +56,8 @@ export class AsteroidField implements IDisposable {
      * Creates a new asteroid field around a given transform
      * @param seed The seed of the asteroid field
      * @param parent A parent transform node for the asteroids
-     * @param averageRadius The average distance to the parent of the asteroids
-     * @param spread The spread of the distance to the parent around the average distance
+     * @param innerRadius The minimum distance from the parent at which asteroids can spawn
+     * @param outerRadius The maximum distance from the parent at which asteroids can spawn
      * @param scene The scene where the asteroid field exists
      */
     constructor(seed: number, parent: TransformNode, innerRadius: number, outerRadius: number, scene: Scene) {
