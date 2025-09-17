@@ -18,7 +18,6 @@
 import {
     Color3,
     DirectionalLight,
-    Matrix,
     Mesh,
     MeshBuilder,
     PBRMetallicRoughnessMaterial,
@@ -51,7 +50,7 @@ export async function createSpaceTelescopeScene(
     await enablePhysics(scene);
 
     const envTextures = await loadEnvironmentTextures(scene, progressMonitor);
-    envTextures.milkyWay.setReflectionTextureMatrix(Matrix.RotationX(Math.PI));
+    //envTextures.milkyWay.setReflectionTextureMatrix(Matrix.RotationX(Math.PI));
     scene.createDefaultSkybox(envTextures.milkyWay, true, 1e3, 0.0);
 
     const foilTextures = await loadFoilMaterialTextures(scene, progressMonitor);
@@ -66,11 +65,6 @@ export async function createSpaceTelescopeScene(
     lookAt(defaultControls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     new DirectionalLight("light1", new Vector3(0, -1, 0), scene);
-
-    const focalLength = 10;
-
-    // Parameters
-    const primaryMirrorRadius = 10;
 
     const telescope = new TransformNode("telescope", scene);
 
@@ -91,17 +85,20 @@ export async function createSpaceTelescopeScene(
     receptorMaterial.baseColor = new Color3(0.0, 0.0, 0.0);
     receptor.material = receptorMaterial;
 
+    const primaryMirrorRadius = 20.25;
+    const focalLength = 15;
+
     const primaryMirrorModel = {
         apertureRadius: primaryMirrorRadius,
         shape: {
             type: "conic",
             focalLength: focalLength,
-            conicConstant: -1,
+            conicConstant: -0.9967,
         },
         segmentation: {
             type: "hexagonTiling",
-            tileRadius: 0.6,
-            gap: 0.05,
+            tileRadius: 0.75,
+            gap: 0.07,
         },
     } satisfies PrimaryMirrorModel;
 

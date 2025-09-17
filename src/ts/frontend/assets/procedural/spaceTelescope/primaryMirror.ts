@@ -50,36 +50,64 @@ export class PrimaryMirror implements Transformable {
         }
 
         const mirrorMaterial = new PBRMetallicRoughnessMaterial("mirrorMaterial", scene);
-        mirrorMaterial.metallic = 1.0;
+        mirrorMaterial.metallic = 1;
         mirrorMaterial.roughness = 0.02;
         mirrorMaterial.baseColor = new Color3(1, 0.7766, 0.3362); // gold-like
+        //mirrorMaterial.emissiveColor = mirrorMaterial.baseColor.scaleInPlace(0.2);
 
-        const hexRadius = 0.28; // circumradius (same as before)
-
+        const hexRadius = model.segmentation.tileRadius; // circumradius (center -> vertex)
         const hexHeight = 0.01;
 
-        // GAP control:
-        //  - 0.00 = tight touching (no visual gap)
-        //  - 0.005 ≈ realistic JWST-ish tiny gap (~0.5%)
-        //  - 0.05..0.15 = visible separation for visualization
-        const gapFraction = model.segmentation.gap / model.segmentation.tileRadius; // change this to tune spacing (8% here gives a clear visible gap)
+        // flat-to-flat (side-to-side) width and apothem
+        const flat = Math.sqrt(3) * hexRadius; // flat-to-flat distance
 
-        const spacingScale = 1 + gapFraction;
+        // spacing scale: add physical 'gap' between flat faces, not relative to circumradius
+        const spacingScale = (flat + model.segmentation.gap) / flat;
 
-        const horiz = 1.5 * hexRadius * spacingScale; // center-to-center horizontal spacing
-        const vert = Math.sqrt(3) * hexRadius * spacingScale; // center-to-center vertical spacing
+        const ringCount = Math.floor(model.apertureRadius / flat);
 
-        const qMax = Math.ceil(model.apertureRadius / horiz) + 1;
-        const rMax = Math.ceil(model.apertureRadius / vert) + 1;
+        // iterate axial coords inside a hex-shaped area of radius `ringCount`
+        for (let q = -ringCount; q <= ringCount; q++) {
+            const rMin = Math.max(-ringCount, -q - ringCount);
+            const rMax = Math.min(ringCount, -q + ringCount);
+            for (let r = rMin; r <= rMax; r++) {
+                // hex (axial) distance from center
+                const hexDist = (Math.abs(q) + Math.abs(r) + Math.abs(q + r)) / 2;
 
-        for (let q = -qMax; q <= qMax; q++) {
-            for (let r = -rMax; r <= rMax; r++) {
+                // For JWST we want the two rings around the center (exclude center)
+                if (hexDist < 1 || hexDist > ringCount) continue;
+
                 const xPos = hexRadius * 1.5 * q * spacingScale;
                 const zPos = hexRadius * Math.sqrt(3) * (r + q / 2) * spacingScale;
 
-                if (xPos * xPos + zPos * zPos < receptorRadius ** 2) continue;
+                const dist = xPos * xPos + zPos * zPos;
 
-                if (xPos * xPos + zPos * zPos > (model.apertureRadius + hexRadius) ** 2) continue;
+                // preserve optional central obstruction
+                if (receptorRadius > 0 && dist < receptorRadius ** 2) continue;
+
+                const eps = 1e-9;
+                const apertureR2 = model.apertureRadius * model.apertureRadius + eps;
+                let includeTile = false;
+
+                // center inside?
+                if (dist <= apertureR2) {
+                    includeTile = true;
+                } else {
+                    // check hex vertices: pointy-top orientation (angles 0..5 * 60°)
+                    // if your hex orientation is rotated by 30°, add Math.PI/6 to angle
+                    const rotation = 0; // change to Math.PI/6 if your hex faces are rotated
+                    for (let k = 0; k < 6; k++) {
+                        const ang = (Math.PI / 3) * k + rotation;
+                        const vx = xPos + hexRadius * Math.cos(ang);
+                        const vz = zPos + hexRadius * Math.sin(ang);
+                        if (vx * vx + vz * vz <= apertureR2) {
+                            includeTile = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!includeTile) continue;
 
                 const y = parabola(xPos, zPos, model.shape.focalLength);
 
