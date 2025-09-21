@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadMusics, type Musics } from "./musics";
 import { loadSounds, type Sounds } from "./sounds";
@@ -26,10 +28,13 @@ export type AudioAssets = {
     readonly speakerVoiceLines: SpeakerVoiceLines;
 };
 
-export async function loadAudioAssets(progressMonitor: ILoadingProgressMonitor | null): Promise<AudioAssets> {
-    const soundsPromise = loadSounds(progressMonitor);
-    const musicsPromise = loadMusics(progressMonitor);
-    const voiceLinesPromise = loadVoiceLines(progressMonitor);
+export async function loadAudioAssets(
+    audioEngine: AudioEngineV2,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<AudioAssets> {
+    const soundsPromise = loadSounds(audioEngine, progressMonitor);
+    const musicsPromise = loadMusics(audioEngine, progressMonitor);
+    const voiceLinesPromise = loadVoiceLines(audioEngine, progressMonitor);
 
     return {
         sounds: await soundsPromise,

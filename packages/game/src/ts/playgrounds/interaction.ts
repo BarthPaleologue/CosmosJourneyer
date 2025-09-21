@@ -18,6 +18,7 @@
 import {
     AbstractMesh,
     Color3,
+    CreateAudioEngineAsync,
     DirectionalLight,
     HemisphericLight,
     MeshBuilder,
@@ -58,13 +59,15 @@ export async function createInteractionDemo(
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
+    const audioEngine = await CreateAudioEngineAsync();
+
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
     const characters = await loadCharacters(scene, progressMonitor);
 
-    const sounds = await loadSounds(progressMonitor);
+    const sounds = await loadSounds(audioEngine, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(0, -1, -1), scene);
 

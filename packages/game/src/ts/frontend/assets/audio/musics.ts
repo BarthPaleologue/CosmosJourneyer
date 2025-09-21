@@ -18,8 +18,9 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
-import { Sound } from "@babylonjs/core/Audio/sound";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import { CreateStreamingSoundAsync, type AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import type { IStreamingSoundOptions } from "@babylonjs/core/AudioV2/abstractAudio/streamingSound";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -38,57 +39,50 @@ import straussBlueDanubePath from "@assets/sound/music/Strauss_The_Blue_Danube_W
 import thatZenMomentPath from "@assets/sound/music/That_Zen_Moment.ogg";
 
 export type Musics = {
-    readonly wandering: Sound;
-    readonly straussBlueDanube: Sound;
-    readonly deepRelaxation: Sound;
-    readonly atlanteanTwilight: Sound;
-    readonly infinitePerspective: Sound;
-    readonly thatZenMoment: Sound;
-    readonly echoesOfTime: Sound;
-    readonly peaceOfMind: Sound;
-    readonly spacialWinds: Sound;
-    readonly mesmerize: Sound;
-    readonly reawakening: Sound;
-    readonly equatorialComplex: Sound;
-    readonly soaring: Sound;
+    readonly wandering: AbstractSound;
+    readonly straussBlueDanube: AbstractSound;
+    readonly deepRelaxation: AbstractSound;
+    readonly atlanteanTwilight: AbstractSound;
+    readonly infinitePerspective: AbstractSound;
+    readonly thatZenMoment: AbstractSound;
+    readonly echoesOfTime: AbstractSound;
+    readonly peaceOfMind: AbstractSound;
+    readonly spacialWinds: AbstractSound;
+    readonly mesmerize: AbstractSound;
+    readonly reawakening: AbstractSound;
+    readonly equatorialComplex: AbstractSound;
+    readonly soaring: AbstractSound;
 };
 
-export async function loadMusics(progressMonitor: ILoadingProgressMonitor | null): Promise<Musics> {
-    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+export async function loadMusics(
+    audioEngine: AudioEngineV2,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<Musics> {
+    const loadSoundAsync = async (
+        name: string,
+        url: string,
+        audioEngine: AudioEngineV2,
+        options?: Partial<IStreamingSoundOptions>,
+    ) => {
         progressMonitor?.startTask();
-        const loadingPromise = new Promise<Sound>((resolve) => {
-            const sound = new Sound(
-                name,
-                url,
-                null,
-                () => {
-                    resolve(sound);
-                },
-                options,
-            );
-        });
-
-        return loadingPromise.then((sound) => {
-            progressMonitor?.completeTask();
-            return sound;
-        });
+        const sound = await CreateStreamingSoundAsync(name, url, options, audioEngine);
+        progressMonitor?.completeTask();
+        return sound;
     };
 
-    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, { loop: true, streaming: true });
-    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath, { streaming: true });
-    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath, { streaming: true });
-    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath, { streaming: true });
-    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath, {
-        streaming: true,
-    });
-    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath, { streaming: true });
-    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath, { streaming: true });
-    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath, { streaming: true });
-    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath, { streaming: true });
-    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath, { streaming: true });
-    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath, { streaming: true });
-    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath, { streaming: true });
-    const soaringPromise = loadSoundAsync("Soaring", soaringPath, { streaming: true });
+    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, audioEngine, { loop: true });
+    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath, audioEngine);
+    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath, audioEngine);
+    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath, audioEngine);
+    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath, audioEngine);
+    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath, audioEngine);
+    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath, audioEngine);
+    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath, audioEngine);
+    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath, audioEngine);
+    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath, audioEngine);
+    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath, audioEngine);
+    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath, audioEngine);
+    const soaringPromise = loadSoundAsync("Soaring", soaringPath, audioEngine);
 
     return {
         wandering: await wanderingPromise,

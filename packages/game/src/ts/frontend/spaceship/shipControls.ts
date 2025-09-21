@@ -514,7 +514,7 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(
+    static async CreateDefault(
         scene: Scene,
         assets: RenderingAssets,
         tts: ITts,
@@ -522,7 +522,7 @@ export class ShipControls implements Controls {
         notificationManager: INotificationManager,
     ) {
         return new ShipControls(
-            Spaceship.CreateDefault(scene, assets, soundPlayer),
+            await Spaceship.CreateDefault(scene, assets, soundPlayer),
             scene,
             soundPlayer,
             tts,

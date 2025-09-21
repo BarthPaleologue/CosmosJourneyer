@@ -18,8 +18,9 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
-import { Sound } from "@babylonjs/core/Audio/sound";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import { CreateSoundAsync, type AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import type { IStaticSoundOptions } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -37,67 +38,79 @@ import warpDriveDisengagedSoundPath from "@assets/sound/voice/WarpDriveDisengage
 import warpDriveEmergencyShutDownSoundPath from "@assets/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
 
 export type VoiceLines = {
-    readonly initiatingPlanetaryLanding: Sound;
-    readonly landingRequestGranted: Sound;
-    readonly landingComplete: Sound;
-    readonly missionComplete: Sound;
-    readonly newDiscovery: Sound;
-    readonly cannotEngageWarpDrive: Sound;
-    readonly warpDriveEmergencyShutDown: Sound;
-    readonly warpDriveDisengaged: Sound;
-    readonly engagingWarpDrive: Sound;
-    readonly fuelScooping: Sound;
-    readonly fuelScoopingComplete: Sound;
-    readonly lowFuelWarning: Sound;
+    readonly initiatingPlanetaryLanding: AbstractSound;
+    readonly landingRequestGranted: AbstractSound;
+    readonly landingComplete: AbstractSound;
+    readonly missionComplete: AbstractSound;
+    readonly newDiscovery: AbstractSound;
+    readonly cannotEngageWarpDrive: AbstractSound;
+    readonly warpDriveEmergencyShutDown: AbstractSound;
+    readonly warpDriveDisengaged: AbstractSound;
+    readonly engagingWarpDrive: AbstractSound;
+    readonly fuelScooping: AbstractSound;
+    readonly fuelScoopingComplete: AbstractSound;
+    readonly lowFuelWarning: AbstractSound;
 };
 
 export type SpeakerVoiceLines = {
     readonly charlotte: VoiceLines;
 };
 
-export async function loadVoiceLines(progressMonitor: ILoadingProgressMonitor | null): Promise<SpeakerVoiceLines> {
-    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+export async function loadVoiceLines(
+    audioEngine: AudioEngineV2,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<SpeakerVoiceLines> {
+    const loadSoundAsync = async (
+        name: string,
+        url: string,
+        audioEngine: AudioEngineV2,
+        options?: Partial<IStaticSoundOptions>,
+    ) => {
         progressMonitor?.startTask();
-        const loadingPromise = new Promise<Sound>((resolve) => {
-            const sound = new Sound(
-                name,
-                url,
-                null,
-                () => {
-                    resolve(sound);
-                },
-                options,
-            );
-        });
-
-        return loadingPromise.then((sound) => {
-            progressMonitor?.completeTask();
-            return sound;
-        });
+        const sound = await CreateSoundAsync(name, url, options, audioEngine);
+        progressMonitor?.completeTask();
+        return sound;
     };
 
     // Voice sounds
     const initiatingPlanetaryLandingSoundPromise = loadSoundAsync(
         "InitiatingPlanetaryLanding",
         initiatingPlanetaryLandingSoundPath,
+        audioEngine,
     );
-    const landingRequestGrantedSoundPromise = loadSoundAsync("LandingRequestGranted", landingRequestSoundPath);
-    const landingCompleteSoundPromise = loadSoundAsync("LandingComplete", landingCompleteSoundPath);
-    const missionCompleteSoundPromise = loadSoundAsync("MissionComplete", missionCompleteSoundPath);
-    const newDiscoverySoundPromise = loadSoundAsync("NewDiscovery", newDiscoverySoundPath);
+    const landingRequestGrantedSoundPromise = loadSoundAsync(
+        "LandingRequestGranted",
+        landingRequestSoundPath,
+        audioEngine,
+    );
+    const landingCompleteSoundPromise = loadSoundAsync("LandingComplete", landingCompleteSoundPath, audioEngine);
+    const missionCompleteSoundPromise = loadSoundAsync("MissionComplete", missionCompleteSoundPath, audioEngine);
+    const newDiscoverySoundPromise = loadSoundAsync("NewDiscovery", newDiscoverySoundPath, audioEngine);
 
-    const cannotEngageWarpDriveSoundPromise = loadSoundAsync("CannotEngageWarpDrive", cannotEngageWarpDriveSoundPath);
+    const cannotEngageWarpDriveSoundPromise = loadSoundAsync(
+        "CannotEngageWarpDrive",
+        cannotEngageWarpDriveSoundPath,
+        audioEngine,
+    );
     const warpDriveEmergencyShutDownSoundPromise = loadSoundAsync(
         "WarpDriveEmergencyShutDown",
         warpDriveEmergencyShutDownSoundPath,
+        audioEngine,
     );
-    const warpDriveDisengagedSoundPromise = loadSoundAsync("WarpDriveDisengaged", warpDriveDisengagedSoundPath);
-    const engagingWarpDriveSoundPromise = loadSoundAsync("EngagingWarpDrive", engagingWarpDriveSoundPath);
+    const warpDriveDisengagedSoundPromise = loadSoundAsync(
+        "WarpDriveDisengaged",
+        warpDriveDisengagedSoundPath,
+        audioEngine,
+    );
+    const engagingWarpDriveSoundPromise = loadSoundAsync("EngagingWarpDrive", engagingWarpDriveSoundPath, audioEngine);
 
-    const fuelScoopingVoicePromise = loadSoundAsync("FuelScoopingVoice", fuelScoopingVoicePath);
-    const fuelScoopingCompleteVoicePromise = loadSoundAsync("FuelScoopingCompleteVoice", fuelScoopingCompleteVoicePath);
-
-    const fuelWarningSoundPromise = loadSoundAsync("LowFuelWarning", lowFuelWarningSoundPath);
+    const fuelScoopingVoicePromise = loadSoundAsync("FuelScoopingVoice", fuelScoopingVoicePath, audioEngine);
+    const fuelScoopingCompleteVoicePromise = loadSoundAsync(
+        "FuelScoopingCompleteVoice",
+        fuelScoopingCompleteVoicePath,
+        audioEngine,
+    );
+    const fuelWarningSoundPromise = loadSoundAsync("LowFuelWarning", lowFuelWarningSoundPath, audioEngine);
 
     return {
         charlotte: {

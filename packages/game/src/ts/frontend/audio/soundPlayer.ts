@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Sound } from "@babylonjs/core/Audio/sound";
+import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import { type Sounds } from "@/frontend/assets/audio/sounds";
 
-import { SoundInstance, SoundInstanceMock, type ISoundInstance } from "./soundInstance";
+import { SoundInstance, SoundInstanceMock, type ISoundInstance, type SoundInstanceOptions } from "./soundInstance";
 
 export const enum SoundType {
     CLICK,
@@ -45,12 +45,7 @@ export const enum SoundType {
 export interface ISoundPlayer {
     playNow(soundType: SoundType): void;
     enqueuePlay(soundType: SoundType): void;
-    createInstance(
-        soundType: SoundType,
-        mask: number,
-        initialTargetVolume: number,
-        isPonctual: boolean,
-    ): ISoundInstance;
+    createInstance(soundType: SoundType, options?: Partial<SoundInstanceOptions>): Promise<ISoundInstance>;
     freeInstance(instance: ISoundInstance): void;
     setInstanceMask(mask: number): void;
     update(): void;
@@ -60,7 +55,7 @@ export class SoundPlayer implements ISoundPlayer {
     private readonly sounds: Sounds;
 
     private isPlaying = false;
-    private soundQueue: Array<Sound> = [];
+    private soundQueue: Array<StaticSound> = [];
 
     private readonly soundInstances: Set<ISoundInstance> = new Set();
     private soundInstanceMask = 0b1111;
@@ -69,7 +64,7 @@ export class SoundPlayer implements ISoundPlayer {
         this.sounds = sounds;
     }
 
-    private getSoundFromType(soundType: SoundType): Sound {
+    private getSoundFromType(soundType: SoundType): StaticSound {
         switch (soundType) {
             case SoundType.CLICK:
             case SoundType.WARNING:
@@ -113,16 +108,14 @@ export class SoundPlayer implements ISoundPlayer {
         this.soundQueue.push(this.getSoundFromType(soundType));
     }
 
-    public createInstance(
+    public async createInstance(
         soundType: SoundType,
-        mask: number,
-        initialTargetVolume: number,
-        isPonctual: boolean,
-    ): ISoundInstance {
+        options?: Partial<SoundInstanceOptions>,
+    ): Promise<ISoundInstance> {
         const sound = this.getSoundFromType(soundType);
-        const instance = new SoundInstance(sound, mask, initialTargetVolume, isPonctual);
+        const instance = await SoundInstance.New(sound, options);
         this.soundInstances.add(instance);
-        instance.setMaskFactor((mask & this.soundInstanceMask) !== 0 ? 1 : 0);
+        instance.setMaskFactor(((options?.mask ?? 0) & this.soundInstanceMask) !== 0 ? 1 : 0);
         return instance;
     }
 
@@ -138,7 +131,7 @@ export class SoundPlayer implements ISoundPlayer {
     public update(): void {
         for (const soundInstance of this.soundInstances) {
             const isSoundEnabled = (soundInstance.getMask() & this.soundInstanceMask) !== 0;
-            soundInstance.setMaskFactor(isSoundEnabled ? 1 : 0);
+            soundInstance.setMaskFactor(isSoundEnabled ? 1 : 0, { duration: 0.1 });
         }
 
         if (this.isPlaying) {
@@ -168,8 +161,8 @@ export class SoundPlayerMock implements ISoundPlayer {
         // No-op
     }
 
-    createInstance(): ISoundInstance {
-        return new SoundInstanceMock();
+    createInstance(): Promise<ISoundInstance> {
+        return Promise.resolve(new SoundInstanceMock());
     }
 
     freeInstance(): void {
