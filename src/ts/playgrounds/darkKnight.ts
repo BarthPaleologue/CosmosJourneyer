@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HemisphericLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { DarkKnight } from "@/frontend/universe/darkKnight";
+import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,
@@ -32,9 +33,9 @@ export async function createDarkKnightScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadEnvironmentTextures(scene, progressMonitor);
 
-    scene.environmentTexture = textures.environment.milkyWay;
+    new StarFieldBox(textures.milkyWay, 1000e3, scene);
 
     const controls = new DefaultControls(scene);
 
@@ -44,12 +45,6 @@ export async function createDarkKnightScene(
     camera.attachControl();
 
     scene.enableDepthRenderer();
-
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
-    light.intensity = 0.7;
 
     // Our built-in 'sphere' shape. Params: name, options, scene
     const darkKnight = new DarkKnight(generateDarkKnightModel([]), scene);

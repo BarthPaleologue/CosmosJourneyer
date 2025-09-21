@@ -600,7 +600,7 @@ export class StarSystemView implements View {
             const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();
             Vector3.TransformCoordinatesToRef(
                 placementDirection,
-                starSystem.starFieldBox.getRotationMatrix(),
+                starSystem.getReferencePlaneRotation(),
                 placementDirection,
             );
 

@@ -113,7 +113,7 @@ export class StarSystemController {
         scene: UberScene,
     ) {
         this.scene = scene;
-        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, scene);
+        this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, 1000e3, scene);
         this.model = model;
 
         this.assets = assets;
@@ -328,7 +328,7 @@ export class StarSystemController {
             rotation.multiplyToRef(this.referencePlaneRotation, this.referencePlaneRotation);
 
             // the starfield is rotated to give the impression the nearest body is rotating, which is only an illusion
-            this.referencePlaneRotation.transposeToRef(this.starFieldBox.getRotationMatrix());
+            this.starFieldBox.setRotationMatrix(this.referencePlaneRotation.transpose());
         } else {
             // if we don't compensate the rotation of the nearest body, we must simply update its rotation
             setRotation(nearestOrbitalObject, this.referencePlaneRotation, this.elapsedSeconds);
@@ -468,7 +468,7 @@ export class StarSystemController {
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
 
-        Vector3.TransformCoordinatesToRef(direction, this.starFieldBox.getRotationMatrix(), direction);
+        Vector3.TransformCoordinatesToRef(direction, this.referencePlaneRotation, direction);
 
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
         if (systemModel === null) {

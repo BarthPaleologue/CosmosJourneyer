@@ -63,7 +63,7 @@ export async function createSunScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    const starField = new StarFieldBox(textures.environment.milkyWay, scene);
+    const starField = new StarFieldBox(textures.environment.milkyWay, 1000e3, scene);
 
     const sunModel = getSunModel();
 

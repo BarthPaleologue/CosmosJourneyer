@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
-import { type Material } from "@babylonjs/core/Materials/material";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
@@ -32,37 +32,38 @@ export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;
     readonly material: Material;
     readonly texture: CubeTexture;
+    readonly clonedTexture: CubeTexture;
 
-    constructor(texture: CubeTexture, scene: Scene) {
+    constructor(texture: CubeTexture, scale: number, scene: Scene) {
         RenderingManager.MIN_RENDERINGGROUPS = Math.min(-1, RenderingManager.MIN_RENDERINGGROUPS);
 
-        this.mesh = MeshBuilder.CreateBox("skybox", { size: 1000e3 }, scene);
+        scene.environmentTexture = texture;
+
+        this.mesh = MeshBuilder.CreateBox("skybox", { size: scale }, scene);
         this.mesh.renderingGroupId = -1;
 
         this.texture = texture;
         this.texture.setReflectionTextureMatrix(Matrix.Identity());
 
+        this.clonedTexture = this.texture.clone();
+        this.clonedTexture.coordinatesMode = Texture.SKYBOX_MODE;
+
         const material = new BackgroundMaterial("skyboxMat", scene);
+        material.reflectionTexture = this.clonedTexture;
         material.backFaceCulling = false;
-        material.reflectionTexture = this.texture;
-        material.reflectionTexture.gammaSpace = true;
-        material.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
         material.disableDepthWrite = true;
 
         this.material = material;
-
         this.mesh.material = this.material;
-        this.mesh.infiniteDistance = true;
 
-        scene.environmentTexture = this.texture;
+        this.mesh.isPickable = false;
+        this.mesh.ignoreCameraMaxZ = true;
+        this.mesh.infiniteDistance = true;
     }
 
     setRotationMatrix(rotationMatrix: Matrix): void {
         this.texture.setReflectionTextureMatrix(rotationMatrix);
-    }
-
-    getRotationMatrix(): Matrix {
-        return this.texture.getReflectionTextureMatrix();
+        this.clonedTexture.setReflectionTextureMatrix(rotationMatrix);
     }
 
     getTransform(): TransformNode {
@@ -70,7 +71,7 @@ export class StarFieldBox implements Transformable {
     }
 
     dispose(): void {
-        this.mesh.dispose();
         this.material.dispose();
+        this.getTransform().dispose();
     }
 }
