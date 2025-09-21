@@ -1,15 +1,16 @@
-import { type Sound } from "@babylonjs/core/Audio/sound";
+import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
+import type { IAudioParameterRampOptions } from "@babylonjs/core/AudioV2/audioParameter";
 
 export interface ISoundInstance {
     play(): void;
-    setVolume(volume: number): void;
-    setMaskFactor(factor: number): void;
+    setVolume(volume: number, options?: Partial<IAudioParameterRampOptions>): void;
+    setMaskFactor(factor: number, options?: Partial<IAudioParameterRampOptions>): void;
     getMask(): number;
     dispose(): void;
 }
 
 export class SoundInstance implements ISoundInstance {
-    readonly sound: Sound;
+    readonly sound: StaticSound;
 
     private targetVolume;
 
@@ -20,37 +21,37 @@ export class SoundInstance implements ISoundInstance {
 
     readonly mask: number;
 
-    constructor(baseSound: Sound, mask: number, initialTargetVolume: number, playOnce: boolean) {
-        const clonedSound = baseSound.clone();
-        if (clonedSound === null) throw new Error("Cloned sound was null!");
+    private constructor(clonedSound: StaticSound, mask: number, initialTargetVolume: number, loop: boolean) {
         this.sound = clonedSound;
 
         this.mask = mask;
 
         this.targetVolume = initialTargetVolume;
 
-        this.volumeMultiplier = baseSound.getVolume();
-        this.playbackSpeedMultiplier = baseSound.getPlaybackRate();
+        this.volumeMultiplier = clonedSound.volume;
+        this.playbackSpeedMultiplier = clonedSound.playbackRate;
 
-        this.sound.updateOptions({
-            playbackRate: this.playbackSpeedMultiplier,
-            volume: this.targetVolume * this.volumeMultiplier * this.maskFactor,
-            loop: !playOnce,
-        });
+        this.sound.playbackRate = this.playbackSpeedMultiplier;
+        this.sound.volume = this.targetVolume * this.volumeMultiplier;
+        this.sound.loop = loop;
+    }
+
+    static async New(baseSound: StaticSound, mask: number, initialTargetVolume: number, loop: boolean) {
+        return new SoundInstance(await baseSound.cloneAsync(), mask, initialTargetVolume, loop);
     }
 
     play(): void {
         this.sound.play();
     }
 
-    setVolume(volume: number) {
+    setVolume(volume: number, options?: Partial<IAudioParameterRampOptions>) {
         this.targetVolume = volume;
-        this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, 0.5);
+        this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, options);
     }
 
-    setMaskFactor(factor: number) {
+    setMaskFactor(factor: number, options?: Partial<IAudioParameterRampOptions>) {
         this.maskFactor = factor;
-        this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, 0.5);
+        this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, options);
     }
 
     getMask(): number {

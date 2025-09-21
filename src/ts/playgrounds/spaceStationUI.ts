@@ -60,7 +60,7 @@ export async function createSpaceStationUIScene(
         throw new Error("No spaceship found in player data");
     }
 
-    const spaceship = Spaceship.Deserialize(
+    const spaceship = await Spaceship.Deserialize(
         serializedSpaceship,
         player.spareSpaceshipComponents,
         scene,

@@ -506,8 +506,8 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(scene: Scene, assets: RenderingAssets, tts: ITts, soundPlayer: ISoundPlayer) {
-        return new ShipControls(Spaceship.CreateDefault(scene, assets, soundPlayer), scene, soundPlayer, tts);
+    static async CreateDefault(scene: Scene, assets: RenderingAssets, tts: ITts, soundPlayer: ISoundPlayer) {
+        return new ShipControls(await Spaceship.CreateDefault(scene, assets, soundPlayer), scene, soundPlayer, tts);
     }
 
     dispose(soundPlayer: ISoundPlayer) {

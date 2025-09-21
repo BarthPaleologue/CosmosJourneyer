@@ -19,7 +19,8 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
 import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
-import { Sound } from "@babylonjs/core/Audio/sound";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import { CreateSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -36,17 +37,17 @@ import warpDriveDisengagedSoundPath from "@assets/sound/voice/WarpDriveDisengage
 import warpDriveEmergencyShutDownSoundPath from "@assets/sound/voice/WarpDriveEmergencyShutdownCharlotte.mp3";
 
 export type VoiceLines = {
-    readonly initiatingPlanetaryLanding: Sound;
-    readonly landingRequestGranted: Sound;
-    readonly landingComplete: Sound;
-    readonly missionComplete: Sound;
-    readonly newDiscovery: Sound;
-    readonly cannotEngageWarpDrive: Sound;
-    readonly warpDriveEmergencyShutDown: Sound;
-    readonly warpDriveDisengaged: Sound;
-    readonly engagingWarpDrive: Sound;
-    readonly fuelScooping: Sound;
-    readonly fuelScoopingComplete: Sound;
+    readonly initiatingPlanetaryLanding: AbstractSound;
+    readonly landingRequestGranted: AbstractSound;
+    readonly landingComplete: AbstractSound;
+    readonly missionComplete: AbstractSound;
+    readonly newDiscovery: AbstractSound;
+    readonly cannotEngageWarpDrive: AbstractSound;
+    readonly warpDriveEmergencyShutDown: AbstractSound;
+    readonly warpDriveDisengaged: AbstractSound;
+    readonly engagingWarpDrive: AbstractSound;
+    readonly fuelScooping: AbstractSound;
+    readonly fuelScoopingComplete: AbstractSound;
 };
 
 export type SpeakerVoiceLines = {
@@ -54,24 +55,11 @@ export type SpeakerVoiceLines = {
 };
 
 export async function loadVoiceLines(progressMonitor: ILoadingProgressMonitor | null): Promise<SpeakerVoiceLines> {
-    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+    const loadSoundAsync = async (name: string, url: string, options?: ISoundOptions) => {
         progressMonitor?.startTask();
-        const loadingPromise = new Promise<Sound>((resolve) => {
-            const sound = new Sound(
-                name,
-                url,
-                null,
-                () => {
-                    resolve(sound);
-                },
-                options,
-            );
-        });
-
-        return loadingPromise.then((sound) => {
-            progressMonitor?.completeTask();
-            return sound;
-        });
+        const sound = await CreateSoundAsync(name, url, options);
+        progressMonitor?.completeTask();
+        return sound;
     };
 
     // Voice sounds

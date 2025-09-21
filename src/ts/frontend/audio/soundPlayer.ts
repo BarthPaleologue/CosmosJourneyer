@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Sound } from "@babylonjs/core/Audio/sound";
+import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import { type Sounds } from "@/frontend/assets/audio/sounds";
 
@@ -50,7 +50,7 @@ export interface ISoundPlayer {
         mask: number,
         initialTargetVolume: number,
         isPonctual: boolean,
-    ): ISoundInstance;
+    ): Promise<ISoundInstance>;
     freeInstance(instance: ISoundInstance): void;
     setInstanceMask(mask: number): void;
     update(): void;
@@ -60,7 +60,7 @@ export class SoundPlayer implements ISoundPlayer {
     private readonly sounds: Sounds;
 
     private isPlaying = false;
-    private soundQueue: Array<Sound> = [];
+    private soundQueue: Array<StaticSound> = [];
 
     private readonly soundInstances: Set<ISoundInstance> = new Set();
     private soundInstanceMask = 0b1111;
@@ -69,7 +69,7 @@ export class SoundPlayer implements ISoundPlayer {
         this.sounds = sounds;
     }
 
-    private getSoundFromType(soundType: SoundType): Sound {
+    private getSoundFromType(soundType: SoundType): StaticSound {
         switch (soundType) {
             case SoundType.CLICK:
             case SoundType.WARNING:
@@ -113,14 +113,14 @@ export class SoundPlayer implements ISoundPlayer {
         this.soundQueue.push(this.getSoundFromType(soundType));
     }
 
-    public createInstance(
+    public async createInstance(
         soundType: SoundType,
         mask: number,
         initialTargetVolume: number,
         isPonctual: boolean,
-    ): ISoundInstance {
+    ): Promise<ISoundInstance> {
         const sound = this.getSoundFromType(soundType);
-        const instance = new SoundInstance(sound, mask, initialTargetVolume, isPonctual);
+        const instance = await SoundInstance.New(sound, mask, initialTargetVolume, isPonctual);
         this.soundInstances.add(instance);
         instance.setMaskFactor((mask & this.soundInstanceMask) !== 0 ? 1 : 0);
         return instance;
@@ -168,8 +168,8 @@ export class SoundPlayerMock implements ISoundPlayer {
         // No-op
     }
 
-    createInstance(): ISoundInstance {
-        return new SoundInstanceMock();
+    createInstance(): Promise<ISoundInstance> {
+        return Promise.resolve(new SoundInstanceMock());
     }
 
     freeInstance(): void {
