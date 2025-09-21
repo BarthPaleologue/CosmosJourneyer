@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Sound } from "@babylonjs/core/Audio/sound";
-import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { SoundState } from "@babylonjs/core";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type Musics } from "@/frontend/assets/audio/musics";
 import { type StarSystemView } from "@/frontend/starSystemView";
 
 export class MusicConductor {
-    private currentMusic: Sound | null = null;
+    private currentMusic: AbstractSound | null = null;
 
     /**
      * The number of seconds to wait before playing a new music.
@@ -39,17 +40,11 @@ export class MusicConductor {
 
     private readonly musics: Musics;
 
-    constructor(musics: Musics, starSystemView: StarSystemView) {
+    constructor(musics: Musics, audioEngine: AudioEngineV2, starSystemView: StarSystemView) {
         this.musics = musics;
         this.starSystemView = starSystemView;
 
-        const audioEngine = AbstractEngine.audioEngine;
-
-        if (audioEngine === null) {
-            throw new Error("Audio context is null");
-        }
-
-        audioEngine.onAudioUnlockedObservable.addOnce(() => {
+        void audioEngine.unlockAsync().then(() => {
             if (this.currentMusic !== null) {
                 const copy = this.currentMusic;
                 this.currentMusic = null;
@@ -58,7 +53,7 @@ export class MusicConductor {
         });
     }
 
-    public setMusicFromSelection(musicSelection: ReadonlyArray<Sound>) {
+    public setMusicFromSelection(musicSelection: ReadonlyArray<AbstractSound>) {
         if (this.currentMusic !== null && musicSelection.includes(this.currentMusic)) {
             return;
         }
@@ -71,13 +66,13 @@ export class MusicConductor {
         this.setMusic(selectedMusic);
     }
 
-    public setMusic(newMusic: Sound | null) {
+    public setMusic(newMusic: AbstractSound | null) {
         if (this.currentMusic === newMusic) {
             return;
         }
 
         if (this.currentMusic !== null) {
-            this.currentMusic.setVolume(0, this.fadeSeconds);
+            this.currentMusic.setVolume(0, { duration: this.fadeSeconds });
             this.currentMusic = null;
 
             // some silence between two musics
@@ -93,7 +88,7 @@ export class MusicConductor {
         this.currentMusic.stop();
         this.currentMusic.setVolume(0);
         this.currentMusic.play();
-        this.currentMusic.setVolume(this.volume, this.fadeSeconds);
+        this.currentMusic.setVolume(this.volume, { duration: this.fadeSeconds });
         console.log("currently playing", this.currentMusic.name);
     }
 
@@ -109,16 +104,16 @@ export class MusicConductor {
 
     public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
         if (this.currentMusic !== null) {
-            if (isPaused && this.pauseMusicWhenPaused && this.currentMusic.isPlaying) {
+            if (isPaused && this.pauseMusicWhenPaused && this.currentMusic.state === SoundState.Started) {
                 this.currentMusic.pause();
                 return;
-            } else if (!isPaused && this.currentMusic.isPaused) {
+            } else if (!isPaused && this.currentMusic.state === SoundState.Paused) {
                 this.currentMusic.play();
                 return;
             }
 
             // if the music has finished playing, set it to null
-            if (!isPaused && !this.currentMusic.isPlaying) {
+            if (!isPaused && this.currentMusic.state === SoundState.Stopped) {
                 this.currentMusic = null;
                 this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
             }

@@ -80,7 +80,7 @@ export async function createStarSystemViewScene(
 
     await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
 
-    starSystemView.initStarSystem();
+    await starSystemView.initStarSystem();
 
     positionNearObjectBrightSide(
         starSystemView.getSpaceshipControls(),

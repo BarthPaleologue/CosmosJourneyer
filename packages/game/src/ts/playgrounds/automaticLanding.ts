@@ -54,7 +54,7 @@ export async function createAutomaticLandingScene(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const ship = Spaceship.CreateDefault(scene, assets, soundPlayer);
+    const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
     ship.getTransform().position.copyFromFloats(
         randRange(-50, 50, Math.random, 0),
         randRange(30, 50, Math.random, 0),

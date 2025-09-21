@@ -18,8 +18,8 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
-import { Sound } from "@babylonjs/core/Audio/sound";
+import { CreateSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import type { IStaticSoundOptions, StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -37,42 +37,29 @@ import engineRunningSoundPath from "@assets/sound/engineRunning.mp3";
 import ouchSoundPath from "@assets/sound/ouch.mp3";
 
 export type Sounds = {
-    readonly ouch: Sound;
-    readonly engineRunning: Sound;
-    readonly menuHover: Sound;
-    readonly menuSelect: Sound;
-    readonly openPauseMenu: Sound;
-    readonly targetLock: Sound;
-    readonly targetUnlock: Sound;
-    readonly enableWarpDrive: Sound;
-    readonly disableWarpDrive: Sound;
-    readonly acceleratingWarpDrive: Sound;
-    readonly deceleratingWarpDrive: Sound;
-    readonly hyperSpace: Sound;
-    readonly thruster: Sound;
-    readonly success: Sound;
-    readonly error: Sound;
+    readonly ouch: StaticSound;
+    readonly engineRunning: StaticSound;
+    readonly menuHover: StaticSound;
+    readonly menuSelect: StaticSound;
+    readonly openPauseMenu: StaticSound;
+    readonly targetLock: StaticSound;
+    readonly targetUnlock: StaticSound;
+    readonly enableWarpDrive: StaticSound;
+    readonly disableWarpDrive: StaticSound;
+    readonly acceleratingWarpDrive: StaticSound;
+    readonly deceleratingWarpDrive: StaticSound;
+    readonly hyperSpace: StaticSound;
+    readonly thruster: StaticSound;
+    readonly success: StaticSound;
+    readonly error: StaticSound;
 };
 
 export async function loadSounds(progressMonitor: ILoadingProgressMonitor | null): Promise<Sounds> {
-    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+    const loadSoundAsync = async (name: string, url: string, options?: Partial<IStaticSoundOptions>) => {
         progressMonitor?.startTask();
-        const loadingPromise = new Promise<Sound>((resolve) => {
-            const sound = new Sound(
-                name,
-                url,
-                null,
-                () => {
-                    resolve(sound);
-                },
-                options,
-            );
-        });
-
-        return loadingPromise.then((sound) => {
-            progressMonitor?.completeTask();
-            return sound;
-        });
+        const sound = await CreateSoundAsync(name, url, options);
+        progressMonitor?.completeTask();
+        return sound;
     };
 
     const ouchSoundPromise = loadSoundAsync("OuchSound", ouchSoundPath);

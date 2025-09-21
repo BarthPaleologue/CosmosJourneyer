@@ -30,23 +30,33 @@ export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(universeBackend: UniverseBackend, scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer) {
-        this.player = Player.Default(universeBackend);
-        this.player.setName("AI");
+    public static async New(
+        universeBackend: UniverseBackend,
+        scene: Scene,
+        assets: RenderingAssets,
+        soundPlayer: ISoundPlayer,
+    ) {
+        const player = Player.Default(universeBackend);
+        player.setName("AI");
 
-        const spaceshipSerialized = this.player.serializedSpaceships.shift();
+        const spaceshipSerialized = player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) {
             throw new Error("No spaceship serialized for AI player");
         }
 
-        const spaceship = Spaceship.Deserialize(
+        const spaceship = await Spaceship.Deserialize(
             spaceshipSerialized,
-            this.player.spareSpaceshipComponents,
+            player.spareSpaceshipComponents,
             scene,
             assets,
             soundPlayer,
         );
 
+        return new AiPlayerControls(player, spaceship, scene);
+    }
+
+    private constructor(player: Player, spaceship: Spaceship, scene: Scene) {
+        this.player = player;
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);
     }
 

@@ -19,7 +19,8 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
 import { type ISoundOptions } from "@babylonjs/core/Audio/Interfaces/ISoundOptions";
-import { Sound } from "@babylonjs/core/Audio/sound";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import { CreateStreamingSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -38,40 +39,27 @@ import straussBlueDanubePath from "@assets/sound/music/Strauss_The_Blue_Danube_W
 import thatZenMomentPath from "@assets/sound/music/That_Zen_Moment.ogg";
 
 export type Musics = {
-    readonly wandering: Sound;
-    readonly straussBlueDanube: Sound;
-    readonly deepRelaxation: Sound;
-    readonly atlanteanTwilight: Sound;
-    readonly infinitePerspective: Sound;
-    readonly thatZenMoment: Sound;
-    readonly echoesOfTime: Sound;
-    readonly peaceOfMind: Sound;
-    readonly spacialWinds: Sound;
-    readonly mesmerize: Sound;
-    readonly reawakening: Sound;
-    readonly equatorialComplex: Sound;
-    readonly soaring: Sound;
+    readonly wandering: AbstractSound;
+    readonly straussBlueDanube: AbstractSound;
+    readonly deepRelaxation: AbstractSound;
+    readonly atlanteanTwilight: AbstractSound;
+    readonly infinitePerspective: AbstractSound;
+    readonly thatZenMoment: AbstractSound;
+    readonly echoesOfTime: AbstractSound;
+    readonly peaceOfMind: AbstractSound;
+    readonly spacialWinds: AbstractSound;
+    readonly mesmerize: AbstractSound;
+    readonly reawakening: AbstractSound;
+    readonly equatorialComplex: AbstractSound;
+    readonly soaring: AbstractSound;
 };
 
 export async function loadMusics(progressMonitor: ILoadingProgressMonitor | null): Promise<Musics> {
-    const loadSoundAsync = (name: string, url: string, options?: ISoundOptions) => {
+    const loadSoundAsync = async (name: string, url: string, options?: ISoundOptions) => {
         progressMonitor?.startTask();
-        const loadingPromise = new Promise<Sound>((resolve) => {
-            const sound = new Sound(
-                name,
-                url,
-                null,
-                () => {
-                    resolve(sound);
-                },
-                options,
-            );
-        });
-
-        return loadingPromise.then((sound) => {
-            progressMonitor?.completeTask();
-            return sound;
-        });
+        const sound = await CreateStreamingSoundAsync(name, url, options);
+        progressMonitor?.completeTask();
+        return sound;
     };
 
     const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, { loop: true, streaming: true });

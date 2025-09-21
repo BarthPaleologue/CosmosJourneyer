@@ -54,7 +54,7 @@ export async function createFlightDemoScene(
     const tts = new TtsMock();
     const notificationManager = new NotificationManagerMock();
 
-    const ship = ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
+    const ship = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
 
     const camera = ship.getActiveCamera();
     camera.minZ = 0.1;
