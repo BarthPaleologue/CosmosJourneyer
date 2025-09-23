@@ -45,7 +45,7 @@ export class StarSystemLoader {
     private maxLoadingIndex: number;
 
     private readonly offset = 1e8;
-    private readonly timeOut = 500;
+    private readonly timeOut = 16 * 10;
 
     constructor() {
         this.loadingIndex = 0;

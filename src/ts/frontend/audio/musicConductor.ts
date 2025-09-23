@@ -80,7 +80,6 @@ export class MusicConductor {
 
         if (this.currentMusic !== null) {
             this.currentMusic.setVolume(0, this.fadeSeconds);
-            this.currentMusic.stop(this.fadeSeconds);
             this.currentMusic = null;
 
             // some silence between two musics

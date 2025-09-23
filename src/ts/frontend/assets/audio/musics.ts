@@ -74,19 +74,21 @@ export async function loadMusics(progressMonitor: ILoadingProgressMonitor | null
         });
     };
 
-    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, { loop: true });
-    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath);
-    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath);
-    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath);
-    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath);
-    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath);
-    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath);
-    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath);
-    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath);
-    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath);
-    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath);
-    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath);
-    const soaringPromise = loadSoundAsync("Soaring", soaringPath);
+    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, { loop: true, streaming: true });
+    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath, { streaming: true });
+    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath, { streaming: true });
+    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath, { streaming: true });
+    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath, {
+        streaming: true,
+    });
+    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath, { streaming: true });
+    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath, { streaming: true });
+    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath, { streaming: true });
+    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath, { streaming: true });
+    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath, { streaming: true });
+    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath, { streaming: true });
+    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath, { streaming: true });
+    const soaringPromise = loadSoundAsync("Soaring", soaringPath, { streaming: true });
 
     return {
         wandering: await wanderingPromise,
