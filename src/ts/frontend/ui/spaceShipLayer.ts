@@ -150,7 +150,7 @@ export class SpaceShipLayer {
 
             // set top and left of targetDot based on direction2D (use %)
             this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;
-            this.targetDot.style.left = `${50 - 50 * directionLocal.x}%`;
+            this.targetDot.style.left = `${50 + 50 * directionLocal.x}%`;
         }
 
         this.currentMissionDisplay.update(missionContext, keyboardLayout, starSystemDatabase);
