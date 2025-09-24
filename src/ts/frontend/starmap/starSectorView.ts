@@ -23,6 +23,7 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -69,7 +70,7 @@ export class StarSectorView {
         this.systems = systemModels.map((systemModel) => {
             return {
                 model: systemModel,
-                position: starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates),
+                position: wrapVector3(starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates)),
             };
         });
     }

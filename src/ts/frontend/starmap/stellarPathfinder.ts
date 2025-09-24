@@ -20,6 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { PriorityQueue } from "@/utils/priorityQueue";
 import { err, ok, type Result } from "@/utils/types";
@@ -83,12 +84,12 @@ export class StellarPathfinder {
 
         this.startSystem = {
             coordinates: startSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates),
+            position: wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates)),
         };
 
         this.targetSystem = {
             coordinates: targetSystemCoordinates,
-            position: this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates),
+            position: wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates)),
         };
 
         this.jumpRange = jumpRange;

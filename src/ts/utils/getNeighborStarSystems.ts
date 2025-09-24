@@ -22,12 +22,14 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Settings } from "@/settings";
 
+import { wrapVector3 } from "./algebra";
+
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
     starSystemDatabase: StarSystemDatabase,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
-    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates);
+    const currentSystemPosition = wrapVector3(starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates));
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
@@ -53,11 +55,9 @@ export function getNeighborStarSystemCoordinates(
     }
 
     return starSectorCoordinates.flatMap((starSector) => {
-        const starPositions = starSystemDatabase.getSystemPositionsInStarSector(
-            starSector.x,
-            starSector.y,
-            starSector.z,
-        );
+        const starPositions = starSystemDatabase
+            .getSystemPositionsInStarSector(starSector.x, starSector.y, starSector.z)
+            .map((position) => wrapVector3(position));
         const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
             starSector.x,
             starSector.y,

@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
@@ -50,7 +48,9 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
 
     hecate.orbit.semiMajorAxis = 21000 * hecate.radius;
 
-    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, Vector3.Zero(), [hecate]);
+    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, { x: 0, y: 0, z: 0 }, [
+        hecate,
+    ]);
 
     const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
     manaleth.orbit.inclination = degreesToRadians(45);

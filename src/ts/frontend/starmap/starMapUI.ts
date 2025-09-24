@@ -26,6 +26,7 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";
@@ -232,9 +233,10 @@ export class StarMapUI {
         this.rebuildSystemIcons();
 
         this.systemIcons.forEach((systemIcons) => {
-            const systemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                systemIcons.getSystemCoordinates(),
+            const systemPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(systemIcons.getSystemCoordinates()),
             );
+
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(
                 systemUniversePosition,
@@ -260,9 +262,9 @@ export class StarMapUI {
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedSystem !== null) {
-            const selectedSystemWorldPosition = this.starSystemDatabase
-                .getSystemGalacticPosition(this.selectedSystem)
-                .addInPlace(centerOfUniversePosition);
+            const selectedSystemWorldPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(this.selectedSystem),
+            ).addInPlace(centerOfUniversePosition);
             const selectedMeshScreenCoordinates = Vector3.Project(
                 selectedSystemWorldPosition,
                 Matrix.IdentityReadOnly,
@@ -297,9 +299,9 @@ export class StarMapUI {
             this.currentSystem !== null &&
             !starSystemCoordinatesEquals(this.hoveredSystem, this.currentSystem)
         ) {
-            const hoveredSystemWorldPosition = this.starSystemDatabase
-                .getSystemGalacticPosition(this.hoveredSystem)
-                .addInPlace(centerOfUniversePosition);
+            const hoveredSystemWorldPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(this.hoveredSystem),
+            ).addInPlace(centerOfUniversePosition);
             const meshScreenCoordinates = Vector3.Project(
                 hoveredSystemWorldPosition,
                 Matrix.IdentityReadOnly,
@@ -318,9 +320,9 @@ export class StarMapUI {
         }
 
         if (this.currentSystem !== null) {
-            const currentSystemWorldPosition = this.starSystemDatabase
-                .getSystemGalacticPosition(this.currentSystem)
-                .addInPlace(centerOfUniversePosition);
+            const currentSystemWorldPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(this.currentSystem),
+            ).addInPlace(centerOfUniversePosition);
             const meshScreenCoordinates = Vector3.Project(
                 currentSystemWorldPosition,
                 Matrix.IdentityReadOnly,
@@ -354,10 +356,14 @@ export class StarMapUI {
     ) {
         this.selectedSystem = targetSystemModel.coordinates;
 
-        const targetPosition = this.starSystemDatabase.getSystemGalacticPosition(targetSystemModel.coordinates);
+        const targetPosition = wrapVector3(
+            this.starSystemDatabase.getSystemGalacticPosition(targetSystemModel.coordinates),
+        );
 
         if (currentSystemCoordinates !== null) {
-            const currentPosition = this.starSystemDatabase.getSystemGalacticPosition(currentSystemCoordinates);
+            const currentPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(currentSystemCoordinates),
+            );
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
                 "units:shortLy",
                 {

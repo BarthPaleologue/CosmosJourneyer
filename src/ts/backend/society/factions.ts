@@ -1,5 +1,6 @@
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool } from "extended-random";
+
+import type { Vector3Like } from "@/utils/algebra";
 
 import { getPowerPlayData } from "./powerplay";
 
@@ -23,7 +24,10 @@ export function factionToString(faction: Faction): string {
     }
 }
 
-export function getFactionFromGalacticPosition(starSystemPosition: Vector3, rng: (index: number) => number): Faction {
+export function getFactionFromGalacticPosition(
+    starSystemPosition: Vector3Like,
+    rng: (index: number) => number,
+): Faction {
     const powerplayData = getPowerPlayData(starSystemPosition);
 
     const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);

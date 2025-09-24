@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
+import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";
@@ -78,7 +78,7 @@ const enum GenerationSteps {
 export function newSeededStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: StarSystemCoordinates,
-    position: Vector3,
+    position: Vector3Like,
     isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);

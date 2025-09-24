@@ -74,6 +74,7 @@ import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
@@ -309,10 +310,12 @@ export class StarSystemView implements View {
             if (!this.jumpLock) this.jumpLock = true;
             else return;
 
-            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                this.getStarSystem().model.coordinates,
+            const currentSystemPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(this.getStarSystem().model.coordinates),
             );
-            const targetSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(target.systemCoordinates);
+            const targetSystemPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(target.systemCoordinates),
+            );
 
             const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
 
@@ -591,10 +594,12 @@ export class StarSystemView implements View {
             positionNearObjectBrightSide(activeControls, firstBody, starSystem, controllerDistanceFactor);
         } else {
             // place player in the direction of the previous system (where we came from)
-            const currentSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(
-                starSystem.model.coordinates,
+            const currentSystemPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(starSystem.model.coordinates),
             );
-            const previousSystemPosition = this.starSystemDatabase.getSystemGalacticPosition(previousSystem);
+            const previousSystemPosition = wrapVector3(
+                this.starSystemDatabase.getSystemGalacticPosition(previousSystem),
+            );
 
             // compute direction from previous system to current system
             const placementDirection = previousSystemPosition.subtract(currentSystemPosition).normalize();

@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { normalRandom } from "extended-random";
 
 import { getFactionFromGalacticPosition } from "@/backend/society/factions";
@@ -26,6 +25,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropTypes, type CropType } from "@/utils/agriculture";
+import type { Vector3Like } from "@/utils/algebra";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
@@ -37,7 +37,7 @@ export function newSeededSpaceStationModel(
     id: string,
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
-    starSystemPosition: Vector3,
+    starSystemPosition: Vector3Like,
     parentBodies: CelestialBodyModel[],
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);

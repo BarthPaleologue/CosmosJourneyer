@@ -5,6 +5,7 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { parseDistance } from "@/utils/strings/parseToStrings";
@@ -33,8 +34,8 @@ export function getGoToSystemInstructions(
         currentPlayerDestination !== undefined &&
         starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
-    const currentSystemPosition = starSystemDatabase.getSystemGalacticPosition(
-        missionContext.currentSystem.model.coordinates,
+    const currentSystemPosition = wrapVector3(
+        starSystemDatabase.getSystemGalacticPosition(missionContext.currentSystem.model.coordinates),
     );
 
     if (!isPlayerGoingToTargetSystem) {
@@ -51,7 +52,7 @@ export function getGoToSystemInstructions(
         }
 
         const distanceToNextSystemLy = Vector3.Distance(
-            starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates),
+            wrapVector3(starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates)),
             currentSystemPosition,
         );
 
