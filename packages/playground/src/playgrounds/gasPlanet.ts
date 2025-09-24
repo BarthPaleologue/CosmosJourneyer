@@ -29,9 +29,10 @@ import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
+import { ItemPool } from "@/utils/itemPool";
+
 import { Settings } from "@/settings";
 
-import { ItemPool } from "../utils/itemPool";
 import { enablePhysics } from "./utils";
 
 export async function createGasPlanetScene(

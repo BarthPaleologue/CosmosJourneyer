@@ -40,7 +40,7 @@ Cosmos Journeyer is available in multiple languages, but you can add more or imp
 
 ### Modifying existing language
 
-To make a change in an existing language, go to `src/locales` and find the language you want to modify by its code.
+To make a change in an existing language, go to `packages/frontend/public/locales` and find the language you want to modify by its code.
 For example if you want to modify the American English translation, you will find the `en-us` folder.
 Inside this folder are many JSON files containing the various words and sentences used throughout the project.
 
@@ -49,7 +49,7 @@ Make the changes you want by editing the files and then open a pull request. If 
 
 ### Adding a new language
 
-Adding a new language altogether is quite straightforward as well. Simply go to the `src/locales` folder and create a new folder with the language code you want to create.
+Adding a new language altogether is quite straightforward as well. Simply go to the `packages/frontend/public/locales` folder and create a new folder with the language code you want to create.
 Then, paste inside the content of another language directory and translate the content inside the JSON files.
 
 You don't need to code at all, the language will be automatically bundled and available inside Cosmos Journeyer.

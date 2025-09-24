@@ -1,0 +1,5 @@
+{
+    "name": "@cosmos/game",
+    "private": true,
+    "type": "module"
+}

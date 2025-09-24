@@ -5,14 +5,14 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
     globalIgnores([
-        "src/ts/utils/TWGSL/**",
+        "packages/utils/src/TWGSL/**",
         "src-tauri",
         "rspack.config.js",
         "tsconfig.json",
         "eslint.config.mjs",
         "dist",
         "doc",
-        "src/asset",
+        "packages/frontend/public/**/*",
         "coverage",
         ".eslintcache",
     ]),

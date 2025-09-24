@@ -6,7 +6,13 @@
     "sourceLinkTemplate": "https://github.com/BarthPaleologue/CosmosJourneyer/blob/{gitRevision}/{path}#L{line}",
 
     "entryPointStrategy": "expand",
-    "entryPoints": ["src/ts"],
+    "entryPoints": [
+        "packages/backend/src",
+        "packages/frontend/src",
+        "packages/game/src",
+        "packages/playground/src",
+        "packages/utils/src"
+    ],
     "exclude": ["**/node_modules/**/*.*", "**/test/**/*.*"],
 
     "includeVersion": true,

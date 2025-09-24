@@ -41,7 +41,7 @@
         width: 30px;
         height: 40px;
         transform-origin: center;
-        background: url("../asset/shipCursor.webp") no-repeat center;
+        background: url("@assets/shipCursor.webp") no-repeat center;
         background-size: cover;
         pointer-events: none;
         filter: drop-shadow(0 0 1px black) hue-rotate(-30deg);

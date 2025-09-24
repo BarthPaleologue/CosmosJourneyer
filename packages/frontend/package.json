@@ -1,0 +1,5 @@
+{
+    "name": "@cosmos/frontend",
+    "private": true,
+    "type": "module"
+}
