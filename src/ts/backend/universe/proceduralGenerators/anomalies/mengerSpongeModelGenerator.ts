@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRange } from "extended-random";
 
 import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
@@ -27,6 +26,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 export function newSeededMengerSpongeModel(
     id: string,
@@ -55,7 +55,7 @@ export function newSeededMengerSpongeModel(
         parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
-        inclination: Tools.ToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
+        inclination: degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
         longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),

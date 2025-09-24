@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom } from "extended-random";
 
 import { getFactionFromGalacticPosition } from "@/backend/society/factions";
@@ -30,6 +29,7 @@ import { CropTypes, type CropType } from "@/utils/agriculture";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { randomPieChart } from "@/utils/random";
 import { generateSpaceStationName } from "@/utils/strings/spaceStationNameGenerator";
 
@@ -69,7 +69,7 @@ export function newSeededSpaceStationModel(
         parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: Tools.ToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
+        inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

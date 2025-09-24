@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Tools } from "@babylonjs/core/Misc/tools";
 
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
@@ -24,7 +23,12 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { astronomicalUnitToMeters, barToPascal, celsiusToKelvin } from "@/utils/physics/unitConversions";
+import {
+    astronomicalUnitToMeters,
+    barToPascal,
+    celsiusToKelvin,
+    degreesToRadians,
+} from "@/utils/physics/unitConversions";
 
 import { getJupiterModel } from "./jupiter";
 import { getSaturnModel } from "./saturn";
@@ -39,7 +43,7 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 2_439.7e3,
         mass: 3.301e23,
-        axialTilt: Tools.ToRadians(0.034),
+        axialTilt: degreesToRadians(0.034),
         siderealDaySeconds: 60 * 60 * 24 * 58.646,
         waterAmount: 0,
         temperature: {
@@ -51,9 +55,9 @@ export function getSolSystemModel(): StarSystemModel {
             semiMajorAxis: astronomicalUnitToMeters(0.38),
             eccentricity: 0.2056,
             p: 2,
-            inclination: Tools.ToRadians(7),
-            longitudeOfAscendingNode: Tools.ToRadians(48.331),
-            argumentOfPeriapsis: Tools.ToRadians(29.124),
+            inclination: degreesToRadians(7),
+            longitudeOfAscendingNode: degreesToRadians(48.331),
+            argumentOfPeriapsis: degreesToRadians(29.124),
             initialMeanAnomaly: 0,
         },
         terrainSettings: {
@@ -81,7 +85,7 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_051.8e3,
         mass: 4.8e20,
-        axialTilt: Tools.ToRadians(177.36),
+        axialTilt: degreesToRadians(177.36),
         siderealDaySeconds: 60 * 60 * 24 * 243.025,
         waterAmount: 0,
         temperature: {
@@ -92,9 +96,9 @@ export function getSolSystemModel(): StarSystemModel {
             parentIds: [sun.id],
             semiMajorAxis: 108_209_500e3,
             eccentricity: 0.0067,
-            inclination: Tools.ToRadians(3.39),
-            longitudeOfAscendingNode: Tools.ToRadians(76.68),
-            argumentOfPeriapsis: Tools.ToRadians(54.88),
+            inclination: degreesToRadians(3.39),
+            longitudeOfAscendingNode: degreesToRadians(76.68),
+            argumentOfPeriapsis: degreesToRadians(54.88),
             initialMeanAnomaly: 0,
             p: 2,
         },
@@ -137,7 +141,7 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 6_371e3,
         mass: 5.972e24,
-        axialTilt: Tools.ToRadians(23.44),
+        axialTilt: degreesToRadians(23.44),
         siderealDaySeconds: 60 * 60 * 24,
         waterAmount: 1,
         temperature: {
@@ -148,9 +152,9 @@ export function getSolSystemModel(): StarSystemModel {
             parentIds: [sun.id],
             semiMajorAxis: 149_597_870e3,
             eccentricity: 0.0167,
-            inclination: Tools.ToRadians(0),
-            longitudeOfAscendingNode: Tools.ToRadians(0),
-            argumentOfPeriapsis: Tools.ToRadians(114.20783),
+            inclination: degreesToRadians(0),
+            longitudeOfAscendingNode: degreesToRadians(0),
+            argumentOfPeriapsis: degreesToRadians(114.20783),
             initialMeanAnomaly: 0,
             p: 2,
         },
@@ -195,7 +199,7 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.TELLURIC_SATELLITE,
         radius: 1_737.1e3,
         mass: 7.342e22,
-        axialTilt: Tools.ToRadians(6.68),
+        axialTilt: degreesToRadians(6.68),
         siderealDaySeconds: 60 * 60 * 24 * 27.322,
         waterAmount: 0,
         temperature: {
@@ -206,9 +210,9 @@ export function getSolSystemModel(): StarSystemModel {
             parentIds: [earth.id],
             semiMajorAxis: 384_400e3,
             eccentricity: 0.0549,
-            inclination: Tools.ToRadians(5.145),
-            longitudeOfAscendingNode: Tools.ToRadians(125.08),
-            argumentOfPeriapsis: Tools.ToRadians(318.15),
+            inclination: degreesToRadians(5.145),
+            longitudeOfAscendingNode: degreesToRadians(125.08),
+            argumentOfPeriapsis: degreesToRadians(318.15),
             initialMeanAnomaly: 0,
             p: 2,
         },
@@ -236,7 +240,7 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.TELLURIC_PLANET,
         radius: 3_389.5e3,
         mass: 6.4171e23,
-        axialTilt: Tools.ToRadians(25.19),
+        axialTilt: degreesToRadians(25.19),
         siderealDaySeconds: 60 * 60 * 24 * 1.027,
         waterAmount: 0,
         temperature: {
@@ -247,9 +251,9 @@ export function getSolSystemModel(): StarSystemModel {
             parentIds: [sun.id],
             semiMajorAxis: 227_939_200e3,
             eccentricity: 0.0934,
-            inclination: Tools.ToRadians(1.85),
-            longitudeOfAscendingNode: Tools.ToRadians(49.558),
-            argumentOfPeriapsis: Tools.ToRadians(286.502),
+            inclination: degreesToRadians(1.85),
+            longitudeOfAscendingNode: degreesToRadians(49.558),
+            argumentOfPeriapsis: degreesToRadians(286.502),
             initialMeanAnomaly: 0,
             p: 2,
         },
@@ -285,15 +289,15 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.GAS_PLANET,
         radius: 25_362e3,
         mass: 8.681e25,
-        axialTilt: Tools.ToRadians(97.77),
+        axialTilt: degreesToRadians(97.77),
         siderealDaySeconds: 60 * 60 * 17.24,
         orbit: {
             parentIds: [sun.id],
             semiMajorAxis: 2_872_463_270e3,
             eccentricity: 0.0565,
-            inclination: Tools.ToRadians(0.77),
-            longitudeOfAscendingNode: Tools.ToRadians(74.229),
-            argumentOfPeriapsis: Tools.ToRadians(96.541),
+            inclination: degreesToRadians(0.77),
+            longitudeOfAscendingNode: degreesToRadians(74.229),
+            argumentOfPeriapsis: degreesToRadians(96.541),
             initialMeanAnomaly: 0,
             p: 2,
         },
@@ -320,15 +324,15 @@ export function getSolSystemModel(): StarSystemModel {
         type: OrbitalObjectType.GAS_PLANET,
         radius: 24_622e3,
         mass: 1.024e26,
-        axialTilt: Tools.ToRadians(28.32),
+        axialTilt: degreesToRadians(28.32),
         siderealDaySeconds: 60 * 60 * 16.11,
         orbit: {
             parentIds: [sun.id],
             semiMajorAxis: 4_495_060_000e3,
             eccentricity: 0.0086,
-            inclination: Tools.ToRadians(1.77),
-            longitudeOfAscendingNode: Tools.ToRadians(131.72169),
-            argumentOfPeriapsis: Tools.ToRadians(265.646853),
+            inclination: degreesToRadians(1.77),
+            longitudeOfAscendingNode: degreesToRadians(131.72169),
+            argumentOfPeriapsis: degreesToRadians(265.646853),
             initialMeanAnomaly: 0,
             p: 2,
         },

@@ -18,7 +18,7 @@
 import { describe, expect, it, test } from "vitest";
 
 import { LightYearInMeters } from "./constants";
-import { celsiusToKelvin, kelvinToCelsius, metersToLightYears } from "./unitConversions";
+import { celsiusToKelvin, degreesToRadians, kelvinToCelsius, metersToLightYears } from "./unitConversions";
 
 test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);
@@ -57,5 +57,38 @@ describe("metersToLightYears", () => {
 
     it("handles negative distances correctly", () => {
         expect(metersToLightYears(-LightYearInMeters)).toBe(-1);
+    });
+});
+
+describe("degreesToRadians", () => {
+    it("converts 0 degrees to 0 radians", () => {
+        expect(degreesToRadians(0)).toBe(0);
+    });
+
+    it("converts 90 degrees to π/2 radians", () => {
+        expect(degreesToRadians(90)).toBeCloseTo(Math.PI / 2);
+    });
+
+    it("converts 180 degrees to π radians", () => {
+        expect(degreesToRadians(180)).toBeCloseTo(Math.PI);
+    });
+
+    it("converts 270 degrees to 3π/2 radians", () => {
+        expect(degreesToRadians(270)).toBeCloseTo((3 * Math.PI) / 2);
+    });
+
+    it("converts 360 degrees to 2π radians", () => {
+        expect(degreesToRadians(360)).toBeCloseTo(2 * Math.PI);
+    });
+
+    it("converts negative angles correctly", () => {
+        expect(degreesToRadians(-90)).toBeCloseTo(-Math.PI / 2);
+        expect(degreesToRadians(-180)).toBeCloseTo(-Math.PI);
+    });
+
+    it("converts fractional degrees correctly", () => {
+        expect(degreesToRadians(45)).toBeCloseTo(Math.PI / 4);
+        expect(degreesToRadians(30)).toBeCloseTo(Math.PI / 6);
+        expect(degreesToRadians(60)).toBeCloseTo(Math.PI / 3);
     });
 });

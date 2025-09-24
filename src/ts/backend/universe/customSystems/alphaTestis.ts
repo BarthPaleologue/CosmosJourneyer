@@ -16,13 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Tools } from "@babylonjs/core/Misc/tools";
 
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
-import { celsiusToKelvin } from "@/utils/physics/unitConversions";
+import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { newSeededGasPlanetModel } from "../proceduralGenerators/gasPlanetModelGenerator";
 import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
@@ -54,7 +53,7 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
     const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, Vector3.Zero(), [hecate]);
 
     const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
-    manaleth.orbit.inclination = Tools.ToRadians(45);
+    manaleth.orbit.inclination = degreesToRadians(45);
     manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.siderealDaySeconds, hecate.mass);
 
     const ares = newSeededTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);

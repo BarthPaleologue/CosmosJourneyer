@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRangeInt } from "extended-random";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
@@ -32,7 +31,7 @@ import { clamp } from "@/utils/math";
 import { EarthMass, EarthSeaLevelPressure, MoonMass } from "@/utils/physics/constants";
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { hasLiquidWater } from "@/utils/physics/physics";
-import { celsiusToKelvin } from "@/utils/physics/unitConversions";
+import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 
@@ -126,7 +125,7 @@ export function newSeededTelluricSatelliteModel(
         inclination:
             parentAverageInclination +
             parentAverageAxialTilt +
-            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

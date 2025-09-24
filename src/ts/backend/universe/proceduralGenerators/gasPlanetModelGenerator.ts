@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthSeaLevelPressure, JupiterMass } from "@/utils/physics/constants";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -68,7 +68,7 @@ export function newSeededGasPlanetModel(
         inclination:
             parentAverageInclination +
             parentAverageAxialTilt +
-            Tools.ToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,

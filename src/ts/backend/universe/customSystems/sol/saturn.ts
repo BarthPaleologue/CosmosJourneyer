@@ -15,13 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tools } from "@babylonjs/core/Misc/tools";
-
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {
@@ -30,15 +29,15 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         type: OrbitalObjectType.GAS_PLANET,
         radius: 58_232e3,
         mass: 5.683e26,
-        axialTilt: Tools.ToRadians(26.73),
+        axialTilt: degreesToRadians(26.73),
         siderealDaySeconds: 60 * 60 * 10.656,
         orbit: {
             parentIds: [...parentIds],
             semiMajorAxis: 1_433_449_370e3,
             eccentricity: 0.0565,
-            inclination: Tools.ToRadians(2.49),
-            longitudeOfAscendingNode: Tools.ToRadians(113.715),
-            argumentOfPeriapsis: Tools.ToRadians(336.092),
+            inclination: degreesToRadians(2.49),
+            longitudeOfAscendingNode: degreesToRadians(113.715),
+            argumentOfPeriapsis: degreesToRadians(336.092),
             initialMeanAnomaly: 0,
             p: 2,
         },
