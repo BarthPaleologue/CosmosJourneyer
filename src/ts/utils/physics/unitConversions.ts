@@ -63,3 +63,12 @@ export function astronomicalUnitToMeters(distanceAU: number): number {
 export function barToPascal(bar: number): number {
     return bar * 100_000; // 1 bar = 100,000 pascals
 }
+
+/**
+ * Converts an angle from degrees to radians
+ * @param degrees The angle in degrees
+ * @returns The angle in radians
+ */
+export function degreesToRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+}

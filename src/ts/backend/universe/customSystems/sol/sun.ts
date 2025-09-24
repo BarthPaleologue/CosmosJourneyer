@@ -1,7 +1,7 @@
-import { Tools } from "@babylonjs/core/Misc/tools";
-
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
+
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 export function getSunModel(): StarModel {
     return {
@@ -11,7 +11,7 @@ export function getSunModel(): StarModel {
         radius: 695_508e3,
         mass: 1.989e30,
         blackBodyTemperature: 5778,
-        axialTilt: Tools.ToRadians(7.25),
+        axialTilt: degreesToRadians(7.25),
         siderealDaySeconds: 60 * 60 * 24 * 25.67,
         orbit: {
             parentIds: [],

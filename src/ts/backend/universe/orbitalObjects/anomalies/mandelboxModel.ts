@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Color3 } from "@babylonjs/core/Maths/math.color";
+import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
 import { type OrbitalObjectType } from "../orbitalObjectType";
@@ -24,7 +24,7 @@ export type MandelboxModel = CelestialBodyModelBase<OrbitalObjectType.MANDELBOX>
     /**
      * The albedo color of the mandelbox
      */
-    readonly color: Color3;
+    readonly color: RGBColor;
 
     /**
      * distance estimator parameter (range is [0-1])

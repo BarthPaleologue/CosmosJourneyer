@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { makeNoise3D } from "fast-simplex-noise";
 
+import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
 import { Settings } from "@/settings";
@@ -40,7 +40,7 @@ const capitalistCommunistPerlin = makeNoise3D(() => {
 export const CapitalistCommunistAxis = (x: number, y: number, z: number) =>
     capitalistCommunistPerlin(x * 0.2, y * 0.2, z * 0.2) * 0.5 + 0.5;
 
-export function getPowerPlayData(systemGalacticPosition: Vector3) {
+export function getPowerPlayData(systemGalacticPosition: Vector3Like) {
     const coords = systemGalacticPosition;
 
     return {

@@ -22,6 +22,8 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { wrapVector3 } from "@/utils/algebra";
+
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
@@ -73,11 +75,13 @@ export function newSightSeeingMission(
 
     const targetSystemCoordinates = target.objectId.systemCoordinates;
 
-    const missionGiverGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(
-        missionGiver.systemCoordinates,
+    const missionGiverGalacticCoordinates = wrapVector3(
+        starSystemDatabase.getSystemGalacticPosition(missionGiver.systemCoordinates),
     );
 
-    const targetGalacticCoordinates = starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates);
+    const targetGalacticCoordinates = wrapVector3(
+        starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates),
+    );
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
     const targetModel = starSystemDatabase.getObjectModelByUniverseId(target.objectId);

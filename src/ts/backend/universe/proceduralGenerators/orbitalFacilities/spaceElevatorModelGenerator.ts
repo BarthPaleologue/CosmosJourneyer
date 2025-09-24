@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import { getFactionFromGalacticPosition } from "@/backend/society/factions";
 import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
@@ -25,6 +23,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropTypes, type CropType } from "@/utils/agriculture";
+import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { randomPieChart } from "@/utils/random";
@@ -34,7 +33,7 @@ export function newSeededSpaceElevatorModel(
     id: string,
     seed: number,
     starSystemCoordinates: StarSystemCoordinates,
-    starSystemPosition: Vector3,
+    starSystemPosition: Vector3Like,
     parentBody: PlanetModel,
 ): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);

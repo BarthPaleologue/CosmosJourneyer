@@ -24,6 +24,7 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
@@ -124,8 +125,8 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
     describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
         const distanceLy = Vector3.Distance(
-            starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates),
-            starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates),
+            wrapVector3(starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates)),
+            wrapVector3(starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
         const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
         const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);

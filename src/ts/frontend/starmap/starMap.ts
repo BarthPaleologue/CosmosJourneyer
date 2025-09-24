@@ -49,6 +49,7 @@ import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
+import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
 import { type DeepReadonly } from "@/utils/types";
@@ -416,7 +417,7 @@ export class StarMap implements View {
 
     private drawPath(path: DeepReadonly<Itinerary>) {
         const points = path.map((coordinates) => {
-            return this.starSystemDatabase.getSystemGalacticPosition(coordinates);
+            return wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(coordinates));
         });
         this.travelLine.setPoints(points);
     }
@@ -673,9 +674,9 @@ export class StarMap implements View {
     }
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
-        const starSystemPosition = this.starSystemDatabase
-            .getSystemGalacticPosition(starSystemCoordinates)
-            .add(this.starMapCenterPosition);
+        const starSystemPosition = wrapVector3(
+            this.starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates),
+        ).add(this.starMapCenterPosition);
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
             Vector3.Forward(this.scene.useRightHandedSystem),

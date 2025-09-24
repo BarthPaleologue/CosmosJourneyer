@@ -76,7 +76,11 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         }
         const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
 
-        const distanceFromSolLy = systemGalacticPosition.length();
+        const distanceFromSolLy = Math.hypot(
+            systemGalacticPosition.x,
+            systemGalacticPosition.y,
+            systemGalacticPosition.z,
+        );
 
         const valueFromDistance = distanceFromSolLy * 100;
 

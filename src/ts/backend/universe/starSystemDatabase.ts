@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
 import { type DeepReadonly } from "@/utils/types";
@@ -175,7 +175,7 @@ export class StarSystemDatabase {
      */
     public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
         const systemPosition = this.getSystemGalacticPosition(systemCoordinates);
-        const distanceToSolLy = systemPosition.length();
+        const distanceToSolLy = Math.hypot(systemPosition.x, systemPosition.y, systemPosition.z);
 
         return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
     }
@@ -355,12 +355,12 @@ export class StarSystemDatabase {
      * @param coordinates The coordinates of the system you want the position of.
      * @returns The position of the given system in the galaxy.
      */
-    public getSystemGalacticPosition(coordinates: StarSystemCoordinates) {
-        return new Vector3(
-            (coordinates.starSectorX + coordinates.localX) * Settings.STAR_SECTOR_SIZE,
-            (coordinates.starSectorY + coordinates.localY) * Settings.STAR_SECTOR_SIZE,
-            (coordinates.starSectorZ + coordinates.localZ) * Settings.STAR_SECTOR_SIZE,
-        );
+    public getSystemGalacticPosition(coordinates: StarSystemCoordinates): Vector3Like {
+        return {
+            x: (coordinates.starSectorX + coordinates.localX) * Settings.STAR_SECTOR_SIZE,
+            y: (coordinates.starSectorY + coordinates.localY) * Settings.STAR_SECTOR_SIZE,
+            z: (coordinates.starSectorZ + coordinates.localZ) * Settings.STAR_SECTOR_SIZE,
+        };
     }
 
     /**
@@ -369,21 +369,25 @@ export class StarSystemDatabase {
      * @param sectorZ
      * @returns The list of all local positions of generated systems in the given star sector (range is [-0.5, 0.5]).
      */
-    private getGeneratedLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+    private getGeneratedLocalPositionsInStarSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number,
+    ): Array<Vector3Like> {
         const rng = getRngFromSeed(hashVec3(sectorX, sectorY, sectorZ));
 
         const density = this.universeDensity(sectorX, sectorY, sectorZ);
 
         const nbGeneratedStars = 40 * density * rng(0);
 
-        const localPositions: Vector3[] = [];
+        const localPositions: Array<Vector3Like> = [];
 
         for (let i = 0; i < nbGeneratedStars; i++) {
-            const starLocalPosition = new Vector3(
-                centeredRand(rng, 10 * i + 1) / 2,
-                centeredRand(rng, 10 * i + 2) / 2,
-                centeredRand(rng, 10 * i + 3) / 2,
-            );
+            const starLocalPosition = {
+                x: centeredRand(rng, 10 * i + 1) / 2,
+                y: centeredRand(rng, 10 * i + 2) / 2,
+                z: centeredRand(rng, 10 * i + 3) / 2,
+            };
 
             localPositions.push(starLocalPosition);
         }
@@ -397,8 +401,8 @@ export class StarSystemDatabase {
      * @param sectorZ
      * @returns The list of all local positions of systems in the given star sector (range is [-0.5, 0.5]).
      */
-    private getSystemLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
-        const localPositions: Vector3[] = [];
+    private getSystemLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number): Array<Vector3Like> {
+        const localPositions: Array<Vector3Like> = [];
 
         localPositions.push(...this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ));
 
@@ -407,25 +411,21 @@ export class StarSystemDatabase {
             this.fallbackSystem.coordinates.starSectorY === sectorY &&
             this.fallbackSystem.coordinates.starSectorZ === sectorZ
         ) {
-            localPositions.push(
-                new Vector3(
-                    this.fallbackSystem.coordinates.localX,
-                    this.fallbackSystem.coordinates.localY,
-                    this.fallbackSystem.coordinates.localZ,
-                ),
-            );
+            localPositions.push({
+                x: this.fallbackSystem.coordinates.localX,
+                y: this.fallbackSystem.coordinates.localY,
+                z: this.fallbackSystem.coordinates.localZ,
+            });
         }
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 
         for (const systemModel of customSystemModels) {
-            localPositions.push(
-                new Vector3(
-                    systemModel.coordinates.localX,
-                    systemModel.coordinates.localY,
-                    systemModel.coordinates.localZ,
-                ),
-            );
+            localPositions.push({
+                x: systemModel.coordinates.localX,
+                y: systemModel.coordinates.localY,
+                z: systemModel.coordinates.localZ,
+            });
         }
 
         return localPositions;
@@ -437,13 +437,17 @@ export class StarSystemDatabase {
      * @param sectorZ
      * @returns The positions of all systems in the given star sector in galactic space.
      */
-    public getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+    public getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number): Array<Vector3Like> {
         const localPositions = this.getSystemLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
 
-        const sectorPosition = new Vector3(sectorX, sectorY, sectorZ);
+        const sectorPosition = { x: sectorX, y: sectorY, z: sectorZ };
 
         return localPositions.map((localPosition) => {
-            return localPosition.addInPlace(sectorPosition).scaleInPlace(Settings.STAR_SECTOR_SIZE);
+            return {
+                x: (localPosition.x + sectorPosition.x) * Settings.STAR_SECTOR_SIZE,
+                y: (localPosition.y + sectorPosition.y) * Settings.STAR_SECTOR_SIZE,
+                z: (localPosition.z + sectorPosition.z) * Settings.STAR_SECTOR_SIZE,
+            };
         });
     }
 

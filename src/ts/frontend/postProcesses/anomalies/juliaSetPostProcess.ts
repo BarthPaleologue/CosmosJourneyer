@@ -20,7 +20,6 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Color3 } from "@babylonjs/core/Maths/math.color";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
@@ -34,6 +33,7 @@ import {
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
 
+import type { RGBColor } from "@/utils/colors";
 import { type DeepReadonly } from "@/utils/types";
 
 import juliaFragment from "@shaders/juliaSet.glsl";
@@ -46,7 +46,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        accentColor: DeepReadonly<Color3>,
+        accentColor: DeepReadonly<RGBColor>,
         scene: Scene,
         stellarObjects: ReadonlyArray<PointLight>,
     ) {
