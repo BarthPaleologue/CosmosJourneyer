@@ -3,7 +3,7 @@ pnpm-lock.yaml
 dist
 node_modules
 src-tauri
-src/styles/nasalization
+packages/frontend/src/styles/nasalization
 packages/frontend/public
 doc
 coverage

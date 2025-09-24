@@ -21,7 +21,7 @@
             "@/*": ["packages/game/src/*"],
             "@assets/*": ["packages/frontend/public/assets/*"],
             "@shaders/*": ["packages/frontend/public/shaders/*"],
-            "@styles/*": ["src/styles/*"]
+            "@styles/*": ["packages/frontend/src/styles/*"]
         },
 
         // Build speed & debugging
