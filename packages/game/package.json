@@ -1,9 +1,8 @@
 {
     "name": "@cosmosjourneyer/game",
-    "private": true,
     "type": "module",
     "scripts": {
-        "build": "rspack --config ../../rspack.game.config.js --mode=production --node-env=production",
-        "serve": "rspack serve --config ../../rspack.game.config.js"
+        "build": "rspack --config ./rspack.config.js --mode=production --node-env=production",
+        "serve": "rspack serve --config ./rspack.config.js"
     }
 }

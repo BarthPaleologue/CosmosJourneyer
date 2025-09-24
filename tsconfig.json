@@ -55,6 +55,7 @@
     "include": [
         "packages/**/*.ts",
         "packages/**/*.d.ts",
+        "packages/**/rspack.config.js",
         "src/**/*.ts",
         "tests/**/*.ts",
         "vitest.config.ts",

@@ -1,5 +1,4 @@
 {
     "name": "@cosmosjourneyer/backend",
-    "private": true,
     "type": "module"
 }

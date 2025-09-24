@@ -1,9 +1,8 @@
 {
     "name": "@cosmosjourneyer/playground",
-    "private": true,
     "type": "module",
     "scripts": {
-        "build": "rspack --config ../../rspack.playground.config.js --mode=production --node-env=production",
-        "serve": "rspack serve --config ../../rspack.playground.config.js"
+        "build": "rspack --config ./rspack.config.js --mode=production --node-env=production",
+        "serve": "rspack serve --config ./rspack.config.js"
     }
 }

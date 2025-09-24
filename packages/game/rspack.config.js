@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { createBaseConfig, projectRoot } from "./config/rspack.base.js";
+import { createBaseConfig, projectRoot } from "../../config/rspack.base.js";
 
 const gameHtmlPath = path.resolve(projectRoot, "packages", "game", "public");
 

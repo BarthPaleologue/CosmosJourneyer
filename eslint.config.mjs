@@ -8,6 +8,7 @@ export default defineConfig([
         "packages/utils/src/TWGSL/**",
         "src-tauri",
         "rspack*.config.js",
+        "packages/**/rspack.config.js",
         "config/rspack.base.js",
         "tsconfig.json",
         "eslint.config.mjs",
