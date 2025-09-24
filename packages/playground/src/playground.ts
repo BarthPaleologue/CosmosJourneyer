@@ -21,9 +21,9 @@ import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
 
+import { LoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 
-import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
 declare global {
