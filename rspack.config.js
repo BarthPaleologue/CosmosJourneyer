@@ -19,9 +19,9 @@ const htmlPath = path.resolve(projectRoot, "src", "html");
 export default defineConfig({
     mode: isProduction ? "production" : "development",
     entry: {
-        main: "./src/ts/index.ts",
-        blackHole: "./src/ts/blackHoleDemo.ts",
-        playground: "./src/ts/playground.ts",
+        main: "./packages/game/src/index.ts",
+        blackHole: "./packages/game/src/blackHoleDemo.ts",
+        playground: "./packages/playground/src/playground.ts",
     },
     output: {
         filename: "[name].[contenthash].js",

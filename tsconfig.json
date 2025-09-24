@@ -12,7 +12,13 @@
         // Ideation-friendly imports
         "baseUrl": "./",
         "paths": {
-            "@/*": ["src/ts/*"],
+            "@/backend": ["packages/backend/src/index.ts"],
+            "@/backend/*": ["packages/backend/src/*"],
+            "@/frontend/*": ["packages/frontend/src/*"],
+            "@/i18n": ["packages/game/src/i18n.ts"],
+            "@/settings": ["packages/game/src/settings.ts"],
+            "@/utils/*": ["packages/utils/src/*"],
+            "@/*": ["packages/game/src/*"],
             "@assets/*": ["src/asset/*"],
             "@shaders/*": ["src/shaders/*"],
             "@styles/*": ["src/styles/*"]
@@ -46,6 +52,13 @@
         "typeRoots": ["node_modules/@types"],
         "types": ["webpack-env"]
     },
-    "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"],
+    "include": [
+        "packages/**/*.ts",
+        "packages/**/*.d.ts",
+        "src/**/*.ts",
+        "tests/**/*.ts",
+        "vitest.config.ts",
+        "playwright.config.ts"
+    ],
     "exclude": ["node_modules", "dist"]
 }

@@ -1,4 +1,4 @@
-src/ts/utils/TWGSL
+packages/utils/src/TWGSL
 pnpm-lock.yaml
 dist
 node_modules

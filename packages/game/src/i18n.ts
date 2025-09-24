@@ -23,7 +23,7 @@ import { z } from "zod";
  * This takes place at build time, so the resources are bundled with the application.
  */
 function loadResources() {
-    const requireContext = require.context("../locales/", true, /\.json$/);
+    const requireContext = require.context("../../../src/locales/", true, /\.json$/);
     const resources: Resource = {}; // { "en-US": { "notifications": { ... } }, "es-ES": { "notifications": { ... } } }
 
     const jsonSchema = z.record(z.string(), z.string());

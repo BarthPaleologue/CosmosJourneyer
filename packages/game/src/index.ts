@@ -24,10 +24,9 @@ import { CosmosJourneyer } from "@/frontend/cosmosJourneyer";
 import { alertModal } from "@/frontend/ui/dialogModal";
 
 import { decodeBase64 } from "@/utils/base64";
+import { createConsoleDumper } from "@/utils/console";
+import { downloadTextFile } from "@/utils/download";
 import { jsonSafeParse } from "@/utils/json";
-
-import { createConsoleDumper } from "./utils/console";
-import { downloadTextFile } from "./utils/download";
 
 const soundPlayerMock = new SoundPlayerMock();
 
