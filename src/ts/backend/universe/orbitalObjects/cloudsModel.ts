@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-
+import type { RGBColor } from "@/utils/colors";
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 
 export type CloudsModel = {
@@ -27,7 +26,7 @@ export type CloudsModel = {
     detailFrequency: number;
     coverage: number;
     sharpness: number;
-    color: Color3;
+    color: RGBColor;
     worleySpeed: number;
     detailSpeed: number;
 };
@@ -46,7 +45,7 @@ export function newCloudsModel(
         detailFrequency: 12,
         coverage: 0.75 * Math.exp((-waterAmount * pressure) / EarthSeaLevelPressure),
         sharpness: 2.5,
-        color: new Color3(0.8, 0.8, 0.8),
+        color: { r: 0.8, g: 0.8, b: 0.8 },
         worleySpeed: 0.0005,
         detailSpeed: 0.003,
     };

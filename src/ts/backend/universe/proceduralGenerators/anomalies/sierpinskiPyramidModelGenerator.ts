@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { normalRandom, randRange } from "extended-random";
 
 import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
@@ -23,6 +22,7 @@ import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { hsvToRgb } from "@/utils/colors";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
@@ -38,11 +38,11 @@ export function newSeededSierpinskiPyramidModel(
 
     const radius = 200e3;
 
-    const accentColor = Color3.FromHSV(
-        360 * rng(GenerationSteps.ACCENT_COLOR),
-        rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
-        0.8,
-    );
+    const accentColor = hsvToRgb({
+        h: 360 * rng(GenerationSteps.ACCENT_COLOR),
+        s: rng(GenerationSteps.ACCENT_COLOR + 123) * 0.5,
+        v: 0.8,
+    });
 
     // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;

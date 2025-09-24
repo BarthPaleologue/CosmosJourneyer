@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
-
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
@@ -127,7 +125,7 @@ export function getSolSystemModel(): StarSystemModel {
             detailFrequency: 12,
             coverage: 0,
             sharpness: 2.5,
-            color: new Color3(0.8, 0.8, 0.1),
+            color: { r: 0.8, g: 0.8, b: 0.1 },
             worleySpeed: 0.0005,
             detailSpeed: 0.003,
         },
@@ -183,7 +181,7 @@ export function getSolSystemModel(): StarSystemModel {
             detailFrequency: 12,
             coverage: 0.5,
             sharpness: 2.5,
-            color: new Color3(0.8, 0.8, 0.8),
+            color: { r: 0.8, g: 0.8, b: 0.8 },
             worleySpeed: 0.0005,
             detailSpeed: 0.003,
         },
