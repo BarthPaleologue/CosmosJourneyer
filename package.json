@@ -32,10 +32,10 @@
         "webgpu"
     ],
     "scripts": {
-        "build": "pnpm --filter @cosmos/game run build && pnpm --filter @cosmos/playground run build",
-        "serve": "pnpm --filter @cosmos/game run serve",
-        "serve:game": "pnpm --filter @cosmos/game run serve",
-        "serve:playground": "pnpm --filter @cosmos/playground run serve",
+        "build": "pnpm --filter @cosmosjourneyer/game run build && pnpm --filter @cosmosjourneyer/playground run build",
+        "serve": "pnpm --filter @cosmosjourneyer/game run serve",
+        "serve:game": "pnpm --filter @cosmosjourneyer/game run serve",
+        "serve:playground": "pnpm --filter @cosmosjourneyer/playground run serve",
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",
         "format": "prettier . --write",
