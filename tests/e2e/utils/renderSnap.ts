@@ -20,9 +20,9 @@ export async function renderAndSnap(
 
     await page.goto(`/playground.html?${urlParams.toString()}`);
 
-    await page.waitForSelector("#renderer", { state: "visible" });
+    await page.waitForSelector("canvas", { state: "visible" });
 
-    await page.locator(`#renderer[data-${opts.flagToWait}="1"]`).waitFor({ timeout: 30_000 });
+    await page.locator(`canvas[data-${opts.flagToWait}="1"]`).waitFor({ timeout: 30_000 });
 
-    await expect(page.locator("#renderer")).toHaveScreenshot(`${opts.shotName}.png`, { timeout: 15_000 });
+    await expect(page.locator("canvas")).toHaveScreenshot(`${opts.shotName}.png`, { timeout: 15_000 });
 }

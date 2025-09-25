@@ -395,7 +395,9 @@ export class CosmosJourneyer {
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public static async CreateAsync(): Promise<CosmosJourneyer> {
-        const canvas = document.getElementById("renderer") as HTMLCanvasElement;
+        const canvas = document.createElement("canvas");
+        document.body.prepend(canvas);
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 

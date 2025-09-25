@@ -26,13 +26,9 @@ import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
 import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 
-declare global {
-    interface Window {
-        scene: Scene;
-    }
-}
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
 
-const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 

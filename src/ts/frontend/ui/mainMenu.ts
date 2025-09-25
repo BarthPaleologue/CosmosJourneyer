@@ -55,11 +55,100 @@ export class MainMenu {
     private readonly title: HTMLElement;
     private readonly version: HTMLElement;
 
+    private readonly startButton: HTMLElement;
+    private readonly loadSaveButton: HTMLElement;
+    private readonly settingsButton: HTMLElement;
+    private readonly tutorialsButton: HTMLElement;
+    private readonly contributeButton: HTMLElement;
+    private readonly creditsButton: HTMLElement;
+    private readonly aboutButton: HTMLElement;
+    private readonly menuItems: HTMLElement;
+
     private readonly sidePanels: SidePanels;
 
     private readonly universeObjectId: UniverseObjectId;
 
     private readonly startAnimationDurationSeconds = 5;
+
+    private createMainMenuHTML(): {
+        htmlRoot: HTMLElement;
+        title: HTMLElement;
+        version: HTMLElement;
+        startButton: HTMLElement;
+        loadSaveButton: HTMLElement;
+        settingsButton: HTMLElement;
+        tutorialsButton: HTMLElement;
+        contributeButton: HTMLElement;
+        creditsButton: HTMLElement;
+        aboutButton: HTMLElement;
+        menuItems: HTMLElement;
+    } {
+        const mainMenuDiv = document.createElement("div");
+        mainMenuDiv.className = "mainMenu";
+
+        // Create title
+        const title = document.createElement("h1");
+        title.textContent = "Cosmos Journeyer";
+        mainMenuDiv.appendChild(title);
+
+        // Create version paragraph
+        const versionP = document.createElement("p");
+        versionP.className = "version";
+        const versionLink = document.createElement("a");
+        versionLink.target = "_blank";
+        versionLink.href = "https://github.com/BarthPaleologue/CosmosJourneyer/releases";
+        versionP.appendChild(versionLink);
+        mainMenuDiv.appendChild(versionP);
+
+        // Create menu items list
+        const menuItemsUl = document.createElement("ul");
+        menuItemsUl.className = "leftSideMenu";
+
+        // Create individual button elements with translated text
+        const startButton = document.createElement("li");
+        startButton.textContent = i18n.t("mainMenu:newJourney");
+        menuItemsUl.appendChild(startButton);
+
+        const loadSaveButton = document.createElement("li");
+        loadSaveButton.textContent = i18n.t("mainMenu:loadSave");
+        menuItemsUl.appendChild(loadSaveButton);
+
+        const settingsButton = document.createElement("li");
+        settingsButton.textContent = i18n.t("mainMenu:settings");
+        menuItemsUl.appendChild(settingsButton);
+
+        const tutorialsButton = document.createElement("li");
+        tutorialsButton.textContent = i18n.t("mainMenu:tutorials");
+        menuItemsUl.appendChild(tutorialsButton);
+
+        const contributeButton = document.createElement("li");
+        contributeButton.textContent = i18n.t("mainMenu:contribute");
+        menuItemsUl.appendChild(contributeButton);
+
+        const creditsButton = document.createElement("li");
+        creditsButton.textContent = i18n.t("mainMenu:credits");
+        menuItemsUl.appendChild(creditsButton);
+
+        const aboutButton = document.createElement("li");
+        aboutButton.textContent = i18n.t("mainMenu:about");
+        menuItemsUl.appendChild(aboutButton);
+
+        mainMenuDiv.appendChild(menuItemsUl);
+
+        return {
+            htmlRoot: mainMenuDiv,
+            title: title,
+            version: versionP,
+            startButton: startButton,
+            loadSaveButton: loadSaveButton,
+            settingsButton: settingsButton,
+            tutorialsButton: tutorialsButton,
+            contributeButton: contributeButton,
+            creditsButton: creditsButton,
+            aboutButton: aboutButton,
+            menuItems: menuItemsUl,
+        };
+    }
 
     constructor(
         sidePanels: SidePanels,
@@ -98,24 +187,40 @@ export class MainMenu {
 
         this.starSystemModel = system;
 
-        const htmlRoot = document.getElementById("mainMenu");
-        if (htmlRoot === null) throw new Error("#mainMenu does not exist!");
-        this.htmlRoot = htmlRoot;
+        // Create and append the main menu HTML structure
+        const elements = this.createMainMenuHTML();
+        this.htmlRoot = elements.htmlRoot;
+        this.title = elements.title;
+        this.version = elements.version;
+        this.startButton = elements.startButton;
+        this.loadSaveButton = elements.loadSaveButton;
+        this.settingsButton = elements.settingsButton;
+        this.tutorialsButton = elements.tutorialsButton;
+        this.contributeButton = elements.contributeButton;
+        this.creditsButton = elements.creditsButton;
+        this.aboutButton = elements.aboutButton;
+        this.menuItems = elements.menuItems;
+
         this.htmlRoot.style.display = "none";
+        document.body.appendChild(this.htmlRoot);
 
-        const title = document.querySelector("#mainMenu h1");
-        if (title === null) throw new Error("#mainMenu h1 does not exist!");
-        this.title = title as HTMLElement;
-
-        const version = document.getElementById("version");
-        if (version === null) throw new Error("#version does not exist!");
-        // children a elements has the version number as textContent
-        const childLink = version.querySelector("a");
+        // Set version text content
+        const childLink = this.version.querySelector("a");
         if (childLink === null) throw new Error("version link does not exist!");
         childLink.textContent = `Alpha ${packageInfo.version}`;
-        this.version = version;
 
-        document.querySelectorAll("#menuItems li").forEach((li) => {
+        // Add sound events to all menu items
+        const allMenuItems = [
+            this.startButton,
+            this.loadSaveButton,
+            this.settingsButton,
+            this.tutorialsButton,
+            this.contributeButton,
+            this.creditsButton,
+            this.aboutButton,
+        ];
+
+        allMenuItems.forEach((li) => {
             // on mouse hover, play a sound
             li.addEventListener("mouseenter", () => {
                 soundPlayer.playNow(SoundType.HOVER);
@@ -127,23 +232,11 @@ export class MainMenu {
             });
         });
 
-        // Translate all main menu elements
-        document.querySelectorAll("#mainMenu *[data-i18n]").forEach((element) => {
-            const key = element.getAttribute("data-i18n");
-            if (key === null) throw new Error("data-i18n attribute is null");
-            element.textContent = i18n.t(key);
-        });
-
-        const startButton = document.getElementById("startButton");
-        if (startButton === null) throw new Error("#startButton does not exist!");
-        startButton.addEventListener("click", () => {
+        this.startButton.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
         });
 
-        const loadSaveButton = document.getElementById("loadSaveButton");
-        if (loadSaveButton === null) throw new Error("#loadSaveButton does not exist!");
-
-        loadSaveButton.addEventListener("click", async () => {
+        this.loadSaveButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
 
@@ -151,40 +244,25 @@ export class MainMenu {
             this.hide();
         });
 
-        const settingsButton = document.getElementById("settingsButton");
-        if (settingsButton === null) throw new Error("#settingsButton does not exist!");
-
-        settingsButton.addEventListener("click", async () => {
+        this.settingsButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
 
-        const tutorialsButton = document.getElementById("tutorialsButton");
-        if (tutorialsButton === null) throw new Error("#tutorialsButton does not exist!");
-
-        tutorialsButton.addEventListener("click", async () => {
+        this.tutorialsButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
 
-        const contributeButton = document.getElementById("contributeButton");
-        if (contributeButton === null) throw new Error("#contributeButton does not exist!");
-
-        contributeButton.addEventListener("click", async () => {
+        this.contributeButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
             this.onContributeObservable.notifyObservers();
         });
 
-        const creditsButton = document.getElementById("creditsButton");
-        if (creditsButton === null) throw new Error("#creditsButton does not exist!");
-
-        creditsButton.addEventListener("click", async () => {
+        this.creditsButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.CREDITS);
             this.onCreditsObservable.notifyObservers();
         });
 
-        const aboutButton = document.getElementById("aboutButton");
-        if (aboutButton === null) throw new Error("#aboutButton does not exist!");
-
-        aboutButton.addEventListener("click", async () => {
+        this.aboutButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel(PanelType.ABOUT);
             this.onAboutObservable.notifyObservers();
         });
@@ -300,9 +378,7 @@ export class MainMenu {
     }
 
     private hideMenu() {
-        const menuItems = document.getElementById("menuItems");
-        if (menuItems === null) throw new Error("#menuItems does not exist!");
-        menuItems.style.left = "-20%";
+        this.menuItems.style.left = "-20%";
     }
 
     public hide() {
