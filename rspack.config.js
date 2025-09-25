@@ -63,7 +63,7 @@ export default defineConfig({
             entryOnly: true,
         }),
         new TsCheckerRspackPlugin(),
-        new HtmlWebpackPlugin({
+        new rspack.HtmlRspackPlugin({
             title: "Cosmos Journeyer",
             filename: "index.html",
             meta: {
@@ -75,7 +75,7 @@ export default defineConfig({
             chunks: ["main"],
             favicon: path.join(htmlPath, "../asset/favicon.png"),
         }),
-        new HtmlWebpackPlugin({
+        new rspack.HtmlRspackPlugin({
             title: "Black Hole - Cosmos Journeyer",
             meta: {
                 description: "Black hole simulation for Cosmos Journeyer with light bending and accretion disk.",
@@ -88,7 +88,7 @@ export default defineConfig({
         new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
-            template: path.join(htmlPath, "emptyIndex.html"),
+            template: path.join(htmlPath, "index.html"),
             chunks: ["playground"],
             favicon: path.join(htmlPath, "../asset/favicon.png"),
         }),
