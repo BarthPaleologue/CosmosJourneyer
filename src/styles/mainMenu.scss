@@ -139,10 +139,6 @@ h1 {
         font-size: 1.25em;
         margin-block: 0;
 
-        &[data-i18n] {
-            white-space: pre-line; // necessary to use \n in the text
-        }
-
         &.signature {
             text-align: right;
             font-style: italic;

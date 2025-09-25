@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import Action from "@brianchirls/game-input/Action";
 import {
     AxisComposite,
@@ -21,76 +38,94 @@ import {
 
 import i18n from "@/i18n";
 
-import { type MusicConductor } from "../audio/musicConductor";
+import { type MusicConductor } from "../../audio/musicConductor";
 
-export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
-    const settingsPanel = document.getElementById("settingsPanel");
-    if (settingsPanel === null) throw new Error("#settings does not exist!");
+export class SettingsPanel {
+    readonly htmlRoot: HTMLElement;
 
-    const audioSection = document.createElement("div");
-    audioSection.classList.add("settings-section");
+    constructor(musicConductor: MusicConductor) {
+        this.htmlRoot = this.createPanelHTML(musicConductor);
+    }
 
-    const volumeTitle = document.createElement("h3");
-    volumeTitle.textContent = i18n.t("sidePanel:audioSettings");
-    volumeTitle.style.fontFamily = "Nasalization, sans-serif";
-    audioSection.appendChild(volumeTitle);
+    private createPanelHTML(musicConductor: MusicConductor): HTMLElement {
+        const panel = document.createElement("div");
+        panel.className = "sidePanel";
 
-    const sliderContainer = document.createElement("div");
-    sliderContainer.style.display = "flex";
-    sliderContainer.style.alignItems = "center";
-    sliderContainer.style.gap = "10px";
-    sliderContainer.style.fontFamily = "Nasalization, sans-serif";
+        // Create title
+        const title = document.createElement("h2");
+        title.textContent = i18n.t("sidePanel:settings");
+        panel.appendChild(title);
 
-    const sliderLabel = document.createElement("label");
-    sliderLabel.textContent = i18n.t("sidePanel:musicVolume");
-    sliderLabel.style.fontFamily = "Nasalization, sans-serif";
-    sliderLabel.style.minWidth = "80px";
-    sliderLabel.style.flexGrow = "1";
-    sliderLabel.style.color = "#fff";
-    sliderLabel.style.fontWeight = "bold";
-    sliderLabel.style.letterSpacing = "1px";
-    sliderLabel.style.fontSize = "1.1em";
-    sliderContainer.appendChild(sliderLabel);
+        // Audio settings section
+        const audioSection = document.createElement("div");
+        audioSection.classList.add("settings-section");
 
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "1";
-    slider.step = "0.05";
-    slider.value = musicConductor.getVolume().toString();
-    slider.style.margin = "0 10px";
-    slider.style.accentColor = "#ffffff";
+        const volumeTitle = document.createElement("h3");
+        volumeTitle.textContent = i18n.t("sidePanel:audioSettings");
+        volumeTitle.style.fontFamily = "Nasalization, sans-serif";
+        audioSection.appendChild(volumeTitle);
 
-    const percentage = document.createElement("span");
-    percentage.textContent = (parseFloat(slider.value) * 100).toFixed(0) + "%";
-    percentage.style.fontFamily = "Nasalization, sans-serif";
-    percentage.style.color = "#fff";
-    percentage.style.backgroundColor = "#1a1a1a";
-    percentage.style.padding = "2px 8px";
-    percentage.style.borderRadius = "4px";
-    percentage.style.fontWeight = "bold";
-    percentage.style.fontSize = "1em";
-    percentage.style.marginLeft = "4px";
-    percentage.style.minWidth = "50px";
-    percentage.style.textAlign = "center";
+        const sliderContainer = document.createElement("div");
+        sliderContainer.style.display = "flex";
+        sliderContainer.style.alignItems = "center";
+        sliderContainer.style.gap = "10px";
+        sliderContainer.style.fontFamily = "Nasalization, sans-serif";
 
-    slider.addEventListener("input", () => {
-        const volume = parseFloat(slider.value);
-        percentage.textContent = (volume * 100).toFixed(0) + "%";
-        musicConductor.setSoundtrackVolume(volume);
-    });
+        const sliderLabel = document.createElement("label");
+        sliderLabel.textContent = i18n.t("sidePanel:musicVolume");
+        sliderLabel.style.fontFamily = "Nasalization, sans-serif";
+        sliderLabel.style.minWidth = "80px";
+        sliderLabel.style.flexGrow = "1";
+        sliderLabel.style.color = "#fff";
+        sliderLabel.style.fontWeight = "bold";
+        sliderLabel.style.letterSpacing = "1px";
+        sliderLabel.style.fontSize = "1.1em";
+        sliderContainer.appendChild(sliderLabel);
 
-    sliderContainer.appendChild(slider);
-    sliderContainer.appendChild(percentage);
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "1";
+        slider.step = "0.05";
+        slider.value = musicConductor.getVolume().toString();
+        slider.style.margin = "0 10px";
+        slider.style.accentColor = "#ffffff";
 
-    audioSection.appendChild(sliderContainer);
-    settingsPanel.appendChild(audioSection);
+        const percentage = document.createElement("span");
+        percentage.textContent = (parseFloat(slider.value) * 100).toFixed(0) + "%";
+        percentage.style.fontFamily = "Nasalization, sans-serif";
+        percentage.style.color = "#fff";
+        percentage.style.backgroundColor = "#1a1a1a";
+        percentage.style.padding = "2px 8px";
+        percentage.style.borderRadius = "4px";
+        percentage.style.fontWeight = "bold";
+        percentage.style.fontSize = "1em";
+        percentage.style.marginLeft = "4px";
+        percentage.style.minWidth = "50px";
+        percentage.style.textAlign = "center";
 
-    void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
+        slider.addEventListener("input", () => {
+            const volume = parseFloat(slider.value);
+            percentage.textContent = (volume * 100).toFixed(0) + "%";
+            musicConductor.setSoundtrackVolume(volume);
+        });
+
+        sliderContainer.appendChild(slider);
+        sliderContainer.appendChild(percentage);
+
+        audioSection.appendChild(sliderContainer);
+        panel.appendChild(audioSection);
+
+        // Initialize input controls asynchronously
+        void this.initializeInputControls(panel);
+
+        return panel;
+    }
+
+    private async initializeInputControls(panel: HTMLElement): Promise<void> {
+        const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
+
         InputMaps.forEach((inputMap) => {
-            // create a div
-            // the name of the map will be an h3
-            // each action will be a div with the name of the action and the bindings
             const mapDiv = document.createElement("div");
             mapDiv.classList.add("map");
             const mapName = document.createElement("h3");
@@ -207,9 +242,7 @@ export function initSettingsPanel(musicConductor: MusicConductor): HTMLElement {
                 mapDiv.appendChild(actionDiv);
             }
 
-            settingsPanel.appendChild(mapDiv);
+            panel.appendChild(mapDiv);
         });
-    });
-
-    return settingsPanel;
+    }
 }

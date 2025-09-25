@@ -216,7 +216,7 @@ export class CosmosJourneyer {
             this.soundPlayer,
             this.musicConductor,
         );
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add((saveData: DeepReadonly<Save>) => {
+        this.sidePanels.loadSavePanel.content.onLoadSaveObservable.add((saveData: DeepReadonly<Save>) => {
             engine.onEndFrameObservable.addOnce(async () => {
                 if (this.isPaused()) {
                     await this.createAutoSave(); // from the pause menu, create autosave of the current game before loading a save
@@ -253,7 +253,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.sidePanels.tutorialsPanelContent.onTutorialSelected.add(async (tutorial) => {
+        this.sidePanels.tutorialsPanel.content.onTutorialSelected.add(async (tutorial) => {
             if (!this.mainMenu.isVisible()) {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
                 await this.createAutoSave();
