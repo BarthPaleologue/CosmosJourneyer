@@ -240,7 +240,7 @@ export class MainMenu {
             await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
 
-        this.sidePanels.loadSavePanelContent.onLoadSaveObservable.add(() => {
+        this.sidePanels.loadSavePanel.content.onLoadSaveObservable.add(() => {
             this.hide();
         });
 

@@ -3,10 +3,15 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+import { assertUnreachable } from "@/utils/types";
+
 import { type MusicConductor } from "../audio/musicConductor";
-import { SaveLoadingPanelContent } from "./saveLoadingPanelContent";
-import { initSettingsPanel } from "./settingsPanel";
-import { TutorialsPanelContent } from "./tutorial/tutorialsPanelContent";
+import { AboutPanel } from "./panels/aboutPanel";
+import { ContributePanel } from "./panels/contributePanel";
+import { CreditsPanel } from "./panels/creditsPanel";
+import { LoadSavePanel } from "./panels/loadSavePanel";
+import { SettingsPanel } from "./panels/settingsPanel";
+import { TutorialsPanel } from "./panels/tutorialsPanel";
 
 export const enum PanelType {
     LOAD_SAVE,
@@ -20,20 +25,14 @@ export const enum PanelType {
 export class SidePanels {
     private activeRightPanel: HTMLElement | null = null;
 
-    private readonly loadSavePanel: HTMLElement;
-    readonly loadSavePanelContent: SaveLoadingPanelContent;
-
-    private readonly settingsPanel: HTMLElement;
-
-    private readonly tutorialsPanel: HTMLElement;
-    readonly tutorialsPanelContent: TutorialsPanelContent;
-
-    private readonly contributePanel: HTMLElement;
-    private readonly creditsPanel: HTMLElement;
-    private readonly aboutPanel: HTMLElement;
+    readonly loadSavePanel: LoadSavePanel;
+    readonly settingsPanel: SettingsPanel;
+    readonly tutorialsPanel: TutorialsPanel;
+    readonly contributePanel: ContributePanel;
+    readonly creditsPanel: CreditsPanel;
+    readonly aboutPanel: AboutPanel;
 
     private readonly starSystemDatabase: StarSystemDatabase;
-
     private readonly saveBackend: ISaveBackend;
 
     constructor(
@@ -45,64 +44,49 @@ export class SidePanels {
         this.starSystemDatabase = starSystemDatabase;
         this.saveBackend = saveManager;
 
-        const loadSavePanel = document.getElementById("loadSavePanel");
-        if (loadSavePanel === null) throw new Error("#loadSavePanel does not exist!");
-        this.loadSavePanel = loadSavePanel;
-        this.attachCloseButton(this.loadSavePanel);
+        // Create panel instances
+        this.loadSavePanel = new LoadSavePanel(starSystemDatabase, soundPlayer);
+        this.attachCloseButton(this.loadSavePanel.htmlRoot);
+        document.body.appendChild(this.loadSavePanel.htmlRoot);
 
-        this.loadSavePanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
-        this.loadSavePanel.appendChild(this.loadSavePanelContent.htmlRoot);
+        this.settingsPanel = new SettingsPanel(musicConductor);
+        this.attachCloseButton(this.settingsPanel.htmlRoot);
+        document.body.appendChild(this.settingsPanel.htmlRoot);
 
-        this.settingsPanel = initSettingsPanel(musicConductor);
-        this.attachCloseButton(this.settingsPanel);
+        this.tutorialsPanel = new TutorialsPanel();
+        this.attachCloseButton(this.tutorialsPanel.htmlRoot);
+        document.body.appendChild(this.tutorialsPanel.htmlRoot);
 
-        const tutorialsPanel = document.getElementById("tutorials");
-        if (tutorialsPanel === null) throw new Error("#tutorials does not exist!");
-        this.tutorialsPanel = tutorialsPanel;
-        this.attachCloseButton(this.tutorialsPanel);
-        this.tutorialsPanelContent = new TutorialsPanelContent();
-        this.tutorialsPanel.appendChild(this.tutorialsPanelContent.htmlRoot);
+        this.contributePanel = new ContributePanel();
+        this.attachCloseButton(this.contributePanel.htmlRoot);
+        document.body.appendChild(this.contributePanel.htmlRoot);
 
-        const contributePanel = document.getElementById("contribute");
-        if (contributePanel === null) throw new Error("#contribute does not exist!");
-        this.contributePanel = contributePanel;
-        this.attachCloseButton(this.contributePanel);
+        this.creditsPanel = new CreditsPanel();
+        this.attachCloseButton(this.creditsPanel.htmlRoot);
+        document.body.appendChild(this.creditsPanel.htmlRoot);
 
-        const creditsPanel = document.getElementById("credits");
-        if (creditsPanel === null) throw new Error("#credits does not exist!");
-        this.creditsPanel = creditsPanel;
-        this.attachCloseButton(this.creditsPanel);
-
-        const aboutPanel = document.getElementById("about");
-        if (aboutPanel === null) throw new Error("#about does not exist!");
-        this.aboutPanel = aboutPanel;
-        this.attachCloseButton(this.aboutPanel);
+        this.aboutPanel = new AboutPanel();
+        this.attachCloseButton(this.aboutPanel.htmlRoot);
+        document.body.appendChild(this.aboutPanel.htmlRoot);
     }
 
     private panelFromType(type: PanelType): HTMLElement {
-        let newPanel: HTMLElement | null = null;
         switch (type) {
             case PanelType.LOAD_SAVE:
-                newPanel = this.loadSavePanel;
-                break;
+                return this.loadSavePanel.htmlRoot;
             case PanelType.SETTINGS:
-                newPanel = this.settingsPanel;
-                break;
+                return this.settingsPanel.htmlRoot;
             case PanelType.TUTORIALS:
-                newPanel = this.tutorialsPanel;
-                break;
+                return this.tutorialsPanel.htmlRoot;
             case PanelType.CONTRIBUTE:
-                newPanel = this.contributePanel;
-                break;
+                return this.contributePanel.htmlRoot;
             case PanelType.CREDITS:
-                newPanel = this.creditsPanel;
-                break;
+                return this.creditsPanel.htmlRoot;
             case PanelType.ABOUT:
-                newPanel = this.aboutPanel;
-                break;
+                return this.aboutPanel.htmlRoot;
+            default:
+                return assertUnreachable(type);
         }
-
-        return newPanel;
     }
 
     private attachCloseButton(panel: HTMLElement): void {
@@ -125,7 +109,7 @@ export class SidePanels {
         }
 
         if (type === PanelType.LOAD_SAVE) {
-            await this.loadSavePanelContent.populateCmdrList(this.starSystemDatabase, this.saveBackend);
+            await this.loadSavePanel.content.populateCmdrList(this.starSystemDatabase, this.saveBackend);
         }
 
         if (this.activeRightPanel !== null) {
