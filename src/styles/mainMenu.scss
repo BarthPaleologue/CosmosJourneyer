@@ -26,7 +26,7 @@ h1 {
     transition: 0.1s;
 }
 
-#mainMenu {
+.mainMenu {
     position: absolute;
     width: 100vw;
     height: 100vh;
@@ -35,7 +35,7 @@ h1 {
 
     display: none;
 
-    #version {
+    .version {
         position: absolute;
         bottom: 0;
         right: 0;

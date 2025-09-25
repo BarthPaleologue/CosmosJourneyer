@@ -84,7 +84,7 @@ export class MainMenu {
         menuItems: HTMLElement;
     } {
         const mainMenuDiv = document.createElement("div");
-        mainMenuDiv.id = "mainMenu";
+        mainMenuDiv.className = "mainMenu";
 
         // Create title
         const title = document.createElement("h1");
@@ -93,7 +93,7 @@ export class MainMenu {
 
         // Create version paragraph
         const versionP = document.createElement("p");
-        versionP.id = "version";
+        versionP.className = "version";
         const versionLink = document.createElement("a");
         versionLink.target = "_blank";
         versionLink.href = "https://github.com/BarthPaleologue/CosmosJourneyer/releases";
