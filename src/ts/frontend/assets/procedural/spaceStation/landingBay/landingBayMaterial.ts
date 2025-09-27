@@ -23,7 +23,6 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
-
 import {
     abs,
     atan2,
@@ -51,7 +50,8 @@ import {
     vec2,
     vertexAttribute,
     xz,
-} from "@/utils/bsl";
+} from "@/frontend/helpers/bsl";
+
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
