@@ -22,7 +22,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
+import { getNeighborStarSystemCoordinates } from "./getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());

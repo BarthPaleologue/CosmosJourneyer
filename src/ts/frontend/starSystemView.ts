@@ -45,6 +45,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
+import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -72,7 +73,6 @@ import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neut
 import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { type View } from "@/frontend/view";
 
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
