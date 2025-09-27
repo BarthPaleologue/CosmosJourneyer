@@ -33,6 +33,11 @@ import HavokPhysics from "@babylonjs/havok";
 import type { ICosmosJourneyerBackend } from "@/backend";
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
+import {
+    type AtStationCoordinates,
+    type RelativeCoordinates,
+    type UniverseCoordinates,
+} from "@/backend/save/universeCoordinates";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
@@ -60,11 +65,6 @@ import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 
-import {
-    type AtStationCoordinates,
-    type RelativeCoordinates,
-    type UniverseCoordinates,
-} from "@/utils/coordinates/universeCoordinates";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
 import type { DeepReadonly } from "@/utils/types";
