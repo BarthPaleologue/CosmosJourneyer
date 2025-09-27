@@ -21,7 +21,7 @@ import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators
 import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
+import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 
 import { CosmosJourneyer } from "./frontend/cosmosJourneyer";
 

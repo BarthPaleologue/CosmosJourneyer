@@ -28,10 +28,13 @@ import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
+import {
+    positionNearObjectAsteroidField,
+    positionNearObjectWithStarVisible,
+} from "@/frontend/helpers/positionNearObject";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { type StarSystemView } from "@/frontend/starSystemView";
 
-import { positionNearObjectAsteroidField, positionNearObjectWithStarVisible } from "@/utils/positionNearObject";
 import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";

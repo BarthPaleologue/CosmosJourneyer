@@ -48,6 +48,7 @@ import { MusicConductor } from "@/frontend/audio/musicConductor";
 import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
+import { positionNearObject } from "@/frontend/helpers/positionNearObject";
 import { UberScene } from "@/frontend/helpers/uberScene";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
@@ -67,7 +68,6 @@ import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { positionNearObject } from "@/utils/positionNearObject";
 import type { DeepReadonly } from "@/utils/types";
 
 import i18n, { initI18n } from "@/i18n";

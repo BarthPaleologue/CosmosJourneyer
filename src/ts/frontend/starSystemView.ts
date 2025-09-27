@@ -46,6 +46,7 @@ import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defau
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
+import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -75,7 +76,6 @@ import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
-import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
 import { type DeepReadonly } from "@/utils/types";
 
