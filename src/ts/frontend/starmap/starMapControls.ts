@@ -26,10 +26,9 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type Controls } from "@/frontend/controls";
 
-import { lerpSmooth } from "@/utils/math";
-
 import { Settings } from "@/settings";
 
+import { lerpSmooth } from "../helpers/animations/interpolations";
 import { StarMapInputs } from "./starMapInputs";
 
 export class StarMapControls implements Controls {

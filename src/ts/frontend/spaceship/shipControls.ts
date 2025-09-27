@@ -39,11 +39,11 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
+import { lerpSmooth, slerpSmoothToRef } from "../helpers/animations/interpolations";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
