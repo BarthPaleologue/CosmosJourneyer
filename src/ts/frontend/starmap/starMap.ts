@@ -52,7 +52,6 @@ import { type View } from "@/frontend/view";
 
 import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { ThickLines } from "@/utils/thickLines";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -62,6 +61,7 @@ import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";
 import { StarSectorView, vector3ToString, type BuildData } from "./starSectorView";
 import { StellarPathfinder } from "./stellarPathfinder";
+import { ThickLines } from "./thickLines";
 
 import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
 import starTexturePath from "@assets/textures/starParticle.png";
