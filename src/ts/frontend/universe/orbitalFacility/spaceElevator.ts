@@ -36,6 +36,7 @@ import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSec
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { setUpVector } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -43,7 +44,6 @@ import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPa
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { clamp, remap, triangleWave } from "@/utils/math";
 import { getSphereRadiatedEnergyFlux } from "@/utils/physics/thermodynamics";
 import { wheelOfFortune } from "@/utils/random";

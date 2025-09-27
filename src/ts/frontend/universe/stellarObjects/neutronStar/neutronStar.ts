@@ -32,6 +32,7 @@ import { type NeutronStarModel } from "@/backend/universe/orbitalObjects/stellar
 
 import { type Textures } from "@/frontend/assets/textures";
 import { type Cullable } from "@/frontend/helpers/cullable";
+import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
@@ -39,7 +40,6 @@ import { type StellarObjectBase } from "@/frontend/universe/architecture/stellar
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";

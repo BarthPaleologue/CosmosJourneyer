@@ -31,10 +31,10 @@ import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/t
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type Cullable } from "@/frontend/helpers/cullable";
+import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
