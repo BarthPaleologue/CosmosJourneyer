@@ -17,11 +17,10 @@
 
 import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { type Cullable } from "@/frontend/helpers/cullable";
 import { type OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
-
-import { type Cullable } from "@/utils/cullable";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
     extends OrbitalObjectBase<T>,

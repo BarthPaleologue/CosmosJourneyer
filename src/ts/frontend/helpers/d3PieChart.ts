@@ -17,7 +17,7 @@
 
 import { arc, interpolateViridis, pie, scaleSequential, type PieArcDatum } from "d3";
 
-import { type DeepReadonly } from "./types";
+import { type DeepReadonly } from "@/utils/types";
 
 export function makeD3PieChart<T>(
     data: DeepReadonly<T[]>,

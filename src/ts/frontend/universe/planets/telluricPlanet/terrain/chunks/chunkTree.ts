@@ -26,9 +26,9 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
+import { type Cullable } from "@/frontend/helpers/cullable";
 import { getRotationQuaternion } from "@/frontend/helpers/transform";
 
-import { type Cullable } from "@/utils/cullable";
 import { clamp } from "@/utils/math";
 import { type DeepReadonly } from "@/utils/types";
 

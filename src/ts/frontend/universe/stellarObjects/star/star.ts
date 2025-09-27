@@ -30,6 +30,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
 import { type Textures } from "@/frontend/assets/textures";
+import { type Cullable } from "@/frontend/helpers/cullable";
 import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
@@ -37,7 +38,6 @@ import { type StellarObjectBase } from "@/frontend/universe/architecture/stellar
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { type Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";

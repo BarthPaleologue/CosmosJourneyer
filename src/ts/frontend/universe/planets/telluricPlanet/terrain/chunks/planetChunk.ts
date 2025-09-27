@@ -30,10 +30,10 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type Cullable } from "@/frontend/helpers/cullable";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { type Cullable } from "@/utils/cullable";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type DeepReadonly } from "@/utils/types";
 
