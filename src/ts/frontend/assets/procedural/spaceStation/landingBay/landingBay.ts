@@ -29,10 +29,10 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { createEnvironmentAggregate } from "@/utils/havok";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 import { type DeepReadonly } from "@/utils/types";

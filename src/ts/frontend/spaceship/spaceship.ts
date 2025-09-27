@@ -45,6 +45,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { setEnabledBody } from "@/frontend/helpers/havok";
 import { translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
@@ -52,7 +53,6 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { distanceToAsteroidField } from "@/utils/asteroidFields";
-import { setEnabledBody } from "@/utils/havok";
 import type { DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
