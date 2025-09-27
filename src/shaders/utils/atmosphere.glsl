@@ -22,7 +22,7 @@ uniform vec3 atmosphere_rayleighCoeffs; // rayleigh scattering coefficients
 
 uniform float atmosphere_mieHeight; // height falloff of mie scattering (in meters)
 uniform vec3 atmosphere_mieCoeffs; // mie scattering coefficients
-uniform float atmosphere_mieAsymmetry; // mie scattering asymmetry (between -1 and 1)
+uniform vec3 atmosphere_mieAsymmetry; // mie scattering asymmetry (between -1 and 1)
 
 uniform float atmosphere_ozoneHeight; // height of ozone layer in meters above the surface
 uniform vec3 atmosphere_ozoneCoeffs; // ozone absorption coefficients

@@ -73,6 +73,20 @@ export class CreditsPanel {
             panel.appendChild(p);
         });
 
+        const modelHeader = document.createElement("h3");
+        modelHeader.textContent = i18n.t("sidePanel:models");
+        panel.appendChild(modelHeader);
+
+        const modelCredits = [
+            'ISS Model from <a target="_blank" href="https://solarsystem.nasa.gov/gltf_embed/2378/">NASA\'s Solar System Exploration</a>',
+        ];
+
+        modelCredits.forEach((credit) => {
+            const p = document.createElement("p");
+            p.innerHTML = credit;
+            panel.appendChild(p);
+        });
+
         // Materials & Textures section
         const materialsHeader = document.createElement("h3");
         materialsHeader.textContent = i18n.t("sidePanel:materials");
@@ -87,6 +101,12 @@ export class CreditsPanel {
             'Neptune texture from <a target="_blank" href="https://www.solarsystemscope.com/textures/">Solar System Scope</a>, licensed under Attribution 4.0 International license',
             'Saturn rings from <a target="_blank" href="https://www.solarsystemscope.com/textures/">Solar System Scope</a>, licensed under Attribution 4.0 International license',
             'Uranus rings from <a target="_blank" href="https://planetpixelemporium.com/uranus.html">Planet Pixel Emporium</a>, licensed under the terms specified <a target="_blank" href="https://planetpixelemporium.com/planets.html">here</a>',
+            'Mars height map from Mola team, published by the <a target="_blank" href="https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m">USGS Astrogeology Science Center</a>, under the CC0 license',
+            'Mars color map from <a target="_blank" href="https://astrogeology.usgs.gov/search/map/mars_viking_global_color_mosaic_925m">USGS Astrogeology Science Center</a>',
+            'Moon color and height map from <a target="_blank" href="https://svs.gsfc.nasa.gov/4720">NASA\'s Scientific Visualization Studio</a>',
+            'Earth height map from <a target="_blank" href="https://commons.wikimedia.org/wiki/File:World_elevation_map.png">Wikipedia Commons</a>, licensed under the Creative Commons <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">Attribution-Share Alike 4.0 International</a> license',
+            'Mercury height map from <a target="_blank" href="https://web.archive.org/web/20210330125010/https://astrogeology.usgs.gov/search/map/Mercury/Topography/MESSENGER/Mercury_Messenger_USGS_DEM_Global_665m_v2">USGS Astrogeology Science Center</a>',
+            'Mercury color map from the <a target="_blank" href="https://astrogeology.usgs.gov/search/map/mercury_messenger_mdis_basemap_md3_color_global_mosaic_665m">Applied Coherent Technology Corporation</a> published by USGS Astrogeology Science Center',
         ];
 
         materialsCredits.forEach((credit) => {

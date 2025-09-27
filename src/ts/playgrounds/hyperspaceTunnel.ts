@@ -38,8 +38,6 @@ export async function createHyperspaceTunnelDemo(
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
 
-    scene.enableDepthRenderer(camera, false, true);
-
     const textures = await loadTextures(scene, progressMonitor);
 
     const directionalLight = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);

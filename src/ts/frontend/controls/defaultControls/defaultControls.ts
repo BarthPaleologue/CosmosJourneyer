@@ -100,6 +100,13 @@ export class DefaultControls implements Controls {
         const cameraForward = this.camera.getDirection(localForward);
         const transformForward = this.getTransform().forward;
 
+        const parent = this.getTransform().parent;
+        if (parent !== null) {
+            const parentInverseWorld = parent.getWorldMatrix().clone().invert();
+            Vector3.TransformNormalToRef(cameraForward, parentInverseWorld, cameraForward);
+            Vector3.TransformNormalToRef(transformForward, parentInverseWorld, transformForward);
+        }
+
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
             const rotation = getTransformationQuaternion(transformForward, cameraForward);
             this.transform.rotationQuaternion = rotation.multiply(

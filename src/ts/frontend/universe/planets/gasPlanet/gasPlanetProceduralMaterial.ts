@@ -18,6 +18,7 @@
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type GasPlanetProceduralColorPalette } from "@/backend/universe/orbitalObjects/gasPlanetModel";
@@ -68,21 +69,18 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
 
         this.setFloat(GasPlanetMaterialUniformNames.SEED, seed);
 
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR1, [
-            colorPalette.color1.r,
-            colorPalette.color1.g,
-            colorPalette.color1.b,
-        ]);
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR2, [
-            colorPalette.color2.r,
-            colorPalette.color2.g,
-            colorPalette.color2.b,
-        ]);
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR3, [
-            colorPalette.color3.r,
-            colorPalette.color3.g,
-            colorPalette.color3.b,
-        ]);
+        this.setColor3(
+            GasPlanetMaterialUniformNames.COLOR1,
+            new Color3(colorPalette.color1.r, colorPalette.color1.g, colorPalette.color1.b),
+        );
+        this.setColor3(
+            GasPlanetMaterialUniformNames.COLOR2,
+            new Color3(colorPalette.color2.r, colorPalette.color2.g, colorPalette.color2.b),
+        );
+        this.setColor3(
+            GasPlanetMaterialUniformNames.COLOR3,
+            new Color3(colorPalette.color3.r, colorPalette.color3.g, colorPalette.color3.b),
+        );
 
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
 

@@ -20,7 +20,7 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 import { hsvToRgb } from "@/utils/colors";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { EarthSeaLevelPressure, JupiterMass } from "@/utils/physics/constants";
+import { JupiterMass } from "@/utils/physics/constants";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -43,7 +43,7 @@ export function newSeededGasPlanetModel(
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
 
     // Todo: do not hardcode
-    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
+    let orbitRadius = rng(GenerationSteps.ORBIT) * 90e9;
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
@@ -107,8 +107,18 @@ export function newSeededGasPlanetModel(
         axialTilt,
         mass,
         atmosphere: {
-            pressure: EarthSeaLevelPressure,
+            seaLevelPressure: 100_000, // 1 bar
             greenHouseEffectFactor: 0.5,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
+            aerosols: {
+                tau550: 0.1,
+                angstromExponent: 0.8,
+                particleRadius: 1.5e-7,
+                settlingCoefficient: 0.5,
+            },
         },
         rings: rings,
         colorPalette: {

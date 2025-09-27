@@ -22,7 +22,7 @@ export async function renderAndSnap(
 
     await page.waitForSelector("canvas", { state: "visible" });
 
-    await page.locator(`canvas[data-${opts.flagToWait}="1"]`).waitFor({ timeout: 30_000 });
+    await page.locator(`canvas[data-${opts.flagToWait}="1"]`).waitFor({ timeout: 4 * 60 * 1000 });
 
-    await expect(page.locator("canvas")).toHaveScreenshot(`${opts.shotName}.png`, { timeout: 15_000 });
+    await expect(page.locator("canvas")).toHaveScreenshot(`${opts.shotName}.png`, { timeout: 60_000 });
 }

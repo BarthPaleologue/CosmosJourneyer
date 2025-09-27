@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
+import { Color4, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+
+import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -34,6 +36,7 @@ export function createAtmosphericScatteringScene(
     scene.useRightHandedSystem = true;
 
     const scalingFactor = 6_000e3;
+    const earthMass = 5.972e24; // kg
 
     const controls = new DefaultControls(scene);
 
@@ -47,7 +50,8 @@ export function createAtmosphericScatteringScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(camera, true, true);
+    depthRenderer.clearColor = new Color4(0, 0, 0, 1);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     const light = new PointLight("light1", new Vector3(10 * scalingFactor, 0, 0), scene);
@@ -55,7 +59,23 @@ export function createAtmosphericScatteringScene(
     // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 64 }, scene);
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
+    const atmosphereModel: AtmosphereModel = {
+        seaLevelPressure: 101325, // Sea level pressure in Pascals
+        greenHouseEffectFactor: 0.5, // Arbitrary value for greenhouse effect
+        gasMix: [
+            ["N2", 0.78], // Nitrogen
+            ["O2", 0.21], // Oxygen
+            ["Ar", 0.01], // Argon
+        ],
+        aerosols: {
+            tau550: 0.05,
+            angstromExponent: 0.0,
+            particleRadius: 0.5e-6,
+            settlingCoefficient: 0.15,
+        },
+    };
+
+    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, earthMass, 298, atmosphereModel);
 
     const atmosphere = new AtmosphericScatteringPostProcess(sphere, scalingFactor, atmosphereUniforms, [light], scene);
     camera.attachPostProcess(atmosphere);

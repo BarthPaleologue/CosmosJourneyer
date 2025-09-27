@@ -37,7 +37,6 @@ uniform sampler2D perlinNoise;
 varying vec3 vPosition;
 varying vec3 vPositionW;
 
-varying mat4 normalMatrix;
 varying vec3 vNormalW;
 
 varying float vPlanetNdl;

@@ -1,0 +1,6 @@
+# Core numerical stack
+numpy>=1.24,<2.0       # ≥1.24 needed by SciPy ≥1.10
+scipy>=1.10,<2.0       # gaussian_filter, sobel
+
+# Raster I/O for tiled processing
+rasterio>=1.3,<2.0     # windowed read/write

@@ -36,8 +36,6 @@ uniform sampler2D depthSampler;// the depth map of the camera
 uniform float cloudLayerMaxHeight;// atmosphere radius (calculate from planet center)
 uniform float cloudLayerMinHeight;
 
-#include "./utils/remap.glsl";
-
 #include "./utils/saturate.glsl";
 
 #include "./utils/noise.glsl";
@@ -175,12 +173,12 @@ void main() {
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);// the pixel position in world space (near plane)
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 rayDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);// normalized direction of the ray
 
     vec3 finalColor = scatter(screenColor, camera_position, rayDir, maximumDistance);// the color to be displayed on the screen
 

@@ -30,9 +30,7 @@ import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
-import { ItemPool } from "@/utils/itemPool";
-
-import { Settings } from "@/settings";
+import { ItemPool } from "@/utils/dataStructures/itemPool";
 
 import { enablePhysics } from "../utils";
 
@@ -62,7 +60,8 @@ export async function createSaturnScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer(null, false, true);
+    const depthRenderer = scene.enableDepthRenderer(null, true, true);
+    depthRenderer.clearColor.set(0, 0, 0, 1);
 
     const sun = new TransformNode("sun", scene);
     sun.position = new Vector3(7, 5.5, -10).scaleInPlace(scalingFactor);
@@ -70,8 +69,6 @@ export async function createSaturnScene(
     const light = new PointLight("light1", Vector3.Zero(), scene);
     light.falloffType = Light.FALLOFF_STANDARD;
     light.parent = sun;
-
-    Settings.EARTH_RADIUS = 6_371e3;
 
     const gasPlanetModel = getSaturnModel([]);
 

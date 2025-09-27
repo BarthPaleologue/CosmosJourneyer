@@ -20,8 +20,7 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Engine } from "@babylonjs/core/Engines/engine";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -411,22 +410,23 @@ export class CosmosJourneyer {
 
         const backend = backendResult.value;
 
-        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
-        const engine = window.location.search.includes("webgpu")
-            ? await EngineFactory.CreateAsync(canvas, {
-                  twgslOptions: {
-                      wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
-                  },
-                  audioEngine: true,
-              })
-            : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true,
-                  useHighPrecisionMatrix: true,
-                  doNotHandleContextLost: true,
-                  audioEngine: true,
-              });
+        if (!(await WebGPUEngine.IsSupportedAsync)) {
+            alert(
+                "WebGPU is not supported in your browser. Please check the compatibility here: https://github.com/gpuweb/gpuweb/wiki/Implementation-Status#implementation-status",
+            );
+        }
+
+        // Init BabylonJS engine
+        const engine = new WebGPUEngine(canvas, {
+            antialias: true,
+            useHighPrecisionMatrix: true,
+            doNotHandleContextLost: true,
+            audioEngine: true,
+        });
+        await engine.initAsync(undefined, {
+            wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+            jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
+        });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = loadingScreen;

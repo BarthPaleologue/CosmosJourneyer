@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
-import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
+import { type AtmosphereModel, type Gas } from "@/backend/universe/orbitalObjects/atmosphereModel";
 import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
 import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
@@ -54,14 +54,6 @@ export function newSeededTelluricPlanetModel(
     );
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
-    const atmosphere: AtmosphereModel | null =
-        pressure > 0
-            ? {
-                  pressure,
-                  greenHouseEffectFactor: 0.5,
-              }
-            : null;
-
     //TODO: use distance to star to determine min temperature when using 1:1 scale
     const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
     // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
@@ -80,6 +72,49 @@ export function newSeededTelluricPlanetModel(
           }
         : null;
 
+    const gasMix: Array<[Gas, number]> =
+        ocean !== null
+            ? [
+                  ["N2", 0.78],
+                  ["O2", 0.21],
+                  ["Ar", 0.01],
+              ]
+            : [
+                  ["CO2", 0.95],
+                  ["N2", 0.04],
+                  ["Ar", 0.01],
+              ];
+
+    const aerosols =
+        ocean !== null
+            ? {
+                  tau550: 0.05,
+                  settlingCoefficient: 0.15,
+                  particleRadius: 0.5e-6,
+                  angstromExponent: 0.0,
+              }
+            : {
+                  tau550: randRange(0.1, 2, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.TAU_550),
+                  settlingCoefficient: randRange(
+                      0.15,
+                      0.3,
+                      rng,
+                      GenerationSteps.ATMOSPHERE.AEROSOLS.SETTLING_COEFFICIENT,
+                  ),
+                  particleRadius: randRange(0.5e-6, 3e-6, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.PARTICLE_RADIUS),
+                  angstromExponent: randRange(0.0, 1.0, rng, GenerationSteps.ATMOSPHERE.AEROSOLS.ANGSTROM_EXPONENT),
+              };
+
+    const atmosphere: AtmosphereModel | null =
+        pressure > 0
+            ? {
+                  seaLevelPressure: pressure,
+                  greenHouseEffectFactor: 0.5,
+                  gasMix,
+                  aerosols,
+              }
+            : null;
+
     const clouds: CloudsModel | null =
         ocean !== null
             ? newCloudsModel(radius + ocean.depth, Settings.CLOUD_LAYER_HEIGHT, waterAmount, pressure)
@@ -87,7 +122,7 @@ export function newSeededTelluricPlanetModel(
 
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
     // Todo: do not hardcode
-    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
+    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 90e9 + parentMaxRadius * 1.5;
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;

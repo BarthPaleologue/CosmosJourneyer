@@ -44,8 +44,6 @@ export async function createDarkKnightScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    scene.enableDepthRenderer();
-
     // Our built-in 'sphere' shape. Params: name, options, scene
     const darkKnight = new DarkKnight(generateDarkKnightModel([]), scene);
 
