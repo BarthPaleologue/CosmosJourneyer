@@ -33,9 +33,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getChunkPlaneSpacePositionFromPath } from "@/utils/chunkUtils";
 import { type Cullable } from "@/utils/cullable";
-import { getQuaternionFromDirection, type Direction } from "@/utils/direction";
 import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -45,6 +43,8 @@ import { InstancePatch } from "../instancePatch/instancePatch";
 import { type IPatch } from "../instancePatch/iPatch";
 import { randomDownSample } from "../instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
+import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
+import { getQuaternionFromDirection, type Direction } from "./direction";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;

@@ -28,16 +28,16 @@ import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainS
 
 import { getRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
 
-import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
 import { type Cullable } from "@/utils/cullable";
-import { type Direction } from "@/utils/direction";
 import { clamp } from "@/utils/math";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
+import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
 import { DeleteSemaphore } from "./deleteSemaphore";
+import { type Direction } from "./direction";
 import { PlanetChunk } from "./planetChunk";
 import { TaskType, type BuildTask } from "./taskTypes";
 

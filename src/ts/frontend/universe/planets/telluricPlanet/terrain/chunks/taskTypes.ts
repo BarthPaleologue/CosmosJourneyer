@@ -21,8 +21,7 @@ import { z } from "zod";
 
 import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
-import { type Direction } from "@/utils/direction";
-
+import { type Direction } from "./direction";
 import { type PlanetChunk } from "./planetChunk";
 
 export const enum TaskType {
