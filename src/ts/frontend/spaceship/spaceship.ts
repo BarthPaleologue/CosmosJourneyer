@@ -50,9 +50,9 @@ import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import { distanceToAsteroidField } from "@/frontend/universe/asteroidFields/helpers/distance";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import { distanceToAsteroidField } from "@/utils/asteroidFields";
 import type { DeepReadonly } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
