@@ -43,6 +43,7 @@ import { CharacterControls } from "@/frontend/controls/characterControls/charact
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -76,7 +77,6 @@ import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neut
 import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { type View } from "@/frontend/view";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { metersToLightYears } from "@/utils/physics/unitConversions";

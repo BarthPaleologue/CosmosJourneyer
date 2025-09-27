@@ -3,9 +3,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { parseDistance } from "@/utils/strings/parseToStrings";

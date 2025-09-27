@@ -20,9 +20,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { Settings } from "@/settings";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 
-import { wrapVector3 } from "./algebra";
+import { Settings } from "@/settings";
 
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,

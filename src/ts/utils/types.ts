@@ -53,3 +53,5 @@ export type StrictEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => 
 
 /** Turns “should be true” into a compilation error when it’s not. */
 export type Assert<T extends true> = T;
+
+export type Vector3Like = { x: number; y: number; z: number };

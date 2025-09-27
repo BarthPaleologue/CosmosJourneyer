@@ -18,9 +18,8 @@
 import { type Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { clamp } from "./math";
-
-export type Vector3Like = { x: number; y: number; z: number };
+import { clamp } from "@/utils/math";
+import type { Vector3Like } from "@/utils/types";
 
 export function wrapVector3(vector: Vector3Like, target = new Vector3()): Vector3 {
     return target.copyFromFloats(vector.x, vector.y, vector.z);

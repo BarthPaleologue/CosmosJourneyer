@@ -21,9 +21,8 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
+import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/frontend/helpers/algebra";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/utils/algebra";
 
 import { CollisionMask } from "@/settings";
 

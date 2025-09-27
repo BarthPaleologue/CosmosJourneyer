@@ -23,11 +23,11 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropTypes, type CropType } from "@/utils/agriculture";
-import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { randomPieChart } from "@/utils/random";
 import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
+import type { Vector3Like } from "@/utils/types";
 
 export function newSeededSpaceElevatorModel(
     id: string,

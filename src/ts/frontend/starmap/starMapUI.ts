@@ -25,8 +25,8 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";

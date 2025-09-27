@@ -41,6 +41,7 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { type Player } from "@/frontend/player/player";
 import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
@@ -50,7 +51,6 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { type DeepReadonly } from "@/utils/types";
 

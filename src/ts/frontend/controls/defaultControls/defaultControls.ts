@@ -22,10 +22,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { getTransformationQuaternion } from "@/frontend/helpers/algebra";
 import { type Controls } from "@/frontend/uberCore/controls";
 import { pitch, roll, translate, yaw } from "@/frontend/uberCore/transforms/basicTransform";
 
-import { getTransformationQuaternion } from "@/utils/algebra";
 import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
