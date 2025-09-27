@@ -21,11 +21,12 @@ import { Faction } from "@/backend/society/factions";
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { AU, EarthMass, SolarMass, SolarRadius } from "@/utils/physics/constants";
+import { type DeepReadonly } from "@/utils/types";
+
 import { Settings } from "@/settings";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
-import { AU, EarthMass, SolarMass, SolarRadius } from "./physics/constants";
-import { type DeepReadonly } from "./types";
 
 describe("distanceToStellarObject", () => {
     const systemModel: DeepReadonly<StarSystemModel> = {
