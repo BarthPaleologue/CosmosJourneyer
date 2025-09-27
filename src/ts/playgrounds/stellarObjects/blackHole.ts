@@ -24,7 +24,7 @@ import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt, translate } from "@/frontend/helpers/transform";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";

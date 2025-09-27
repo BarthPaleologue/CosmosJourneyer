@@ -22,11 +22,11 @@ import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { Settings } from "@/settings";

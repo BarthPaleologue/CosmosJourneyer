@@ -22,9 +22,9 @@ import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";

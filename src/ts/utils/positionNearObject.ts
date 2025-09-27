@@ -19,8 +19,8 @@ import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { type Controls } from "@/frontend/uberCore/controls";
-import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
+import { type Controls } from "@/frontend/controls";
+import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/helpers/transform";
 import { type CanHaveRings } from "@/frontend/universe/architecture/canHaveRings";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";

@@ -42,11 +42,11 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
+import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
+import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
+import { lookAt, translate } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
-import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
-import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
-import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";

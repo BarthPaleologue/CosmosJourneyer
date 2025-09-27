@@ -23,13 +23,13 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { getTransformationQuaternion } from "@/frontend/helpers/algebra";
-import { type Controls } from "@/frontend/uberCore/controls";
-import { pitch, roll, translate, yaw } from "@/frontend/uberCore/transforms/basicTransform";
+import { pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
 
 import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
+import { type Controls } from "../";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {

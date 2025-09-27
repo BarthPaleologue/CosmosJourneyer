@@ -20,36 +20,36 @@ import { type TransformNode } from "@babylonjs/core/Meshes";
 
 import { clamp } from "@/utils/math";
 
-import { rotate } from "../basicTransform";
+import { translate } from "../transform";
 import { type CustomAnimation } from "./animation";
 import { easeInOutInterpolation } from "./interpolations";
 
-export class TransformRotationAnimation implements CustomAnimation {
+export class TransformTranslationAnimation implements CustomAnimation {
     private clock = 0;
     private readonly duration: number;
-    private thetaAcc = 0;
-    private readonly totalTheta;
-    private readonly axis;
+    private distanceAcc = 0;
+    private readonly totalDistance;
+    private readonly direction: Vector3;
     private readonly transform: TransformNode;
 
-    constructor(transform: TransformNode, axis: Vector3, theta: number, duration: number) {
+    constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
         this.transform = transform;
-        this.axis = axis;
-        this.totalTheta = theta;
         this.duration = duration;
+        this.totalDistance = targetPosition.subtract(transform.getAbsolutePosition()).length();
+        this.direction = targetPosition.subtract(transform.getAbsolutePosition()).normalizeToNew();
     }
 
-    update(deltaSeconds: number) {
+    update(deltaTime: number) {
         if (this.isFinished()) return;
 
-        this.clock += deltaSeconds;
+        this.clock += deltaTime;
 
         const t = clamp(this.clock / this.duration, 0, 1);
 
-        const dtheta = this.totalTheta * easeInOutInterpolation(t) - this.thetaAcc;
-        this.thetaAcc += dtheta;
+        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
+        this.distanceAcc += dDistance;
 
-        rotate(this.transform, this.axis, dtheta);
+        translate(this.transform, this.direction.scale(dDistance));
     }
 
     isFinished(): boolean {

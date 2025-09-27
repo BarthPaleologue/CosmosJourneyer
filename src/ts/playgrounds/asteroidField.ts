@@ -29,7 +29,7 @@ import {
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
 

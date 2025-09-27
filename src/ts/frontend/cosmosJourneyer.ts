@@ -47,12 +47,12 @@ import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
 import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
+import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
+import { UberScene } from "@/frontend/helpers/uberScene";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
 import { StarMap } from "@/frontend/starmap/starMap";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { LoadingScreen } from "@/frontend/uberCore/loadingScreen";
-import { UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
 import {
@@ -74,7 +74,7 @@ import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
-import { lookAt } from "./uberCore/transforms/basicTransform";
+import { lookAt } from "./helpers/transform";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";

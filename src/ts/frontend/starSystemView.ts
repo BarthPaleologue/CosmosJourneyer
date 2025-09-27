@@ -44,6 +44,9 @@ import { CharacterInputs } from "@/frontend/controls/characterControls/character
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
+import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
+import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -51,14 +54,6 @@ import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager"
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import {
-    getRotationQuaternion,
-    lookAt,
-    setRotationQuaternion,
-    translate,
-} from "@/frontend/uberCore/transforms/basicTransform";
-import { type UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";

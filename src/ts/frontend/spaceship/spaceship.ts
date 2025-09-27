@@ -46,7 +46,7 @@ import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { setEnabledBody } from "@/frontend/helpers/havok";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";

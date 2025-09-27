@@ -36,7 +36,7 @@ import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSec
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { setUpVector } from "@/frontend/uberCore/transforms/basicTransform";
+import { setUpVector } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";

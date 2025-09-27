@@ -26,8 +26,8 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
-import { type UberScene } from "@/frontend/uberCore/uberScene";
+import { translate } from "@/frontend/helpers/transform";
+import { type UberScene } from "@/frontend/helpers/uberScene";
 import {
     getOrbitalPosition,
     getRotationAngle,

@@ -22,7 +22,7 @@ import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { DarkKnight } from "@/frontend/universe/darkKnight";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 
