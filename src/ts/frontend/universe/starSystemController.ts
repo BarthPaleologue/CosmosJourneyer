@@ -35,10 +35,10 @@ import {
 } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { SystemTarget } from "@/frontend/universe/systemTarget";
 
 import { wrapVector3 } from "@/utils/algebra";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { SystemTarget } from "@/utils/systemTarget";
 import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
