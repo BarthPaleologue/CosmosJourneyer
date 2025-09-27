@@ -74,6 +74,7 @@ import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import { SystemTarget } from "@/frontend/universe/systemTarget";
+import { type View } from "@/frontend/view";
 
 import { wrapVector3 } from "@/utils/algebra";
 import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
@@ -82,7 +83,6 @@ import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
 import { type DeepReadonly } from "@/utils/types";
-import { type View } from "@/utils/view";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

@@ -48,12 +48,12 @@ import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/an
 import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { type View } from "@/frontend/view";
 
 import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
 import { ThickLines } from "@/utils/thickLines";
 import { type DeepReadonly } from "@/utils/types";
-import { type View } from "@/utils/view";
 
 import { Settings } from "@/settings";
 

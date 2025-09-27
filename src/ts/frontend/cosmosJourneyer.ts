@@ -64,11 +64,11 @@ import {
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
+import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { positionNearObject } from "@/utils/positionNearObject";
 import type { DeepReadonly } from "@/utils/types";
-import { type View } from "@/utils/view";
 
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
