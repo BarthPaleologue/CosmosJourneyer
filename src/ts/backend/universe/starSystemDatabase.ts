@@ -23,8 +23,7 @@ import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
-import type { Vector3Like } from "@/utils/types";
-import { type DeepReadonly } from "@/utils/types";
+import { type DeepReadonly, type Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
