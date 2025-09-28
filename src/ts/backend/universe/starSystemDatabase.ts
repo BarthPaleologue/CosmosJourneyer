@@ -21,10 +21,9 @@ import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
-import { type DeepReadonly } from "@/utils/types";
+import { type DeepReadonly, type Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

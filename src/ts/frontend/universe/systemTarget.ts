@@ -7,10 +7,10 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { ObjectTargetCursorType, type Targetable } from "@/frontend/universe/architecture/targetable";
 
-import i18n from "@/i18n";
+import { lightYearsToMeters } from "@/utils/physics/unitConversions";
+import { type DeepReadonly } from "@/utils/types";
 
-import { lightYearsToMeters } from "./physics/unitConversions";
-import { type DeepReadonly } from "./types";
+import i18n from "@/i18n";
 
 export class SystemTarget implements Targetable {
     readonly name: string;

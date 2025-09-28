@@ -25,8 +25,9 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { translate } from "@/frontend/uberCore/transforms/basicTransform";
-import { type UberScene } from "@/frontend/uberCore/uberScene";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { translate } from "@/frontend/helpers/transform";
+import { type UberScene } from "@/frontend/helpers/uberScene";
 import {
     getOrbitalPosition,
     getRotationAngle,
@@ -35,10 +36,9 @@ import {
 } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { SystemTarget } from "@/frontend/universe/systemTarget";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { SystemTarget } from "@/utils/systemTarget";
 import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";

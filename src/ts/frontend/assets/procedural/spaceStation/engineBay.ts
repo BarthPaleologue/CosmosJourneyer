@@ -28,9 +28,8 @@ import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { createEnvironmentAggregate } from "@/utils/havok";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

@@ -29,6 +29,8 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type Cullable } from "@/frontend/helpers/cullable";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { type CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
@@ -39,10 +41,7 @@ import { type PlanetaryMassObjectBase } from "@/frontend/universe/architecture/p
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { type Cullable } from "@/utils/cullable";
-import { Direction } from "@/utils/direction";
 import { type ItemPool } from "@/utils/itemPool";
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -50,6 +49,7 @@ import { Settings } from "@/settings";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
+import { Direction } from "./terrain/chunks/direction";
 
 export class TelluricPlanet
     implements

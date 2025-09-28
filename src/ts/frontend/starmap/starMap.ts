@@ -41,19 +41,18 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
+import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
+import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
+import { lookAt, translate } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
-import { CameraRadiusAnimation } from "@/frontend/uberCore/transforms/animations/radius";
-import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import { TransformTranslationAnimation } from "@/frontend/uberCore/transforms/animations/translation";
-import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { type View } from "@/frontend/view";
 
-import { wrapVector3 } from "@/utils/algebra";
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { ThickLines } from "@/utils/thickLines";
 import { type DeepReadonly } from "@/utils/types";
-import { type View } from "@/utils/view";
 
 import { Settings } from "@/settings";
 
@@ -62,6 +61,7 @@ import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";
 import { StarSectorView, vector3ToString, type BuildData } from "./starSectorView";
 import { StellarPathfinder } from "./stellarPathfinder";
+import { ThickLines } from "./thickLines";
 
 import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
 import starTexturePath from "@assets/textures/starParticle.png";

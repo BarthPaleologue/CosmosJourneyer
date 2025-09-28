@@ -26,7 +26,7 @@ import {
     getAxisFromQuaternion,
     getDeltaQuaternion,
     getTransformationQuaternion,
-} from "@/utils/algebra";
+} from "./algebra";
 
 describe("algebra utilities", () => {
     describe("getTransformationQuaternion", () => {

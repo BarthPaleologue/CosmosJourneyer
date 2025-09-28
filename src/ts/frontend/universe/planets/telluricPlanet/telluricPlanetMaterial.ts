@@ -26,6 +26,7 @@ import { centeredRand } from "extended-random";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
+import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 import { type AllTerrainTextures } from "@/frontend/assets/textures/terrains";
 import {
     setStellarObjectUniforms,
@@ -34,7 +35,6 @@ import {
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { type ItemPool } from "@/utils/itemPool";
-import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { type DeepReadonly } from "@/utils/types";
 
 import { ColorMode } from "./colorSettingsInterface";

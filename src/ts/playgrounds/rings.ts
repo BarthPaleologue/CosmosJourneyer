@@ -23,10 +23,10 @@ import { type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/helpers/transform";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 
 import { ItemPool } from "@/utils/itemPool";
 

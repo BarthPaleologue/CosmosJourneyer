@@ -30,6 +30,9 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
 import { type Textures } from "@/frontend/assets/textures";
+import { type Cullable } from "@/frontend/helpers/cullable";
+import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
@@ -37,11 +40,8 @@ import { type StellarObjectBase } from "@/frontend/universe/architecture/stellar
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { type Cullable } from "@/utils/cullable";
-import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -98,7 +98,8 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.aggregate.body.disablePreStep = false;
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse = getRgbFromTemperature(this.model.blackBodyTemperature);
+        const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
+        this.light.diffuse.copyFromFloats(starColor.r, starColor.g, starColor.b);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 

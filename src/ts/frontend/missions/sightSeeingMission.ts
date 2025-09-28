@@ -22,7 +22,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { wrapVector3 } from "@/utils/algebra";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";

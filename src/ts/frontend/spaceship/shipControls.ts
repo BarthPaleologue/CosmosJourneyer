@@ -27,11 +27,12 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
+import { type Controls } from "@/frontend/controls";
+import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
+import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
+import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
+import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { type Controls } from "@/frontend/uberCore/controls";
-import { CameraShakeAnimation } from "@/frontend/uberCore/transforms/animations/cameraShake";
-import { quickAnimation } from "@/frontend/uberCore/transforms/animations/quickAnimation";
-import { pitch, roll, yaw } from "@/frontend/uberCore/transforms/basicTransform";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -39,11 +40,10 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { lerpSmooth, slerpSmoothToRef } from "@/utils/math";
-import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
+import { lerpSmooth, slerpSmoothToRef } from "../helpers/animations/interpolations";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";

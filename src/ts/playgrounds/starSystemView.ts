@@ -27,12 +27,11 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
+import { UberScene } from "@/frontend/helpers/uberScene";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { UberScene } from "@/frontend/uberCore/uberScene";
 import { updateNotifications } from "@/frontend/ui/notification";
-
-import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
 
 import { initI18n } from "@/i18n";
 

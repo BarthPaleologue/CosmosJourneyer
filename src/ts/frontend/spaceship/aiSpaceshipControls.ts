@@ -22,7 +22,7 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Controls } from "@/frontend/uberCore/controls";
+import { type Controls } from "@/frontend/controls";
 
 import { type Spaceship } from "./spaceship";
 

@@ -17,8 +17,8 @@
 
 import { makeNoise3D } from "fast-simplex-noise";
 
-import type { Vector3Like } from "@/utils/algebra";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import type { Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -24,12 +24,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Controls } from "@/frontend/uberCore/controls";
-
-import { lerpSmooth } from "@/utils/math";
+import { type Controls } from "@/frontend/controls";
 
 import { Settings } from "@/settings";
 
+import { lerpSmooth } from "../helpers/animations/interpolations";
 import { StarMapInputs } from "./starMapInputs";
 
 export class StarMapControls implements Controls {

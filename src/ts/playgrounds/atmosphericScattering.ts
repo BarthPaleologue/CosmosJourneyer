@@ -21,9 +21,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,

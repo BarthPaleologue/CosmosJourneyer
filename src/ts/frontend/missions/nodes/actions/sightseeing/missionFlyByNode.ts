@@ -24,9 +24,10 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { wrapVector3 } from "@/utils/algebra";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
+
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";

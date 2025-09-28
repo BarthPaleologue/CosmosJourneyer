@@ -43,6 +43,13 @@ import { CharacterControls } from "@/frontend/controls/characterControls/charact
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
+import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
+import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
+import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
+import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
+import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -50,14 +57,6 @@ import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager"
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { TransformRotationAnimation } from "@/frontend/uberCore/transforms/animations/rotation";
-import {
-    getRotationQuaternion,
-    lookAt,
-    setRotationQuaternion,
-    translate,
-} from "@/frontend/uberCore/transforms/basicTransform";
-import { type UberScene } from "@/frontend/uberCore/uberScene";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
@@ -73,16 +72,12 @@ import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { SystemTarget } from "@/frontend/universe/systemTarget";
+import { type View } from "@/frontend/view";
 
-import { wrapVector3 } from "@/utils/algebra";
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
-import { positionNearObjectBrightSide } from "@/utils/positionNearObject";
-import { axisCompositeToString, dPadCompositeToString } from "@/utils/strings/inputControlsString";
-import { SystemTarget } from "@/utils/systemTarget";
 import { type DeepReadonly } from "@/utils/types";
-import { type View } from "@/utils/view";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

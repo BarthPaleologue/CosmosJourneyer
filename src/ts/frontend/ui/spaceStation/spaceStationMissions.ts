@@ -21,10 +21,10 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
 import { type Player } from "@/frontend/player/player";
 
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";

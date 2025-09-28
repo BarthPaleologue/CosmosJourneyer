@@ -18,7 +18,7 @@
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { type Effect } from "@babylonjs/core/Materials/effect";
 
-import { flattenColor3Array, flattenVector3Array } from "@/utils/algebra";
+import { flattenColor3Array, flattenVector3Array } from "@/frontend/helpers/algebra";
 
 export const StellarObjectUniformNames = {
     STAR_POSITIONS: "star_positions",

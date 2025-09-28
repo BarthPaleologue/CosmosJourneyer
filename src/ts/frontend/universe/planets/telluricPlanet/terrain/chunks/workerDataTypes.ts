@@ -17,8 +17,7 @@
 
 import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
-import { type Direction } from "@/utils/direction";
-
+import { type Direction } from "./direction";
 import { type TaskType } from "./taskTypes";
 
 export type WorkerData = {

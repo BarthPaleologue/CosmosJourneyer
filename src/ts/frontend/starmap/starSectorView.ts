@@ -23,7 +23,8 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { wrapVector3 } from "@/utils/algebra";
+import { wrapVector3 } from "@/frontend/helpers/algebra";
+
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";

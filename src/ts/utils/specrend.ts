@@ -1,4 +1,4 @@
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { RGBColor } from "./colors";
 
 /*
                 Colour Rendering of Spectra
@@ -554,7 +554,7 @@ export function demonstrate() {
     }
 }
 
-export function getRgbFromTemperature(temperature: number): Color3 {
+export function getRgbFromTemperature(temperature: number): RGBColor {
     const cs = HDTVsystem;
 
     bbTemp = temperature;
@@ -562,5 +562,5 @@ export function getRgbFromTemperature(temperature: number): Color3 {
     let [r, g, b] = xyz_to_rgb(cs, x, y, z);
     [r, g, b] = constrain_rgb(r, g, b);
     [r, g, b] = norm_rgb(r, g, b);
-    return new Color3(r, g, b);
+    return { r, g, b };
 }

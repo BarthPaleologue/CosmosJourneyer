@@ -28,7 +28,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 

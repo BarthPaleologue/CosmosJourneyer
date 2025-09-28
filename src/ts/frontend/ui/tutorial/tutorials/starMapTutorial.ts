@@ -22,16 +22,16 @@ import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import {
+    axisCompositeToString,
+    dPadCompositeToString,
+    pressInteractionToStrings,
+} from "@/frontend/helpers/inputControlsString";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import {
-    axisCompositeToString,
-    dPadCompositeToString,
-    pressInteractionToStrings,
-} from "@/utils/strings/inputControlsString";
 import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";

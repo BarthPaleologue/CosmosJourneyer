@@ -30,13 +30,13 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Controls } from "@/frontend/uberCore/controls";
-import { setUpVector, translate } from "@/frontend/uberCore/transforms/basicTransform";
+import { setUpVector, translate } from "@/frontend/helpers/transform";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 
 import { CollisionMask, Settings } from "@/settings";
 
+import { type Controls } from "../";
 import { CharacterInputs } from "./characterControlsInputs";
 
 class AnimationGroupWrapper {

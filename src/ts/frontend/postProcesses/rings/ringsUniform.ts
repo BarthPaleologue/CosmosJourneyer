@@ -25,10 +25,10 @@ import {
     type TexturedRingsModel,
 } from "@/backend/universe/orbitalObjects/ringsModel";
 
+import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 import { type Textures } from "@/frontend/assets/textures";
 
 import { type ItemPool } from "@/utils/itemPool";
-import { createEmptyTexture } from "@/utils/proceduralTexture";
 import { type DeepReadonly } from "@/utils/types";
 
 import { type RingsProceduralPatternLut } from "./ringsProceduralLut";

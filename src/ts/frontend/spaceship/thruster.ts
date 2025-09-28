@@ -20,7 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
-import { SolidPlume } from "@/utils/solidPlume";
+import { SolidPlume } from "./solidPlume";
 
 export class Thruster {
     protected readonly maxAuthority = 3e3;

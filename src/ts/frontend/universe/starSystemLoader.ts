@@ -24,13 +24,13 @@ import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/t
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { getDistancesToStellarObjects } from "@/frontend/helpers/distanceToStellarObject";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 

@@ -8,7 +8,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type NoiseTextures } from "@/frontend/assets/textures";
-import { rotate } from "@/frontend/uberCore/transforms/basicTransform";
+import { rotate } from "@/frontend/helpers/transform";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { clamp } from "@/utils/math";

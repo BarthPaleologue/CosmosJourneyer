@@ -1,6 +1,6 @@
 import { uniformRandBool } from "extended-random";
 
-import type { Vector3Like } from "@/utils/algebra";
+import type { Vector3Like } from "@/utils/types";
 
 import { getPowerPlayData } from "./powerplay";
 

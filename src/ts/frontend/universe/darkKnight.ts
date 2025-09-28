@@ -24,9 +24,9 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
 import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";
 
 import { type CelestialBodyBase } from "./architecture/celestialBody";

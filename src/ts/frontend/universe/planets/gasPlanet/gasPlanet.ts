@@ -31,6 +31,9 @@ import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanet
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type Textures } from "@/frontend/assets/textures";
+import { type Cullable } from "@/frontend/helpers/cullable";
+import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
@@ -38,10 +41,7 @@ import { type PlanetaryMassObjectBase } from "@/frontend/universe/architecture/p
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { type Cullable } from "@/utils/cullable";
-import { isSizeOnScreenEnough } from "@/utils/isObjectVisibleOnScreen";
 import { type ItemPool } from "@/utils/itemPool";
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";

@@ -25,12 +25,12 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import { type Textures } from "@/frontend/assets/textures";
+import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { createHelix } from "@/utils/geometry/helixBuilder";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { createEnvironmentAggregate } from "@/utils/havok";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 

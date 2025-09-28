@@ -22,14 +22,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Controls } from "@/frontend/uberCore/controls";
-import { pitch, roll, translate, yaw } from "@/frontend/uberCore/transforms/basicTransform";
-
-import { getTransformationQuaternion } from "@/utils/algebra";
-import { lerpSmooth } from "@/utils/math";
+import { getTransformationQuaternion } from "@/frontend/helpers/algebra";
+import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
+import { pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
 
 import { Settings } from "@/settings";
 
+import { type Controls } from "../";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {

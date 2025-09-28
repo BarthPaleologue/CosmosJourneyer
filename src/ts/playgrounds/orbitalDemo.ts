@@ -26,7 +26,7 @@ import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObje
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/uberCore/transforms/basicTransform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";

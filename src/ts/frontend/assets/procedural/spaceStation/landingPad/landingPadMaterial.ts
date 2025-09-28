@@ -22,7 +22,6 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
-
 import {
     add,
     div,
@@ -49,7 +48,7 @@ import {
     vec2,
     vertexAttribute,
     xz,
-} from "@/utils/bsl";
+} from "@/frontend/helpers/bsl";
 
 import { Settings } from "@/settings";
 

@@ -20,7 +20,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
-
 import {
     abs,
     add,
@@ -46,7 +45,7 @@ import {
     vec2,
     vec3,
     vertexAttribute,
-} from "@/utils/bsl";
+} from "@/frontend/helpers/bsl";
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {

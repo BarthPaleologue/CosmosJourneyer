@@ -25,9 +25,9 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
+import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { type Player } from "@/frontend/player/player";
 
-import { getNeighborStarSystemCoordinates } from "@/utils/getNeighborStarSystems";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { type DeepReadonly } from "@/utils/types";
 

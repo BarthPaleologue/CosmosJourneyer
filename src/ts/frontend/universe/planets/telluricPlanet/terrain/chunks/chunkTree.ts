@@ -26,18 +26,18 @@ import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/tell
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
-import { getRotationQuaternion } from "@/frontend/uberCore/transforms/basicTransform";
+import { type Cullable } from "@/frontend/helpers/cullable";
+import { getRotationQuaternion } from "@/frontend/helpers/transform";
 
-import { getChunkSphereSpacePositionFromPath } from "@/utils/chunkUtils";
-import { type Cullable } from "@/utils/cullable";
-import { type Direction } from "@/utils/direction";
 import { clamp } from "@/utils/math";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
+import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
 import { DeleteSemaphore } from "./deleteSemaphore";
+import { type Direction } from "./direction";
 import { PlanetChunk } from "./planetChunk";
 import { TaskType, type BuildTask } from "./taskTypes";
 

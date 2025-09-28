@@ -25,10 +25,10 @@ import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerato
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { lookAt, translate } from "@/frontend/helpers/transform";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { lookAt, translate } from "@/frontend/uberCore/transforms/basicTransform";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
 import { getRgbFromTemperature } from "@/utils/specrend";

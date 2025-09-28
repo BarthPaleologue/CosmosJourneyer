@@ -22,10 +22,10 @@ import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpa
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
-import { UniverseCoordinatesSchema, type UniverseCoordinates } from "@/utils/coordinates/universeCoordinates";
 import { ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type SaveLoadingError } from "../saveLoadingError";
+import { UniverseCoordinatesSchema, type UniverseCoordinates } from "../universeCoordinates";
 import { safeParseSaveV1, SystemObjectType, type SaveV1 } from "../v1/saveV1";
 
 export const SaveSchemaV2 = z.object({

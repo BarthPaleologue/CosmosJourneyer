@@ -39,7 +39,7 @@ import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/a
 import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type Textures } from "@/frontend/assets/textures";
-import { type UberScene } from "@/frontend/uberCore/uberScene";
+import { type UberScene } from "@/frontend/helpers/uberScene";
 import { type CelestialBody, type StellarObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";

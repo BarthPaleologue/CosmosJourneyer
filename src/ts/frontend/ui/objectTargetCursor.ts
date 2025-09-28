@@ -19,7 +19,8 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { getAngularSize } from "@/utils/isObjectVisibleOnScreen";
+import { getAngularSize } from "@/frontend/helpers/isObjectVisibleOnScreen";
+
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
