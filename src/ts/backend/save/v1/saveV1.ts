@@ -95,7 +95,7 @@ export const SaveSchemaV1 = z.object({
     version: z.string().default(projectInfo.version),
 
     /** The timestamp when the save file was created. */
-    timestamp: z.number().default(Date.now()),
+    timestamp: z.number().default(() => Date.now()),
 
     /** The player data. */
     player: z.object({
