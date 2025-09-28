@@ -28,7 +28,7 @@ export const SerializedPlayerSchema = z.object({
         .default(() => crypto.randomUUID()),
     name: z.string().default("Python"),
     balance: z.number().default(10000),
-    creationDate: z.string().default(new Date().toISOString()),
+    creationDate: z.string().default(() => new Date().toISOString()),
     timePlayedSeconds: z.number().default(0),
     visitedSystemHistory: z.array(StarSystemCoordinatesSchema).default([]),
     discoveries: z

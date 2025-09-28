@@ -74,6 +74,24 @@ describe("Player", () => {
         });
     });
 
+    describe("SerializedPlayerSchema", () => {
+        it("should assign a unique creationDate default for each parse", () => {
+            vi.useFakeTimers();
+
+            try {
+                vi.setSystemTime(new Date("2024-01-01T00:00:00.000Z"));
+                const firstCreationDate = SerializedPlayerSchema.parse({}).creationDate;
+
+                vi.setSystemTime(new Date("2024-01-01T00:00:01.000Z"));
+                const secondCreationDate = SerializedPlayerSchema.parse({}).creationDate;
+
+                expect(firstCreationDate).not.toBe(secondCreationDate);
+            } finally {
+                vi.useRealTimers();
+            }
+        });
+    });
+
     describe("Serialization and Deserialization", () => {
         it("should serialize and deserialize a default player without data loss", () => {
             const originalPlayer = Player.Default(starSystemDatabase);
