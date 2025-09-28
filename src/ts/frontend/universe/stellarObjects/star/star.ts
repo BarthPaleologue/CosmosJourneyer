@@ -98,7 +98,8 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
         this.aggregate.body.disablePreStep = false;
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse = getRgbFromTemperature(this.model.blackBodyTemperature);
+        const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
+        this.light.diffuse.copyFromFloats(starColor.r, starColor.g, starColor.b);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 

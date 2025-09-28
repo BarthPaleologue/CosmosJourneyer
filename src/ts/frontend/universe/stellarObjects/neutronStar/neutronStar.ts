@@ -102,7 +102,8 @@ export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        this.light.diffuse.fromArray(getRgbFromTemperature(this.model.blackBodyTemperature).asArray());
+        const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
+        this.light.diffuse.copyFromFloats(starColor.r, starColor.g, starColor.b);
         this.light.falloffType = Light.FALLOFF_STANDARD;
         this.light.parent = this.getTransform();
 

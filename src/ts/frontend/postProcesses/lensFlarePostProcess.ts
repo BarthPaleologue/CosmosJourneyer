@@ -19,7 +19,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Matrix, type Color3 } from "@babylonjs/core/Maths/math";
+import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -27,6 +27,7 @@ import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { RGBColor } from "@/utils/colors";
 import { moveTowards } from "@/utils/math";
 
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -46,7 +47,7 @@ export class LensFlarePostProcess extends PostProcess {
 
     private activeCamera: Camera | null = null;
 
-    constructor(stellarTransform: TransformNode, boundingRadius: number, color: Color3, scene: Scene) {
+    constructor(stellarTransform: TransformNode, boundingRadius: number, color: RGBColor, scene: Scene) {
         const shaderName = "lensflare";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = lensFlareFragment;

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type Scene } from "@babylonjs/core/scene";
@@ -379,8 +380,9 @@ export class StarMapUI {
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         const objectColor = getRgbFromTemperature(starModel.blackBodyTemperature);
-        this.infoPanelStarPreview.style.background = objectColor.toHexString();
-        this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColor.toHexString()}`;
+        const objectColorHexString = new Color3(objectColor.r, objectColor.g, objectColor.b).toHexString();
+        this.infoPanelStarPreview.style.background = objectColorHexString;
+        this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColorHexString}`;
 
         this.infoPanelTitle.textContent = targetSystemModel.name;
         this.shortHandUITitle.textContent = targetSystemModel.name;
