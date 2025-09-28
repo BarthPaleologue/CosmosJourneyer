@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -167,6 +167,50 @@ describe("SaveManager", () => {
             expect(result.success).toBe(false);
             if (!result.success) {
                 expect(result.error).toEqual({ type: SaveLoadingErrorType.INVALID_JSON });
+            }
+        });
+
+        it("should assign unique timestamps when they are missing", async () => {
+            const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+            const { timestamp: firstTimestampValue, ...manualSaveWithoutTimestamp1 } = createTestSave(0);
+            void firstTimestampValue;
+            const { timestamp: secondTimestampValue, ...manualSaveWithoutTimestamp2 } = createTestSave(0);
+            void secondTimestampValue;
+
+            const backend = new MockSaveBackend(
+                JSON.stringify({
+                    [cmdrUuid1]: {
+                        manual: [manualSaveWithoutTimestamp1, manualSaveWithoutTimestamp2],
+                        auto: [],
+                    },
+                }),
+            );
+            const backupBackend = new MockSaveBackend();
+
+            const firstTimestamp = 1_000_000;
+            const secondTimestamp = 2_000_000;
+            const nowSpy = vi.spyOn(Date, "now");
+            nowSpy
+                .mockImplementationOnce(() => firstTimestamp)
+                .mockImplementationOnce(() => secondTimestamp)
+                .mockImplementation(() => secondTimestamp + 1);
+
+            try {
+                const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, starSystemDatabase);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const saves = await result.value.getSavesForCmdr(cmdrUuid1);
+                    expect(saves).toBeDefined();
+                    if (saves !== undefined) {
+                        expect(saves.manual).toHaveLength(2);
+                        expect(saves.manual[0]?.timestamp).toBe(firstTimestamp);
+                        expect(saves.manual[1]?.timestamp).toBe(secondTimestamp);
+                        expect(saves.manual[0]?.timestamp).not.toEqual(saves.manual[1]?.timestamp);
+                    }
+                }
+            } finally {
+                nowSpy.mockRestore();
             }
         });
     });

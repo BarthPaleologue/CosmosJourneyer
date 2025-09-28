@@ -32,7 +32,7 @@ export const SaveSchemaV2 = z.object({
     uuid: z.string().default(() => crypto.randomUUID()),
 
     /** The timestamp when the save file was created. */
-    timestamp: z.number().default(Date.now()),
+    timestamp: z.number().default(() => Date.now()),
 
     /** The player data. */
     player: SerializedPlayerSchema,
