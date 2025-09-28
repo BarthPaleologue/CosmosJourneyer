@@ -23,9 +23,9 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StarSystemInputs } from "@/frontend//inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControlsInputs";
+import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { axisCompositeToString, pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";

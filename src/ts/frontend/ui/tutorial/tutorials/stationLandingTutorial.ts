@@ -19,11 +19,11 @@ import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
+import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";

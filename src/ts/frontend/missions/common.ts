@@ -4,10 +4,10 @@ import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backe
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";

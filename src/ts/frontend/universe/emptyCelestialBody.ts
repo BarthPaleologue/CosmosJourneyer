@@ -22,7 +22,8 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
-import { getOrbitalObjectTypeToI18nString } from "@/utils/strings/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
+
 import { type DeepReadonly } from "@/utils/types";
 
 import { type CelestialBodyBase } from "./architecture/celestialBody";

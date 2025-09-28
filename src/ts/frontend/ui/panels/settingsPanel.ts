@@ -25,16 +25,16 @@ import {
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type Interaction from "@brianchirls/game-input/interactions/Interaction";
 
-import { InputMaps } from "@/frontend/inputs/inputMaps";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import {
     axisCompositeToString,
     buttonInputToString,
     dPadCompositeToString,
     stickInputToString,
     vector2ToString,
-} from "@/utils/strings/inputControlsString";
+} from "@/frontend/helpers/inputControlsString";
+import { InputMaps } from "@/frontend/inputs/inputMaps";
+
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
 import i18n from "@/i18n";
 

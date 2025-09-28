@@ -30,6 +30,7 @@ import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
 import { type Controls } from "@/frontend/controls";
 import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
+import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
@@ -39,7 +40,6 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { pressInteractionToStrings } from "@/utils/strings/inputControlsString";
 
 import i18n from "@/i18n";
 
