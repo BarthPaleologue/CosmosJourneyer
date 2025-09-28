@@ -30,28 +30,28 @@ export const SerializedPlayerSchema = z.object({
     balance: z.number().default(10000),
     creationDate: z.string().default(() => new Date().toISOString()),
     timePlayedSeconds: z.number().default(0),
-    visitedSystemHistory: z.array(StarSystemCoordinatesSchema).default([]),
+    visitedSystemHistory: z.array(StarSystemCoordinatesSchema).default(() => []),
     discoveries: z
         .object({
-            local: z.array(SpaceDiscoveryDataSchema).default([]),
-            uploaded: z.array(SpaceDiscoveryDataSchema).default([]),
+            local: z.array(SpaceDiscoveryDataSchema).default(() => []),
+            uploaded: z.array(SpaceDiscoveryDataSchema).default(() => []),
         })
-        .default({
+        .default(() => ({
             local: [],
             uploaded: [],
-        }),
+        })),
     currentItinerary: ItinerarySchema.nullable().catch(null),
-    systemBookmarks: z.array(StarSystemCoordinatesSchema).default([]),
-    currentMissions: z.array(MissionSerializedSchema).default([]),
-    completedMissions: z.array(MissionSerializedSchema).default([]),
-    spaceShips: z.array(SerializedSpaceshipSchema).default([getDefaultSerializedSpaceship()]),
-    spareSpaceshipComponents: z.array(SerializedComponentSchema).default([]),
-    tutorials: CompletedTutorialsSchema.default({
+    systemBookmarks: z.array(StarSystemCoordinatesSchema).default(() => []),
+    currentMissions: z.array(MissionSerializedSchema).default(() => []),
+    completedMissions: z.array(MissionSerializedSchema).default(() => []),
+    spaceShips: z.array(SerializedSpaceshipSchema).default(() => [getDefaultSerializedSpaceship()]),
+    spareSpaceshipComponents: z.array(SerializedComponentSchema).default(() => []),
+    tutorials: CompletedTutorialsSchema.default(() => ({
         flightCompleted: false,
         stationLandingCompleted: false,
         starMapCompleted: false,
         fuelScoopingCompleted: false,
-    }),
+    })),
 });
 
 export type SerializedPlayer = z.infer<typeof SerializedPlayerSchema>;

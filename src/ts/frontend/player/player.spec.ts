@@ -72,6 +72,15 @@ describe("Player", () => {
 
             expect(player1.uuid).not.toBe(player2.uuid);
         });
+
+        it("should generate new default spaceships for each schema parse", () => {
+            const parsed1 = SerializedPlayerSchema.parse({});
+            const parsed2 = SerializedPlayerSchema.parse({});
+
+            expect(parsed1.spaceShips).toHaveLength(1);
+            expect(parsed2.spaceShips).toHaveLength(1);
+            expect(parsed1.spaceShips[0]?.id).not.toBe(parsed2.spaceShips[0]?.id);
+        });
     });
 
     describe("SerializedPlayerSchema", () => {
