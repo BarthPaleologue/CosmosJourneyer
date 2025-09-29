@@ -12,13 +12,15 @@
         // Ideation-friendly imports
         "baseUrl": "./",
         "paths": {
-            "@/*": ["src/ts/*"],
+            "@/*": ["packages/frontend/src/*", "src/ts/*"],
             "@/backend": ["packages/backend/src/index.ts"],
             "@/backend/*": ["packages/backend/src/*"],
             "@/utils/*": ["packages/utils/src/*"],
-            "@assets/*": ["src/asset/*"],
-            "@shaders/*": ["src/shaders/*"],
-            "@styles/*": ["src/styles/*"]
+            "@/frontend/*": ["packages/frontend/src/frontend/*"],
+            "@/i18n": ["packages/frontend/src/i18n.ts"],
+            "@assets/*": ["packages/frontend/src/asset/*"],
+            "@shaders/*": ["packages/frontend/src/shaders/*"],
+            "@styles/*": ["packages/frontend/src/styles/*"]
         },
 
         // Build speed & debugging

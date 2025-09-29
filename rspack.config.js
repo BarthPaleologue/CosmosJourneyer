@@ -15,6 +15,7 @@ const isProduction = process.env.NODE_ENV === "production";
 // Define reusable paths
 const projectRoot = __dirname;
 const htmlPath = path.resolve(projectRoot, "src", "html");
+const frontendAssetsPath = path.resolve(projectRoot, "packages", "frontend", "src", "asset");
 
 export default defineConfig({
     mode: isProduction ? "production" : "development",
@@ -73,7 +74,7 @@ export default defineConfig({
             inject: true,
             template: path.join(htmlPath, "index.html"),
             chunks: ["main"],
-            favicon: path.join(htmlPath, "../asset/favicon.png"),
+            favicon: path.join(frontendAssetsPath, "favicon.png"),
         }),
         new rspack.HtmlRspackPlugin({
             title: "Black Hole - Cosmos Journeyer",
@@ -83,14 +84,14 @@ export default defineConfig({
             filename: "blackhole.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["blackHole"],
-            favicon: path.join(htmlPath, "../asset/favicon.png"),
+            favicon: path.join(frontendAssetsPath, "favicon.png"),
         }),
         new rspack.HtmlRspackPlugin({
             title: "Playground - Cosmos Journeyer",
             filename: "playground.html",
             template: path.join(htmlPath, "index.html"),
             chunks: ["playground"],
-            favicon: path.join(htmlPath, "../asset/favicon.png"),
+            favicon: path.join(frontendAssetsPath, "favicon.png"),
         }),
     ],
     watchOptions: {

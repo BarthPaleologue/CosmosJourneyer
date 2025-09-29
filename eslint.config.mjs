@@ -12,7 +12,7 @@ export default defineConfig([
         "eslint.config.mjs",
         "dist",
         "doc",
-        "src/asset",
+        "packages/frontend/src/asset",
         "coverage",
         ".eslintcache",
     ]),

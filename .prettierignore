@@ -1,11 +1,10 @@
 packages/utils/src/TWGSL
-src/ts/utils/TWGSL
 pnpm-lock.yaml
 dist
 node_modules
 src-tauri
-src/styles/nasalization
-src/asset
+packages/frontend/src/styles/nasalization
+packages/frontend/src/asset
 doc
 coverage
 .eslintcache

@@ -39,7 +39,7 @@ import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 
-import packageInfo from "../../../../package.json";
+import packageInfo from "../../../../../package.json";
 import { PanelType, type SidePanels } from "./sidePanels";
 
 export class MainMenu {

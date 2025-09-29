@@ -21,9 +21,8 @@ import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators
 import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
+import { CosmosJourneyer } from "@/frontend/cosmosJourneyer";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-
-import { CosmosJourneyer } from "./frontend/cosmosJourneyer";
 
 const engine = await CosmosJourneyer.CreateAsync();
 engine.setAutoSaveEnabled(false);
