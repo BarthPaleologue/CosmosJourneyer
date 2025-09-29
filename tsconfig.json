@@ -13,6 +13,8 @@
         "baseUrl": "./",
         "paths": {
             "@/*": ["src/ts/*"],
+            "@/backend": ["packages/backend/src/index.ts"],
+            "@/backend/*": ["packages/backend/src/*"],
             "@/utils/*": ["packages/utils/src/*"],
             "@assets/*": ["src/asset/*"],
             "@shaders/*": ["src/shaders/*"],

@@ -1,0 +1,15 @@
+{
+    "name": "@cosmos-journeyer/backend",
+    "version": "0.0.0",
+    "type": "module",
+    "license": "AGPL-3.0-only",
+    "dependencies": {
+        "@cosmos-journeyer/utils": "workspace:*",
+        "extended-random": "^1.2.2",
+        "fast-simplex-noise": "^4.0.0",
+        "zod": "^3.25.76"
+    },
+    "exports": {
+        "./*": "./src/*"
+    }
+}
