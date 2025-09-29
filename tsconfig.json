@@ -13,6 +13,7 @@
         "baseUrl": "./",
         "paths": {
             "@/*": ["src/ts/*"],
+            "@/utils/*": ["packages/utils/src/*"],
             "@assets/*": ["src/asset/*"],
             "@shaders/*": ["src/shaders/*"],
             "@styles/*": ["src/styles/*"]
@@ -46,6 +47,6 @@
         "typeRoots": ["node_modules/@types"],
         "types": ["webpack-env"]
     },
-    "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"],
+    "include": ["src/**/*.ts", "packages/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"],
     "exclude": ["node_modules", "dist"]
 }

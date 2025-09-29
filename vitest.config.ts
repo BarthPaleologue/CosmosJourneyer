@@ -4,8 +4,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
     test: {
         environment: "jsdom",
-        include: ["**/*.{test,spec}.ts"],
-        exclude: ["node_modules", "dist", ".git", "tests/e2e/**"],
+        include: ["src/**/*.{test,spec}.ts", "packages/**/*.{test,spec}.ts", "tests/**/*.{test,spec}.ts"],
+        exclude: ["**/node_modules/**", "dist", ".git", "tests/e2e/**"],
     },
     plugins: [
         tsconfigPaths(),
