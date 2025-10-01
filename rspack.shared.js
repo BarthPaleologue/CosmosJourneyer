@@ -18,6 +18,7 @@ export function createSharedConfig({ projectRoot, entry, htmlPages, outputPath =
     }
 
     return defineConfig({
+        context: projectRoot,
         mode: isProduction ? "production" : "development",
         entry,
         output: {

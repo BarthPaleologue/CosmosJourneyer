@@ -1,0 +1,14 @@
+node_modules
+test-results
+snapshots
+playwright-report
+.env
+.git
+dist
+tests
+src-tauri
+.idea
+research
+doc
+coverage
+.eslintcache

@@ -5,7 +5,7 @@ export default defineConfig({
     test: {
         environment: "jsdom",
         include: ["src/**/*.{test,spec}.ts", "packages/**/*.{test,spec}.ts", "tests/**/*.{test,spec}.ts"],
-        exclude: ["**/node_modules/**", "dist", ".git", "tests/e2e/**"],
+        exclude: ["**/node_modules/**", "dist", ".git", "packages/playground/tests/**"],
     },
     plugins: [
         tsconfigPaths(),

@@ -1,7 +1,13 @@
+import path from "path";
+import { fileURLToPath } from "url";
+
 import { defineConfig } from "@playwright/test";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export default defineConfig({
-    testDir: "tests/e2e",
+    testDir: "./tests",
     use: {
         baseURL: "http://localhost:8080",
         browserName: "chromium",
@@ -24,7 +30,8 @@ export default defineConfig({
     },
 
     webServer: {
-        command: "npm run serve:prod",
+        command: "pnpm --filter @cosmos-journeyer/playground serve",
+        cwd: path.resolve(__dirname, "../.."),
         url: "http://localhost:8080",
         reuseExistingServer: process.env["CI"] === undefined,
     },

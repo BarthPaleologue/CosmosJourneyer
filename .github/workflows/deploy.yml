@@ -33,8 +33,18 @@ jobs:
             - name: Test project
               run: pnpm test:unit
 
-            - name: Build project
-              run: pnpm build
+            - name: Build applications
+              run: |
+                  pnpm build
+                  pnpm build:playground
+                  pnpm build:black-hole-demo
+                  rm -rf dist
+                  mkdir -p dist
+                  cp -r packages/game/dist/* dist/
+                  mkdir -p dist/playground
+                  cp -r packages/playground/dist/* dist/playground/
+                  mkdir -p dist/black-hole-demo
+                  cp -r packages/black-hole-demo/dist/* dist/black-hole-demo/
 
             - name: Build doc
               run: pnpm doc

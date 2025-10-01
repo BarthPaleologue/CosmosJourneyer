@@ -244,6 +244,18 @@ importers:
         specifier: workspace:*
         version: link:../utils
 
+  packages/playground:
+    dependencies:
+      '@cosmos-journeyer/backend':
+        specifier: workspace:*
+        version: link:../backend
+      '@cosmos-journeyer/frontend':
+        specifier: workspace:*
+        version: link:../frontend
+      '@cosmos-journeyer/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/utils:
     dependencies:
       extended-random:

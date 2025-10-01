@@ -18,7 +18,8 @@ export async function renderAndSnap(
         urlParams.set(key, String(value));
     }
 
-    await page.goto(`/playground.html?${urlParams.toString()}`);
+    const query = urlParams.toString();
+    await page.goto(`/index.html${query.length > 0 ? `?${query}` : ""}`);
 
     await page.waitForSelector("canvas", { state: "visible" });
 

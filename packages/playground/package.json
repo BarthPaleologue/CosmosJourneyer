@@ -1,0 +1,23 @@
+{
+    "name": "@cosmos-journeyer/playground",
+    "version": "0.0.0",
+    "type": "module",
+    "license": "AGPL-3.0-only",
+    "scripts": {
+        "build": "rspack --config ./rspack.config.js --mode=production --node-env=production",
+        "serve": "rspack serve --config ./rspack.config.js",
+        "serve:prod": "http-server dist -p 8080",
+        "test:e2e": "playwright test --config ./playwright.config.ts",
+        "test:e2e:update": "playwright test --config ./playwright.config.ts --update-snapshots",
+        "test:e2e:docker": "docker build -t cosmos-journeyer-e2e -f ./Dockerfile ../.. && docker run --rm --ipc=host -e CI=1 -v \"$(pwd)/../../artifacts:/output\" -v \"$(pwd)/tests:/app/packages/playground/tests\" cosmos-journeyer-e2e npx playwright test --config packages/playground/playwright.config.ts --output=/output --reporter=line,html",
+        "test:e2e:docker:update": "docker build -t cosmos-journeyer-e2e -f ./Dockerfile ../.. && docker run --rm --ipc=host -e CI=1 -v \"$(pwd)/../../artifacts:/output\" -v \"$(pwd)/tests:/app/packages/playground/tests\" cosmos-journeyer-e2e npx playwright test --config packages/playground/playwright.config.ts --output=/output --reporter=line,html --update-snapshots"
+    },
+    "dependencies": {
+        "@cosmos-journeyer/backend": "workspace:*",
+        "@cosmos-journeyer/frontend": "workspace:*",
+        "@cosmos-journeyer/utils": "workspace:*"
+    },
+    "exports": {
+        "./*": "./src/*"
+    }
+}

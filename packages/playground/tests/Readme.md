@@ -1,10 +1,10 @@
 # End-to-End testing in Cosmos Journeyer
 
-Cosmos Journeyer uses [Playwright](https://playwright.dev/) for end-to-end testing. The tests are located in the `tests/e2e` directory.
+Cosmos Journeyer uses [Playwright](https://playwright.dev/) for end-to-end testing. The tests are located in the `packages/playground/tests` directory.
 
 ## Writing tests
 
-You can write end-to-end tests in `tests/e2e` using Playwright's API. You can have a look at `default.spec.ts` for an example of how to write a test.
+You can write end-to-end tests in `packages/playground/tests` using Playwright's API. You can have a look at `default.spec.ts` for an example of how to write a test.
 
 Screenshots are stored in folders next to the test files. The screenshots are versioned using git-lfs, so you need to have git-lfs installed and configured to use them.
 
