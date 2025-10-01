@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tools } from "@babylonjs/core/Misc/tools";
-
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
 
@@ -60,7 +58,7 @@ export const Settings = {
      */
     HYDROPONIC_TO_CONVENTIONAL_RATIO: 3.5,
 
-    FOV: Tools.ToRadians(60),
+    FOV: (60 * Math.PI) / 180,
 
     LANDING_PAD_ASPECT_RATIO: 1.618,
 

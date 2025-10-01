@@ -13,9 +13,17 @@
         "test:e2e:docker:update": "docker build -t cosmos-journeyer-e2e -f ./Dockerfile ../.. && docker run --rm --ipc=host -e CI=1 -v \"$(pwd)/../../artifacts:/output\" -v \"$(pwd)/tests:/app/packages/playground/tests\" cosmos-journeyer-e2e npx playwright test --config packages/playground/playwright.config.ts --output=/output --reporter=line,html --update-snapshots"
     },
     "dependencies": {
+        "@babylonjs/core": "^8.26.2",
+        "@babylonjs/havok": "^1.3.10",
+        "@babylonjs/inspector": "^8.26.2",
+        "@babylonjs/loaders": "^8.26.2",
+        "@babylonjs/materials": "^8.26.2",
+        "@babylonjs/node-editor": "^8.26.2",
         "@cosmos-journeyer/backend": "workspace:*",
         "@cosmos-journeyer/frontend": "workspace:*",
-        "@cosmos-journeyer/utils": "workspace:*"
+        "@cosmos-journeyer/utils": "workspace:*",
+        "extended-random": "^1.2.2",
+        "squirrel-noise": "^1.0.0"
     },
     "exports": {
         "./*": "./src/*"
