@@ -1,13 +1,13 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "$schema": "../../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "cosmos-journeyer",
   "version": "../package.json",
   "identifier": "com.cosmosjourneyer",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:8080",
-    "beforeDevCommand": "pnpm serve",
-    "beforeBuildCommand": "pnpm build"
+    "beforeDevCommand": "pnpm serve:game",
+    "beforeBuildCommand": "pnpm build:game"
   },
   "app": {
     "windows": [

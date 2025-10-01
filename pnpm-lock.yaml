@@ -172,6 +172,18 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
 
+  packages/black-hole-demo:
+    dependencies:
+      '@cosmos-journeyer/backend':
+        specifier: workspace:*
+        version: link:../backend
+      '@cosmos-journeyer/frontend':
+        specifier: workspace:*
+        version: link:../frontend
+      '@cosmos-journeyer/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/frontend:
     dependencies:
       '@babylonjs/core':
@@ -219,6 +231,18 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+
+  packages/game:
+    dependencies:
+      '@cosmos-journeyer/backend':
+        specifier: workspace:*
+        version: link:../backend
+      '@cosmos-journeyer/frontend':
+        specifier: workspace:*
+        version: link:../frontend
+      '@cosmos-journeyer/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/utils:
     dependencies:

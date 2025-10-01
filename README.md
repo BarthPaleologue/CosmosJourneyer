@@ -186,7 +186,7 @@ To find what dependencies your OS is missing, run `pnpm tauri info`.
 
 Then you can build the application with `pnpm tauri build` or run the dev version with `pnpm tauri dev`.
 
-The build artifacts will appear in `src-tauri/target/release/bundle/<platform>`.
+The build artifacts will appear in `packages/game/src-tauri/target/release/bundle/<platform>`.
 
 ### Testing
 
@@ -217,7 +217,7 @@ Cosmos Journeyer is a free and open-source software licensed under the terms of 
 
 ## Credits
 
-All credits can be found in [the credits panel](./src/html/mainMenu.html) of the game.
+All credits can be found in [the credits panel](./packages/game/html/index.html) of the game.
 
 ## Special Thanks
 

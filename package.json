@@ -33,9 +33,11 @@
         "webgpu"
     ],
     "scripts": {
-        "build": "rspack --mode=production --node-env=production",
+        "build": "pnpm build:game",
+        "build:game": "rspack --config packages/game/rspack.config.js --mode=production --node-env=production",
         "build:black-hole-demo": "rspack --config packages/black-hole-demo/rspack.config.js --mode=production --node-env=production",
-        "serve": "rspack serve",
+        "serve": "pnpm serve:game",
+        "serve:game": "rspack serve --config packages/game/rspack.config.js",
         "serve:black-hole-demo": "rspack serve --config packages/black-hole-demo/rspack.config.js",
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",

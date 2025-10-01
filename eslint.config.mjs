@@ -6,7 +6,7 @@ import tseslint from "typescript-eslint";
 export default defineConfig([
     globalIgnores([
         "packages/utils/src/TWGSL/**",
-        "src-tauri",
+        "packages/game/src-tauri",
         "rspack.config.js",
         "tsconfig.json",
         "eslint.config.mjs",
