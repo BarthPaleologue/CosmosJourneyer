@@ -5,9 +5,10 @@
     "theme": "typedoc-github-theme",
     "sourceLinkTemplate": "https://github.com/BarthPaleologue/CosmosJourneyer/blob/{gitRevision}/{path}#L{line}",
 
+    "tsconfig": "tsconfig.json",
     "entryPointStrategy": "expand",
-    "entryPoints": ["src/ts"],
-    "exclude": ["**/node_modules/**/*.*", "**/test/**/*.*"],
+    "entryPoints": ["packages/backend/src", "packages/frontend/src", "packages/utils/src", "packages/game/src"],
+    "exclude": ["**/node_modules/**", "packages/**/tests/**", "packages/playground/**", "packages/black-hole-demo/**"],
 
     "includeVersion": true,
     "excludeInternal": true,
