@@ -6,7 +6,7 @@
 [![pages-build-deployment](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BarthPaleologue/CosmosJourneyer/actions/workflows/pages/pages-build-deployment)
 [![License](https://img.shields.io/github/license/BarthPaleologue/CosmosJourneyer)](./LICENSE.md)
 
-[![Teaser Video](./coverImages/video.png)](https://youtu.be/5pXZqHRShTE)
+[![Presentation Video](./coverImages/video.png)](https://youtu.be/AZM6psivIBE)
 
 - [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)
 - [How to play](#how-to-play)
