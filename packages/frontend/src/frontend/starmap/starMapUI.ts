@@ -29,10 +29,9 @@ import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSys
 import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
 import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import { type Player } from "../player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";

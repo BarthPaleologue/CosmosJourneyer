@@ -20,9 +20,8 @@ import {
     getComponentTypeI18n,
     type SerializedComponent,
 } from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
-
-import i18n from "@/i18n";
-import { Settings } from "@/settings";
+import i18n from "@cosmos-journeyer/frontend/i18n";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;

@@ -24,8 +24,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeConvexHull, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { CollisionMask } from "@/settings";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { type Materials } from "../materials";

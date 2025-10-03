@@ -19,12 +19,11 @@ import { safeParseSave, type Save } from "@cosmos-journeyer/backend/save/saveFil
 import { type SaveLoadingError } from "@cosmos-journeyer/backend/save/saveLoadingError";
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "@cosmos-journeyer/frontend/ui/tutorial/tutorialLayerInputs";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 import { type Result } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import { type Tutorial } from "./tutorial";
 

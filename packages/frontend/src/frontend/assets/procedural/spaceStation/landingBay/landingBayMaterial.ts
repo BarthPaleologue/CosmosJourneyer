@@ -49,9 +49,8 @@ import {
     vertexAttribute,
     xz,
 } from "@cosmos-journeyer/frontend/helpers/bsl";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 export class LandingBayMaterial extends NodeMaterial {
     constructor(

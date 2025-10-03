@@ -29,9 +29,8 @@ import { clamp } from "@cosmos-journeyer/utils/math";
 import { EarthMass, EarthSeaLevelPressure } from "@cosmos-journeyer/utils/physics/constants";
 import { hasLiquidWater } from "@cosmos-journeyer/utils/physics/physics";
 import { celsiusToKelvin, degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
-
-import { Settings } from "@/settings";
 
 export function newSeededTelluricPlanetModel(
     id: string,

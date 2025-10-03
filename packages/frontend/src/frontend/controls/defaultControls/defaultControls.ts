@@ -24,8 +24,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { getTransformationQuaternion } from "@cosmos-journeyer/frontend/helpers/algebra";
 import { lerpSmooth } from "@cosmos-journeyer/frontend/helpers/animations/interpolations";
 import { pitch, roll, translate, yaw } from "@cosmos-journeyer/frontend/helpers/transform";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { type Controls } from "../";
 import { DefaultControlsInputs } from "./defaultControlsInputs";

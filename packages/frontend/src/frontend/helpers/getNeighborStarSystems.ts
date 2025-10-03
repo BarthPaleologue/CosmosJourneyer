@@ -22,8 +22,7 @@ import {
 } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,

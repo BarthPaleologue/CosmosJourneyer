@@ -26,8 +26,7 @@ import {
     getDeltaQuaternion,
 } from "@cosmos-journeyer/frontend/helpers/algebra";
 import { type ILandingPad } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
-
-import { CollisionMask } from "@/settings";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 
 export const enum LandingTargetKind {
     LANDING_PAD,

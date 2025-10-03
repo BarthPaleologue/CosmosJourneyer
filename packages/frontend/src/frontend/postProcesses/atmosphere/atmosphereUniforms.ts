@@ -17,8 +17,7 @@
 
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 const AtmosphereUniformNames = {
     ATMOSPHERE_RADIUS: "atmosphere_radius",

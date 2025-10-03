@@ -31,6 +31,7 @@ import { CameraShakeAnimation } from "@cosmos-journeyer/frontend/helpers/animati
 import { quickAnimation } from "@cosmos-journeyer/frontend/helpers/animations/quickAnimation";
 import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@cosmos-journeyer/frontend/helpers/transform";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { StarSystemInputs } from "@cosmos-journeyer/frontend/inputs/starSystemInputs";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
 import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
@@ -38,8 +39,6 @@ import { type Transformable } from "@cosmos-journeyer/frontend/universe/architec
 import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
 import { type ManagesLandingPads } from "@cosmos-journeyer/frontend/universe/orbitalFacility/managesLandingPads";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 import { lerpSmooth, slerpSmoothToRef } from "../helpers/animations/interpolations";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";

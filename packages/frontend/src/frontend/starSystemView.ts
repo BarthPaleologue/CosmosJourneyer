@@ -56,6 +56,7 @@ import {
     translate,
 } from "@cosmos-journeyer/frontend/helpers/transform";
 import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { StarSystemInputs } from "@cosmos-journeyer/frontend/inputs/starSystemInputs";
 import { type Mission } from "@cosmos-journeyer/frontend/missions/mission";
 import { type MissionContext } from "@cosmos-journeyer/frontend/missions/missionContext";
@@ -82,10 +83,8 @@ import { SystemTarget } from "@cosmos-journeyer/frontend/universe/systemTarget";
 import { type View } from "@cosmos-journeyer/frontend/view";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 import { metersToLightYears } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
 import { AiPlayerControls } from "./player/aiPlayerControls";
 import { type Player } from "./player/player";

@@ -24,14 +24,13 @@ import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/star
 import { getObjectModelById } from "@cosmos-journeyer/backend/universe/starSystemModel";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type Player } from "@cosmos-journeyer/frontend/player/player";
 import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
 import { getOrbitalPeriod } from "@cosmos-journeyer/utils/physics/orbit";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { parseDistance, parseSecondsPrecise } from "@cosmos-journeyer/utils/strings/parseToStrings";
-
-import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;

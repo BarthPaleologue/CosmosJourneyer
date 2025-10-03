@@ -19,9 +19,8 @@ import { MissionType, type MissionSerialized } from "@cosmos-journeyer/backend/m
 import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import { type MissionContext } from "./missionContext";
 import { deserializeMissionNode } from "./nodes/deserializeNode";

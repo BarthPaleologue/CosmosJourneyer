@@ -29,11 +29,10 @@ import {
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { universeObjectIdEquals, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
 import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 import { parseDistance } from "@cosmos-journeyer/utils/strings/parseToStrings";
-
-import i18n from "@/i18n";
-import { CollisionMask } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
 import { type MissionContext } from "../../../missionContext";

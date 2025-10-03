@@ -23,12 +23,11 @@ import {
 } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type Player } from "@cosmos-journeyer/frontend/player/player";
 import { alertModal, promptModalString } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
-import { Settings } from "@/settings";
 
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";

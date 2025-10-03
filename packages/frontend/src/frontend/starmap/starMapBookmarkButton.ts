@@ -3,8 +3,7 @@ import {
     type StarSystemCoordinates,
 } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 
 import { type Player } from "../player/player";
 

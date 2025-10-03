@@ -27,9 +27,8 @@ import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
 import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
 import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 import { randRange } from "extended-random";
-
-import { CollisionMask } from "@/settings";
 
 import { enablePhysics } from "./utils";
 

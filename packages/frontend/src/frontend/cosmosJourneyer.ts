@@ -53,6 +53,7 @@ import { Tts } from "@cosmos-journeyer/frontend/audio/tts";
 import { LoadingScreen } from "@cosmos-journeyer/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
 import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import i18n, { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { GeneralInputs } from "@cosmos-journeyer/frontend/inputs/generalInputs";
 import { Player } from "@cosmos-journeyer/frontend/player/player";
 import { StarMap } from "@cosmos-journeyer/frontend/starmap/starMap";
@@ -70,10 +71,8 @@ import { SidePanels } from "@cosmos-journeyer/frontend/ui/sidePanels";
 import { TutorialLayer } from "@cosmos-journeyer/frontend/ui/tutorial/tutorialLayer";
 import { type View } from "@cosmos-journeyer/frontend/view";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n, { initI18n } from "@/i18n";
-import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { lookAt } from "./helpers/transform";

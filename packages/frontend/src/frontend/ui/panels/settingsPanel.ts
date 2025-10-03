@@ -31,10 +31,9 @@ import {
     stickInputToString,
     vector2ToString,
 } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { InputMaps } from "@cosmos-journeyer/frontend/inputs/inputMaps";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 import { type MusicConductor } from "../../audio/musicConductor";
 

@@ -29,9 +29,8 @@ import { EarthMass, EarthSeaLevelPressure, MoonMass } from "@cosmos-journeyer/ut
 import { getOrbitalPeriod } from "@cosmos-journeyer/utils/physics/orbit";
 import { hasLiquidWater } from "@cosmos-journeyer/utils/physics/physics";
 import { celsiusToKelvin, degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { normalRandom, randRangeInt } from "extended-random";
-
-import { Settings } from "@/settings";
 
 export function newSeededTelluricSatelliteModel(
     id: string,

@@ -30,8 +30,7 @@ import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
 import { SpaceStation } from "@cosmos-journeyer/frontend/universe/orbitalFacility/spaceStation";
 import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
 import { AU } from "@cosmos-journeyer/utils/physics/constants";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { enablePhysics } from "./utils";
 

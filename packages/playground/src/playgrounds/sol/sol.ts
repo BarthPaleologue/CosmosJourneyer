@@ -22,14 +22,13 @@ import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/rendering
 import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
 import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { PostProcessManager } from "@cosmos-journeyer/frontend/postProcesses/postProcessManager";
 import { TargetCursorLayer } from "@cosmos-journeyer/frontend/ui/targetCursorLayer";
 import { ChunkForgeWorkers } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarSystemController } from "@cosmos-journeyer/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@cosmos-journeyer/frontend/universe/starSystemLoader";
-
-import { initI18n } from "@/i18n";
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { enablePhysics } from "../utils";
 

@@ -25,8 +25,7 @@ import { AtmosphericScatteringPostProcess } from "@cosmos-journeyer/frontend/pos
 import { RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@cosmos-journeyer/frontend/universe/planets/gasPlanet/gasPlanet";
 import { ItemPool } from "@cosmos-journeyer/utils/itemPool";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { enablePhysics } from "../utils";
 

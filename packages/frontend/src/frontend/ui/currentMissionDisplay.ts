@@ -18,13 +18,12 @@
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type Mission } from "@cosmos-journeyer/frontend/missions/mission";
 import { type MissionContext } from "@cosmos-journeyer/frontend/missions/missionContext";
 import { type Player } from "@cosmos-journeyer/frontend/player/player";
 import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;

@@ -12,12 +12,11 @@
         // Ideation-friendly imports
         "baseUrl": "./",
         "paths": {
-            "@/*": ["packages/frontend/src/*", "src/ts/*"],
             "@cosmos-journeyer/backend": ["packages/backend/src/index.ts"],
             "@cosmos-journeyer/backend/*": ["packages/backend/src/*"],
             "@cosmos-journeyer/frontend/*": ["packages/frontend/src/frontend/*"],
+            "@cosmos-journeyer/frontend/i18n": ["packages/frontend/src/i18n.ts"],
             "@cosmos-journeyer/utils/*": ["packages/utils/src/*"],
-            "@/i18n": ["packages/frontend/src/i18n.ts"],
             "@assets/*": ["packages/frontend/src/asset/*"],
             "@shaders/*": ["packages/frontend/src/shaders/*"],
             "@styles/*": ["packages/frontend/src/styles/*"]

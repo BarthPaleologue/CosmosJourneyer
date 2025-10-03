@@ -32,8 +32,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { setUpVector, translate } from "@cosmos-journeyer/frontend/helpers/transform";
 import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 import { TelluricPlanet } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/telluricPlanet";
-
-import { CollisionMask, Settings } from "@/settings";
+import { CollisionMask, Settings } from "@cosmos-journeyer/utils/settings";
 
 import { type Controls } from "../";
 import { CharacterInputs } from "./characterControlsInputs";

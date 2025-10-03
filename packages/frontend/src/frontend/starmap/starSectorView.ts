@@ -22,9 +22,8 @@ import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/s
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
 import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;

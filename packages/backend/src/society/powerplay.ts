@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import type { Vector3Like } from "@cosmos-journeyer/utils/types";
 import { makeNoise3D } from "fast-simplex-noise";
-
-import { Settings } from "@/settings";
 
 const materialistSpiritualistRng = getRngFromSeed(Settings.POWER_PLAY_SEED);
 let materialistSpiritualistSampleStep = 0;

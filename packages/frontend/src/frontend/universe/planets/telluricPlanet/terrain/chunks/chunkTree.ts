@@ -27,9 +27,8 @@ import { type TerrainSettings } from "@cosmos-journeyer/backend/universe/orbital
 import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
 import { getRotationQuaternion } from "@cosmos-journeyer/frontend/helpers/transform";
 import { clamp } from "@cosmos-journeyer/utils/math";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
 import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";

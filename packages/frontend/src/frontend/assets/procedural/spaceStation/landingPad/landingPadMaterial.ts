@@ -48,8 +48,7 @@ import {
     vertexAttribute,
     xz,
 } from "@cosmos-journeyer/frontend/helpers/bsl";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 export class LandingPadMaterial extends NodeMaterial {
     constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {

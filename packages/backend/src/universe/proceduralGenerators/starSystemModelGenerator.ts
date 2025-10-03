@@ -18,14 +18,13 @@
 import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { Alphabet, ReversedGreekAlphabet } from "@cosmos-journeyer/utils/strings/parseToStrings";
 import { romanNumeral } from "@cosmos-journeyer/utils/strings/romanNumerals";
 import { generateStarName } from "@cosmos-journeyer/utils/strings/starNameGenerator";
 import type { Vector3Like } from "@cosmos-journeyer/utils/types";
 import { isNonEmptyArray } from "@cosmos-journeyer/utils/types";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
-
-import { Settings } from "@/settings";
 
 import {
     type AnomalyModel,

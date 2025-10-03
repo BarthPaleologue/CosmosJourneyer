@@ -22,13 +22,12 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type Scene } from "@babylonjs/core/scene";
 import { type PBRTextures } from "@cosmos-journeyer/frontend/assets/textures/materials";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import {
     ObjectTargetCursorType,
     type Targetable,
     type TargetInfo,
 } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
-
-import i18n from "@/i18n";
 
 import { type SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";

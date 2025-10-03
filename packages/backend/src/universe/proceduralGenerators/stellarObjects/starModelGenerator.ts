@@ -23,9 +23,8 @@ import { type StarModel } from "@cosmos-journeyer/backend/universe/orbitalObject
 import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
-
-import { Settings } from "@/settings";
 
 export function newSeededStarModel(
     id: string,

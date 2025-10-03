@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type Player } from "@cosmos-journeyer/frontend/player/player";
-
-import i18n from "@/i18n";
 
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
 

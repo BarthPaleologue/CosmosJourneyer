@@ -51,10 +51,9 @@ import { type Player } from "@cosmos-journeyer/frontend/player/player";
 import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
 import { type View } from "@cosmos-journeyer/frontend/view";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";

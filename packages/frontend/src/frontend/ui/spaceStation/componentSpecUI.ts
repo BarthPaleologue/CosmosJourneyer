@@ -40,9 +40,8 @@ import {
     getWarpDriveSpec,
     type SerializedWarpDrive,
 } from "@cosmos-journeyer/backend/spaceship/serializedComponents/warpDrive";
-
-import i18n from "@/i18n";
-import { Settings } from "@/settings";
+import i18n from "@cosmos-journeyer/frontend/i18n";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 export class ComponentSpecUI {
     readonly root: HTMLElement;

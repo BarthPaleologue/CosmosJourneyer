@@ -19,8 +19,7 @@ import { type AssetContainer } from "@babylonjs/core/assetContainer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { CollisionMask } from "@/settings";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";

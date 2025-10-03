@@ -27,11 +27,10 @@ import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { TtsMock } from "@cosmos-journeyer/frontend/audio/tts";
 import { positionNearObjectBrightSide } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
 import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { Player } from "@cosmos-journeyer/frontend/player/player";
 import { StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
 import { updateNotifications } from "@cosmos-journeyer/frontend/ui/notification";
-
-import { initI18n } from "@/i18n";
 
 import { enablePhysics } from "./utils";
 

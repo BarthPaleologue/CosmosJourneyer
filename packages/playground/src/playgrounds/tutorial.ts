@@ -20,13 +20,12 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { TutorialLayer } from "@cosmos-journeyer/frontend/ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "@cosmos-journeyer/frontend/ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "@cosmos-journeyer/frontend/ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "@cosmos-journeyer/frontend/ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "@cosmos-journeyer/frontend/ui/tutorial/tutorials/stationLandingTutorial";
-
-import { initI18n } from "@/i18n";
 
 export async function createTutorialScene(
     engine: AbstractEngine,

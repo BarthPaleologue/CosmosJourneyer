@@ -31,10 +31,9 @@ import {
     positionNearObjectWithStarVisible,
 } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
 import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import packageInfo from "../../../../../package.json";
 import { PanelType, type SidePanels } from "./sidePanels";

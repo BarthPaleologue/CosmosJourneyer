@@ -22,11 +22,10 @@ import {
 import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 import { hashVec3 } from "@cosmos-journeyer/utils/hash";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly, type Vector3Like } from "@cosmos-journeyer/utils/types";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
-
-import { Settings } from "@/settings";
 
 import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";

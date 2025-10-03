@@ -5,11 +5,10 @@ import { createUrlFromSave, type Save } from "@cosmos-journeyer/backend/save/sav
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@cosmos-journeyer/backend/save/saveLoadingError";
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { alertModal, promptModalBoolean } from "@cosmos-journeyer/frontend/ui/dialogModal";
 import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
 import { type DeepReadonly, type Result } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";

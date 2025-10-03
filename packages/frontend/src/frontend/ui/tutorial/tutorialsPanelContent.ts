@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import i18n from "@/i18n";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";

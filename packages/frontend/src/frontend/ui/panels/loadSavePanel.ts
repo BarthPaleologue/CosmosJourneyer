@@ -17,8 +17,7 @@
 
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 
 import { SaveLoadingPanelContent } from "../saveLoadingPanelContent";
 

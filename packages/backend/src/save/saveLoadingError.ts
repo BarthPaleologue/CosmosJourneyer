@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type z } from "zod";
-
-import i18n from "@/i18n";
 
 export const enum SaveLoadingErrorType {
     INVALID_JSON = "INVALID_JSON",

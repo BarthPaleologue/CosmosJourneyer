@@ -20,10 +20,9 @@ import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 import { EarthSeaLevelPressure, JupiterMass } from "@cosmos-journeyer/utils/physics/constants";
 import { degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
-
-import { Settings } from "@/settings";
 
 import { type GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
 import { type CelestialBodyModel } from "../orbitalObjects/index";

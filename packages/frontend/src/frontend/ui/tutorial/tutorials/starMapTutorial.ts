@@ -25,13 +25,12 @@ import {
     dPadCompositeToString,
     pressInteractionToStrings,
 } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { GeneralInputs } from "@cosmos-journeyer/frontend/inputs/generalInputs";
 import { StarSystemInputs } from "@cosmos-journeyer/frontend/inputs/starSystemInputs";
 import { StarMapInputs } from "@cosmos-journeyer/frontend/starmap/starMapInputs";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 import { type Result } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import { type Tutorial } from "./tutorial";

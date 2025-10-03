@@ -23,11 +23,10 @@ import { StarSystemCoordinatesSchema } from "@cosmos-journeyer/backend/universe/
 import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { Player } from "@cosmos-journeyer/frontend/player/player";
 import { StarMap } from "@cosmos-journeyer/frontend/starmap/starMap";
 import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
-
-import { initI18n } from "@/i18n";
 
 export async function createStarMapScene(
     engine: AbstractEngine,

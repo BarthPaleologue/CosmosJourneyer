@@ -50,9 +50,8 @@ import { type CelestialBody, type OrbitalObject } from "@cosmos-journeyer/fronte
 import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 import { distanceToAsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/helpers/distance";
 import { type ILandingPad } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { CollisionMask } from "@/settings";
 
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";

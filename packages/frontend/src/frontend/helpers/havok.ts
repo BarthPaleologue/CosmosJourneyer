@@ -21,8 +21,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { CollisionMask } from "@/settings";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 
 /**
  *

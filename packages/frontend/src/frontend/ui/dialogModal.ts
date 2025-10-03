@@ -1,6 +1,5 @@
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 
 export function promptModalString(
     prompt: string,

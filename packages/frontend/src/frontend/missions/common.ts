@@ -6,11 +6,10 @@ import {
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
 import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { GeneralInputs } from "@cosmos-journeyer/frontend/inputs/generalInputs";
 import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
 import { parseDistance } from "@cosmos-journeyer/utils/strings/parseToStrings";
-
-import i18n from "@/i18n";
 
 import { type MissionContext } from "./missionContext";
 

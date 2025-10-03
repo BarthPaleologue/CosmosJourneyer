@@ -17,9 +17,8 @@
 
 import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import type { ISaveBackend } from "./saveBackend";
 import { safeParseSave, type CmdrSaves, type Save } from "./saveFileData";

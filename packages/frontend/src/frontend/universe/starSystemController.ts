@@ -36,9 +36,8 @@ import { BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/bl
 import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
 import { SystemTarget } from "@cosmos-journeyer/frontend/universe/systemTarget";
 import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly, type NonEmptyArray } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import {
     type Anomaly,

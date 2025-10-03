@@ -2,10 +2,9 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { type IDisposable } from "@babylonjs/core/scene";
 import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { promptModalBoolean } from "@cosmos-journeyer/frontend/ui/dialogModal";
 import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import { type Tutorial } from "./tutorials/tutorial";

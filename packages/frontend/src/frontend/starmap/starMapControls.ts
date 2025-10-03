@@ -24,8 +24,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 import { type Controls } from "@cosmos-journeyer/frontend/controls";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { lerpSmooth } from "../helpers/animations/interpolations";
 import { StarMapInputs } from "./starMapInputs";

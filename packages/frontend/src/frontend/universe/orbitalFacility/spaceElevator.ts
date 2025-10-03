@@ -49,10 +49,9 @@ import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 import { clamp, remap, triangleWave } from "@cosmos-journeyer/utils/math";
 import { getSphereRadiatedEnergyFlux } from "@cosmos-journeyer/utils/physics/thermodynamics";
 import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@cosmos-journeyer/utils/solarPanels";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 

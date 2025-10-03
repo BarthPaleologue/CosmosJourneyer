@@ -28,8 +28,7 @@ import { ShadowPostProcess } from "@cosmos-journeyer/frontend/postProcesses/shad
 import { AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@cosmos-journeyer/frontend/universe/planets/gasPlanet/gasPlanet";
 import { ItemPool } from "@cosmos-journeyer/utils/itemPool";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { enablePhysics } from "../utils";
 

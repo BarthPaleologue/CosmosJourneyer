@@ -19,8 +19,7 @@ import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/star
 import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { type Mission } from "@cosmos-journeyer/frontend/missions/mission";
 import { type Player } from "@cosmos-journeyer/frontend/player/player";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 import { AcceptMissionButton } from "./acceptMissionButton";
 

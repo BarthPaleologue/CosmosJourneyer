@@ -17,8 +17,7 @@
 
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { Settings } from "@/settings";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 
 export class LandingPadTexturePool {
     private readonly landingPadTextures: Map<number, DynamicTexture> = new Map();

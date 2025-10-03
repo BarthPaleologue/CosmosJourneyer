@@ -30,8 +30,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
 import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
-
-import { CollisionMask } from "@/settings";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

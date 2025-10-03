@@ -19,10 +19,9 @@ import { Faction } from "@cosmos-journeyer/backend/society/factions";
 import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
 import { getObjectModelById, type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
 import { AU, EarthMass, SolarMass, SolarRadius } from "@cosmos-journeyer/utils/physics/constants";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { describe, expect, it } from "vitest";
-
-import { Settings } from "@/settings";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
 

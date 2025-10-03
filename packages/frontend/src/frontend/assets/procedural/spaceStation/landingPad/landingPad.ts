@@ -7,14 +7,13 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { ObjectTargetCursorType, type TargetInfo } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
 import {
     type ILandingPad,
     type LandingPadSize,
 } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
-
-import i18n from "@/i18n";
-import { CollisionMask, Settings } from "@/settings";
+import { CollisionMask, Settings } from "@cosmos-journeyer/utils/settings";
 
 import { LandingPadMaterial } from "./landingPadMaterial";
 

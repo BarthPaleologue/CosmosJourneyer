@@ -24,12 +24,11 @@ import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/
 import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 import { TtsMock } from "@cosmos-journeyer/frontend/audio/tts";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { Player } from "@cosmos-journeyer/frontend/player/player";
 import { ShipControls } from "@cosmos-journeyer/frontend/spaceship/shipControls";
 import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
 import { SpaceStationLayer } from "@cosmos-journeyer/frontend/ui/spaceStation/spaceStationLayer";
-
-import { initI18n } from "@/i18n";
 
 import { enablePhysics } from "./utils";
 

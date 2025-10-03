@@ -32,9 +32,8 @@ import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@cosmos-journeyer/frontend/helpers/isObjectVisibleOnScreen";
 import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { CollisionMask } from "@cosmos-journeyer/utils/settings";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { CollisionMask } from "@/settings";
 
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { type IPatch } from "../instancePatch/iPatch";

@@ -3,11 +3,10 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { ObjectTargetCursorType, type Targetable } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
 import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 export class SystemTarget implements Targetable {
     readonly name: string;

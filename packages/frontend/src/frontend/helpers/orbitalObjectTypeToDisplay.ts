@@ -18,9 +18,8 @@
 import { type OrbitalObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
 import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
+import i18n from "@cosmos-journeyer/frontend/i18n";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import i18n from "@/i18n";
 
 export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>): string {
     switch (model.type) {

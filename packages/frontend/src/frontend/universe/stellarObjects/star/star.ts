@@ -41,10 +41,9 @@ import {
 } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
 import { type ItemPool } from "@cosmos-journeyer/utils/itemPool";
+import { Settings } from "@cosmos-journeyer/utils/settings";
 import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
 import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
-
-import { Settings } from "@/settings";
 
 import { StarMaterial } from "./starMaterial";
 

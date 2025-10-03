@@ -24,10 +24,9 @@ import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSyst
 import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { initI18n } from "@cosmos-journeyer/frontend/i18n";
 import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
 import { SaveLoadingPanelContent } from "@cosmos-journeyer/frontend/ui/saveLoadingPanelContent";
-
-import { initI18n } from "@/i18n";
 
 export async function createSaveLoadingPanelContentScene(
     engine: AbstractEngine,
