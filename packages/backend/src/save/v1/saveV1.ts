@@ -15,12 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { CompletedTutorialsSchema } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { StarSystemCoordinatesSchema } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { err, ok, type Result } from "@cosmos-journeyer/utils/types";
 import { z } from "zod";
-
-import { CompletedTutorialsSchema } from "@/backend/player/serializedPlayer";
-import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
-
-import { err, ok, type Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";
 import { SaveLoadingErrorType, type SaveLoadingError } from "../saveLoadingError";

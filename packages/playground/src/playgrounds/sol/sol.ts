@@ -16,19 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3, type AbstractEngine, type Scene } from "@babylonjs/core";
-
-import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { UberScene } from "@/frontend/helpers/uberScene";
-import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
-import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
-import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
+import { getSolSystemModel } from "@cosmos-journeyer/backend/universe/customSystems/sol/sol";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { PostProcessManager } from "@cosmos-journeyer/frontend/postProcesses/postProcessManager";
+import { TargetCursorLayer } from "@cosmos-journeyer/frontend/ui/targetCursorLayer";
+import { ChunkForgeWorkers } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { StarSystemController } from "@cosmos-journeyer/frontend/universe/starSystemController";
+import { StarSystemLoader } from "@cosmos-journeyer/frontend/universe/starSystemLoader";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

@@ -27,11 +27,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
 
 import { CollisionMask } from "@/settings";
 

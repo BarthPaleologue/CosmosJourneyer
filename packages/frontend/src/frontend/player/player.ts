@@ -16,24 +16,25 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type CompletedTutorials, type Itinerary, type SerializedPlayer } from "@/backend/player/serializedPlayer";
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { type SpaceDiscoveryData } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalactica";
+import {
+    type CompletedTutorials,
+    type Itinerary,
+    type SerializedPlayer,
+} from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { type SerializedComponent } from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
 import {
     getDefaultSerializedSpaceship,
     SerializedSpaceshipSchema,
     type SerializedSpaceship,
-} from "@/backend/spaceship/serializedSpaceship";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { Mission } from "@/frontend/missions/mission";
-import { type Spaceship } from "@/frontend/spaceship/spaceship";
-
-import { jsonSafeParse } from "@/utils/json";
-import { type DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/backend/spaceship/serializedSpaceship";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { Mission } from "@cosmos-journeyer/frontend/missions/mission";
+import { type Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
+import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 export class Player {
     uuid: string;

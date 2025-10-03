@@ -17,22 +17,23 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type AnomalyModel, type PlanetModel, type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { getDistancesToStellarObjects } from "@/frontend/helpers/distanceToStellarObject";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
-
-import { isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
-import { wait } from "@/utils/wait";
+import {
+    type AnomalyModel,
+    type PlanetModel,
+    type StellarObjectModel,
+} from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { getDistancesToStellarObjects } from "@cosmos-journeyer/frontend/helpers/distanceToStellarObject";
+import { GasPlanet } from "@cosmos-journeyer/frontend/universe/planets/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/telluricPlanet";
+import { BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@cosmos-journeyer/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
+import { isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@cosmos-journeyer/utils/types";
+import { wait } from "@cosmos-journeyer/utils/wait";
 
 import { type Anomaly, type OrbitalFacility, type Planet, type StellarObject } from "./architecture/orbitalObject";
 import { DarkKnight } from "./darkKnight";

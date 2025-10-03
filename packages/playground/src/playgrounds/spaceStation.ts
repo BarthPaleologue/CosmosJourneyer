@@ -18,21 +18,18 @@
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
-import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
-
-import { AU } from "@/utils/physics/constants";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { getSunModel } from "@cosmos-journeyer/backend/universe/customSystems/sol/sun";
+import { type StarModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { newSeededSpaceStationModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { SpaceStation } from "@cosmos-journeyer/frontend/universe/orbitalFacility/spaceStation";
+import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
+import { AU } from "@cosmos-journeyer/utils/physics/constants";
 
 import { Settings } from "@/settings";
 

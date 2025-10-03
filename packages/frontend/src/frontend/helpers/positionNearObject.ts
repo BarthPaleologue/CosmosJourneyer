@@ -18,13 +18,12 @@
 import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
-import { type Controls } from "@/frontend/controls";
-import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/helpers/transform";
-import { type CanHaveRings } from "@/frontend/universe/architecture/canHaveRings";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { type StarSystemController } from "@/frontend/universe/starSystemController";
+import { type Controls } from "@cosmos-journeyer/frontend/controls";
+import { lookAt, roll, rotateAround, setRotationQuaternion } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type CanHaveRings } from "@cosmos-journeyer/frontend/universe/architecture/canHaveRings";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { type StarSystemController } from "@cosmos-journeyer/frontend/universe/starSystemController";
 
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;

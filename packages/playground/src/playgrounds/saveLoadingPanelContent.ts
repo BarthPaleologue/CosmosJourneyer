@@ -18,16 +18,14 @@
 import { FreeCamera, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-
-import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
-import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { alertModal } from "@/frontend/ui/dialogModal";
-import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
+import { SaveBackendSingleFile } from "@cosmos-journeyer/backend/save/saveBackendSingleFile";
+import { SaveLocalStorage } from "@cosmos-journeyer/backend/save/saveLocalStorage";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { SaveLoadingPanelContent } from "@cosmos-journeyer/frontend/ui/saveLoadingPanelContent";
 
 import { initI18n } from "@/i18n";
 

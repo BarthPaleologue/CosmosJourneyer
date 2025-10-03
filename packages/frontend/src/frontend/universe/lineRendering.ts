@@ -22,8 +22,7 @@ import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBu
 import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RGBColor } from "@/utils/colors";
+import { type RGBColor } from "@cosmos-journeyer/utils/colors";
 
 export type CreateLinesMeshFunction = (
     name: string,

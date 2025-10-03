@@ -26,58 +26,63 @@ import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { ItinerarySchema } from "@/backend/player/serializedPlayer";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
-import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
-import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
-import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
-import { type UberScene } from "@/frontend/helpers/uberScene";
-import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { type Mission } from "@/frontend/missions/mission";
-import { type MissionContext } from "@/frontend/missions/missionContext";
-import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
-import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
-import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
-import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
-import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { SystemTarget } from "@/frontend/universe/systemTarget";
-import { type View } from "@/frontend/view";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { metersToLightYears } from "@/utils/physics/unitConversions";
-import { type DeepReadonly } from "@/utils/types";
+import { type EncyclopaediaGalacticaManager } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { ItinerarySchema } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { AudioMasks } from "@cosmos-journeyer/frontend/audio/audioMasks";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { Speaker, VoiceLine, type ITts } from "@cosmos-journeyer/frontend/audio/tts";
+import { CharacterControls } from "@cosmos-journeyer/frontend/controls/characterControls/characterControls";
+import { CharacterInputs } from "@cosmos-journeyer/frontend/controls/characterControls/characterControlsInputs";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { DefaultControlsInputs } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControlsInputs";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { TransformRotationAnimation } from "@cosmos-journeyer/frontend/helpers/animations/rotation";
+import { getNeighborStarSystemCoordinates } from "@cosmos-journeyer/frontend/helpers/getNeighborStarSystems";
+import { axisCompositeToString, dPadCompositeToString } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import { positionNearObjectBrightSide } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
+import {
+    getRotationQuaternion,
+    lookAt,
+    setRotationQuaternion,
+    translate,
+} from "@cosmos-journeyer/frontend/helpers/transform";
+import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { StarSystemInputs } from "@cosmos-journeyer/frontend/inputs/starSystemInputs";
+import { type Mission } from "@cosmos-journeyer/frontend/missions/mission";
+import { type MissionContext } from "@cosmos-journeyer/frontend/missions/missionContext";
+import { PostProcessManager } from "@cosmos-journeyer/frontend/postProcesses/postProcessManager";
+import { ShipControls } from "@cosmos-journeyer/frontend/spaceship/shipControls";
+import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
+import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
+import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
+import { SpaceShipLayer } from "@cosmos-journeyer/frontend/ui/spaceShipLayer";
+import { SpaceStationLayer } from "@cosmos-journeyer/frontend/ui/spaceStation/spaceStationLayer";
+import { TargetCursorLayer } from "@cosmos-journeyer/frontend/ui/targetCursorLayer";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { AxisRenderer } from "@cosmos-journeyer/frontend/universe/axisRenderer";
+import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { OrbitRenderer } from "@cosmos-journeyer/frontend/universe/orbitRenderer";
+import { type ChunkForge } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
+import { ChunkForgeWorkers } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { StarSystemController } from "@cosmos-journeyer/frontend/universe/starSystemController";
+import { StarSystemLoader } from "@cosmos-journeyer/frontend/universe/starSystemLoader";
+import { BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@cosmos-journeyer/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { SystemTarget } from "@cosmos-journeyer/frontend/universe/systemTarget";
+import { type View } from "@cosmos-journeyer/frontend/view";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
+import { metersToLightYears } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

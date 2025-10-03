@@ -22,12 +22,15 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
-import { type CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type LightEmitter } from "@/frontend/universe/architecture/lightEmitter";
+import { createEmptyTexture } from "@cosmos-journeyer/frontend/assets/procedural/proceduralTexture";
+import { type CloudsUniforms } from "@cosmos-journeyer/frontend/postProcesses/clouds/cloudsUniforms";
+import {
+    RingsSamplerNames,
+    RingsUniformNames,
+    RingsUniforms,
+} from "@cosmos-journeyer/frontend/postProcesses/rings/ringsUniform";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { type LightEmitter } from "@cosmos-journeyer/frontend/universe/architecture/lightEmitter";
 
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";

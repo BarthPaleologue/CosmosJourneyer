@@ -23,8 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type WaterTextures } from "@/frontend/assets/textures";
+import { type WaterTextures } from "@cosmos-journeyer/frontend/assets/textures";
 
 import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "../uniforms/objectUniforms";

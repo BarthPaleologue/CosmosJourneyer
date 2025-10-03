@@ -15,17 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type CelestialBodyModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type BlackHoleModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/utils/physics/blackHole";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { normalRandom } from "extended-random";
-
-import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
-
-import { GenerationSteps } from "@/utils/generationSteps";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { getMassFromSchwarzschildRadius } from "@/utils/physics/blackHole";
-import { type DeepReadonly } from "@/utils/types";
 
 export function newSeededBlackHoleModel(
     id: string,

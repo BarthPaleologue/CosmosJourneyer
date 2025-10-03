@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import {
+    ItinerarySchema,
+    SerializedPlayerSchema,
+    type Itinerary,
+} from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { getDefaultSerializedSpaceship } from "@cosmos-journeyer/backend/spaceship/serializedSpaceship";
+import { type OrbitalObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { ok, type DeepReadonly, type Result } from "@cosmos-journeyer/utils/types";
 import { z } from "zod";
-
-import { ItinerarySchema, SerializedPlayerSchema, type Itinerary } from "@/backend/player/serializedPlayer";
-import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
-import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type SaveLoadingError } from "../saveLoadingError";
 import { UniverseCoordinatesSchema, type UniverseCoordinates } from "../universeCoordinates";

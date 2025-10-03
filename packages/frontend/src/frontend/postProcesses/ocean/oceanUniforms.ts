@@ -17,8 +17,7 @@
 
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
-import { type WaterTextures } from "@/frontend/assets/textures";
+import { type WaterTextures } from "@cosmos-journeyer/frontend/assets/textures";
 
 const OceanUniformNames = {
     OCEAN_RADIUS: "ocean_radius",

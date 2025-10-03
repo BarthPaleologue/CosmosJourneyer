@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
 
 import { type ChunkForge } from "./chunkForge";
 import { ReturnedChunkDataSchema, TaskType, type ApplyTask, type BuildTask } from "./taskTypes";

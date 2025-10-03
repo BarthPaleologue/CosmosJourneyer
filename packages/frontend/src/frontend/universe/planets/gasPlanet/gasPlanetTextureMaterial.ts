@@ -17,10 +17,8 @@
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type GasPlanetTextureId } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-
-import { type GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
+import { type GasPlanetTextureId } from "@cosmos-journeyer/backend/universe/orbitalObjects/gasPlanetModel";
+import { type GasPlanetTextures } from "@cosmos-journeyer/frontend/assets/textures/gasPlanet";
 
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,

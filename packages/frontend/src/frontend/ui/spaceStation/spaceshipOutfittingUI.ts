@@ -15,14 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
-import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Player } from "@/frontend/player/player";
-import { deserializeComponent } from "@/frontend/spaceship/components/component";
-import { type ComponentSlot } from "@/frontend/spaceship/componentSlot";
-import { type SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
+import { getComponentTypeI18n } from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
+import { getComponentValue } from "@cosmos-journeyer/backend/spaceship/serializedComponents/pricing";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { deserializeComponent } from "@cosmos-journeyer/frontend/spaceship/components/component";
+import { type ComponentSlot } from "@cosmos-journeyer/frontend/spaceship/componentSlot";
+import { type SpaceshipInternals } from "@cosmos-journeyer/frontend/spaceship/spaceshipInternals";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

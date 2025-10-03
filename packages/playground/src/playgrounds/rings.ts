@@ -18,17 +18,14 @@
 import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-
-import { ItemPool } from "@/utils/itemPool";
+import { type RingsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/ringsModel";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { RingsPostProcess } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsUniform";
+import { ItemPool } from "@cosmos-journeyer/utils/itemPool";
 
 export async function createRingsScene(
     engine: AbstractEngine,

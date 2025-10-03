@@ -26,10 +26,9 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { createEnvironmentAggregate } from "@cosmos-journeyer/frontend/helpers/havok";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 

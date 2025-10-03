@@ -24,18 +24,15 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-
-import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { EarthG } from "@/utils/physics/constants";
-import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
-import { type DeepReadonly } from "@/utils/types";
+import { type OrbitalFacilityModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { createRing } from "@cosmos-journeyer/frontend/assets/procedural/helpers/ringBuilder";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { createEnvironmentAggregate } from "@cosmos-journeyer/frontend/helpers/havok";
+import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { EarthG } from "@cosmos-journeyer/utils/physics/constants";
+import { getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/utils/physics/physics";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";

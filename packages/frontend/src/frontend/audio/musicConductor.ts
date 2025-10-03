@@ -18,11 +18,9 @@
 import { type Sound } from "@babylonjs/core/Audio/sound";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type Musics } from "@/frontend/assets/audio/musics";
-import { type StarSystemView } from "@/frontend/starSystemView";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type Musics } from "@cosmos-journeyer/frontend/assets/audio/musics";
+import { type StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
 
 export class MusicConductor {
     private currentMusic: Sound | null = null;

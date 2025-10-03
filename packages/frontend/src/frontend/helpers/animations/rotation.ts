@@ -17,8 +17,7 @@
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
-
-import { clamp } from "@/utils/math";
+import { clamp } from "@cosmos-journeyer/utils/math";
 
 import { rotate } from "../transform";
 import { type CustomAnimation } from "./animation";

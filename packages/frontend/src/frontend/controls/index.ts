@@ -17,8 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 
 export interface Controls extends Transformable {
     /**

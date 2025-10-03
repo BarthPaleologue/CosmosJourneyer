@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { C } from "@cosmos-journeyer/utils/physics/constants";
 import { z } from "zod";
-
-import { C } from "@/utils/physics/constants";
 
 export const SerializedWarpDriveSchema = z.object({
     type: z.literal("warpDrive"),

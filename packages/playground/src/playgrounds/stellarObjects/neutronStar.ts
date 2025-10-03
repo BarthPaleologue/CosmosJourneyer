@@ -19,19 +19,16 @@ import { Axis } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, translate } from "@/frontend/helpers/transform";
-import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
-import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
-import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-
-import { getRgbFromTemperature } from "@/utils/specrend";
+import { newSeededNeutronStarModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt, translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { LensFlarePostProcess } from "@cosmos-journeyer/frontend/postProcesses/lensFlarePostProcess";
+import { MatterJetPostProcess } from "@cosmos-journeyer/frontend/postProcesses/matterJetPostProcess";
+import { VolumetricLight } from "@cosmos-journeyer/frontend/postProcesses/volumetricLight/volumetricLight";
+import { NeutronStar } from "@cosmos-journeyer/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
 
 import { enablePhysics } from "../utils";
 

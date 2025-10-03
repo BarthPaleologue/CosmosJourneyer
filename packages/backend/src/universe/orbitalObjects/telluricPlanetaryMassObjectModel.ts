@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+import { type CloudsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/cloudsModel";
+import { type TerrainSettings } from "@cosmos-journeyer/backend/universe/orbitalObjects/terrainSettings";
 
 import { type AtmosphereModel } from "./atmosphereModel";
 import { type OceanModel } from "./oceanModel";

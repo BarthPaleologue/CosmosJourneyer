@@ -15,18 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type SpaceDiscoveryData } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalactica";
+import { FlyByState } from "@cosmos-journeyer/backend/missions/missionFlyByNodeSerialized";
+import { MissionNodeType } from "@cosmos-journeyer/backend/missions/missionNodeType";
+import { MissionType } from "@cosmos-journeyer/backend/missions/missionSerialized";
+import { SerializedPlayerSchema, type SerializedPlayer } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { getDefaultSerializedSpaceship } from "@cosmos-journeyer/backend/spaceship/serializedSpaceship";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { FlyByState } from "@/backend/missions/missionFlyByNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { MissionType } from "@/backend/missions/missionSerialized";
-import { SerializedPlayerSchema, type SerializedPlayer } from "@/backend/player/serializedPlayer";
-import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Player } from "./player";
 

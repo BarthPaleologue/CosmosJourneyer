@@ -26,24 +26,24 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
-
-import { type Textures } from "@/frontend/assets/textures";
-import { type Cullable } from "@/frontend/helpers/cullable";
-import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
-import { type StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
-import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-
-import { type ItemPool } from "@/utils/itemPool";
-import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type NeutronStarModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
+import { type Textures } from "@cosmos-journeyer/frontend/assets/textures";
+import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
+import { isSizeOnScreenEnough } from "@cosmos-journeyer/frontend/helpers/isObjectVisibleOnScreen";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import { type RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsUniform";
+import { VolumetricLightUniforms } from "@cosmos-journeyer/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
+import { type StellarObjectBase } from "@cosmos-journeyer/frontend/universe/architecture/stellarObject";
+import {
+    defaultTargetInfoCelestialBody,
+    type TargetInfo,
+} from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import { AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
+import { type ItemPool } from "@cosmos-journeyer/utils/itemPool";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

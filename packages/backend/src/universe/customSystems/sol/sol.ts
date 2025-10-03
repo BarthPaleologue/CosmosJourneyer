@@ -15,18 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
+import { type GasPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/gasPlanetModel";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type TelluricPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
 import {
     astronomicalUnitToMeters,
     barToPascal,
     celsiusToKelvin,
     degreesToRadians,
-} from "@/utils/physics/unitConversions";
+} from "@cosmos-journeyer/utils/physics/unitConversions";
 
 import { getJupiterModel } from "./jupiter";
 import { getSaturnModel } from "./saturn";

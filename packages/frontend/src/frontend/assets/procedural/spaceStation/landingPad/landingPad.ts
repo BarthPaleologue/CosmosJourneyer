@@ -6,10 +6,12 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { ObjectTargetCursorType, type TargetInfo } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import {
+    type ILandingPad,
+    type LandingPadSize,
+} from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";

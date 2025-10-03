@@ -20,9 +20,8 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Controls } from "@/frontend/controls";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type Controls } from "@cosmos-journeyer/frontend/controls";
 
 import { type Spaceship } from "./spaceship";
 

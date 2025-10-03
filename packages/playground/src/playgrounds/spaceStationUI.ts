@@ -17,19 +17,17 @@
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-
-import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
-import { Player } from "@/frontend/player/player";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
+import { EncyclopaediaGalacticaManager } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { TtsMock } from "@cosmos-journeyer/frontend/audio/tts";
+import { Player } from "@cosmos-journeyer/frontend/player/player";
+import { ShipControls } from "@cosmos-journeyer/frontend/spaceship/shipControls";
+import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
+import { SpaceStationLayer } from "@cosmos-journeyer/frontend/ui/spaceStation/spaceStationLayer";
 
 import { initI18n } from "@/i18n";
 

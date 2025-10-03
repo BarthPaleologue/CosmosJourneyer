@@ -19,21 +19,19 @@ import { ArcRotateCamera, type PostProcess, type TransformNode } from "@babylonj
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { newSeededJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
-import { newSeededMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
-import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
-import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
-import { MandelboxPostProcess } from "@/frontend/postProcesses/anomalies/mandelboxPostProcess";
-import { MandelbulbPostProcess } from "@/frontend/postProcesses/anomalies/mandelbulbPostProcess";
-import { MengerSpongePostProcess } from "@/frontend/postProcesses/anomalies/mengerSpongePostProcess";
-import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
-import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { newSeededJuliaSetModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
+import { newSeededMandelboxModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
+import { newSeededMandelbulbModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
+import { newSeededMengerSpongeModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
+import { newSeededSierpinskiPyramidModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { JuliaSetPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/juliaSetPostProcess";
+import { MandelboxPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/mandelboxPostProcess";
+import { MandelbulbPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/mandelbulbPostProcess";
+import { MengerSpongePostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/mengerSpongePostProcess";
+import { SierpinskiPyramidPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
+import { type UpdatablePostProcess } from "@cosmos-journeyer/frontend/postProcesses/updatablePostProcess";
+import { EmptyCelestialBody } from "@cosmos-journeyer/frontend/universe/emptyCelestialBody";
 
 export async function createXrScene(
     engine: AbstractEngine,

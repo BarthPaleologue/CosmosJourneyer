@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-
-import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type DeepReadonly, type NonEmptyArray } from "@cosmos-journeyer/utils/types";
 
 import {
     type AnomalyModel,

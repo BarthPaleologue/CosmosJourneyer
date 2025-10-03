@@ -15,18 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type JuliaSetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/juliaSetModel";
+import { type OrbitalObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { hsvToRgb } from "@cosmos-journeyer/utils/colors";
+import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { clamp } from "@cosmos-journeyer/utils/math";
+import { degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
 import { normalRandom, randRange } from "extended-random";
-
-import { type JuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModel";
-import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { hsvToRgb } from "@/utils/colors";
-import { GenerationSteps } from "@/utils/generationSteps";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { clamp } from "@/utils/math";
-import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 export function newSeededJuliaSetModel(
     id: string,

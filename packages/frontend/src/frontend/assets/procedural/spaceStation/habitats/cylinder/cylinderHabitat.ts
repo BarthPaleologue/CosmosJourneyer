@@ -23,14 +23,12 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type Textures } from "@/frontend/assets/textures";
-import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { EarthG } from "@/utils/physics/constants";
-import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
+import { type Textures } from "@cosmos-journeyer/frontend/assets/textures";
+import { createEnvironmentAggregate } from "@cosmos-journeyer/frontend/helpers/havok";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { EarthG } from "@cosmos-journeyer/utils/physics/constants";
+import { getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/utils/physics/physics";
 
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 

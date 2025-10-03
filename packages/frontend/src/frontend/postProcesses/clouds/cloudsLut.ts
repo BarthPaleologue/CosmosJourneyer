@@ -18,10 +18,8 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-
-import { type DeepReadonly } from "@/utils/types";
+import { type CloudsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/cloudsModel";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 

@@ -18,14 +18,13 @@
 import { FreeCamera, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { createGrassBlade } from "@cosmos-journeyer/frontend/assets/procedural/grass/grassBlade";
+import { GrassMaterial } from "@cosmos-journeyer/frontend/assets/procedural/grass/grassMaterial";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { createSquareMatrixBuffer } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
+import { ThinInstancePatch } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 import { seededSquirrelNoise } from "squirrel-noise";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
-import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
-import { loadTextures } from "@/frontend/assets/textures";
-import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
-import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
 export async function createGrassScene(
     engine: AbstractEngine,

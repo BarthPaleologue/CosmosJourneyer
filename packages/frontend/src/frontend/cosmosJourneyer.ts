@@ -29,46 +29,48 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
-
-import type { ICosmosJourneyerBackend } from "@/backend";
-import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
-import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
+import { CosmosJourneyerBackendLocal } from "@cosmos-journeyer/backend/backendLocal";
+import type { ICosmosJourneyerBackend } from "@cosmos-journeyer/backend/index";
+import { createUrlFromSave, type Save } from "@cosmos-journeyer/backend/save/saveFileData";
 import {
     type AtStationCoordinates,
     type RelativeCoordinates,
     type UniverseCoordinates,
-} from "@/backend/save/universeCoordinates";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { loadAssets, type Assets } from "@/frontend/assets/assets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Tts } from "@/frontend/audio/tts";
-import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
-import { positionNearObject } from "@/frontend/helpers/positionNearObject";
-import { UberScene } from "@/frontend/helpers/uberScene";
-import { GeneralInputs } from "@/frontend/inputs/generalInputs";
-import { Player } from "@/frontend/player/player";
-import { StarMap } from "@/frontend/starmap/starMap";
-import { StarSystemView } from "@/frontend/starSystemView";
-import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
-import { MainMenu } from "@/frontend/ui/mainMenu";
+} from "@cosmos-journeyer/backend/save/universeCoordinates";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { getUniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { loadAssets, type Assets } from "@cosmos-journeyer/frontend/assets/assets";
+import { AudioMasks } from "@cosmos-journeyer/frontend/audio/audioMasks";
+import { MusicConductor } from "@cosmos-journeyer/frontend/audio/musicConductor";
+import {
+    SoundPlayer,
+    SoundPlayerMock,
+    SoundType,
+    type ISoundPlayer,
+} from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { Tts } from "@cosmos-journeyer/frontend/audio/tts";
+import { LoadingScreen } from "@cosmos-journeyer/frontend/helpers/loadingScreen";
+import { positionNearObject } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
+import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { GeneralInputs } from "@cosmos-journeyer/frontend/inputs/generalInputs";
+import { Player } from "@cosmos-journeyer/frontend/player/player";
+import { StarMap } from "@cosmos-journeyer/frontend/starmap/starMap";
+import { StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
+import { alertModal, promptModalBoolean, promptModalString } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { MainMenu } from "@cosmos-journeyer/frontend/ui/mainMenu";
 import {
     createNotification,
     NotificationIntent,
     NotificationOrigin,
     updateNotifications,
-} from "@/frontend/ui/notification";
-import { PauseMenu } from "@/frontend/ui/pauseMenu";
-import { SidePanels } from "@/frontend/ui/sidePanels";
-import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { type View } from "@/frontend/view";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import type { DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/frontend/ui/notification";
+import { PauseMenu } from "@cosmos-journeyer/frontend/ui/pauseMenu";
+import { SidePanels } from "@cosmos-journeyer/frontend/ui/sidePanels";
+import { TutorialLayer } from "@cosmos-journeyer/frontend/ui/tutorial/tutorialLayer";
+import { type View } from "@cosmos-journeyer/frontend/view";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
+import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
@@ -415,8 +417,8 @@ export class CosmosJourneyer {
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
                   twgslOptions: {
-                      wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
+                      wasmPath: new URL("@cosmos-journeyer/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                      jsPath: new URL("@cosmos-journeyer/utils/TWGSL/twgsl.js", import.meta.url).href,
                   },
                   audioEngine: true,
               })

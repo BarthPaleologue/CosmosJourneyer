@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core";
+import { ObjectTargetCursorType, type TargetInfo } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 
 import { LandingPadManager, LandingPadSize, type ILandingPad, type LandingRequest } from "./landingPadManager";
 

@@ -21,21 +21,18 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Matrix } from "@babylonjs/core/Maths/math";
 import { type Scene } from "@babylonjs/core/scene";
-import { centeredRand } from "extended-random";
-
-import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-
-import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
-import { type AllTerrainTextures } from "@/frontend/assets/textures/terrains";
+import { type TelluricPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { createEmptyTexture } from "@cosmos-journeyer/frontend/assets/procedural/proceduralTexture";
+import { type AllTerrainTextures } from "@cosmos-journeyer/frontend/assets/textures/terrains";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { type ItemPool } from "@/utils/itemPool";
-import { type DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/stellarObjectUniforms";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { type ItemPool } from "@cosmos-journeyer/utils/itemPool";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
+import { centeredRand } from "extended-random";
 
 import { ColorMode } from "./colorSettingsInterface";
 import { type TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";

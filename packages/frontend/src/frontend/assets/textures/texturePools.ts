@@ -16,13 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Scene } from "@babylonjs/core/scene";
-
-import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { TelluricPlanetMaterialLut } from "@/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
-import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
-
-import { ItemPool } from "@/utils/itemPool";
+import { CloudsLut } from "@cosmos-journeyer/frontend/postProcesses/clouds/cloudsLut";
+import { RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
+import { TelluricPlanetMaterialLut } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/telluricPlanetMaterialLut";
+import { StarMaterialLut } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/starMaterialLut";
+import { ItemPool } from "@cosmos-journeyer/utils/itemPool";
 
 import { LandingPadTexturePool } from "../landingPadTexturePool";
 

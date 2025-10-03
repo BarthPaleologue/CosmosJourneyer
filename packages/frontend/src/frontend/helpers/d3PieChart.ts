@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { arc, interpolateViridis, pie, scaleSequential, type PieArcDatum } from "d3";
-
-import { type DeepReadonly } from "@/utils/types";
 
 export function makeD3PieChart<T>(
     data: DeepReadonly<T[]>,

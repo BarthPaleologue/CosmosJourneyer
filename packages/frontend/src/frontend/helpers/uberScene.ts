@@ -22,8 +22,7 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { type DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type Controls } from "@/frontend/controls";
+import { type Controls } from "@cosmos-journeyer/frontend/controls";
 
 /**
  * A very thin wrapper around Babylon's Scene class to add some convenience methods.

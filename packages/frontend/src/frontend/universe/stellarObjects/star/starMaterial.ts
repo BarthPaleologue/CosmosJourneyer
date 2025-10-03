@@ -18,12 +18,10 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
-
-import type { RGBColor } from "@/utils/colors";
-import { type ItemPool } from "@/utils/itemPool";
-import { getRgbFromTemperature } from "@/utils/specrend";
+import { createEmptyTexture } from "@cosmos-journeyer/frontend/assets/procedural/proceduralTexture";
+import type { RGBColor } from "@cosmos-journeyer/utils/colors";
+import { type ItemPool } from "@cosmos-journeyer/utils/itemPool";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
 
 import { type StarMaterialLut } from "./starMaterialLut";
 

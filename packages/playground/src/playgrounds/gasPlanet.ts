@@ -16,20 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-
-import { ItemPool } from "@/utils/itemPool";
+import { newSeededGasPlanetModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { AtmosphericScatteringPostProcess } from "@cosmos-journeyer/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { RingsPostProcess } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsPostProcess";
+import { RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
+import { ShadowPostProcess } from "@cosmos-journeyer/frontend/postProcesses/shadowPostProcess";
+import { GasPlanet } from "@cosmos-journeyer/frontend/universe/planets/gasPlanet/gasPlanet";
+import { ItemPool } from "@cosmos-journeyer/utils/itemPool";
 
 import { Settings } from "@/settings";
 

@@ -18,20 +18,18 @@
 import { Axis, Space } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
-import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { UberScene } from "@/frontend/helpers/uberScene";
-import { Player } from "@/frontend/player/player";
-import { StarSystemView } from "@/frontend/starSystemView";
-import { updateNotifications } from "@/frontend/ui/notification";
+import { EncyclopaediaGalacticaManager } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { getAlphaTestisSystemModel } from "@cosmos-journeyer/backend/universe/customSystems/alphaTestis";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { TtsMock } from "@cosmos-journeyer/frontend/audio/tts";
+import { positionNearObjectBrightSide } from "@cosmos-journeyer/frontend/helpers/positionNearObject";
+import { UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { Player } from "@cosmos-journeyer/frontend/player/player";
+import { StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
+import { updateNotifications } from "@cosmos-journeyer/frontend/ui/notification";
 
 import { initI18n } from "@/i18n";
 

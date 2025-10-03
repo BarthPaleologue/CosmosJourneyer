@@ -26,13 +26,12 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { TtsMock } from "@cosmos-journeyer/frontend/audio/tts";
+import { ShipControls } from "@cosmos-journeyer/frontend/spaceship/shipControls";
+import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
 
 import { enablePhysics } from "./utils";
 

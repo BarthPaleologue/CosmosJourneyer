@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type Result } from "@/utils/types";
+import { type Save } from "@cosmos-journeyer/backend/save/saveFileData";
+import { type SaveLoadingError } from "@cosmos-journeyer/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type Result } from "@cosmos-journeyer/utils/types";
 
 export interface Tutorial {
     getTitle(): string;

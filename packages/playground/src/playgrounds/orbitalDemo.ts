@@ -21,18 +21,16 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
-import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
-import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type OrbitalObject } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
+import { setOrbitalPosition, setRotation } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObjectUtils";
+import { AxisRenderer } from "@cosmos-journeyer/frontend/universe/axisRenderer";
+import { CustomOrbitalObject } from "@cosmos-journeyer/frontend/universe/customOrbitalObject";
+import { CreateGreasedLineHelper } from "@cosmos-journeyer/frontend/universe/lineRendering";
+import { OrbitRenderer } from "@cosmos-journeyer/frontend/universe/orbitRenderer";
 
 export function createOrbitalDemoScene(
     engine: AbstractEngine,

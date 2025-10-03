@@ -17,11 +17,9 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
-import { type OrbitalObjectModelBase } from "@/backend/universe/orbitalObjects/orbitalObjectModelBase";
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type DeepReadonly } from "@/utils/types";
+import { type OrbitalObjectModelBase } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectModelBase";
+import { type OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { type OrbitalObjectBase } from "./architecture/orbitalObjectBase";
 

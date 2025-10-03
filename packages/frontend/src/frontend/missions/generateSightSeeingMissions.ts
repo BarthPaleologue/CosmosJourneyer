@@ -16,20 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MissionType } from "@cosmos-journeyer/backend/missions/missionSerialized";
+import { type OrbitalFacilityModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { getNeighborStarSystemCoordinates } from "@cosmos-journeyer/frontend/helpers/getNeighborStarSystems";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { uniformRandBool } from "extended-random";
-
-import { MissionType } from "@/backend/missions/missionSerialized";
-import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
-import { type Player } from "@/frontend/player/player";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { type DeepReadonly } from "@/utils/types";
 
 import { type Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";

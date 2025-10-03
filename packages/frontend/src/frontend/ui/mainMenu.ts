@@ -17,25 +17,22 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
-import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { getUniverseObjectId, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { TransformRotationAnimation } from "@cosmos-journeyer/frontend/helpers/animations/rotation";
+import { TransformTranslationAnimation } from "@cosmos-journeyer/frontend/helpers/animations/translation";
 import {
     positionNearObjectAsteroidField,
     positionNearObjectWithStarVisible,
-} from "@/frontend/helpers/positionNearObject";
-import { type UberScene } from "@/frontend/helpers/uberScene";
-import { type StarSystemView } from "@/frontend/starSystemView";
-
-import { type DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/frontend/helpers/positionNearObject";
+import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { type StarSystemView } from "@cosmos-journeyer/frontend/starSystemView";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 

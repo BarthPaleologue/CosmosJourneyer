@@ -18,14 +18,11 @@
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-
-import { type DeepReadonly } from "@/utils/types";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

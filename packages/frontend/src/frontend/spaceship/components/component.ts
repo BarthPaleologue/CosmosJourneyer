@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { type SerializedComponent } from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
 
 import { DiscoveryScanner } from "./discoveryScanner";
 import { FuelScoop } from "./fuelScoop";

@@ -1,4 +1,4 @@
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 

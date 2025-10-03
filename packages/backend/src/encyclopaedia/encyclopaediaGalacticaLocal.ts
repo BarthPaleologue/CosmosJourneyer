@@ -1,11 +1,10 @@
-import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
+import { type GasPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/gasPlanetModel";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type TelluricPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/utils/types";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 

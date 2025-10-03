@@ -18,11 +18,9 @@
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { getAngularSize } from "@/frontend/helpers/isObjectVisibleOnScreen";
-
-import { smoothstep } from "@/utils/math";
-import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
+import { getAngularSize } from "@cosmos-journeyer/frontend/helpers/isObjectVisibleOnScreen";
+import { smoothstep } from "@cosmos-journeyer/utils/math";
+import { parseDistance, parseSecondsRough } from "@cosmos-journeyer/utils/strings/parseToStrings";
 
 import { type HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";

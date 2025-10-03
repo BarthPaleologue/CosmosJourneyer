@@ -18,10 +18,9 @@
 import { MeshBuilder } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { WarpTunnel } from "@cosmos-journeyer/frontend/assets/procedural/warpTunnel";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
 
 import { enablePhysics } from "./utils";
 

@@ -33,26 +33,26 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
-import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
-import { lookAt, translate } from "@/frontend/helpers/transform";
-import { type Player } from "@/frontend/player/player";
-import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-import { type View } from "@/frontend/view";
-
-import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
+import { type EncyclopaediaGalactica } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalactica";
+import { ItinerarySchema, type Itinerary } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { CameraRadiusAnimation } from "@cosmos-journeyer/frontend/helpers/animations/radius";
+import { TransformRotationAnimation } from "@cosmos-journeyer/frontend/helpers/animations/rotation";
+import { TransformTranslationAnimation } from "@cosmos-journeyer/frontend/helpers/animations/translation";
+import { lookAt, translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
+import { type View } from "@cosmos-journeyer/frontend/view";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

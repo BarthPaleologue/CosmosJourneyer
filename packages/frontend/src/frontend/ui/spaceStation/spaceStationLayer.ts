@@ -16,16 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Player } from "@/frontend/player/player";
-import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
-
-import { type DeepReadonly } from "@/utils/types";
+import { type EncyclopaediaGalacticaManager } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import {
+    type OrbitalFacilityModel,
+    type OrbitalObjectModel,
+} from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { alertModal, promptModalString } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

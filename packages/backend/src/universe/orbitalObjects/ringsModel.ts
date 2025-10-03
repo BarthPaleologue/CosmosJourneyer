@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type RGBColor } from "@cosmos-journeyer/utils/colors";
 import { normalRandom, randRange } from "extended-random";
-
-import { type RGBColor } from "@/utils/colors";
 
 type RingsModelBase = {
     /**

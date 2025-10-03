@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Sound } from "@babylonjs/core/Audio/sound";
-
-import { type Sounds } from "@/frontend/assets/audio/sounds";
+import { type Sounds } from "@cosmos-journeyer/frontend/assets/audio/sounds";
 
 import { SoundInstance, SoundInstanceMock, type ISoundInstance } from "./soundInstance";
 

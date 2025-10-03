@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-
-import { clamp } from "@/utils/math";
+import { clamp } from "@cosmos-journeyer/utils/math";
 
 import { type CustomAnimation } from "./animation";
 

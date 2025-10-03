@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SerializedPlayerSchema } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { beforeEach, describe, expect, it } from "vitest";
-
-import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SaveBackendMultiFile, type IFileSystem } from "./saveBackendMultiFile";
 import { type CmdrSaves, type Save } from "./saveFileData";

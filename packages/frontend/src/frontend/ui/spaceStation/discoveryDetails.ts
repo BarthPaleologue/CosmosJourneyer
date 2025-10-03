@@ -16,19 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { getObjectModelById } from "@/backend/universe/starSystemModel";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { type Player } from "@/frontend/player/player";
-import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-
-import { getOrbitalPeriod } from "@/utils/physics/orbit";
-import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
+import {
+    type EncyclopaediaGalactica,
+    type SpaceDiscoveryData,
+} from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalactica";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { getObjectModelById } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
+import { getOrbitalPeriod } from "@cosmos-journeyer/utils/physics/orbit";
+import { parseDistance, parseSecondsPrecise } from "@cosmos-journeyer/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

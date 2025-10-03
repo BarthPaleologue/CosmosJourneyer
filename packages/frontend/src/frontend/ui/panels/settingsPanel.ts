@@ -24,17 +24,15 @@ import {
 } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type Interaction from "@brianchirls/game-input/interactions/Interaction";
-
 import {
     axisCompositeToString,
     buttonInputToString,
     dPadCompositeToString,
     stickInputToString,
     vector2ToString,
-} from "@/frontend/helpers/inputControlsString";
-import { InputMaps } from "@/frontend/inputs/inputMaps";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+} from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import { InputMaps } from "@cosmos-journeyer/frontend/inputs/inputMaps";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 
 import i18n from "@/i18n";
 

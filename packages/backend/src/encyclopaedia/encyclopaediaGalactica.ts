@@ -15,11 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { UniverseObjectIdSchema, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { type Result } from "@cosmos-journeyer/utils/types";
 import { z } from "zod";
-
-import { UniverseObjectIdSchema, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { type Result } from "@/utils/types";
 
 export const SpaceDiscoveryDataSchema = z.object({
     /**

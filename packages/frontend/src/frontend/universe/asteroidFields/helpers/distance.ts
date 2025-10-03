@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { type AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
+import { type AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
 
 export function distanceToAsteroidField(position: Vector3, asteroidField: AsteroidField) {
     const celestialBody = asteroidField.parent;

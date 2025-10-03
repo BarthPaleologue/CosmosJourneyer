@@ -17,10 +17,8 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type OrbitalObject } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
 
 export function canEngageWarpDrive(
     shipTransform: TransformNode,

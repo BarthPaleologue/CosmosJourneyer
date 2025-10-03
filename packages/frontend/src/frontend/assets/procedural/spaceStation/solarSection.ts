@@ -24,13 +24,11 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { wheelOfFortune } from "@/utils/random";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { createEnvironmentAggregate } from "@cosmos-journeyer/frontend/helpers/havok";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
 
 import { type SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";

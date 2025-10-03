@@ -15,20 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
+import { type MissionAsteroidFieldNodeSerialized } from "@cosmos-journeyer/backend/missions/missionAsteroidFieldNodeSerialized";
+import { type MissionFlyByNodeSerialized } from "@cosmos-journeyer/backend/missions/missionFlyByNodeSerialized";
 import {
     type MissionAndNodeSerialized,
     type MissionNodeSerialized,
     type MissionOrNodeSerialized,
     type MissionSequenceNodeSerialized,
     type MissionXorNodeSerialized,
-} from "@/backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import type { DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/backend/missions/missionNodeSerialized";
+import { MissionNodeType } from "@cosmos-journeyer/backend/missions/missionNodeType";
+import { type MissionTerminatorLandingNodeSerialized } from "@cosmos-journeyer/backend/missions/missionTerminatorLandingNodeSerialized";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";

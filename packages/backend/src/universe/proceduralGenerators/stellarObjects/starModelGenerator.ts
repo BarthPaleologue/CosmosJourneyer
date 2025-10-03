@@ -15,17 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type OrbitalObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { newSeededRingsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/ringsModel";
+import { type StarModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/starModel";
+import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
-
-import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
-import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
-
-import { GenerationSteps } from "@/utils/generationSteps";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { wheelOfFortune } from "@/utils/random";
 
 import { Settings } from "@/settings";
 

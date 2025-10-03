@@ -18,11 +18,9 @@
 import { Quaternion, Vector3, type Matrix } from "@babylonjs/core/Maths/math";
 import { type Mesh } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-
-import { getOrbitalPeriod } from "@/utils/physics/orbit";
+import { getPointOnOrbitLocal } from "@cosmos-journeyer/frontend/helpers/orbit";
+import { type OrbitalObject } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
+import { getOrbitalPeriod } from "@cosmos-journeyer/utils/physics/orbit";
 
 import { type CreateLinesMeshFunction } from "./lineRendering";
 

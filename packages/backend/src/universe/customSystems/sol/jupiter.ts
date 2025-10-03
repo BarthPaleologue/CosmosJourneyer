@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { EarthSeaLevelPressure } from "@/utils/physics/constants";
-import { degreesToRadians } from "@/utils/physics/unitConversions";
+import { type GasPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/gasPlanetModel";
+import { type OrbitalObjectId } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { EarthSeaLevelPressure } from "@cosmos-journeyer/utils/physics/constants";
+import { degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
 
 export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {

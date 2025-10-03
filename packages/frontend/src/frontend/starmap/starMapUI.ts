@@ -19,18 +19,18 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { factionToString } from "@/backend/society/factions";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-
-import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
+import { factionToString } from "@cosmos-journeyer/backend/society/factions";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 

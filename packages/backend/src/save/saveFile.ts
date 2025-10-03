@@ -15,10 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { jsonSafeParse } from "@/utils/json";
-import { err, type Result } from "@/utils/types";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
+import { err, type Result } from "@cosmos-journeyer/utils/types";
 
 import { safeParseSave, type Save } from "./saveFileData";
 import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";

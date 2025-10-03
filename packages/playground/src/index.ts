@@ -20,9 +20,8 @@ import "@babylonjs/inspector";
 import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
-
-import { LoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
+import { LoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { LoadingScreen } from "@cosmos-journeyer/frontend/helpers/loadingScreen";
 
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 

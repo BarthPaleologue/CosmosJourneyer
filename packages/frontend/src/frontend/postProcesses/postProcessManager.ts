@@ -30,26 +30,23 @@ import { type PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { type PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
-
-import { type JuliaSetModel } from "@/backend/universe/orbitalObjects/anomalies/juliaSetModel";
-import { type MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies/mandelboxModel";
-import { type MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
-import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
-import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type Textures } from "@/frontend/assets/textures";
-import { type UberScene } from "@/frontend/helpers/uberScene";
-import { type CelestialBody, type StellarObject } from "@/frontend/universe/architecture/orbitalObject";
-import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
-import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { type Star } from "@/frontend/universe/stellarObjects/star/star";
-
-import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
+import { type JuliaSetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/juliaSetModel";
+import { type MandelboxModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/mandelboxModel";
+import { type MandelbulbModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
+import { type MengerSpongeModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
+import { type SierpinskiPyramidModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type Textures } from "@cosmos-journeyer/frontend/assets/textures";
+import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
+import { type CelestialBody, type StellarObject } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
+import { type GasPlanet } from "@cosmos-journeyer/frontend/universe/planets/gasPlanet/gasPlanet";
+import { type TelluricPlanet } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/telluricPlanet";
+import { type BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
+import { type NeutronStar } from "@cosmos-journeyer/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { type Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
+import { getRgbFromTemperature } from "@cosmos-journeyer/utils/specrend";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelboxPostProcess";

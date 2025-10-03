@@ -26,9 +26,8 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
-
-import type { RGBColor } from "@/utils/colors";
-import { moveTowards } from "@/utils/math";
+import type { RGBColor } from "@cosmos-journeyer/utils/colors";
+import { moveTowards } from "@cosmos-journeyer/utils/math";
 
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";

@@ -15,10 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import type { Vector3Like } from "@cosmos-journeyer/utils/types";
 import { makeNoise3D } from "fast-simplex-noise";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import type { Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -17,9 +17,8 @@
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+import { type TerrainSettings } from "@cosmos-journeyer/backend/universe/orbitalObjects/terrainSettings";
 import { z } from "zod";
-
-import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
 import { type Direction } from "./direction";
 import { type PlanetChunk } from "./planetChunk";

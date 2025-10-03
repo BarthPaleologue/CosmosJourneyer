@@ -16,13 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { AiSpaceshipControls } from "@/frontend/spaceship/aiSpaceshipControls";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { AiSpaceshipControls } from "@cosmos-journeyer/frontend/spaceship/aiSpaceshipControls";
+import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
 
 import { Player } from "./player";
 

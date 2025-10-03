@@ -16,15 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { generateDarkKnightModel } from "@/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { DarkKnight } from "@/frontend/universe/darkKnight";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
+import { generateDarkKnightModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadEnvironmentTextures } from "@cosmos-journeyer/frontend/assets/textures/environment";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { DarkKnight } from "@cosmos-journeyer/frontend/universe/darkKnight";
+import { StarFieldBox } from "@cosmos-journeyer/frontend/universe/starFieldBox";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,

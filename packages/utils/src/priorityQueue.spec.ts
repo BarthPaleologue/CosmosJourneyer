@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PriorityQueue } from "@cosmos-journeyer/utils/priorityQueue";
 import { expect, test } from "vitest";
-
-import { PriorityQueue } from "@/utils/priorityQueue";
 
 test("PriorityList", () => {
     const queue = new PriorityQueue<number>((a, b) => a > b);

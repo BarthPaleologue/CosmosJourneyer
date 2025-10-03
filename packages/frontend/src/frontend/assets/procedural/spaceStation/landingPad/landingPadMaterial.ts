@@ -19,9 +19,8 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
+import { type LandingPadTexturePool } from "@cosmos-journeyer/frontend/assets/landingPadTexturePool";
+import { type PBRTextures } from "@cosmos-journeyer/frontend/assets/textures/materials";
 import {
     add,
     div,
@@ -48,7 +47,7 @@ import {
     vec2,
     vertexAttribute,
     xz,
-} from "@/frontend/helpers/bsl";
+} from "@cosmos-journeyer/frontend/helpers/bsl";
 
 import { Settings } from "@/settings";
 

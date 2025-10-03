@@ -15,17 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type OrbitalObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { newSeededRingsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/ringsModel";
+import { type NeutronStarModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
+import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { clamp } from "@cosmos-journeyer/utils/math";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
-
-import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
-import { type NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
-
-import { GenerationSteps } from "@/utils/generationSteps";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { clamp } from "@/utils/math";
 
 /**
  * Creates a new pseudo-random neutron star model

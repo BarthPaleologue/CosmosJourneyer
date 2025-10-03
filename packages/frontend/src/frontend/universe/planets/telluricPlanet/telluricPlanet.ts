@@ -23,26 +23,26 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type Cullable } from "@/frontend/helpers/cullable";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { type CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
-import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
-import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { type PlanetaryMassObjectBase } from "@/frontend/universe/architecture/planetaryMassObject";
-import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-
-import { type ItemPool } from "@/utils/itemPool";
-import { type DeepReadonly } from "@/utils/types";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type TelluricPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import { AtmosphereUniforms } from "@cosmos-journeyer/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { type CloudsLut } from "@cosmos-journeyer/frontend/postProcesses/clouds/cloudsLut";
+import { CloudsUniforms } from "@cosmos-journeyer/frontend/postProcesses/clouds/cloudsUniforms";
+import { OceanUniforms } from "@cosmos-journeyer/frontend/postProcesses/ocean/oceanUniforms";
+import { type RingsProceduralPatternLut } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@cosmos-journeyer/frontend/postProcesses/rings/ringsUniform";
+import { type PlanetaryMassObjectBase } from "@cosmos-journeyer/frontend/universe/architecture/planetaryMassObject";
+import {
+    defaultTargetInfoCelestialBody,
+    type TargetInfo,
+} from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import { AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
+import { type ItemPool } from "@cosmos-journeyer/utils/itemPool";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

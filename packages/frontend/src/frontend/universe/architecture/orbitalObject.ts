@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { type Star } from "@/frontend/universe/stellarObjects/star/star";
+import { type OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type CustomOrbitalObject } from "@cosmos-journeyer/frontend/universe/customOrbitalObject";
+import { type BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { type NeutronStar } from "@cosmos-journeyer/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { type Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
 
 import { type DarkKnight } from "../darkKnight";
 import { type EmptyCelestialBody } from "../emptyCelestialBody";

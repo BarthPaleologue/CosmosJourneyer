@@ -17,18 +17,15 @@
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
-import { StarMap } from "@/frontend/starmap/starMap";
-
-import { jsonSafeParse } from "@/utils/json";
+import { EncyclopaediaGalacticaLocal } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { StarSystemCoordinatesSchema } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { Player } from "@cosmos-journeyer/frontend/player/player";
+import { StarMap } from "@cosmos-journeyer/frontend/starmap/starMap";
+import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
 
 import { initI18n } from "@/i18n";
 

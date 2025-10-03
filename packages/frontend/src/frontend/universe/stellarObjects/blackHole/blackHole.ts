@@ -21,15 +21,15 @@ import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
-
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { type StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
-import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-
-import { type DeepReadonly } from "@/utils/types";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type BlackHoleModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import { type StellarObjectBase } from "@cosmos-journeyer/frontend/universe/architecture/stellarObject";
+import {
+    defaultTargetInfoCelestialBody,
+    type TargetInfo,
+} from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 

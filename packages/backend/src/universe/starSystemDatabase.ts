@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { hashVec3 } from "@cosmos-journeyer/utils/hash";
+import { type DeepReadonly, type Vector3Like } from "@cosmos-journeyer/utils/types";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
-
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { hashVec3 } from "@/utils/hash";
-import { type DeepReadonly, type Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { UniverseObjectIdSchema } from "@cosmos-journeyer/backend/universe/universeObjectId";
 import { z } from "zod";
-
-import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
 import { MissionNodeType } from "./missionNodeType";
 

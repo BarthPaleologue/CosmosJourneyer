@@ -17,9 +17,8 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
 
 /**
  * Computes the angular size in radians of an object viewed by a camera

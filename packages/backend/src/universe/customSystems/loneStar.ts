@@ -15,13 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Faction } from "@/backend/society/factions";
-import { OrbitSchema } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
-import { CropType } from "@/utils/agriculture";
-import { SolarMass, SolarRadius } from "@/utils/physics/constants";
+import { Faction } from "@cosmos-journeyer/backend/society/factions";
+import { OrbitSchema } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { CropType } from "@cosmos-journeyer/utils/agriculture";
+import { SolarMass, SolarRadius } from "@cosmos-journeyer/utils/physics/constants";
 
 export function getLoneStarSystem(): StarSystemModel {
     return {

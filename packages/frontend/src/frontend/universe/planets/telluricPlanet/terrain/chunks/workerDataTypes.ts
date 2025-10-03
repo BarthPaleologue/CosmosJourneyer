@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
+import { type TerrainSettings } from "@cosmos-journeyer/backend/universe/orbitalObjects/terrainSettings";
 
 import { type Direction } from "./direction";
 import { type TaskType } from "./taskTypes";

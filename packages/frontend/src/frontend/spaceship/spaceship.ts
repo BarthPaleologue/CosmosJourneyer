@@ -30,30 +30,27 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { type SerializedComponent } from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
 import {
     getDefaultSerializedSpaceship,
     ShipType,
     type SerializedSpaceship,
-} from "@/backend/spaceship/serializedSpaceship";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { type ISoundInstance } from "@/frontend/audio/soundInstance";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { setEnabledBody } from "@/frontend/helpers/havok";
-import { translate } from "@/frontend/helpers/transform";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { distanceToAsteroidField } from "@/frontend/universe/asteroidFields/helpers/distance";
-import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import type { DeepReadonly } from "@/utils/types";
+} from "@cosmos-journeyer/backend/spaceship/serializedSpaceship";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { HyperSpaceTunnel } from "@cosmos-journeyer/frontend/assets/procedural/hyperSpaceTunnel";
+import { WarpTunnel } from "@cosmos-journeyer/frontend/assets/procedural/warpTunnel";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { AudioMasks } from "@cosmos-journeyer/frontend/audio/audioMasks";
+import { type ISoundInstance } from "@cosmos-journeyer/frontend/audio/soundInstance";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { setEnabledBody } from "@cosmos-journeyer/frontend/helpers/havok";
+import { translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { type CelestialBody, type OrbitalObject } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { distanceToAsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/helpers/distance";
+import { type ILandingPad } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { CollisionMask } from "@/settings";
 

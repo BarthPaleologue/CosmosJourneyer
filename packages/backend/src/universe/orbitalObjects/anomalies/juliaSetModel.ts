@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RGBColor } from "@/utils/colors";
+import type { RGBColor } from "@cosmos-journeyer/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
 import { type OrbitalObjectType } from "../orbitalObjectType";

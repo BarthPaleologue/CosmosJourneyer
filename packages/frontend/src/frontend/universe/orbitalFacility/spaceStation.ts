@@ -19,32 +19,33 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
-import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
-import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
-import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
-import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
-import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
-import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
-import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { getSphereRadiatedEnergyFlux } from "@/utils/physics/thermodynamics";
-import { wheelOfFortune } from "@/utils/random";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
-import { type DeepReadonly } from "@/utils/types";
+import { type StellarObjectModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type SpaceStationModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { EngineBay } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/engineBay";
+import { CylinderHabitat } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
+import { HelixHabitat } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
+import { RingHabitat } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
+import { LandingBay } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/landingBay/landingBay";
+import { SolarSection } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/solarSection";
+import { SpaceStationNodeType } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/spaceStationNode";
+import { UtilitySection } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/utilitySection";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { isSizeOnScreenEnough } from "@cosmos-journeyer/frontend/helpers/isObjectVisibleOnScreen";
+import { getOrbitalObjectTypeToI18nString } from "@cosmos-journeyer/frontend/helpers/orbitalObjectTypeToDisplay";
+import {
+    ObjectTargetCursorType,
+    type Targetable,
+    type TargetInfo,
+} from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { LandingPadManager } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { getEdibleEnergyPerHaPerDay } from "@cosmos-journeyer/utils/agriculture";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { getSphereRadiatedEnergyFlux } from "@cosmos-journeyer/utils/physics/thermodynamics";
+import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "@cosmos-journeyer/utils/solarPanels";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

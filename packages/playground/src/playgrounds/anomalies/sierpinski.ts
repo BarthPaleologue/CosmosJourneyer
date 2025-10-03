@@ -16,12 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { newSeededSierpinskiPyramidModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { SierpinskiPyramidPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
+import { EmptyCelestialBody } from "@cosmos-journeyer/frontend/universe/emptyCelestialBody";
 
 export function createSierpinskiScene(
     engine: AbstractEngine,

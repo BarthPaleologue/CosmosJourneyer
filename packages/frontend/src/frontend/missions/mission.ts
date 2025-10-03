@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import type { DeepReadonly } from "@/utils/types";
+import { MissionType, type MissionSerialized } from "@cosmos-journeyer/backend/missions/missionSerialized";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 

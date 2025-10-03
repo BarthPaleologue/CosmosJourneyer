@@ -23,15 +23,23 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
-import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
+import {
+    CameraUniformNames,
+    setCameraUniforms,
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/cameraUniforms";
+import {
+    ObjectUniformNames,
+    setObjectUniforms,
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/objectUniforms";
+import {
+    SamplerUniformNames,
+    setSamplerUniforms,
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/samplerUniforms";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/stellarObjectUniforms";
+import { type UpdatablePostProcess } from "@cosmos-journeyer/frontend/postProcesses/updatablePostProcess";
 
 import { CloudsSamplerNames, CloudsUniformNames, type CloudsUniforms } from "./cloudsUniforms";
 

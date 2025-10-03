@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
-
-import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
-
-import { clamp, remap } from "@/utils/math";
+import {
+    getWarpDriveSpec,
+    type SerializedWarpDrive,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/warpDrive";
+import { lerpSmooth } from "@cosmos-journeyer/frontend/helpers/animations/interpolations";
+import { clamp, remap } from "@cosmos-journeyer/utils/math";
 
 const enum WarpDriveState {
     /**

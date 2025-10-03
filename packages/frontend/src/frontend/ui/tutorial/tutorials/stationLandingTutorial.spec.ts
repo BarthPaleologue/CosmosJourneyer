@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
 import { describe, expect, it } from "vitest";
-
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { StationLandingTutorial } from "./stationLandingTutorial";
 

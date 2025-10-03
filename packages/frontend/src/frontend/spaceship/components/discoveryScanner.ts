@@ -16,16 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import {
     getDiscoveryScannerSpec,
     type SerializedDiscoveryScanner,
-} from "@/backend/spaceship/serializedComponents/discoveryScanner";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
-
-import { assertUnreachable } from "@/utils/types";
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/discoveryScanner";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type CelestialBody } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObject";
+import { assertUnreachable } from "@cosmos-journeyer/utils/types";
 
 export class DiscoveryScanner {
     readonly type;

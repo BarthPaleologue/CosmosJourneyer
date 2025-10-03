@@ -15,17 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { wheelOfFortune } from "@cosmos-journeyer/utils/random";
+import { Alphabet, ReversedGreekAlphabet } from "@cosmos-journeyer/utils/strings/parseToStrings";
+import { romanNumeral } from "@cosmos-journeyer/utils/strings/romanNumerals";
+import { generateStarName } from "@cosmos-journeyer/utils/strings/starNameGenerator";
+import type { Vector3Like } from "@cosmos-journeyer/utils/types";
+import { isNonEmptyArray } from "@cosmos-journeyer/utils/types";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
-
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { wheelOfFortune } from "@/utils/random";
-import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";
-import { romanNumeral } from "@/utils/strings/romanNumerals";
-import { generateStarName } from "@/utils/strings/starNameGenerator";
-import type { Vector3Like } from "@/utils/types";
-import { isNonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -15,19 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getFactionFromGalacticPosition } from "@/backend/society/factions";
-import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-
-import { CropTypes, type CropType } from "@/utils/agriculture";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
-import { randomPieChart } from "@/utils/random";
-import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
-import type { Vector3Like } from "@/utils/types";
+import { getFactionFromGalacticPosition } from "@cosmos-journeyer/backend/society/factions";
+import { type PlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { type SpaceElevatorModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { CropTypes, type CropType } from "@cosmos-journeyer/utils/agriculture";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { getOrbitRadiusFromPeriod } from "@cosmos-journeyer/utils/physics/orbit";
+import { randomPieChart } from "@cosmos-journeyer/utils/random";
+import { generateSpaceElevatorName } from "@cosmos-journeyer/utils/strings/spaceStationNameGenerator";
+import type { Vector3Like } from "@cosmos-journeyer/utils/types";
 
 export function newSeededSpaceElevatorModel(
     id: string,

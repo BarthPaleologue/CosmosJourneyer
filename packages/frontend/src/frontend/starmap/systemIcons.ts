@@ -1,4 +1,7 @@
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
 
 export const enum SystemIconMask {
     BOOKMARK = 0b01,

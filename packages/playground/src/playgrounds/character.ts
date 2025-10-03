@@ -29,11 +29,10 @@ import {
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadCharacters } from "@cosmos-journeyer/frontend/assets/objects/characters";
+import { CharacterControls } from "@cosmos-journeyer/frontend/controls/characterControls/characterControls";
+import { CharacterInputs } from "@cosmos-journeyer/frontend/controls/characterControls/characterControlsInputs";
 
 import { enablePhysics } from "./utils";
 

@@ -18,16 +18,14 @@
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, translate } from "@/frontend/helpers/transform";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
+import { newSeededBlackHoleModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt, translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { StarFieldBox } from "@cosmos-journeyer/frontend/universe/starFieldBox";
+import { BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
 
 import { enablePhysics } from "../utils";
 

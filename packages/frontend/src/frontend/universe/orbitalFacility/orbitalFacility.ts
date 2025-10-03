@@ -15,12 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
-import { type Cullable } from "@/frontend/helpers/cullable";
-import { type OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
-import { type Targetable } from "@/frontend/universe/architecture/targetable";
-import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import { type OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
+import { type OrbitalObjectBase } from "@cosmos-journeyer/frontend/universe/architecture/orbitalObjectBase";
+import { type Targetable } from "@cosmos-journeyer/frontend/universe/architecture/targetable";
+import { type ManagesLandingPads } from "@cosmos-journeyer/frontend/universe/orbitalFacility/managesLandingPads";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
     extends OrbitalObjectBase<T>,

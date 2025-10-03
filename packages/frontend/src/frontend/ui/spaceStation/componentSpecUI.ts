@@ -15,16 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import {
+    getComponentTypeI18n,
+    type SerializedComponent,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
     type SerializedDiscoveryScanner,
-} from "@/backend/spaceship/serializedComponents/discoveryScanner";
-import { getFuelScoopSpec, type SerializedFuelScoop } from "@/backend/spaceship/serializedComponents/fuelScoop";
-import { getFuelTankSpecs, type SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
-import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
-import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
-import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/discoveryScanner";
+import {
+    getFuelScoopSpec,
+    type SerializedFuelScoop,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/fuelScoop";
+import {
+    getFuelTankSpecs,
+    type SerializedFuelTank,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/fuelTank";
+import { getComponentValue } from "@cosmos-journeyer/backend/spaceship/serializedComponents/pricing";
+import {
+    getThrustersSpec,
+    type SerializedThrusters,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/thrusters";
+import {
+    getWarpDriveSpec,
+    type SerializedWarpDrive,
+} from "@cosmos-journeyer/backend/spaceship/serializedComponents/warpDrive";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

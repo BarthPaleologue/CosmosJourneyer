@@ -29,10 +29,9 @@ import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { setUpVector, translate } from "@/frontend/helpers/transform";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
+import { setUpVector, translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { TelluricPlanet } from "@cosmos-journeyer/frontend/universe/planets/telluricPlanet/telluricPlanet";
 
 import { CollisionMask, Settings } from "@/settings";
 

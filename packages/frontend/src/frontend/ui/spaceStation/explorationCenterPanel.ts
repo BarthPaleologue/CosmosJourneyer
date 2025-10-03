@@ -15,14 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Player } from "@/frontend/player/player";
-import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { type SpaceDiscoveryData } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalactica";
+import { type EncyclopaediaGalacticaManager } from "@cosmos-journeyer/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { connectEncyclopaediaGalacticaModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

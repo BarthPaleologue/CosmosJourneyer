@@ -16,12 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { newSeededJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { newSeededJuliaSetModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { JuliaSetPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/juliaSetPostProcess";
+import { EmptyCelestialBody } from "@cosmos-journeyer/frontend/universe/emptyCelestialBody";
 
 export function createJuliaSetScene(
     engine: AbstractEngine,

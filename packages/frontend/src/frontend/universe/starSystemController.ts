@@ -17,29 +17,26 @@
 
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type StarSystemModel } from "@/backend/universe/starSystemModel";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { translate } from "@/frontend/helpers/transform";
-import { type UberScene } from "@/frontend/helpers/uberScene";
+import { type OrbitalObjectId } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectId";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type StarSystemModel } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { translate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type UberScene } from "@cosmos-journeyer/frontend/helpers/uberScene";
 import {
     getOrbitalPosition,
     getRotationAngle,
     setOrbitalPosition,
     setRotation,
-} from "@/frontend/universe/architecture/orbitalObjectUtils";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
-import { SystemTarget } from "@/frontend/universe/systemTarget";
-
-import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
+} from "@cosmos-journeyer/frontend/universe/architecture/orbitalObjectUtils";
+import { BlackHole } from "@cosmos-journeyer/frontend/universe/stellarObjects/blackHole/blackHole";
+import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
+import { SystemTarget } from "@cosmos-journeyer/frontend/universe/systemTarget";
+import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { type DeepReadonly, type NonEmptyArray } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

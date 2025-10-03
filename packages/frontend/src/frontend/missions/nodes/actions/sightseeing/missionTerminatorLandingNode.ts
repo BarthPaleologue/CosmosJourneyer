@@ -17,20 +17,20 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
+import { MissionNodeType } from "@cosmos-journeyer/backend/missions/missionNodeType";
 import {
     LandMissionState,
     type MissionTerminatorLandingNodeSerialized,
-} from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-
-import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { parseDistance } from "@/utils/strings/parseToStrings";
+} from "@cosmos-journeyer/backend/missions/missionTerminatorLandingNodeSerialized";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { universeObjectIdEquals, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { parseDistance } from "@cosmos-journeyer/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";

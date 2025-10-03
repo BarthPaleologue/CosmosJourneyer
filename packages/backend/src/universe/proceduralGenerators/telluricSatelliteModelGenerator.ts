@@ -15,23 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type AtmosphereModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/atmosphereModel";
+import { newCloudsModel, type CloudsModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/cloudsModel";
+import { type PlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type OceanModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/oceanModel";
+import { type Orbit } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbit";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { GenerationSteps } from "@cosmos-journeyer/utils/generationSteps";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { clamp } from "@cosmos-journeyer/utils/math";
+import { EarthMass, EarthSeaLevelPressure, MoonMass } from "@cosmos-journeyer/utils/physics/constants";
+import { getOrbitalPeriod } from "@cosmos-journeyer/utils/physics/orbit";
+import { hasLiquidWater } from "@cosmos-journeyer/utils/physics/physics";
+import { celsiusToKelvin, degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
 import { normalRandom, randRangeInt } from "extended-random";
-
-import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
-import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
-import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
-import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-
-import { GenerationSteps } from "@/utils/generationSteps";
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { clamp } from "@/utils/math";
-import { EarthMass, EarthSeaLevelPressure, MoonMass } from "@/utils/physics/constants";
-import { getOrbitalPeriod } from "@/utils/physics/orbit";
-import { hasLiquidWater } from "@/utils/physics/physics";
-import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 

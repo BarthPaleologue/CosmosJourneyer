@@ -16,12 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { MandelbulbPostProcess } from "@/frontend/postProcesses/anomalies/mandelbulbPostProcess";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { newSeededMandelbulbModel } from "@cosmos-journeyer/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { MandelbulbPostProcess } from "@cosmos-journeyer/frontend/postProcesses/anomalies/mandelbulbPostProcess";
+import { EmptyCelestialBody } from "@cosmos-journeyer/frontend/universe/emptyCelestialBody";
 
 export function createMandelbulbScene(
     engine: AbstractEngine,

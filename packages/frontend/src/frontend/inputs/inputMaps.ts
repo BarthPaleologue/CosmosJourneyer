@@ -1,8 +1,8 @@
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
-import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
+import { CharacterInputs } from "@cosmos-journeyer/frontend/controls/characterControls/characterControlsInputs";
+import { DefaultControlsInputs } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControlsInputs";
+import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
+import { StarMapInputs } from "@cosmos-journeyer/frontend/starmap/starMapInputs";
+import { TutorialControlsInputs } from "@cosmos-journeyer/frontend/ui/tutorial/tutorialLayerInputs";
 
 import { GeneralInputs } from "./generalInputs";
 import { StarSystemInputs } from "./starSystemInputs";

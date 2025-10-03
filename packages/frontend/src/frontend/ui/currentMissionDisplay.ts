@@ -15,16 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-import { type Mission } from "@/frontend/missions/mission";
-import { type MissionContext } from "@/frontend/missions/missionContext";
-import { type Player } from "@/frontend/player/player";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import { type Mission } from "@cosmos-journeyer/frontend/missions/mission";
+import { type MissionContext } from "@cosmos-journeyer/frontend/missions/missionContext";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend/spaceship/spaceShipControlsInputs";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 
 import i18n from "@/i18n";
 

@@ -17,16 +17,14 @@
 
 import "@styles/index.scss";
 
-import { safeParseSave } from "@/backend/save/saveFileData";
-
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { CosmosJourneyer } from "@/frontend/cosmosJourneyer";
-import { alertModal } from "@/frontend/ui/dialogModal";
-
-import { decodeBase64 } from "@/utils/base64";
-import { createConsoleDumper } from "@/utils/console";
-import { downloadTextFile } from "@/utils/download";
-import { jsonSafeParse } from "@/utils/json";
+import { safeParseSave } from "@cosmos-journeyer/backend/save/saveFileData";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { CosmosJourneyer } from "@cosmos-journeyer/frontend/cosmosJourneyer";
+import { alertModal } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { decodeBase64 } from "@cosmos-journeyer/utils/base64";
+import { createConsoleDumper } from "@cosmos-journeyer/utils/console";
+import { downloadTextFile } from "@cosmos-journeyer/utils/download";
+import { jsonSafeParse } from "@cosmos-journeyer/utils/json";
 
 const soundPlayerMock = new SoundPlayerMock();
 

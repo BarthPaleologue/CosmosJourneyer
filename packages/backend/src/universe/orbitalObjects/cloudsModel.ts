@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RGBColor } from "@/utils/colors";
-import { EarthSeaLevelPressure } from "@/utils/physics/constants";
+import type { RGBColor } from "@cosmos-journeyer/utils/colors";
+import { EarthSeaLevelPressure } from "@cosmos-journeyer/utils/physics/constants";
 
 export type CloudsModel = {
     layerRadius: number;

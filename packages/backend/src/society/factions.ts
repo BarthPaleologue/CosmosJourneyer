@@ -1,6 +1,5 @@
+import type { Vector3Like } from "@cosmos-journeyer/utils/types";
 import { uniformRandBool } from "extended-random";
-
-import type { Vector3Like } from "@/utils/types";
 
 import { getPowerPlayData } from "./powerplay";
 

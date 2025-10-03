@@ -1,9 +1,7 @@
-import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-
-import { assertUnreachable } from "@/utils/types";
+import { type ISaveBackend } from "@cosmos-journeyer/backend/save/saveBackend";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { assertUnreachable } from "@cosmos-journeyer/utils/types";
 
 import { type MusicConductor } from "../audio/musicConductor";
 import { AboutPanel } from "./panels/aboutPanel";

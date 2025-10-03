@@ -20,11 +20,10 @@ import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { HyperSpaceTunnel } from "@cosmos-journeyer/frontend/assets/procedural/hyperSpaceTunnel";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
 
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,

@@ -25,13 +25,12 @@ import {
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadAsteroids } from "@cosmos-journeyer/frontend/assets/objects/asteroids";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { AsteroidField } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidField";
+import { AsteroidPatch } from "@cosmos-journeyer/frontend/universe/asteroidFields/asteroidPatch";
 
 import { enablePhysics } from "./utils";
 

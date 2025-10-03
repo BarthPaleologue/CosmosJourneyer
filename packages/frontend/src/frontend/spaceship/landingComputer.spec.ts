@@ -4,9 +4,8 @@ import { type PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycas
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { type LandingPad } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { type LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 

@@ -21,10 +21,9 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { getTransformationQuaternion } from "@/frontend/helpers/algebra";
-import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
-import { pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
+import { getTransformationQuaternion } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { lerpSmooth } from "@cosmos-journeyer/frontend/helpers/animations/interpolations";
+import { pitch, roll, translate, yaw } from "@cosmos-journeyer/frontend/helpers/transform";
 
 import { Settings } from "@/settings";
 

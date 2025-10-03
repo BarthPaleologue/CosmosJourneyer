@@ -6,12 +6,10 @@ import { type TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type NoiseTextures } from "@/frontend/assets/textures";
-import { rotate } from "@/frontend/helpers/transform";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { clamp } from "@/utils/math";
+import { type NoiseTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { rotate } from "@cosmos-journeyer/frontend/helpers/transform";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { clamp } from "@cosmos-journeyer/utils/math";
 
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
 import warpConeVertex from "@shaders/warpConeMaterial/vertex.glsl";

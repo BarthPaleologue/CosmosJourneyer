@@ -15,20 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type OrbitalFacilityModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/index";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { getNeighborStarSystemCoordinates } from "@cosmos-journeyer/frontend/helpers/getNeighborStarSystems";
+import { generateSightseeingMissions } from "@cosmos-journeyer/frontend/missions/generateSightSeeingMissions";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { getRngFromSeed } from "@cosmos-journeyer/utils/getRngFromSeed";
+import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { parseDistance } from "@cosmos-journeyer/utils/strings/parseToStrings";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 import { uniformRandBool } from "extended-random";
-
-import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
-import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
-import { type Player } from "@/frontend/player/player";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { parseDistance } from "@/utils/strings/parseToStrings";
-import { type DeepReadonly } from "@/utils/types";
 
 import { MissionContainer } from "./missionContainer";
 

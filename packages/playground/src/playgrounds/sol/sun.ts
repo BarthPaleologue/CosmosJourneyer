@@ -16,17 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FreeCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt } from "@/frontend/helpers/transform";
-import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
-import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { getSunModel } from "@cosmos-journeyer/backend/universe/customSystems/sol/sun";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { loadTextures } from "@cosmos-journeyer/frontend/assets/textures";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { lookAt } from "@cosmos-journeyer/frontend/helpers/transform";
+import { LensFlarePostProcess } from "@cosmos-journeyer/frontend/postProcesses/lensFlarePostProcess";
+import { VolumetricLight } from "@cosmos-journeyer/frontend/postProcesses/volumetricLight/volumetricLight";
+import { StarFieldBox } from "@cosmos-journeyer/frontend/universe/starFieldBox";
+import { Star } from "@cosmos-journeyer/frontend/universe/stellarObjects/star/star";
 
 import { enablePhysics } from "../utils";
 

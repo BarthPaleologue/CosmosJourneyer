@@ -1,9 +1,7 @@
+import { getLoneStarSystem } from "@cosmos-journeyer/backend/universe/customSystems/loneStar";
+import { StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type DeepPartial } from "@cosmos-journeyer/utils/types";
 import { expect, test } from "vitest";
-
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type DeepPartial } from "@/utils/types";
 
 import { safeParseSave } from "../saveFileData";
 import { type SaveV1 } from "./saveV1";

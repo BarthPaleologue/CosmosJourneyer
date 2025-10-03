@@ -21,16 +21,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
-import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
-
-import { type Cullable } from "@/frontend/helpers/cullable";
-import { getRotationQuaternion } from "@/frontend/helpers/transform";
-
-import { clamp } from "@/utils/math";
-import { type DeepReadonly } from "@/utils/types";
+import { type TelluricPlanetModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricPlanetModel";
+import { type TelluricSatelliteModel } from "@cosmos-journeyer/backend/universe/orbitalObjects/telluricSatelliteModel";
+import { type TerrainSettings } from "@cosmos-journeyer/backend/universe/orbitalObjects/terrainSettings";
+import { type Cullable } from "@cosmos-journeyer/frontend/helpers/cullable";
+import { getRotationQuaternion } from "@cosmos-journeyer/frontend/helpers/transform";
+import { clamp } from "@cosmos-journeyer/utils/math";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import { Settings } from "@/settings";
 

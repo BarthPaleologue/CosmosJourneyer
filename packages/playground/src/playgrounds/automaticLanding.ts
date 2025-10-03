@@ -20,15 +20,14 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
+import { LandingPad } from "@cosmos-journeyer/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import { loadRenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { SoundPlayerMock } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { DefaultControls } from "@cosmos-journeyer/frontend/controls/defaultControls/defaultControls";
+import { Spaceship } from "@cosmos-journeyer/frontend/spaceship/spaceship";
+import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
 import { randRange } from "extended-random";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
 

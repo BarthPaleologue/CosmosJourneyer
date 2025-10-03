@@ -18,9 +18,8 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
-import * as BSL from "@/frontend/helpers/bsl";
+import { type PBRTextures } from "@cosmos-journeyer/frontend/assets/textures/materials";
+import * as BSL from "@cosmos-journeyer/frontend/helpers/bsl";
 
 export class SolarPanelMaterial extends NodeMaterial {
     constructor(textures: Omit<PBRTextures, "ambientOcclusion">, scene: Scene) {

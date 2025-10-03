@@ -18,15 +18,12 @@
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
-
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type MissionContext } from "@/frontend/missions/missionContext";
-import { type Player } from "@/frontend/player/player";
-
-import { smoothstep } from "@/utils/math";
-import { parseSpeed } from "@/utils/strings/parseToStrings";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { type MissionContext } from "@cosmos-journeyer/frontend/missions/missionContext";
+import { type Player } from "@cosmos-journeyer/frontend/player/player";
+import { smoothstep } from "@cosmos-journeyer/utils/math";
+import { parseSpeed } from "@cosmos-journeyer/utils/strings/parseToStrings";
 
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 

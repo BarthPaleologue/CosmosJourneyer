@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-
-import { EarthSeaLevelPressure } from "@/utils/physics/constants";
-import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
-import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
+import { type StarSystemCoordinates } from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { EarthSeaLevelPressure } from "@cosmos-journeyer/utils/physics/constants";
+import { getOrbitRadiusFromPeriod } from "@cosmos-journeyer/utils/physics/orbit";
+import { celsiusToKelvin, degreesToRadians } from "@cosmos-journeyer/utils/physics/unitConversions";
 
 import { newSeededGasPlanetModel } from "../proceduralGenerators/gasPlanetModelGenerator";
 import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";

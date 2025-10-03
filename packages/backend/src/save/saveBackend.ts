@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DeepReadonly } from "@/utils/types";
+import type { DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 import type { CmdrSaves, Save } from "./saveFileData";
 

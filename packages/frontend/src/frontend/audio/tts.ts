@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Sound } from "@babylonjs/core/Audio/sound";
-
-import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
+import { type SpeakerVoiceLines, type VoiceLines } from "@cosmos-journeyer/frontend/assets/audio/voiceLines";
 
 export const enum Speaker {
     CHARLOTTE,

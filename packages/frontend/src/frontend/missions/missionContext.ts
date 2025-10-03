@@ -17,12 +17,9 @@
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-
-import { type Itinerary } from "@/backend/player/serializedPlayer";
-
-import { type StarSystemController } from "@/frontend/universe/starSystemController";
-
-import { type DeepReadonly } from "@/utils/types";
+import { type Itinerary } from "@cosmos-journeyer/backend/player/serializedPlayer";
+import { type StarSystemController } from "@cosmos-journeyer/frontend/universe/starSystemController";
+import { type DeepReadonly } from "@cosmos-journeyer/utils/types";
 
 /**
  * Describes information used by mission nodes to update their state

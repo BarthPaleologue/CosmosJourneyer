@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 

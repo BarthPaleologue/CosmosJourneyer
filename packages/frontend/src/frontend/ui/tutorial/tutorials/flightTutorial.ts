@@ -16,17 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AxisComposite } from "@brianchirls/game-input/browser";
-
-import { safeParseSave, type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { StarSystemInputs } from "@/frontend//inputs/starSystemInputs";
-import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControlsInputs";
-import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { type Result } from "@/utils/types";
+import { safeParseSave, type Save } from "@cosmos-journeyer/backend/save/saveFileData";
+import { type SaveLoadingError } from "@cosmos-journeyer/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { StarSystemInputs } from "@cosmos-journeyer/frontend//inputs/starSystemInputs";
+import { SpaceShipControlsInputs } from "@cosmos-journeyer/frontend//spaceship/spaceShipControlsInputs";
+import {
+    axisCompositeToString,
+    pressInteractionToStrings,
+} from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
+import { type Result } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 

@@ -1,8 +1,7 @@
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
-
-import { InputDevices } from "@/frontend/inputs/devices";
-import { InputMap } from "@/frontend/inputs/inputMap";
+import { InputDevices } from "@cosmos-journeyer/frontend/inputs/devices";
+import { InputMap } from "@cosmos-journeyer/frontend/inputs/inputMap";
 
 const keyboard = InputDevices.KEYBOARD;
 

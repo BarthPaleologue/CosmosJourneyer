@@ -22,11 +22,10 @@ import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
-
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
 import butterflyFragment from "@shaders/butterflyMaterial/butterflyFragment.glsl";
 import butterflyVertex from "@shaders/butterflyMaterial/butterflyVertex.glsl";

@@ -16,23 +16,23 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
 import {
     AsteroidFieldMissionState,
     type MissionAsteroidFieldNodeSerialized,
-} from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { getObjectModelById } from "@/backend/universe/starSystemModel";
-import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { wrapVector3 } from "@/frontend/helpers/algebra";
-
-import { clamp } from "@/utils/math";
-import { lightYearsToMeters } from "@/utils/physics/unitConversions";
-import { parseDistance } from "@/utils/strings/parseToStrings";
+} from "@cosmos-journeyer/backend/missions/missionAsteroidFieldNodeSerialized";
+import { MissionNodeType } from "@cosmos-journeyer/backend/missions/missionNodeType";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import {
+    starSystemCoordinatesEquals,
+    type StarSystemCoordinates,
+} from "@cosmos-journeyer/backend/universe/starSystemCoordinates";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { getObjectModelById } from "@cosmos-journeyer/backend/universe/starSystemModel";
+import { universeObjectIdEquals, type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
+import { clamp } from "@cosmos-journeyer/utils/math";
+import { lightYearsToMeters } from "@cosmos-journeyer/utils/physics/unitConversions";
+import { parseDistance } from "@cosmos-journeyer/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 

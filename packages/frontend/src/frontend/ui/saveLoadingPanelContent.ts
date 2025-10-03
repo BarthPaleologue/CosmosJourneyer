@@ -1,16 +1,13 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { parseSaveFile } from "@/backend/save/saveFile";
-import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
-import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-
-import { type DeepReadonly, type Result } from "@/utils/types";
+import { type ISaveBackend } from "@cosmos-journeyer/backend/save/saveBackend";
+import { parseSaveFile } from "@cosmos-journeyer/backend/save/saveFile";
+import { createUrlFromSave, type Save } from "@cosmos-journeyer/backend/save/saveFileData";
+import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@cosmos-journeyer/backend/save/saveLoadingError";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { SoundType, type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { alertModal, promptModalBoolean } from "@cosmos-journeyer/frontend/ui/dialogModal";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
+import { type DeepReadonly, type Result } from "@cosmos-journeyer/utils/types";
 
 import i18n from "@/i18n";
 

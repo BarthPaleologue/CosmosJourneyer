@@ -23,23 +23,21 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
-import { type Controls } from "@/frontend/controls";
-import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
-import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
-import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-import { pitch, roll, yaw } from "@/frontend/helpers/transform";
-import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
-
-import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { type RenderingAssets } from "@cosmos-journeyer/frontend/assets/renderingAssets";
+import { type ISoundPlayer } from "@cosmos-journeyer/frontend/audio/soundPlayer";
+import { Speaker, VoiceLine, type ITts } from "@cosmos-journeyer/frontend/audio/tts";
+import { type Controls } from "@cosmos-journeyer/frontend/controls";
+import { CameraShakeAnimation } from "@cosmos-journeyer/frontend/helpers/animations/cameraShake";
+import { quickAnimation } from "@cosmos-journeyer/frontend/helpers/animations/quickAnimation";
+import { pressInteractionToStrings } from "@cosmos-journeyer/frontend/helpers/inputControlsString";
+import { pitch, roll, yaw } from "@cosmos-journeyer/frontend/helpers/transform";
+import { StarSystemInputs } from "@cosmos-journeyer/frontend/inputs/starSystemInputs";
+import { createNotification, NotificationIntent, NotificationOrigin } from "@cosmos-journeyer/frontend/ui/notification";
+import { type HasBoundingSphere } from "@cosmos-journeyer/frontend/universe/architecture/hasBoundingSphere";
+import { type Transformable } from "@cosmos-journeyer/frontend/universe/architecture/transformable";
+import { LandingPadSize } from "@cosmos-journeyer/frontend/universe/orbitalFacility/landingPadManager";
+import { type ManagesLandingPads } from "@cosmos-journeyer/frontend/universe/orbitalFacility/managesLandingPads";
+import { getGlobalKeyboardLayoutMap } from "@cosmos-journeyer/utils/keyboardAPI";
 
 import i18n from "@/i18n";
 

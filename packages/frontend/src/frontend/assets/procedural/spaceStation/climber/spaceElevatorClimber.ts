@@ -21,9 +21,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { type PBRTextures } from "@cosmos-journeyer/frontend/assets/textures/materials";
+import {
+    ObjectTargetCursorType,
+    type Targetable,
+    type TargetInfo,
+} from "@cosmos-journeyer/frontend/universe/architecture/targetable";
 
 import i18n from "@/i18n";
 

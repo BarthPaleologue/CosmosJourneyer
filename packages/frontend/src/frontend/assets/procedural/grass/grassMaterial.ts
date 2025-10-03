@@ -21,11 +21,10 @@ import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
-
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+} from "@cosmos-journeyer/frontend/postProcesses/uniforms/stellarObjectUniforms";
 
 import { type NoiseTextures } from "../../textures";
 

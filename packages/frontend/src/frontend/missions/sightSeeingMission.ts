@@ -16,13 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { MissionType } from "@/backend/missions/missionSerialized";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { MissionType } from "@cosmos-journeyer/backend/missions/missionSerialized";
+import { OrbitalObjectType } from "@cosmos-journeyer/backend/universe/orbitalObjects/orbitalObjectType";
+import { type StarSystemDatabase } from "@cosmos-journeyer/backend/universe/starSystemDatabase";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { wrapVector3 } from "@cosmos-journeyer/frontend/helpers/algebra";
 
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";

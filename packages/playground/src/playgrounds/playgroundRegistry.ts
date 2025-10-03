@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type AbstractEngine, type Scene } from "@babylonjs/core";
-
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "@cosmos-journeyer/frontend/assets/loadingProgressMonitor";
 
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";

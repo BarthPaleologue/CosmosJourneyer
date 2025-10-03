@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { romanNumeral } from "@cosmos-journeyer/utils/strings/romanNumerals";
 import { expect, test } from "vitest";
-
-import { romanNumeral } from "@/utils/strings/romanNumerals";
 
 test("romanNumeral", () => {
     expect(romanNumeral(1)).toBe("I");

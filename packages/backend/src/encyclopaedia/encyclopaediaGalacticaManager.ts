@@ -1,6 +1,5 @@
-import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
-
-import { ok, type Result } from "@/utils/types";
+import { type UniverseObjectId } from "@cosmos-journeyer/backend/universe/universeObjectId";
+import { ok, type Result } from "@cosmos-journeyer/utils/types";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
