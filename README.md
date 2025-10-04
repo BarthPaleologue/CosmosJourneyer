@@ -165,8 +165,8 @@ Cosmos Journeyer is built using the following technologies:
 2. Install [Pnpm](https://pnpm.io/) globally with `npm install -g pnpm`
 3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 4. Navigate to the project directory with `cd CosmosJourneyer`
-5. Install the dependencies with `pnpm install`
-   (this also sets up Git hooks for formatting changed files before commit.
+5. Install the dependencies with `pnpm install -r`
+   (the `-r` flag installs every workspace package and also sets up Git hooks for formatting changed files before commit.
    For pnpm 10 and later, hooks are installed because Husky is listed in
    `onlyBuiltDependencies`.)
 
