@@ -2,13 +2,17 @@ ARG PW_VERSION=1.55.0
 FROM mcr.microsoft.com/playwright:v${PW_VERSION}-jammy AS e2e
 
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/game/package.json packages/game/
+
 RUN npm install -g pnpm
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --recursive --frozen-lockfile
 
 # copy sources and build your webpack bundle
 COPY . .
-RUN pnpm build        # → dist/ with WebGL assets
+RUN pnpm build
+
+WORKDIR /app/packages/game
 
 # run tests by default (override in CI if you just want the image)
 CMD ["npx","playwright","test","--reporter=line"]

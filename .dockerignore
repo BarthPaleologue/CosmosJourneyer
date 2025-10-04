@@ -6,9 +6,12 @@ playwright-report
 .git
 dist
 tests/e2e
-src-tauri
+packages/game/src-tauri
 .idea
 research
 doc
 coverage
 .eslintcache
+packages/game/dist
+packages/game/doc
+packages/game/tests/e2e

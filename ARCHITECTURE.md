@@ -2,6 +2,8 @@
 
 If you are willing to contribute, this document will give you a good idea of where everything is and how it is organized.
 
+All referenced TypeScript modules now live under `packages/game/src`. The workspace also contains additional tooling (see the root README for an overview).
+
 ## General architecture
 
 The following diagram is not an inheritance diagram, but a composition diagram. Each arrow represents an "is part of" relationship.
@@ -92,4 +94,4 @@ An `OrbitalObject` builds on top of this by adding the notion of orbit and mass 
 `Planet` builds on top of `CelestialBody` by adding atmospheres.
 
 The other nodes are the concrete implementations of all these abstractions.
-They can be found in their respective folders (`planets` for `TelluricPlanet` and `GasPlanet`, `stellarObjects` for `Star`, `BlackHole` and `NeutronStar`, and spaceStations for `SpaceStation`).
+They can be found in their respective folders under `packages/game/src/ts/frontend` (`planets` for `TelluricPlanet` and `GasPlanet`, `stellarObjects` for `Star`, `BlackHole` and `NeutronStar`, and `spaceStations` for `SpaceStation`).
