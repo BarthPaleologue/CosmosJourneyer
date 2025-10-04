@@ -34,10 +34,15 @@ jobs:
                   path: ~/.git/lfs/ # default client cache
                   key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
 
+            - name: Determine pnpm version
+              id: pnpm-version
+              run: |
+                  echo "version=$(jq -r '.packageManager' package.json | cut -d'@' -f2)" >> "$GITHUB_OUTPUT"
+
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: ${{ steps.pnpm-version.outputs.version }}
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4

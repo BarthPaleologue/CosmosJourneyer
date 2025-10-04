@@ -5,12 +5,14 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/game/package.json packages/game/
 
-RUN npm install -g pnpm
+RUN corepack enable \
+    && PNPM_VERSION=$(node -p "const pm=require('./package.json').packageManager; pm.substring(pm.indexOf('@') + 1)") \
+    && corepack prepare pnpm@${PNPM_VERSION} --activate
 RUN pnpm install --frozen-lockfile
 
 # copy sources and build your webpack bundle
 COPY . .
-RUN pnpm build        # → dist/ with WebGL assets
+RUN pnpm build
 
 WORKDIR /app/packages/game
 
