@@ -17,7 +17,7 @@
 
 import { expect, test } from "vitest";
 
-import { romanNumeral } from "@/utils/strings/romanNumerals";
+import { romanNumeral } from "./romanNumerals";
 
 test("romanNumeral", () => {
     expect(romanNumeral(1)).toBe("I");
