@@ -17,7 +17,7 @@
 
 import { expect, test } from "vitest";
 
-import { pickPseudoRandomItems, randomPieChart } from "@/utils/random";
+import { pickPseudoRandomItems, randomPieChart } from "./random";
 
 test("pickPseudoRandomItems", () => {
     const items = [0, 1, 2, 3, 4, 5];
