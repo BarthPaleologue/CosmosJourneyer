@@ -6,11 +6,11 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/game/package.json packages/game/
 
 RUN npm install -g pnpm
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --recursive --frozen-lockfile
 
 # copy sources and build your webpack bundle
 COPY . .
-RUN pnpm build        # → dist/ with WebGL assets
+RUN pnpm build
 
 WORKDIR /app/packages/game
 
