@@ -41,7 +41,7 @@ jobs:
             - name: Deploy to GitHub Pages (Production)
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  folder: dist
+                  folder: packages/game/dist
                   branch: gh-pages
                   clean: false
                   force: false

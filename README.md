@@ -217,7 +217,7 @@ Cosmos Journeyer is a free and open-source software licensed under the terms of 
 
 ## Credits
 
-All credits can be found in [the credits panel](./src/html/mainMenu.html) of the game.
+All credits can be found in [the credits panel](./packages/game/src/html/mainMenu.html) of the game.
 
 ## Special Thanks
 

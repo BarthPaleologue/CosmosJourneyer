@@ -40,12 +40,12 @@ jobs:
               run: pnpm doc
 
             - name: Move doc to dist
-              run: mv doc dist/doc
+              run: mv packages/game/doc packages/game/dist/doc
 
             - name: Deploy to GitHub Pages (Production)
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  folder: dist
+                  folder: packages/game/dist
                   branch: gh-pages
                   clean-exclude: pr-preview
                   force: false

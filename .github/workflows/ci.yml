@@ -79,7 +79,8 @@ jobs:
               run: |
                   mkdir -p artifacts                 # host dir for reports / diffs  
                   docker run --rm --ipc=host -e CI=1 \
-                    -v ${{ github.workspace }}/tests/e2e:/app/tests/e2e \
+                    -w /app/packages/game \
+                    -v ${{ github.workspace }}/packages/game/tests/e2e:/app/packages/game/tests/e2e \
                     -v ${{ github.workspace }}/artifacts:/output \
                     cosmos-journeyer-e2e:${{ github.sha }} \
                     npx playwright test \
