@@ -5,14 +5,14 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
     globalIgnores([
-        "src/ts/utils/TWGSL/**",
-        "src-tauri",
-        "rspack.config.js",
+        "packages/game/src/ts/utils/TWGSL/**",
+        "packages/game/src-tauri",
+        "packages/game/rspack.config.js",
         "tsconfig.json",
         "eslint.config.mjs",
-        "dist",
-        "doc",
-        "src/asset",
+        "packages/game/dist",
+        "packages/game/doc",
+        "packages/game/src/asset",
         "coverage",
         ".eslintcache",
     ]),
@@ -24,7 +24,7 @@ export default defineConfig([
         settings: {
             "import/resolver": {
                 typescript: {
-                    project: "./tsconfig.json",
+                    project: "./packages/game/tsconfig.json",
                     alwaysTryTypes: true,
                 },
             },
