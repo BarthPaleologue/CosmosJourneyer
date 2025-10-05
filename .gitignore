@@ -12,3 +12,7 @@ doc
 *.blend11
 artifacts
 .eslintcache
+packages/game/dist
+packages/game/doc
+packages/game/coverage
+.pnpm-store

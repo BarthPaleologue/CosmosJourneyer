@@ -34,10 +34,15 @@ jobs:
                   path: ~/.git/lfs/ # default client cache
                   key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
 
+            - name: Determine pnpm version
+              id: pnpm-version
+              run: |
+                  echo "version=$(jq -r '.packageManager' package.json | cut -d'@' -f2)" >> "$GITHUB_OUTPUT"
+
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: ${{ steps.pnpm-version.outputs.version }}
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
@@ -79,7 +84,8 @@ jobs:
               run: |
                   mkdir -p artifacts                 # host dir for reports / diffs  
                   docker run --rm --ipc=host -e CI=1 \
-                    -v ${{ github.workspace }}/tests/e2e:/app/tests/e2e \
+                    -w /app/packages/game \
+                    -v ${{ github.workspace }}/packages/game/tests/e2e:/app/packages/game/tests/e2e \
                     -v ${{ github.workspace }}/artifacts:/output \
                     cosmos-journeyer-e2e:${{ github.sha }} \
                     npx playwright test \

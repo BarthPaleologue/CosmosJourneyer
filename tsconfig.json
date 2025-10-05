@@ -1,51 +1,9 @@
 {
-    "compilerOptions": {
-        // Basic & ESM
-        "target": "ES2024",
-        "module": "ES2022",
-        "moduleResolution": "bundler",
-        "rootDir": ".",
-        "outDir": "./dist",
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-
-        // Ideation-friendly imports
-        "baseUrl": "./",
-        "paths": {
-            "@/*": ["src/ts/*"],
-            "@assets/*": ["src/asset/*"],
-            "@shaders/*": ["src/shaders/*"],
-            "@styles/*": ["src/styles/*"]
-        },
-
-        // Build speed & debugging
-        "incremental": true,
-        "sourceMap": true,
-        "tsBuildInfoFile": "./dist/.tsbuildinfo",
-
-        // Strong typing
-        "strict": true,
-        "exactOptionalPropertyTypes": true,
-        "noImplicitOverride": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedIndexedAccess": true,
-        "noPropertyAccessFromIndexSignature": true,
-
-        // Quality guardrails
-        "forceConsistentCasingInFileNames": true,
-        "isolatedModules": true,
-        "skipLibCheck": true, // disable if you run into lib-type mismatches
-        "resolveJsonModule": true,
-        "noUncheckedSideEffectImports": true,
-        "verbatimModuleSyntax": true,
-        "moduleDetection": "force",
-
-        // Browser & ambient types
-        "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
-        "typeRoots": ["node_modules/@types"],
-        "types": ["webpack-env"]
-    },
-    "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "playwright.config.ts"],
-    "exclude": ["node_modules", "dist"]
+    "extends": "./tsconfig.base.json",
+    "files": [],
+    "references": [
+        {
+            "path": "./packages/game/tsconfig.json"
+        }
+    ]
 }

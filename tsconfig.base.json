@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "target": "ES2024",
+        "module": "ES2022",
+        "moduleResolution": "bundler",
+        "rootDir": ".",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "incremental": true,
+        "sourceMap": true,
+        "tsBuildInfoFile": "./dist/.tsbuildinfo",
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "noUncheckedSideEffectImports": true,
+        "verbatimModuleSyntax": true,
+        "moduleDetection": "force",
+        "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
+        "types": ["webpack-env"]
+    }
+}

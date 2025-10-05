@@ -1,0 +1,15 @@
+{
+    "name": "Cosmos Journeyer API Documentation",
+    "out": "doc",
+    "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"],
+    "theme": "typedoc-github-theme",
+    "sourceLinkTemplate": "https://github.com/BarthPaleologue/CosmosJourneyer/blob/{gitRevision}/{path}#L{line}",
+
+    "entryPointStrategy": "expand",
+    "entryPoints": ["src/ts"],
+    "exclude": ["**/node_modules/**/*.*", "**/tests/**/*.*"],
+
+    "includeVersion": true,
+    "excludeInternal": true,
+    "excludePrivate": true
+}
