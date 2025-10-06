@@ -33,6 +33,7 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
+import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 
 import { enablePhysics } from "./utils";
 
@@ -50,8 +51,9 @@ export async function createFlightDemoScene(
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
+    const notificationManager = new NotificationManagerMock();
 
-    const ship = ShipControls.CreateDefault(scene, assets, tts, soundPlayer);
+    const ship = ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
 
     const camera = ship.getActiveCamera();
     camera.minZ = 0.1;

@@ -27,6 +27,7 @@ import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal";
+import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
 
 import { initI18n } from "@/i18n";
@@ -46,8 +47,9 @@ export async function createSaveLoadingPanelContentScene(
     const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
     const soundPlayer = new SoundPlayerMock();
+    const notificationManager = new NotificationManagerMock();
 
-    const saveLoadingPanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
+    const saveLoadingPanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer, notificationManager);
     saveLoadingPanelContent.htmlRoot.style.position = "absolute";
     document.body.appendChild(saveLoadingPanelContent.htmlRoot);
 

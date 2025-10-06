@@ -33,7 +33,7 @@ import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -44,6 +44,7 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import i18n from "@/i18n";
 
 import { lerpSmooth, slerpSmoothToRef } from "../helpers/animations/interpolations";
+import { type INotificationManager } from "../ui/notificationManager";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
@@ -80,12 +81,20 @@ export class ShipControls implements Controls {
 
     private readonly tts: ITts;
     private readonly soundPlayer: ISoundPlayer;
+    private readonly notificationManager: INotificationManager;
 
-    constructor(spaceship: Spaceship, scene: Scene, soundPlayer: ISoundPlayer, tts: ITts) {
+    constructor(
+        spaceship: Spaceship,
+        scene: Scene,
+        soundPlayer: ISoundPlayer,
+        tts: ITts,
+        notificationManager: INotificationManager,
+    ) {
         this.spaceship = spaceship;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
+        this.notificationManager = notificationManager;
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
@@ -153,12 +162,11 @@ export class ShipControls implements Controls {
                             keyboardLayoutMap,
                         ).join(", ");
                         //FIXME: localize
-                        createNotification(
+                        this.notificationManager.create(
                             NotificationOrigin.SPACE_STATION,
                             NotificationIntent.INFO,
                             `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
                             5000,
-                            soundPlayer,
                         );
                     }
                 }
@@ -176,12 +184,11 @@ export class ShipControls implements Controls {
                     SpaceShipControlsInputs.map.toggleWarpDrive,
                     keyboardLayout,
                 );
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
                     `Cannot land while warp drive is enabled. You can use ${relevantKeys.join(", ")} to toggle your warp drive.`,
                     5000,
-                    soundPlayer,
                 );
                 return;
             }
@@ -196,12 +203,11 @@ export class ShipControls implements Controls {
 
             // If the object is too far, don't engage landing
             if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
                     "Too high to land",
                     2000,
-                    soundPlayer,
                 );
                 return;
             }
@@ -219,23 +225,21 @@ export class ShipControls implements Controls {
                 minimumPadSize: LandingPadSize.SMALL,
             });
             if (landingPad === null) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.SPACE_STATION,
                     NotificationIntent.ERROR,
                     "Landing request rejected",
                     2000,
-                    soundPlayer,
                 );
                 return;
             }
 
             tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_REQUEST_GRANTED);
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.SPACE_STATION,
                 NotificationIntent.SUCCESS,
                 `Landing request granted. Proceed to pad ${landingPad.getPadNumber()}`,
                 30000,
-                soundPlayer,
             );
             spaceship.engageLandingOnPad(landingPad);
         };
@@ -437,54 +441,49 @@ export class ShipControls implements Controls {
                     StarSystemInputs.map.toggleSpaceShipCharacter,
                     keyboardLayoutMap,
                 ).join(", ");
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.INFO,
                     i18n.t("notifications:landingComplete", { bindingsString: bindingsString }),
                     5000,
-                    this.soundPlayer,
                 );
             }
         });
 
         this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:landingSequenceEngaged"),
                 5000,
-                this.soundPlayer,
             );
             this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.INITIATING_PLANETARY_LANDING);
         });
 
         this.spaceship.onLandingCancelled.add(() => {
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:landingCancelled"),
                 5000,
-                this.soundPlayer,
             );
         });
 
         this.spaceship.onTakeOff.add(() => {
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:takeOffSuccess"),
                 2000,
-                this.soundPlayer,
             );
         });
 
         this.spaceship.onAutoPilotEngaged.add(() => {
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.SPACESHIP,
                 NotificationIntent.INFO,
                 i18n.t("notifications:autoPilotEngaged"),
                 30_000,
-                this.soundPlayer,
             );
         });
 
@@ -506,8 +505,20 @@ export class ShipControls implements Controls {
         return this.spaceship;
     }
 
-    static CreateDefault(scene: Scene, assets: RenderingAssets, tts: ITts, soundPlayer: ISoundPlayer) {
-        return new ShipControls(Spaceship.CreateDefault(scene, assets, soundPlayer), scene, soundPlayer, tts);
+    static CreateDefault(
+        scene: Scene,
+        assets: RenderingAssets,
+        tts: ITts,
+        soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
+    ) {
+        return new ShipControls(
+            Spaceship.CreateDefault(scene, assets, soundPlayer),
+            scene,
+            soundPlayer,
+            tts,
+            notificationManager,
+        );
     }
 
     dispose(soundPlayer: ISoundPlayer) {

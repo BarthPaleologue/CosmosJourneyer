@@ -22,11 +22,12 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
+import { type INotificationManager } from "../notificationManager";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const ExplorationCenterFilter = {
@@ -53,17 +54,20 @@ export class ExplorationCenterPanel {
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     private readonly soundPlayer: ISoundPlayer;
+    private readonly notificationManager: INotificationManager;
 
     constructor(
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
 
         this.soundPlayer = soundPlayer;
+        this.notificationManager = notificationManager;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("flex-column", "discoveryPanel");
@@ -107,12 +111,11 @@ export class ExplorationCenterPanel {
             for (const discovery of this.player.discoveries.local) {
                 const valueResult = await encyclopaedia.estimateDiscovery(discovery.objectId);
                 if (!valueResult.success) {
-                    createNotification(
+                    this.notificationManager.create(
                         NotificationOrigin.GENERAL,
                         NotificationIntent.ERROR,
                         valueResult.error,
                         5_000,
-                        this.soundPlayer,
                     );
                     continue;
                 }
@@ -166,7 +169,13 @@ export class ExplorationCenterPanel {
         this.discoveryList.classList.add("flex-column", "overflow-y-auto", "discoveryList");
         horizontalContainer.appendChild(this.discoveryList);
 
-        this.discoveryDetails = new DiscoveryDetails(player, encyclopaedia, starSystemDatabase, this.soundPlayer);
+        this.discoveryDetails = new DiscoveryDetails(
+            player,
+            encyclopaedia,
+            starSystemDatabase,
+            this.soundPlayer,
+            this.notificationManager,
+        );
         this.discoveryDetails.onSellDiscovery.add(async () => {
             await this.populate(starSystemDatabase);
         });
@@ -200,12 +209,11 @@ export class ExplorationCenterPanel {
         for (const discovery of this.player.discoveries.local) {
             const result = await this.encyclopaedia.estimateDiscovery(discovery.objectId);
             if (!result.success) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.ERROR,
                     result.error,
                     5_000,
-                    this.soundPlayer,
                 );
                 continue;
             }
