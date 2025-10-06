@@ -1,0 +1,395 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@font-face {
+    font-family: "Nasalization";
+    src: url("/fonts/nasalization-rg.otf");
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    background-color: rgb(61, 61, 61);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;
+}
+
+body {
+    margin: 0;
+    background: black;
+    overflow-x: hidden;
+}
+
+.fullView {
+    height: 100vh;
+    position: relative;
+    background-position: center;
+}
+
+// Screen reader only content
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Focus styles for accessibility
+button:focus,
+a:focus {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+@import "roadmap.scss";
+@import "animatedText.scss";
+@import "about.scss";
+
+.fullView {
+    &#view1 {
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+    }
+
+    &#viewRoadmap {
+        background-image: url(/static/starmap.webp);
+    }
+
+    &#view2 {
+        background-image: url(/static/footer2.webp);
+    }
+
+    background-size: cover;
+
+    color: white;
+
+    a {
+        color: white;
+        text-decoration: 2px underline rgba(255, 255, 255, 0.7);
+        transition: 0.2s;
+
+        &:hover {
+            text-decoration: 2px underline rgba(255, 255, 255, 1);
+        }
+
+        &:visited {
+            color: white;
+        }
+    }
+
+    .headerBackground {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 80%, rgb(0, 0, 0) 99%);
+        z-index: 0;
+        padding-bottom: 100px;
+    }
+
+    .headerRoadmap {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 1));
+        z-index: 0;
+        padding: 100px 0;
+    }
+
+    .view2Background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(to top, rgba(0, 0, 0, 0) 75%, rgba(0, 0, 0, 1));
+        z-index: 0;
+    }
+
+    h1 {
+        font-family: "Nasalization";
+        text-align: center;
+        z-index: 1;
+        text-shadow: 0 0 50px rgb(185 185 185 / 70%);
+        font-size: 6vw;
+
+        @media screen and (max-width: 1100px) {
+            font-size: 15vw;
+            margin-block: 0;
+        }
+    }
+
+    h2 {
+        font-family: "Nasalization";
+        font-weight: 100;
+        text-align: center;
+        font-size: 3.5vw;
+        z-index: 1;
+        margin-bottom: 10vh;
+        text-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+
+        @media screen and (max-width: 1100px) {
+            font-size: 7vw;
+        }
+    }
+
+    h3 {
+        font-family: "Nasalization";
+        text-align: center;
+        font-size: 2em;
+        z-index: 1;
+        text-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+    }
+
+    #buttonGrid {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        #secondaryButtons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+
+            a {
+                text-decoration: none;
+                color: white;
+                padding: 15px;
+
+                $tileSize: 30px;
+
+                width: $tileSize;
+                height: $tileSize;
+
+                background: #002b6a;
+
+                font-family: "Nasalization";
+                font-size: 2em;
+                width: fit-content;
+                box-shadow: 0 0 10px opacify($color: #002b6a, $amount: 0.5);
+                transition: 0.2s;
+
+                &#redditButton {
+                    background: #ff4500;
+                    box-shadow: 0 0 10px opacify($color: #ff4500, $amount: 0.5);
+
+                    &:hover {
+                        box-shadow: 0 0 50px opacify($color: #ff4500, $amount: 0.5);
+                    }
+                }
+
+                &#githubButton {
+                    background: #333;
+                    box-shadow: 0 0 10px opacify($color: #333, $amount: 0.5);
+
+                    &:hover {
+                        box-shadow: 0 0 50px opacify($color: #333, $amount: 0.5);
+                    }
+                }
+
+                &#youtubeButton {
+                    background: #ff0000;
+                    box-shadow: 0 0 10px opacify($color: #ff0000, $amount: 0.5);
+
+                    &:hover {
+                        box-shadow: 0 0 50px opacify($color: #ff0000, $amount: 0.5);
+                    }
+                }
+
+                &#patreonButton {
+                    background: #ff424d;
+                    box-shadow: 0 0 10px opacify($color: #ff424d, $amount: 0.5);
+
+                    &:hover {
+                        box-shadow: 0 0 50px opacify($color: #ff424d, $amount: 0.5);
+                    }
+                }
+
+                &#devlogButton {
+                    background: #ff8c00;
+                    box-shadow: 0 0 10px opacify($color: #ff8c00, $amount: 0.5);
+
+                    &:hover {
+                        box-shadow: 0 0 50px opacify($color: #ff8c00, $amount: 0.5);
+                    }
+                }
+
+                img {
+                    width: $tileSize;
+                    height: $tileSize;
+                }
+
+                &:hover {
+                    transform: perspective(1000px) rotateX(20deg) scale(1.1);
+                    box-shadow: 0 0 50px opacify($color: #002b6a, $amount: 0.5);
+                }
+
+                @media screen and (max-width: 1100px) {
+                    font-size: 1.5em;
+                }
+            }
+        }
+    }
+
+    #buttonGrid #mainButton {
+        font-family: "Nasalization";
+        font-size: 3em;
+        background: #002b6a !important;
+        background-color: #002b6a !important;
+        border: none;
+        color: white !important;
+        width: fit-content;
+        padding: 10px 20px;
+        cursor: pointer;
+        box-shadow: 0 0 10px opacify($color: #002b6a, $amount: 0.5);
+        transition: 0.2s;
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        &:hover {
+            background: #002b6a !important;
+            background-color: #002b6a !important;
+            transform: perspective(1000px) rotateX(20deg) scale(1.1);
+            box-shadow: 0 0 50px opacify($color: #002b6a, $amount: 0.5);
+        }
+
+        @media screen and (max-width: 1100px) {
+            font-size: 2em;
+        }
+    }
+
+    // Ensure main button has correct blue background with maximum specificity
+    .fullView #buttonGrid button#mainButton {
+        background: #002b6a !important;
+        background-color: #002b6a !important;
+        color: white !important;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: #002b6a !important;
+            background-color: #002b6a !important;
+            color: white !important;
+        }
+    }
+
+    .downArrow,
+    .topArrow {
+        position: absolute;
+        width: 100%;
+        height: 70px;
+        left: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &::before {
+            content: "";
+            background-image: url(/static/icons/up.webp);
+            background-size: cover;
+            width: 50px;
+            height: 50px;
+        }
+    }
+
+    .topArrow {
+        top: 30px;
+
+        &::before {
+            animation: bounce2 2s infinite ease-in-out;
+            animation-delay: 1s;
+        }
+    }
+
+    .downArrow {
+        bottom: 30px;
+
+        &::before {
+            rotate: 180deg;
+            animation: bounce 2s infinite ease-in-out;
+        }
+    }
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce2 {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+#support {
+    width: 600px;
+    margin: auto;
+    text-align: center;
+}
+
+#supportList img {
+    filter: invert(1);
+    aspect-ratio: 1;
+    height: 50px;
+}

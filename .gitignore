@@ -16,3 +16,5 @@ packages/game/dist
 packages/game/doc
 packages/game/coverage
 .pnpm-store
+.next
+out
