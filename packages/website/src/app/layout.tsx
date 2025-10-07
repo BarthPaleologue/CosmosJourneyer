@@ -16,17 +16,18 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
-import { SITE_CONFIG } from "@/utils/constants";
+import { SiteConfig } from "@/utils/constants";
 
 export const metadata: Metadata = {
-    metadataBase: new URL(SITE_CONFIG.url),
+    metadataBase: new URL(SiteConfig.url),
     title: {
-        default: SITE_CONFIG.name,
-        template: `%s | ${SITE_CONFIG.name}`,
+        default: SiteConfig.name,
+        template: `%s | ${SiteConfig.name}`,
     },
-    description: SITE_CONFIG.description,
-    applicationName: SITE_CONFIG.name,
+    description: SiteConfig.description,
+    applicationName: SiteConfig.name,
     authors: [{ name: "Barthélemy Paléologue" }],
     generator: "Next.js",
     keywords: [
@@ -55,23 +56,23 @@ export const metadata: Metadata = {
     openGraph: {
         type: "website",
         locale: "en_US",
-        url: SITE_CONFIG.url,
-        title: SITE_CONFIG.name,
-        description: SITE_CONFIG.description,
-        siteName: SITE_CONFIG.name,
+        url: SiteConfig.url,
+        title: SiteConfig.name,
+        description: SiteConfig.description,
+        siteName: SiteConfig.name,
         images: [
             {
                 url: "/icon.png",
                 width: 1200,
                 height: 630,
-                alt: SITE_CONFIG.name,
+                alt: SiteConfig.name,
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: SITE_CONFIG.name,
-        description: SITE_CONFIG.description,
+        title: SiteConfig.name,
+        description: SiteConfig.description,
         images: ["/icon.png"],
     },
     icons: {
@@ -82,7 +83,7 @@ export const metadata: Metadata = {
 };
 
 interface RootLayoutProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {

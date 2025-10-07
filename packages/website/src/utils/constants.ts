@@ -1,4 +1,4 @@
-import { RoadmapItem, SocialLink } from "@/types";
+import type { RoadmapItem, SocialLink } from "@/types";
 
 // Images - using public folder paths
 const spaceStationImage = "/static/spacestation.webp";
@@ -15,7 +15,7 @@ const reddit = "/static/icons/reddit.webp";
 const patreon = "/static/icons/patreon.webp";
 const devlog = "/static/icons/devlog.webp";
 
-export const SOCIAL_LINKS = [
+export const SocialLinks = [
     {
         id: "patreon",
         name: "Patreon",
@@ -53,7 +53,7 @@ export const SOCIAL_LINKS = [
     },
 ] as const satisfies SocialLink[];
 
-export const ROADMAP_ITEMS = [
+export const RoadmapItems = [
     {
         id: "space-stations",
         title: "Space stations",
@@ -177,7 +177,7 @@ export const ROADMAP_ITEMS = [
     },
 ] as const satisfies RoadmapItem[];
 
-export const FAQ_ITEMS = [
+export const FaqItems = [
     {
         id: "what-is-cosmos-journeyer",
         question: "What is Cosmos Journeyer?",
@@ -199,7 +199,7 @@ export const FAQ_ITEMS = [
     },
 ] as const;
 
-export const SITE_CONFIG = {
+export const SiteConfig = {
     name: "Cosmos Journeyer",
     description:
         "Cosmos Journeyer is a free and open-source space exploration game that lets you discover the wonders of the universe.",

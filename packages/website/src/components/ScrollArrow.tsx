@@ -20,15 +20,18 @@ export const ScrollArrow = ({ direction, targetSection, onClick, className = "",
     };
 
     const defaultAriaLabel = direction === "up" ? "Scroll to top" : "Scroll to next section";
+    const computedAriaLabel = ariaLabel ?? defaultAriaLabel;
 
     return (
         <div
             className={`${direction === "up" ? "topArrow" : "downArrow"} ${className}`}
             onClick={handleClick}
-            onKeyDown={(e) => handleKeyPress(handleClick, e)}
+            onKeyDown={(e) => {
+                handleKeyPress(handleClick, e);
+            }}
             role="button"
             tabIndex={0}
-            aria-label={ariaLabel || defaultAriaLabel}
+            aria-label={computedAriaLabel}
         />
     );
 };

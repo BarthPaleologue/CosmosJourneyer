@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { ScrollDirection } from "@/types";
+import type { ScrollDirection } from "@/types";
 
 export const useScrollTo = () => {
     const scrollTo = useCallback((options: ScrollDirection) => {

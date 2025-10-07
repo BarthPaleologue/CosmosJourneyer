@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import { handleExternalLink, handleKeyPress } from "@/utils";
 
-import { SocialLink } from "@/types";
+import type { SocialLink } from "@/types";
 
 interface SocialLinksProps {
     links: SocialLink[];
@@ -24,7 +24,11 @@ export const SocialLinks = ({ links, className = "" }: SocialLinksProps) => {
                         e.preventDefault();
                         handleExternalLink(link.url);
                     }}
-                    onKeyDown={(e) => handleKeyPress(() => handleExternalLink(link.url), e)}
+                    onKeyDown={(e) => {
+                        handleKeyPress(() => {
+                            handleExternalLink(link.url);
+                        }, e);
+                    }}
                     role="button"
                     tabIndex={0}
                 >

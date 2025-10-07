@@ -17,9 +17,9 @@
 
 "use client";
 
-import React from "react";
+import type { FC } from "react";
 
-import { FAQ_ITEMS } from "@/utils/constants";
+import { FaqItems } from "@/utils/constants";
 
 import { FAQ } from "@/components/FAQ";
 import { RotatingCube } from "@/components/RotatingCube";
@@ -32,17 +32,23 @@ export interface View2Props {
 
 const CUBE_FACES = ["Free Forever", "Curiosity Driven", "Open Source", "Labor of Love"];
 
-export const View2: React.FC<View2Props> = ({ className = "" }) => {
+export const View2: FC<View2Props> = ({ className = "" }) => {
     const { scrollToView } = useScrollTo();
 
     return (
         <div className={`fullView ${className}`} id="view2">
             <div className="view2Background">
-                <ScrollArrow direction="up" onClick={() => scrollToView(1)} ariaLabel="Scroll to previous section" />
+                <ScrollArrow
+                    direction="up"
+                    onClick={() => {
+                        scrollToView(1);
+                    }}
+                    ariaLabel="Scroll to previous section"
+                />
 
                 <RotatingCube faces={CUBE_FACES} />
 
-                <FAQ items={FAQ_ITEMS} />
+                <FAQ items={FaqItems} />
 
                 <footer>{/* Footer content can be added here */}</footer>
             </div>

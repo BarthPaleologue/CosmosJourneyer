@@ -1,6 +1,6 @@
-import React from "react";
+import type { FC } from "react";
 
-import { FAQItem } from "@/types";
+import type { FAQItem } from "@/types";
 
 interface FAQProps {
     items: readonly FAQItem[];
@@ -10,7 +10,7 @@ interface FAQItemProps {
     item: FAQItem;
 }
 
-const FAQItemComponent: React.FC<FAQItemProps> = ({ item }) => {
+const FAQItemComponent: FC<FAQItemProps> = ({ item }) => {
     const renderAnswer = (answer: string | readonly string[]) => {
         if (typeof answer === "string") {
             return <p dangerouslySetInnerHTML={{ __html: answer }} />;
@@ -33,7 +33,7 @@ const FAQItemComponent: React.FC<FAQItemProps> = ({ item }) => {
     );
 };
 
-export const FAQ: React.FC<FAQProps> = ({ items }) => {
+export const FAQ: FC<FAQProps> = ({ items }) => {
     return (
         <div id="about">
             <h2>FAQ:</h2>

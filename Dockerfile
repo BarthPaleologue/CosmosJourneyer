@@ -4,6 +4,7 @@ FROM mcr.microsoft.com/playwright:v${PW_VERSION}-jammy AS e2e
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/game/package.json packages/game/
+COPY packages/website/package.json packages/website/
 
 RUN corepack enable \
     && PNPM_VERSION=$(node -p "const pm=require('./package.json').packageManager; pm.substring(pm.indexOf('@') + 1)") \

@@ -9,7 +9,6 @@
         "allowSyntheticDefaultImports": true,
         "incremental": true,
         "sourceMap": true,
-        "tsBuildInfoFile": "./dist/.tsbuildinfo",
         "strict": true,
         "exactOptionalPropertyTypes": true,
         "noImplicitOverride": true,
@@ -24,7 +23,6 @@
         "noUncheckedSideEffectImports": true,
         "verbatimModuleSyntax": true,
         "moduleDetection": "force",
-        "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
-        "types": ["webpack-env"]
+        "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"]
     }
 }

@@ -1,11 +1,11 @@
-import React from "react";
+import type { FC } from "react";
 
 interface RotatingCubeProps {
     faces: string[];
     className?: string;
 }
 
-export const RotatingCube: React.FC<RotatingCubeProps> = ({ faces, className = "" }) => {
+export const RotatingCube: FC<RotatingCubeProps> = ({ faces, className = "" }) => {
     return (
         <div id="shared-loader" className={className}>
             <div className="cube">

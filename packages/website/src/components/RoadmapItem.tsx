@@ -1,13 +1,13 @@
 import Image from "next/image";
-import React from "react";
+import type { FC } from "react";
 
-import { RoadmapItem } from "@/types";
+import type { RoadmapItem } from "@/types";
 
 interface RoadmapItemComponentProps {
     item: RoadmapItem;
 }
 
-export const RoadmapItemComponent: React.FC<RoadmapItemComponentProps> = ({ item }) => {
+export const RoadmapItemComponent: FC<RoadmapItemComponentProps> = ({ item }) => {
     return (
         <div className="roadmapItem">
             <h3>{item.title}</h3>

@@ -1,4 +1,6 @@
-import { ScrollDirection } from "@/types";
+import type { KeyboardEvent, MouseEvent } from "react";
+
+import type { ScrollDirection } from "@/types";
 
 export const smoothScrollTo = (options: ScrollDirection): void => {
     window.scrollTo(options);
@@ -18,7 +20,7 @@ export const scrollToSection = (sectionIndex: number): void => {
     });
 };
 
-export const handleExternalLink = (url: string, event?: React.MouseEvent): void => {
+export const handleExternalLink = (url: string, event?: MouseEvent): void => {
     if (event) {
         event.preventDefault();
     }
@@ -26,7 +28,7 @@ export const handleExternalLink = (url: string, event?: React.MouseEvent): void 
 };
 
 // Accessibility helper for keyboard navigation
-export const handleKeyPress = (callback: () => void, event: React.KeyboardEvent): void => {
+export const handleKeyPress = (callback: () => void, event: KeyboardEvent): void => {
     if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         callback();
@@ -37,8 +39,8 @@ export const handleKeyPress = (callback: () => void, event: React.KeyboardEvent)
 export const getOptimizedImageProps = (src: string, alt: string, width?: number, height?: number) => ({
     src,
     alt,
-    width: width || 480,
-    height: height || undefined,
+    width: width ?? 480,
+    height: height ?? undefined,
     loading: "lazy" as const,
     placeholder: "blur" as const,
     blurDataURL:

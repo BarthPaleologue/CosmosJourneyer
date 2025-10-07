@@ -17,18 +17,16 @@
 
 "use client";
 
-import React from "react";
-
 import { handleExternalLink, handleKeyPress } from "@/utils";
-import { SITE_CONFIG, SOCIAL_LINKS } from "@/utils/constants";
+import { SiteConfig, SocialLinks as socialLinks } from "@/utils/constants";
 
 import { ScrollArrow } from "@/components/ScrollArrow";
-import { SocialLinks } from "@/components/SocialLinks";
-import { ViewProps } from "@/types";
+import { SocialLinks as SocialLinksComponent } from "@/components/SocialLinks";
+import type { ViewProps } from "@/types";
 
 export const View1 = ({ className = "", id = "view1" }: ViewProps) => {
     const handleStartJourney = () => {
-        handleExternalLink(SITE_CONFIG.gameUrl);
+        handleExternalLink(SiteConfig.gameUrl);
     };
 
     return (
@@ -44,7 +42,7 @@ export const View1 = ({ className = "", id = "view1" }: ViewProps) => {
             />
             <div className="headerBackground">
                 <header>
-                    <h1>{SITE_CONFIG.name}</h1>
+                    <h1>{SiteConfig.name}</h1>
                     <h2>An entire universe on a web page</h2>
                 </header>
 
@@ -53,12 +51,14 @@ export const View1 = ({ className = "", id = "view1" }: ViewProps) => {
                         type="button"
                         id="mainButton"
                         onClick={handleStartJourney}
-                        onKeyDown={(e) => handleKeyPress(handleStartJourney, e)}
+                        onKeyDown={(e) => {
+                            handleKeyPress(handleStartJourney, e);
+                        }}
                     >
                         Start your journey!
                     </button>
 
-                    <SocialLinks links={SOCIAL_LINKS} />
+                    <SocialLinksComponent links={socialLinks} />
                 </div>
 
                 <ScrollArrow direction="down" targetSection={1} ariaLabel="Scroll to roadmap section" />

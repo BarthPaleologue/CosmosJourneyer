@@ -17,9 +17,10 @@
 
 "use client";
 
-import React, { useRef } from "react";
+import { useRef } from "react";
+import type { FC } from "react";
 
-import { ROADMAP_ITEMS } from "@/utils/constants";
+import { RoadmapItems } from "@/utils/constants";
 
 import { RoadmapItemComponent } from "@/components/RoadmapItem";
 import { ScrollArrow } from "@/components/ScrollArrow";
@@ -29,7 +30,7 @@ export interface ViewRoadmapProps {
     className?: string;
 }
 
-export const ViewRoadmap: React.FC<ViewRoadmapProps> = ({ className = "" }) => {
+export const ViewRoadmap: FC<ViewRoadmapProps> = ({ className = "" }) => {
     const roadmapRef = useRef<HTMLDivElement>(null);
     const { scrollToView } = useScrollTo();
 
@@ -56,13 +57,19 @@ export const ViewRoadmap: React.FC<ViewRoadmapProps> = ({ className = "" }) => {
     return (
         <div className={`fullView ${className}`} id="viewRoadmap">
             <div className="headerRoadmap">
-                <ScrollArrow direction="up" onClick={() => scrollToView(0)} ariaLabel="Scroll to top" />
+                <ScrollArrow
+                    direction="up"
+                    onClick={() => {
+                        scrollToView(0);
+                    }}
+                    ariaLabel="Scroll to top"
+                />
 
                 <h2>Roadmap</h2>
 
                 <div className="roadmapContainer">
                     <div id="roadmap" ref={roadmapRef}>
-                        {ROADMAP_ITEMS.map((item) => (
+                        {RoadmapItems.map((item) => (
                             <RoadmapItemComponent key={item.id} item={item} />
                         ))}
                     </div>
@@ -86,7 +93,13 @@ export const ViewRoadmap: React.FC<ViewRoadmapProps> = ({ className = "" }) => {
                     </button>
                 </div>
 
-                <ScrollArrow direction="down" onClick={() => scrollToView(2)} ariaLabel="Scroll to next section" />
+                <ScrollArrow
+                    direction="down"
+                    onClick={() => {
+                        scrollToView(2);
+                    }}
+                    ariaLabel="Scroll to next section"
+                />
             </div>
         </div>
     );
