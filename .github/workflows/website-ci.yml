@@ -20,8 +20,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    quality-check:
-        name: website-ci
+    website-validation:
+        name: website-quality-gate
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -51,7 +51,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Type check
-              run: pnpm --filter @cosmos-journeyer/website type-check
+              run: pnpm --filter @cosmos-journeyer/website typecheck
 
             - name: Format check
               run: pnpm --filter @cosmos-journeyer/website format:check

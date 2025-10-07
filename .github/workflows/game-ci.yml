@@ -1,18 +1,40 @@
-name: CI Pipeline
+name: Game CI
 on:
     push:
         branches: [main]
+        paths:
+            - "packages/game/**"
+            - "scripts/**"
+            - "Dockerfile"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "tsconfig.base.json"
+            - "tsconfig.json"
+            - "eslint.config.mjs"
+            - ".github/workflows/game-ci.yml"
     pull_request:
         branches: [main]
+        paths:
+            - "packages/game/**"
+            - "scripts/**"
+            - "Dockerfile"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "tsconfig.base.json"
+            - "tsconfig.json"
+            - "eslint.config.mjs"
+            - ".github/workflows/game-ci.yml"
     workflow_dispatch:
 
 concurrency:
-    group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
+    group: game-ci-${{ github.head_ref || github.ref_name || github.run_id }}
     cancel-in-progress: true
 
 jobs:
-    validate:
-        name: full-ci-pipeline
+    game-validation:
+        name: game-full-pipeline
         runs-on: ubuntu-latest
         timeout-minutes: 20
         strategy:
@@ -59,10 +81,6 @@ jobs:
 
             - name: Build documentation
               run: pnpm doc
-
-            # ─────────── Build & E2E Tests ───────────
-            - name: Build
-              run: pnpm build
 
               # ─────────── build test image (local load, no push)
             - name: Build Docker image

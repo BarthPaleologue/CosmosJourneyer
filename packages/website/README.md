@@ -8,20 +8,15 @@ If you are looking for the game itself, please visit this [GitHub Repository](ht
 
 ## Quick Start
 
-1. **Clone the repository**
+1. Clone the Cosmos Journeyer monorepo and run `pnpm install`.
+
+2. Change to the website package:
 
     ```bash
-    git clone <repository-url>
-    cd CosmosJourneyerWebsite
+    cd packages/website
     ```
 
-2. **Install dependencies**
-
-    ```bash
-    pnpm install
-    ```
-
-3. **Start development server**
+3. Start the website development server:
 
     ```bash
     pnpm dev
@@ -31,6 +26,8 @@ If you are looking for the game itself, please visit this [GitHub Repository](ht
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Available Scripts
+
+Run the following from `packages/website`:
 
 ### Development
 
@@ -42,14 +39,13 @@ If you are looking for the game itself, please visit this [GitHub Repository](ht
 
 - `pnpm lint` - Run ESLint
 - `pnpm lint:fix` - Fix ESLint issues
-- `pnpm type-check` - Run TypeScript type checking
+- `pnpm typecheck` - Run TypeScript type checking
 - `pnpm format` - Format code with Prettier
 - `pnpm format:check` - Check code formatting
 
 ### Testing & Deployment
 
 - `pnpm test:all` - Run all checks (lint + type-check + build)
-- `pnpm export` - Build and export static site
 - `pnpm serve:prod` - Serve production build locally
 
 ## Tech Stack
