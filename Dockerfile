@@ -13,7 +13,7 @@ RUN pnpm install --frozen-lockfile
 
 # copy sources and build your webpack bundle
 COPY . .
-RUN pnpm build
+RUN pnpm build:prod
 
 WORKDIR /app/packages/game
 

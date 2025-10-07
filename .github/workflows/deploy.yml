@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Game
 on:
     workflow_dispatch:
 
@@ -6,11 +6,11 @@ permissions:
     contents: write
 
 concurrency:
-    group: deploy
+    group: deploy_game
     cancel-in-progress: true
 
 jobs:
-    deploy:
+    deploy_game:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:

@@ -37,9 +37,12 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "pnpm --filter @cosmos-journeyer/game build",
+        "build": "pnpm build:game",
+        "build:game": "pnpm --filter @cosmos-journeyer/game build",
+        "build:website": "pnpm --filter @cosmos-journeyer/website build",
+        "build:prod": "tsx ./scripts/build-prod.ts",
         "serve": "pnpm --filter @cosmos-journeyer/game serve",
-        "serve:prod": "pnpm --filter @cosmos-journeyer/game serve:prod",
+        "serve:prod": "http-server dist -p 8080",
         "format:check": "pnpm --filter @cosmos-journeyer/game format:check",
         "format": "pnpm --filter @cosmos-journeyer/game format",
         "test:unit": "pnpm --filter @cosmos-journeyer/game test:unit",
@@ -64,6 +67,8 @@
         "@eslint/js": "^9.35.0",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
         "@next/eslint-plugin-next": "^14.2.33",
+        "http-server": "^14.1.1",
+        "tsx": "^4.19.2",
         "eslint": "^9.35.0",
         "eslint-import-resolver-typescript": "^4.4.4",
         "eslint-plugin-import": "^2.32.0",
