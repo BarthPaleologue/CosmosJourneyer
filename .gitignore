@@ -19,3 +19,4 @@ packages/game/coverage
 .next
 out
 .tsbuildinfo
+packages/website/next-env.d.ts

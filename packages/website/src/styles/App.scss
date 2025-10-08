@@ -15,6 +15,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+@use "./roadmap.scss" as *;
+@use "./animatedText.scss" as *;
+@use "./about.scss" as *;
+
 @font-face {
     font-family: "Nasalization";
     src: url("/fonts/nasalization-rg.otf");
@@ -61,10 +65,6 @@ a:focus {
     outline: 2px solid #ffffff;
     outline-offset: 2px;
 }
-
-@import "roadmap.scss";
-@import "animatedText.scss";
-@import "about.scss";
 
 .fullView {
     &#view1 {
@@ -205,51 +205,51 @@ a:focus {
                 font-family: "Nasalization";
                 font-size: 2em;
                 width: fit-content;
-                box-shadow: 0 0 10px opacify($color: #002b6a, $amount: 0.5);
+                box-shadow: 0 0 10px #002b6a;
                 transition: 0.2s;
 
                 &#redditButton {
                     background: #ff4500;
-                    box-shadow: 0 0 10px opacify($color: #ff4500, $amount: 0.5);
+                    box-shadow: 0 0 10px #ff4500;
 
                     &:hover {
-                        box-shadow: 0 0 50px opacify($color: #ff4500, $amount: 0.5);
+                        box-shadow: 0 0 50px #ff4500;
                     }
                 }
 
                 &#githubButton {
                     background: #333;
-                    box-shadow: 0 0 10px opacify($color: #333, $amount: 0.5);
+                    box-shadow: 0 0 10px #333;
 
                     &:hover {
-                        box-shadow: 0 0 50px opacify($color: #333, $amount: 0.5);
+                        box-shadow: 0 0 50px #333;
                     }
                 }
 
                 &#youtubeButton {
                     background: #ff0000;
-                    box-shadow: 0 0 10px opacify($color: #ff0000, $amount: 0.5);
+                    box-shadow: 0 0 10px #ff0000;
 
                     &:hover {
-                        box-shadow: 0 0 50px opacify($color: #ff0000, $amount: 0.5);
+                        box-shadow: 0 0 50px #ff0000;
                     }
                 }
 
                 &#patreonButton {
                     background: #ff424d;
-                    box-shadow: 0 0 10px opacify($color: #ff424d, $amount: 0.5);
+                    box-shadow: 0 0 10px #ff424d;
 
                     &:hover {
-                        box-shadow: 0 0 50px opacify($color: #ff424d, $amount: 0.5);
+                        box-shadow: 0 0 50px #ff424d;
                     }
                 }
 
                 &#devlogButton {
                     background: #ff8c00;
-                    box-shadow: 0 0 10px opacify($color: #ff8c00, $amount: 0.5);
+                    box-shadow: 0 0 10px #ff8c00;
 
                     &:hover {
-                        box-shadow: 0 0 50px opacify($color: #ff8c00, $amount: 0.5);
+                        box-shadow: 0 0 50px #ff8c00;
                     }
                 }
 
@@ -260,7 +260,7 @@ a:focus {
 
                 &:hover {
                     transform: perspective(1000px) rotateX(20deg) scale(1.1);
-                    box-shadow: 0 0 50px opacify($color: #002b6a, $amount: 0.5);
+                    box-shadow: 0 0 50px #002b6a;
                 }
 
                 @media screen and (max-width: 1100px) {
@@ -280,7 +280,7 @@ a:focus {
         width: fit-content;
         padding: 10px 20px;
         cursor: pointer;
-        box-shadow: 0 0 10px opacify($color: #002b6a, $amount: 0.5);
+        box-shadow: 0 0 10px #002b6a;
         transition: 0.2s;
 
         a {
@@ -292,7 +292,7 @@ a:focus {
             background: #002b6a !important;
             background-color: #002b6a !important;
             transform: perspective(1000px) rotateX(20deg) scale(1.1);
-            box-shadow: 0 0 50px opacify($color: #002b6a, $amount: 0.5);
+            box-shadow: 0 0 50px #002b6a;
         }
 
         @media screen and (max-width: 1100px) {
