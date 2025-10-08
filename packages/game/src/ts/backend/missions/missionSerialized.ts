@@ -34,7 +34,7 @@ export const MissionSerializedSchema = z.object({
     missionGiver: UniverseObjectIdSchema,
     tree: MissionNodeSerializedSchema,
     reward: z.number().default(0),
-    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY),
+    type: z.enum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY),
 });
 
 /**

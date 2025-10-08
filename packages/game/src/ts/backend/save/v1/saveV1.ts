@@ -36,7 +36,7 @@ const SystemObjectIdSchema = z.object({
     /**
      * The type of the object.
      */
-    objectType: z.nativeEnum(SystemObjectType),
+    objectType: z.enum(SystemObjectType),
 
     /**
      * The index of the object inside the array containing all objects of the given type within the star system.
@@ -65,12 +65,9 @@ const SerializedFuelScoopSchema = z.object({
 });
 
 const SerializedSpaceshipSchemaV1 = z.object({
-    id: z
-        .string()
-        .uuid()
-        .default(() => crypto.randomUUID()),
+    id: z.uuid().default(() => crypto.randomUUID()),
     name: z.string().default("Wanderer"),
-    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
+    type: z.enum(ShipType).default(ShipType.WANDERER),
     fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
     fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 }),
 });
@@ -136,7 +133,7 @@ export const SaveSchemaV1 = z.object({
             /**
              * The type of the object.
              */
-            objectType: z.nativeEnum(SystemObjectType),
+            objectType: z.enum(SystemObjectType),
 
             /**
              * The index of the object inside the array containing all objects of the given type within the star system.

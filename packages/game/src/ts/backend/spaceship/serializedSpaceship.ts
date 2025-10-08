@@ -27,8 +27,8 @@ export enum ShipType {
 }
 
 export const BaseSpaceshipSchema = z.object({
-    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
-    id: z.string().uuid(),
+    type: z.enum(ShipType).default(ShipType.WANDERER),
+    id: z.uuid(),
     name: z.string(),
     components: z.object({
         primary: z.object({

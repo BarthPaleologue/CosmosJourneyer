@@ -30,7 +30,7 @@ export enum LandMissionState {
 export const MissionTerminatorLandingNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.TERMINATOR_LANDING),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(LandMissionState),
+    state: z.enum(LandMissionState),
 });
 
 export type MissionTerminatorLandingNodeSerialized = z.infer<typeof MissionTerminatorLandingNodeSerializedSchema>;

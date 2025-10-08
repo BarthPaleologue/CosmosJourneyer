@@ -39,7 +39,7 @@ export const SaveSchemaV2 = z.object({
 
     playerLocation: UniverseCoordinatesSchema,
 
-    shipLocations: z.record(z.string().uuid(), UniverseCoordinatesSchema),
+    shipLocations: z.record(z.uuid(), UniverseCoordinatesSchema),
 
     thumbnail: z.string().optional(),
 });

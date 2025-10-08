@@ -30,7 +30,7 @@ export enum FlyByState {
 export const MissionFlyByNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.FLY_BY),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(FlyByState),
+    state: z.enum(FlyByState),
 });
 
 export type MissionFlyByNodeSerialized = z.infer<typeof MissionFlyByNodeSerializedSchema>;

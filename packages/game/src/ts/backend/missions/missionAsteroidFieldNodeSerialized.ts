@@ -30,7 +30,7 @@ export enum AsteroidFieldMissionState {
 export const MissionAsteroidFieldNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.ASTEROID_FIELD),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(AsteroidFieldMissionState),
+    state: z.enum(AsteroidFieldMissionState),
 });
 
 export type MissionAsteroidFieldNodeSerialized = z.infer<typeof MissionAsteroidFieldNodeSerializedSchema>;
