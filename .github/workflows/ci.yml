@@ -40,5 +40,5 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Build
-              run: pnpm build
+            - name: Build production bundle
+              run: pnpm build:prod
