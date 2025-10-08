@@ -33,9 +33,9 @@ export const SocialLinks = [
     {
         id: "youtube",
         name: "YouTube",
-        url: "https://www.youtube.com/watch?v=5pXZqHRShTE",
+        url: "https://youtu.be/AZM6psivIBE",
         icon: { src: youtube, alt: "youtube" },
-        title: "Watch the trailer on Youtube!",
+        title: "Watch the gameplay demo on Youtube!",
     },
     {
         id: "reddit",
