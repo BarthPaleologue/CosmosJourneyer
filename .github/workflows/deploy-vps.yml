@@ -1,14 +1,39 @@
 name: Deploy to VPS
 
 on:
-    push:
-        branches:
-            - gh-pages
+    workflow_dispatch:
 
 jobs:
     deploy-vps:
         runs-on: ubuntu-latest
         steps:
-            - name: Force pull changes from GitHub
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Use Node.js 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build production bundle
+              run: pnpm build:prod
+
+            - name: Add VPS to known hosts
               run: |
-                  ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.VPS_DEPLOY_PATH }} && git fetch && sudo git reset --hard origin/gh-pages && sudo git clean -df"
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+            - name: Ensure remote directory exists
+              run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "sudo mkdir -p /var/www/cosmos_journeyer_prod"
+
+            - name: Deploy production assets
+              run: rsync -az --delete --rsync-path="sudo rsync" dist/ ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/var/www/cosmos_journeyer_prod/
