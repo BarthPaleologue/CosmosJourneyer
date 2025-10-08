@@ -29,7 +29,6 @@ import { Settings } from "@/settings";
 import { type GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
 import { type CelestialBodyModel } from "../orbitalObjects/index";
 import { type Orbit } from "../orbitalObjects/orbit";
-import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
 import { newSeededRingsModel } from "../orbitalObjects/ringsModel";
 
 export function newSeededGasPlanetModel(
@@ -97,7 +96,7 @@ export function newSeededGasPlanetModel(
     const colorSharpness = randRangeInt(40, 80, rng, 80) / 10;
 
     return {
-        type: OrbitalObjectType.GAS_PLANET,
+        type: "gasPlanet",
         id: id,
         name: name,
         seed: seed,

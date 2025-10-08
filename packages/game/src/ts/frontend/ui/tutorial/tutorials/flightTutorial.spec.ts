@@ -18,7 +18,6 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { FlightTutorial } from "./flightTutorial";
@@ -61,8 +60,8 @@ describe("flightTutorial", () => {
             throw new Error("planetModel is null");
         }
 
-        expect(planetModel.type).toBe(OrbitalObjectType.GAS_PLANET);
-        if (planetModel.type !== OrbitalObjectType.GAS_PLANET) {
+        expect(planetModel.type).toBe("gasPlanet");
+        if (planetModel.type !== "gasPlanet") {
             throw new Error("planetModel.type is not GAS_PLANET");
         }
 

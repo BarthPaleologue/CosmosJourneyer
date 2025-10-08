@@ -26,7 +26,6 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
 import { type Textures } from "@/frontend/assets/textures";
@@ -48,7 +47,7 @@ import { Settings } from "@/settings";
 
 import { StarMaterial } from "./starMaterial";
 
-export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable {
+export class Star implements StellarObjectBase<"star">, Cullable {
     readonly mesh: Mesh;
     readonly light: PointLight;
     private readonly material: StarMaterial;
@@ -63,7 +62,7 @@ export class Star implements StellarObjectBase<OrbitalObjectType.STAR>, Cullable
 
     readonly model: DeepReadonly<StarModel>;
 
-    readonly type = OrbitalObjectType.STAR;
+    readonly type = "star";
 
     readonly targetInfo: TargetInfo;
 

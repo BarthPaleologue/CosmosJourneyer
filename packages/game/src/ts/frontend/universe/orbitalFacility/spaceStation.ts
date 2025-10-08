@@ -22,7 +22,6 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
@@ -50,12 +49,12 @@ import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 
-export class SpaceStation implements OrbitalFacilityBase<OrbitalObjectType.SPACE_STATION> {
+export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     readonly name: string;
 
     readonly model: DeepReadonly<SpaceStationModel>;
 
-    readonly type = OrbitalObjectType.SPACE_STATION;
+    readonly type = "spaceStation";
 
     readonly solarSections: SolarSection[] = [];
     readonly utilitySections: UtilitySection[] = [];

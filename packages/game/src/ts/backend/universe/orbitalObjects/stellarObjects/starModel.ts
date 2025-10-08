@@ -17,10 +17,9 @@
 
 import { type HasSeed } from "../hasSeed";
 import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 import { type RingsModel } from "../ringsModel";
 
-export type StarModel = OrbitalObjectModelBase<OrbitalObjectType.STAR> &
+export type StarModel = OrbitalObjectModelBase<"star"> &
     HasSeed & {
         readonly radius: number;
 

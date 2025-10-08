@@ -25,7 +25,6 @@ import { type GasPlanetModel } from "./gasPlanetModel";
 import { type SpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModel";
 import { type SpaceStationModel } from "./orbitalFacilities/spacestationModel";
 import { type OrbitalObjectModelBase } from "./orbitalObjectModelBase";
-import { type OrbitalObjectType } from "./orbitalObjectType";
 import { type BlackHoleModel } from "./stellarObjects/blackHoleModel";
 import { type NeutronStarModel } from "./stellarObjects/neutronStarModel";
 import { type StarModel } from "./stellarObjects/starModel";
@@ -52,6 +51,8 @@ export type CelestialBodyModel = StellarObjectModel | PlanetaryMassObjectModel |
 
 export type OrbitalFacilityModel = SpaceStationModel | SpaceElevatorModel;
 
-export type CustomObjectModel = OrbitalObjectModelBase<OrbitalObjectType.CUSTOM>;
+export type CustomObjectModel = OrbitalObjectModelBase<"custom">;
 
 export type OrbitalObjectModel = CelestialBodyModel | OrbitalFacilityModel | CustomObjectModel;
+
+export type OrbitalObjectType = OrbitalObjectModel["type"];

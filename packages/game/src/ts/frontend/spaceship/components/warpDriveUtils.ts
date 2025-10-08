@@ -18,8 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
 import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 export function canEngageWarpDrive(
@@ -34,10 +32,10 @@ export function canEngageWarpDrive(
     }
 
     if (
-        nearestOrbitalObject.type !== OrbitalObjectType.GAS_PLANET &&
-        nearestOrbitalObject.type !== OrbitalObjectType.TELLURIC_PLANET &&
-        nearestOrbitalObject.type !== OrbitalObjectType.STAR &&
-        nearestOrbitalObject.type !== OrbitalObjectType.NEUTRON_STAR
+        nearestOrbitalObject.type !== "gasPlanet" &&
+        nearestOrbitalObject.type !== "telluricPlanet" &&
+        nearestOrbitalObject.type !== "star" &&
+        nearestOrbitalObject.type !== "neutronStar"
     ) {
         return true;
     }

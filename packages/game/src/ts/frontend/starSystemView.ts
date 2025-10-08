@@ -29,7 +29,6 @@ import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -824,10 +823,7 @@ export class StarSystemView implements View {
         this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
         spaceship.setClosestWalkableObject(nearestOrbitalObject);
 
-        if (
-            nearestOrbitalObject.type === OrbitalObjectType.SPACE_STATION ||
-            nearestOrbitalObject.type === OrbitalObjectType.SPACE_ELEVATOR
-        ) {
+        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
             this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);

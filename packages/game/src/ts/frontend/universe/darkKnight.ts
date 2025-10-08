@@ -22,7 +22,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
@@ -33,8 +32,8 @@ import { type CelestialBodyBase } from "./architecture/celestialBody";
 import { ObjectTargetCursorType, type TargetInfo } from "./architecture/targetable";
 import { type AsteroidField } from "./asteroidFields/asteroidField";
 
-export class DarkKnight implements CelestialBodyBase<OrbitalObjectType.DARK_KNIGHT> {
-    readonly type: OrbitalObjectType.DARK_KNIGHT;
+export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
+    readonly type: "darkKnight";
 
     readonly model: DeepReadonly<DarkKnightModel>;
 

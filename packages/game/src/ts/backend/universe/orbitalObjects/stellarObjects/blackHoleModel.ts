@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type BlackHoleModel = OrbitalObjectModelBase<OrbitalObjectType.BLACK_HOLE> & {
+export type BlackHoleModel = OrbitalObjectModelBase<"blackHole"> & {
     /**
      * The Schwarzschild radius of the black hole in meters
      */

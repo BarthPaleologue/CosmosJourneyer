@@ -38,7 +38,6 @@ import {
     type RelativeCoordinates,
     type UniverseCoordinates,
 } from "@/backend/save/universeCoordinates";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 
@@ -961,8 +960,7 @@ export class CosmosJourneyer {
         const station = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
 
         const doesStationExist =
-            station !== undefined &&
-            (station.type === OrbitalObjectType.SPACE_STATION || station.type === OrbitalObjectType.SPACE_ELEVATOR);
+            station !== undefined && (station.type === "spaceStation" || station.type === "spaceElevator");
 
         if (!doesStationExist) {
             const fallbackObject = starSystem.getStellarObjects()[0];

@@ -36,7 +36,6 @@ import { type MandelboxModel } from "@/backend/universe/orbitalObjects/anomalies
 import { type MandelbulbModel } from "@/backend/universe/orbitalObjects/anomalies/mandelbulbModel";
 import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { type SierpinskiPyramidModel } from "@/backend/universe/orbitalObjects/anomalies/sierpinskiPyramidModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type Textures } from "@/frontend/assets/textures";
 import { type UberScene } from "@/frontend/helpers/uberScene";
@@ -567,40 +566,40 @@ export class PostProcessManager {
         const lightSources = stellarObjects.map((object) => object.getLight());
         for (const object of bodies) {
             switch (object.type) {
-                case OrbitalObjectType.STAR:
+                case "star":
                     this.addStar(object, excludedMeshes);
                     break;
-                case OrbitalObjectType.NEUTRON_STAR:
+                case "neutronStar":
                     this.addNeutronStar(object, excludedMeshes);
                     break;
-                case OrbitalObjectType.BLACK_HOLE:
+                case "blackHole":
                     this.addBlackHole(object);
                     break;
-                case OrbitalObjectType.TELLURIC_PLANET:
+                case "telluricPlanet":
                     this.addTelluricPlanet(object, stellarObjects);
                     break;
-                case OrbitalObjectType.TELLURIC_SATELLITE:
+                case "telluricSatellite":
                     this.addTelluricPlanet(object, stellarObjects);
                     break;
-                case OrbitalObjectType.GAS_PLANET:
+                case "gasPlanet":
                     this.addGasPlanet(object, stellarObjects);
                     break;
-                case OrbitalObjectType.MANDELBULB:
+                case "mandelbulb":
                     this.addMandelbulb(object.getTransform(), object.getRadius(), object.model, lightSources);
                     break;
-                case OrbitalObjectType.JULIA_SET:
+                case "juliaSet":
                     this.addJuliaSet(object.getTransform(), object.getRadius(), object.model, lightSources);
                     break;
-                case OrbitalObjectType.MANDELBOX:
+                case "mandelbox":
                     this.addMandelbox(object.getTransform(), object.getRadius(), object.model, lightSources);
                     break;
-                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                case "sierpinskiPyramid":
                     this.addSierpinskiPyramid(object.getTransform(), object.getRadius(), object.model, lightSources);
                     break;
-                case OrbitalObjectType.MENGER_SPONGE:
+                case "mengerSponge":
                     this.addMengerSponge(object.getTransform(), object.getRadius(), object.model, lightSources);
                     break;
-                case OrbitalObjectType.DARK_KNIGHT:
+                case "darkKnight":
                     // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
                     break;
             }

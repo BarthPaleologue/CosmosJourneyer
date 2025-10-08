@@ -19,8 +19,6 @@ import { type Sound } from "@babylonjs/core/Audio/sound";
 import { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
 import { type Musics } from "@/frontend/assets/audio/musics";
 import { type StarSystemView } from "@/frontend/starSystemView";
 
@@ -164,31 +162,31 @@ export class MusicConductor {
         const warpDrive = spaceship.getInternals().getWarpDrive();
 
         switch (closestOrbitalObject.model.type) {
-            case OrbitalObjectType.BLACK_HOLE:
+            case "blackHole":
                 this.setMusicFromSelection([this.musics.soaring]);
                 return;
 
-            case OrbitalObjectType.MANDELBULB:
-            case OrbitalObjectType.JULIA_SET:
-            case OrbitalObjectType.MANDELBOX:
-            case OrbitalObjectType.SIERPINSKI_PYRAMID:
-            case OrbitalObjectType.MENGER_SPONGE:
-            case OrbitalObjectType.DARK_KNIGHT:
+            case "mandelbulb":
+            case "juliaSet":
+            case "mandelbox":
+            case "sierpinskiPyramid":
+            case "mengerSponge":
+            case "darkKnight":
                 if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
                     this.setMusicFromSelection([this.musics.spacialWinds, this.musics.echoesOfTime]);
                     return;
                 }
                 break;
 
-            case OrbitalObjectType.STAR:
-            case OrbitalObjectType.NEUTRON_STAR:
-            case OrbitalObjectType.TELLURIC_PLANET:
-            case OrbitalObjectType.TELLURIC_SATELLITE:
-            case OrbitalObjectType.GAS_PLANET:
-            case OrbitalObjectType.CUSTOM:
+            case "star":
+            case "neutronStar":
+            case "telluricPlanet":
+            case "telluricSatellite":
+            case "gasPlanet":
+            case "custom":
                 break;
-            case OrbitalObjectType.SPACE_STATION:
-            case OrbitalObjectType.SPACE_ELEVATOR:
+            case "spaceStation":
+            case "spaceElevator":
                 if (
                     (warpDrive === null || warpDrive.isDisabled()) &&
                     distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10

@@ -27,7 +27,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
 import { type Textures } from "@/frontend/assets/textures";
@@ -49,10 +48,10 @@ import { Settings } from "@/settings";
 
 import { StarMaterial } from "../star/starMaterial";
 
-export class NeutronStar implements StellarObjectBase<OrbitalObjectType.NEUTRON_STAR>, Cullable {
+export class NeutronStar implements StellarObjectBase<"neutronStar">, Cullable {
     readonly model: DeepReadonly<NeutronStarModel>;
 
-    readonly type = OrbitalObjectType.NEUTRON_STAR;
+    readonly type = "neutronStar";
 
     readonly mesh: Mesh;
     readonly light: PointLight;

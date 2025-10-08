@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type OrbitalObjectType } from "./index";
 import { type Orbit } from "./orbit";
 import { type OrbitalObjectId } from "./orbitalObjectId";
-import { type OrbitalObjectType } from "./orbitalObjectType";
 
 /**
  * Describes the model of an orbital object

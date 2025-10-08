@@ -17,14 +17,13 @@
 
 import { type DarkKnightModel } from "@/backend/universe/orbitalObjects/anomalies/darkKnightModel";
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthMass } from "@/utils/physics/constants";
 import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 
 export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
     return {
-        type: OrbitalObjectType.DARK_KNIGHT,
+        type: "darkKnight",
         id: "darkKnight",
         name: "Dark Knight",
         axialTilt: 0,

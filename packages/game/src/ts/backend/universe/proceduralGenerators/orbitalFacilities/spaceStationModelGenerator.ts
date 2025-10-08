@@ -21,7 +21,6 @@ import { getFactionFromGalacticPosition } from "@/backend/society/factions";
 import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropTypes, type CropType } from "@/utils/agriculture";
@@ -46,15 +45,15 @@ export function newSeededSpaceStationModel(
 
     const parentMaxRadius = parentBodies.reduce((max, body) => {
         let radius = body.radius;
-        if (body.type === OrbitalObjectType.BLACK_HOLE) {
+        if (body.type === "blackHole") {
             radius += body.accretionDiskRadius;
         }
 
         if (
-            body.type === OrbitalObjectType.GAS_PLANET ||
-            body.type === OrbitalObjectType.TELLURIC_PLANET ||
-            body.type === OrbitalObjectType.STAR ||
-            body.type === OrbitalObjectType.NEUTRON_STAR
+            body.type === "gasPlanet" ||
+            body.type === "telluricPlanet" ||
+            body.type === "star" ||
+            body.type === "neutronStar"
         ) {
             radius = body.rings?.outerRadius ?? radius;
         }
@@ -102,7 +101,7 @@ export function newSeededSpaceStationModel(
     const solarPanelEfficiency = 0.4;
 
     return {
-        type: OrbitalObjectType.SPACE_STATION,
+        type: "spaceStation",
         seed,
         starSystemCoordinates: starSystemCoordinates,
         id: id,

@@ -1,5 +1,4 @@
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
@@ -86,35 +85,35 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
 
         let objectTypeMultiplier: number;
         switch (model.type) {
-            case OrbitalObjectType.STAR:
+            case "star":
                 objectTypeMultiplier = 1;
                 break;
-            case OrbitalObjectType.NEUTRON_STAR:
+            case "neutronStar":
                 objectTypeMultiplier = 8;
                 break;
-            case OrbitalObjectType.BLACK_HOLE:
+            case "blackHole":
                 objectTypeMultiplier = 10;
                 break;
-            case OrbitalObjectType.TELLURIC_PLANET:
+            case "telluricPlanet":
                 objectTypeMultiplier = this.evaluateTelluricPlanetMultiplier(model);
                 break;
-            case OrbitalObjectType.TELLURIC_SATELLITE:
+            case "telluricSatellite":
                 objectTypeMultiplier = this.evaluateTelluricSatelliteMultiplier(model);
                 break;
-            case OrbitalObjectType.GAS_PLANET:
+            case "gasPlanet":
                 objectTypeMultiplier = this.evaluateGasPlanetMultiplier(model);
                 break;
-            case OrbitalObjectType.MANDELBULB:
-            case OrbitalObjectType.JULIA_SET:
-            case OrbitalObjectType.MANDELBOX:
-            case OrbitalObjectType.SIERPINSKI_PYRAMID:
-            case OrbitalObjectType.MENGER_SPONGE:
+            case "mandelbulb":
+            case "juliaSet":
+            case "mandelbox":
+            case "sierpinskiPyramid":
+            case "mengerSponge":
                 objectTypeMultiplier = 2;
                 break;
-            case OrbitalObjectType.SPACE_STATION:
-            case OrbitalObjectType.SPACE_ELEVATOR:
-            case OrbitalObjectType.DARK_KNIGHT:
-            case OrbitalObjectType.CUSTOM:
+            case "spaceStation":
+            case "spaceElevator":
+            case "darkKnight":
+            case "custom":
                 objectTypeMultiplier = 0;
                 break;
         }

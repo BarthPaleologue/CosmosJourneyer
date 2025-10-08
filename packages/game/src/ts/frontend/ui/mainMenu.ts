@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -276,7 +275,7 @@ export class MainMenu {
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = this.starSystemModel.stellarObjects[0].type === OrbitalObjectType.BLACK_HOLE ? 8 : 2;
+            const nbRadius = this.starSystemModel.stellarObjects[0].type === "blackHole" ? 8 : 2;
             const targetObject = this.starSystemView
                 .getStarSystem()
                 .getOrbitalObjectById(this.universeObjectId.idInSystem);

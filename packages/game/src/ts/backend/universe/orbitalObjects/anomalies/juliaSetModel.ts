@@ -18,8 +18,7 @@
 import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type JuliaSetModel = CelestialBodyModelBase<OrbitalObjectType.JULIA_SET> & {
+export type JuliaSetModel = CelestialBodyModelBase<"juliaSet"> & {
     readonly accentColor: RGBColor;
 };

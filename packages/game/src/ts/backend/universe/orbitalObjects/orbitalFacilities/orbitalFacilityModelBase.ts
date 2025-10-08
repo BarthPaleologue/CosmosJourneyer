@@ -20,8 +20,8 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 
 import { type CropType } from "@/utils/agriculture";
 
+import { type OrbitalObjectType } from "..";
 import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
 export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
     readonly starSystemCoordinates: StarSystemCoordinates;

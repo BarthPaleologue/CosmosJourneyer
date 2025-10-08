@@ -36,7 +36,6 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
@@ -598,7 +597,7 @@ export class StarMap implements View {
         let instance: InstancedMesh | null = null;
         let recycled = false;
 
-        if (stellarObjectModel.type !== OrbitalObjectType.BLACK_HOLE) {
+        if (stellarObjectModel.type !== "blackHole") {
             const recycledStar = this.recycledStars.shift();
             if (recycledStar !== undefined) {
                 instance = recycledStar;
@@ -660,7 +659,7 @@ export class StarMap implements View {
 
         this.fadeIn(initializedInstance);
 
-        if (stellarObjectModel.type === OrbitalObjectType.BLACK_HOLE)
+        if (stellarObjectModel.type === "blackHole")
             this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
         else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
     }

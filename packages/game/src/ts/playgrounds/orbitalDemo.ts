@@ -22,8 +22,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
@@ -64,7 +62,7 @@ export function createOrbitalDemoScene(
             eccentricity: 0,
             p: 2,
         },
-        type: OrbitalObjectType.CUSTOM,
+        type: "custom",
         axialTilt: 0,
         mass: 1e12,
         siderealDaySeconds: 0,
@@ -83,7 +81,7 @@ export function createOrbitalDemoScene(
             eccentricity: 0.5,
             p: 2,
         },
-        type: OrbitalObjectType.CUSTOM,
+        type: "custom",
         axialTilt: Tools.ToRadians(23.5),
         mass: 1e11,
         siderealDaySeconds: 0,
@@ -102,7 +100,7 @@ export function createOrbitalDemoScene(
             eccentricity: 0.7,
             p: 2,
         },
-        type: OrbitalObjectType.CUSTOM,
+        type: "custom",
         mass: 1e10,
         axialTilt: 0,
         siderealDaySeconds: 0,

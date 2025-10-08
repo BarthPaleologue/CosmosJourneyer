@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getStellarTypeFromTemperature } from "@/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
 
 import { type DeepReadonly } from "@/utils/types";
@@ -25,32 +24,32 @@ import i18n from "@/i18n";
 
 export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>): string {
     switch (model.type) {
-        case OrbitalObjectType.MANDELBULB:
-        case OrbitalObjectType.JULIA_SET:
-        case OrbitalObjectType.MANDELBOX:
-        case OrbitalObjectType.SIERPINSKI_PYRAMID:
-        case OrbitalObjectType.MENGER_SPONGE:
-        case OrbitalObjectType.DARK_KNIGHT:
+        case "mandelbulb":
+        case "juliaSet":
+        case "mandelbox":
+        case "sierpinskiPyramid":
+        case "mengerSponge":
+        case "darkKnight":
             return i18n.t("objectTypes:anomaly");
-        case OrbitalObjectType.GAS_PLANET:
+        case "gasPlanet":
             return i18n.t("objectTypes:gasPlanet");
-        case OrbitalObjectType.TELLURIC_PLANET:
+        case "telluricPlanet":
             return i18n.t("objectTypes:telluricPlanet");
-        case OrbitalObjectType.TELLURIC_SATELLITE:
+        case "telluricSatellite":
             return i18n.t("objectTypes:telluricMoon");
-        case OrbitalObjectType.SPACE_STATION:
+        case "spaceStation":
             return i18n.t("objectTypes:spaceStation");
-        case OrbitalObjectType.SPACE_ELEVATOR:
+        case "spaceElevator":
             return i18n.t("objectTypes:spaceElevator");
-        case OrbitalObjectType.STAR:
+        case "star":
             return i18n.t("objectTypes:star", {
                 stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature),
             });
-        case OrbitalObjectType.NEUTRON_STAR:
+        case "neutronStar":
             return i18n.t("objectTypes:neutronStar");
-        case OrbitalObjectType.BLACK_HOLE:
+        case "blackHole":
             return i18n.t("objectTypes:blackHole");
-        case OrbitalObjectType.CUSTOM:
+        case "custom":
             return i18n.t("objectTypes:custom");
     }
 }

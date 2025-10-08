@@ -17,7 +17,6 @@
 
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
@@ -26,7 +25,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
     return {
         id: "jupiter",
         name: "Jupiter",
-        type: OrbitalObjectType.GAS_PLANET,
+        type: "gasPlanet",
         radius: 69_911e3,
         mass: 1.898e27,
         axialTilt: degreesToRadians(3.13),

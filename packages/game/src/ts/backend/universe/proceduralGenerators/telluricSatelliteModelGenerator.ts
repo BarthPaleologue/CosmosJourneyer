@@ -22,7 +22,6 @@ import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObje
 import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
@@ -43,8 +42,8 @@ export function newSeededTelluricSatelliteModel(
 ): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
 
-    const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === OrbitalObjectType.TELLURIC_PLANET);
-    const isSatelliteOfGas = parentBodies.some((parent) => parent.type === OrbitalObjectType.GAS_PLANET);
+    const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === "telluricPlanet");
+    const isSatelliteOfGas = parentBodies.some((parent) => parent.type === "gasPlanet");
 
     let radius: number;
     if (isSatelliteOfTelluric) {
@@ -155,7 +154,7 @@ export function newSeededTelluricSatelliteModel(
     };
 
     return {
-        type: OrbitalObjectType.TELLURIC_SATELLITE,
+        type: "telluricSatellite",
         id: id,
         seed: seed,
         name,

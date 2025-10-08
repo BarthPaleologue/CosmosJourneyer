@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-import { getOrbitalObjectTypeStringId, type OrbitalObjectType } from "./orbitalObjectType";
+import { type OrbitalObjectType } from "./index";
 
 export const OrbitalObjectIdSchema = z.string();
 
@@ -31,8 +31,7 @@ export function createOrbitalObjectId(
     type: OrbitalObjectType,
     index: number,
 ): OrbitalObjectId {
-    const typeString = getOrbitalObjectTypeStringId(type);
-    return `[${parentIds.join("|")}]->${typeString}${index}`;
+    return `[${parentIds.join("|")}]->${type}${index}`;
 }
 
 export function orbitalObjectIdEquals(a: OrbitalObjectId, b: OrbitalObjectId): boolean {

@@ -19,9 +19,9 @@ import { type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel"
 import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainSettings";
 
 import { type AtmosphereModel } from "./atmosphereModel";
+import { type OrbitalObjectType } from "./index";
 import { type OceanModel } from "./oceanModel";
 import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
-import { type OrbitalObjectType } from "./orbitalObjectType";
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
     readonly waterAmount: number;

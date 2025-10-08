@@ -22,7 +22,6 @@ import {
     type MissionAsteroidFieldNodeSerialized,
 } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
@@ -70,10 +69,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
             return null;
         }
 
-        if (
-            objectModel.type !== OrbitalObjectType.TELLURIC_PLANET &&
-            objectModel.type !== OrbitalObjectType.GAS_PLANET
-        ) {
+        if (objectModel.type !== "telluricPlanet" && objectModel.type !== "gasPlanet") {
             return null;
         }
 

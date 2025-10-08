@@ -18,8 +18,7 @@
 import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type SierpinskiPyramidModel = CelestialBodyModelBase<OrbitalObjectType.SIERPINSKI_PYRAMID> & {
+export type SierpinskiPyramidModel = CelestialBodyModelBase<"sierpinskiPyramid"> & {
     readonly accentColor: RGBColor;
 };

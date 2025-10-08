@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type OrbitalObjectModel, type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type DeepReadonly } from "@/utils/types";
@@ -33,11 +32,7 @@ export function getDistancesToStellarObjects(
             continue;
         }
 
-        if (
-            parent.type === OrbitalObjectType.STAR ||
-            parent.type === OrbitalObjectType.NEUTRON_STAR ||
-            parent.type === OrbitalObjectType.BLACK_HOLE
-        ) {
+        if (parent.type === "star" || parent.type === "neutronStar" || parent.type === "blackHole") {
             distances.set(parent, object.orbit.semiMajorAxis);
             continue;
         }

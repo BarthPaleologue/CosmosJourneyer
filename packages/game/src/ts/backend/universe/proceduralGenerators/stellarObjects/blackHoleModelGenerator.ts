@@ -19,7 +19,6 @@ import { normalRandom } from "extended-random";
 
 import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
 import { GenerationSteps } from "@/utils/generationSteps";
@@ -63,7 +62,7 @@ export function newSeededBlackHoleModel(
     const blackHoleBlackBodyTemperature = 7_000;
 
     return {
-        type: OrbitalObjectType.BLACK_HOLE,
+        type: "blackHole",
         id: id,
         name,
         radius,
