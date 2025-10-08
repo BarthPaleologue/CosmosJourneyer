@@ -1,4 +1,4 @@
-ARG PW_VERSION=1.55.0
+ARG PW_VERSION=1.56.0
 FROM mcr.microsoft.com/playwright:v${PW_VERSION}-jammy AS e2e
 
 WORKDIR /app
