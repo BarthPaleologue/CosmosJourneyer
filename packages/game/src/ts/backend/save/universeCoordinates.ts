@@ -72,7 +72,7 @@ export type OnSurfaceCoordinates = z.infer<typeof OnSurfaceCoordinatesSchema>;
 export const InSpaceshipCoordinatesSchema = z.object({
     type: z.literal("inSpaceship"),
 
-    shipId: z.string().uuid(),
+    shipId: z.uuid(),
 });
 
 export type InSpaceshipCoordinates = z.infer<typeof InSpaceshipCoordinatesSchema>;

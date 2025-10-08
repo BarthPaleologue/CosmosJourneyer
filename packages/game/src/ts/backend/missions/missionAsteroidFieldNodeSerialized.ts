@@ -21,16 +21,35 @@ import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
 import { MissionNodeType } from "./missionNodeType";
 
-export enum AsteroidFieldMissionState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH,
+export const AsteroidFieldMissionState = {
+    NOT_IN_SYSTEM: "notInSystem",
+    TOO_FAR_IN_SYSTEM: "tooFarInSystem",
+    CLOSE_ENOUGH: "closeEnough",
+} as const;
+
+export type AsteroidFieldMissionState = (typeof AsteroidFieldMissionState)[keyof typeof AsteroidFieldMissionState];
+
+function preprocessLegacyAsteroidFieldMissionState(state: unknown): unknown {
+    if (typeof state !== "number") {
+        return state;
+    }
+
+    switch (state) {
+        case 0:
+            return AsteroidFieldMissionState.NOT_IN_SYSTEM;
+        case 1:
+            return AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM;
+        case 2:
+            return AsteroidFieldMissionState.CLOSE_ENOUGH;
+        default:
+            return state;
+    }
 }
 
 export const MissionAsteroidFieldNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.ASTEROID_FIELD),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(AsteroidFieldMissionState),
+    state: z.preprocess((value) => preprocessLegacyAsteroidFieldMissionState(value), z.enum(AsteroidFieldMissionState)),
 });
 
 export type MissionAsteroidFieldNodeSerialized = z.infer<typeof MissionAsteroidFieldNodeSerializedSchema>;

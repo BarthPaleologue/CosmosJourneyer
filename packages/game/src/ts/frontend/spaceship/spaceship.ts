@@ -34,8 +34,8 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import {
     getDefaultSerializedSpaceship,
-    ShipType,
     type SerializedSpaceship,
+    type ShipType,
 } from "@/backend/spaceship/serializedSpaceship";
 
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
@@ -739,7 +739,7 @@ export class Spaceship implements Transformable {
 
     public serialize(): SerializedSpaceship {
         switch (this.shipType) {
-            case ShipType.WANDERER:
+            case "WANDERER":
                 return {
                     id: this.id,
                     name: this.name,

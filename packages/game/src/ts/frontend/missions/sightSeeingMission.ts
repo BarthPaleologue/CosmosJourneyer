@@ -33,9 +33,9 @@ import { type MissionNode } from "./nodes/missionNode";
  * Sightseeing mission types are a subset of mission types.
  */
 export type SightSeeingType =
-    | MissionType.SIGHT_SEEING_FLY_BY
-    | MissionType.SIGHT_SEEING_TERMINATOR_LANDING
-    | MissionType.SIGHT_SEEING_ASTEROID_FIELD;
+    | (typeof MissionType)["SIGHT_SEEING_FLY_BY"]
+    | (typeof MissionType)["SIGHT_SEEING_TERMINATOR_LANDING"]
+    | (typeof MissionType)["SIGHT_SEEING_ASTEROID_FIELD"];
 
 /**
  * Defines a target for a sightseeing mission and the type of sightseeing mission.

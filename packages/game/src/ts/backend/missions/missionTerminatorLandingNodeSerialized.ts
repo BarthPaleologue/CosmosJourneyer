@@ -21,16 +21,35 @@ import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
 import { MissionNodeType } from "./missionNodeType";
 
-export enum LandMissionState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    LANDED,
+export const LandMissionState = {
+    NOT_IN_SYSTEM: "notInSystem",
+    TOO_FAR_IN_SYSTEM: "tooFarInSystem",
+    LANDED: "landed",
+} as const;
+
+export type LandMissionState = (typeof LandMissionState)[keyof typeof LandMissionState];
+
+function preprocessLegacyLandMissionState(state: unknown): unknown {
+    if (typeof state !== "number") {
+        return state;
+    }
+
+    switch (state) {
+        case 0:
+            return LandMissionState.NOT_IN_SYSTEM;
+        case 1:
+            return LandMissionState.TOO_FAR_IN_SYSTEM;
+        case 2:
+            return LandMissionState.LANDED;
+        default:
+            return state;
+    }
 }
 
 export const MissionTerminatorLandingNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.TERMINATOR_LANDING),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(LandMissionState),
+    state: z.preprocess((val) => preprocessLegacyLandMissionState(val), z.enum(LandMissionState)),
 });
 
 export type MissionTerminatorLandingNodeSerialized = z.infer<typeof MissionTerminatorLandingNodeSerializedSchema>;

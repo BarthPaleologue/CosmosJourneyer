@@ -44,7 +44,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
  * Node used to describe a trek to an asteroid field
  */
 export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType.ASTEROID_FIELD> {
-    private state = AsteroidFieldMissionState.NOT_IN_SYSTEM;
+    private state: AsteroidFieldMissionState = AsteroidFieldMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
 
