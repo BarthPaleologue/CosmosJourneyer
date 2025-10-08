@@ -1,18 +1,16 @@
-name: Deploy (Main Preview)
+name: Deploy Game (GitHub Pages)
 on:
-    push:
-        branches:
-            - main
+    workflow_dispatch:
 
 permissions:
     contents: write
 
 concurrency:
-    group: main-preview
+    group: deploy_game_gh_pages
     cancel-in-progress: true
 
 jobs:
-    deploy:
+    deploy_game_gh_pages:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
@@ -34,13 +32,18 @@ jobs:
               run: pnpm test:unit
 
             - name: Build project
-              run: pnpm run build
+              run: pnpm build
+
+            - name: Build doc
+              run: pnpm doc
+
+            - name: Move doc to dist
+              run: mv packages/game/doc packages/game/dist/doc
 
             - name: Deploy to GitHub Pages (Production)
               uses: JamesIves/github-pages-deploy-action@v4
               with:
                   folder: packages/game/dist
                   branch: gh-pages
-                  clean: false
+                  clean-exclude: pr-preview
                   force: false
-                  target-folder: preview
