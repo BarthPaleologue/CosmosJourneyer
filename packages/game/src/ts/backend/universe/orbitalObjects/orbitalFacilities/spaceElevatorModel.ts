@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type HasSeed } from "../hasSeed";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 import { type OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
 
-export type SpaceElevatorModel = OrbitalFacilityModelBase<OrbitalObjectType.SPACE_ELEVATOR> &
+export type SpaceElevatorModel = OrbitalFacilityModelBase<"spaceElevator"> &
     HasSeed & {
         readonly tetherLength: number;
     };

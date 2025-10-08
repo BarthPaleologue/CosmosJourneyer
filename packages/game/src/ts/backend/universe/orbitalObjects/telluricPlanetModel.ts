@@ -16,11 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type HasSeed } from "./hasSeed";
-import { type OrbitalObjectType } from "./orbitalObjectType";
 import { type RingsModel } from "./ringsModel";
 import { type TelluricPlanetaryMassObjectModelBase } from "./telluricPlanetaryMassObjectModel";
 
-export type TelluricPlanetModel = TelluricPlanetaryMassObjectModelBase<OrbitalObjectType.TELLURIC_PLANET> &
+export type TelluricPlanetModel = TelluricPlanetaryMassObjectModelBase<"telluricPlanet"> &
     HasSeed & {
         readonly rings: RingsModel | null;
     };

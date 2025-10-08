@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -38,7 +37,7 @@ export function getSolSystemModel(): StarSystemModel {
     const mercury: TelluricPlanetModel = {
         id: "mercury",
         name: "Mercury",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: "telluricPlanet",
         radius: 2_439.7e3,
         mass: 3.301e23,
         axialTilt: degreesToRadians(0.034),
@@ -80,7 +79,7 @@ export function getSolSystemModel(): StarSystemModel {
     const venus: TelluricPlanetModel = {
         id: "venus",
         name: "Venus",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: "telluricPlanet",
         radius: 6_051.8e3,
         mass: 4.8e20,
         axialTilt: degreesToRadians(177.36),
@@ -136,7 +135,7 @@ export function getSolSystemModel(): StarSystemModel {
     const earth: TelluricPlanetModel = {
         id: "earth",
         name: "Earth",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: "telluricPlanet",
         radius: 6_371e3,
         mass: 5.972e24,
         axialTilt: degreesToRadians(23.44),
@@ -194,7 +193,7 @@ export function getSolSystemModel(): StarSystemModel {
     const moon: TelluricSatelliteModel = {
         id: "moon",
         name: "Moon",
-        type: OrbitalObjectType.TELLURIC_SATELLITE,
+        type: "telluricSatellite",
         radius: 1_737.1e3,
         mass: 7.342e22,
         axialTilt: degreesToRadians(6.68),
@@ -235,7 +234,7 @@ export function getSolSystemModel(): StarSystemModel {
     const mars: TelluricPlanetModel = {
         id: "mars",
         name: "Mars",
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: "telluricPlanet",
         radius: 3_389.5e3,
         mass: 6.4171e23,
         axialTilt: degreesToRadians(25.19),
@@ -284,7 +283,7 @@ export function getSolSystemModel(): StarSystemModel {
     const uranus: GasPlanetModel = {
         id: "uranus",
         name: "Uranus",
-        type: OrbitalObjectType.GAS_PLANET,
+        type: "gasPlanet",
         radius: 25_362e3,
         mass: 8.681e25,
         axialTilt: degreesToRadians(97.77),
@@ -319,7 +318,7 @@ export function getSolSystemModel(): StarSystemModel {
     const neptune: GasPlanetModel = {
         id: "neptune",
         name: "Neptune",
-        type: OrbitalObjectType.GAS_PLANET,
+        type: "gasPlanet",
         radius: 24_622e3,
         mass: 1.024e26,
         axialTilt: degreesToRadians(28.32),

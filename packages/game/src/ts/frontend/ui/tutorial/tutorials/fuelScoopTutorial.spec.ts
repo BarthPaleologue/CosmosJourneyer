@@ -18,7 +18,6 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
@@ -56,6 +55,6 @@ describe("FuelScoopTutorial", () => {
 
         const closestObjectModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
-        expect(closestObjectModel?.type).toBe(OrbitalObjectType.STAR);
+        expect(closestObjectModel?.type).toBe("star");
     });
 });

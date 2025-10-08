@@ -18,7 +18,6 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { Mission } from "@/frontend/missions/mission";
@@ -58,7 +57,7 @@ describe("StarMapTutorial", () => {
 
         const stationModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
-        expect(stationModel?.type).toBe(OrbitalObjectType.SPACE_STATION);
+        expect(stationModel?.type).toBe("spaceStation");
     });
 
     it("has correct mission objectives", () => {

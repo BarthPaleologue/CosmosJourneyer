@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
-
 import { type CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
@@ -34,11 +32,11 @@ export type StellarObject = Star | NeutronStar | BlackHole;
 export type Planet = TelluricPlanet | GasPlanet;
 
 export type Anomaly =
-    | EmptyCelestialBody<OrbitalObjectType.MENGER_SPONGE>
-    | EmptyCelestialBody<OrbitalObjectType.MANDELBULB>
-    | EmptyCelestialBody<OrbitalObjectType.JULIA_SET>
-    | EmptyCelestialBody<OrbitalObjectType.SIERPINSKI_PYRAMID>
-    | EmptyCelestialBody<OrbitalObjectType.MANDELBOX>
+    | EmptyCelestialBody<"mengerSponge">
+    | EmptyCelestialBody<"mandelbulb">
+    | EmptyCelestialBody<"juliaSet">
+    | EmptyCelestialBody<"sierpinskiPyramid">
+    | EmptyCelestialBody<"mandelbox">
     | DarkKnight;
 
 export type OrbitalFacility = SpaceStation | SpaceElevator;

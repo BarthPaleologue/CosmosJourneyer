@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
@@ -88,7 +87,7 @@ export function newSightSeeingMission(
 
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
-    if (targetModel?.type === OrbitalObjectType.NEUTRON_STAR || targetModel?.type === OrbitalObjectType.BLACK_HOLE) {
+    if (targetModel?.type === "neutronStar" || targetModel?.type === "blackHole") {
         // reward for stellar objects is higher to nudge the player towards them
         reward *= 1.5;
     }

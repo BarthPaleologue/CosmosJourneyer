@@ -16,8 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type HasSeed } from "./hasSeed";
-import { type OrbitalObjectType } from "./orbitalObjectType";
 import { type TelluricPlanetaryMassObjectModelBase } from "./telluricPlanetaryMassObjectModel";
 
-export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModelBase<OrbitalObjectType.TELLURIC_SATELLITE> &
-    HasSeed;
+export type TelluricSatelliteModel = TelluricPlanetaryMassObjectModelBase<"telluricSatellite"> & HasSeed;

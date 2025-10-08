@@ -19,7 +19,6 @@ import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended
 
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 import { type NeutronStarModel } from "@/backend/universe/orbitalObjects/stellarObjects/neutronStarModel";
 
@@ -76,7 +75,7 @@ export function newSeededNeutronStarModel(
     const rings = uniformRandBool(ringProportion, rng, GenerationSteps.RINGS) ? newSeededRingsModel(radius, rng) : null;
 
     return {
-        type: OrbitalObjectType.NEUTRON_STAR,
+        type: "neutronStar",
         id: id,
         name,
         seed,

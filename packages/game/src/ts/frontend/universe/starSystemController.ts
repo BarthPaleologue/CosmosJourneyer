@@ -19,7 +19,6 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
@@ -391,10 +390,7 @@ export class StarSystemController {
 
         for (const object of this.getPlanetaryMassObjects()) {
             object.computeCulling(controls.getActiveCamera());
-            if (
-                object.type === OrbitalObjectType.TELLURIC_PLANET ||
-                object.type === OrbitalObjectType.TELLURIC_SATELLITE
-            ) {
+            if (object.type === "telluricPlanet" || object.type === "telluricSatellite") {
                 object.updateLOD(controls.getTransform().getAbsolutePosition(), chunkForge);
             }
         }

@@ -19,7 +19,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type AnomalyModel, type PlanetModel, type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
@@ -100,13 +99,13 @@ export class StarSystemLoader {
             console.log("Loading stellar object:", stellarObjectModel.name);
             let stellarObject: StellarObject;
             switch (stellarObjectModel.type) {
-                case OrbitalObjectType.STAR:
+                case "star":
                     stellarObject = new Star(stellarObjectModel, assets.textures, scene);
                     break;
-                case OrbitalObjectType.BLACK_HOLE:
+                case "blackHole":
                     stellarObject = new BlackHole(stellarObjectModel, assets.textures.environment.milkyWay, scene);
                     break;
-                case OrbitalObjectType.NEUTRON_STAR:
+                case "neutronStar":
                     stellarObject = new NeutronStar(stellarObjectModel, assets.textures, scene);
                     break;
             }
@@ -133,22 +132,22 @@ export class StarSystemLoader {
             console.log("Loading Anomaly:", anomalyModel.name);
             let anomaly: Anomaly;
             switch (anomalyModel.type) {
-                case OrbitalObjectType.MANDELBULB:
+                case "mandelbulb":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
                     break;
-                case OrbitalObjectType.JULIA_SET:
+                case "juliaSet":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
                     break;
-                case OrbitalObjectType.MANDELBOX:
+                case "mandelbox":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
                     break;
-                case OrbitalObjectType.SIERPINSKI_PYRAMID:
+                case "sierpinskiPyramid":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
                     break;
-                case OrbitalObjectType.MENGER_SPONGE:
+                case "mengerSponge":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
                     break;
-                case OrbitalObjectType.DARK_KNIGHT:
+                case "darkKnight":
                     anomaly = new DarkKnight(anomalyModel, scene);
                     break;
             }
@@ -173,10 +172,10 @@ export class StarSystemLoader {
 
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
-                case OrbitalObjectType.SPACE_STATION:
+                case "spaceStation":
                     orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
                     break;
-                case OrbitalObjectType.SPACE_ELEVATOR:
+                case "spaceElevator":
                     orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
             }
             orbitalFacilities.push(orbitalFacility);
@@ -199,10 +198,10 @@ export class StarSystemLoader {
 
             let planet: Planet;
             switch (planetModel.type) {
-                case OrbitalObjectType.TELLURIC_PLANET:
+                case "telluricPlanet":
                     planet = new TelluricPlanet(planetModel, assets, scene);
                     break;
-                case OrbitalObjectType.GAS_PLANET:
+                case "gasPlanet":
                     planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsPatternLut, scene);
                     break;
             }

@@ -17,7 +17,6 @@
 
 import { Faction } from "@/backend/society/factions";
 import { OrbitSchema } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { CropType } from "@/utils/agriculture";
@@ -38,7 +37,7 @@ export function getLoneStarSystem(): StarSystemModel {
             {
                 id: "loneStar",
                 name: "Lone Star",
-                type: OrbitalObjectType.STAR,
+                type: "star",
                 mass: SolarMass,
                 radius: SolarRadius,
                 blackBodyTemperature: 5778,
@@ -65,7 +64,7 @@ export function getLoneStarSystem(): StarSystemModel {
             {
                 id: "loneStarStation",
                 name: "Lone Star Station",
-                type: OrbitalObjectType.SPACE_STATION,
+                type: "spaceStation",
                 mass: 1,
                 agricultureMix: [[1, CropType.LENTIL]],
                 population: 1e6,

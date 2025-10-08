@@ -37,7 +37,6 @@ import {
     type StellarObjectModel,
 } from "../orbitalObjects/index";
 import { createOrbitalObjectId } from "../orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "../orbitalObjects/orbitalObjectType";
 import { type TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "../starSystemModel";
 import { newSeededJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
@@ -90,29 +89,17 @@ export function newSeededStarSystemModel(
     const seed = centeredRand(systemRng, GenerationSteps.STARS + 0) * Settings.SEED_HALF_RANGE;
     const stellarObjectName = `${systemName} ${Alphabet.charAt(0).toUpperCase()}`;
     switch (stellarObjectType) {
-        case OrbitalObjectType.STAR:
+        case "star":
+            stellarObjects.push(newSeededStarModel(createOrbitalObjectId([], "star", 0), seed, stellarObjectName, []));
+            break;
+        case "blackHole":
             stellarObjects.push(
-                newSeededStarModel(createOrbitalObjectId([], OrbitalObjectType.STAR, 0), seed, stellarObjectName, []),
+                newSeededBlackHoleModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
             );
             break;
-        case OrbitalObjectType.BLACK_HOLE:
+        case "neutronStar":
             stellarObjects.push(
-                newSeededBlackHoleModel(
-                    createOrbitalObjectId([], OrbitalObjectType.NEUTRON_STAR, 0),
-                    seed,
-                    stellarObjectName,
-                    [],
-                ),
-            );
-            break;
-        case OrbitalObjectType.NEUTRON_STAR:
-            stellarObjects.push(
-                newSeededNeutronStarModel(
-                    createOrbitalObjectId([], OrbitalObjectType.BLACK_HOLE, 0),
-                    seed,
-                    stellarObjectName,
-                    [],
-                ),
+                newSeededNeutronStarModel(createOrbitalObjectId([], "blackHole", 0), seed, stellarObjectName, []),
             );
             break;
     }
@@ -128,33 +115,31 @@ export function newSeededStarSystemModel(
 
     //Fixme: planets need to work with black holes as well at some point
     const nbPlanets =
-        firstStellarObject.type === OrbitalObjectType.BLACK_HOLE
-            ? 0
-            : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
+        firstStellarObject.type === "blackHole" ? 0 : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
         const bodyType = uniformRandBool(0.5, systemRng, GenerationSteps.PLANET_TYPE + i)
-            ? OrbitalObjectType.TELLURIC_PLANET
-            : OrbitalObjectType.GAS_PLANET;
+            ? "telluricPlanet"
+            : "gasPlanet";
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
         const parentIds = stellarObjects.map((object) => object.id);
 
         const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * Settings.SEED_HALF_RANGE;
 
         switch (bodyType) {
-            case OrbitalObjectType.TELLURIC_PLANET:
+            case "telluricPlanet":
                 planets.push(
                     newSeededTelluricPlanetModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.TELLURIC_PLANET, i),
+                        createOrbitalObjectId(parentIds, "telluricPlanet", i),
                         seed,
                         planetName,
                         stellarObjects,
                     ),
                 );
                 break;
-            case OrbitalObjectType.GAS_PLANET:
+            case "gasPlanet":
                 planets.push(
                     newSeededGasPlanetModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.GAS_PLANET, i),
+                        createOrbitalObjectId(parentIds, "gasPlanet", i),
                         seed,
                         planetName,
                         stellarObjects,
@@ -168,14 +153,14 @@ export function newSeededStarSystemModel(
     planets.forEach((planet) => {
         const planetRng = getRngFromSeed(planet.seed);
         const nbMoons =
-            planet.type === OrbitalObjectType.GAS_PLANET
+            planet.type === "gasPlanet"
                 ? randRangeInt(0, 3, planetRng, GenerationSteps.NB_MOONS)
                 : randRangeInt(0, 2, planetRng, GenerationSteps.NB_MOONS);
 
         for (let j = 0; j < nbMoons; j++) {
             const satelliteName = `${planet.name}${Alphabet[j]}`;
             const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
-            const satelliteId = createOrbitalObjectId([planet.id], OrbitalObjectType.TELLURIC_SATELLITE, j);
+            const satelliteId = createOrbitalObjectId([planet.id], "telluricSatellite", j);
             const satelliteModel = newSeededTelluricSatelliteModel(satelliteId, satelliteSeed, satelliteName, [planet]);
             satellites.push(satelliteModel);
         }
@@ -194,11 +179,11 @@ export function newSeededStarSystemModel(
         const anomalySeed = centeredRand(systemRng, GenerationSteps.ANOMALIES + i * 100) * Settings.SEED_HALF_RANGE;
         const anomalyType: AnomalyType = wheelOfFortune(
             [
-                [OrbitalObjectType.MANDELBULB, 1],
-                [OrbitalObjectType.MANDELBOX, 1],
-                [OrbitalObjectType.JULIA_SET, 1],
-                [OrbitalObjectType.SIERPINSKI_PYRAMID, 1],
-                [OrbitalObjectType.MENGER_SPONGE, 1],
+                ["mandelbulb", 1],
+                ["mandelbox", 1],
+                ["juliaSet", 1],
+                ["sierpinskiPyramid", 1],
+                ["mengerSponge", 1],
             ],
             systemRng(GenerationSteps.ANOMALIES + i * 300),
         );
@@ -206,50 +191,47 @@ export function newSeededStarSystemModel(
         const parentIds = stellarObjects.map((object) => object.id);
 
         switch (anomalyType) {
-            case OrbitalObjectType.MANDELBULB:
+            case "mandelbulb":
                 anomalies.push(
                     newSeededMandelbulbModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBULB, i),
+                        createOrbitalObjectId(parentIds, "mandelbulb", i),
                         anomalySeed,
                         anomalyName,
                         [firstStellarObject],
                     ),
                 );
                 break;
-            case OrbitalObjectType.JULIA_SET:
+            case "juliaSet":
                 anomalies.push(
-                    newSeededJuliaSetModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.JULIA_SET, i),
-                        anomalySeed,
-                        anomalyName,
-                        [firstStellarObject],
-                    ),
+                    newSeededJuliaSetModel(createOrbitalObjectId(parentIds, "juliaSet", i), anomalySeed, anomalyName, [
+                        firstStellarObject,
+                    ]),
                 );
                 break;
-            case OrbitalObjectType.MANDELBOX:
+            case "mandelbox":
                 anomalies.push(
                     newSeededMandelboxModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.MANDELBOX, i),
+                        createOrbitalObjectId(parentIds, "mandelbox", i),
                         anomalySeed,
                         anomalyName,
                         [firstStellarObject],
                     ),
                 );
                 break;
-            case OrbitalObjectType.SIERPINSKI_PYRAMID:
+            case "sierpinskiPyramid":
                 anomalies.push(
                     newSeededSierpinskiPyramidModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.SIERPINSKI_PYRAMID, i),
+                        createOrbitalObjectId(parentIds, "sierpinskiPyramid", i),
                         anomalySeed,
                         anomalyName,
                         [firstStellarObject],
                     ),
                 );
                 break;
-            case OrbitalObjectType.MENGER_SPONGE:
+            case "mengerSponge":
                 anomalies.push(
                     newSeededMengerSpongeModel(
-                        createOrbitalObjectId(parentIds, OrbitalObjectType.MENGER_SPONGE, i),
+                        createOrbitalObjectId(parentIds, "mengerSponge", i),
                         anomalySeed,
                         anomalyName,
                         [firstStellarObject],
@@ -292,11 +274,11 @@ export function newSeededStarSystemModel(
 
             if (
                 uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
-                planet.type === OrbitalObjectType.TELLURIC_PLANET && // space elevators can't be built on gas giants yet
+                planet.type === "telluricPlanet" && // space elevators can't be built on gas giants yet
                 planet.rings === null // can't have rings because the tether would be at risk
             ) {
                 const spaceElevatorModel = newSeededSpaceElevatorModel(
-                    createOrbitalObjectId([planet.id], OrbitalObjectType.SPACE_ELEVATOR, 0),
+                    createOrbitalObjectId([planet.id], "spaceElevator", 0),
                     spaceStationSeed,
                     coordinates,
                     position,
@@ -305,7 +287,7 @@ export function newSeededStarSystemModel(
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
                 const spaceStationModel = newSeededSpaceStationModel(
-                    createOrbitalObjectId([planet.id], OrbitalObjectType.SPACE_STATION, 0),
+                    createOrbitalObjectId([planet.id], "spaceStation", 0),
                     spaceStationSeed,
                     coordinates,
                     position,
@@ -339,8 +321,8 @@ export function newSeededStarSystemModel(
  */
 function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {
     // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
-    if (uniformRandBool(0.0006, rng, GenerationSteps.STARS + index)) return OrbitalObjectType.BLACK_HOLE;
-    if (uniformRandBool(0.0026, rng, GenerationSteps.STARS + index)) return OrbitalObjectType.NEUTRON_STAR;
+    if (uniformRandBool(0.0006, rng, GenerationSteps.STARS + index)) return "blackHole";
+    if (uniformRandBool(0.0026, rng, GenerationSteps.STARS + index)) return "neutronStar";
 
-    return OrbitalObjectType.STAR;
+    return "star";
 }

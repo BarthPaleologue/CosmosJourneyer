@@ -22,7 +22,6 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type BlackHoleModel } from "@/backend/universe/orbitalObjects/stellarObjects/blackHoleModel";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
@@ -33,7 +32,7 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 
-export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE> {
+export class BlackHole implements StellarObjectBase<"blackHole"> {
     readonly name: string;
 
     private readonly transform: TransformNode;
@@ -42,7 +41,7 @@ export class BlackHole implements StellarObjectBase<OrbitalObjectType.BLACK_HOLE
 
     readonly model: DeepReadonly<BlackHoleModel>;
 
-    readonly type = OrbitalObjectType.BLACK_HOLE;
+    readonly type = "blackHole";
 
     readonly ringsUniforms = null;
 

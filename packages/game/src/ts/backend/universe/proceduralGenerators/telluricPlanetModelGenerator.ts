@@ -22,7 +22,6 @@ import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObje
 import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
 import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { newSeededRingsModel, type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 
@@ -132,7 +131,7 @@ export function newSeededTelluricPlanetModel(
         : null;
 
     return {
-        type: OrbitalObjectType.TELLURIC_PLANET,
+        type: "telluricPlanet",
         id: id,
         seed: seed,
         name,

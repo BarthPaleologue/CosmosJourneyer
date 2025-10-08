@@ -24,7 +24,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
 
@@ -51,14 +50,10 @@ import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 import { Direction } from "./terrain/chunks/direction";
 
-export class TelluricPlanet
-    implements
-        PlanetaryMassObjectBase<OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE>,
-        Cullable
-{
+export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
-    readonly type: OrbitalObjectType.TELLURIC_PLANET | OrbitalObjectType.TELLURIC_SATELLITE;
+    readonly type: "telluricPlanet" | "telluricSatellite";
 
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
@@ -123,7 +118,7 @@ export class TelluricPlanet
             this.oceanUniforms = null;
         }
 
-        if (this.model.type === OrbitalObjectType.TELLURIC_PLANET && this.model.rings !== null) {
+        if (this.model.type === "telluricPlanet" && this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(
                 this.model.rings,
                 assets.textures,
@@ -167,7 +162,7 @@ export class TelluricPlanet
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
         this.targetInfo.maxDistance =
-            this.model.type === OrbitalObjectType.TELLURIC_SATELLITE ? this.model.orbit.semiMajorAxis * 8.0 : 0;
+            this.model.type === "telluricSatellite" ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }
 
     getTransform(): TransformNode {

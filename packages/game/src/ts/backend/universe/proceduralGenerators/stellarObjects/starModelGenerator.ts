@@ -19,7 +19,6 @@ import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { newSeededRingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
 import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
 
@@ -69,7 +68,7 @@ export function newSeededStarModel(
         : null;
 
     return {
-        type: OrbitalObjectType.STAR,
+        type: "star",
         id: id,
         name: name,
         seed: seed,

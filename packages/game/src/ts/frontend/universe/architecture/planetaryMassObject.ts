@@ -17,7 +17,7 @@
 
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
+import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/index";
 
 import { type CelestialBodyBase } from "./celestialBody";
 

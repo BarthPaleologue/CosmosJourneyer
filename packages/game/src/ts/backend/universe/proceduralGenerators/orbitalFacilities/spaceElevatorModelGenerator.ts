@@ -19,7 +19,6 @@ import { getFactionFromGalacticPosition } from "@/backend/society/factions";
 import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
 import { CropTypes, type CropType } from "@/utils/agriculture";
@@ -83,7 +82,7 @@ export function newSeededSpaceElevatorModel(
     const solarPanelEfficiency = 0.4;
 
     return {
-        type: OrbitalObjectType.SPACE_ELEVATOR,
+        type: "spaceElevator",
         seed,
         starSystemCoordinates: starSystemCoordinates,
         id: id,

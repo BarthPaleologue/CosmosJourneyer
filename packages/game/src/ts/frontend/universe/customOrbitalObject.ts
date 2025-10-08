@@ -19,18 +19,17 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type OrbitalObjectModelBase } from "@/backend/universe/orbitalObjects/orbitalObjectModelBase";
-import { type OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type DeepReadonly } from "@/utils/types";
 
 import { type OrbitalObjectBase } from "./architecture/orbitalObjectBase";
 
-export class CustomOrbitalObject implements OrbitalObjectBase<OrbitalObjectType.CUSTOM> {
+export class CustomOrbitalObject implements OrbitalObjectBase<"custom"> {
     private readonly _transform: TransformNode;
-    readonly model: DeepReadonly<OrbitalObjectModelBase<OrbitalObjectType.CUSTOM>>;
-    readonly type: OrbitalObjectType.CUSTOM;
+    readonly model: DeepReadonly<OrbitalObjectModelBase<"custom">>;
+    readonly type: "custom";
     private readonly boundingRadius: number;
-    constructor(transform: TransformNode, model: DeepReadonly<OrbitalObjectModelBase<OrbitalObjectType.CUSTOM>>) {
+    constructor(transform: TransformNode, model: DeepReadonly<OrbitalObjectModelBase<"custom">>) {
         this._transform = transform;
         this._transform.rotationQuaternion = Quaternion.Identity();
 

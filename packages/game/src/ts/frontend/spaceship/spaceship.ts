@@ -37,7 +37,6 @@ import {
     ShipType,
     type SerializedSpaceship,
 } from "@/backend/spaceship/serializedSpaceship";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
@@ -449,8 +448,7 @@ export class Spaceship implements Transformable {
         const fuelScoop = this.getInternals().getFuelScoop();
         if (fuelScoop === null) return;
         if (this.nearestCelestialBody === null) return;
-        if (![OrbitalObjectType.STAR, OrbitalObjectType.GAS_PLANET].includes(this.nearestCelestialBody.model.type))
-            return;
+        if (!["star", "gasPlanet"].includes(this.nearestCelestialBody.model.type)) return;
 
         const distanceToBody = Vector3.Distance(
             this.getTransform().getAbsolutePosition(),
@@ -480,22 +478,22 @@ export class Spaceship implements Transformable {
 
         let fuelAvailability: number;
         switch (this.nearestCelestialBody.model.type) {
-            case OrbitalObjectType.STAR:
+            case "star":
                 fuelAvailability = 1;
                 break;
-            case OrbitalObjectType.GAS_PLANET:
+            case "gasPlanet":
                 fuelAvailability = 0.3;
                 break;
-            case OrbitalObjectType.NEUTRON_STAR:
-            case OrbitalObjectType.BLACK_HOLE:
-            case OrbitalObjectType.TELLURIC_PLANET:
-            case OrbitalObjectType.TELLURIC_SATELLITE:
-            case OrbitalObjectType.MANDELBULB:
-            case OrbitalObjectType.JULIA_SET:
-            case OrbitalObjectType.MANDELBOX:
-            case OrbitalObjectType.SIERPINSKI_PYRAMID:
-            case OrbitalObjectType.MENGER_SPONGE:
-            case OrbitalObjectType.DARK_KNIGHT:
+            case "neutronStar":
+            case "blackHole":
+            case "telluricPlanet":
+            case "telluricSatellite":
+            case "mandelbulb":
+            case "juliaSet":
+            case "mandelbox":
+            case "sierpinskiPyramid":
+            case "mengerSponge":
+            case "darkKnight":
                 fuelAvailability = 0;
         }
 

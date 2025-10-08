@@ -18,9 +18,8 @@
 import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type MandelbulbModel = CelestialBodyModelBase<OrbitalObjectType.MANDELBULB> & {
+export type MandelbulbModel = CelestialBodyModelBase<"mandelbulb"> & {
     readonly power: number;
     readonly accentColor: RGBColor;
 };

@@ -17,10 +17,9 @@
 
 import { type HasSeed } from "../hasSeed";
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 import { type RingsModel } from "../ringsModel";
 
-export type NeutronStarModel = CelestialBodyModelBase<OrbitalObjectType.NEUTRON_STAR> &
+export type NeutronStarModel = CelestialBodyModelBase<"neutronStar"> &
     HasSeed & {
         readonly blackBodyTemperature: number;
 

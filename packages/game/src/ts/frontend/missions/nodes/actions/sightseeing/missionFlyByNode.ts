@@ -19,7 +19,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { FlyByState, type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
@@ -92,25 +91,25 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
         let thresholdMultiplier = 1;
         switch (targetObject.type) {
-            case OrbitalObjectType.STAR:
-            case OrbitalObjectType.TELLURIC_PLANET:
-            case OrbitalObjectType.TELLURIC_SATELLITE:
-            case OrbitalObjectType.GAS_PLANET:
-            case OrbitalObjectType.MANDELBULB:
-            case OrbitalObjectType.JULIA_SET:
-            case OrbitalObjectType.MANDELBOX:
-            case OrbitalObjectType.SIERPINSKI_PYRAMID:
-            case OrbitalObjectType.MENGER_SPONGE:
-            case OrbitalObjectType.DARK_KNIGHT:
-            case OrbitalObjectType.SPACE_STATION:
-            case OrbitalObjectType.SPACE_ELEVATOR:
-            case OrbitalObjectType.CUSTOM:
+            case "star":
+            case "telluricPlanet":
+            case "telluricSatellite":
+            case "gasPlanet":
+            case "mandelbulb":
+            case "juliaSet":
+            case "mandelbox":
+            case "sierpinskiPyramid":
+            case "mengerSponge":
+            case "darkKnight":
+            case "spaceStation":
+            case "spaceElevator":
+            case "custom":
                 thresholdMultiplier = 3;
                 break;
-            case OrbitalObjectType.NEUTRON_STAR:
+            case "neutronStar":
                 thresholdMultiplier = 70_000;
                 break;
-            case OrbitalObjectType.BLACK_HOLE:
+            case "blackHole":
                 thresholdMultiplier = 10;
                 break;
         }

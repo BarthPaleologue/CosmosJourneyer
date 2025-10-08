@@ -28,7 +28,6 @@ import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type Textures } from "@/frontend/assets/textures";
 import { type Cullable } from "@/frontend/helpers/cullable";
@@ -49,10 +48,10 @@ import { Settings } from "@/settings";
 import { GasPlanetProceduralMaterial } from "./gasPlanetProceduralMaterial";
 import { createGasPlanetTextureMaterial } from "./gasPlanetTextureMaterial";
 
-export class GasPlanet implements PlanetaryMassObjectBase<OrbitalObjectType.GAS_PLANET>, Cullable {
+export class GasPlanet implements PlanetaryMassObjectBase<"gasPlanet">, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
 
-    readonly type = OrbitalObjectType.GAS_PLANET;
+    readonly type = "gasPlanet";
 
     private readonly mesh: Mesh;
     readonly material: GasPlanetProceduralMaterial | Material;

@@ -20,7 +20,6 @@ import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
@@ -133,7 +132,7 @@ function generateAnomalyFlyByMissionsInSystem(
             continue;
         }
 
-        if (anomaly.type === OrbitalObjectType.DARK_KNIGHT) {
+        if (anomaly.type === "darkKnight") {
             continue;
         }
 
@@ -166,7 +165,7 @@ function generateNeutronStarFlyByMissionsInSystem(
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    const neutronStars = systemModel.stellarObjects.filter((model) => model.type === OrbitalObjectType.NEUTRON_STAR);
+    const neutronStars = systemModel.stellarObjects.filter((model) => model.type === "neutronStar");
     for (const neutronStar of neutronStars) {
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
@@ -196,7 +195,7 @@ function generateBlackHoleFlyByMissionsInSystem(
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    const blackHoles = systemModel.stellarObjects.filter((model) => model.type === OrbitalObjectType.BLACK_HOLE);
+    const blackHoles = systemModel.stellarObjects.filter((model) => model.type === "blackHole");
     for (const blackHole of blackHoles) {
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
@@ -260,7 +259,7 @@ function generateTerminatorLandingMissionsInSystem(
     const missions: Array<Mission> = [];
 
     for (const planet of systemModel.planets) {
-        if (planet.type !== OrbitalObjectType.TELLURIC_PLANET) {
+        if (planet.type !== "telluricPlanet") {
             continue;
         }
 

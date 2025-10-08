@@ -18,7 +18,6 @@
 import { describe, expect, it } from "vitest";
 
 import { Faction } from "@/backend/society/factions";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { AU, EarthMass, SolarMass, SolarRadius } from "@/utils/physics/constants";
@@ -41,7 +40,7 @@ describe("distanceToStellarObject", () => {
         },
         stellarObjects: [
             {
-                type: OrbitalObjectType.STAR,
+                type: "star",
                 id: "star",
                 name: "Star",
                 orbit: {
@@ -65,7 +64,7 @@ describe("distanceToStellarObject", () => {
         ],
         planets: [
             {
-                type: OrbitalObjectType.GAS_PLANET,
+                type: "gasPlanet",
                 id: "planet",
                 name: "Planet",
                 orbit: {
@@ -98,7 +97,7 @@ describe("distanceToStellarObject", () => {
         anomalies: [],
         orbitalFacilities: [
             {
-                type: OrbitalObjectType.SPACE_STATION,
+                type: "spaceStation",
                 id: "station",
                 name: "Station",
                 orbit: {

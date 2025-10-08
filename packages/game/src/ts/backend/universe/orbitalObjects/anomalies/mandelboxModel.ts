@@ -18,9 +18,8 @@
 import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type MandelboxModel = CelestialBodyModelBase<OrbitalObjectType.MANDELBOX> & {
+export type MandelboxModel = CelestialBodyModelBase<"mandelbox"> & {
     /**
      * The albedo color of the mandelbox
      */

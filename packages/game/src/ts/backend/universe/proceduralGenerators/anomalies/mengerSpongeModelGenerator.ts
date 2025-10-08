@@ -20,7 +20,6 @@ import { normalRandom, randRange } from "extended-random";
 import { type MengerSpongeModel } from "@/backend/universe/orbitalObjects/anomalies/mengerSpongeModel";
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { hsvToRgb } from "@/utils/colors";
 import { GenerationSteps } from "@/utils/generationSteps";
@@ -66,7 +65,7 @@ export function newSeededMengerSpongeModel(
     const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
 
     return {
-        type: OrbitalObjectType.MENGER_SPONGE,
+        type: "mengerSponge",
         id: id,
         name,
         radius,

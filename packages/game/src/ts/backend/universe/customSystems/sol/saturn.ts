@@ -17,7 +17,6 @@
 
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
@@ -26,7 +25,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
     return {
         id: "saturn",
         name: "Saturn",
-        type: OrbitalObjectType.GAS_PLANET,
+        type: "gasPlanet",
         radius: 58_232e3,
         mass: 5.683e26,
         axialTilt: degreesToRadians(26.73),

@@ -24,7 +24,6 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { SpaceElevatorClimber } from "@/frontend/assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
@@ -55,12 +54,12 @@ import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 
-export class SpaceElevator implements OrbitalFacilityBase<OrbitalObjectType.SPACE_ELEVATOR> {
+export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly name: string;
 
     readonly model: DeepReadonly<SpaceElevatorModel>;
 
-    readonly type = OrbitalObjectType.SPACE_ELEVATOR;
+    readonly type = "spaceElevator";
 
     private readonly solarSections: SolarSection[] = [];
     private readonly utilitySections: UtilitySection[] = [];

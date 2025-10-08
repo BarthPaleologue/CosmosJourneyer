@@ -21,7 +21,6 @@ import {
     getDiscoveryScannerSpec,
     type SerializedDiscoveryScanner,
 } from "@/backend/spaceship/serializedComponents/discoveryScanner";
-import { OrbitalObjectType } from "@/backend/universe/orbitalObjects/orbitalObjectType";
 
 import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 
@@ -57,22 +56,22 @@ export function isScannerInRange(scanner: DiscoveryScanner, playerPosition: Vect
     let baseDistanceMultiplier: number;
     const type = celestialBody.type;
     switch (type) {
-        case OrbitalObjectType.TELLURIC_PLANET:
-        case OrbitalObjectType.TELLURIC_SATELLITE:
-        case OrbitalObjectType.GAS_PLANET:
-        case OrbitalObjectType.MANDELBULB:
-        case OrbitalObjectType.JULIA_SET:
-        case OrbitalObjectType.MANDELBOX:
-        case OrbitalObjectType.SIERPINSKI_PYRAMID:
-        case OrbitalObjectType.MENGER_SPONGE:
-        case OrbitalObjectType.DARK_KNIGHT:
-        case OrbitalObjectType.STAR:
+        case "telluricPlanet":
+        case "telluricSatellite":
+        case "gasPlanet":
+        case "mandelbulb":
+        case "juliaSet":
+        case "mandelbox":
+        case "sierpinskiPyramid":
+        case "mengerSponge":
+        case "darkKnight":
+        case "star":
             baseDistanceMultiplier = 1;
             break;
-        case OrbitalObjectType.NEUTRON_STAR:
+        case "neutronStar":
             baseDistanceMultiplier = 70_000;
             break;
-        case OrbitalObjectType.BLACK_HOLE:
+        case "blackHole":
             baseDistanceMultiplier = 20;
             break;
         default:

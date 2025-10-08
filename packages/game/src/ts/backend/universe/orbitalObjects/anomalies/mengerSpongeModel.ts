@@ -18,8 +18,7 @@
 import type { RGBColor } from "@/utils/colors";
 
 import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
-import { type OrbitalObjectType } from "../orbitalObjectType";
 
-export type MengerSpongeModel = CelestialBodyModelBase<OrbitalObjectType.MENGER_SPONGE> & {
+export type MengerSpongeModel = CelestialBodyModelBase<"mengerSponge"> & {
     readonly color: RGBColor;
 };
