@@ -1,0 +1,1 @@
+export { useScrollTo } from "./useScrollTo";

@@ -1,7 +1,32 @@
 import eslint from "@eslint/js";
+import nextPlugin from "@next/eslint-plugin-next";
 import importPlugin from "eslint-plugin-import";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
+
+const projectConfigs = ["./packages/game/tsconfig.json", "./packages/website/tsconfig.json"];
+
+const strictTypeChecked = tseslint.configs.strictTypeChecked.map((config) => ({
+    ...config,
+    languageOptions: {
+        ...(config.languageOptions ?? {}),
+        parserOptions: {
+            ...(config.languageOptions?.parserOptions ?? {}),
+            projectService: true,
+            project: projectConfigs,
+            tsconfigRootDir: import.meta.dirname,
+        },
+    },
+}));
+
+const nextCoreWebVitalsRules = nextPlugin.configs["core-web-vitals"]?.rules ?? {};
+const nextCoreWebVitals = {
+    files: ["packages/website/**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+        "@next/next": nextPlugin,
+    },
+    rules: nextCoreWebVitalsRules,
+};
 
 export default defineConfig([
     globalIgnores([
@@ -15,16 +40,21 @@ export default defineConfig([
         "packages/game/src/asset",
         "coverage",
         ".eslintcache",
+        "packages/website/.next",
+        "packages/website/out",
+        "packages/website/next.config.js",
     ]),
     eslint.configs.recommended,
-    ...tseslint.configs.strictTypeChecked,
+    ...strictTypeChecked,
     importPlugin.flatConfigs.recommended,
     importPlugin.flatConfigs.typescript,
+    nextCoreWebVitals,
     {
+        files: ["packages/**/*.{ts,tsx,js,jsx}"],
         settings: {
             "import/resolver": {
                 typescript: {
-                    project: "./packages/game/tsconfig.json",
+                    project: projectConfigs,
                     alwaysTryTypes: true,
                 },
             },
@@ -32,13 +62,12 @@ export default defineConfig([
         languageOptions: {
             parserOptions: {
                 projectService: true,
+                project: projectConfigs,
                 tsconfigRootDir: import.meta.dirname,
             },
             ecmaVersion: "latest",
             sourceType: "module",
         },
-    },
-    {
         rules: {
             "import/no-cycle": "error",
 
@@ -99,18 +128,18 @@ export default defineConfig([
                 {
                     selector: "variable",
                     modifiers: ["exported", "const", "global"],
-                    format: ["PascalCase"],
+                    format: ["PascalCase", "camelCase"],
                     leadingUnderscore: "forbid",
                 },
                 {
                     selector: "function",
-                    format: ["camelCase", "snake_case"],
+                    format: ["camelCase", "snake_case", "PascalCase"],
                     leadingUnderscore: "forbid",
                 },
                 {
                     selector: "function",
                     modifiers: ["exported", "global"],
-                    format: ["camelCase"],
+                    format: ["camelCase", "PascalCase"],
                     leadingUnderscore: "forbid",
                 },
                 { selector: "interface", format: ["PascalCase"], leadingUnderscore: "forbid" },

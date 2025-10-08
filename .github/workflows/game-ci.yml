@@ -1,0 +1,112 @@
+name: Game CI
+on:
+    push:
+        branches: [main]
+        paths:
+            - "packages/game/**"
+            - "scripts/**"
+            - "Dockerfile"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "tsconfig.base.json"
+            - "tsconfig.json"
+            - "eslint.config.mjs"
+            - ".github/workflows/game-ci.yml"
+    pull_request:
+        branches: [main]
+        paths:
+            - "packages/game/**"
+            - "scripts/**"
+            - "Dockerfile"
+            - "package.json"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "tsconfig.base.json"
+            - "tsconfig.json"
+            - "eslint.config.mjs"
+            - ".github/workflows/game-ci.yml"
+    workflow_dispatch:
+
+concurrency:
+    group: game-ci-${{ github.head_ref || github.ref_name || github.run_id }}
+    cancel-in-progress: true
+
+jobs:
+    game-validation:
+        name: game-full-pipeline
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        strategy:
+            matrix:
+                node-version: [22]
+        steps:
+            # ─────────── Setup Environment ───────────
+
+            # ─────────── repo + LFS
+            - name: Checkout repository with LFS
+              uses: actions/checkout@v4 # ⬇ repo
+              with: #    + LFS blobs
+                  lfs: true #   (LFS support)
+                  fetch-depth: 0 #    (helps LFS cache hits)
+
+            - name: Cache Git-LFS objects
+              uses: actions/cache@v4
+              with:
+                  path: ~/.git/lfs/ # default client cache
+                  key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+              # ─────────── Install & Checks ───────────
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Format check
+              run: pnpm format:check
+
+            - name: Lint
+              run: pnpm lint
+
+            - name: Test
+              run: pnpm test:unit
+
+            - name: Build documentation
+              run: pnpm doc
+
+              # ─────────── build test image (local load, no push)
+            - name: Build Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  tags: cosmos-journeyer-e2e:${{ github.sha }}
+                  load: true # load into the runner’s daemon
+
+              # ─────────── run Playwright
+            - name: Run Playwright suite
+              run: |
+                  mkdir -p artifacts                 # host dir for reports / diffs  
+                  docker run --rm --ipc=host -e CI=1 \
+                    -w /app/packages/game \
+                    -v ${{ github.workspace }}/packages/game/tests/e2e:/app/packages/game/tests/e2e \
+                    -v ${{ github.workspace }}/artifacts:/output \
+                    cosmos-journeyer-e2e:${{ github.sha }} \
+                    npx playwright test \
+                        --output=/output \
+                        --reporter=line,html
+
+            # ─────────── publish results
+            - name: Upload raw diffs (only on failure)
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-results
+                  path: artifacts

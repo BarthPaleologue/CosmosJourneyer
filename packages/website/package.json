@@ -1,0 +1,32 @@
+{
+    "name": "@cosmos-journeyer/website",
+    "private": true,
+    "version": "0.1.0",
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint . --max-warnings=0",
+        "lint:fix": "eslint . --max-warnings=0 --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "typecheck": "tsc --noEmit",
+        "typecheck:watch": "tsc --noEmit --watch",
+        "test:all": "pnpm lint && pnpm typecheck && pnpm build",
+        "serve:prod": "http-server out"
+    },
+    "dependencies": {
+        "next": "^14.2.30",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "sass": "^1.89.2",
+        "sharp": "^0.34.3"
+    },
+    "devDependencies": {
+        "@types/node": "^20.19.6",
+        "@types/react": "^18.3.23",
+        "@types/react-dom": "^18.3.7",
+        "http-server": "^14.1.1",
+        "typescript": "^5.9.2"
+    }
+}

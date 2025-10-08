@@ -8,3 +8,4 @@ packages/game/src/asset
 packages/game/doc
 coverage
 .eslintcache
+packages/website/public

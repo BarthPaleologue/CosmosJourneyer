@@ -1,0 +1,63 @@
+name: Website CI
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "packages/website/**"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "package.json"
+            - ".github/workflows/website-ci.yml"
+    pull_request:
+        branches: [main]
+        paths:
+            - "packages/website/**"
+            - "pnpm-lock.yaml"
+            - "pnpm-workspace.yaml"
+            - "package.json"
+            - ".github/workflows/website-ci.yml"
+    workflow_dispatch:
+
+jobs:
+    website-validation:
+        name: website-quality-gate
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [22]
+        steps:
+            - name: Checkout repository with LFS
+              uses: actions/checkout@v4
+              with:
+                  lfs: true
+
+            - name: Cache Git-LFS objects
+              uses: actions/cache@v4
+              with:
+                  path: ~/.git/lfs/
+                  key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "pnpm"
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Type check
+              run: pnpm --filter @cosmos-journeyer/website typecheck
+
+            - name: Format check
+              run: pnpm --filter @cosmos-journeyer/website format:check
+
+            - name: Lint
+              run: pnpm --filter @cosmos-journeyer/website lint
+
+            - name: Build
+              run: pnpm --filter @cosmos-journeyer/website build

@@ -24,7 +24,7 @@ export default defineConfig({
     },
 
     webServer: {
-        command: "npm run serve:prod",
+        command: "pnpm serve:prod",
         url: "http://localhost:8080",
         reuseExistingServer: process.env["CI"] === undefined,
     },

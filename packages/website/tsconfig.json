@@ -1,0 +1,27 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "jsx": "preserve",
+        "tsBuildInfoFile": "./.tsbuildinfo",
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "paths": {
+            "@/*": ["./src/*"],
+            "@/components/*": ["./src/components/*"],
+            "@/types/*": ["./src/types/*"],
+            "@/utils/*": ["./src/utils/*"],
+            "@/styles/*": ["./src/styles/*"]
+        },
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "typeRoots": ["./node_modules/@types"],
+        "allowJs": true,
+        "module": "esnext"
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+}

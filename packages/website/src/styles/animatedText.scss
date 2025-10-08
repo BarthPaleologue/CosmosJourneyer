@@ -1,0 +1,106 @@
+@keyframes spin {
+    // show all the 4 faces of the cube that are not the right face or the left face
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    20% {
+        transform: rotateX(0deg);
+    }
+
+    25% {
+        transform: rotateX(90deg);
+    }
+
+    45% {
+        transform: rotateX(90deg);
+    }
+
+    50% {
+        transform: rotateX(180deg);
+    }
+
+    70% {
+        transform: rotateX(180deg);
+    }
+
+    75% {
+        transform: rotateX(270deg);
+    }
+
+    95% {
+        transform: rotateX(270deg);
+    }
+
+    100% {
+        transform: rotateX(360deg);
+    }
+}
+:root {
+    --cube-size: 1200px;
+}
+
+#shared-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    width: var(--cube-size);
+    height: var(--cube-size);
+    margin: 0;
+    perspective: calc(var(--cube-size) * 2);
+    transform: scale(0.2) translateX(-110%) translateY(-50%);
+}
+
+.cube {
+    width: var(--cube-size);
+    height: var(--cube-size);
+    position: relative;
+    transform-style: preserve-3d;
+    transform: translateZ(-calc(var(--cube-size) / 2));
+    transition: transform 2s;
+    animation: spin 20s ease-in-out infinite;
+}
+
+.cube-face {
+    position: absolute;
+    width: var(--cube-size);
+    height: var(--cube-size);
+    font-size: 25em;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+
+    font-family: "Nasalization";
+    text-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+
+    /* hide the back faces */
+    backface-visibility: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cube-face-front {
+    transform: rotateY(0deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-face-back {
+    transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2)) rotateX(180deg) rotateY(180deg);
+}
+
+.cube-face-top {
+    transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.cube-face-bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+@media screen and (max-width: 1640px) {
+    #shared-loader {
+        display: none;
+    }
+}

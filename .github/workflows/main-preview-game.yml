@@ -1,16 +1,18 @@
-name: Deploy
+name: Deploy Game (Main Preview)
 on:
-    workflow_dispatch:
+    push:
+        branches:
+            - main
 
 permissions:
     contents: write
 
 concurrency:
-    group: deploy
+    group: main-preview-game
     cancel-in-progress: true
 
 jobs:
-    deploy:
+    deploy_game_preview:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
@@ -20,7 +22,7 @@ jobs:
               uses: pnpm/action-setup@v4
 
             - name: Install dependencies
-              run: pnpm i
+              run: pnpm install --frozen-lockfile
 
             - name: Check formatting
               run: pnpm run format:check
@@ -32,18 +34,13 @@ jobs:
               run: pnpm test:unit
 
             - name: Build project
-              run: pnpm build
-
-            - name: Build doc
-              run: pnpm doc
-
-            - name: Move doc to dist
-              run: mv packages/game/doc packages/game/dist/doc
+              run: pnpm run build
 
             - name: Deploy to GitHub Pages (Production)
               uses: JamesIves/github-pages-deploy-action@v4
               with:
                   folder: packages/game/dist
                   branch: gh-pages
-                  clean-exclude: pr-preview
+                  clean: false
                   force: false
+                  target-folder: preview

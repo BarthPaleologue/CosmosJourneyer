@@ -1,4 +1,5 @@
-name: CI Pipeline
+name: Monorepo Checks
+
 on:
     push:
         branches: [main]
@@ -7,43 +8,28 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
+    group: monorepo-checks-${{ github.head_ref || github.ref_name || github.run_id }}
     cancel-in-progress: true
 
 jobs:
-    validate:
-        name: full-ci-pipeline
+    verify:
+        name: format-lint-build
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        strategy:
-            matrix:
-                node-version: [22]
         steps:
-            # ─────────── Setup Environment ───────────
-
-            # ─────────── repo + LFS
-            - name: Checkout repository with LFS
-              uses: actions/checkout@v4 # ⬇ repo
-              with: #    + LFS blobs
-                  lfs: true #   (LFS support)
-                  fetch-depth: 0 #    (helps LFS cache hits)
-
-            - name: Cache Git-LFS objects
-              uses: actions/cache@v4
+            - name: Checkout repository
+              uses: actions/checkout@v4
               with:
-                  path: ~/.git/lfs/ # default client cache
-                  key: lfs-${{ runner.os }}-${{ hashFiles('.gitattributes') }}
+                  lfs: true
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
 
-            - name: Use Node.js ${{ matrix.node-version }}
+            - name: Use Node.js 22
               uses: actions/setup-node@v4
               with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: "pnpm"
-
-              # ─────────── Install & Checks ───────────
+                  node-version: 22
+                  cache: pnpm
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -54,41 +40,5 @@ jobs:
             - name: Lint
               run: pnpm lint
 
-            - name: Test
-              run: pnpm test:unit
-
-            - name: Build documentation
-              run: pnpm doc
-
-            # ─────────── Build & E2E Tests ───────────
-            - name: Build
-              run: pnpm build
-
-              # ─────────── build test image (local load, no push)
-            - name: Build Docker image
-              uses: docker/build-push-action@v5
-              with:
-                  context: .
-                  tags: cosmos-journeyer-e2e:${{ github.sha }}
-                  load: true # load into the runner’s daemon
-
-              # ─────────── run Playwright
-            - name: Run Playwright suite
-              run: |
-                  mkdir -p artifacts                 # host dir for reports / diffs  
-                  docker run --rm --ipc=host -e CI=1 \
-                    -w /app/packages/game \
-                    -v ${{ github.workspace }}/packages/game/tests/e2e:/app/packages/game/tests/e2e \
-                    -v ${{ github.workspace }}/artifacts:/output \
-                    cosmos-journeyer-e2e:${{ github.sha }} \
-                    npx playwright test \
-                        --output=/output \
-                        --reporter=line,html
-
-            # ─────────── publish results
-            - name: Upload raw diffs (only on failure)
-              if: failure()
-              uses: actions/upload-artifact@v4
-              with:
-                  name: test-results
-                  path: artifacts
+            - name: Build production bundle
+              run: pnpm build:prod

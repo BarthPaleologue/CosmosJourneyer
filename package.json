@@ -4,8 +4,7 @@
     "version": "1.11.0-dev",
     "packageManager": "pnpm@10.18.0",
     "engines": {
-        "node": ">=18.0.0",
-        "pnpm": ">=8.0.0"
+        "node": ">=20.0.0"
     },
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
     "homepage": "https://cosmosjourneyer.com",
@@ -37,11 +36,13 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "pnpm --filter @cosmos-journeyer/game build",
-        "serve": "pnpm --filter @cosmos-journeyer/game serve",
-        "serve:prod": "pnpm --filter @cosmos-journeyer/game serve:prod",
-        "format:check": "pnpm --filter @cosmos-journeyer/game format:check",
-        "format": "pnpm --filter @cosmos-journeyer/game format",
+        "build": "pnpm -r build",
+        "build:game": "pnpm --filter @cosmos-journeyer/game build",
+        "build:website": "pnpm --filter @cosmos-journeyer/website build",
+        "build:prod": "tsx ./scripts/build-prod.ts",
+        "serve:prod": "http-server dist -p 8080",
+        "format": "pnpm -r format",
+        "format:check": "pnpm -r format:check",
         "test:unit": "pnpm --filter @cosmos-journeyer/game test:unit",
         "test:coverage": "pnpm --filter @cosmos-journeyer/game test:coverage",
         "test:e2e": "pnpm --filter @cosmos-journeyer/game test:e2e",
@@ -49,20 +50,17 @@
         "test:e2e:docker": "pnpm --filter @cosmos-journeyer/game test:e2e:docker",
         "test:e2e:docker:update": "pnpm --filter @cosmos-journeyer/game test:e2e:docker:update",
         "doc": "pnpm --filter @cosmos-journeyer/game doc",
-        "serve:doc": "pnpm --filter @cosmos-journeyer/game serve:doc",
-        "lint": "pnpm --filter @cosmos-journeyer/game lint",
-        "lint:fast": "pnpm --filter @cosmos-journeyer/game lint:fast",
-        "typecheck:watch": "pnpm --filter @cosmos-journeyer/game typecheck:watch",
-        "typecheck": "pnpm --filter @cosmos-journeyer/game typecheck",
+        "lint": "pnpm -r run lint",
+        "typecheck": "pnpm -r typecheck",
         "prepare": "husky",
-        "tauri:dev": "pnpm --filter @cosmos-journeyer/game tauri:dev",
-        "tauri:build": "pnpm --filter @cosmos-journeyer/game tauri:build",
-        "tauri:info": "pnpm --filter @cosmos-journeyer/game tauri:info",
         "tauri": "pnpm --filter @cosmos-journeyer/game exec -- tauri"
     },
     "devDependencies": {
         "@eslint/js": "^9.35.0",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+        "@next/eslint-plugin-next": "^14.2.33",
+        "http-server": "^14.1.1",
+        "tsx": "^4.19.2",
         "eslint": "^9.35.0",
         "eslint-import-resolver-typescript": "^4.4.4",
         "eslint-plugin-import": "^2.32.0",
@@ -70,6 +68,7 @@
         "husky": "^9.1.7",
         "lint-staged": "^16.1.6",
         "prettier": "^3.6.2",
+        "typescript": "^5.9.2",
         "typescript-eslint": "^8.43.0"
     },
     "lint-staged": {
