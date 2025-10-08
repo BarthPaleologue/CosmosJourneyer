@@ -8,11 +8,13 @@ import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { type DeepReadonly, type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
+
+import { type INotificationManager } from "./notificationManager";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";
@@ -29,12 +31,18 @@ export class SaveLoadingPanelContent {
     readonly onLoadSaveObservable: Observable<DeepReadonly<Save>> = new Observable<DeepReadonly<Save>>();
 
     private readonly soundPlayer: ISoundPlayer;
+    private readonly notificationManager: INotificationManager;
 
-    constructor(starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
+    ) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
 
         this.soundPlayer = soundPlayer;
+        this.notificationManager = notificationManager;
 
         const dropFileZone = document.createElement("div");
         dropFileZone.id = "dropFileZone";
@@ -203,12 +211,11 @@ export class SaveLoadingPanelContent {
                     return;
                 }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(
+                    this.notificationManager.create(
                         NotificationOrigin.GENERAL,
                         NotificationIntent.SUCCESS,
                         i18n.t("notifications:copiedToClipboard"),
                         5000,
-                        this.soundPlayer,
                     );
                 });
             });
@@ -335,12 +342,11 @@ export class SaveLoadingPanelContent {
                 return;
             }
             await navigator.clipboard.writeText(url.toString()).then(() => {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.INFO,
                     i18n.t("notifications:copiedToClipboard"),
                     5000,
-                    this.soundPlayer,
                 );
             });
         });

@@ -31,7 +31,7 @@ import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObj
 import { UberScene } from "@/frontend/helpers/uberScene";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { updateNotifications } from "@/frontend/ui/notification";
+import { NotificationManagerMock, type INotificationManager } from "@/frontend/ui/notificationManager";
 
 import { initI18n } from "@/i18n";
 
@@ -52,6 +52,7 @@ export async function createStarSystemViewScene(
     const soundPlayerMock = new SoundPlayerMock();
 
     const ttsMock = new TtsMock();
+    const notificationManager: INotificationManager = new NotificationManagerMock();
 
     const scene = new UberScene(engine);
     scene.useRightHandedSystem = true;
@@ -69,6 +70,7 @@ export async function createStarSystemViewScene(
         starSystemDatabase,
         soundPlayerMock,
         ttsMock,
+        notificationManager,
         assets,
     );
 
@@ -89,7 +91,7 @@ export async function createStarSystemViewScene(
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
-        updateNotifications(deltaSeconds);
+        notificationManager.update(deltaSeconds);
     });
 
     return starSystemView.scene;

@@ -27,6 +27,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { StarMap } from "@/frontend/starmap/starMap";
+import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 
 import { jsonSafeParse } from "@/utils/json";
 
@@ -46,8 +47,16 @@ export async function createStarMapScene(
     const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(starSystemDatabase);
 
     const soundPlayerMock = new SoundPlayerMock();
+    const notificationManager = new NotificationManagerMock();
 
-    const starMap = new StarMap(player, engine, encyclopaediaGalactica, starSystemDatabase, soundPlayerMock);
+    const starMap = new StarMap(
+        player,
+        engine,
+        encyclopaediaGalactica,
+        starSystemDatabase,
+        soundPlayerMock,
+        notificationManager,
+    );
     starMap.setCurrentStarSystem(starSystemDatabase.fallbackSystem.coordinates);
 
     // Get system coordinates from URL parameters

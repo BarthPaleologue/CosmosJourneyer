@@ -1,3 +1,20 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import informationIcon from "@assets/icons/information.webp";
@@ -19,7 +36,7 @@ export const enum NotificationIntent {
     ERROR = "error",
 }
 
-class Notification {
+export class Notification {
     private progressSeconds = 0;
     private readonly progressDurationSeconds;
     private removalProgressSeconds = 0;
@@ -35,22 +52,19 @@ class Notification {
         text: string,
         durationSeconds: number,
         soundPlayer: ISoundPlayer,
+        container: HTMLDivElement,
+        documentRef: Document,
     ) {
-        let container = document.getElementById("notificationContainer");
-        if (container === null) {
-            container = document.createElement("div");
-            container.id = "notificationContainer";
-            document.body.appendChild(container);
-        }
+        const doc = documentRef;
 
-        this.htmlRoot = document.createElement("div");
+        this.htmlRoot = doc.createElement("div");
         this.htmlRoot.classList.add("notification", origin);
 
-        const contentContainer = document.createElement("div");
+        const contentContainer = doc.createElement("div");
         contentContainer.classList.add("notification-content");
         this.htmlRoot.appendChild(contentContainer);
 
-        const iconNode = document.createElement("img");
+        const iconNode = doc.createElement("img");
         switch (origin) {
             case NotificationOrigin.GENERAL:
                 iconNode.src = informationIcon;
@@ -68,14 +82,14 @@ class Notification {
         iconNode.classList.add("notification-icon");
         contentContainer.appendChild(iconNode);
 
-        const textNode = document.createElement("p");
+        const textNode = doc.createElement("p");
         textNode.textContent = text;
         contentContainer.appendChild(textNode);
 
-        const progress = document.createElement("div");
+        const progress = doc.createElement("div");
         progress.classList.add("notification-progress");
 
-        const progressBar = document.createElement("div");
+        const progressBar = doc.createElement("div");
         progressBar.classList.add("notification-progress-bar");
         progress.appendChild(progressBar);
 
@@ -131,36 +145,4 @@ class Notification {
     dispose(): void {
         this.htmlRoot.remove();
     }
-}
-
-let activeNotifications: Notification[] = [];
-
-export function updateNotifications(deltaSeconds: number): void {
-    activeNotifications.forEach((notification) => {
-        notification.update(deltaSeconds);
-        if (notification.getProgress() === 1 && !notification.hasRemovalStarted()) {
-            notification.startRemoval();
-        }
-        if (notification.getRemovalProgress() === 1) {
-            notification.dispose();
-        }
-    });
-
-    activeNotifications = activeNotifications.filter((notification) => notification.getRemovalProgress() < 1);
-}
-
-/**
- * Create a notification with a text and a duration (in ms)
- * @param text The text to display
- * @param durationMillis The duration of the notification in ms
- */
-export function createNotification(
-    type: NotificationOrigin,
-    intent: NotificationIntent,
-    text: string,
-    durationMillis: number,
-    soundPlayer: ISoundPlayer,
-) {
-    const notification = new Notification(type, intent, text, durationMillis / 1000, soundPlayer);
-    activeNotifications.push(notification);
 }

@@ -57,7 +57,7 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
@@ -84,6 +84,7 @@ import { Settings } from "@/settings";
 import { AiPlayerControls } from "./player/aiPlayerControls";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
+import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
@@ -219,6 +220,7 @@ export class StarSystemView implements View {
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly tts: ITts;
+    private readonly notificationManager: INotificationManager;
 
     private readonly assets: RenderingAssets;
 
@@ -238,6 +240,7 @@ export class StarSystemView implements View {
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
         tts: ITts,
+        notificationManager: INotificationManager,
         assets: RenderingAssets,
     ) {
         this.player = player;
@@ -255,6 +258,7 @@ export class StarSystemView implements View {
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
+        this.notificationManager = notificationManager;
         this.assets = assets;
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
@@ -263,6 +267,7 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
+            this.notificationManager.setVisible(this.isUiEnabled);
             this.soundPlayer.playNow(SoundType.CLICK);
         });
 
@@ -316,12 +321,11 @@ export class StarSystemView implements View {
             const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.SPACESHIP,
                     NotificationIntent.ERROR,
                     i18n.t("notifications:notEnoughFuel"),
                     5000,
-                    this.soundPlayer,
                 );
                 this.jumpLock = false;
                 return;
@@ -431,14 +435,13 @@ export class StarSystemView implements View {
                     if (!(control instanceof AxisComposite)) {
                         throw new Error("Up down is not an axis composite");
                     }
-                    createNotification(
+                    this.notificationManager.create(
                         NotificationOrigin.SPACESHIP,
                         NotificationIntent.INFO,
                         i18n.t("notifications:howToLiftOff", {
                             bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1],
                         }),
                         5000,
-                        this.soundPlayer,
                     );
                 }
             }
@@ -477,6 +480,7 @@ export class StarSystemView implements View {
             this.encyclopaedia,
             this.starSystemDatabase,
             this.soundPlayer,
+            this.notificationManager,
         );
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
@@ -688,7 +692,13 @@ export class StarSystemView implements View {
         this.player.instancedSpaceships.push(spaceship);
 
         if (this.spaceshipControls === null) {
-            this.spaceshipControls = new ShipControls(spaceship, this.scene, this.soundPlayer, this.tts);
+            this.spaceshipControls = new ShipControls(
+                spaceship,
+                this.scene,
+                this.soundPlayer,
+                this.tts,
+                this.notificationManager,
+            );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
@@ -773,14 +783,13 @@ export class StarSystemView implements View {
             const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.EXPLORATION,
                     NotificationIntent.SUCCESS,
                     i18n.t("notifications:newDiscovery", {
                         objectName: nearestCelestialBody.model.name,
                     }),
                     15_000,
-                    this.soundPlayer,
                 );
                 this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.NEW_DISCOVERY);
                 this.onNewDiscovery.notifyObservers(universeId);
@@ -1060,12 +1069,11 @@ export class StarSystemView implements View {
                 keyboardLayoutMap,
             );
             const keys = horizontalKeys.concat(verticalKeys);
-            createNotification(
+            this.notificationManager.create(
                 NotificationOrigin.GENERAL,
                 NotificationIntent.INFO,
                 `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
                 20_000,
-                this.soundPlayer,
             );
         }
     }
@@ -1098,6 +1106,7 @@ export class StarSystemView implements View {
 
     public setUIEnabled(enabled: boolean) {
         this.isUiEnabled = enabled;
+        this.notificationManager.setVisible(enabled);
     }
 
     public setTarget(target: (Transformable & HasBoundingSphere & TypedObject) | null) {

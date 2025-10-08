@@ -47,7 +47,7 @@ import { TransformTranslationAnimation } from "@/frontend/helpers/animations/tra
 import { lookAt, translate } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
@@ -55,6 +55,7 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import { type INotificationManager } from "../ui/notificationManager";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";
@@ -157,6 +158,7 @@ export class StarMap implements View {
     private static readonly SHIMMER_DURATION = 1000;
 
     private readonly soundPlayer: ISoundPlayer;
+    private readonly notificationManager: INotificationManager;
 
     constructor(
         player: Player,
@@ -164,6 +166,7 @@ export class StarMap implements View {
         encyclopaedia: EncyclopaediaGalactica,
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
     ) {
         this.scene = new Scene(engine);
         this.scene.clearColor = new Color4(0, 0, 0, 1);
@@ -173,6 +176,7 @@ export class StarMap implements View {
         });
 
         this.soundPlayer = soundPlayer;
+        this.notificationManager = notificationManager;
 
         this.controls = new StarMapControls(this.scene);
         this.controls.getCameras().forEach((camera) => (camera.minZ = 0.01));
@@ -372,12 +376,11 @@ export class StarMap implements View {
                         this.drawPath(parsedItinerary.data);
                         this.player.currentItinerary = parsedItinerary.data;
                     } else {
-                        createNotification(
+                        this.notificationManager.create(
                             NotificationOrigin.GENERAL,
                             NotificationIntent.ERROR,
                             `Failed to parse itinerary: ${parsedItinerary.error.message}`,
                             5000,
-                            this.soundPlayer,
                         );
                         this.player.currentItinerary = null;
                     }
@@ -388,12 +391,11 @@ export class StarMap implements View {
                         this.onTargetSetObservable.notifyObservers(nextDestination);
                     }
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
-                    createNotification(
+                    this.notificationManager.create(
                         NotificationOrigin.GENERAL,
                         NotificationIntent.ERROR,
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
                         5000,
-                        this.soundPlayer,
                     );
                 }
             }

@@ -6,6 +6,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { assertUnreachable } from "@/utils/types";
 
 import { type MusicConductor } from "../audio/musicConductor";
+import { type INotificationManager } from "./notificationManager";
 import { AboutPanel } from "./panels/aboutPanel";
 import { ContributePanel } from "./panels/contributePanel";
 import { CreditsPanel } from "./panels/creditsPanel";
@@ -40,12 +41,13 @@ export class SidePanels {
         saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
+        notificationManager: INotificationManager,
     ) {
         this.starSystemDatabase = starSystemDatabase;
         this.saveBackend = saveManager;
 
         // Create panel instances
-        this.loadSavePanel = new LoadSavePanel(starSystemDatabase, soundPlayer);
+        this.loadSavePanel = new LoadSavePanel(starSystemDatabase, soundPlayer, notificationManager);
         this.attachCloseButton(this.loadSavePanel.htmlRoot);
         document.body.appendChild(this.loadSavePanel.htmlRoot);
 

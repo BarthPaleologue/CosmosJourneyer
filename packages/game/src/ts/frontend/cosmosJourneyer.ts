@@ -55,12 +55,7 @@ import { StarMap } from "@/frontend/starmap/starMap";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
-import {
-    createNotification,
-    NotificationIntent,
-    NotificationOrigin,
-    updateNotifications,
-} from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
@@ -74,6 +69,7 @@ import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { lookAt } from "./helpers/transform";
+import { NotificationManager, type INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
@@ -109,6 +105,7 @@ export class CosmosJourneyer {
     readonly musicConductor: MusicConductor;
     readonly soundPlayer: ISoundPlayer;
     readonly tts: Tts;
+    readonly notificationManager: INotificationManager;
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
@@ -148,6 +145,7 @@ export class CosmosJourneyer {
         backend: ICosmosJourneyerBackend,
         soundPlayer: ISoundPlayer,
         tts: Tts,
+        notificationManager: INotificationManager,
     ) {
         this.engine = engine;
 
@@ -187,6 +185,7 @@ export class CosmosJourneyer {
         this.musicConductor = new MusicConductor(this.assets.audio.musics, this.starSystemView);
         this.soundPlayer = soundPlayer;
         this.tts = tts;
+        this.notificationManager = notificationManager;
 
         // Init starmap view
         this.starMap = new StarMap(
@@ -195,6 +194,7 @@ export class CosmosJourneyer {
             this.backend.encyclopaedia,
             this.backend.universe,
             this.soundPlayer,
+            this.notificationManager,
         );
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
@@ -214,6 +214,7 @@ export class CosmosJourneyer {
             this.backend.save,
             this.soundPlayer,
             this.musicConductor,
+            this.notificationManager,
         );
         this.sidePanels.loadSavePanel.content.onLoadSaveObservable.add((saveData: DeepReadonly<Save>) => {
             engine.onEndFrameObservable.addOnce(async () => {
@@ -319,12 +320,11 @@ export class CosmosJourneyer {
                 }
 
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    createNotification(
+                    this.notificationManager.create(
                         NotificationOrigin.GENERAL,
                         NotificationIntent.INFO,
                         i18n.t("notifications:copiedToClipboard"),
                         2000,
-                        this.soundPlayer,
                     );
                 });
             });
@@ -332,20 +332,18 @@ export class CosmosJourneyer {
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.createManualSave();
             if (saveSuccess)
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.SUCCESS,
                     i18n.t("notifications:saveOk"),
                     2000,
-                    this.soundPlayer,
                 );
             else
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.ERROR,
                     i18n.t("notifications:cantSaveTutorial"),
                     2000,
-                    this.soundPlayer,
                 );
         });
 
@@ -466,6 +464,7 @@ export class CosmosJourneyer {
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
+        const notificationManager = new NotificationManager(soundPlayer);
 
         // Init star system view
         const starSystemView = new StarSystemView(
@@ -477,6 +476,7 @@ export class CosmosJourneyer {
             backend.universe,
             soundPlayer,
             tts,
+            notificationManager,
             assets.rendering,
         );
 
@@ -488,7 +488,16 @@ export class CosmosJourneyer {
             await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
         }
 
-        return new CosmosJourneyer(player, engine, assets, starSystemView, backend, soundPlayer, tts);
+        return new CosmosJourneyer(
+            player,
+            engine,
+            assets,
+            starSystemView,
+            backend,
+            soundPlayer,
+            tts,
+            notificationManager,
+        );
     }
 
     public pause(): void {
@@ -548,7 +557,7 @@ export class CosmosJourneyer {
                 }
             }
 
-            updateNotifications(deltaSeconds);
+            this.notificationManager.update(deltaSeconds);
             this.musicConductor.update(
                 this.isPaused(),
                 this.activeView === this.starSystemView,

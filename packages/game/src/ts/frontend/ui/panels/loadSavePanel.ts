@@ -21,14 +21,19 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
+import { type INotificationManager } from "../notificationManager";
 import { SaveLoadingPanelContent } from "../saveLoadingPanelContent";
 
 export class LoadSavePanel {
     readonly htmlRoot: HTMLElement;
     readonly content: SaveLoadingPanelContent;
 
-    constructor(starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
-        this.content = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer);
+    constructor(
+        starSystemDatabase: StarSystemDatabase,
+        soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
+    ) {
+        this.content = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer, notificationManager);
         this.htmlRoot = this.createPanelHTML();
     }
 

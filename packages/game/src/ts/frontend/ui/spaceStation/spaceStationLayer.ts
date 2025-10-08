@@ -30,6 +30,7 @@ import { type DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
+import { type INotificationManager } from "../notificationManager";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
 import { generateInfoHTML } from "./spaceStationInfos";
@@ -92,6 +93,7 @@ export class SpaceStationLayer {
         encyclopaedia: EncyclopaediaGalacticaManager,
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
     ) {
         this.soundPlayer = soundPlayer;
 
@@ -163,6 +165,7 @@ export class SpaceStationLayer {
             player,
             starSystemDatabase,
             this.soundPlayer,
+            notificationManager,
         );
 
         this.actionsContainer = document.createElement("div");

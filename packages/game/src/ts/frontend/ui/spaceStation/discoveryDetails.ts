@@ -25,13 +25,15 @@ import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { createNotification, NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
+import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
+
+import { type INotificationManager } from "../notificationManager";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;
@@ -59,14 +61,17 @@ export class DiscoveryDetails {
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
     private readonly soundPlayer: ISoundPlayer;
+    private readonly notificationManager: INotificationManager;
 
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
         starSystemDatabase: StarSystemDatabase,
         soundPlayer: ISoundPlayer,
+        notificationManager: INotificationManager,
     ) {
         this.soundPlayer = soundPlayer;
+        this.notificationManager = notificationManager;
 
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -97,12 +102,11 @@ export class DiscoveryDetails {
             this.soundPlayer.playNow(SoundType.SUCCESS);
             const valueResult = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             if (!valueResult.success) {
-                createNotification(
+                this.notificationManager.create(
                     NotificationOrigin.GENERAL,
                     NotificationIntent.ERROR,
                     valueResult.error,
                     5_000,
-                    this.soundPlayer,
                 );
                 return;
             }

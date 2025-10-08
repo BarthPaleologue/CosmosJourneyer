@@ -29,6 +29,7 @@ import { TtsMock } from "@/frontend/audio/tts";
 import { Player } from "@/frontend/player/player";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 
 import { initI18n } from "@/i18n";
@@ -50,6 +51,7 @@ export async function createSpaceStationUIScene(
 
     const soundPlayer = new SoundPlayerMock();
     const tts = new TtsMock();
+    const notificationManager = new NotificationManagerMock();
 
     const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
 
@@ -69,7 +71,7 @@ export async function createSpaceStationUIScene(
     );
     player.instancedSpaceships.push(spaceship);
 
-    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts);
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);
 
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
@@ -79,7 +81,13 @@ export async function createSpaceStationUIScene(
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 
-    const spaceStationUI = new SpaceStationLayer(player, encyclopaedia, systemDatabase, soundPlayer);
+    const spaceStationUI = new SpaceStationLayer(
+        player,
+        encyclopaedia,
+        systemDatabase,
+        soundPlayer,
+        notificationManager,
+    );
 
     const stationModel = systemModel.orbitalFacilities[0];
     if (stationModel === undefined) {
