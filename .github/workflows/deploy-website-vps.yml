@@ -1,0 +1,50 @@
+name: Deploy Website to VPS
+
+on:
+    workflow_dispatch:
+
+jobs:
+    deploy-website:
+        runs-on: ubuntu-latest
+        environment:
+            name: website
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Use Node.js 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build website bundle
+              run: pnpm build:website
+
+            - name: Configure SSH agent
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+            - name: Add VPS to known hosts
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+            - name: Ensure remote directory exists
+              env:
+                  REMOTE_PATH: ${{ secrets.VPS_WEBSITE_PATH }}
+              run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} "sudo mkdir -p \"$REMOTE_PATH\""
+
+            - name: Deploy website assets
+              env:
+                  REMOTE_PATH: ${{ secrets.VPS_WEBSITE_PATH }}
+              run: rsync -az --delete --rsync-path="sudo rsync" packages/website/out/ ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:"$REMOTE_PATH"/
