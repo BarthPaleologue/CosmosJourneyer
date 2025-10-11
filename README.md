@@ -149,6 +149,7 @@ Cosmos Journeyer generates a virtually infinite amount of star systems that all 
 Cosmos Journeyer is built using the following technologies:
 
 - [BabylonJS](https://www.babylonjs.com/) for the 3D engine
+- [Next.js](https://nextjs.org/) for the website
 - [TypeScript](https://www.typescriptlang.org/) for the programming language
 - [Rspack](https://rspack.dev/) for bundling the application
 - [Pnpm](https://pnpm.io/) for the package manager
@@ -161,8 +162,8 @@ Cosmos Journeyer is built using the following technologies:
 
 ### Setup
 
-1. Install [Node.js](https://nodejs.org/) (version 20 or higher)
-2. Install [Pnpm](https://pnpm.io/) globally with `npm install -g pnpm`
+1. Install [Node.js](https://nodejs.org/)
+2. Install [Pnpm](https://pnpm.io/installation)
 3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 4. Navigate to the project directory with `cd CosmosJourneyer`
 5. Install the dependencies with `pnpm install`
@@ -175,24 +176,25 @@ Cosmos Journeyer is built using the following technologies:
 This project uses a pnpm workspace. Packages live under `packages/` and share tooling defined at the repository root.
 
 - `packages/game` – main Babylon.js game sources, assets, build config, and tests
-- `packages/game/src-tauri` – desktop shell that wraps the web build
-- `research/`, `coverImages/`, … – supporting material that stays outside of workspace packages
+- `packages/website` – Next.js website sources and build config
+
+### Development
+
+You can start the development server for the game with `pnpm dev:game` and for the website with `pnpm dev:website`.
 
 ### Building
 
 #### Web
 
-To build the web version of Cosmos Journeyer, run `pnpm build`. Everything will be built in `packages/game/dist`.
-
-To start the production server version, run `pnpm serve:prod`. The development version can be started with `pnpm serve`. Both commands delegate to the `@cosmos-journeyer/game` workspace package.
+To build the web version of Cosmos Journeyer, run `pnpm build:game`. Everything will be built in `packages/game/dist`.
 
 #### Tauri
 
 Cosmos Journeyer can be built as a desktop application using Tauri.
 
-To find what dependencies your OS is missing, run `pnpm tauri:info`.
+To find what dependencies your OS is missing, run `pnpm tauri info`.
 
-Then you can build the application with `pnpm tauri:build` or run the dev version with `pnpm tauri:dev`.
+Then you can build the application with `pnpm tauri build` or run the dev version with `pnpm tauri dev`.
 
 The build artifacts will appear in `packages/game/src-tauri/target/release/bundle/<platform>`.
 
@@ -225,11 +227,10 @@ Cosmos Journeyer is a free and open-source software licensed under the terms of 
 
 ## Credits
 
-All credits can be found in [the credits panel](./packages/game/src/html/mainMenu.html) of the game.
+All credits can be found in [the credits panel](./packages/game/src/ts/frontend/ui/panels/creditsPanel.ts) of the game.
 
 ## Special Thanks
 
 - Martin Molli for his fearless refactoring of the messy code base in its early days
-- The people from [BabylonJS](https://www.babylonjs.com/) for their amazing work on the BabylonJS framework and their
-  help on the forum
+- The people from [BabylonJS](https://www.babylonjs.com/) for their amazing work on the BabylonJS framework and their help on the forum
 - My family for their continuous support
