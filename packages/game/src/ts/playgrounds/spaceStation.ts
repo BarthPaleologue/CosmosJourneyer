@@ -44,6 +44,7 @@ export async function createSpaceStationScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
 
     await enablePhysics(scene);
 
@@ -57,9 +58,6 @@ export async function createSpaceStationScene(
     camera.attachControl();
 
     const distanceToStar = AU;
-
-    defaultControls.getTransform().setAbsolutePosition(new Vector3(0, 2, -3).normalize().scaleInPlace(40e3));
-    lookAt(defaultControls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     const coordinates = {
         starSectorX: 0,
@@ -78,9 +76,12 @@ export async function createSpaceStationScene(
     const sun = new Star(sunModel, assets.textures, scene);
     sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const seedParam = urlParams.get("seed");
+
     const spaceStationModel = newSeededSpaceStationModel(
         "station",
-        Math.random() * Settings.SEED_HALF_RANGE,
+        seedParam !== null ? Number(seedParam) : Math.random() * Settings.SEED_HALF_RANGE,
         coordinates,
         systemPosition,
         [sunModel],
@@ -88,6 +89,12 @@ export async function createSpaceStationScene(
     spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
     const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), assets, scene);
+
+    spaceStation.landingBays[0]
+        ?.getTransform()
+        .position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
+
+    lookAt(defaultControls.getTransform(), spaceStation.getTransform().position, scene.useRightHandedSystem);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
