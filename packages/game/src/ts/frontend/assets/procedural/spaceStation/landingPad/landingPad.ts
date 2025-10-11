@@ -1,13 +1,11 @@
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
-import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { Textures } from "@/frontend/assets/textures";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
@@ -22,8 +20,6 @@ export class LandingPad implements ILandingPad {
 
     private readonly deckMaterial: LandingPadMaterial;
 
-    private readonly crates: InstancedMesh[] = [];
-
     readonly padNumber: number;
     private readonly padSize: LandingPadSize;
 
@@ -36,7 +32,7 @@ export class LandingPad implements ILandingPad {
     private readonly width: number;
     private readonly depth: number;
 
-    constructor(padNumber: number, padSize: LandingPadSize, assets: RenderingAssets, scene: Scene) {
+    constructor(padNumber: number, padSize: LandingPadSize, textures: Textures, scene: Scene) {
         this.padSize = padSize;
 
         this.width = 40 * padSize;
@@ -48,8 +44,8 @@ export class LandingPad implements ILandingPad {
 
         this.deckMaterial = new LandingPadMaterial(
             padNumber,
-            assets.textures.materials.concrete,
-            assets.textures.pools.landingPad,
+            textures.materials.concrete,
+            textures.pools.landingPad,
             scene,
         );
 
@@ -66,44 +62,11 @@ export class LandingPad implements ILandingPad {
 
         this.enablePhysics(scene);
 
-        const nbBoxes = Math.floor(Math.random() * 5);
-        this.scatterAssets(assets.objects.crate, nbBoxes);
-
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
             minDistance: this.getBoundingRadius() * 4.0,
             maxDistance: this.getBoundingRadius() * 6.0,
         };
-    }
-
-    scatterAssets(asset: Mesh, nbScatter: number) {
-        for (let i = 0; i < nbScatter; i++) {
-            const corner1 = Math.random() < 0.5 ? -1 : 1;
-            const corner2 = Math.random() < 0.5 ? -1 : 1;
-
-            const crateSize = Math.random() < 0.2 ? 0.5 : 1;
-            const crate = asset.createInstance(`crate${i}`);
-            crate.scaling.scaleInPlace(crateSize);
-            crate.parent = this.deck;
-            crate.position.y += 0.25 + crateSize / 2;
-
-            let nbTries = 0;
-            const maxTries = 10;
-            do {
-                crate.position.x = (corner1 * (this.width - 10 * Math.random() - 3)) / 2;
-                crate.position.z = (corner2 * (this.depth - 10 * Math.random() - 3)) / 2;
-                crate.rotation.y = Math.random() * Math.PI * 2;
-                nbTries++;
-                if (nbTries > maxTries) {
-                    crate.dispose();
-                    break;
-                }
-            } while (!this.crates.every((otherCrate) => Vector3.Distance(crate.position, otherCrate.position) > 1.5));
-
-            if (nbTries <= maxTries) {
-                this.crates.push(crate);
-            }
-        }
     }
 
     disablePhysics() {
@@ -150,9 +113,6 @@ export class LandingPad implements ILandingPad {
         this.deck.dispose();
         this.deckAggregate?.dispose();
         this.deckMaterial.dispose();
-        this.crates.forEach((crate) => {
-            crate.dispose();
-        });
     }
 
     getTypeName(): string {

@@ -70,7 +70,7 @@ export async function createAutomaticLandingScene(
     camera.minZ = 0.1;
     camera.attachControl();
 
-    const landingPad = new LandingPad(42, LandingPadSize.SMALL, assets, scene);
+    const landingPad = new LandingPad(42, LandingPadSize.SMALL, assets.textures, scene);
 
     const ground = MeshBuilder.CreateBox("ground", { width: 100, height: 1, depth: 100 }, scene);
     ground.position.y = -2;

@@ -148,7 +148,7 @@ export class LandingBay {
                 const landingPad = new LandingPad(
                     padNumber++,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
-                    assets,
+                    assets.textures,
                     scene,
                 );
                 landingPad.getTransform().parent = this.getTransform();
