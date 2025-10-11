@@ -34,6 +34,7 @@
  * - They return the relevant output connection point
  */
 
+import { Light } from "@babylonjs/core/Lights/light";
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { ColorConverterBlock } from "@babylonjs/core/Materials/Node/Blocks/colorConverterBlock";
@@ -1284,6 +1285,7 @@ export type PBROptions = {
     ambientOcclusion: NodeMaterialConnectionPoint;
     opacity: NodeMaterialConnectionPoint;
     perturbedNormal: NodeMaterialConnectionPoint;
+    lightFalloff: typeof Light.FALLOFF_PHYSICAL | typeof Light.FALLOFF_GLTF | typeof Light.FALLOFF_STANDARD;
 };
 
 export type PBROutput = {
@@ -1316,6 +1318,7 @@ export function pbr(
     PBRMetallicRoughness.useEnergyConservation = options?.useEnergyConservation ?? true;
     PBRMetallicRoughness.useRadianceOcclusion = options?.useRadianceOcclusion ?? true;
     PBRMetallicRoughness.useHorizonOcclusion = options?.useHorizonOcclusion ?? true;
+    PBRMetallicRoughness.lightFalloff = options?.lightFalloff ?? Light.FALLOFF_GLTF;
 
     metallicFloat.connectTo(PBRMetallicRoughness.metallic);
     roughnessFloat.connectTo(PBRMetallicRoughness.roughness);
