@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -57,16 +56,10 @@ export class LandingBay {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    private readonly centralLight: PointLight;
-
     readonly landingPads: LandingPad[] = [];
 
     constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
-
-        this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);
-        this.centralLight.parent = this.root;
-        this.centralLight.intensity = 1000;
 
         this.rng = getRngFromSeed(seed);
 
@@ -190,8 +183,6 @@ export class LandingBay {
             .forEach((mesh) => {
                 mesh.position.subtractInPlace(center);
             });
-
-        this.centralLight.includedOnlyMeshes = this.getTransform().getChildMeshes();
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -267,7 +258,5 @@ export class LandingBay {
         this.landingPads.forEach((landingPad) => {
             landingPad.dispose();
         });
-
-        this.centralLight.dispose();
     }
 }
