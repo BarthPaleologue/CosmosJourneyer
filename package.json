@@ -41,6 +41,8 @@
         "build:website": "pnpm --filter @cosmos-journeyer/website build",
         "build:prod": "tsx ./scripts/build-prod.ts",
         "serve:prod": "http-server dist -p 8080",
+        "dev:game": "pnpm --filter @cosmos-journeyer/game serve",
+        "dev:website": "pnpm --filter @cosmos-journeyer/website dev",
         "format": "pnpm -r format",
         "format:check": "pnpm -r format:check",
         "test:unit": "pnpm --filter @cosmos-journeyer/game test:unit",
