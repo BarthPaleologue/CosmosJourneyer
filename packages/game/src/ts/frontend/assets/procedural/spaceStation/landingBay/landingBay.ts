@@ -108,6 +108,8 @@ export class LandingBay {
         lightMesh.parent = this.getTransform();
 
         const nbLights = nbSteps;
+        const lightMatrixBuffer = new Float32Array(16 * nbLights);
+
         for (let i = 0; i < nbLights; i++) {
             const lampPostHeight = 10;
 
@@ -118,16 +120,15 @@ export class LandingBay {
                 (this.radius + (deltaRadius - lampThickness) / 2) * Math.sin(theta),
             );
 
-            lightMesh.thinInstanceAdd(
-                Matrix.Compose(
-                    Vector3.OneReadOnly,
-                    Quaternion.FromLookDirectionRH(
-                        new Vector3(-position.x, 0, -position.z).normalize(),
-                        Vector3.UpReadOnly,
-                    ),
-                    position,
+            const matrix = Matrix.Compose(
+                Vector3.OneReadOnly,
+                Quaternion.FromLookDirectionRH(
+                    new Vector3(-position.x, 0, -position.z).normalize(),
+                    Vector3.UpReadOnly,
                 ),
+                position,
             );
+            matrix.copyToArray(lightMatrixBuffer, i * 16);
 
             const lightPosition = position.clone();
             lightPosition.y = heightFactor * deltaRadius + lampPostHeight + lampHeight / 2;
@@ -138,6 +139,8 @@ export class LandingBay {
 
             this.lights.push(light);
         }
+
+        lightMesh.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
 
         this.landingBayMaterial = new LandingBayMaterial(
             stationModel,
