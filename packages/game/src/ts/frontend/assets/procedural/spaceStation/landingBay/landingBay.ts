@@ -19,7 +19,7 @@ import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -32,7 +32,6 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -93,34 +92,49 @@ export class LandingBay {
         const lightMeshMaterial = new StandardMaterial("LandingBayLightMeshMaterial", scene);
         lightMeshMaterial.emissiveColor.set(1, 1, 1);
         lightMeshMaterial.disableLighting = true;
+
+        const lampHeight = deltaRadius / 16;
+        const lampThickness = lampHeight;
+        const lightMesh = MeshBuilder.CreateBox(
+            `LandingBayLightCaps`,
+            {
+                width: deltaRadius / 8,
+                depth: lampThickness,
+                height: lampHeight,
+            },
+            scene,
+        );
+        lightMesh.material = lightMeshMaterial;
+        lightMesh.parent = this.getTransform();
+
         const nbLights = nbSteps;
         for (let i = 0; i < nbLights; i++) {
             const lampPostHeight = 10;
-            const lampHeight = deltaRadius / 16;
-            const lampThickness = lampHeight;
-            const lightMesh = MeshBuilder.CreateBox(
-                `LandingBayLightCap${i}`,
-                {
-                    width: deltaRadius / 8,
-                    depth: lampThickness,
-                    height: lampHeight,
-                },
-                scene,
-            );
-            lightMesh.material = lightMeshMaterial;
 
             const theta = (2 * Math.PI * i) / nbLights;
-            lightMesh.position.set(
+            const position = new Vector3(
                 (this.radius + (deltaRadius - lampThickness) / 2) * Math.cos(theta),
                 (heightFactor * deltaRadius) / 2 + lampPostHeight + lampHeight / 2,
                 (this.radius + (deltaRadius - lampThickness) / 2) * Math.sin(theta),
             );
-            lightMesh.parent = this.getTransform();
-            lookAt(lightMesh, new Vector3(0, (heightFactor * deltaRadius) / 2, 0), scene.useRightHandedSystem);
 
-            const light = new PointLight(`LandingBayLight${i}`, Vector3.Zero(), scene);
+            lightMesh.thinInstanceAdd(
+                Matrix.Compose(
+                    Vector3.OneReadOnly,
+                    Quaternion.FromLookDirectionRH(
+                        new Vector3(-position.x, 0, -position.z).normalize(),
+                        Vector3.UpReadOnly,
+                    ),
+                    position,
+                ),
+            );
+
+            const lightPosition = position.clone();
+            lightPosition.y = heightFactor * deltaRadius + lampPostHeight + lampHeight / 2;
+
+            const light = new PointLight(`LandingBayLightCaps${i}`, lightPosition, scene);
             light.range = deltaRadius * 2;
-            light.parent = lightMesh;
+            light.parent = this.getTransform();
 
             this.lights.push(light);
         }
