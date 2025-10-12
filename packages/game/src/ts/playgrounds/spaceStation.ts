@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ClusteredLightContainer, Color3, PointLight, Scalar } from "@babylonjs/core";
+import { ClusteredLightContainer, GlowLayer } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -89,31 +89,46 @@ export async function createSpaceStationScene(
 
     const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), assets, scene);
 
-    spaceStation.landingBays[0]
-        ?.getTransform()
-        .position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
+    const landingBay = spaceStation.landingBays[0];
+    if (landingBay === undefined) {
+        throw new Error("Space station has no landing bay");
+    }
+
+    landingBay.getTransform().position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
 
     lookAt(defaultControls.getTransform(), spaceStation.getTransform().position, scene.useRightHandedSystem);
 
+    const clustered = new ClusteredLightContainer(
+        "clustered",
+        landingBay.landingPads.flatMap((pad) => pad.getLights()),
+        scene,
+    );
+    for (const light of landingBay.lights) {
+        clustered.addLight(light);
+    }
+
+    /*
     const LIGHTS = 300;
     const WIDTH = 500;
     const HEIGHT = 1000;
     const DEPTH = 500;
 
-    const clustered = new ClusteredLightContainer("clustered", [], scene);
+
     for (let i = 0; i < LIGHTS; i += 1) {
         const position = new Vector3(
             Scalar.RandomRange(-DEPTH, DEPTH),
             Scalar.RandomRange(0, HEIGHT),
             Scalar.RandomRange(-WIDTH, WIDTH),
         );
-        spaceStation.landingBays[0]?.getTransform().position.addToRef(position, position);
+        landingBay.getTransform().position.addToRef(position, position);
         const pointLight = new PointLight(`point${i}`, position, scene);
         pointLight.diffuse = Color3.Random().scale(3);
         pointLight.range = 200;
 
         clustered.addLight(pointLight);
-    }
+    }*/
+
+    new GlowLayer("glow", scene);
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
