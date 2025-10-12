@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type SpotLight } from "@babylonjs/core/Lights/spotLight";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
@@ -30,6 +30,7 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import type { RGBColor } from "@/utils/colors";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 import i18n from "@/i18n";
@@ -116,7 +117,11 @@ export class LandingPad implements ILandingPad {
             );
             proceduralSpotLight.getTransform().position.set(corner.x, lightHeight, corner.z);
             proceduralSpotLight.getTransform().parent = this.getTransform();
-            lookAt(proceduralSpotLight.getTransform(), Vector3.Zero(), sceneUsesRightHanded);
+            lookAt(
+                proceduralSpotLight.getTransform(),
+                new Vector3(corner.x / 2, 0, corner.z / 2),
+                sceneUsesRightHanded,
+            );
 
             const lampPost = MeshBuilder.CreateCylinder(
                 "Lamp Post",
