@@ -107,27 +107,6 @@ export async function createSpaceStationScene(
         clustered.addLight(light);
     }
 
-    /*
-    const LIGHTS = 300;
-    const WIDTH = 500;
-    const HEIGHT = 1000;
-    const DEPTH = 500;
-
-
-    for (let i = 0; i < LIGHTS; i += 1) {
-        const position = new Vector3(
-            Scalar.RandomRange(-DEPTH, DEPTH),
-            Scalar.RandomRange(0, HEIGHT),
-            Scalar.RandomRange(-WIDTH, WIDTH),
-        );
-        landingBay.getTransform().position.addToRef(position, position);
-        const pointLight = new PointLight(`point${i}`, position, scene);
-        pointLight.diffuse = Color3.Random().scale(3);
-        pointLight.range = 200;
-
-        clustered.addLight(pointLight);
-    }*/
-
     new GlowLayer("glow", scene);
 
     scene.onBeforePhysicsObservable.add(() => {
