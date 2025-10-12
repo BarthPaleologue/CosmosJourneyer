@@ -111,9 +111,9 @@ export class RingHabitatMaterial extends NodeMaterial {
         );
 
         const lightColor = vec3(f(1), f(1), f(0.7));
+        const glow = mul(lightEmission, lightColor);
 
-        const finalColor = add(pbrLighting.lighting, mul(lightEmission, lightColor));
-        const fragOutput = outputFragColor(finalColor);
+        const fragOutput = outputFragColor(add(pbrLighting.lighting, glow), { glow });
 
         this.addOutputNode(fragOutput);
 
