@@ -19,7 +19,7 @@ import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -32,6 +32,7 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
+import { createCircle as createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -95,7 +96,7 @@ export class LandingBay {
 
         const lampHeight = deltaRadius / 16;
         const lampThickness = lampHeight;
-        const lightMesh = MeshBuilder.CreateBox(
+        const lightMeshInstances = MeshBuilder.CreateBox(
             `LandingBayLightCaps`,
             {
                 width: deltaRadius / 8,
@@ -104,43 +105,27 @@ export class LandingBay {
             },
             scene,
         );
-        lightMesh.material = lightMeshMaterial;
-        lightMesh.parent = this.getTransform();
+        lightMeshInstances.material = lightMeshMaterial;
+        lightMeshInstances.parent = this.getTransform();
 
-        const nbLights = nbSteps;
-        const lightMatrixBuffer = new Float32Array(16 * nbLights);
+        const lampPostHeight = 10;
+        lightMeshInstances.position.y = (heightFactor * deltaRadius) / 2 + lampPostHeight + lampHeight / 2;
 
-        for (let i = 0; i < nbLights; i++) {
-            const lampPostHeight = 10;
+        const lightMatrixBuffer = createCircleInstanceBuffer(this.radius + (deltaRadius - lampThickness) / 2, nbSteps);
+        lightMeshInstances.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
 
-            const theta = (2 * Math.PI * i) / nbLights;
-            const position = new Vector3(
-                (this.radius + (deltaRadius - lampThickness) / 2) * Math.cos(theta),
-                (heightFactor * deltaRadius) / 2 + lampPostHeight + lampHeight / 2,
-                (this.radius + (deltaRadius - lampThickness) / 2) * Math.sin(theta),
-            );
+        for (let i = 0; i < nbSteps; i++) {
+            const bufferOffset = i * 16;
+            const x = lightMatrixBuffer[bufferOffset + 12];
+            const y = lightMatrixBuffer[bufferOffset + 13];
+            const z = lightMatrixBuffer[bufferOffset + 14];
 
-            const matrix = Matrix.Compose(
-                Vector3.OneReadOnly,
-                Quaternion.FromLookDirectionRH(
-                    new Vector3(-position.x, 0, -position.z).normalize(),
-                    Vector3.UpReadOnly,
-                ),
-                position,
-            );
-            matrix.copyToArray(lightMatrixBuffer, i * 16);
-
-            const lightPosition = position.clone();
-            lightPosition.y = heightFactor * deltaRadius + lampPostHeight + lampHeight / 2;
-
-            const light = new PointLight(`LandingBayLightCaps${i}`, lightPosition, scene);
+            const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene);
             light.range = deltaRadius * 2;
-            light.parent = this.getTransform();
+            light.parent = lightMeshInstances;
 
             this.lights.push(light);
         }
-
-        lightMesh.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
 
         this.landingBayMaterial = new LandingBayMaterial(
             stationModel,
