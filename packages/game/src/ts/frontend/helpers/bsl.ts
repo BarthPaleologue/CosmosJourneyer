@@ -1354,6 +1354,7 @@ export type OutputFragColorOptions = {
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
     alpha: NodeMaterialConnectionPoint;
+    glow: NodeMaterialConnectionPoint;
 };
 
 /**
@@ -1372,6 +1373,7 @@ export function outputFragColor(
 
     colorRgb.connectTo(FragmentOutput.rgb);
     options?.alpha?.connectTo(FragmentOutput.a);
+    options?.glow?.connectTo(FragmentOutput.additionalColor);
 
     return FragmentOutput;
 }
