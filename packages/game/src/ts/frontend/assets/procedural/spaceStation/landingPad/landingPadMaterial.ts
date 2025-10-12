@@ -24,7 +24,6 @@ import { type LandingPadTexturePool } from "@/frontend/assets/landingPadTextureP
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     add,
-    div,
     f,
     length,
     min,
@@ -34,6 +33,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    smoothstep,
     splitVec,
     step,
     sub,
@@ -89,6 +89,9 @@ export class LandingPadMaterial extends NodeMaterial {
         const paintMaskUV = vec2(uvSplit.y, add(uvSplit.x, f(0.01)));
         const paintWeight = textureSample(numberUniformTexture, paintMaskUV).a;
         const paintAlbedo = vec(Vector3.One());
+        const paintMetallic = f(0);
+        const paintRoughness = f(0.2);
+        const paintAmbientOcclusion = f(1);
 
         const borderThickness = f(0.03);
 
@@ -108,9 +111,13 @@ export class LandingPadMaterial extends NodeMaterial {
         const circleThickness = f(0.01);
         const distToCenter = length(centeredUVScaled);
 
+        const circleMinRadius = sub(circleRadius, circleThickness);
+        const circleMaxRadius = add(circleRadius, circleThickness);
+        const smoothness = f(0.005);
+
         const circleMask = mul(
-            step(sub(circleRadius, circleThickness), distToCenter),
-            step(distToCenter, add(circleRadius, circleThickness)),
+            smoothstep(circleMinRadius, add(circleMinRadius, smoothness), distToCenter),
+            sub(f(1), smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
         );
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
@@ -128,16 +135,16 @@ export class LandingPadMaterial extends NodeMaterial {
         const ambientOcclusion = textureSample(occlusionTexture, proceduralUV);
 
         const finalAlbedo = mix(albedo.rgb, paintAlbedo, fullPaintWeight);
-        const finalMetallic = mix(metallicRoughness.r, f(0), fullPaintWeight);
-        const finalRoughness = mix(metallicRoughness.g, f(0.7), fullPaintWeight);
-        const finalAmbientOcclusion = mix(ambientOcclusion.r, f(1), fullPaintWeight);
+        const finalMetallic = mix(metallicRoughness.r, paintMetallic, fullPaintWeight);
+        const finalRoughness = mix(metallicRoughness.g, paintRoughness, fullPaintWeight);
+        const finalAmbientOcclusion = mix(ambientOcclusion.r, paintAmbientOcclusion, fullPaintWeight);
 
         const perturbedNormal = perturbNormal(
             proceduralUV,
             positionW,
             normalW,
             normalMapValue.rgb,
-            sub(f(1), mul(fullPaintWeight, f(0.5))),
+            sub(f(1), mul(fullPaintWeight, f(0.8))),
         );
 
         const view = uniformView();
@@ -149,9 +156,7 @@ export class LandingPadMaterial extends NodeMaterial {
             perturbedNormal: perturbedNormal.output,
         });
 
-        const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));
-
-        const fragOutput = outputFragColor(add(pbrLighting.lighting, additionalLight));
+        const fragOutput = outputFragColor(pbrLighting.lighting);
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragOutput);
