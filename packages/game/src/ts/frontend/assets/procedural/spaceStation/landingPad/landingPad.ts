@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Light } from "@babylonjs/core/Lights/light";
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -26,7 +26,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
 import type { Textures } from "@/frontend/assets/textures";
-import { lookAt } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
@@ -36,14 +35,13 @@ import { degreesToRadians } from "@/utils/physics/unitConversions";
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
-import { ProceduralSpotLight } from "../../spotLight";
 import { LandingPadMaterial } from "./landingPadMaterial";
 
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
     private deckAggregate: PhysicsAggregate | null = null;
 
-    private spotLights: Array<ProceduralSpotLight>;
+    private lights: Array<Light> = [];
 
     private readonly deckMaterial: LandingPadMaterial;
 
@@ -106,9 +104,24 @@ export class LandingPad implements ILandingPad {
             { x: halfWidth, z: -halfDepth },
         ];
 
-        const sceneUsesRightHanded = scene.useRightHandedSystem;
+        for (const corner of corners) {
+            const position = new Vector3(corner.x, lightHeight, corner.z);
+            const target = new Vector3(corner.x / 2, 0, corner.z / 2);
+            const direction = target.subtract(position).normalize();
+            const light = new SpotLight(
+                `LandingPadLight${this.padNumber}`,
+                position,
+                direction,
+                degreesToRadians(120),
+                2,
+                scene,
+            );
+            light.parent = this.getTransform();
+            light.range = this.depth;
+            this.lights.push(light);
+        }
 
-        this.spotLights = corners.map((corner) => {
+        /*this.spotLights = corners.map((corner) => {
             const proceduralSpotLight = new ProceduralSpotLight(
                 degreesToRadians(120),
                 this.padSize * 0.6,
@@ -140,7 +153,7 @@ export class LandingPad implements ILandingPad {
             lampPost.material = lampPostMaterial;
 
             return proceduralSpotLight;
-        });
+        });*/
     }
 
     disablePhysics() {
@@ -184,12 +197,12 @@ export class LandingPad implements ILandingPad {
     }
 
     getLights(): Array<Light> {
-        return this.spotLights.map((entry) => entry.light);
+        return this.lights;
     }
 
     setLightsColor({ r, g, b }: RGBColor): void {
-        for (const spotLight of this.spotLights) {
-            spotLight.color.copyFromFloats(r, g, b);
+        for (const light of this.lights) {
+            light.diffuse.copyFromFloats(r, g, b);
         }
     }
 
