@@ -60,6 +60,10 @@ class MockLandingPad implements ILandingPad {
         return 0;
     }
 
+    setLightsColor(): void {
+        // No-op for testing
+    }
+
     // Implement other required LandingPad methods with minimal functionality
     getTransform() {
         return this.transform;
