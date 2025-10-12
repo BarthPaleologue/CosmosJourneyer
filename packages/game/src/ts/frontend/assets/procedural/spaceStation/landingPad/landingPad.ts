@@ -178,8 +178,14 @@ export class LandingPad implements ILandingPad {
         return this.boundingRadius;
     }
 
-    getSpotLights(): Array<SpotLight> {
+    getLights(): Array<Light> {
         return this.spotLights.map((entry) => entry.light);
+    }
+
+    setLightsColor({ r, g, b }: RGBColor): void {
+        for (const spotLight of this.spotLights) {
+            spotLight.color.copyFromFloats(r, g, b);
+        }
     }
 
     dispose() {
