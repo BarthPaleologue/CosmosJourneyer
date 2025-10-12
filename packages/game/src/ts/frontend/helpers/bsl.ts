@@ -884,6 +884,7 @@ export function pbrMetallicRoughnessMaterial(
 export type OutputFragColorOptions = {
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
+    glow: NodeMaterialConnectionPoint;
 };
 
 /**
@@ -901,6 +902,7 @@ export function outputFragColor(
     FragmentOutput.convertToLinearSpace = options?.convertToLinearSpace ?? false;
 
     colorRgb.connectTo(FragmentOutput.rgb);
+    options?.glow?.connectTo(FragmentOutput.additionalColor);
 
     return FragmentOutput;
 }
