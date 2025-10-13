@@ -45,7 +45,6 @@ export class UtilitySection implements Transformable {
 
     private readonly metalSectionMaterial: Material;
 
-    private readonly tankBase: Mesh;
     private readonly tanks: Array<AbstractMesh> = [];
     private tankBodies: Array<PhysicsBody> = [];
     private readonly tankShape: PhysicsShape;
@@ -75,9 +74,9 @@ export class UtilitySection implements Transformable {
         this.attachment.material = this.metalSectionMaterial;
 
         const tankRadius = 40;
-        this.tankBase = MeshBuilder.CreateIcoSphere("box", { radius: tankRadius }, scene);
-        this.tankBase.parent = this.getTransform();
-        this.tankBase.material = assets.materials.tank;
+        const tankBase = MeshBuilder.CreateIcoSphere("box", { radius: tankRadius }, scene);
+        tankBase.parent = this.getTransform();
+        tankBase.material = assets.materials.tank;
 
         this.tankShape = new PhysicsShapeSphere(Vector3.Zero(), tankRadius, scene);
 
@@ -87,7 +86,7 @@ export class UtilitySection implements Transformable {
                     const radius = attachmentRadius * Math.cos(Math.PI / tesselation) + tankRadius;
                     const theta = Math.PI / tesselation + ((2 * Math.PI) / tesselation) * sideIndex;
 
-                    const tank = this.tankBase.createInstance(`tankInstance${ring}_${sideIndex}`);
+                    const tank = tankBase.createInstance(`tankInstance${ring}_${sideIndex}`);
                     tank.position.set(radius * Math.cos(theta), ring * tankRadius * 2, radius * Math.sin(theta));
 
                     this.tanks.push(tank);
@@ -138,7 +137,6 @@ export class UtilitySection implements Transformable {
         this.tankBodies.forEach((tankBody) => {
             tankBody.dispose();
         });
-        this.tankBase.dispose();
         this.tankShape.dispose();
     }
 }
