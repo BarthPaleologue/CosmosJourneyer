@@ -7,7 +7,7 @@ test("The space station playground renders correctly", async ({ page }) => {
         scene: "spaceStation",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 3, seed: 10 },
+        urlParams: { freeze: 1, seed: 10 },
     });
 });
 
