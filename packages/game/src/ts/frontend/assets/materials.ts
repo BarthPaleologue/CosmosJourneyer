@@ -33,6 +33,7 @@ export type Materials = {
     readonly crate: PBRMetallicRoughnessMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
+    readonly tank: PBRMetallicRoughnessMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -46,6 +47,11 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     treeMaterial.baseTexture = textures.materials.tree.albedo;
     treeMaterial.transparencyMode = 1;
 
+    const tankMaterial = new PBRMetallicRoughnessMaterial("tankMaterial", scene);
+    tankMaterial.baseColor.copyFromFloats(0.2, 0.2, 0.2);
+    tankMaterial.metallic = 1;
+    tankMaterial.roughness = 0.4;
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
         butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
@@ -54,6 +60,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,
+        tank: tankMaterial,
     };
 }
 
