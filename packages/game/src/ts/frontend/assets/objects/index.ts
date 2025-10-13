@@ -154,6 +154,7 @@ export async function loadObjects(
 
     stationEngine.scalingDeterminant = 1.0 / maxDimension;
     stationEngine.bakeCurrentTransformIntoVertices();
+    stationEngine.refreshBoundingInfo();
 
     const stationEngineShape = new PhysicsShapeConvexHull(stationEngine, scene);
     stationEngineShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
