@@ -83,6 +83,7 @@ if (urlParams.get("physicsViewer") !== null) {
 const maxFrameCounter = urlParams.get("freeze");
 const maxFrameCounterValue = Number(maxFrameCounter);
 if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
+    engine["getDeltaTime"] = () => 0; // Disable delta time to freeze the scene
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;

@@ -19,10 +19,9 @@ import "@babylonjs/loaders";
 import "@babylonjs/core/Loading/Plugins/babylonFileLoader";
 import "@babylonjs/core/Animations/animatable";
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeConvexHull, PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
@@ -39,7 +38,6 @@ import bananaPath from "@assets/banana/banana.glb";
 import rockPath from "@assets/rock.glb";
 import wandererPath from "@assets/spaceship/wanderer.glb";
 import stationEnginePath from "@assets/SpaceStationParts/engine.glb";
-import sphericalTankPath from "@assets/SpaceStationParts/sphericalTank.glb";
 import treePath from "@assets/tree/tree.babylon";
 
 export type Objects = {
@@ -52,10 +50,6 @@ export type Objects = {
     rock: Mesh;
     asteroids: ReadonlyArray<Asteroid>;
     tree: Mesh;
-    sphericalTank: {
-        mesh: Mesh;
-        shape: PhysicsShapeSphere;
-    };
     stationEngine: {
         mesh: Mesh;
         shape: PhysicsShapeConvexHull;
@@ -74,7 +68,6 @@ export async function loadObjects(
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
     const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
-    const sphericalTankPromise = loadAssetInContainerAsync("SphericalTank", sphericalTankPath, scene, progressMonitor);
     const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath, scene, progressMonitor);
 
     const butterfly = createButterfly(scene);
@@ -146,32 +139,6 @@ export async function loadObjects(
 
     treeContainer.addAllToScene();
 
-    const sphericalTankContainer = await sphericalTankPromise;
-    const sphericalTank = sphericalTankContainer.meshes[1];
-    if (!(sphericalTank instanceof Mesh)) {
-        throw new Error("SphericalTank root node is not a Mesh");
-    }
-
-    sphericalTank.parent = null;
-    sphericalTank.isVisible = false;
-    sphericalTankContainer.addAllToScene();
-
-    const sphericalTankBoundingBox = sphericalTank.getBoundingInfo().boundingBox;
-    const sphericalTankMaxDimension = Math.max(
-        sphericalTankBoundingBox.extendSize.x,
-        sphericalTankBoundingBox.extendSize.y,
-        sphericalTankBoundingBox.extendSize.z,
-    );
-
-    const sphericalTankTargetDimension = 20;
-
-    sphericalTank.scaling.scaleInPlace(sphericalTankTargetDimension / sphericalTankMaxDimension);
-    sphericalTank.bakeCurrentTransformIntoVertices();
-
-    const sphericalTankPhysicsShape = new PhysicsShapeSphere(Vector3.Zero(), sphericalTankTargetDimension * 2.5, scene);
-    sphericalTankPhysicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-    sphericalTankPhysicsShape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-
     const stationEngineContainer = await stationEnginePromise;
     const stationEngine = stationEngineContainer.meshes[1];
     if (!(stationEngine instanceof Mesh)) {
@@ -187,6 +154,7 @@ export async function loadObjects(
 
     stationEngine.scalingDeterminant = 1.0 / maxDimension;
     stationEngine.bakeCurrentTransformIntoVertices();
+    stationEngine.refreshBoundingInfo();
 
     const stationEngineShape = new PhysicsShapeConvexHull(stationEngine, scene);
     stationEngineShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
@@ -196,10 +164,6 @@ export async function loadObjects(
         stationEngine: {
             mesh: stationEngine,
             shape: stationEngineShape,
-        },
-        sphericalTank: {
-            mesh: sphericalTank,
-            shape: sphericalTankPhysicsShape,
         },
         tree,
         asteroids: await asteroidPromises,

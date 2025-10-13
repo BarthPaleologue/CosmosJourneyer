@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Material } from "@babylonjs/core/Materials/material";
-import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -25,7 +24,7 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeSphere, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -46,9 +45,9 @@ export class UtilitySection implements Transformable {
 
     private readonly metalSectionMaterial: Material;
 
-    private readonly tanks: AbstractMesh[] = [];
-    private readonly tankBodies: PhysicsBody[] = [];
-
+    private readonly tankBase: Mesh;
+    private readonly tanks: Array<AbstractMesh> = [];
+    private tankBodies: Array<PhysicsBody> = [];
     private readonly tankShape: PhysicsShape;
 
     constructor(seed: number, assets: RenderingAssets, scene: Scene) {
@@ -60,11 +59,14 @@ export class UtilitySection implements Transformable {
 
         this.rng = getRngFromSeed(seed);
 
+        const attachmentRadius = 50;
+        const tesselation = 6;
+
         this.attachment = MeshBuilder.CreateCylinder(
             "UtilitySectionRoot",
             {
                 height: 700,
-                diameter: 100,
+                diameter: attachmentRadius * 2,
                 tessellation: 6,
             },
             scene,
@@ -72,25 +74,21 @@ export class UtilitySection implements Transformable {
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
 
-        const boundingVectors = this.attachment.getHierarchyBoundingVectors();
-        const boundingExtendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
+        const tankRadius = 40;
+        this.tankBase = MeshBuilder.CreateIcoSphere("box", { radius: tankRadius }, scene);
+        this.tankBase.parent = this.getTransform();
+        this.tankBase.material = assets.materials.tank;
 
-        this.tankShape = assets.objects.sphericalTank.shape;
+        this.tankShape = new PhysicsShapeSphere(Vector3.Zero(), tankRadius, scene);
 
         if (this.rng(0) < 0.3) {
             for (let ring = -3; ring <= 3; ring++) {
-                for (let sideIndex = 0; sideIndex < 6; sideIndex++) {
-                    const tank = assets.objects.sphericalTank.mesh.createInstance("SphericalTank");
-                    tank.scalingDeterminant = 2.4;
+                for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
+                    const radius = attachmentRadius * Math.cos(Math.PI / tesselation) + tankRadius;
+                    const theta = Math.PI / tesselation + ((2 * Math.PI) / tesselation) * sideIndex;
 
-                    const newBoundingVectors = tank.getHierarchyBoundingVectors();
-                    const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
-
-                    tank.position.x = boundingExtendSize.x + newBoundingExtendSize.x;
-                    tank.parent = this.getTransform();
-
-                    tank.rotateAround(Vector3.Zero(), Axis.Y, Math.PI / 6 + (Math.PI / 3) * sideIndex);
-                    tank.translate(Axis.Y, ring * 40);
+                    const tank = this.tankBase.createInstance(`tankInstance${ring}_${sideIndex}`);
+                    tank.position.set(radius * Math.cos(theta), ring * tankRadius * 2, radius * Math.sin(theta));
 
                     this.tanks.push(tank);
                 }
@@ -137,8 +135,10 @@ export class UtilitySection implements Transformable {
         this.tanks.forEach((tank) => {
             tank.dispose();
         });
-        this.tankBodies.forEach((tankAggregate) => {
-            tankAggregate.dispose();
+        this.tankBodies.forEach((tankBody) => {
+            tankBody.dispose();
         });
+        this.tankBase.dispose();
+        this.tankShape.dispose();
     }
 }
