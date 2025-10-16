@@ -22,9 +22,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, translate } from "@/frontend/helpers/transform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
@@ -35,12 +35,12 @@ export async function createBlackHoleScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { floatingOriginMode: true });
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadEnvironmentTextures(scene, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2000000;
@@ -52,10 +52,10 @@ export async function createBlackHoleScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    new StarFieldBox(textures.environment.milkyWay, 1000e3, scene);
+    new StarFieldBox(textures.milkyWay, 1000e3, scene);
 
     const blackHoleModel = newSeededBlackHoleModel("blackHole", 42, "Black Hole Demo", []);
-    const blackHole = new BlackHole(blackHoleModel, textures.environment.milkyWay, scene);
+    const blackHole = new BlackHole(blackHoleModel, textures.milkyWay, scene);
     blackHole.getTransform().position = new Vector3(0, -0.2, 1).scaleInPlace(blackHole.getRadius() * 20);
 
     const blackHolePostProcess = new BlackHolePostProcess(blackHole.getTransform(), blackHole.blackHoleUniforms, scene);
@@ -66,11 +66,7 @@ export async function createBlackHoleScene(
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        const displacement = defaultControls.update(deltaSeconds);
-
-        translate(defaultControls.getTransform(), displacement.negate());
-        translate(blackHole.getTransform(), displacement.negate());
-
+        defaultControls.update(deltaSeconds);
         blackHolePostProcess.update(deltaSeconds);
     });
 

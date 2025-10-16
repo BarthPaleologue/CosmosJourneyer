@@ -35,7 +35,7 @@ export async function createRingsScene(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { floatingOriginMode: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
@@ -97,12 +97,6 @@ export async function createRingsScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
-        const cameraPosition = controls.getTransform().position.clone();
-
-        controls.getTransform().position = Vector3.Zero();
-        sphere.position.subtractInPlace(cameraPosition);
-        light.position.subtractInPlace(cameraPosition);
     });
 
     return scene;

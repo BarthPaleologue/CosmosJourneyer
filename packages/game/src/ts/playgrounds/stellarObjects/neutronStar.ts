@@ -25,7 +25,7 @@ import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerato
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { lookAt, translate } from "@/frontend/helpers/transform";
+import { lookAt } from "@/frontend/helpers/transform";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
@@ -39,7 +39,7 @@ export async function createNeutronStarScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { floatingOriginMode: true });
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
@@ -47,7 +47,7 @@ export async function createNeutronStarScene(
     const textures = await loadTextures(scene, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
-    defaultControls.speed = 2000;
+    defaultControls.speed = 2e9;
 
     const camera = defaultControls.getActiveCamera();
     camera.attachControl();
@@ -84,13 +84,8 @@ export async function createNeutronStarScene(
 
     scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        const displacement = defaultControls.update(deltaSeconds);
-
+        defaultControls.update(deltaSeconds);
         neutronStar.getTransform().rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.siderealDaySeconds);
-
-        translate(defaultControls.getTransform(), displacement.negate());
-        translate(neutronStar.getTransform(), displacement.negate());
-
         matterJets.update(deltaSeconds);
     });
 
