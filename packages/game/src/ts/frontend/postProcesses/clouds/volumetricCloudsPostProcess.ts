@@ -93,7 +93,8 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("Camera is null");
+                console.warn("Camera is null");
+                return;
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;

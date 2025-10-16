@@ -85,7 +85,8 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("FlatCloudsPostProcess: activeCamera is null");
+                console.warn("Camera is null");
+                return;
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
