@@ -22,7 +22,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
 import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -44,26 +44,26 @@ export async function createSaveLoadingPanelContentScene(
 
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(getLoneStarSystem());
 
     const soundPlayer = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();
 
-    const saveLoadingPanelContent = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer, notificationManager);
+    const saveLoadingPanelContent = new SaveLoadingPanelContent(universeBackend, soundPlayer, notificationManager);
     saveLoadingPanelContent.htmlRoot.style.position = "absolute";
     document.body.appendChild(saveLoadingPanelContent.htmlRoot);
 
     const saveManager = await SaveBackendSingleFile.CreateAsync(
         new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
         new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
-        starSystemDatabase,
+        universeBackend,
     );
     if (!saveManager.success) {
         await alertModal("Could not load saves", soundPlayer);
         return scene;
     }
 
-    await saveLoadingPanelContent.populateCmdrList(starSystemDatabase, saveManager.value);
+    await saveLoadingPanelContent.populateCmdrList(universeBackend, saveManager.value);
 
     return scene;
 }

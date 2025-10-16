@@ -23,8 +23,8 @@ import {
 } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -55,11 +55,8 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         this.targetSystemCoordinates = objectId.systemCoordinates;
     }
 
-    public static New(
-        objectId: UniverseObjectId,
-        starSystemDatabase: StarSystemDatabase,
-    ): MissionAsteroidFieldNode | null {
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(objectId.systemCoordinates);
+    public static New(objectId: UniverseObjectId, universeBackend: UniverseBackend): MissionAsteroidFieldNode | null {
+        const systemModel = universeBackend.getSystemModelFromCoordinates(objectId.systemCoordinates);
         if (systemModel === null) {
             return null;
         }
@@ -148,13 +145,13 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
         const distanceLy = Vector3.Distance(
-            wrapVector3(starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates)),
-            wrapVector3(starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
-        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: objectModel or systemModel is null";
         }
@@ -168,13 +165,13 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:asteroidField:missionCompleted");
         }
 
-        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             return "ERROR: targetObject is null";
         }
@@ -185,7 +182,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase,
+                    universeBackend,
                 );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

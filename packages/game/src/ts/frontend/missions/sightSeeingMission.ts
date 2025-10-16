@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -45,14 +45,14 @@ export type SightSeeingTarget = {
     objectId: UniverseObjectId;
 };
 
-function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: StarSystemDatabase): MissionNode | null {
+function generateMissionTree(target: SightSeeingTarget, universeBackend: UniverseBackend): MissionNode | null {
     switch (target.type) {
         case MissionType.SIGHT_SEEING_FLY_BY:
             return new MissionFlyByNode(target.objectId);
         case MissionType.SIGHT_SEEING_TERMINATOR_LANDING:
             return new MissionTerminatorLandingNode(target.objectId);
         case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
-            return MissionAsteroidFieldNode.New(target.objectId, starSystemDatabase);
+            return MissionAsteroidFieldNode.New(target.objectId, universeBackend);
     }
 }
 
@@ -65,9 +65,9 @@ function generateMissionTree(target: SightSeeingTarget, starSystemDatabase: Star
 export function newSightSeeingMission(
     missionGiver: UniverseObjectId,
     target: SightSeeingTarget,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): Mission | null {
-    const missionTree = generateMissionTree(target, starSystemDatabase);
+    const missionTree = generateMissionTree(target, universeBackend);
     if (missionTree === null) {
         return null;
     }
@@ -75,15 +75,13 @@ export function newSightSeeingMission(
     const targetSystemCoordinates = target.objectId.systemCoordinates;
 
     const missionGiverGalacticCoordinates = wrapVector3(
-        starSystemDatabase.getSystemGalacticPosition(missionGiver.systemCoordinates),
+        universeBackend.getSystemGalacticPosition(missionGiver.systemCoordinates),
     );
 
-    const targetGalacticCoordinates = wrapVector3(
-        starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates),
-    );
+    const targetGalacticCoordinates = wrapVector3(universeBackend.getSystemGalacticPosition(targetSystemCoordinates));
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-    const targetModel = starSystemDatabase.getObjectModelByUniverseId(target.objectId);
+    const targetModel = universeBackend.getObjectModelByUniverseId(target.objectId);
 
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));

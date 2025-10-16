@@ -26,7 +26,7 @@ import {
 } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { DeepReadonly } from "@/utils/types";
 
@@ -45,19 +45,19 @@ import { type MissionNode } from "./missionNode";
  */
 export function deserializeMissionNode(
     missionNodeSerialized: DeepReadonly<MissionNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionNode | null {
     switch (missionNodeSerialized.type) {
         case MissionNodeType.AND:
-            return deserializeMissionAndNode(missionNodeSerialized, starSystemDatabase);
+            return deserializeMissionAndNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.OR:
-            return deserializeMissionOrNode(missionNodeSerialized, starSystemDatabase);
+            return deserializeMissionOrNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.XOR:
-            return deserializeMissionXorNode(missionNodeSerialized, starSystemDatabase);
+            return deserializeMissionXorNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.SEQUENCE:
-            return deserializeMissionSequenceNode(missionNodeSerialized, starSystemDatabase);
+            return deserializeMissionSequenceNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.ASTEROID_FIELD:
-            return deserializeMissionAsteroidFieldNode(missionNodeSerialized, starSystemDatabase);
+            return deserializeMissionAsteroidFieldNode(missionNodeSerialized, universeBackend);
         case MissionNodeType.FLY_BY:
             return deserializeMissionFlyByNode(missionNodeSerialized);
         case MissionNodeType.TERMINATOR_LANDING:
@@ -67,44 +67,44 @@ export function deserializeMissionNode(
 
 function deserializeMissionAndNode(
     serialized: DeepReadonly<MissionAndNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionAndNode {
     return new MissionAndNode(
         serialized.children
-            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .map((child) => deserializeMissionNode(child, universeBackend))
             .filter((child) => child !== null),
     );
 }
 
 function deserializeMissionOrNode(
     serialized: DeepReadonly<MissionOrNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionOrNode {
     return new MissionOrNode(
         serialized.children
-            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .map((child) => deserializeMissionNode(child, universeBackend))
             .filter((child) => child !== null),
     );
 }
 
 function deserializeMissionXorNode(
     serialized: DeepReadonly<MissionXorNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionXorNode {
     return new MissionXorNode(
         serialized.children
-            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .map((child) => deserializeMissionNode(child, universeBackend))
             .filter((child) => child !== null),
     );
 }
 
 function deserializeMissionSequenceNode(
     serialized: DeepReadonly<MissionSequenceNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionSequenceNode {
     const missionNode = new MissionSequenceNode(
         serialized.children
-            .map((child) => deserializeMissionNode(child, starSystemDatabase))
+            .map((child) => deserializeMissionNode(child, universeBackend))
             .filter((child) => child !== null),
     );
     missionNode.setActiveChildIndex(serialized.activeChildIndex);
@@ -113,9 +113,9 @@ function deserializeMissionSequenceNode(
 
 function deserializeMissionAsteroidFieldNode(
     serialized: DeepReadonly<MissionAsteroidFieldNodeSerialized>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): MissionAsteroidFieldNode | null {
-    const missionNode = MissionAsteroidFieldNode.New(serialized.objectId, starSystemDatabase);
+    const missionNode = MissionAsteroidFieldNode.New(serialized.objectId, universeBackend);
     missionNode?.setState(serialized.state);
     return missionNode;
 }

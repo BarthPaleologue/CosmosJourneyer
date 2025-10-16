@@ -22,8 +22,8 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { factionToString } from "@/backend/society/factions";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -80,17 +80,17 @@ export class StarMapUI {
 
     private readonly player: Player;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly universeBackend: UniverseBackend;
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
-    constructor(scene: Scene, player: Player, starSystemDatabase: StarSystemDatabase, soundPlayer: ISoundPlayer) {
+    constructor(scene: Scene, player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
 
         this.player = player;
 
-        this.starSystemDatabase = starSystemDatabase;
+        this.universeBackend = universeBackend;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -235,7 +235,7 @@ export class StarMapUI {
 
         this.systemIcons.forEach((systemIcons) => {
             const systemPosition = wrapVector3(
-                this.starSystemDatabase.getSystemGalacticPosition(systemIcons.getSystemCoordinates()),
+                this.universeBackend.getSystemGalacticPosition(systemIcons.getSystemCoordinates()),
             );
 
             const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
@@ -264,7 +264,7 @@ export class StarMapUI {
         const minScale = 5.0;
         if (this.selectedSystem !== null) {
             const selectedSystemWorldPosition = wrapVector3(
-                this.starSystemDatabase.getSystemGalacticPosition(this.selectedSystem),
+                this.universeBackend.getSystemGalacticPosition(this.selectedSystem),
             ).addInPlace(centerOfUniversePosition);
             const selectedMeshScreenCoordinates = Vector3.Project(
                 selectedSystemWorldPosition,
@@ -301,7 +301,7 @@ export class StarMapUI {
             !starSystemCoordinatesEquals(this.hoveredSystem, this.currentSystem)
         ) {
             const hoveredSystemWorldPosition = wrapVector3(
-                this.starSystemDatabase.getSystemGalacticPosition(this.hoveredSystem),
+                this.universeBackend.getSystemGalacticPosition(this.hoveredSystem),
             ).addInPlace(centerOfUniversePosition);
             const meshScreenCoordinates = Vector3.Project(
                 hoveredSystemWorldPosition,
@@ -322,7 +322,7 @@ export class StarMapUI {
 
         if (this.currentSystem !== null) {
             const currentSystemWorldPosition = wrapVector3(
-                this.starSystemDatabase.getSystemGalacticPosition(this.currentSystem),
+                this.universeBackend.getSystemGalacticPosition(this.currentSystem),
             ).addInPlace(centerOfUniversePosition);
             const meshScreenCoordinates = Vector3.Project(
                 currentSystemWorldPosition,
@@ -358,12 +358,12 @@ export class StarMapUI {
         this.selectedSystem = targetSystemModel.coordinates;
 
         const targetPosition = wrapVector3(
-            this.starSystemDatabase.getSystemGalacticPosition(targetSystemModel.coordinates),
+            this.universeBackend.getSystemGalacticPosition(targetSystemModel.coordinates),
         );
 
         if (currentSystemCoordinates !== null) {
             const currentPosition = wrapVector3(
-                this.starSystemDatabase.getSystemGalacticPosition(currentSystemCoordinates),
+                this.universeBackend.getSystemGalacticPosition(currentSystemCoordinates),
             );
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
                 "units:shortLy",
@@ -396,7 +396,7 @@ export class StarMapUI {
             value: Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1),
         })}`;
 
-        if (this.starSystemDatabase.isSystemInHumanBubble(targetSystemModel.coordinates)) {
+        if (this.universeBackend.isSystemInHumanBubble(targetSystemModel.coordinates)) {
             const spaceStations = targetSystemModel.orbitalFacilities;
 
             this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;

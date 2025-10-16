@@ -21,22 +21,22 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 
 import { getLoneStarSystem } from "./customSystems/loneStar";
 import { getSolSystemModel } from "./customSystems/sol/sol";
-import { StarSystemDatabase } from "./starSystemDatabase";
 import { type StarSystemModel } from "./starSystemModel";
+import { UniverseBackend } from "./universeBackend";
 
-describe("StarSystemDatabase", () => {
-    let database: StarSystemDatabase;
+describe("UniverseBackend", () => {
+    let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        database = new StarSystemDatabase(getLoneStarSystem());
+        universeBackend = new UniverseBackend(getLoneStarSystem());
     });
 
     describe("registerCustomSystem", () => {
         it("should add a custom system that can be retrieved", () => {
             const customSystem = getSolSystemModel();
-            database.registerCustomSystem(customSystem);
+            universeBackend.registerCustomSystem(customSystem);
 
-            const retrievedSystems = database.getSystemModelsInStarSector(
+            const retrievedSystems = universeBackend.getSystemModelsInStarSector(
                 customSystem.coordinates.starSectorX,
                 customSystem.coordinates.starSectorY,
                 customSystem.coordinates.starSectorZ,
@@ -47,14 +47,14 @@ describe("StarSystemDatabase", () => {
 
     describe("registerSinglePlugin", () => {
         it("should modify a system at specific coordinates", () => {
-            const coordinates: StarSystemCoordinates = database.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
+            const coordinates: StarSystemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
             const plugin = (system: StarSystemModel) => {
                 system.name = "Modified System";
                 return system;
             };
 
-            database.registerSinglePlugin(coordinates, plugin);
-            const model = database.getSystemModelFromCoordinates(coordinates);
+            universeBackend.registerSinglePlugin(coordinates, plugin);
+            const model = universeBackend.getSystemModelFromCoordinates(coordinates);
             expect(model).not.toBeNull();
             expect(model?.name).toBe("Modified System");
         });
@@ -70,7 +70,7 @@ describe("StarSystemDatabase", () => {
                 localY: 0,
                 localZ: 0,
             };
-            expect(database.isSystemInHumanBubble(closeCoordinates)).toBe(true);
+            expect(universeBackend.isSystemInHumanBubble(closeCoordinates)).toBe(true);
         });
 
         it("should return false for distant systems", () => {
@@ -82,7 +82,7 @@ describe("StarSystemDatabase", () => {
                 localY: 0,
                 localZ: 0,
             };
-            expect(database.isSystemInHumanBubble(farCoordinates)).toBe(false);
+            expect(universeBackend.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });
     });
 });

@@ -18,16 +18,16 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { StationLandingTutorial } from "./stationLandingTutorial";
 
 describe("StationLandingTutorial", () => {
     it("spawns near a space station", () => {
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new StationLandingTutorial();
 
-        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -53,7 +53,7 @@ describe("StationLandingTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const stationModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const stationModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(stationModel?.type).toBe("spaceStation");
     });

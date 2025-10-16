@@ -20,7 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -53,7 +53,7 @@ export async function createSpaceStationUIScene(
     const tts = new TtsMock();
     const notificationManager = new NotificationManagerMock();
 
-    const systemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const systemDatabase = new UniverseBackend(getLoneStarSystem());
 
     const player = Player.Default(systemDatabase);
 

@@ -18,7 +18,7 @@
 import { type MissionSequenceNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
@@ -83,19 +83,19 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
         this.activeChildIndex = index;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, starSystemDatabase)).join(" then ");
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend)).join(" then ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         const activeChild = this.children[this.activeChildIndex];
         if (activeChild === undefined) return "Mission error: activeChildIndex out of bounds";
-        return activeChild.describeNextTask(context, keyboardLayout, starSystemDatabase);
+        return activeChild.describeNextTask(context, keyboardLayout, universeBackend);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

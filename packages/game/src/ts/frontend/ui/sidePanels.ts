@@ -1,5 +1,5 @@
 import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
@@ -33,21 +33,21 @@ export class SidePanels {
     readonly creditsPanel: CreditsPanel;
     readonly aboutPanel: AboutPanel;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly universeBackend: UniverseBackend;
     private readonly saveBackend: ISaveBackend;
 
     constructor(
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
         notificationManager: INotificationManager,
     ) {
-        this.starSystemDatabase = starSystemDatabase;
+        this.universeBackend = universeBackend;
         this.saveBackend = saveManager;
 
         // Create panel instances
-        this.loadSavePanel = new LoadSavePanel(starSystemDatabase, soundPlayer, notificationManager);
+        this.loadSavePanel = new LoadSavePanel(universeBackend, soundPlayer, notificationManager);
         this.attachCloseButton(this.loadSavePanel.htmlRoot);
         document.body.appendChild(this.loadSavePanel.htmlRoot);
 
@@ -111,7 +111,7 @@ export class SidePanels {
         }
 
         if (type === PanelType.LOAD_SAVE) {
-            await this.loadSavePanel.content.populateCmdrList(this.starSystemDatabase, this.saveBackend);
+            await this.loadSavePanel.content.populateCmdrList(this.universeBackend, this.saveBackend);
         }
 
         if (this.activeRightPanel !== null) {

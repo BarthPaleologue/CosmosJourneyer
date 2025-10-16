@@ -20,8 +20,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type OrbitalObjectId } from "@/backend/universe/orbitalObjects/orbitalObjectId";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -452,16 +452,11 @@ export class StarSystemController {
         this.scene.activeCamera?.getViewMatrix(true);
     }
 
-    addSystemTarget(
-        targetCoordinates: StarSystemCoordinates,
-        starSystemDatabase: StarSystemDatabase,
-    ): SystemTarget | null {
+    addSystemTarget(targetCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): SystemTarget | null {
         const currentSystemUniversePosition = wrapVector3(
-            starSystemDatabase.getSystemGalacticPosition(this.model.coordinates),
+            universeBackend.getSystemGalacticPosition(this.model.coordinates),
         );
-        const targetSystemUniversePosition = wrapVector3(
-            starSystemDatabase.getSystemGalacticPosition(targetCoordinates),
-        );
+        const targetSystemUniversePosition = wrapVector3(universeBackend.getSystemGalacticPosition(targetCoordinates));
 
         const distance = lightYearsToMeters(
             Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition),
@@ -471,7 +466,7 @@ export class StarSystemController {
 
         Vector3.TransformCoordinatesToRef(direction, this.referencePlaneRotation, direction);
 
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetCoordinates);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(targetCoordinates);
         if (systemModel === null) {
             return null;
         }

@@ -4,7 +4,7 @@ import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
@@ -34,7 +34,7 @@ export class SaveLoadingPanelContent {
     private readonly notificationManager: INotificationManager;
 
     constructor(
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -81,7 +81,7 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            await this.loadSaveFile(file, starSystemDatabase);
+            await this.loadSaveFile(file, universeBackend);
         });
 
         dropFileZone.addEventListener("click", () => {
@@ -99,7 +99,7 @@ export class SaveLoadingPanelContent {
                     return;
                 }
 
-                await this.loadSaveFile(file, starSystemDatabase);
+                await this.loadSaveFile(file, universeBackend);
             };
             fileInput.click();
         });
@@ -109,7 +109,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(starSystemDatabase: StarSystemDatabase, saveManager: ISaveBackend) {
+    async populateCmdrList(universeBackend: UniverseBackend, saveManager: ISaveBackend) {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -232,12 +232,7 @@ export class SaveLoadingPanelContent {
             cmdrDiv.appendChild(savesList);
 
             allCmdrSaves.forEach((save) => {
-                const saveDiv = this.createSaveDiv(
-                    save,
-                    cmdrSaves.auto.includes(save),
-                    starSystemDatabase,
-                    saveManager,
-                );
+                const saveDiv = this.createSaveDiv(save, cmdrSaves.auto.includes(save), universeBackend, saveManager);
                 savesList.appendChild(saveDiv);
             });
 
@@ -263,7 +258,7 @@ export class SaveLoadingPanelContent {
     private createSaveDiv(
         save: DeepReadonly<Save>,
         isAutoSave: boolean,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         saveManager: ISaveBackend,
     ): HTMLElement {
         const saveDiv = document.createElement("div");
@@ -289,7 +284,7 @@ export class SaveLoadingPanelContent {
             throw new Error("Spaceship inside a spaceship is not supported yet");
         }
         const isLanded = locationToUse.type === "atStation";
-        const nearestObject = starSystemDatabase.getObjectModelByUniverseId(locationToUse.universeObjectId);
+        const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
         saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
             location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
             interpolation: {
@@ -403,11 +398,8 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
-    private async loadSaveFile(
-        file: File,
-        starSystemDatabase: StarSystemDatabase,
-    ): Promise<Result<Save, SaveLoadingError>> {
-        const saveFileDataResult = await parseSaveFile(file, starSystemDatabase);
+    private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file, universeBackend);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
             await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error), this.soundPlayer);

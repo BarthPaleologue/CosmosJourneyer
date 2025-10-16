@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
@@ -27,9 +27,9 @@ import { Settings } from "@/settings";
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
-    const currentSystemPosition = wrapVector3(starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates));
+    const currentSystemPosition = wrapVector3(universeBackend.getSystemGalacticPosition(starSystemCoordinates));
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
@@ -55,10 +55,10 @@ export function getNeighborStarSystemCoordinates(
     }
 
     return starSectorCoordinates.flatMap((starSector) => {
-        const starPositions = starSystemDatabase
+        const starPositions = universeBackend
             .getSystemPositionsInStarSector(starSector.x, starSector.y, starSector.z)
             .map((position) => wrapVector3(position));
-        const systemCoordinates = starSystemDatabase.getSystemCoordinatesInStarSector(
+        const systemCoordinates = universeBackend.getSystemCoordinatesInStarSector(
             starSector.x,
             starSector.y,
             starSector.z,

@@ -18,7 +18,7 @@
 import { type MissionOrNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import i18n from "@/i18n";
 
@@ -64,20 +64,20 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
         this.hasCompletedLock = this.children.some((child) => child.isCompleted());
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
         return this.children
-            .map((child) => child.describe(originSystemCoordinates, starSystemDatabase))
+            .map((child) => child.describe(originSystemCoordinates, universeBackend))
             .join(` ${i18n.t("common:or")} `);
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string {
         if (this.hasCompletedLock) return "Mission completed";
         return this.children
-            .map((child) => child.describeNextTask(context, keyboardLayout, starSystemDatabase))
+            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
             .join(` ${i18n.t("common:or")} `);
     }
 

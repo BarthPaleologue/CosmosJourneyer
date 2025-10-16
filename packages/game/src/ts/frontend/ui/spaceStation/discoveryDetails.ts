@@ -18,8 +18,8 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
@@ -66,7 +66,7 @@ export class DiscoveryDetails {
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -116,13 +116,13 @@ export class DiscoveryDetails {
             player.discoveries.uploaded.push(this.currentDiscovery);
 
             this.onSellDiscovery.notifyObservers(this.currentDiscovery);
-            await this.setDiscovery(null, starSystemDatabase);
+            await this.setDiscovery(null, universeBackend);
         });
 
-        void this.setDiscovery(null, starSystemDatabase);
+        void this.setDiscovery(null, universeBackend);
     }
 
-    async setDiscovery(discovery: SpaceDiscoveryData | null, starSystemDatabase: StarSystemDatabase) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null, universeBackend: UniverseBackend) {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;
@@ -132,7 +132,7 @@ export class DiscoveryDetails {
             return;
         }
 
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(
+        const systemModel = universeBackend.getSystemModelFromCoordinates(
             this.currentDiscovery.objectId.systemCoordinates,
         );
 

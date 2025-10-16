@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type DeepPartial } from "@/utils/types";
 
@@ -9,9 +9,9 @@ import { safeParseSave } from "../saveFileData";
 import { type SaveV2 } from "./saveV2";
 
 test("Loading a correct save file", () => {
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(getLoneStarSystem());
     const shipId = crypto.randomUUID();
-    const fallbackStation = starSystemDatabase.fallbackSystem.orbitalFacilities[0];
+    const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
     if (fallbackStation === undefined) {
         throw new Error("Fallback station is undefined!");
     }
@@ -98,7 +98,7 @@ test("Loading a correct save file", () => {
                     tree: {
                         type: 0,
                         objectId: {
-                            idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
+                            idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
                             systemCoordinates: {
                                 starSectorX: -3,
                                 starSectorY: -1,
@@ -124,8 +124,8 @@ test("Loading a correct save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: starSystemDatabase.fallbackSystem.coordinates,
+                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
                 },
                 position: {
                     x: -0.3993145315439042,
@@ -142,12 +142,12 @@ test("Loading a correct save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
+    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
 
 test("Loading a minimal save file", () => {
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<SaveV2> = {
         player: {
@@ -168,8 +168,8 @@ test("Loading a minimal save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: starSystemDatabase.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: starSystemDatabase.fallbackSystem.coordinates,
+                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
                 },
                 position: {
                     x: 0,
@@ -186,7 +186,7 @@ test("Loading a minimal save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, starSystemDatabase);
+    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     if (!parsedSaveFile.success) {
         console.log(parsedSaveFile.error);
     }
@@ -269,7 +269,7 @@ test("Loading a save file with a corrupted itinerary", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFile, new StarSystemDatabase(getLoneStarSystem()));
+    const parsedSaveFile = safeParseSave(saveFile, new UniverseBackend(getLoneStarSystem()));
     if (!parsedSaveFile.success) {
         throw new Error(`Failed to parse save file: ${parsedSaveFile.error.type}`);
     }

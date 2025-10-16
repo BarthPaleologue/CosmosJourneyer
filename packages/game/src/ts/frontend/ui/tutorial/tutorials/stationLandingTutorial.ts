@@ -17,7 +17,7 @@
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
@@ -39,8 +39,8 @@ import stationServicesImageSrc from "@assets/tutorials/stationLandingTutorial/st
 export class StationLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = station1ImageSrc;
 
-    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
-        return safeParseSave(saveData, starSystemDatabase);
+    getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData, universeBackend);
     }
 
     getTitle() {

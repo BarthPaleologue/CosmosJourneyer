@@ -20,19 +20,19 @@ import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { starSystemCoordinatesEquals } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { getNeighborStarSystemCoordinates } from "./getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(getLoneStarSystem());
 
-    const systemCoordinates = starSystemDatabase.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
+    const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
     for (let i = 0; i < 10; i++) {
         const searchRadius = 5 * i;
 
-        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, starSystemDatabase);
+        const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, universeBackend);
         neighbors.forEach((neighbor) => {
             const { coordinates: starSystemCoordinates, position, distance } = neighbor;
             expect(position).toBeInstanceOf(Vector3);

@@ -17,7 +17,7 @@
 
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
@@ -59,7 +59,7 @@ export class ExplorationCenterPanel {
     constructor(
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -123,7 +123,7 @@ export class ExplorationCenterPanel {
                 player.discoveries.local = player.discoveries.local.filter((d) => d !== discovery);
                 player.discoveries.uploaded.push(discovery);
             }
-            await this.populate(starSystemDatabase);
+            await this.populate(universeBackend);
         });
         buttonHorizontalContainer.appendChild(this.sellAllButton);
 
@@ -151,7 +151,7 @@ export class ExplorationCenterPanel {
                 case ExplorationCenterFilter.UPLOADED_ONLY:
                 case ExplorationCenterFilter.ALL:
                     this.filter = discoveryListSelect.value;
-                    await this.populate(starSystemDatabase);
+                    await this.populate(universeBackend);
                     break;
                 default:
                     throw new Error("Invalid value of discoveryListSelect!");
@@ -172,12 +172,12 @@ export class ExplorationCenterPanel {
         this.discoveryDetails = new DiscoveryDetails(
             player,
             encyclopaedia,
-            starSystemDatabase,
+            universeBackend,
             this.soundPlayer,
             this.notificationManager,
         );
         this.discoveryDetails.onSellDiscovery.add(async () => {
-            await this.populate(starSystemDatabase);
+            await this.populate(universeBackend);
         });
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
@@ -189,7 +189,7 @@ export class ExplorationCenterPanel {
         }
     }
 
-    async populate(starSystemDatabase: StarSystemDatabase) {
+    async populate(universeBackend: UniverseBackend) {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 
@@ -253,7 +253,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.appendChild(searchField);
 
         discoveries.forEach((discovery) => {
-            const objectModel = starSystemDatabase.getObjectModelByUniverseId(discovery.objectId);
+            const objectModel = universeBackend.getObjectModelByUniverseId(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
@@ -267,7 +267,7 @@ export class ExplorationCenterPanel {
                 this.selectedDiscovery = discoveryItem;
                 this.selectedDiscovery.classList.add("selected");
 
-                await this.discoveryDetails.setDiscovery(discovery, starSystemDatabase);
+                await this.discoveryDetails.setDiscovery(discovery, universeBackend);
             });
             this.discoveryToHtmlItem.set(discovery, discoveryItem);
             this.discoveryList.appendChild(discoveryItem);

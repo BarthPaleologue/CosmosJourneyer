@@ -1,7 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
@@ -18,7 +18,7 @@ export function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): string {
     const itinerary = missionContext.currentItinerary;
     if (itinerary === null) {
@@ -35,7 +35,7 @@ export function getGoToSystemInstructions(
         starSystemCoordinatesEquals(currentPlayerDestination, targetSystemCoordinates);
 
     const currentSystemPosition = wrapVector3(
-        starSystemDatabase.getSystemGalacticPosition(missionContext.currentSystem.model.coordinates),
+        universeBackend.getSystemGalacticPosition(missionContext.currentSystem.model.coordinates),
     );
 
     if (!isPlayerGoingToTargetSystem) {
@@ -46,13 +46,13 @@ export function getGoToSystemInstructions(
         });
     } else {
         const nextSystemCoordinates = itinerary[1];
-        const nextSystemModel = starSystemDatabase.getSystemModelFromCoordinates(nextSystemCoordinates);
+        const nextSystemModel = universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
         if (nextSystemModel === null) {
             return i18n.t("missions:common:corruptedItinerary");
         }
 
         const distanceToNextSystemLy = Vector3.Distance(
-            wrapVector3(starSystemDatabase.getSystemGalacticPosition(nextSystemModel.coordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(nextSystemModel.coordinates)),
             currentSystemPosition,
         );
 

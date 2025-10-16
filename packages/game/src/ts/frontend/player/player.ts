@@ -26,7 +26,7 @@ import {
     type SerializedSpaceship,
 } from "@/backend/spaceship/serializedSpaceship";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Mission } from "@/frontend/missions/mission";
@@ -70,7 +70,7 @@ export class Player {
     readonly onNameChangedObservable = new Observable<string>();
     readonly onBalanceChangedObservable = new Observable<number>();
 
-    private constructor(serializedPlayer: DeepReadonly<SerializedPlayer>, starSystemDatabase: StarSystemDatabase) {
+    private constructor(serializedPlayer: DeepReadonly<SerializedPlayer>, universeBackend: UniverseBackend) {
         this.uuid = serializedPlayer.uuid;
 
         this.#name = serializedPlayer.name;
@@ -97,10 +97,10 @@ export class Player {
         this.currentItinerary = structuredClone(serializedPlayer.currentItinerary);
         this.systemBookmarks = serializedPlayer.systemBookmarks.map((coords) => structuredClone(coords));
         this.currentMissions = serializedPlayer.currentMissions
-            .map((mission) => Mission.Deserialize(mission, starSystemDatabase))
+            .map((mission) => Mission.Deserialize(mission, universeBackend))
             .filter((mission) => mission !== null);
         this.completedMissions = serializedPlayer.completedMissions
-            .map((mission) => Mission.Deserialize(mission, starSystemDatabase))
+            .map((mission) => Mission.Deserialize(mission, universeBackend))
             .filter((mission) => mission !== null);
 
         this.serializedSpaceships = [...serializedPlayer.spaceShips];
@@ -138,7 +138,7 @@ export class Player {
         return true;
     }
 
-    public static Default(starSystemDatabase: StarSystemDatabase): Player {
+    public static Default(universeBackend: UniverseBackend): Player {
         return new Player(
             {
                 uuid: crypto.randomUUID(),
@@ -161,15 +161,15 @@ export class Player {
                     fuelScoopingCompleted: false,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
     }
 
     public static Deserialize(
         serializedPlayer: DeepReadonly<SerializedPlayer>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): Player {
-        return new Player(serializedPlayer, starSystemDatabase);
+        return new Player(serializedPlayer, universeBackend);
     }
 
     public static Serialize(player: Player): SerializedPlayer {
@@ -205,7 +205,7 @@ export class Player {
      * Performs a deep copy of the player
      * @param player the player to copy from
      */
-    public copyFrom(player: Player, starSystemDatabase: StarSystemDatabase) {
+    public copyFrom(player: Player, universeBackend: UniverseBackend) {
         this.uuid = player.uuid;
         this.setName(player.getName());
         this.setBalance(player.getBalance());
@@ -225,10 +225,10 @@ export class Player {
         this.currentItinerary = player.currentItinerary !== null ? [...player.currentItinerary] : null;
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));
         this.currentMissions = player.currentMissions
-            .map((mission) => Mission.Deserialize(mission.serialize(), starSystemDatabase))
+            .map((mission) => Mission.Deserialize(mission.serialize(), universeBackend))
             .filter((mission) => mission !== null);
         this.completedMissions = player.completedMissions
-            .map((mission) => Mission.Deserialize(mission.serialize(), starSystemDatabase))
+            .map((mission) => Mission.Deserialize(mission.serialize(), universeBackend))
             .filter((mission) => mission !== null);
         this.serializedSpaceships = player.serializedSpaceships.map((spaceship) => structuredClone(spaceship));
         this.instancedSpaceships = [...player.instancedSpaceships];

@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
@@ -59,10 +59,10 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
-    private starSystemDatabase: StarSystemDatabase;
+    private universeBackend: UniverseBackend;
 
-    public constructor(starSystemDatabase: StarSystemDatabase) {
-        this.starSystemDatabase = starSystemDatabase;
+    public constructor(universeBackend: UniverseBackend) {
+        this.universeBackend = universeBackend;
     }
 
     /**
@@ -85,12 +85,12 @@ export class StellarPathfinder {
 
         this.startSystem = {
             coordinates: startSystemCoordinates,
-            position: wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(startSystemCoordinates)),
+            position: wrapVector3(this.universeBackend.getSystemGalacticPosition(startSystemCoordinates)),
         };
 
         this.targetSystem = {
             coordinates: targetSystemCoordinates,
-            position: wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(targetSystemCoordinates)),
+            position: wrapVector3(this.universeBackend.getSystemGalacticPosition(targetSystemCoordinates)),
         };
 
         this.jumpRange = jumpRange;
@@ -115,7 +115,7 @@ export class StellarPathfinder {
         const stellarNeighbors = getNeighborStarSystemCoordinates(
             node.coordinates,
             this.jumpRange,
-            this.starSystemDatabase,
+            this.universeBackend,
         );
         return stellarNeighbors.map<{ node: Node; distance: number }>(({ coordinates, position, distance }) => {
             return {

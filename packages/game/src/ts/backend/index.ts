@@ -17,7 +17,7 @@
 
 import type { EncyclopaediaGalacticaManager } from "./encyclopaedia/encyclopaediaGalacticaManager";
 import type { ISaveBackend } from "./save/saveBackend";
-import type { StarSystemDatabase } from "./universe/starSystemDatabase";
+import type { UniverseBackend } from "./universe/universeBackend";
 
 /** Exposes the backend services needed to operate Cosmos Journeyer. */
 export interface ICosmosJourneyerBackend {
@@ -28,5 +28,5 @@ export interface ICosmosJourneyerBackend {
     readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
     /** The backend service responsible for universe data generation. */
-    readonly universe: StarSystemDatabase;
+    readonly universe: UniverseBackend;
 }

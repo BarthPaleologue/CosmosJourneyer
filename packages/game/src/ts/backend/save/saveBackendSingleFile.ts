@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { jsonSafeParse } from "@/utils/json";
 import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
@@ -81,7 +81,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
     public static async CreateAsync(
         mainFile: IFile,
         backupFile: IFile,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): Promise<Result<SaveBackendSingleFile, SaveLoadingError>> {
         const rawSaves = await mainFile.read();
         const rawBackupSaves = await backupFile.read();
@@ -121,8 +121,8 @@ export class SaveBackendSingleFile implements ISaveBackend {
 
         // filter saves
         for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
-            const parsedManualSaves = parseSaveArray(cmdrSaves.manual, starSystemDatabase);
-            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto, starSystemDatabase);
+            const parsedManualSaves = parseSaveArray(cmdrSaves.manual, universeBackend);
+            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto, universeBackend);
 
             correctSaves[cmdrUuid] = {
                 manual: parsedManualSaves.validSaves,

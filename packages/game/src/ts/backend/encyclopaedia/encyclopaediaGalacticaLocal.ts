@@ -1,7 +1,7 @@
 import { type GasPlanetModel } from "@/backend/universe/orbitalObjects/gasPlanetModel";
 import { type TelluricPlanetModel } from "@/backend/universe/orbitalObjects/telluricPlanetModel";
 import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/telluricSatelliteModel";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
@@ -20,10 +20,10 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
      */
     private readonly redundantDataPrice = 100;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly universeBackend: UniverseBackend;
 
-    constructor(starSystemDatabase: StarSystemDatabase) {
-        this.starSystemDatabase = starSystemDatabase;
+    constructor(universeBackend: UniverseBackend) {
+        this.universeBackend = universeBackend;
     }
 
     public contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
@@ -69,11 +69,11 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = this.starSystemDatabase.getObjectModelByUniverseId(object);
+        const model = this.universeBackend.getObjectModelByUniverseId(object);
         if (model === null) {
             return err("Object model not found for object ID");
         }
-        const systemGalacticPosition = this.starSystemDatabase.getSystemGalacticPosition(object.systemCoordinates);
+        const systemGalacticPosition = this.universeBackend.getSystemGalacticPosition(object.systemCoordinates);
 
         const distanceFromSolLy = Math.hypot(
             systemGalacticPosition.x,

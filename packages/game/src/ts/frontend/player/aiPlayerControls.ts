@@ -17,7 +17,7 @@
 
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -30,13 +30,8 @@ export class AiPlayerControls {
     readonly player: Player;
     readonly spaceshipControls: AiSpaceshipControls;
 
-    constructor(
-        starSystemDatabase: StarSystemDatabase,
-        scene: Scene,
-        assets: RenderingAssets,
-        soundPlayer: ISoundPlayer,
-    ) {
-        this.player = Player.Default(starSystemDatabase);
+    constructor(universeBackend: UniverseBackend, scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer) {
+        this.player = Player.Default(universeBackend);
         this.player.setName("AI");
 
         const spaceshipSerialized = this.player.serializedSpaceships.shift();

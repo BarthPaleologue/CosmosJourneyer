@@ -20,8 +20,8 @@ import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
@@ -43,7 +43,7 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 export function generateSightseeingMissions(
     spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
     starSystemModel: DeepReadonly<StarSystemModel>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
     player: Player,
     timestampMillis: number,
 ): ReadonlyArray<Mission> {
@@ -55,9 +55,9 @@ export function generateSightseeingMissions(
 
     const spaceStationUniverseId = getUniverseObjectId(spaceStationModel, starSystemModel);
 
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, starSystemDatabase);
+    const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, universeBackend);
     neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {
-        const neighborSystemModel = starSystemDatabase.getSystemModelFromCoordinates(systemCoordinates);
+        const neighborSystemModel = universeBackend.getSystemModelFromCoordinates(systemCoordinates);
         if (neighborSystemModel === null) {
             return;
         }
@@ -69,17 +69,15 @@ export function generateSightseeingMissions(
                 spaceStationUniverseId,
                 distance,
                 rng,
-                starSystemDatabase,
+                universeBackend,
             ),
         );
     });
 
-    missions.push(
-        ...generateAsteroidFieldMissionsInSystem(starSystemModel, spaceStationUniverseId, starSystemDatabase),
-    );
+    missions.push(...generateAsteroidFieldMissionsInSystem(starSystemModel, spaceStationUniverseId, universeBackend));
 
     missions.push(
-        ...generateTerminatorLandingMissionsInSystem(starSystemModel, spaceStationUniverseId, starSystemDatabase),
+        ...generateTerminatorLandingMissionsInSystem(starSystemModel, spaceStationUniverseId, universeBackend),
     );
 
     // filter missions to avoid duplicates with already accepted missions of the player
@@ -96,7 +94,7 @@ function generateSightseeingMissionsInSystem(
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
     rng: (seed: number) => number,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -107,13 +105,13 @@ function generateSightseeingMissionsInSystem(
             spaceStationUniverseId,
             distance,
             rng,
-            starSystemDatabase,
+            universeBackend,
         ),
     );
 
-    missions.push(...generateNeutronStarFlyByMissionsInSystem(systemModel, spaceStationUniverseId, starSystemDatabase));
+    missions.push(...generateNeutronStarFlyByMissionsInSystem(systemModel, spaceStationUniverseId, universeBackend));
 
-    missions.push(...generateBlackHoleFlyByMissionsInSystem(systemModel, spaceStationUniverseId, starSystemDatabase));
+    missions.push(...generateBlackHoleFlyByMissionsInSystem(systemModel, spaceStationUniverseId, universeBackend));
 
     return missions;
 }
@@ -124,7 +122,7 @@ function generateAnomalyFlyByMissionsInSystem(
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
     rng: (seed: number) => number,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
     for (const [anomalyIndex, anomaly] of systemModel.anomalies.entries()) {
@@ -145,7 +143,7 @@ function generateAnomalyFlyByMissionsInSystem(
                     idInSystem: anomaly.id,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
 
         if (mission === null) {
@@ -161,7 +159,7 @@ function generateAnomalyFlyByMissionsInSystem(
 function generateNeutronStarFlyByMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -176,7 +174,7 @@ function generateNeutronStarFlyByMissionsInSystem(
                     idInSystem: neutronStar.id,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
 
         if (mission === null) {
@@ -191,7 +189,7 @@ function generateNeutronStarFlyByMissionsInSystem(
 function generateBlackHoleFlyByMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -206,7 +204,7 @@ function generateBlackHoleFlyByMissionsInSystem(
                     idInSystem: blackHole.id,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
 
         if (mission === null) {
@@ -221,7 +219,7 @@ function generateBlackHoleFlyByMissionsInSystem(
 function generateAsteroidFieldMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -239,7 +237,7 @@ function generateAsteroidFieldMissionsInSystem(
                     idInSystem: planet.id,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
 
         if (mission === null) {
@@ -254,7 +252,7 @@ function generateAsteroidFieldMissionsInSystem(
 function generateTerminatorLandingMissionsInSystem(
     systemModel: DeepReadonly<StarSystemModel>,
     spaceStationUniverseId: UniverseObjectId,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
@@ -276,7 +274,7 @@ function generateTerminatorLandingMissionsInSystem(
                     idInSystem: planet.id,
                 },
             },
-            starSystemDatabase,
+            universeBackend,
         );
 
         if (mission === null) {
