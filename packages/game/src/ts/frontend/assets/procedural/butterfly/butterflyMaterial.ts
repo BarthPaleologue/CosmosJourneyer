@@ -19,10 +19,11 @@ import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { OffsetWorldToRef } from "@/frontend/helpers/floatingOrigin";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
@@ -79,23 +80,43 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.backFaceCulling = false;
         this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, butterflyTexture);
 
+        const tempPlayerPosition = Vector3.Zero();
+        const tempCameraPosition = Vector3.Zero();
+        const tempPlanetPosition = Vector3.Zero();
+        const tempPlanetWorld = new Matrix();
         this.onBindObservable.add(() => {
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
+
             setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
 
-            this.getEffect().setVector3(ButterflyMaterialUniformNames.PLAYER_POSITION, this.playerPosition);
+            this.getEffect().setVector3(
+                ButterflyMaterialUniformNames.PLAYER_POSITION,
+                this.playerPosition.subtractToRef(floatingOriginOffset, tempPlayerPosition),
+            );
             this.getEffect().setFloat(ButterflyMaterialUniformNames.TIME, this.elapsedSeconds);
 
             const activeCamera = this.scene.activeCamera;
-            if (activeCamera === null) throw new Error("No active camera in the scene");
-            this.getEffect().setVector3(ButterflyMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+            if (activeCamera === null) {
+                console.error("No active camera in the scene");
+                return;
+            }
+            this.getEffect().setVector3(
+                ButterflyMaterialUniformNames.CAMERA_POSITION,
+                floatingOriginEnabled
+                    ? Vector3.ZeroReadOnly
+                    : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
+            );
 
             if (this.planet !== null) {
                 this.getEffect().setVector3(
                     ButterflyMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition(),
+                    this.planet.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempPlanetPosition),
                 );
-                this.getEffect().setMatrix(ButterflyMaterialUniformNames.PLANET_WORLD, this.planet.getWorldMatrix());
+                this.getEffect().setMatrix(
+                    ButterflyMaterialUniformNames.PLANET_WORLD,
+                    OffsetWorldToRef(floatingOriginOffset, this.planet.getWorldMatrix(), tempPlanetWorld),
+                );
             }
         });
 
