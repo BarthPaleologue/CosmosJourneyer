@@ -30,6 +30,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import type { RGBColor } from "@/utils/colors";
 import { moveTowards } from "@/utils/math";
 
+import { OffsetViewProjectionToRef } from "../helpers/floatingOrigin";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
@@ -96,6 +97,8 @@ export class LensFlarePostProcess extends PostProcess {
             this.activeCamera = camera;
         });
 
+        const tempViewProjection = new Matrix();
+        const tempStellarObjectPosition = new Vector3();
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 console.warn("Camera is null");
@@ -111,9 +114,13 @@ export class LensFlarePostProcess extends PostProcess {
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 
             const clipPosition = Vector3.Project(
-                stellarTransform.getAbsolutePosition(),
+                stellarTransform.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempStellarObjectPosition),
                 Matrix.IdentityReadOnly,
-                scene.getTransformMatrix(),
+                OffsetViewProjectionToRef(
+                    this.activeCamera.getViewMatrix(),
+                    this.activeCamera.getProjectionMatrix(),
+                    tempViewProjection,
+                ),
                 this.activeCamera.viewport,
             );
             settings.behindCamera = clipPosition.z < 0;

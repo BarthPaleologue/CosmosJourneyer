@@ -2,6 +2,7 @@
 
 import type { IMatrixLike, IVector3Like } from "@babylonjs/core/Maths/math.like";
 import type { Matrix } from "@babylonjs/core/Maths/math.vector";
+import { MultiplyMatricesToRef } from "@babylonjs/core/Maths/ThinMaths/thinMath.matrix.functions";
 import type { DeepImmutable } from "@babylonjs/core/types";
 
 export function OffsetWorldToRef(
@@ -23,5 +24,14 @@ export function OffsetViewToRef(view: DeepImmutable<Matrix>, ref: Matrix): DeepI
     refArray[12] = 0;
     refArray[13] = 0;
     refArray[14] = 0;
+    return ref;
+}
+
+export function OffsetViewProjectionToRef(
+    view: DeepImmutable<Matrix>,
+    projection: DeepImmutable<Matrix>,
+    ref: Matrix,
+): DeepImmutable<Matrix> {
+    MultiplyMatricesToRef(OffsetViewToRef(view, ref), projection, ref);
     return ref;
 }
