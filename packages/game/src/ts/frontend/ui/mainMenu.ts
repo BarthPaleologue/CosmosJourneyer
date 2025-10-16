@@ -19,8 +19,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -155,7 +155,7 @@ export class MainMenu {
     constructor(
         sidePanels: SidePanels,
         starSystemView: StarSystemView,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.sidePanels = sidePanels;
@@ -175,7 +175,7 @@ export class MainMenu {
             starSectorZ: 0,
         };
 
-        const system = starSystemDatabase.getSystemModelFromCoordinates(coordinates);
+        const system = universeBackend.getSystemModelFromCoordinates(coordinates);
         if (system === null) {
             throw new Error("Cannot find system");
         }

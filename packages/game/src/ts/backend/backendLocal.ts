@@ -29,21 +29,21 @@ import { SaveLocalStorage } from "./save/saveLocalStorage";
 import { getLoneStarSystem } from "./universe/customSystems/loneStar";
 import { registerCustomSystems } from "./universe/customSystems/registerCustomSystems";
 import { generateDarkKnightModel } from "./universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
-import { StarSystemDatabase } from "./universe/starSystemDatabase";
+import { UniverseBackend } from "./universe/universeBackend";
 
 export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
     readonly save: ISaveBackend;
     readonly encyclopaedia: EncyclopaediaGalacticaManager;
-    readonly universe: StarSystemDatabase;
+    readonly universe: UniverseBackend;
 
-    constructor(save: ISaveBackend, encyclopaedia: EncyclopaediaGalacticaManager, universe: StarSystemDatabase) {
+    constructor(save: ISaveBackend, encyclopaedia: EncyclopaediaGalacticaManager, universe: UniverseBackend) {
         this.save = save;
         this.encyclopaedia = encyclopaedia;
         this.universe = universe;
     }
 
     static async New(): Promise<Result<CosmosJourneyerBackendLocal, Error>> {
-        const universeBackend = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         registerCustomSystems(universeBackend);
 
         universeBackend.registerGeneralPlugin(

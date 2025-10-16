@@ -37,7 +37,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -85,7 +85,7 @@ export class StarMap implements View {
 
     private readonly encyclopaedia: EncyclopaediaGalactica;
 
-    private readonly starSystemDatabase: StarSystemDatabase;
+    private readonly universeBackend: UniverseBackend;
 
     /**
      * The position of the center of the starmap in world space.
@@ -164,7 +164,7 @@ export class StarMap implements View {
         player: Player,
         engine: AbstractEngine,
         encyclopaedia: EncyclopaediaGalactica,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -186,11 +186,11 @@ export class StarMap implements View {
         this.player = player;
 
         this.encyclopaedia = encyclopaedia;
-        this.starSystemDatabase = starSystemDatabase;
+        this.universeBackend = universeBackend;
 
-        this.stellarPathfinder = new StellarPathfinder(starSystemDatabase);
+        this.stellarPathfinder = new StellarPathfinder(universeBackend);
 
-        this.starMapUI = new StarMapUI(this.scene, this.player, this.starSystemDatabase, this.soundPlayer);
+        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });
@@ -418,7 +418,7 @@ export class StarMap implements View {
 
     private drawPath(path: DeepReadonly<Itinerary>) {
         const points = path.map((coordinates) => {
-            return wrapVector3(this.starSystemDatabase.getSystemGalacticPosition(coordinates));
+            return wrapVector3(this.universeBackend.getSystemGalacticPosition(coordinates));
         });
         this.travelLine.setPoints(points);
     }
@@ -453,7 +453,7 @@ export class StarMap implements View {
      * @param generateNow
      */
     private registerStarSector(coordinates: Vector3, generateNow = false): StarSectorView {
-        const starSector = new StarSectorView(coordinates, this.starSystemDatabase);
+        const starSector = new StarSectorView(coordinates, this.universeBackend);
         this.loadedStarSectors.set(starSector.getKey(), starSector);
 
         if (!generateNow) this.starBuildStack.push(...starSector.generate());
@@ -584,7 +584,7 @@ export class StarMap implements View {
 
     private createInstance(data: BuildData) {
         const starSystemCoordinates = data.coordinates;
-        const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
@@ -676,7 +676,7 @@ export class StarMap implements View {
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
         const starSystemPosition = wrapVector3(
-            this.starSystemDatabase.getSystemGalacticPosition(starSystemCoordinates),
+            this.universeBackend.getSystemGalacticPosition(starSystemCoordinates),
         ).add(this.starMapCenterPosition);
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
@@ -733,7 +733,7 @@ export class StarMap implements View {
         }
 
         this.selectedSystemCoordinates = starSystemCoordinates;
-        const starSystemModel = this.starSystemDatabase.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null)
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,

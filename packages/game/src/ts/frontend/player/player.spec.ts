@@ -25,22 +25,22 @@ import { SerializedPlayerSchema, type SerializedPlayer } from "@/backend/player/
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { Player } from "./player";
 
 describe("Player", () => {
-    let starSystemDatabase: StarSystemDatabase;
+    let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        universeBackend = new UniverseBackend(getLoneStarSystem());
         vi.clearAllMocks();
     });
 
     describe("Default Player Creation", () => {
         it("should create a default player with correct initial values", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             expect(player.uuid).toBeDefined();
             expect(player.uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
@@ -67,8 +67,8 @@ describe("Player", () => {
         });
 
         it("should create unique UUIDs for different default players", () => {
-            const player1 = Player.Default(starSystemDatabase);
-            const player2 = Player.Default(starSystemDatabase);
+            const player1 = Player.Default(universeBackend);
+            const player2 = Player.Default(universeBackend);
 
             expect(player1.uuid).not.toBe(player2.uuid);
         });
@@ -103,10 +103,10 @@ describe("Player", () => {
 
     describe("Serialization and Deserialization", () => {
         it("should serialize and deserialize a default player without data loss", () => {
-            const originalPlayer = Player.Default(starSystemDatabase);
+            const originalPlayer = Player.Default(universeBackend);
 
             const serialized = Player.Serialize(originalPlayer);
-            const deserializedPlayer = Player.Deserialize(serialized, starSystemDatabase);
+            const deserializedPlayer = Player.Deserialize(serialized, universeBackend);
 
             expect(deserializedPlayer.uuid).toBe(originalPlayer.uuid);
             expect(deserializedPlayer.getName()).toBe(originalPlayer.getName());
@@ -130,7 +130,7 @@ describe("Player", () => {
         });
 
         it("should serialize and deserialize a complex player with all data types", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Populate with complex data
             player.setName("Test Explorer");
@@ -199,7 +199,7 @@ describe("Player", () => {
             player.tutorials.starMapCompleted = true;
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             // Verify all data is preserved
             expect(deserialized.uuid).toBe(player.uuid);
@@ -222,7 +222,7 @@ describe("Player", () => {
         });
 
         it("should serialize with corrupted spaceship data gracefully", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Add a corrupted spaceship to serializedSpaceships
             const corruptedSpaceship = { ...getDefaultSerializedSpaceship() };
@@ -274,10 +274,10 @@ describe("Player", () => {
         });
 
         it("should handle mission serialization/deserialization", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Get a valid space station from the fallback system for the mission giver
-            const fallbackSystem = starSystemDatabase.fallbackSystem;
+            const fallbackSystem = universeBackend.fallbackSystem;
             const spaceStation = fallbackSystem.orbitalFacilities[0];
             if (!spaceStation) {
                 throw new Error("No space station found in fallback system for test");
@@ -308,7 +308,7 @@ describe("Player", () => {
                 completedMissions: [mockSerializedMission],
             };
 
-            const deserialized = Player.Deserialize(serializedPlayer, starSystemDatabase);
+            const deserialized = Player.Deserialize(serializedPlayer, universeBackend);
 
             // Should handle missions gracefully (they will be filtered out if invalid)
             expect(Array.isArray(deserialized.currentMissions)).toBe(true);
@@ -316,21 +316,21 @@ describe("Player", () => {
         });
 
         it("should handle null and edge case values correctly", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Set edge cases
             player.currentItinerary = null;
             player.timePlayedSeconds = 0.123456789; // Fractional seconds
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             expect(deserialized.currentItinerary).toBeNull();
             expect(deserialized.timePlayedSeconds).toBe(0); // Should be rounded
         });
 
         it("should validate serialized data against schema", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
             const serialized = Player.Serialize(player);
 
             const validationResult = SerializedPlayerSchema.safeParse(serialized);
@@ -338,7 +338,7 @@ describe("Player", () => {
         });
 
         it("should preserve deep nested object references correctly", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Add complex nested data
             const systemCoords: StarSystemCoordinates = {
@@ -355,7 +355,7 @@ describe("Player", () => {
             player.currentItinerary = [systemCoords, systemCoords];
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             // Verify deep equality but separate object references
             expect(deserialized.visitedSystemHistory[0]).toEqual(systemCoords);
@@ -375,7 +375,7 @@ describe("Player", () => {
 
     describe("Visited Objects Tracking", () => {
         it("should track visited objects correctly", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             const objectId: UniverseObjectId = {
                 systemCoordinates: {
@@ -405,7 +405,7 @@ describe("Player", () => {
         });
 
         it("should distinguish between different objects correctly", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             const objectId1: UniverseObjectId = {
                 systemCoordinates: {
@@ -456,7 +456,7 @@ describe("Player", () => {
         });
 
         it("should preserve visited objects through serialization", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             const objectId: UniverseObjectId = {
                 systemCoordinates: {
@@ -473,7 +473,7 @@ describe("Player", () => {
             player.addVisitedObjectIfNew(objectId);
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             expect(deserialized.hasVisitedObject(objectId)).toBe(true);
             expect(deserialized.discoveries.local).toHaveLength(1);
@@ -483,7 +483,7 @@ describe("Player", () => {
 
     describe("Balance and Name Management", () => {
         it("should manage name changes with observable notifications", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
             let notifiedName = "";
 
             player.onNameChangedObservable.add((name) => {
@@ -497,7 +497,7 @@ describe("Player", () => {
         });
 
         it("should manage balance changes with observable notifications", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
             let notifiedBalance = 0;
 
             player.onBalanceChangedObservable.add((balance) => {
@@ -511,7 +511,7 @@ describe("Player", () => {
         });
 
         it("should handle pay and earn operations correctly", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
             const initialBalance = player.getBalance();
 
             player.earn(5000);
@@ -522,7 +522,7 @@ describe("Player", () => {
         });
 
         it("should allow negative balances from pay operations", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             player.pay(player.getBalance() + 1000);
             expect(player.getBalance()).toBe(-1000);
@@ -531,8 +531,8 @@ describe("Player", () => {
 
     describe("Deep Copy Functionality", () => {
         it("should perform deep copy with copyFrom method", () => {
-            const sourcePlayer = Player.Default(starSystemDatabase);
-            const targetPlayer = Player.Default(starSystemDatabase);
+            const sourcePlayer = Player.Default(universeBackend);
+            const targetPlayer = Player.Default(universeBackend);
 
             // Modify source player
             sourcePlayer.setName("Source Player");
@@ -566,7 +566,7 @@ describe("Player", () => {
             sourcePlayer.tutorials.flightCompleted = true;
 
             // Perform deep copy
-            targetPlayer.copyFrom(sourcePlayer, starSystemDatabase);
+            targetPlayer.copyFrom(sourcePlayer, universeBackend);
 
             // Verify all properties are copied
             expect(targetPlayer.uuid).toBe(sourcePlayer.uuid);
@@ -592,12 +592,12 @@ describe("Player", () => {
         });
 
         it("should handle null itinerary in copyFrom", () => {
-            const sourcePlayer = Player.Default(starSystemDatabase);
-            const targetPlayer = Player.Default(starSystemDatabase);
+            const sourcePlayer = Player.Default(universeBackend);
+            const targetPlayer = Player.Default(universeBackend);
 
             sourcePlayer.currentItinerary = null;
 
-            targetPlayer.copyFrom(sourcePlayer, starSystemDatabase);
+            targetPlayer.copyFrom(sourcePlayer, universeBackend);
 
             expect(targetPlayer.currentItinerary).toBeNull();
         });
@@ -627,7 +627,7 @@ describe("Player", () => {
                 },
             };
 
-            const player = Player.Deserialize(serializedData, starSystemDatabase);
+            const player = Player.Deserialize(serializedData, universeBackend);
 
             expect(player.visitedSystemHistory).toEqual([]);
             expect(player.discoveries.local).toEqual([]);
@@ -640,7 +640,7 @@ describe("Player", () => {
         });
 
         it("should handle invalid mission data gracefully", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             const serializedData: SerializedPlayer = {
                 ...Player.Serialize(player),
@@ -657,7 +657,7 @@ describe("Player", () => {
             // Should not throw an error during deserialization
             let deserializedPlayer: Player | undefined;
             expect(() => {
-                deserializedPlayer = Player.Deserialize(serializedData, starSystemDatabase);
+                deserializedPlayer = Player.Deserialize(serializedData, universeBackend);
             }).not.toThrow();
 
             // Invalid missions should be filtered out
@@ -669,7 +669,7 @@ describe("Player", () => {
         });
 
         it("should preserve exact floating point precision where possible", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             const preciseCoordinates: StarSystemCoordinates = {
                 starSectorX: 1,
@@ -683,13 +683,13 @@ describe("Player", () => {
             player.visitedSystemHistory.push(preciseCoordinates);
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             expect(deserialized.visitedSystemHistory[0]).toEqual(preciseCoordinates);
         });
 
         it("should handle very large collections efficiently", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             // Add many discoveries
             const startTime = Date.now();
@@ -709,7 +709,7 @@ describe("Player", () => {
             }
 
             const serialized = Player.Serialize(player);
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
             const endTime = Date.now();
 
             expect(deserialized.discoveries.local).toHaveLength(1000);
@@ -734,7 +734,7 @@ describe("Player", () => {
 
     describe("Observable Behavior", () => {
         it("should not trigger observables during deserialization", () => {
-            const player = Player.Default(starSystemDatabase);
+            const player = Player.Default(universeBackend);
 
             let nameChangeCount = 0;
             let balanceChangeCount = 0;
@@ -756,7 +756,7 @@ describe("Player", () => {
             balanceChangeCount = 0;
 
             // Deserialize should not trigger observables
-            const deserialized = Player.Deserialize(serialized, starSystemDatabase);
+            const deserialized = Player.Deserialize(serialized, universeBackend);
 
             expect(nameChangeCount).toBe(0);
             expect(balanceChangeCount).toBe(0);

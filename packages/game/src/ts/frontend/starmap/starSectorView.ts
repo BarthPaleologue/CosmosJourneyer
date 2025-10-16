@@ -20,8 +20,8 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
@@ -59,11 +59,11 @@ export class StarSectorView {
         position: Vector3;
     }>;
 
-    constructor(coordinates: Vector3, starSystemDatabase: StarSystemDatabase) {
+    constructor(coordinates: Vector3, universeBackend: UniverseBackend) {
         this.coordinates = coordinates;
         this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
 
-        const systemModels = starSystemDatabase.getSystemModelsInStarSector(
+        const systemModels = universeBackend.getSystemModelsInStarSector(
             this.coordinates.x,
             this.coordinates.y,
             this.coordinates.z,
@@ -71,7 +71,7 @@ export class StarSectorView {
         this.systems = systemModels.map((systemModel) => {
             return {
                 model: systemModel,
-                position: wrapVector3(starSystemDatabase.getSystemGalacticPosition(systemModel.coordinates)),
+                position: wrapVector3(universeBackend.getSystemGalacticPosition(systemModel.coordinates)),
             };
         });
     }

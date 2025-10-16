@@ -32,10 +32,10 @@ import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModel
 import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
 
 /**
- * The StarSystemDatabase defines the content of the universe.
+ * The UniverseBackend defines the content of the universe.
  * It is responsible for generating star system models and system positions in the galaxy.
  */
-export class StarSystemDatabase {
+export class UniverseBackend {
     /**
      * Maps star sectors to the custom systems they contain.
      */

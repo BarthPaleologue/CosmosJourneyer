@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
@@ -29,11 +29,11 @@ export class LoadSavePanel {
     readonly content: SaveLoadingPanelContent;
 
     constructor(
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
-        this.content = new SaveLoadingPanelContent(starSystemDatabase, soundPlayer, notificationManager);
+        this.content = new SaveLoadingPanelContent(universeBackend, soundPlayer, notificationManager);
         this.htmlRoot = this.createPanelHTML();
     }
 

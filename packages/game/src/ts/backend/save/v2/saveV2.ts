@@ -20,7 +20,7 @@ import { z } from "zod";
 import { ItinerarySchema, SerializedPlayerSchema, type Itinerary } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { ok, type DeepReadonly, type Result } from "@/utils/types";
 
@@ -49,11 +49,11 @@ export const SaveSchemaV2 = z.object({
  */
 export type SaveV2 = z.infer<typeof SaveSchemaV2>;
 
-export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemDatabase): SaveV2 {
+export function migrateV1ToV2(saveV1: SaveV1, universeBackend: UniverseBackend): SaveV2 {
     const systemModel =
-        starSystemDatabase.getSystemModelFromCoordinates(
+        universeBackend.getSystemModelFromCoordinates(
             saveV1.universeCoordinates.universeObjectId.starSystemCoordinates,
-        ) ?? starSystemDatabase.fallbackSystem;
+        ) ?? universeBackend.fallbackSystem;
 
     let closestObject: DeepReadonly<OrbitalObjectModel> | undefined;
     let radius: number | undefined;
@@ -142,7 +142,7 @@ export function migrateV1ToV2(saveV1: SaveV1, starSystemDatabase: StarSystemData
 
 export function safeParseSaveV2(
     json: Record<string, unknown>,
-    starSystemDatabase: StarSystemDatabase,
+    universeBackend: UniverseBackend,
 ): Result<SaveV2, SaveLoadingError> {
     const result = SaveSchemaV2.safeParse(json);
     if (result.success) {
@@ -151,7 +151,7 @@ export function safeParseSaveV2(
 
     const parseV1Result = safeParseSaveV1(json);
     if (parseV1Result.success) {
-        return ok(migrateV1ToV2(parseV1Result.value, starSystemDatabase));
+        return ok(migrateV1ToV2(parseV1Result.value, universeBackend));
     }
 
     return parseV1Result;

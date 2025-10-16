@@ -21,7 +21,7 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -43,9 +43,9 @@ export async function createStarSystemViewScene(
 ): Promise<Scene> {
     await initI18n();
 
-    const starSystemDatabase = new StarSystemDatabase(getAlphaTestisSystemModel());
+    const universeBackend = new UniverseBackend(getAlphaTestisSystemModel());
 
-    const player = Player.Default(starSystemDatabase);
+    const player = Player.Default(universeBackend);
 
     const encyclopaediaManager = new EncyclopaediaGalacticaManager();
 
@@ -67,7 +67,7 @@ export async function createStarSystemViewScene(
         engine,
         havokPlugin,
         encyclopaediaManager,
-        starSystemDatabase,
+        universeBackend,
         soundPlayerMock,
         ttsMock,
         notificationManager,
@@ -78,7 +78,7 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(starSystemDatabase.fallbackSystem);
+    await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
 
     starSystemView.initStarSystem();
 

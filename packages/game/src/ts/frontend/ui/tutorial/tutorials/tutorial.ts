@@ -17,7 +17,7 @@
 
 import { type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type Result } from "@/utils/types";
 
@@ -26,7 +26,7 @@ export interface Tutorial {
     readonly coverImageSrc: string;
     getDescription(): string;
 
-    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError>;
+    getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError>;
 
     getContentPanelsHtml(): Promise<string[]>;
 }

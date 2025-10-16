@@ -18,7 +18,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Mission } from "@/frontend/missions/mission";
 
@@ -26,10 +26,10 @@ import { StarMapTutorial } from "./starMapTutorial";
 
 describe("StarMapTutorial", () => {
     it("spawns near a space station", () => {
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
-        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -55,16 +55,16 @@ describe("StarMapTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const stationModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const stationModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(stationModel?.type).toBe("spaceStation");
     });
 
     it("has correct mission objectives", () => {
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new StarMapTutorial();
 
-        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -76,15 +76,15 @@ describe("StarMapTutorial", () => {
 
         for (const serializedMission of saveData.player.currentMissions) {
             const missionGiverId = serializedMission.missionGiver;
-            const missionGiver = starSystemDatabase.getObjectModelByUniverseId(missionGiverId);
+            const missionGiver = universeBackend.getObjectModelByUniverseId(missionGiverId);
             expect(missionGiver).not.toBe(null);
 
-            const mission = Mission.Deserialize(serializedMission, starSystemDatabase);
+            const mission = Mission.Deserialize(serializedMission, universeBackend);
             expect(mission).not.toBe(null);
 
             const targetSystems = mission?.getTargetSystems();
             for (const targetSystem of targetSystems ?? []) {
-                const systemModel = starSystemDatabase.getSystemModelFromCoordinates(targetSystem);
+                const systemModel = universeBackend.getSystemModelFromCoordinates(targetSystem);
                 expect(systemModel).not.toBe(null);
             }
         }

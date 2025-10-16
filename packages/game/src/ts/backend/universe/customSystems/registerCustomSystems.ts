@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 // import { getSolSystemModel } from "./sol";
 
-export function registerCustomSystems(starSystemDatabase: StarSystemDatabase) {
-    void starSystemDatabase;
-    // starSystemDatabase.registerCustomSystem(getSolSystemModel());
+export function registerCustomSystems(universeBackend: UniverseBackend) {
+    void universeBackend;
+    // universeBackend.registerCustomSystem(getSolSystemModel());
 }

@@ -18,16 +18,16 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new FuelScoopTutorial();
 
-        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -53,7 +53,7 @@ describe("FuelScoopTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const closestObjectModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const closestObjectModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(closestObjectModel?.type).toBe("star");
     });

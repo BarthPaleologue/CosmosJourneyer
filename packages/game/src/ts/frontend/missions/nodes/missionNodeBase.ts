@@ -18,7 +18,7 @@
 import { type MissionNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { type MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type MissionContext } from "../missionContext";
 import { type MissionNode } from "./missionNode";
@@ -49,7 +49,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
      * Describes the node recursively.
      * @param originSystemCoordinates The seed of the system where the mission has been given.
      */
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string;
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string;
 
     /**
      * Describes the next task to be done in the mission subtree.
@@ -59,7 +59,7 @@ export interface MissionNodeBase<T extends MissionNodeType> {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string;
 
     /**

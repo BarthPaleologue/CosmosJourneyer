@@ -17,7 +17,7 @@
 
 import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import type { DeepReadonly } from "@/utils/types";
@@ -75,9 +75,9 @@ export class Mission {
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string {
-        return this.tree.describeNextTask(context, keyboardLayout, starSystemDatabase);
+        return this.tree.describeNextTask(context, keyboardLayout, universeBackend);
     }
 
     /**
@@ -121,8 +121,8 @@ export class Mission {
     /**
      * Returns a string describing the mission using the mission tree and the origin seed
      */
-    describe(starSystemDatabase: StarSystemDatabase): string {
-        return this.tree.describe(this.missionGiver.systemCoordinates, starSystemDatabase);
+    describe(universeBackend: UniverseBackend): string {
+        return this.tree.describe(this.missionGiver.systemCoordinates, universeBackend);
     }
 
     /**
@@ -155,10 +155,10 @@ export class Mission {
 
     static Deserialize(
         missionSerialized: DeepReadonly<MissionSerialized>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): Mission | null {
         try {
-            const missionTree = deserializeMissionNode(missionSerialized.tree, starSystemDatabase);
+            const missionTree = deserializeMissionNode(missionSerialized.tree, universeBackend);
             if (missionTree === null) {
                 return null;
             }

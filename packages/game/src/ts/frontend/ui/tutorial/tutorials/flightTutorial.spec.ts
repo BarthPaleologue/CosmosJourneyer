@@ -18,16 +18,16 @@
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { FlightTutorial } from "./flightTutorial";
 
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
-        const starSystemDatabase = new StarSystemDatabase(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new FlightTutorial();
 
-        const saveDataResult = tutorial.getSaveData(starSystemDatabase);
+        const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -53,7 +53,7 @@ describe("flightTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const planetModel = starSystemDatabase.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const planetModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
 
         expect(planetModel).not.toBe(null);
         if (planetModel === null) {

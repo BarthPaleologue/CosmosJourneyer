@@ -20,7 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { FlyByState, type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -123,13 +123,13 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, starSystemDatabase: StarSystemDatabase): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
         const distanceLy = Vector3.Distance(
-            wrapVector3(starSystemDatabase.getSystemGalacticPosition(originSystemCoordinates)),
-            wrapVector3(starSystemDatabase.getSystemGalacticPosition(this.targetSystemCoordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
-        const objectModel = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
-        const systemModel = starSystemDatabase.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
@@ -143,13 +143,13 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
-        starSystemDatabase: StarSystemDatabase,
+        universeBackend: UniverseBackend,
     ): string {
         if (this.isCompleted()) {
             return i18n.t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = starSystemDatabase.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
         if (targetObject === null) {
             return "ERROR: target object is null";
         }
@@ -160,7 +160,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
                     context,
                     this.targetSystemCoordinates,
                     keyboardLayout,
-                    starSystemDatabase,
+                    universeBackend,
                 );
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return i18n.t("missions:common:getCloserToTarget", {

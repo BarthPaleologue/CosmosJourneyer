@@ -20,7 +20,7 @@ import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type StarSystemDatabase } from "@/backend/universe/starSystemDatabase";
+import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import {
     axisCompositeToString,
@@ -50,8 +50,8 @@ import saveData from "@assets/tutorials/starMapTutorial/save.json";
 export class StarMapTutorial implements Tutorial {
     readonly coverImageSrc: string = coverImgSrc;
 
-    getSaveData(starSystemDatabase: StarSystemDatabase): Result<Save, SaveLoadingError> {
-        return safeParseSave(saveData, starSystemDatabase);
+    getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData, universeBackend);
     }
 
     getTitle() {
