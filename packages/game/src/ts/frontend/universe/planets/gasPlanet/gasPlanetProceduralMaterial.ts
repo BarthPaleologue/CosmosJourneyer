@@ -18,6 +18,7 @@
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type GasPlanetProceduralColorPalette } from "@/backend/universe/orbitalObjects/gasPlanetModel";
@@ -86,10 +87,21 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
 
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
 
+        const tempCameraPosition = new Vector3();
         this.onBindObservable.add((mesh) => {
             const activeCamera = mesh.getScene().activeCamera;
-            if (activeCamera === null) throw new Error("No active camera in the scene");
-            this.getEffect().setVector3(GasPlanetMaterialUniformNames.CAMERA_POSITION, activeCamera.globalPosition);
+            if (activeCamera === null) {
+                console.warn("No active camera in the scene");
+                return;
+            }
+
+            const floatingOriginEnabled = scene.floatingOriginMode;
+            this.getEffect().setVector3(
+                GasPlanetMaterialUniformNames.CAMERA_POSITION,
+                floatingOriginEnabled
+                    ? Vector3.ZeroReadOnly
+                    : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
+            );
         });
     }
 
