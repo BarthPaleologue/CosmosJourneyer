@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Effect } from "@babylonjs/core/Materials/effect";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export const ObjectUniformNames = {
@@ -25,8 +26,18 @@ export const ObjectUniformNames = {
     OBJECT_SCALING_DETERMINANT: "object_scaling_determinant",
 };
 
-export function setObjectUniforms(effect: Effect, transform: TransformNode, boundingRadius: number): void {
-    effect.setVector3(ObjectUniformNames.OBJECT_POSITION, transform.getAbsolutePosition());
+const tempVector = new Vector3();
+
+export function setObjectUniforms(
+    effect: Effect,
+    transform: TransformNode,
+    boundingRadius: number,
+    floatingOriginOffset: Vector3,
+): void {
+    effect.setVector3(
+        ObjectUniformNames.OBJECT_POSITION,
+        transform.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempVector),
+    );
     effect.setFloat(ObjectUniformNames.OBJECT_RADIUS, boundingRadius);
     effect.setVector3(ObjectUniformNames.OBJECT_ROTATION_AXIS, transform.up);
     effect.setFloat(ObjectUniformNames.OBJECT_SCALING_DETERMINANT, transform.scalingDeterminant);

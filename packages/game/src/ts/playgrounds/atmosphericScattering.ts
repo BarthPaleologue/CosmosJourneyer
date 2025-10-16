@@ -30,7 +30,7 @@ export function createAtmosphericScatteringScene(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { floatingOriginMode: true });
     scene.useRightHandedSystem = true;
 
     const scalingFactor = 6_000e3;
@@ -63,11 +63,6 @@ export function createAtmosphericScatteringScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
-        const cameraPosition = controls.getTransform().position.clone();
-
-        controls.getTransform().position = Vector3.Zero();
-        sphere.position.subtractInPlace(cameraPosition);
     });
 
     return Promise.resolve(scene);

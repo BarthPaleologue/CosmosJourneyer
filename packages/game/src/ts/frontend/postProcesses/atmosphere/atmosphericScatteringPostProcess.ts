@@ -80,12 +80,16 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("Camera is null");
+                console.warn("Camera is null");
+                return;
             }
 
-            setCameraUniforms(effect, this.activeCamera);
-            setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, planetBoundingRadius);
+            const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
+
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
+            setObjectUniforms(effect, planetTransform, planetBoundingRadius, floatingOriginOffset);
 
             atmosphereUniforms.setUniforms(effect);
 

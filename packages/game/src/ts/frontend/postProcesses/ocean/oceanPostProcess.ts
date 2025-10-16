@@ -85,12 +85,16 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("Camera is null");
+                console.warn("Camera is null");
+                return;
             }
 
-            setCameraUniforms(effect, this.activeCamera);
-            setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, boundingRadius);
+            const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
+
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
+            setObjectUniforms(effect, planetTransform, boundingRadius, floatingOriginOffset);
 
             oceanUniforms.setUniforms(effect, planetTransform);
 

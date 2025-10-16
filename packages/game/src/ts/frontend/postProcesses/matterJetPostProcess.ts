@@ -93,11 +93,15 @@ export class MatterJetPostProcess extends PostProcess implements UpdatablePostPr
 
         this.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
-                throw new Error("Camera is null");
+                console.warn("Camera is null");
+                return;
             }
 
-            setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, stellarTransform, boundingRadius);
+            const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
+
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
+            setObjectUniforms(effect, stellarTransform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(MatterJetUniformNames.TIME, this.matterJetUniforms.elapsedSeconds % 10000);
 

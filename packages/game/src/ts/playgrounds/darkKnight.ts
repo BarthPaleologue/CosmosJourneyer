@@ -30,7 +30,7 @@ export async function createDarkKnightScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { floatingOriginMode: true });
     scene.useRightHandedSystem = true;
 
     const textures = await loadEnvironmentTextures(scene, progressMonitor);
@@ -60,11 +60,6 @@ export async function createDarkKnightScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
-        const cameraPosition = controls.getTransform().position.clone();
-
-        controls.getTransform().position = Vector3.Zero();
-        darkKnight.getTransform().position.subtractInPlace(cameraPosition);
     });
 
     return scene;

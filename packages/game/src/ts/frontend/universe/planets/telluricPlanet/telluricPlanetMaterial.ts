@@ -19,7 +19,7 @@ import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Matrix } from "@babylonjs/core/Maths/math";
+import { Matrix } from "@babylonjs/core/Maths/math";
 import { type Scene } from "@babylonjs/core/scene";
 import { centeredRand } from "extended-random";
 
@@ -28,6 +28,7 @@ import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/t
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 import { type AllTerrainTextures } from "@/frontend/assets/textures/terrains";
+import { OffsetWorldToRef } from "@/frontend/helpers/floatingOrigin";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
@@ -229,11 +230,16 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         );
     }
 
+    private readonly tempPlanetOffsetWorld = new Matrix();
     public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<PointLight>) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
-            this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);
-            setStellarObjectUniforms(this.getEffect(), stellarObjects);
+            const floatingOriginOffset = this.getScene().floatingOriginOffset;
+            this.getEffect().setMatrix(
+                TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX,
+                OffsetWorldToRef(floatingOriginOffset, planetWorldMatrix, this.tempPlanetOffsetWorld),
+            );
+            setStellarObjectUniforms(this.getEffect(), stellarObjects, floatingOriginOffset);
         });
     }
 
