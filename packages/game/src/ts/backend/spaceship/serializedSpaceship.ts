@@ -22,13 +22,8 @@ import { SerializedOptionalComponentSchema } from "./serializedComponents/option
 import { SerializedThrustersSchema } from "./serializedComponents/thrusters";
 import { SerializedWarpDriveSchema } from "./serializedComponents/warpDrive";
 
-export enum ShipType {
-    WANDERER = "WANDERER",
-}
-
 export const BaseSpaceshipSchema = z.object({
-    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
-    id: z.string().uuid(),
+    id: z.uuid(),
     name: z.string(),
     components: z.object({
         primary: z.object({
@@ -41,7 +36,7 @@ export const BaseSpaceshipSchema = z.object({
 });
 
 export const WandererSchema = BaseSpaceshipSchema.extend({
-    type: z.literal(ShipType.WANDERER),
+    type: z.literal("WANDERER"),
     components: z.object({
         primary: z.object({
             warpDrive: SerializedWarpDriveSchema.nullable(),
@@ -56,6 +51,12 @@ export const WandererSchema = BaseSpaceshipSchema.extend({
     }),
 });
 
+const DiscriminatedSpaceshipSchema = z.discriminatedUnion("type", [WandererSchema]);
+
+export const SpaceshipSchema = DiscriminatedSpaceshipSchema;
+
+export type ShipType = SerializedWanderer["type"];
+
 export type SerializedWanderer = z.infer<typeof WandererSchema>;
 
 export const SerializedSpaceshipSchema = z.discriminatedUnion("type", [WandererSchema]);
@@ -64,7 +65,7 @@ export type SerializedSpaceship = z.infer<typeof SerializedSpaceshipSchema>;
 
 export function getDefaultSerializedSpaceship(): SerializedSpaceship {
     return WandererSchema.parse({
-        type: ShipType.WANDERER,
+        type: "WANDERER",
         name: "Wanderer",
         id: crypto.randomUUID(),
         components: {

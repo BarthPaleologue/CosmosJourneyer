@@ -25,18 +25,18 @@ import { err, ok, type Result } from "@/utils/types";
 import projectInfo from "../../../../../package.json";
 import { SaveLoadingErrorType, type SaveLoadingError } from "../saveLoadingError";
 
-export enum SystemObjectType {
-    STELLAR_OBJECT,
-    PLANETARY_MASS_OBJECT,
-    ANOMALY,
-    ORBITAL_FACILITY,
-}
+export const SystemObjectType = {
+    STELLAR_OBJECT: 0,
+    PLANETARY_MASS_OBJECT: 1,
+    ANOMALY: 2,
+    ORBITAL_FACILITY: 3,
+} as const;
 
 const SystemObjectIdSchema = z.object({
     /**
      * The type of the object.
      */
-    objectType: z.nativeEnum(SystemObjectType),
+    objectType: z.enum(SystemObjectType),
 
     /**
      * The index of the object inside the array containing all objects of the given type within the star system.
@@ -51,9 +51,9 @@ const UniverseObjectIdSchema = z.object({
     starSystemCoordinates: StarSystemCoordinatesSchema,
 });
 
-enum ShipType {
-    WANDERER,
-}
+const ShipType = {
+    WANDERER: 0,
+} as const;
 
 const SerializedFuelTankSchema = z.object({
     currentFuel: z.number(),
@@ -65,12 +65,9 @@ const SerializedFuelScoopSchema = z.object({
 });
 
 const SerializedSpaceshipSchemaV1 = z.object({
-    id: z
-        .string()
-        .uuid()
-        .default(() => crypto.randomUUID()),
+    id: z.uuid().default(() => crypto.randomUUID()),
     name: z.string().default("Wanderer"),
-    type: z.nativeEnum(ShipType).default(ShipType.WANDERER),
+    type: z.enum(ShipType).default(ShipType.WANDERER),
     fuelTanks: z.array(SerializedFuelTankSchema).default([{ currentFuel: 100, maxFuel: 100 }]),
     fuelScoop: z.nullable(SerializedFuelScoopSchema).nullable().default({ fuelPerSecond: 2.5 }),
 });
@@ -136,7 +133,7 @@ export const SaveSchemaV1 = z.object({
             /**
              * The type of the object.
              */
-            objectType: z.nativeEnum(SystemObjectType),
+            objectType: z.enum(SystemObjectType),
 
             /**
              * The index of the object inside the array containing all objects of the given type within the star system.

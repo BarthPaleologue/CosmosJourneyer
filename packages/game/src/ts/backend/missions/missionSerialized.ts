@@ -24,17 +24,37 @@ import { MissionNodeSerializedSchema } from "./missionNodeSerialized";
 /**
  * Registered mission types. Those are used to display localized strings in the UI
  */
-export enum MissionType {
-    SIGHT_SEEING_FLY_BY,
-    SIGHT_SEEING_TERMINATOR_LANDING,
-    SIGHT_SEEING_ASTEROID_FIELD,
+export const MissionType = {
+    SIGHT_SEEING_FLY_BY: "sightSeeingFlyBy",
+    SIGHT_SEEING_TERMINATOR_LANDING: "sightSeeingTerminatorLanding",
+    SIGHT_SEEING_ASTEROID_FIELD: "sightSeeingAsteroidField",
+} as const;
+
+export type MissionType = (typeof MissionType)[keyof typeof MissionType];
+function preprocessLegacyMissionType(type: unknown): unknown {
+    if (typeof type !== "number") {
+        return type;
+    }
+
+    switch (type) {
+        case 0:
+            return MissionType.SIGHT_SEEING_FLY_BY;
+        case 1:
+            return MissionType.SIGHT_SEEING_TERMINATOR_LANDING;
+        case 2:
+            return MissionType.SIGHT_SEEING_ASTEROID_FIELD;
+        default:
+            return type;
+    }
 }
 
 export const MissionSerializedSchema = z.object({
     missionGiver: UniverseObjectIdSchema,
     tree: MissionNodeSerializedSchema,
     reward: z.number().default(0),
-    type: z.nativeEnum(MissionType).default(MissionType.SIGHT_SEEING_FLY_BY),
+    type: z
+        .preprocess((value) => preprocessLegacyMissionType(value), z.enum(MissionType))
+        .default(MissionType.SIGHT_SEEING_FLY_BY),
 });
 
 /**

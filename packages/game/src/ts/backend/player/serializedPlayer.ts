@@ -22,10 +22,7 @@ export const ItinerarySchema = z
 export type Itinerary = z.infer<typeof ItinerarySchema>;
 
 export const SerializedPlayerSchema = z.object({
-    uuid: z
-        .string()
-        .uuid()
-        .default(() => crypto.randomUUID()),
+    uuid: z.uuid().default(() => crypto.randomUUID()),
     name: z.string().default("Python"),
     balance: z.number().default(10000),
     creationDate: z.string().default(() => new Date().toISOString()),

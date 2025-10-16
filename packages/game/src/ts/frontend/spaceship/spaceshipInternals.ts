@@ -17,7 +17,7 @@
 
 import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import { type SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
-import { ShipType, type SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import { type SerializedSpaceship, type ShipType } from "@/backend/spaceship/serializedSpaceship";
 
 import type { DeepReadonly } from "@/utils/types";
 
@@ -47,7 +47,7 @@ export class SpaceshipInternals {
         const primary = components.primary;
         const optionals = components.optional;
         switch (serializedSpaceship.type) {
-            case ShipType.WANDERER:
+            case "WANDERER":
                 this.primary = {
                     warpDrive: ComponentSlot.NewWarpDrive(3),
                     thrusters: ComponentSlot.NewThrusters(3),
@@ -181,7 +181,7 @@ export class SpaceshipInternals {
             );
 
         switch (this.type) {
-            case ShipType.WANDERER:
+            case "WANDERER":
                 if (optionals[0] === undefined || optionals[1] === undefined || optionals[2] === undefined) {
                     throw new Error("Optional components are undefined");
                 }

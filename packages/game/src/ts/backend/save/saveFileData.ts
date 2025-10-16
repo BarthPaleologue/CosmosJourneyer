@@ -95,4 +95,4 @@ export type CmdrSaves = {
 
 export type CmdrSavesShapeIsStable = Assert<StrictEqual<DeepMutable<CmdrSaves>, z.infer<typeof CmdrSavesDeepSchema>>>;
 
-export const SavesSchema = z.record(z.string().uuid(), CmdrSavesShallowSchema);
+export const SavesSchema = z.record(z.uuid(), CmdrSavesShallowSchema);

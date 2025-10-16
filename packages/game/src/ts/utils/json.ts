@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-const JsonSchema = z.record(z.unknown());
+const JsonSchema = z.record(z.string(), z.unknown());
 
 export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
     try {

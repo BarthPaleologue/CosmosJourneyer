@@ -21,16 +21,35 @@ import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
 import { MissionNodeType } from "./missionNodeType";
 
-export enum FlyByState {
-    NOT_IN_SYSTEM,
-    TOO_FAR_IN_SYSTEM,
-    CLOSE_ENOUGH,
+export const FlyByState = {
+    NOT_IN_SYSTEM: "notInSystem",
+    TOO_FAR_IN_SYSTEM: "tooFarInSystem",
+    CLOSE_ENOUGH: "closeEnough",
+} as const;
+
+export type FlyByState = (typeof FlyByState)[keyof typeof FlyByState];
+
+function preprocessLegacyFlyByState(state: unknown): unknown {
+    if (typeof state !== "number") {
+        return state;
+    }
+
+    switch (state) {
+        case 0:
+            return FlyByState.NOT_IN_SYSTEM;
+        case 1:
+            return FlyByState.TOO_FAR_IN_SYSTEM;
+        case 2:
+            return FlyByState.CLOSE_ENOUGH;
+        default:
+            return state;
+    }
 }
 
 export const MissionFlyByNodeSerializedSchema = z.object({
     type: z.literal(MissionNodeType.FLY_BY),
     objectId: UniverseObjectIdSchema,
-    state: z.nativeEnum(FlyByState),
+    state: z.preprocess((value) => preprocessLegacyFlyByState(value), z.enum(FlyByState)),
 });
 
 export type MissionFlyByNodeSerialized = z.infer<typeof MissionFlyByNodeSerializedSchema>;

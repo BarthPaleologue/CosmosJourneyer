@@ -223,6 +223,10 @@ describe("Player", () => {
 
         it("should serialize with corrupted spaceship data gracefully", () => {
             const player = Player.Default(universeBackend);
+            const playerSpaceship = player.serializedSpaceships[0];
+            if (playerSpaceship === undefined) {
+                throw new Error("No default spaceship found for test");
+            }
 
             // Add a corrupted spaceship to serializedSpaceships
             const corruptedSpaceship = { ...getDefaultSerializedSpaceship() };
@@ -234,43 +238,7 @@ describe("Player", () => {
 
             // Should only contain the valid spaceships (the default one)
             expect(serialized.spaceShips).toHaveLength(1);
-            expect(serialized.spaceShips[0]).toMatchObject({
-                name: "Wanderer",
-                type: "WANDERER",
-                components: {
-                    primary: {
-                        warpDrive: {
-                            type: "warpDrive",
-                            size: 3,
-                            quality: 1,
-                        },
-                        thrusters: {
-                            type: "thrusters",
-                            size: 3,
-                            quality: 1,
-                        },
-                        fuelTank: {
-                            type: "fuelTank",
-                            size: 2,
-                            quality: 1,
-                            currentFuel01: 1,
-                        },
-                    },
-                    optional: [
-                        null,
-                        {
-                            type: "fuelScoop",
-                            size: 2,
-                            quality: 1,
-                        },
-                        {
-                            type: "discoveryScanner",
-                            size: 2,
-                            quality: 1,
-                        },
-                    ],
-                },
-            });
+            expect(serialized.spaceShips[0]).toMatchObject(playerSpaceship);
         });
 
         it("should handle mission serialization/deserialization", () => {
