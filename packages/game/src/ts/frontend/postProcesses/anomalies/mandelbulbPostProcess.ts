@@ -100,7 +100,7 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(MandelbulbUniformNames.POWER, mandelbulbModel.power);

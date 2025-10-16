@@ -81,7 +81,8 @@ export class GrassMaterial extends ShaderMaterial {
         this.setTexture("perlinNoise", noiseTextures.seamlessPerlin);
 
         this.onBindObservable.add(() => {
-            setStellarObjectUniforms(this.getEffect(), this.stars);
+            const floatingOriginOffset = scene.floatingOriginOffset;
+            setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
 
             this.getEffect().setVector3(GrassMaterialUniformNames.PLAYER_POSITION, this.playerPosition);
             this.getEffect().setFloat(GrassMaterialUniformNames.TIME, this.elapsedSeconds);

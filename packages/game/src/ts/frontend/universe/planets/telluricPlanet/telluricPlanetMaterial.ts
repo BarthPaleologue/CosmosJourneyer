@@ -232,8 +232,9 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     public update(planetWorldMatrix: Matrix, stellarObjects: ReadonlyArray<PointLight>) {
         // The add once is important because the material will be bound for every chunk of the planet
         this.onBindObservable.addOnce(() => {
+            const floatingOriginOffset = this.getScene().floatingOriginOffset;
             this.getEffect().setMatrix(TelluricPlanetMaterialUniformNames.PLANET_WORLD_MATRIX, planetWorldMatrix);
-            setStellarObjectUniforms(this.getEffect(), stellarObjects);
+            setStellarObjectUniforms(this.getEffect(), stellarObjects, floatingOriginOffset);
         });
     }
 

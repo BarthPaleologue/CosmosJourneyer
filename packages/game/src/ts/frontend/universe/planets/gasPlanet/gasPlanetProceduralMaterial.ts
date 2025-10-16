@@ -97,7 +97,8 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {
-            setStellarObjectUniforms(this.getEffect(), stellarObjects);
+            const floatingOriginOffset = this.getScene().floatingOriginOffset;
+            setStellarObjectUniforms(this.getEffect(), stellarObjects, floatingOriginOffset);
             this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }

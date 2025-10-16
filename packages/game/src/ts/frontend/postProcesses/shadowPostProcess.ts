@@ -123,6 +123,7 @@ export class ShadowPostProcess extends PostProcess {
             setStellarObjectUniforms(
                 effect,
                 stellarObjects.map((star) => star.getLight()),
+                floatingOriginOffset,
             );
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 

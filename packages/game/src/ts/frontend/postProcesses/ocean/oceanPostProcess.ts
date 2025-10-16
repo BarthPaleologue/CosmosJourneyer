@@ -93,7 +93,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, planetTransform, boundingRadius, floatingOriginOffset);
 
             oceanUniforms.setUniforms(effect, planetTransform);

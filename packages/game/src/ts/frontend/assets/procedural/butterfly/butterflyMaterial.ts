@@ -80,7 +80,8 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, butterflyTexture);
 
         this.onBindObservable.add(() => {
-            setStellarObjectUniforms(this.getEffect(), this.stars);
+            const floatingOriginOffset = scene.floatingOriginOffset;
+            setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
 
             this.getEffect().setVector3(ButterflyMaterialUniformNames.PLAYER_POSITION, this.playerPosition);
             this.getEffect().setFloat(ButterflyMaterialUniformNames.TIME, this.elapsedSeconds);

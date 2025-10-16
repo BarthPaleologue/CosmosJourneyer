@@ -17,6 +17,7 @@
 
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { type Effect } from "@babylonjs/core/Materials/effect";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { flattenColor3Array, flattenVector3Array } from "@/frontend/helpers/algebra";
 
@@ -26,7 +27,21 @@ export const StellarObjectUniformNames = {
     NB_STARS: "nbStars",
 };
 
-export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<PointLight>): void {
+const tempVectorMap = new Map<number, Vector3>();
+function getTempVector(index: number) {
+    let vector = tempVectorMap.get(index);
+    if (vector === undefined) {
+        vector = Vector3.Zero();
+        tempVectorMap.set(index, vector);
+    }
+    return vector;
+}
+
+export function setStellarObjectUniforms(
+    effect: Effect,
+    stellarObjects: ReadonlyArray<PointLight>,
+    floatingOriginOffset: Vector3,
+): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
     if (stellarObjects.length === 0) {
@@ -37,7 +52,11 @@ export function setStellarObjectUniforms(effect: Effect, stellarObjects: Readonl
 
     effect.setArray3(
         StellarObjectUniformNames.STAR_POSITIONS,
-        flattenVector3Array(stellarObjects.map((stellarObject) => stellarObject.getAbsolutePosition())),
+        flattenVector3Array(
+            stellarObjects.map((stellarObject, index) =>
+                stellarObject.getAbsolutePosition().subtractToRef(floatingOriginOffset, getTempVector(index)),
+            ),
+        ),
     );
     effect.setArray3(
         StellarObjectUniformNames.STAR_COLORS,

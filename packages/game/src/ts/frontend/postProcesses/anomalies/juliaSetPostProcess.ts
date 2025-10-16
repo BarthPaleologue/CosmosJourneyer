@@ -97,7 +97,7 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(JuliaUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);

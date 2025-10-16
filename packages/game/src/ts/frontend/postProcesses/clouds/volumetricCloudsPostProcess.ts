@@ -102,7 +102,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
-            setStellarObjectUniforms(effect, stars);
+            setStellarObjectUniforms(effect, stars, floatingOriginOffset);
 
             effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, boundingRadius);
             effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MAX_HEIGHT, boundingRadius + 30e3);

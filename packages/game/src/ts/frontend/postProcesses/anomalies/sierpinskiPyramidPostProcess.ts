@@ -99,7 +99,7 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(SierpinskiPyramidUniformNames.ACCENT_COLOR, model.accentColor);

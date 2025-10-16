@@ -99,7 +99,7 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(MengerSpongeUniformNames.ACCENT_COLOR, model.color);

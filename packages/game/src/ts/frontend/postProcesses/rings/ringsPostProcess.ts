@@ -96,7 +96,7 @@ export class RingsPostProcess extends PostProcess {
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
+            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
             setObjectUniforms(effect, bodyTransform, bodyModel.radius, floatingOriginOffset);
 
             this.ringsUniforms.setUniforms(effect);
