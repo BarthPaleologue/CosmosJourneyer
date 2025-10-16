@@ -98,8 +98,9 @@ export class VolumetricCloudsPostProcess extends PostProcess {
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
 
-            setCameraUniforms(effect, this.activeCamera);
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
             setStellarObjectUniforms(effect, stars);
 

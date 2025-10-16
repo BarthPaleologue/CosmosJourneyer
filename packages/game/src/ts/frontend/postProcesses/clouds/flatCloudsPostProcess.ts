@@ -90,8 +90,9 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
 
-            setCameraUniforms(effect, this.activeCamera);
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, planetTransform, boundingRadius, floatingOriginOffset);
             this.cloudUniforms.setUniforms(effect);

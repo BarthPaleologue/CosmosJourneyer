@@ -85,8 +85,9 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
 
-            setCameraUniforms(effect, this.activeCamera);
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, planetTransform, planetBoundingRadius, floatingOriginOffset);
 

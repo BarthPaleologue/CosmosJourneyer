@@ -103,8 +103,9 @@ export class LensFlarePostProcess extends PostProcess {
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
 
-            setCameraUniforms(effect, this.activeCamera);
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, stellarTransform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);

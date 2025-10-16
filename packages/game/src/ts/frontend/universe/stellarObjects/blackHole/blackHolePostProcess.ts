@@ -77,8 +77,9 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
             }
 
             const floatingOriginOffset = scene.floatingOriginOffset;
+            const floatingOriginEnabled = scene.floatingOriginMode;
 
-            setCameraUniforms(effect, this.activeCamera);
+            setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, blackHoleTransform, blackHoleUniforms.schwarzschildRadius, floatingOriginOffset);
             blackHoleUniforms.setUniforms(effect, blackHoleTransform);
 

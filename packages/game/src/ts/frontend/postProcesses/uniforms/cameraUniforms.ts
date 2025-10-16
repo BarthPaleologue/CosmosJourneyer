@@ -17,6 +17,9 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Effect } from "@babylonjs/core/Materials/effect";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import { OffsetViewToRef } from "@/frontend/helpers/floatingOrigin";
 
 export const CameraUniformNames = {
     CAMERA_POSITION: "camera_position",
@@ -29,12 +32,25 @@ export const CameraUniformNames = {
     CAMERA_FOV: "camera_fov",
 };
 
-export function setCameraUniforms(effect: Effect, camera: Camera): void {
-    effect.setVector3(CameraUniformNames.CAMERA_POSITION, camera.globalPosition);
+const tempMatrix1 = new Matrix();
+const tempMatrix2 = new Matrix();
+const tempMatrix3 = new Matrix();
+
+const tempVector1 = new Vector3();
+
+export function setCameraUniforms(effect: Effect, camera: Camera, floatingOriginEnabled: boolean): void {
+    const view = floatingOriginEnabled ? OffsetViewToRef(camera.getViewMatrix(), tempMatrix1) : camera.getViewMatrix();
+    const cameraPosition = floatingOriginEnabled
+        ? Vector3.ZeroReadOnly
+        : camera.getWorldMatrix().getTranslationToRef(tempVector1);
+    effect.setVector3(CameraUniformNames.CAMERA_POSITION, cameraPosition);
     effect.setMatrix(CameraUniformNames.CAMERA_PROJECTION, camera.getProjectionMatrix());
-    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_PROJECTION, camera.getProjectionMatrix().clone().invert());
-    effect.setMatrix(CameraUniformNames.CAMERA_VIEW, camera.getViewMatrix());
-    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_VIEW, camera.getViewMatrix().clone().invert());
+    effect.setMatrix(
+        CameraUniformNames.CAMERA_INVERSE_PROJECTION,
+        camera.getProjectionMatrix().invertToRef(tempMatrix2),
+    );
+    effect.setMatrix(CameraUniformNames.CAMERA_VIEW, view);
+    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_VIEW, view.invertToRef(tempMatrix3));
     effect.setFloat(CameraUniformNames.CAMERA_NEAR, camera.minZ);
     effect.setFloat(CameraUniformNames.CAMERA_FAR, camera.maxZ);
     effect.setFloat(CameraUniformNames.CAMERA_FOV, camera.fov);
