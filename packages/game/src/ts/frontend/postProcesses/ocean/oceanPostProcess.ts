@@ -88,9 +88,11 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, boundingRadius);
+            setObjectUniforms(effect, planetTransform, boundingRadius, floatingOriginOffset);
 
             oceanUniforms.setUniforms(effect, planetTransform);
 

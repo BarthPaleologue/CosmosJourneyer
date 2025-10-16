@@ -91,9 +91,11 @@ export class RingsPostProcess extends PostProcess {
                 throw new Error("RingsPostProcess: activeCamera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, bodyTransform, bodyModel.radius);
+            setObjectUniforms(effect, bodyTransform, bodyModel.radius, floatingOriginOffset);
 
             this.ringsUniforms.setUniforms(effect);
             this.ringsUniforms.setSamplers(effect);

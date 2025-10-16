@@ -92,9 +92,11 @@ export class JuliaSetPostProcess extends PostProcess implements UpdatablePostPro
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(JuliaUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
             effect.setColor3(JuliaUniformNames.ACCENT_COLOR, accentColor);

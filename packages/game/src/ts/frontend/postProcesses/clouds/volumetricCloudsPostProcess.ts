@@ -96,8 +96,10 @@ export class VolumetricCloudsPostProcess extends PostProcess {
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
             setStellarObjectUniforms(effect, stars);
 
             effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, boundingRadius);

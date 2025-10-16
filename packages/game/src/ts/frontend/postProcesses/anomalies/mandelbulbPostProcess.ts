@@ -95,9 +95,11 @@ export class MandelbulbPostProcess extends PostProcess implements UpdatablePostP
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(MandelbulbUniformNames.POWER, mandelbulbModel.power);
             effect.setColor3(MandelbulbUniformNames.ACCENT_COLOR, mandelbulbModel.accentColor);

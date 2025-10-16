@@ -83,9 +83,11 @@ export class AtmosphericScatteringPostProcess extends PostProcess {
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, planetBoundingRadius);
+            setObjectUniforms(effect, planetTransform, planetBoundingRadius, floatingOriginOffset);
 
             atmosphereUniforms.setUniforms(effect);
 

@@ -96,9 +96,11 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(MandelboxUniformNames.MR2, model.mr2);
             effect.setFloat(MandelboxUniformNames.SPREAD, model.spread);

@@ -94,9 +94,11 @@ export class MengerSpongePostProcess extends PostProcess implements UpdatablePos
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(MengerSpongeUniformNames.ACCENT_COLOR, model.color);
             effect.setFloat(MengerSpongeUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);

@@ -94,9 +94,11 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(SierpinskiPyramidUniformNames.ACCENT_COLOR, model.accentColor);
             effect.setFloat(SierpinskiPyramidUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);

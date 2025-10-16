@@ -101,8 +101,10 @@ export class LensFlarePostProcess extends PostProcess {
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, stellarTransform, boundingRadius);
+            setObjectUniforms(effect, stellarTransform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 

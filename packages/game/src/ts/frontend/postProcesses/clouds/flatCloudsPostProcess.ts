@@ -87,9 +87,12 @@ export class FlatCloudsPostProcess extends PostProcess implements UpdatablePostP
             if (this.activeCamera === null) {
                 throw new Error("FlatCloudsPostProcess: activeCamera is null");
             }
+
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, planetTransform, boundingRadius);
+            setObjectUniforms(effect, planetTransform, boundingRadius, floatingOriginOffset);
             this.cloudUniforms.setUniforms(effect);
 
             this.cloudUniforms.setSamplers(effect);

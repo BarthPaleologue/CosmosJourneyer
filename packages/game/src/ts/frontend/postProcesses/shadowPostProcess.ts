@@ -115,12 +115,14 @@ export class ShadowPostProcess extends PostProcess {
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
             setStellarObjectUniforms(
                 effect,
                 stellarObjects.map((star) => star.getLight()),
             );
-            setObjectUniforms(effect, transform, boundingRadius);
+            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloatArray(
                 ShadowUniformNames.STAR_RADIUSES,

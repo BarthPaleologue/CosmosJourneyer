@@ -76,8 +76,10 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
                 throw new Error("Camera is null");
             }
 
+            const floatingOriginOffset = scene.floatingOriginOffset;
+
             setCameraUniforms(effect, this.activeCamera);
-            setObjectUniforms(effect, blackHoleTransform, blackHoleUniforms.schwarzschildRadius);
+            setObjectUniforms(effect, blackHoleTransform, blackHoleUniforms.schwarzschildRadius, floatingOriginOffset);
             blackHoleUniforms.setUniforms(effect, blackHoleTransform);
 
             setSamplerUniforms(effect, this.activeCamera, scene);
