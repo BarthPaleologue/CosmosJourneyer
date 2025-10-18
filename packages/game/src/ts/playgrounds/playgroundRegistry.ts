@@ -37,6 +37,7 @@ import { createGrassScene } from "./grass";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
+import { createRoverScene } from "./rover";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
 import { createJupiterScene } from "./sol/jupiter";
 import { createSaturnScene } from "./sol/saturn";
@@ -88,6 +89,7 @@ export class PlaygroundRegistry {
         ["warpTunnel", createWarpTunnelScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
+        ["rover", createRoverScene],
     ]);
 
     register(
