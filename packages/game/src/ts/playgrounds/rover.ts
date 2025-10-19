@@ -19,19 +19,29 @@ import {
     ArcRotateCamera,
     DirectionalLight,
     MeshBuilder,
+    PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
     ShadowGenerator,
+    Texture,
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 import { FilterMeshCollisions, VehicleBuilder } from "@/frontend/vehicle/vehicleBuilder";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 
 import { enablePhysics } from "./utils";
+
+import tireAOPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_ao_2k.jpg";
+import tireAlbedoPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_color_2k.jpg";
+import tireMetallicPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_metallic_2k.jpg";
+import tireNormalPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_normal_direct_2k.png";
+import tireOpacityPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_opacity_2k.jpg";
+import tireRoughnessPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_roughness_2k.jpg";
 
 export async function createRoverScene(
     engine: AbstractEngine,
@@ -59,27 +69,6 @@ export async function createRoverScene(
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0, friction: 2 }, scene);
 
-    const rover = CreateRover(scene);
-    camera.setTarget(rover.getTransform());
-    shadowGenerator.addShadowCaster(rover.frame.mesh);
-
-    const roverControls = new VehicleControls(scene);
-    roverControls.setVehicle(rover);
-
-    //spawn a bunch of boxes
-    for (let i = 0; i < 50; i++) {
-        const box = MeshBuilder.CreateBox(`box${i}`, { size: 4 }, scene);
-        box.position = new Vector3((Math.random() - 0.5) * 200, 20 + Math.random() * 50, (Math.random() - 0.5) * 200);
-        box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
-        shadowGenerator.addShadowCaster(box);
-
-        new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
-    }
-
-    return Promise.resolve(scene);
-}
-
-function CreateRover(scene: Scene) {
     const carFrame = MeshBuilder.CreateBox("Frame", { height: 1, width: 12, depth: 24 });
     carFrame.position = new Vector3(0, 1, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
@@ -112,10 +101,38 @@ function CreateRover(scene: Scene) {
     vehicleBuilder.addWheel(rearLeftWheelPosition, true, true);
     vehicleBuilder.addWheel(rearRightWheelPosition, true, true);
 
-    const vehicle = vehicleBuilder.build(scene);
+    const tireMaterial = new TireMaterial(
+        {
+            albedo: new Texture(tireAlbedoPath, scene),
+            normal: new Texture(tireNormalPath, scene),
+            roughness: new Texture(tireRoughnessPath, scene),
+            metallic: new Texture(tireMetallicPath, scene),
+            ambientOcclusion: new Texture(tireAOPath, scene),
+            opacity: new Texture(tireOpacityPath, scene),
+        },
+        scene,
+    );
+
+    const rover = vehicleBuilder.build({ tireMaterial: tireMaterial.get() }, scene);
 
     carAggregate.body.disablePreStep = false;
     carFrame.position.y = 5;
 
-    return vehicle;
+    camera.setTarget(rover.getTransform());
+    shadowGenerator.addShadowCaster(rover.frame.mesh);
+
+    const roverControls = new VehicleControls(scene);
+    roverControls.setVehicle(rover);
+
+    //spawn a bunch of boxes
+    for (let i = 0; i < 50; i++) {
+        const box = MeshBuilder.CreateBox(`box${i}`, { size: 4 }, scene);
+        box.position = new Vector3((Math.random() - 0.5) * 200, 20 + Math.random() * 50, (Math.random() - 0.5) * 200);
+        box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
+        shadowGenerator.addShadowCaster(box);
+
+        new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
+    }
+
+    return Promise.resolve(scene);
 }
