@@ -25,7 +25,6 @@ import {
     outputFragColor,
     outputVertexPosition,
     pbr,
-    pbrMetallicRoughnessMaterial,
     perturbNormal,
     textureSample,
     transformDirection,
