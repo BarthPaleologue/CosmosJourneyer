@@ -57,12 +57,18 @@ export async function createRoverScene(
     const camera = new ArcRotateCamera("camera", Math.PI / 2, -Math.PI / 3, 50, Vector3.Zero(), scene);
     camera.attachControl();
 
-    const sun = new DirectionalLight("sun", new Vector3(0, -0.5, -1), scene);
+    const sun = new DirectionalLight("sun", new Vector3(0, -0.7, -1), scene);
+    sun.position = new Vector3(0, 50, 0);
     sun.autoUpdateExtends = true;
+    scene.onAfterRenderObservable.addOnce(() => {
+        sun.autoUpdateExtends = false;
+    });
 
-    const shadowGenerator = new ShadowGenerator(1024, sun);
+    const shadowGenerator = new ShadowGenerator(2048, sun);
     shadowGenerator.useExponentialShadowMap = true;
+    shadowGenerator.usePercentageCloserFiltering = true;
     shadowGenerator.useBlurExponentialShadowMap = true;
+    shadowGenerator.transparencyShadow = true;
 
     const ground = MeshBuilder.CreateGround("ground", { width: 300, height: 300 }, scene);
     ground.receiveShadows = true;
@@ -81,8 +87,8 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 1, width: 6, depth: 12 });
-    carFrame.position = new Vector3(0, 1, 0);
+    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.5, width: 4, depth: 9 });
+    carFrame.position = new Vector3(0, 0.8, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
         mass: 2000,
         restitution: 0,
@@ -91,14 +97,14 @@ export async function createRoverScene(
     });
     FilterMeshCollisions(carAggregate.shape);
 
-    const wheelDistanceFromCenter = 4;
+    const wheelDistanceFromCenter = 2.5;
 
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 4);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 4);
+    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 3);
+    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 3);
     const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
     const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -4);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -4);
+    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -3);
+    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -3);
 
     const vehicleBuilder = new VehicleBuilder({
         mesh: carFrame,
