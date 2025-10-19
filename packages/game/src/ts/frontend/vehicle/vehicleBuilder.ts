@@ -171,7 +171,9 @@ export function AddAxlePhysics(mesh: Mesh, mass: number, bounce: number, frictio
 }
 
 export function CreateAxle(position: Vector3, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateBox("Axle", { height: 1, width: 2.5, depth: 1 }, scene);
+    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: 1, height: 2.5 }, scene);
+    axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
+    axleMesh.bakeCurrentTransformIntoVertices();
     axleMesh.position.copyFrom(position);
 
     return axleMesh;

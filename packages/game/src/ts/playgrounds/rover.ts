@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+    AbstractMesh,
     ArcRotateCamera,
     DirectionalLight,
     MeshBuilder,
-    PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
@@ -30,6 +30,8 @@ import {
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 import { FilterMeshCollisions, VehicleBuilder } from "@/frontend/vehicle/vehicleBuilder";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
@@ -45,7 +47,6 @@ import tireRoughnessPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_roughness
 
 export async function createRoverScene(
     engine: AbstractEngine,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
@@ -68,6 +69,17 @@ export async function createRoverScene(
     ground.position.y = -2;
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0, friction: 2 }, scene);
+
+    const characters = await loadCharacters(scene, progressMonitor);
+    const characterObject = characters.default.instantiateHierarchy(null);
+    if (!(characterObject instanceof AbstractMesh)) {
+        throw new Error("Character object is null");
+    }
+
+    const character = new CharacterControls(characterObject, scene);
+    character.setThirdPersonCameraActive();
+    character.getTransform().position = new Vector3(10, 0, -10);
+    shadowGenerator.addShadowCaster(character.character);
 
     const carFrame = MeshBuilder.CreateBox("Frame", { height: 1, width: 12, depth: 24 });
     carFrame.position = new Vector3(0, 1, 0);
@@ -125,8 +137,8 @@ export async function createRoverScene(
     roverControls.setVehicle(rover);
 
     //spawn a bunch of boxes
-    for (let i = 0; i < 50; i++) {
-        const box = MeshBuilder.CreateBox(`box${i}`, { size: 4 }, scene);
+    for (let i = 0; i < 200; i++) {
+        const box = MeshBuilder.CreateBox(`box${i}`, { size: Math.random() }, scene);
         box.position = new Vector3((Math.random() - 0.5) * 200, 20 + Math.random() * 50, (Math.random() - 0.5) * 200);
         box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
         shadowGenerator.addShadowCaster(box);
@@ -134,5 +146,10 @@ export async function createRoverScene(
         new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
     }
 
-    return Promise.resolve(scene);
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        character.update(deltaSeconds);
+    });
+
+    return scene;
 }
