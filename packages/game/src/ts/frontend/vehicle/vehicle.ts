@@ -41,7 +41,7 @@ export class Vehicle implements Transformable {
 
     readonly maxForwardSpeed = 50;
     readonly maxReverseSpeed = 25;
-    readonly maxSteeringAngle = Math.PI / 6;
+    readonly maxSteeringAngle = Math.PI / 4;
 
     constructor(
         frame: { mesh: Mesh; physicsBody: PhysicsBody; physicsShape: PhysicsShape },
@@ -77,7 +77,7 @@ export class Vehicle implements Transformable {
 
     setTargetSpeed(speed: number) {
         this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
-        const motorTorque = 330000 / 20;
+        const motorTorque = 330000 / 50;
         for (const motor of this.motorConstraints) {
             motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
             motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, this.targetSpeed);

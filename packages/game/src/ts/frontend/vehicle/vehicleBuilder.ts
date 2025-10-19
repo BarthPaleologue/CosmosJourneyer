@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -39,6 +38,7 @@ export class VehicleBuilder {
 
     private readonly wheels: Array<{
         position: Vector3;
+        radius: number;
         powered: boolean;
         steerable: boolean;
     }> = [];
@@ -47,16 +47,23 @@ export class VehicleBuilder {
         this.frame = frame;
     }
 
-    addWheel(position: Vector3, powered: boolean, steerable: boolean): this {
-        this.wheels.push({ position, powered, steerable });
+    addWheel(position: Vector3, radius: number, powered: boolean, steerable: boolean): this {
+        this.wheels.push({ position, radius, powered, steerable });
         return this;
     }
 
-    build(scene: Scene): Vehicle {
+    build(assets: { tireMaterial: Material }, scene: Scene): Vehicle {
         const motorConstraints: Array<Physics6DoFConstraint> = [];
         const steeringConstraints: Array<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }> = [];
-        for (const { position, powered, steerable } of this.wheels) {
-            const wheelAxle = CreateWheelAxleAggregate(position, powered, steerable, scene);
+        for (const { position, radius, powered, steerable } of this.wheels) {
+            const wheelAxle = CreateWheelAxleAggregate(
+                position,
+                radius,
+                powered,
+                steerable,
+                assets.tireMaterial,
+                scene,
+            );
             if (powered) {
                 motorConstraints.push(wheelAxle.wheelAxleConstraint);
             }
@@ -94,12 +101,14 @@ export type WheelAxleAggregate = {
 
 export function CreateWheelAxleAggregate(
     position: Vector3,
+    radius: number,
     powered: boolean,
     steerable: boolean,
+    tireMaterial: Material,
     scene: Scene,
 ): WheelAxleAggregate {
-    const axleMesh = CreateAxle(position, scene);
-    const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(axleMesh, 190, 0, 0, scene);
+    const axleMesh = CreateAxle(position, radius, scene);
+    const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(axleMesh, radius, 190, 0, 0, scene);
     FilterMeshCollisions(axleShape);
 
     const axle = {
@@ -108,16 +117,8 @@ export function CreateWheelAxleAggregate(
         physicsShape: axleShape,
     };
 
-    const wheelRadius = 2;
-    const wheelMesh = CreateWheel(position, wheelRadius, scene);
-    const { physicsBody: wheelBody, physicsShape: wheelShape } = AddWheelPhysics(
-        wheelMesh,
-        wheelRadius,
-        150,
-        0,
-        2.5,
-        scene,
-    );
+    const wheelMesh = CreateWheel(position, radius, tireMaterial, scene);
+    const { physicsBody: wheelBody, physicsShape: wheelShape } = AddWheelPhysics(wheelMesh, radius, 150, 0, 2.5, scene);
     FilterMeshCollisions(wheelShape);
 
     const wheel = {
@@ -157,11 +158,23 @@ export function AddWheelPhysics(
     return { physicsBody, physicsShape };
 }
 
-export function AddAxlePhysics(mesh: Mesh, mass: number, bounce: number, friction: number, scene: Scene) {
+export function AddAxlePhysics(
+    mesh: Mesh,
+    wheelRadius: number,
+    mass: number,
+    bounce: number,
+    friction: number,
+    scene: Scene,
+) {
     //
     // NOTE: Making the axle shape similar dimensions to the wheel shape increases stability of the joint when it is added
     //
-    const physicsShape = new PhysicsShapeCylinder(new Vector3(-0.8, 0, 0), new Vector3(0.8, 0, 0), 1.8, scene);
+    const physicsShape = new PhysicsShapeCylinder(
+        new Vector3(-0.8, 0, 0),
+        new Vector3(0.8, 0, 0),
+        wheelRadius * 0.9,
+        scene,
+    );
     const physicsBody = new PhysicsBody(mesh, PhysicsMotionType.DYNAMIC, false, scene);
     physicsBody.setMassProperties({ mass: mass });
     physicsShape.material = { restitution: bounce, friction: friction };
@@ -170,33 +183,34 @@ export function AddAxlePhysics(mesh: Mesh, mass: number, bounce: number, frictio
     return { physicsBody, physicsShape };
 }
 
-export function CreateAxle(position: Vector3, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateBox("Axle", { height: 1, width: 2.5, depth: 1 }, scene);
+export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
+    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.1 * 2, height: radius }, scene);
+    axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
+    axleMesh.bakeCurrentTransformIntoVertices();
     axleMesh.position.copyFrom(position);
 
     return axleMesh;
 }
 
-export function CreateWheel(position: Vector3, radius: number, scene: Scene) {
+export function CreateWheel(position: Vector3, radius: number, tireMaterial: Material, scene: Scene) {
     const rimRadius = radius * 0.5;
     const tireThickness = radius - rimRadius;
 
     const wheelThickness = tireThickness * 2;
-    const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: wheelThickness, diameter: rimRadius * 2 }, scene);
+    const wheelMesh = MeshBuilder.CreateCylinder(
+        "Wheel",
+        { height: wheelThickness / 5, diameter: rimRadius * 2 },
+        scene,
+    );
     wheelMesh.rotation = new Vector3(0, 0, Math.PI / 2);
 
     const tireMesh = MeshBuilder.CreateTorus(
         "Tire",
-        { diameter: rimRadius * 2, thickness: tireThickness * 2, tessellation: 12 },
+        { diameter: rimRadius * 2, thickness: tireThickness * 2, tessellation: 24 },
         scene,
     );
-    tireMesh.parent = wheelMesh;
-
-    const tireMaterial = new PBRMetallicRoughnessMaterial("TireMaterial", scene);
-    tireMaterial.metallic = 0.0;
-    tireMaterial.roughness = 1.0;
-    tireMaterial.baseColor = new Color3(0.05, 0.05, 0.05);
     tireMesh.material = tireMaterial;
+    tireMesh.parent = wheelMesh;
 
     wheelMesh.bakeCurrentTransformIntoVertices();
     wheelMesh.position.copyFrom(position);
