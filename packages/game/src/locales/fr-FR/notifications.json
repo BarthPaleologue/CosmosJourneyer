@@ -16,5 +16,6 @@
     "saveOk": "Sauvegardé avec succès dans le stockage local.",
     "cantSaveTutorial": "Impossible de sauvegarder pendant un tutoriel.",
     "newDiscovery": "Découverte de {{objectName}}. Enregistrement des données effectuées.",
-    "unknownKeyboardLayout": "Impossible de détecter votre disposition de clavier. La disposition QWERTY sera utilisée par défaut."
+    "unknownKeyboardLayout": "Impossible de détecter votre disposition de clavier. La disposition QWERTY sera utilisée par défaut.",
+    "lowFuelWarning": "Avertissement: Carburant faible! Veuillez faire le plein bientôt pour éviter d’être bloqué dans l’espace."
 }
