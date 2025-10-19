@@ -18,8 +18,10 @@
 import {
     AbstractMesh,
     ArcRotateCamera,
+    Color3,
     DirectionalLight,
     MeshBuilder,
+    PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
@@ -57,8 +59,8 @@ export async function createRoverScene(
     const camera = new ArcRotateCamera("camera", Math.PI / 2, -Math.PI / 3, 50, Vector3.Zero(), scene);
     camera.attachControl();
 
-    const sun = new DirectionalLight("sun", new Vector3(0, -0.7, -1), scene);
-    sun.position = new Vector3(0, 50, 0);
+    const sun = new DirectionalLight("sun", new Vector3(0, -1, -1), scene);
+    sun.position = new Vector3(0, 50, 50);
     sun.autoUpdateExtends = true;
     scene.onAfterRenderObservable.addOnce(() => {
         sun.autoUpdateExtends = false;
@@ -73,6 +75,11 @@ export async function createRoverScene(
     const ground = MeshBuilder.CreateGround("ground", { width: 300, height: 300 }, scene);
     ground.receiveShadows = true;
     ground.position.y = -2;
+
+    const groundMaterial = new PBRMaterial("groundMaterial", scene);
+    groundMaterial.metallic = 0;
+    groundMaterial.roughness = 0.7;
+    ground.material = groundMaterial;
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0, friction: 2 }, scene);
 
@@ -146,10 +153,16 @@ export async function createRoverScene(
 
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
-        const box = MeshBuilder.CreateBox(`box${i}`, { size: Math.random() }, scene);
+        const box = MeshBuilder.CreateBox(`box${i}`, { size: 2 * Math.random() }, scene);
         box.position = new Vector3((Math.random() - 0.5) * 200, 20 + Math.random() * 50, (Math.random() - 0.5) * 200);
         box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
         shadowGenerator.addShadowCaster(box);
+
+        const boxMaterial = new PBRMaterial("boxMaterial", scene);
+        boxMaterial.albedoColor = Color3.Random();
+        boxMaterial.metallic = 0;
+        boxMaterial.roughness = 0.7;
+        box.material = boxMaterial;
 
         new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
     }
