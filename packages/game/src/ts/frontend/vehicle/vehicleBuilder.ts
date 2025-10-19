@@ -184,7 +184,7 @@ export function AddAxlePhysics(
 }
 
 export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.25 * 2, height: 1 }, scene);
+    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.1 * 2, height: radius }, scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
     axleMesh.bakeCurrentTransformIntoVertices();
     axleMesh.position.copyFrom(position);
@@ -197,7 +197,11 @@ export function CreateWheel(position: Vector3, radius: number, tireMaterial: Mat
     const tireThickness = radius - rimRadius;
 
     const wheelThickness = tireThickness * 2;
-    const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: wheelThickness, diameter: rimRadius * 2 }, scene);
+    const wheelMesh = MeshBuilder.CreateCylinder(
+        "Wheel",
+        { height: wheelThickness / 5, diameter: rimRadius * 2 },
+        scene,
+    );
     wheelMesh.rotation = new Vector3(0, 0, Math.PI / 2);
 
     const tireMesh = MeshBuilder.CreateTorus(

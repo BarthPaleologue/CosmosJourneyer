@@ -41,7 +41,7 @@ export class Vehicle implements Transformable {
 
     readonly maxForwardSpeed = 50;
     readonly maxReverseSpeed = 25;
-    readonly maxSteeringAngle = Math.PI / 6;
+    readonly maxSteeringAngle = Math.PI / 4;
 
     constructor(
         frame: { mesh: Mesh; physicsBody: PhysicsBody; physicsShape: PhysicsShape },

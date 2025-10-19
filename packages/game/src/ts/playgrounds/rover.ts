@@ -94,7 +94,7 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.5, width: 4, depth: 9 });
+    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: 4, depth: 9 });
     carFrame.position = new Vector3(0, 0.8, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
         mass: 2000,
