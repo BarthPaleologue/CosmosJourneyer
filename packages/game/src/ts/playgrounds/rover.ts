@@ -81,7 +81,7 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 1, width: 12, depth: 24 });
+    const carFrame = MeshBuilder.CreateBox("Frame", { height: 1, width: 6, depth: 12 });
     carFrame.position = new Vector3(0, 1, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
         mass: 2000,
@@ -91,14 +91,14 @@ export async function createRoverScene(
     });
     FilterMeshCollisions(carAggregate.shape);
 
-    const wheelDistanceFromCenter = 7;
+    const wheelDistanceFromCenter = 4;
 
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 8);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 8);
+    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 4);
+    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 4);
     const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
     const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -8);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -8);
+    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -4);
+    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -4);
 
     const vehicleBuilder = new VehicleBuilder({
         mesh: carFrame,
@@ -106,12 +106,14 @@ export async function createRoverScene(
         physicsShape: carAggregate.shape,
     });
 
-    vehicleBuilder.addWheel(forwardLeftWheelPosition, true, true);
-    vehicleBuilder.addWheel(forwardRightWheelPosition, true, true);
-    vehicleBuilder.addWheel(middleLeftWheelPosition, true, false);
-    vehicleBuilder.addWheel(middleRightWheelPosition, true, false);
-    vehicleBuilder.addWheel(rearLeftWheelPosition, true, true);
-    vehicleBuilder.addWheel(rearRightWheelPosition, true, true);
+    const wheelRadius = 0.7;
+
+    vehicleBuilder.addWheel(forwardLeftWheelPosition, wheelRadius, true, true);
+    vehicleBuilder.addWheel(forwardRightWheelPosition, wheelRadius, true, true);
+    vehicleBuilder.addWheel(middleLeftWheelPosition, wheelRadius, true, false);
+    vehicleBuilder.addWheel(middleRightWheelPosition, wheelRadius, true, false);
+    vehicleBuilder.addWheel(rearLeftWheelPosition, wheelRadius, true, true);
+    vehicleBuilder.addWheel(rearRightWheelPosition, wheelRadius, true, true);
 
     const tireMaterial = new TireMaterial(
         {
