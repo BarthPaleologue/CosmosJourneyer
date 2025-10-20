@@ -35,6 +35,7 @@ export const enum VoiceLine {
     ENGAGING_WARP_DRIVE,
     FUEL_SCOOPING,
     FUEL_SCOOPING_COMPLETE,
+    LOW_FUEL_WARNING,
 }
 
 export interface ITts {
@@ -77,6 +78,8 @@ export class Tts implements ITts {
                 return voiceLines.fuelScooping;
             case VoiceLine.FUEL_SCOOPING_COMPLETE:
                 return voiceLines.fuelScoopingComplete;
+            case VoiceLine.LOW_FUEL_WARNING:
+                return voiceLines.lowFuelWarning;
         }
     }
 

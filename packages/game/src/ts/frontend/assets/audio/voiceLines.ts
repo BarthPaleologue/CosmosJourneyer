@@ -30,6 +30,7 @@ import fuelScoopingCompleteVoicePath from "@assets/sound/voice/FuelScoopingCompl
 import initiatingPlanetaryLandingSoundPath from "@assets/sound/voice/InitiatingPlanetaryLandingCharlotte.mp3";
 import landingCompleteSoundPath from "@assets/sound/voice/LandingCompleteCharlotte.mp3";
 import landingRequestSoundPath from "@assets/sound/voice/LandingRequestGrantedCharlotte.mp3";
+import lowFuelWarningSoundPath from "@assets/sound/voice/LowFuelWarningCharlotte.mp3";
 import missionCompleteSoundPath from "@assets/sound/voice/MissionCompleteCharlotte.mp3";
 import newDiscoverySoundPath from "@assets/sound/voice/NewDiscoveryCharlotte.mp3";
 import warpDriveDisengagedSoundPath from "@assets/sound/voice/WarpDriveDisengagedCharlotte.mp3";
@@ -47,6 +48,7 @@ export type VoiceLines = {
     readonly engagingWarpDrive: Sound;
     readonly fuelScooping: Sound;
     readonly fuelScoopingComplete: Sound;
+    readonly lowFuelWarning: Sound;
 };
 
 export type SpeakerVoiceLines = {
@@ -95,6 +97,8 @@ export async function loadVoiceLines(progressMonitor: ILoadingProgressMonitor | 
     const fuelScoopingVoicePromise = loadSoundAsync("FuelScoopingVoice", fuelScoopingVoicePath);
     const fuelScoopingCompleteVoicePromise = loadSoundAsync("FuelScoopingCompleteVoice", fuelScoopingCompleteVoicePath);
 
+    const fuelWarningSoundPromise = loadSoundAsync("LowFuelWarning", lowFuelWarningSoundPath);
+
     return {
         charlotte: {
             initiatingPlanetaryLanding: await initiatingPlanetaryLandingSoundPromise,
@@ -108,6 +112,7 @@ export async function loadVoiceLines(progressMonitor: ILoadingProgressMonitor | 
             engagingWarpDrive: await engagingWarpDriveSoundPromise,
             fuelScooping: await fuelScoopingVoicePromise,
             fuelScoopingComplete: await fuelScoopingCompleteVoicePromise,
+            lowFuelWarning: await fuelWarningSoundPromise,
         },
     };
 }

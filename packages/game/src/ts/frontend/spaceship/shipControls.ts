@@ -432,6 +432,16 @@ export class ShipControls implements Controls {
             this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.FUEL_SCOOPING_COMPLETE);
         });
 
+        this.spaceship.onLowFuelWarning.add(() => {
+            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LOW_FUEL_WARNING);
+            this.notificationManager.create(
+                NotificationOrigin.SPACESHIP,
+                NotificationIntent.WARNING,
+                i18n.t("notifications:lowFuelWarning"),
+                5000,
+            );
+        });
+
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
             this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_COMPLETE);

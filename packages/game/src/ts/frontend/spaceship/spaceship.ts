@@ -110,6 +110,9 @@ export class Spaceship implements Transformable {
 
     private isFuelScooping = false;
 
+    private lowFuelWarningTriggered = false;
+    private readonly lowFuelWarningThreshold = 0.2;
+
     readonly enableWarpDriveSound: ISoundInstance;
     readonly disableWarpDriveSound: ISoundInstance;
     readonly acceleratingWarpDriveSound: ISoundInstance;
@@ -119,6 +122,8 @@ export class Spaceship implements Transformable {
 
     readonly onFuelScoopStart = new Observable<void>();
     readonly onFuelScoopEnd = new Observable<void>();
+
+    readonly onLowFuelWarning = new Observable<void>();
 
     readonly onWarpDriveEnabled = new Observable<void>();
     readonly onWarpDriveDisabled = new Observable<boolean>();
@@ -583,6 +588,17 @@ export class Spaceship implements Transformable {
         this.handleFuelScoop(deltaSeconds);
 
         const warpDrive = this.getInternals().getWarpDrive();
+
+        // Low fuel warning check
+        const fuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
+        if (fuelPercentage < this.lowFuelWarningThreshold && fuelPercentage > 0 && !this.lowFuelWarningTriggered) {
+            this.onLowFuelWarning.notifyObservers();
+            this.lowFuelWarningTriggered = true;
+        }
+        // Reset the warning if fuel is above the threshold
+        if (fuelPercentage >= this.lowFuelWarningThreshold) {
+            this.lowFuelWarningTriggered = false;
+        }
 
         if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
