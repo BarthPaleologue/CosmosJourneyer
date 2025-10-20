@@ -26,26 +26,19 @@ import {
     PhysicsShapeType,
     Scene,
     ShadowGenerator,
-    Texture,
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadTireTextures } from "@/frontend/assets/textures/materials/tire";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 import { FilterMeshCollisions, VehicleBuilder } from "@/frontend/vehicle/vehicleBuilder";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 
 import { createSky, enablePhysics } from "./utils";
-
-import tireAOPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_ao_2k.jpg";
-import tireAlbedoPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_color_2k.jpg";
-import tireMetallicPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_metallic_2k.jpg";
-import tireNormalPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_normal_direct_2k.png";
-import tireOpacityPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_opacity_2k.jpg";
-import tireRoughnessPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_roughness_2k.jpg";
 
 export async function createRoverScene(
     engine: AbstractEngine,
@@ -130,17 +123,9 @@ export async function createRoverScene(
     vehicleBuilder.addWheel(rearLeftWheelPosition, wheelRadius, true, true);
     vehicleBuilder.addWheel(rearRightWheelPosition, wheelRadius, true, true);
 
-    const tireMaterial = new TireMaterial(
-        {
-            albedo: new Texture(tireAlbedoPath, scene),
-            normal: new Texture(tireNormalPath, scene),
-            roughness: new Texture(tireRoughnessPath, scene),
-            metallic: new Texture(tireMetallicPath, scene),
-            ambientOcclusion: new Texture(tireAOPath, scene),
-            opacity: new Texture(tireOpacityPath, scene),
-        },
-        scene,
-    );
+    const tireTextures = await loadTireTextures(scene, progressMonitor);
+
+    const tireMaterial = new TireMaterial(tireTextures, scene);
 
     const rover = vehicleBuilder.build({ tireMaterial: tireMaterial.get() }, scene);
 
@@ -155,8 +140,8 @@ export async function createRoverScene(
 
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
-        const box = MeshBuilder.CreateBox(`box${i}`, { size: 2 * Math.random() }, scene);
-        box.position = new Vector3((Math.random() - 0.5) * 200, 20 + Math.random() * 50, (Math.random() - 0.5) * 200);
+        const box = MeshBuilder.CreateBox(`box${i}`, { size: 0.2 + Math.random() }, scene);
+        box.position = new Vector3((Math.random() - 0.5) * 200, 0, (Math.random() - 0.5) * 200);
         box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
         shadowGenerator.addShadowCaster(box);
 
