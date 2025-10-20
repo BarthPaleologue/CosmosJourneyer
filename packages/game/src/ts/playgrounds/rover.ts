@@ -69,6 +69,7 @@ export async function createRoverScene(
     ground.position.y = -2;
 
     const groundMaterial = new PBRMaterial("groundMaterial", scene);
+    groundMaterial.albedoColor.set(0.8, 0.4, 0.2);
     groundMaterial.metallic = 0;
     groundMaterial.roughness = 0.7;
     ground.material = groundMaterial;

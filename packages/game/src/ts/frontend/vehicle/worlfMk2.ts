@@ -15,19 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { TireTextures } from "../assets/textures/materials/tire";
+import { createMeshFrame } from "../helpers/meshFrame";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
 import { FilterMeshCollisions, VehicleBuilder } from "./vehicleBuilder";
 
 export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle {
+    const frameMat = new PBRMaterial("frame", scene);
+    frameMat.metallic = 0;
+    frameMat.roughness = 1.0;
+
     const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: 4, depth: 9 });
+    carFrame.material = frameMat;
     carFrame.position = new Vector3(0, 0.8, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
         mass: 2000,
@@ -36,6 +46,41 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
         center: new Vector3(0, -2.5, 0),
     });
     FilterMeshCollisions(carAggregate.shape);
+
+    // Faceted canopy vertices (Vector3[])
+    const positions = new Float32Array([
+        -0.9, 0.6, 0.2, 0.9, 0.6, 0.2, -1.1, 0.1, 0.0, 1.1, 0.1, 0.0, -0.8, -0.4, -0.2, 0.8, -0.4, -0.2, 0.0, 0.2, 0.6,
+    ]);
+
+    // Flatten to typed arrays
+    const indices = new Uint32Array([0, 2, 6, 2, 4, 6, 1, 6, 3, 3, 6, 5, 0, 6, 1, 4, 5, 6]);
+
+    const glass = new PBRMaterial("glass", scene);
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+    glass.metallic = 0;
+    glass.roughness = 0.05;
+    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    glass.alpha = 0.25;
+    glass.indexOfRefraction = 1.5;
+    glass.backFaceCulling = false;
+
+    const canopy = new Mesh("canopyGlass", scene);
+    const vd = new VertexData();
+    vd.positions = positions;
+    vd.indices = indices;
+    vd.normals = [];
+    VertexData.ComputeNormals(vd.positions, vd.indices, vd.normals);
+    vd.applyToMesh(canopy);
+    canopy.parent = carFrame;
+    canopy.position = new Vector3(0, 0.6, 4.5);
+    canopy.material = glass;
+
+    const canopyFrame = createMeshFrame("canopyFrame", positions, indices, 0.05, scene);
+    if (canopyFrame !== null) {
+        canopyFrame.parent = canopy;
+        canopyFrame.material = frameMat;
+    }
 
     const wheelDistanceFromCenter = 2.5;
 
