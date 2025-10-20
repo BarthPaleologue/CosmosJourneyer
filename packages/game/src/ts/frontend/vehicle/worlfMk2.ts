@@ -36,7 +36,9 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     frameMat.metallic = 0;
     frameMat.roughness = 1.0;
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: 4, depth: 9 });
+    const roverHalfWidth = 1.5;
+
+    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: roverHalfWidth * 2, depth: 9 });
     carFrame.material = frameMat;
     carFrame.position = new Vector3(0, 0.8, 0);
     const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
@@ -47,9 +49,38 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     });
     FilterMeshCollisions(carAggregate.shape);
 
+    const canopyHeight = 2.0;
+
     // Faceted canopy vertices (Vector3[])
     const positions = new Float32Array([
-        -0.9, 0.6, 0.2, 0.9, 0.6, 0.2, -1.1, 0.1, 0.0, 1.1, 0.1, 0.0, -0.8, -0.4, -0.2, 0.8, -0.4, -0.2, 0.0, 0.2, 0.6,
+        // top left
+        -roverHalfWidth,
+        canopyHeight,
+        0.2,
+        // top right
+        roverHalfWidth,
+        canopyHeight,
+        0.2,
+        // middle left
+        -roverHalfWidth - 0.3,
+        canopyHeight / 2,
+        0.0,
+        // middle right
+        roverHalfWidth + 0.3,
+        canopyHeight / 2,
+        0.0,
+        // bottom left
+        -roverHalfWidth,
+        0,
+        0,
+        // bottom right
+        roverHalfWidth,
+        0,
+        0,
+        // center
+        0.0,
+        canopyHeight * 0.5,
+        0.6,
     ]);
 
     // Flatten to typed arrays
@@ -73,7 +104,7 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     VertexData.ComputeNormals(vd.positions, vd.indices, vd.normals);
     vd.applyToMesh(canopy);
     canopy.parent = carFrame;
-    canopy.position = new Vector3(0, 0.6, 4.5);
+    canopy.position = new Vector3(0, 0, 4.5);
     canopy.material = glass;
 
     const canopyFrame = createMeshFrame("canopyFrame", positions, indices, 0.05, scene);
