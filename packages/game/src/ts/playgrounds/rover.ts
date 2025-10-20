@@ -34,9 +34,8 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { loadTireTextures } from "@/frontend/assets/textures/materials/tire";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
-import { FilterMeshCollisions, VehicleBuilder } from "@/frontend/vehicle/vehicleBuilder";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
+import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
 
 import { createSky, enablePhysics } from "./utils";
 
@@ -89,48 +88,12 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: 4, depth: 9 });
-    carFrame.position = new Vector3(0, 0.8, 0);
-    const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
-        mass: 2000,
-        restitution: 0,
-        friction: 0,
-        center: new Vector3(0, -2.5, 0),
-    });
-    FilterMeshCollisions(carAggregate.shape);
-
-    const wheelDistanceFromCenter = 2.5;
-
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 3);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 3);
-    const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
-    const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -3);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -3);
-
-    const vehicleBuilder = new VehicleBuilder({
-        mesh: carFrame,
-        physicsBody: carAggregate.body,
-        physicsShape: carAggregate.shape,
-    });
-
-    const wheelRadius = 0.7;
-
-    vehicleBuilder.addWheel(forwardLeftWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(forwardRightWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(middleLeftWheelPosition, wheelRadius, true, false);
-    vehicleBuilder.addWheel(middleRightWheelPosition, wheelRadius, true, false);
-    vehicleBuilder.addWheel(rearLeftWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(rearRightWheelPosition, wheelRadius, true, true);
-
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const tireMaterial = new TireMaterial(tireTextures, scene);
+    const rover = createWolfMk2(tireTextures, scene);
 
-    const rover = vehicleBuilder.build({ tireMaterial: tireMaterial.get() }, scene);
-
-    carAggregate.body.disablePreStep = false;
-    carFrame.position.y = 5;
+    rover.frame.physicsBody.disablePreStep = false;
+    rover.frame.mesh.position.y = 5;
 
     camera.setTarget(rover.getTransform());
     shadowGenerator.addShadowCaster(rover.frame.mesh);
