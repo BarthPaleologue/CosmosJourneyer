@@ -111,6 +111,7 @@ export class Spaceship implements Transformable {
     private isFuelScooping = false;
 
     private lowFuelWarningTriggered = false;
+    private readonly lowFuelWarningThreshold = 0.2;
 
     readonly enableWarpDriveSound: ISoundInstance;
     readonly disableWarpDriveSound: ISoundInstance;
@@ -504,10 +505,6 @@ export class Spaceship implements Transformable {
         this.refuel(fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
     }
 
-    private triggerLowFuelWarning() {
-        this.onLowFuelWarning.notifyObservers();
-    }
-
     private updateWarpDrive(deltaSeconds: number) {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
@@ -594,12 +591,12 @@ export class Spaceship implements Transformable {
 
         // Low fuel warning check
         const fuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
-        if (fuelPercentage < 0.2 && fuelPercentage > 0 && !this.lowFuelWarningTriggered) {
-            this.triggerLowFuelWarning();
+        if (fuelPercentage < this.lowFuelWarningThreshold && fuelPercentage > 0 && !this.lowFuelWarningTriggered) {
+            this.onLowFuelWarning.notifyObservers();
             this.lowFuelWarningTriggered = true;
         }
-        // Reset the warning if fuel is above 20%
-        if (fuelPercentage >= 0.2) {
+        // Reset the warning if fuel is above the threshold
+        if (fuelPercentage >= this.lowFuelWarningThreshold) {
             this.lowFuelWarningTriggered = false;
         }
 
