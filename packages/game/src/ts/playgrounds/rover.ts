@@ -49,6 +49,7 @@ export async function createRoverScene(
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
     const camera = new ArcRotateCamera("camera", Math.PI / 2, -Math.PI / 3, 50, Vector3.Zero(), scene);
+    camera.wheelPrecision *= 10;
     camera.attachControl();
 
     const sun = new DirectionalLight("sun", new Vector3(0, -1, -1), scene);
@@ -71,6 +72,7 @@ export async function createRoverScene(
     ground.position.y = -2;
 
     const groundMaterial = new PBRMaterial("groundMaterial", scene);
+    groundMaterial.albedoColor.set(0.8, 0.4, 0.2);
     groundMaterial.metallic = 0;
     groundMaterial.roughness = 0.7;
     ground.material = groundMaterial;
