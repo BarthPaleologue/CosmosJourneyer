@@ -92,7 +92,12 @@ export async function createRoverScene(
 
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const rover = createWolfMk2(tireTextures, scene);
+    const roverResult = createWolfMk2(tireTextures, scene);
+    if (!roverResult.success) {
+        throw new Error(roverResult.error);
+    }
+
+    const rover = roverResult.value;
 
     rover.frame.physicsBody.disablePreStep = false;
     rover.frame.mesh.position.y = 5;
