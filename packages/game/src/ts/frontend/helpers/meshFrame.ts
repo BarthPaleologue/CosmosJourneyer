@@ -20,79 +20,62 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 
-export function createMeshFrame(
+export function createEdgeTubeFrame(
     name: string,
     positions: Float32Array,
-    indices: Uint32Array,
+    edges: Uint32Array,
     radius: number,
-    excludedEdges: ReadonlyArray<[number, number]>,
     scene: Scene,
 ) {
     const edgeKey = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
     const seen = new Set<string>();
-    const tubes: Mesh[] = [];
-    const tessel = 12;
-    const overlap = radius * 0;
-
-    // normalize excluded list to a Set of keys
-    const excluded = new Set<string>(excludedEdges.map(([i, j]) => edgeKey(i, j)));
+    const tubes: Array<Mesh> = [];
+    const tessellation = 12;
+    const overlap = 0;
 
     const getVec = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
-    const usedVerts = new Set(indices);
+    const usedVerts = new Set<number>();
 
-    for (let i = 0; i < indices.length; i += 3) {
-        const a = indices[i],
-            b = indices[i + 1],
-            c = indices[i + 2];
-        if (a === undefined || b === undefined || c === undefined) continue;
+    for (let i = 0; i < edges.length; i += 2) {
+        const a = edges[i];
+        const b = edges[i + 1];
+        if (a === undefined || b === undefined) continue;
 
-        const edges: [[number, number], [number, number], [number, number]] = [
-            [a, b],
-            [b, c],
-            [c, a],
-        ];
+        const k = edgeKey(a, b);
+        if (seen.has(k)) continue;
+        seen.add(k);
 
-        for (const [i1, i2] of edges) {
-            const k = edgeKey(i1, i2);
-            if (seen.has(k)) {
-                continue;
-            }
-            seen.add(k);
+        usedVerts.add(a);
+        usedVerts.add(b);
 
-            if (excluded.has(k)) {
-                continue;
-            }
+        const p1 = getVec(a);
+        const p2 = getVec(b);
+        const dir = p2.subtract(p1).normalize();
 
-            const p1 = getVec(i1);
-            const p2 = getVec(i2);
-            const dir = p2.subtract(p1).normalize();
+        const q1 = p1.subtract(dir.scale(overlap));
+        const q2 = p2.add(dir.scale(overlap));
 
-            const q1 = p1.subtract(dir.scale(overlap));
-            const q2 = p2.add(dir.scale(overlap));
-
-            const tube = MeshBuilder.CreateTube(
-                `e_${k}`,
-                { path: [q1, q2], radius, tessellation: tessel, updatable: false },
-                scene,
-            );
-            tubes.push(tube);
-        }
+        const tube = MeshBuilder.CreateTube(
+            `e_${k}`,
+            { path: [q1, q2], radius, tessellation, updatable: false },
+            scene,
+        );
+        tubes.push(tube);
     }
 
     for (const vi of usedVerts) {
-        const joint = MeshBuilder.CreateSphere(`j_${vi}`, { diameter: radius * 2, segments: 12 }, scene);
         const x = positions[3 * vi];
         const y = positions[3 * vi + 1];
         const z = positions[3 * vi + 2];
         if (x === undefined || y === undefined || z === undefined) continue;
+        const joint = MeshBuilder.CreateSphere(`j_${vi}`, { diameter: radius * 2, segments: 12 }, scene);
         joint.position.set(x, y, z);
         tubes.push(joint);
     }
 
     const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
-    if (merged === null) return null;
-
+    if (!merged) return null;
     merged.name = name;
     return merged;
 }
