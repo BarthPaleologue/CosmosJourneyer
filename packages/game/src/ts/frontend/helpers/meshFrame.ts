@@ -25,13 +25,17 @@ export function createMeshFrame(
     positions: Float32Array,
     indices: Uint32Array,
     radius: number,
+    excludedEdges: ReadonlyArray<[number, number]>,
     scene: Scene,
 ) {
     const edgeKey = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
-    const seen = new Set();
-    const tubes = [];
+    const seen = new Set<string>();
+    const tubes: Mesh[] = [];
     const tessel = 12;
     const overlap = radius * 0;
+
+    // normalize excluded list to a Set of keys
+    const excluded = new Set<string>(excludedEdges.map(([i, j]) => edgeKey(i, j)));
 
     const getVec = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
@@ -41,9 +45,7 @@ export function createMeshFrame(
         const a = indices[i],
             b = indices[i + 1],
             c = indices[i + 2];
-        if (a === undefined || b === undefined || c === undefined) {
-            continue;
-        }
+        if (a === undefined || b === undefined || c === undefined) continue;
 
         const edges: [[number, number], [number, number], [number, number]] = [
             [a, b],
@@ -53,8 +55,14 @@ export function createMeshFrame(
 
         for (const [i1, i2] of edges) {
             const k = edgeKey(i1, i2);
-            if (seen.has(k)) continue;
+            if (seen.has(k)) {
+                continue;
+            }
             seen.add(k);
+
+            if (excluded.has(k)) {
+                continue;
+            }
 
             const p1 = getVec(i1);
             const p2 = getVec(i2);
@@ -77,18 +85,13 @@ export function createMeshFrame(
         const x = positions[3 * vi];
         const y = positions[3 * vi + 1];
         const z = positions[3 * vi + 2];
-        if (x === undefined || y === undefined || z === undefined) {
-            continue;
-        }
-
+        if (x === undefined || y === undefined || z === undefined) continue;
         joint.position.set(x, y, z);
         tubes.push(joint);
     }
 
     const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
-    if (merged === null) {
-        return null;
-    }
+    if (merged === null) return null;
 
     merged.name = name;
     return merged;

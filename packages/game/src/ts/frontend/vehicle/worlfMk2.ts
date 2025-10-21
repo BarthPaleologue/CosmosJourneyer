@@ -77,14 +77,18 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
         roverHalfWidth,
         0,
         0,
-        // center
-        0.0,
+        // center left
+        -roverHalfWidth * 0.5,
+        canopyHeight * 0.5,
+        0.6,
+        // center right
+        roverHalfWidth * 0.5,
         canopyHeight * 0.5,
         0.6,
     ]);
 
     // Flatten to typed arrays
-    const indices = new Uint32Array([0, 2, 6, 2, 4, 6, 1, 6, 3, 3, 6, 5, 0, 6, 1, 4, 5, 6]);
+    const indices = new Uint32Array([0, 2, 6, 2, 4, 6, 1, 7, 3, 3, 7, 5, 7, 6, 1, 6, 1, 0, 4, 5, 6, 5, 6, 7]);
 
     const glass = new PBRMaterial("glass", scene);
     glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
@@ -107,7 +111,17 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     canopy.position = new Vector3(0, 0, 4.5);
     canopy.material = glass;
 
-    const canopyFrame = createMeshFrame("canopyFrame", positions, indices, 0.05, scene);
+    const canopyFrame = createMeshFrame(
+        "canopyFrame",
+        positions,
+        indices,
+        0.05,
+        [
+            [6, 1],
+            [5, 6],
+        ],
+        scene,
+    );
     if (canopyFrame !== null) {
         canopyFrame.parent = canopy;
         canopyFrame.material = frameMat;
