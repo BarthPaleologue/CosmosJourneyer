@@ -19,14 +19,13 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { TireTextures } from "../assets/textures/materials/tire";
-import { createMeshFrame } from "../helpers/meshFrame";
+import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
 import { FilterMeshCollisions, VehicleBuilder } from "./vehicleBuilder";
@@ -88,7 +87,9 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     ]);
 
     // Flatten to typed arrays
-    const indices = new Uint32Array([0, 2, 6, 2, 4, 6, 1, 7, 3, 3, 7, 5, 7, 6, 1, 6, 1, 0, 4, 5, 6, 5, 6, 7]);
+    const edges = new Uint32Array([
+        5, 3, 3, 1, 3, 7, 0, 2, 2, 6, 6, 0, 2, 4, 4, 6, 6, 2, 1, 7, 3, 3, 7, 5, 7, 6, 1, 0, 4, 5, 6, 7,
+    ]);
 
     const glass = new PBRMaterial("glass", scene);
     glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
@@ -100,31 +101,17 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     glass.indexOfRefraction = 1.5;
     glass.backFaceCulling = false;
 
-    const canopy = new Mesh("canopyGlass", scene);
-    const vd = new VertexData();
-    vd.positions = positions;
-    vd.indices = indices;
-    vd.normals = [];
-    VertexData.ComputeNormals(vd.positions, vd.indices, vd.normals);
-    vd.applyToMesh(canopy);
-    canopy.parent = carFrame;
-    canopy.position = new Vector3(0, 0, 4.5);
-    canopy.material = glass;
-
-    const canopyFrame = createMeshFrame(
-        "canopyFrame",
-        positions,
-        indices,
-        0.05,
-        [
-            [6, 1],
-            [5, 6],
-        ],
-        scene,
-    );
+    const canopyFrame = createEdgeTubeFrame("canopyFrame", positions, edges, 0.05, scene);
     if (canopyFrame !== null) {
-        canopyFrame.parent = canopy;
+        canopyFrame.position = new Vector3(0, 0, 4.5);
+        canopyFrame.parent = carFrame;
         canopyFrame.material = frameMat;
+
+        const glassPanels = createPanelsFromFrame("canopyPanels", positions, edges, 0.02, scene);
+        if (glassPanels !== null) {
+            glassPanels.parent = canopyFrame;
+            glassPanels.material = glass;
+        }
     }
 
     const wheelDistanceFromCenter = 2.5;
@@ -154,4 +141,58 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Vehicle
     const tireMaterial = new TireMaterial(tireTextures, scene);
 
     return vehicleBuilder.build({ tireMaterial: tireMaterial.get() }, scene);
+}
+
+function createEdgeTubeFrame(name: string, positions: Float32Array, edges: Uint32Array, radius: number, scene: Scene) {
+    const edgeKey = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
+    const seen = new Set<string>();
+    const tubes: Array<Mesh> = [];
+    const tessellation = 12;
+    const overlap = 0;
+
+    const getVec = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
+
+    const usedVerts = new Set<number>();
+
+    for (let i = 0; i < edges.length; i += 2) {
+        const a = edges[i];
+        const b = edges[i + 1];
+        if (a === undefined || b === undefined) continue;
+
+        const k = edgeKey(a, b);
+        if (seen.has(k)) continue;
+        seen.add(k);
+
+        usedVerts.add(a);
+        usedVerts.add(b);
+
+        const p1 = getVec(a);
+        const p2 = getVec(b);
+        const dir = p2.subtract(p1).normalize();
+
+        const q1 = p1.subtract(dir.scale(overlap));
+        const q2 = p2.add(dir.scale(overlap));
+
+        const tube = MeshBuilder.CreateTube(
+            `e_${k}`,
+            { path: [q1, q2], radius, tessellation, updatable: false },
+            scene,
+        );
+        tubes.push(tube);
+    }
+
+    for (const vi of usedVerts) {
+        const x = positions[3 * vi];
+        const y = positions[3 * vi + 1];
+        const z = positions[3 * vi + 2];
+        if (x === undefined || y === undefined || z === undefined) continue;
+        const joint = MeshBuilder.CreateSphere(`j_${vi}`, { diameter: radius * 2, segments: 12 }, scene);
+        joint.position.set(x, y, z);
+        tubes.push(joint);
+    }
+
+    const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
+    if (!merged) return null;
+    merged.name = name;
+    return merged;
 }
