@@ -38,12 +38,14 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<
     frameMat.metallic = 0;
     frameMat.roughness = 1.0;
 
-    const roverHalfWidth = 1.5;
+    const roverHalfWidth = 1.2;
 
-    const carFrame = MeshBuilder.CreateBox("Frame", { height: 0.2, width: roverHalfWidth * 2, depth: 9 });
-    carFrame.material = frameMat;
-    carFrame.position = new Vector3(0, 0.8, 0);
-    const carAggregate = new PhysicsAggregate(carFrame, PhysicsShapeType.MESH, {
+    const roverLength = 6.0;
+
+    const frameFloor = MeshBuilder.CreateBox("Frame", { height: 0.2, width: roverHalfWidth * 2, depth: roverLength });
+    frameFloor.material = frameMat;
+    frameFloor.position = new Vector3(0, 0.5, 0);
+    const carAggregate = new PhysicsAggregate(frameFloor, PhysicsShapeType.MESH, {
         mass: 2000,
         restitution: 0,
         friction: 0,
@@ -51,29 +53,100 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<
     });
     FilterMeshCollisions(carAggregate.shape);
 
-    const canopyHeight = 2.0;
+    const roverHeight = 2.0;
+
+    const frameRoof = MeshBuilder.CreateBox("FrameRoof", {
+        height: 0.2,
+        width: roverHalfWidth * 2,
+        depth: roverLength,
+    });
+    frameRoof.material = frameMat;
+    frameRoof.position = new Vector3(0, roverHeight, 0);
+    frameRoof.parent = frameFloor;
+
+    const frameBackDoor = MeshBuilder.CreateBox("FrameBackDoor", {
+        height: roverHeight,
+        width: roverHalfWidth * 2,
+        depth: 0.2,
+    });
+    frameBackDoor.material = frameMat;
+    frameBackDoor.position = new Vector3(0, roverHeight / 2, -roverLength / 2);
+    frameBackDoor.parent = frameFloor;
+
+    const doorWidth = 1.0;
+
+    const frameLeftWall = MeshBuilder.CreateBox("FrameLeftWall", {
+        height: roverHeight,
+        width: 0.2,
+        depth: roverLength - doorWidth,
+    });
+    frameLeftWall.material = frameMat;
+    frameLeftWall.position = new Vector3(roverHalfWidth, roverHeight / 2, -doorWidth / 2);
+    frameLeftWall.parent = frameFloor;
+
+    const frameRightWall = MeshBuilder.CreateBox("FrameRightWall", {
+        height: roverHeight,
+        width: 0.2,
+        depth: roverLength,
+    });
+    frameRightWall.material = frameMat;
+    frameRightWall.position = new Vector3(-roverHalfWidth, roverHeight / 2, 0);
+    frameRightWall.parent = frameFloor;
+
+    const canopyHeight = roverHeight;
 
     const canopyTopology = new WireframeTopology();
-    const topLeft = canopyTopology.addVertex(-roverHalfWidth, canopyHeight, 0.2);
-    const topRight = canopyTopology.addVertex(roverHalfWidth, canopyHeight, 0.2);
-    const middleLeft = canopyTopology.addVertex(-roverHalfWidth - 0.3, canopyHeight / 2, 0.0);
-    const middleRight = canopyTopology.addVertex(roverHalfWidth + 0.3, canopyHeight / 2, 0.0);
     const bottomLeft = canopyTopology.addVertex(-roverHalfWidth, 0, 0);
     const bottomRight = canopyTopology.addVertex(roverHalfWidth, 0, 0);
-    const centerLeft = canopyTopology.addVertex(-roverHalfWidth * 0.5, canopyHeight * 0.5, 0.6);
-    const centerRight = canopyTopology.addVertex(roverHalfWidth * 0.5, canopyHeight * 0.5, 0.6);
 
-    canopyTopology.connect(bottomRight, middleRight);
-    canopyTopology.connect(middleRight, topRight);
-    canopyTopology.connect(topRight, centerRight);
-    canopyTopology.connect(centerRight, bottomRight);
+    const middleOverhang = 0.7;
+    const middleHeight = canopyHeight * 0.2;
+    const middleHalfWidth = roverHalfWidth + 0.4;
+
+    const middleLeft = canopyTopology.addVertex(-middleHalfWidth, middleHeight, middleOverhang);
+    const middleRight = canopyTopology.addVertex(middleHalfWidth, middleHeight, middleOverhang);
+    const centerLeft = canopyTopology.addVertex(-middleHalfWidth * 0.4, middleHeight, middleOverhang);
+    const centerRight = canopyTopology.addVertex(middleHalfWidth * 0.4, middleHeight, middleOverhang);
+
+    const frontOverhang = middleOverhang + 0.3;
+    const frontHalfWidth = roverHalfWidth * 0.9;
+    const frontHeight = middleHeight + 1.0;
+
+    const frontLeft = canopyTopology.addVertex(-frontHalfWidth, frontHeight, frontOverhang);
+    const frontRight = canopyTopology.addVertex(frontHalfWidth, frontHeight, frontOverhang);
+
+    const topOverhang = 0.0;
+    const topHeight = canopyHeight;
+
+    const topLeft = canopyTopology.addVertex(-frontHalfWidth - 0.3, topHeight, topOverhang);
+    const topMidLeft = canopyTopology.addVertex(-frontHalfWidth * 0.5, topHeight, topOverhang);
+    const topMidRight = canopyTopology.addVertex(frontHalfWidth * 0.5, topHeight, topOverhang);
+    const topRight = canopyTopology.addVertex(frontHalfWidth + 0.3, topHeight, topOverhang);
+
+    canopyTopology.connect(frontLeft, topLeft);
+    canopyTopology.connect(frontLeft, topMidLeft);
+    canopyTopology.connect(frontRight, topMidRight);
+    canopyTopology.connect(frontRight, topRight);
+    canopyTopology.connect(topLeft, topMidLeft);
+    canopyTopology.connect(topMidLeft, topMidRight);
+    canopyTopology.connect(topMidRight, topRight);
+
+    canopyTopology.connect(topLeft, middleLeft);
+    canopyTopology.connect(topRight, middleRight);
 
     canopyTopology.connect(bottomLeft, middleLeft);
-    canopyTopology.connect(middleLeft, topLeft);
-    canopyTopology.connect(topLeft, centerLeft);
-    canopyTopology.connect(centerLeft, bottomLeft);
+    canopyTopology.connect(bottomRight, middleRight);
 
-    canopyTopology.connect(topLeft, topRight);
+    canopyTopology.connect(middleLeft, frontLeft);
+    canopyTopology.connect(middleRight, frontRight);
+
+    canopyTopology.connect(centerLeft, bottomLeft);
+    canopyTopology.connect(centerRight, bottomRight);
+
+    canopyTopology.connect(frontRight, centerRight);
+    canopyTopology.connect(frontLeft, centerLeft);
+
+    canopyTopology.connect(frontLeft, frontRight);
     canopyTopology.connect(bottomLeft, bottomRight);
     canopyTopology.connect(centerLeft, centerRight);
 
@@ -101,8 +174,8 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<
 
     const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.05, scene);
     if (canopyFrame !== null) {
-        canopyFrame.position = new Vector3(0, 0, 4.5);
-        canopyFrame.parent = carFrame;
+        canopyFrame.position = new Vector3(0, 0, roverLength / 2);
+        canopyFrame.parent = frameFloor;
         canopyFrame.material = frameMat;
 
         const glassPanels = createPanelsFromFrame(
@@ -118,17 +191,19 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<
         }
     }
 
-    const wheelDistanceFromCenter = 2.5;
+    const wheelDistanceFromCenter = roverHalfWidth + 1.0;
 
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 3);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 3);
+    const wheelSpread = 0.4;
+
+    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, roverLength * wheelSpread);
+    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, roverLength * wheelSpread);
     const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
     const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -3);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -3);
+    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
+    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
 
     const vehicleBuilder = new VehicleBuilder({
-        mesh: carFrame,
+        mesh: frameFloor,
         physicsBody: carAggregate.body,
         physicsShape: carAggregate.shape,
     });
