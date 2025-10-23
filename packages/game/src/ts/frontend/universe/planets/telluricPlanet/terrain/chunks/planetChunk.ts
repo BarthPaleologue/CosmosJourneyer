@@ -156,7 +156,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
             this.aggregate.body.disablePreStep = false;
             this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+            this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
         }
 
         this.mesh.setEnabled(true);
