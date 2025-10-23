@@ -19,8 +19,6 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { ok, type Result } from "@/utils/types";
@@ -30,13 +28,17 @@ import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
-import { FilterMeshCollisions, VehicleBuilder } from "./vehicleBuilder";
+import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
 
 export function createWolfMk2(
     tireTextures: TireTextures,
     scene: Scene,
-    spawnPosition = Vector3.Zero(),
+    spawnPosition: Vector3,
+    spawnRotation: {
+        axis: Vector3;
+        angle: number;
+    },
 ): Result<Vehicle, string> {
     const frameMat = new PBRMaterial("frame", scene);
     frameMat.metallic = 0;
@@ -46,53 +48,66 @@ export function createWolfMk2(
 
     const roverLength = 6.0;
 
-    const frameFloor = MeshBuilder.CreateBox("Frame", { height: 0.2, width: roverHalfWidth * 2, depth: roverLength });
+    const frameFloor = MeshBuilder.CreateBox(
+        "Frame",
+        { height: 0.2, width: roverHalfWidth * 2, depth: roverLength },
+        scene,
+    );
+    frameFloor.position.y = 0.5;
     frameFloor.material = frameMat;
-    frameFloor.position.copyFrom(spawnPosition);
-    const carAggregate = new PhysicsAggregate(frameFloor, PhysicsShapeType.MESH, {
-        mass: 2000,
-        restitution: 0,
-        friction: 0,
-        center: new Vector3(0, -2.5, 0),
-    });
-    FilterMeshCollisions(carAggregate.shape);
 
     const roverHeight = 2.0;
 
-    const frameRoof = MeshBuilder.CreateBox("FrameRoof", {
-        height: 0.2,
-        width: roverHalfWidth * 2,
-        depth: roverLength,
-    });
+    const frameRoof = MeshBuilder.CreateBox(
+        "FrameRoof",
+        {
+            height: 0.2,
+            width: roverHalfWidth * 2,
+            depth: roverLength,
+        },
+        scene,
+    );
     frameRoof.material = frameMat;
     frameRoof.position = new Vector3(0, roverHeight, 0);
     frameRoof.parent = frameFloor;
 
-    const frameBackDoor = MeshBuilder.CreateBox("FrameBackDoor", {
-        height: roverHeight,
-        width: roverHalfWidth * 2,
-        depth: 0.2,
-    });
+    const frameBackDoor = MeshBuilder.CreateBox(
+        "FrameBackDoor",
+        {
+            height: roverHeight,
+            width: roverHalfWidth * 2,
+            depth: 0.2,
+        },
+        scene,
+    );
     frameBackDoor.material = frameMat;
     frameBackDoor.position = new Vector3(0, roverHeight / 2, -roverLength / 2);
     frameBackDoor.parent = frameFloor;
 
     const doorWidth = 1.0;
 
-    const frameLeftWall = MeshBuilder.CreateBox("FrameLeftWall", {
-        height: roverHeight,
-        width: 0.2,
-        depth: roverLength - doorWidth,
-    });
+    const frameLeftWall = MeshBuilder.CreateBox(
+        "FrameLeftWall",
+        {
+            height: roverHeight,
+            width: 0.2,
+            depth: roverLength - doorWidth,
+        },
+        scene,
+    );
     frameLeftWall.material = frameMat;
     frameLeftWall.position = new Vector3(roverHalfWidth, roverHeight / 2, -doorWidth / 2);
     frameLeftWall.parent = frameFloor;
 
-    const frameRightWall = MeshBuilder.CreateBox("FrameRightWall", {
-        height: roverHeight,
-        width: 0.2,
-        depth: roverLength,
-    });
+    const frameRightWall = MeshBuilder.CreateBox(
+        "FrameRightWall",
+        {
+            height: roverHeight,
+            width: 0.2,
+            depth: roverLength,
+        },
+        scene,
+    );
     frameRightWall.material = frameMat;
     frameRightWall.position = new Vector3(-roverHalfWidth, roverHeight / 2, 0);
     frameRightWall.parent = frameFloor;
@@ -172,7 +187,7 @@ export function createWolfMk2(
     glass.metallic = 0;
     glass.roughness = 0.05;
     glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
-    glass.alpha = 0.25;
+    glass.alpha = 0.1;
     glass.indexOfRefraction = 1.5;
     glass.backFaceCulling = false;
 
@@ -206,22 +221,22 @@ export function createWolfMk2(
     const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
     const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
 
-    const vehicleBuilder = new VehicleBuilder({
-        mesh: frameFloor,
-        physicsBody: carAggregate.body,
-        physicsShape: carAggregate.shape,
-    });
+    const vehicleBuilder = new VehicleBuilder(frameFloor);
 
     const wheelRadius = 0.7;
-
-    vehicleBuilder.addWheel(forwardLeftWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(forwardRightWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(middleLeftWheelPosition, wheelRadius, true, false);
-    vehicleBuilder.addWheel(middleRightWheelPosition, wheelRadius, true, false);
-    vehicleBuilder.addWheel(rearLeftWheelPosition, wheelRadius, true, true);
-    vehicleBuilder.addWheel(rearRightWheelPosition, wheelRadius, true, true);
-
+    const wheelThickness = 0.8;
     const tireMaterial = new TireMaterial(tireTextures, scene);
 
-    return ok(vehicleBuilder.build({ tireMaterial: tireMaterial.get() }, scene));
+    vehicleBuilder
+        .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
+        .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
+        .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .build({ tireMaterial: tireMaterial.get() }, scene)
+        .translateSpawn(spawnPosition)
+        .rotateSpawn(spawnRotation.axis, spawnRotation.angle);
+
+    return ok(vehicleBuilder.assemble(scene));
 }

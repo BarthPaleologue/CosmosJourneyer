@@ -15,77 +15,106 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { Vehicle } from "./vehicle";
+import type { Controls } from "../controls";
+import { type Vehicle } from "./vehicle";
+import { VehicleInputs } from "./vehicleControlsInputs";
 
-export class VehicleControls {
+export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
 
+    private readonly thirdPersonCamera: ArcRotateCamera;
+
+    private readonly firstPersonCamera: FreeCamera;
+
+    private activeCamera: Camera;
+
     constructor(scene: Scene) {
-        let forwardPressed = false;
-        let backPressed = false;
-        let leftPressed = false;
-        let rightPressed = false;
-        let brakePressed = false;
+        this.thirdPersonCamera = new ArcRotateCamera(
+            "thirdPersonCamera",
+            -Math.PI / 3,
+            Math.PI / 3,
+            20,
+            Vector3.Zero(),
+            scene,
+        );
 
-        scene.onKeyboardObservable.add((e) => {
-            switch (e.event.key) {
-                case "z":
-                    forwardPressed = e.type === KeyboardEventTypes.KEYDOWN ? true : false;
-                    break;
-                case "s":
-                    backPressed = e.type === KeyboardEventTypes.KEYDOWN ? true : false;
-                    break;
-                case "q":
-                    leftPressed = e.type === KeyboardEventTypes.KEYDOWN ? true : false;
-                    break;
-                case "d":
-                    rightPressed = e.type === KeyboardEventTypes.KEYDOWN ? true : false;
-                    break;
-                case " ":
-                    brakePressed = e.type === KeyboardEventTypes.KEYDOWN ? true : false;
-                    break;
-            }
-        });
+        this.firstPersonCamera = new FreeCamera("firstPersonCamera", new Vector3(0.5, 1, 2), scene);
+        this.firstPersonCamera.speed = 0;
 
-        scene.onBeforeRenderObservable.add(() => {
-            const vehicle = this.getVehicle();
-            if (vehicle === null) {
-                return;
-            }
+        this.activeCamera = this.firstPersonCamera;
 
-            let turnAngle = 0;
-            if (rightPressed) {
-                turnAngle = 0.03;
-            } else if (leftPressed) {
-                turnAngle = -0.03;
-            }
-
-            vehicle.turn(turnAngle);
-
-            if (brakePressed) {
-                vehicle.brake();
+        VehicleInputs.map.toggleCamera.on("complete", () => {
+            if (this.activeCamera === this.firstPersonCamera) {
+                this.switchToThirdPersonCamera();
             } else {
-                const vehicleMaxAcceleration = 8;
-                let vehicleAcceleration = 0;
-                if (forwardPressed) {
-                    vehicleAcceleration = vehicleMaxAcceleration;
-                } else if (backPressed) {
-                    vehicleAcceleration = -vehicleMaxAcceleration;
-                }
-
-                vehicle.accelerate(vehicleAcceleration);
+                this.switchToFirstPersonCamera();
             }
         });
+    }
+
+    shouldLockPointer(): boolean {
+        return true;
+    }
+
+    getCameras(): Array<Camera> {
+        return [this.thirdPersonCamera, this.firstPersonCamera];
+    }
+
+    getActiveCamera(): Camera {
+        return this.activeCamera;
+    }
+
+    switchToFirstPersonCamera() {
+        this.activeCamera = this.firstPersonCamera;
+    }
+
+    switchToThirdPersonCamera() {
+        this.activeCamera = this.thirdPersonCamera;
     }
 
     setVehicle(vehicle: Vehicle) {
         this.vehicle = vehicle;
+        this.thirdPersonCamera.parent = vehicle.getTransform();
+        this.firstPersonCamera.parent = vehicle.getTransform();
     }
 
     getVehicle() {
         return this.vehicle;
+    }
+
+    getTransform(): TransformNode {
+        const vehicle = this.getVehicle();
+        if (vehicle === null) {
+            throw new Error("No vehicle assigned to controls");
+        }
+
+        return vehicle.getTransform();
+    }
+
+    update(): void {
+        const vehicle = this.getVehicle();
+        if (vehicle === null) {
+            return;
+        }
+
+        const steeringAngle = VehicleInputs.map.steer.value * 0.03;
+        vehicle.turn(steeringAngle);
+
+        if (VehicleInputs.map.brake.value > 0) {
+            vehicle.brake();
+        } else {
+            const vehicleMaxAcceleration = 8;
+            const vehicleAcceleration = VehicleInputs.map.accelerate.value * vehicleMaxAcceleration;
+            vehicle.accelerate(vehicleAcceleration);
+        }
+
+        return;
     }
 }

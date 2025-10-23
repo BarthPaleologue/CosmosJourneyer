@@ -17,7 +17,6 @@
 
 import {
     AbstractMesh,
-    ArcRotateCamera,
     Color3,
     DirectionalLight,
     MeshBuilder,
@@ -35,6 +34,7 @@ import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { loadTireTextures } from "@/frontend/assets/textures/materials/tire";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
+import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
 
 import { createSky, enablePhysics } from "./utils";
@@ -48,11 +48,7 @@ export async function createRoverScene(
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
-    const camera = new ArcRotateCamera("camera", Math.PI / 2, -Math.PI / 3, 50, Vector3.Zero(), scene);
-    camera.wheelPrecision *= 10;
-    camera.attachControl();
-
-    const sun = new DirectionalLight("sun", new Vector3(0, -1, -1), scene);
+    const sun = new DirectionalLight("sun", new Vector3(0.5, -1, -0.5), scene);
     sun.position = new Vector3(0, 50, 50);
     sun.autoUpdateExtends = true;
     scene.onAfterRenderObservable.addOnce(() => {
@@ -86,27 +82,30 @@ export async function createRoverScene(
     }
 
     const character = new CharacterControls(characterObject, scene);
-    character.setThirdPersonCameraActive();
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const roverResult = createWolfMk2(tireTextures, scene);
+    const roverResult = createWolfMk2(tireTextures, scene, new Vector3(0, 10, 0), {
+        axis: new Vector3(0, 1, 0),
+        angle: Math.PI / 4,
+    });
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }
 
     const rover = roverResult.value;
 
-    rover.frame.physicsBody.disablePreStep = false;
-    rover.frame.mesh.position.y = 5;
-
-    camera.setTarget(rover.getTransform());
     shadowGenerator.addShadowCaster(rover.frame.mesh);
 
     const roverControls = new VehicleControls(scene);
     roverControls.setVehicle(rover);
+    roverControls.switchToThirdPersonCamera();
+
+    const camera = roverControls.getActiveCamera();
+    scene.activeCamera = camera;
+    camera.attachControl();
 
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
@@ -124,9 +123,20 @@ export async function createRoverScene(
         new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
     }
 
+    VehicleInputs.setEnabled(true);
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
+        roverControls.update();
+
+        if (scene.activeCamera !== roverControls.getActiveCamera()) {
+            if (scene.activeCamera !== null) {
+                scene.activeCamera.detachControl();
+            }
+            scene.activeCamera = roverControls.getActiveCamera();
+            scene.activeCamera.attachControl();
+        }
     });
 
     return scene;
