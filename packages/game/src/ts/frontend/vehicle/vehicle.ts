@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { TransformNode } from "@babylonjs/core";
+import type { TransformNode, Vector3 } from "@babylonjs/core";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
