@@ -4,6 +4,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
+import { VehicleInputs } from "../vehicle/vehicleControlsInputs";
 import { GeneralInputs } from "./generalInputs";
 import { StarSystemInputs } from "./starSystemInputs";
 
@@ -15,4 +16,5 @@ export const InputMaps = [
     CharacterInputs,
     DefaultControlsInputs,
     TutorialControlsInputs,
+    VehicleInputs,
 ] as const;
