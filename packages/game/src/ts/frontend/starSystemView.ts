@@ -74,6 +74,7 @@ import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { clamp } from "@/utils/math";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -90,6 +91,9 @@ import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
+import { VehicleControls } from "./vehicle/vehicleControls";
+import { VehicleInputs } from "./vehicle/vehicleControlsInputs";
+import { createWolfMk2 } from "./vehicle/worlfMk2";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -151,6 +155,8 @@ export class StarSystemView implements View {
      * @private
      */
     private characterControls: CharacterControls | null = null;
+
+    private vehicleControls: VehicleControls;
 
     /**
      * A debug helper to display the orbits of the orbital objects
@@ -292,6 +298,8 @@ export class StarSystemView implements View {
 
         this.interactionLayer = new InteractionLayer(this.interactionSystem, this.keyboardLayoutMap);
         document.body.appendChild(this.interactionLayer.root);
+
+        this.vehicleControls = new VehicleControls(scene);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap ?? new Map<string, string>();
@@ -478,6 +486,22 @@ export class StarSystemView implements View {
 
                 spaceship.soundInstances.acceleratingWarpDrive.setVolume(0);
                 spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
+
+                const spawnPosition = shipPosition.add(up.scale(10).add(left.scale(20)));
+
+                const spawnRotationAxis = Vector3.Cross(Vector3.Up(), up).normalize();
+                const spawnRotationAngle = Math.acos(clamp(Vector3.Dot(Vector3.Up(), up), -1, 1));
+
+                const roverResult = createWolfMk2(this.assets.textures.materials.tire, this.scene, spawnPosition, {
+                    axis: spawnRotationAxis,
+                    angle: spawnRotationAngle,
+                });
+                if (!roverResult.success) {
+                    throw new Error("The rover had a stroke");
+                }
+
+                const rover = roverResult.value;
+                this.vehicleControls.setVehicle(rover);
             }
         });
 
@@ -673,6 +697,8 @@ export class StarSystemView implements View {
             this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         }
 
+        this.vehicleControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
 
@@ -734,6 +760,13 @@ export class StarSystemView implements View {
                 this.notificationManager,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+
+            document.addEventListener("keydown", async (e) => {
+                if (e.key !== "r") {
+                    return;
+                }
+                await this.switchToVehicleControls();
+            });
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
             this.spaceshipControls.reset();
@@ -979,6 +1012,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
+        VehicleInputs.setEnabled(false);
 
         const previousControls = this.scene.getActiveControls();
         await this.scene.setActiveControls(shipControls);
@@ -1021,6 +1055,7 @@ export class StarSystemView implements View {
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
+        VehicleInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
 
@@ -1042,6 +1077,8 @@ export class StarSystemView implements View {
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
+
+        VehicleInputs.setEnabled(false);
 
         this.stopBackgroundSounds();
 
@@ -1077,6 +1114,16 @@ export class StarSystemView implements View {
                 20_000,
             );
         }
+    }
+
+    async switchToVehicleControls() {
+        this.spaceShipLayer.setVisibility(false);
+
+        SpaceShipControlsInputs.setEnabled(false);
+        CharacterInputs.setEnabled(false);
+        VehicleInputs.setEnabled(true);
+
+        await this.scene.setActiveControls(this.vehicleControls);
     }
 
     /**
