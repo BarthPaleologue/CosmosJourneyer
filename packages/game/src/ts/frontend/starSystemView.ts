@@ -21,8 +21,9 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsAggregate, PhysicsShapeType, type PhysicsBody, type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
@@ -88,6 +89,7 @@ import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
+import { createWolfMk2 } from "./vehicle/worlfMk2";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -693,6 +695,51 @@ export class StarSystemView implements View {
                 this.notificationManager,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key !== "r") {
+                    return;
+                }
+
+                const shipPosition = this.spaceshipControls?.getTransform().getAbsolutePosition() ?? Vector3.Zero();
+                const nearestPlanet = this.getStarSystem().getNearestCelestialBody(shipPosition);
+
+                const up = shipPosition.subtract(nearestPlanet.getTransform().getAbsolutePosition()).normalize();
+
+                const spawnPosition = shipPosition.add(
+                    up.scale(20).add(new Vector3(Math.random(), Math.random(), Math.random()).scale(10)),
+                );
+
+                const roverResult = createWolfMk2(this.assets.textures.materials.tire, this.scene, spawnPosition);
+                if (!roverResult.success) {
+                    throw new Error("The rover had a stroke");
+                }
+
+                const rover = roverResult.value;
+                rover.frame.physicsBody.disablePreStep = false;
+                for (const child of rover.frame.mesh.getChildMeshes()) {
+                    if (child.physicsBody !== null && child.physicsBody !== undefined) {
+                        child.physicsBody.disablePreStep = false;
+                    }
+                }
+
+                const handleBody = (body: PhysicsBody) => {
+                    const mass = body.getMassProperties().mass ?? 1;
+                    this.scene.onBeforePhysicsObservable.add(() => {
+                        body.applyForce(up.scale(-9.81 * mass), Vector3.Zero());
+                    });
+                };
+
+                handleBody(rover.frame.physicsBody);
+
+                const cube = MeshBuilder.CreateBox("box", { size: 5 }, this.scene);
+                cube.position.copyFrom(spawnPosition.scale(2));
+
+                const cubeAggregate = new PhysicsAggregate(cube, PhysicsShapeType.BOX, { mass: 200 }, this.scene);
+                cubeAggregate.body.disablePreStep = false;
+
+                handleBody(cubeAggregate.body);
+            });
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
             this.spaceshipControls.reset();
