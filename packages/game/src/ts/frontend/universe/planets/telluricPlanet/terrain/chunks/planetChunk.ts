@@ -152,7 +152,12 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.mesh.freezeNormals();
 
         if (this.depth > 3) {
-            this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.MESH, { mass: 0 }, this.mesh.getScene());
+            this.aggregate = new PhysicsAggregate(
+                this.mesh,
+                PhysicsShapeType.MESH,
+                { mass: 0, restitution: 0, friction: 2 },
+                this.mesh.getScene(),
+            );
             this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
             this.aggregate.body.disablePreStep = false;
             this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
