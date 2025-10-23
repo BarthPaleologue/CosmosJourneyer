@@ -33,7 +33,11 @@ import type { Vehicle } from "./vehicle";
 import { FilterMeshCollisions, VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
 
-export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<Vehicle, string> {
+export function createWolfMk2(
+    tireTextures: TireTextures,
+    scene: Scene,
+    spawnPosition = Vector3.Zero(),
+): Result<Vehicle, string> {
     const frameMat = new PBRMaterial("frame", scene);
     frameMat.metallic = 0;
     frameMat.roughness = 1.0;
@@ -44,7 +48,7 @@ export function createWolfMk2(tireTextures: TireTextures, scene: Scene): Result<
 
     const frameFloor = MeshBuilder.CreateBox("Frame", { height: 0.2, width: roverHalfWidth * 2, depth: roverLength });
     frameFloor.material = frameMat;
-    frameFloor.position = new Vector3(0, 0.5, 0);
+    frameFloor.position.copyFrom(spawnPosition);
     const carAggregate = new PhysicsAggregate(frameFloor, PhysicsShapeType.MESH, {
         mass: 2000,
         restitution: 0,
