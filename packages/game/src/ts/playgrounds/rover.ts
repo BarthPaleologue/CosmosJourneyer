@@ -91,7 +91,7 @@ export async function createRoverScene(
 
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const roverResult = createWolfMk2(tireTextures, scene, new Vector3(0, 5, 0));
+    const roverResult = createWolfMk2(tireTextures, scene);
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }
@@ -140,9 +140,13 @@ export async function createRoverScene(
 
 class GravityManager {
     update(physicsBodies: ReadonlyArray<PhysicsBody>) {
-        physicsBodies.forEach((body) => {
-            const mass = body.getMassProperties().mass ?? 1;
+        for (const body of physicsBodies) {
+            const mass = body.getMassProperties().mass;
+            if (mass === undefined) {
+                console.warn("Physics body has undefined mass", body);
+                continue;
+            }
             body.applyForce(new Vector3(0, -9.81 * mass, 0), body.getObjectCenterWorld());
-        });
+        }
     }
 }

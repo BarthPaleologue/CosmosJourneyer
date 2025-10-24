@@ -710,12 +710,13 @@ export class StarSystemView implements View {
                     up.scale(20).add(new Vector3(Math.random(), Math.random(), Math.random()).scale(10)),
                 );
 
-                const roverResult = createWolfMk2(this.assets.textures.materials.tire, this.scene, spawnPosition);
+                const roverResult = createWolfMk2(this.assets.textures.materials.tire, this.scene);
                 if (!roverResult.success) {
                     throw new Error("The rover had a stroke");
                 }
 
                 const rover = roverResult.value;
+                rover.setPosition(spawnPosition);
                 rover.frame.physicsBody.disablePreStep = false;
                 for (const child of rover.frame.mesh.getChildMeshes()) {
                     if (child.physicsBody !== null && child.physicsBody !== undefined) {
