@@ -726,7 +726,7 @@ export class StarSystemView implements View {
                 const handleBody = (body: PhysicsBody) => {
                     const mass = body.getMassProperties().mass ?? 1;
                     this.scene.onBeforePhysicsObservable.add(() => {
-                        body.applyForce(up.scale(-9.81 * mass), Vector3.Zero());
+                        body.applyForce(up.scale(-9.81 * mass), body.getObjectCenterWorld());
                     });
                 };
 
