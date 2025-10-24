@@ -28,6 +28,7 @@ import {
     ShadowGenerator,
     Vector3,
     type AbstractEngine,
+    type PhysicsBody,
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -46,7 +47,7 @@ export async function createRoverScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    await enablePhysics(scene);
 
     const camera = new ArcRotateCamera("camera", Math.PI / 2, -Math.PI / 3, 50, Vector3.Zero(), scene);
     camera.wheelPrecision *= 10;
@@ -90,21 +91,20 @@ export async function createRoverScene(
 
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const roverResult = createWolfMk2(tireTextures, scene);
+    const roverResult = createWolfMk2(tireTextures, scene, new Vector3(0, 5, 0));
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }
 
     const rover = roverResult.value;
 
-    rover.frame.physicsBody.disablePreStep = false;
-    rover.frame.mesh.position.y = 5;
-
     camera.setTarget(rover.getTransform());
     shadowGenerator.addShadowCaster(rover.frame.mesh);
 
     const roverControls = new VehicleControls(scene);
     roverControls.setVehicle(rover);
+
+    const physicsManager = new GravityManager();
 
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
@@ -122,10 +122,27 @@ export async function createRoverScene(
         new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
     }
 
-    scene.onBeforeRenderObservable.add(() => {
+    const physicsBodies: PhysicsBody[] = [];
+    for (const mesh of scene.meshes) {
+        if (mesh.physicsBody) {
+            physicsBodies.push(mesh.physicsBody);
+        }
+    }
+
+    scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
+        physicsManager.update(physicsBodies);
     });
 
     return scene;
+}
+
+class GravityManager {
+    update(physicsBodies: ReadonlyArray<PhysicsBody>) {
+        physicsBodies.forEach((body) => {
+            const mass = body.getMassProperties().mass ?? 1;
+            body.applyForce(new Vector3(0, -9.81 * mass, 0), body.getObjectCenterWorld());
+        });
+    }
 }
