@@ -316,7 +316,10 @@ export class ShipControls implements Controls {
         const spaceship = this.getSpaceship();
         spaceship.update(deltaSeconds);
 
-        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
+        const warpDrive = this.spaceship.getInternals().getWarpDrive();
+        if (warpDrive !== null && warpDrive.isEnabled()) {
+            if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
+        }
 
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
         if (SpaceShipControlsInputs.map.ignorePointer.value > 0 || spaceship.isAutoPiloted()) {
@@ -324,7 +327,6 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        const warpDrive = spaceship.getInternals().getWarpDrive();
         if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
