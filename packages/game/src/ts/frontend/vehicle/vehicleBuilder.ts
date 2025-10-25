@@ -68,8 +68,6 @@ export class VehicleBuilder {
                 motorConstraints.push(wheelAxle.wheelAxleConstraint);
             }
 
-            this.frame.mesh.addChild(wheelAxle.axle.mesh);
-
             const frameAxleConstraint = AttachAxleToFrame(
                 wheelAxle.axle.physicsBody,
                 this.frame.physicsBody,
@@ -302,7 +300,6 @@ function AttachWheelToAxle(
         scene,
     );
 
-    axle.mesh.addChild(wheel.mesh);
     axle.physicsBody.addConstraint(wheel.physicsBody, motorJoint);
 
     return motorJoint;
