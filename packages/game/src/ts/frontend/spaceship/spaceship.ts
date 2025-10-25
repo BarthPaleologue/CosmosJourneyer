@@ -176,14 +176,14 @@ export class Spaceship implements Transformable {
             }
             const childShape = new PhysicsShapeMesh(child as Mesh, scene);
             childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-            childShape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS;
+            childShape.filterCollideMask = CollisionMask.EVERYTHING;
             this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
         }
         this.aggregate.body.disablePreStep = false;
         this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-        this.aggregate.shape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS;
+        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
 
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
@@ -394,7 +394,7 @@ export class Spaceship implements Transformable {
         this.state = ShipState.LANDED;
 
         this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
         this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
 
         if (this.targetLandingPad !== null) {
@@ -412,7 +412,7 @@ export class Spaceship implements Transformable {
         this.getTransform().setParent(null);
 
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.landingComputer?.setTarget(null);
@@ -453,7 +453,7 @@ export class Spaceship implements Transformable {
         this.state = ShipState.FLYING;
         this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
+        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
