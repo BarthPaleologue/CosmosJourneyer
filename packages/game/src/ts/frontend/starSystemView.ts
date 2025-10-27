@@ -984,7 +984,14 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
+
+        const previousControls = this.scene.getActiveControls();
         await this.scene.setActiveControls(shipControls);
+
+        this.scene
+            .getActiveControls()
+            .getTransform()
+            .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
         setRotationQuaternion(
             shipControls.getTransform(),
             getRotationQuaternion(defaultControls.getTransform()).clone(),
@@ -1002,18 +1009,20 @@ export class StarSystemView implements View {
     public async switchToCharacterControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
-        const defaultControls = this.getDefaultControls();
 
         this.spaceShipLayer.setVisibility(false);
 
         characterControls.getTransform().setEnabled(true);
         CharacterInputs.setEnabled(true);
-        characterControls.getTransform().setAbsolutePosition(defaultControls.getTransform().absolutePosition);
+        DefaultControlsInputs.setEnabled(false);
+
+        const previousControls = this.scene.getActiveControls();
         await this.scene.setActiveControls(characterControls);
-        setRotationQuaternion(
-            characterControls.getTransform(),
-            getRotationQuaternion(defaultControls.getTransform()).clone(),
-        );
+
+        this.scene
+            .getActiveControls()
+            .getTransform()
+            .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
@@ -1044,9 +1053,18 @@ export class StarSystemView implements View {
 
         this.stopBackgroundSounds();
 
+        const previousControls = this.scene.getActiveControls();
         await this.scene.setActiveControls(defaultControls);
+
+        DefaultControlsInputs.setEnabled(true);
+
+        this.scene
+            .getActiveControls()
+            .getTransform()
+            .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
+
         setRotationQuaternion(
-            defaultControls.getTransform(),
+            previousControls.getTransform(),
             getRotationQuaternion(shipControls.getTransform()).clone(),
         );
 
