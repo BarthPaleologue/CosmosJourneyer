@@ -326,6 +326,20 @@ export class Spaceship implements Transformable {
     }
 
     /**
+     * Sets both main engine and warp drive throttles to idle (0%)
+     */
+    public idleThrottle(): void {
+        this.mainEngineThrottle = 0;
+
+        const warpDrive = this.getInternals().getWarpDrive();
+        if (warpDrive !== null) {
+            warpDrive.idleThrottle();
+        }
+        // Stop thruster sounds as well
+        this.thrusterSound.setVolume(0);
+    }
+
+    /**
      * Returns the speed of the ship in m/s
      * If warp drive is enabled, returns the warp speed
      * If warp drive is disabled, returns the linear velocity of the ship

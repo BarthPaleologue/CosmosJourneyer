@@ -386,6 +386,8 @@ export class StarSystemView implements View {
             spaceship.warpTunnel.getTransform().setEnabled(true);
             spaceship.hyperSpaceSound.setVolume(0);
 
+            spaceship.idleThrottle();
+
             soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
             this.jumpLock = false;
@@ -733,7 +735,8 @@ export class StarSystemView implements View {
 
         this.chunkForge.update(this.assets);
 
-        starSystem.update(deltaSeconds, this.chunkForge);
+        // Update the entire system (both orbital simulation and controls)
+        starSystem.update(deltaSeconds * Settings.TIME_MULTIPLIER, this.chunkForge);
 
         const nearestCelestialBody = starSystem.getNearestCelestialBody(
             this.scene.getActiveControls().getActiveCamera().globalPosition,
