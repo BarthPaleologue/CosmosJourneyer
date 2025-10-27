@@ -32,7 +32,7 @@ export class CameraShakeAnimation implements CustomAnimation {
         this.camera = camera;
         this.intensity = intensity;
         this.duration = duration;
-        this.elapsedSeconds = duration; // TODO: Temporary fix for startup shake until proper logic.
+        this.elapsedSeconds = duration; // TODO: Temporary fix for startup shake until proper logic (see issue #559).
     }
 
     private sumOfSines(t: number, frequency: number, phase: number): number {
