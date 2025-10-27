@@ -264,23 +264,31 @@ export class StarSystemController {
 
     /**
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
+     * Uses updateOrbitalSimulation to avoid feeding large deltaSeconds to ship systems.
+     * @param nbWarmUpUpdates Number of additional small updates to stabilize the simulation
+     * @param chunkForge The chunk forge used for terrain generation
      */
     public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
-        this.update(Date.now() / 1000, chunkForge);
+        // Use updateOrbitalSimulation
+        this.updateOrbitalSimulation(Date.now() / 1000);
+
+        // Perform warm-up updates with small time steps
         for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge);
     }
 
     /**
-     * Updates the system and all its orbital objects forward in time by the given delta time.
-     * The nearest object is kept in place and the other objects are updated accordingly.
+     * Updates only the orbital simulation (planets, stars, asteroids) forward in time.
+     * Does not update ship systems or controls.
      * @param deltaSeconds The time elapsed since the last update
-     * @param chunkForge The chunk forge used to update the LOD of the telluric planets
+     * @param cachedControlsPosition Optional pre-cached controls position to prevent reading
+     *        from a moving transform during initialization warm-up
      */
-    public update(deltaSeconds: number, chunkForge: ChunkForge): void {
+    private updateOrbitalSimulation(deltaSeconds: number, cachedControlsPosition?: Vector3): void {
         this.elapsedSeconds += deltaSeconds;
 
         const controls = this.scene.getActiveControls();
-        const controlsPosition = controls.getTransform().getAbsolutePosition();
+        // Use cached position if provided (during initialization), otherwise read current position
+        const controlsPosition = cachedControlsPosition ?? controls.getTransform().getAbsolutePosition();
 
         const celestialBodies = this.getCelestialBodies();
         const orbitalFacilities = this.getOrbitalFacilities();
@@ -300,7 +308,7 @@ export class StarSystemController {
             controlsPosition,
         );
 
-        // compensate rotation when close to the body
+        // Compensate rotation when close to the body
         let shouldCompensateRotation = distanceOfNearestToControls < nearestOrbitalObject.getBoundingRadius() * 3;
         if (nearestOrbitalObject === nearestCelestialBody && ringUniforms !== null) {
             // or in the vicinity of the rings
@@ -354,7 +362,6 @@ export class StarSystemController {
         const negatedDisplacement = nearestBodyDisplacement.negate();
         for (const object of orbitalObjects) {
             if (object === nearestOrbitalObject) continue;
-
             // the body is translated so that the nearest body can stay in place
             translate(object.getTransform(), negatedDisplacement);
         }
@@ -374,12 +381,12 @@ export class StarSystemController {
             setRotation(object, this.referencePlaneRotation, this.elapsedSeconds);
         }
 
+        // Update system targets
         for (const systemTarget of this.systemTargets) {
             systemTarget.updatePosition(this.referencePlaneRotation, this.referencePosition);
         }
 
-        controls.update(deltaSeconds);
-
+        // Update asteroid fields (no deltaSeconds needed for position updates)
         for (const object of celestialBodies) {
             object.asteroidField?.update(
                 controls.getActiveCamera().globalPosition,
@@ -388,6 +395,30 @@ export class StarSystemController {
             );
         }
 
+        // Update orbital facilities positions
+        const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
+        for (const orbitalFacility of orbitalFacilities) {
+            const parents = this.objectToParents.get(orbitalFacility) ?? [];
+            orbitalFacility.update(parents, cameraWorldPosition, deltaSeconds);
+            orbitalFacility.computeCulling(controls.getActiveCamera());
+        }
+    }
+
+    /**
+     * Updates the system and all its orbital objects forward in time by the given delta time.
+     * The nearest object is kept in place and the other objects are updated accordingly.
+     * @param deltaSeconds The time elapsed since the last update
+     * @param chunkForge The chunk forge used to update the LOD of the telluric planets
+     */
+    public update(deltaSeconds: number, chunkForge: ChunkForge): void {
+        // Update orbital simulation first
+        this.updateOrbitalSimulation(deltaSeconds);
+
+        // Now update ship controls and other time-sensitive systems
+        const controls = this.scene.getActiveControls();
+        controls.update(deltaSeconds);
+
+        // Update planet LOD and culling
         for (const object of this.getPlanetaryMassObjects()) {
             object.computeCulling(controls.getActiveCamera());
             if (object.type === "telluricPlanet" || object.type === "telluricSatellite") {
@@ -395,16 +426,10 @@ export class StarSystemController {
             }
         }
 
-        const cameraWorldPosition = controls.getTransform().getAbsolutePosition();
-        for (const orbitalFacility of orbitalFacilities) {
-            const parents = this.objectToParents.get(orbitalFacility) ?? [];
-            orbitalFacility.update(parents, cameraWorldPosition, deltaSeconds);
-            orbitalFacility.computeCulling(controls.getActiveCamera());
-        }
-
-        // floating origin
+        // Apply floating origin
         this.applyFloatingOrigin();
 
+        // Update shaders
         this.updateShaders(deltaSeconds);
     }
 
