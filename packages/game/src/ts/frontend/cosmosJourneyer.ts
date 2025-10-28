@@ -906,12 +906,6 @@ export class CosmosJourneyer {
 
         await this.loadLocation(locationToUse);
 
-        // updates camera position
-        this.starSystemView.getSpaceshipControls().getActiveCamera().getViewMatrix(true);
-
-        // re-centers the star system
-        this.starSystemView.getStarSystem().applyFloatingOrigin();
-
         this.engine.loadingScreen.hideLoadingUI();
 
         if (this.player.currentItinerary !== null) {

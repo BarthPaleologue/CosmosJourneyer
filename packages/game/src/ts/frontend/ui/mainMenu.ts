@@ -361,15 +361,9 @@ export class MainMenu {
 
                 return;
             }
-
-            this.controls.getActiveCamera().getViewMatrix();
-
-            starSystemController.applyFloatingOrigin();
-            this.starSystemView.postProcessManager.update(0.0);
-            starSystemController.updateShaders(0.0);
         };
 
-        this.scene.onBeforePhysicsObservable.add(animationCallback);
+        this.scene.onBeforePhysicsObservable.add(animationCallback, undefined, true);
 
         this.hideMenu();
         this.hideVersion();

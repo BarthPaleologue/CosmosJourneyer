@@ -42,6 +42,7 @@ import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import {
     type Anomaly,
     type CelestialBody,
@@ -96,6 +97,7 @@ export class StarSystemController {
     private readonly assets: RenderingAssets;
 
     private readonly gravitySystem: GravitySystem;
+    private readonly floatingOriginSystem: FloatingOriginSystem;
 
     /**
      * Creates a new star system controller from a given model and scene
@@ -128,6 +130,7 @@ export class StarSystemController {
         this.orbitalFacilities = orbitalObjects.orbitalFacilities;
 
         this.gravitySystem = new GravitySystem(this.scene);
+        this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
 
         this.getOrbitalObjects().forEach((object) => {
             this.objectToParents.set(
@@ -440,32 +443,11 @@ export class StarSystemController {
             })),
         );
 
-        // Apply floating origin
-        this.applyFloatingOrigin();
+        this.floatingOriginSystem.update(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        this.floatingOriginSystem.getOffsetToRef(this.referencePosition);
 
         // Update shaders
         this.updateShaders(deltaSeconds);
-    }
-
-    /**
-     * Translates all celestial bodies and spacestations in the system by the given displacement
-     * @param displacement The displacement applied to all bodies
-     */
-    public translateEverythingNow(displacement: Vector3): void {
-        const orbitalObjects = this.getOrbitalObjects();
-        for (const object of orbitalObjects) translate(object.getTransform(), displacement);
-        this.referencePosition.addInPlace(displacement);
-    }
-
-    public applyFloatingOrigin() {
-        const controls = this.scene.getActiveControls();
-        if (controls.getTransform().getAbsolutePosition().length() > Settings.FLOATING_ORIGIN_THRESHOLD) {
-            const displacementTranslation = controls.getTransform().getAbsolutePosition().negate();
-            this.translateEverythingNow(displacementTranslation);
-            if (controls.getTransform().parent === null) {
-                translate(controls.getTransform(), displacementTranslation);
-            }
-        }
     }
 
     /**

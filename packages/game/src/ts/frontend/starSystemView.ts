@@ -608,10 +608,6 @@ export class StarSystemView implements View {
                 .getTransform()
                 .setAbsolutePosition(firstBody.getTransform().getAbsolutePosition().add(positionOffset));
 
-            // put the player back to the origin of the star system
-            starSystem.translateEverythingNow(activeControls.getTransform().getAbsolutePosition().negate());
-            activeControls.getTransform().setAbsolutePosition(Vector3.Zero());
-
             // look at the first body
             lookAt(
                 activeControls.getTransform(),
@@ -738,7 +734,7 @@ export class StarSystemView implements View {
         starSystem.update(deltaSeconds, this.chunkForge);
 
         const nearestCelestialBody = starSystem.getNearestCelestialBody(
-            this.scene.getActiveControls().getActiveCamera().globalPosition,
+            this.scene.getActiveControls().getActiveCamera().getWorldMatrix().getTranslation(),
         );
 
         this.postProcessManager.setCelestialBody(nearestCelestialBody);
