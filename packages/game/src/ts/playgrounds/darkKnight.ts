@@ -30,7 +30,7 @@ export async function createDarkKnightScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine, { floatingOriginMode: true });
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
     const textures = await loadEnvironmentTextures(scene, progressMonitor);
