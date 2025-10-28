@@ -335,8 +335,6 @@ export class Spaceship implements Transformable {
         if (warpDrive !== null) {
             warpDrive.idleThrottle();
         }
-        // Stop thruster sounds as well
-        this.thrusterSound.setVolume(0);
     }
 
     /**

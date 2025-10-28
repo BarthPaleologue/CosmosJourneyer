@@ -735,8 +735,7 @@ export class StarSystemView implements View {
 
         this.chunkForge.update(this.assets);
 
-        // Update the entire system (both orbital simulation and controls)
-        starSystem.update(deltaSeconds * Settings.TIME_MULTIPLIER, this.chunkForge);
+        starSystem.update(deltaSeconds, this.chunkForge);
 
         const nearestCelestialBody = starSystem.getNearestCelestialBody(
             this.scene.getActiveControls().getActiveCamera().globalPosition,
