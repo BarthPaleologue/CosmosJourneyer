@@ -203,6 +203,13 @@ export class WarpDrive implements ReadonlyWarpDrive {
         this.throttle = clamp(this.throttle + deltaThrottle, 0, 1);
     }
 
+    /**
+     * Safely sets the warp drive throttle to idle (0%)
+     */
+    public idleThrottle(): void {
+        this.throttle = 0;
+    }
+
     public getWarpSpeed(): number {
         return this.currentSpeed;
     }

@@ -386,6 +386,8 @@ export class StarSystemView implements View {
             spaceship.warpTunnel.getTransform().setEnabled(true);
             spaceship.hyperSpaceSound.setVolume(0);
 
+            spaceship.idleThrottle();
+
             soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
             observer.remove();
             this.jumpLock = false;
