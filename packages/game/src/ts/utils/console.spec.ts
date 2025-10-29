@@ -32,31 +32,26 @@ describe("Console Dumper", () => {
 
     // Mock date implementation
     const mockDate = new Date("2023-01-01T12:00:00.000Z");
-    // Using a more specific type that works with Vitest's spy implementation
-    let dateNowSpy: { mockRestore: () => void };
 
     beforeEach(() => {
-        // Store original console methods before each test
         originalLog = console.log;
         originalInfo = console.info;
         originalWarn = console.warn;
         originalError = console.error;
         originalDebug = console.debug;
 
-        // Mock Date.now() and new Date() to return consistent timestamps
-        dateNowSpy = vi.spyOn(global, "Date").mockImplementation(() => mockDate);
+        vi.useFakeTimers();
+        vi.setSystemTime(mockDate);
     });
 
     afterEach(() => {
-        // Restore original console methods after each test
         console.log = originalLog;
         console.info = originalInfo;
         console.warn = originalWarn;
         console.error = originalError;
         console.debug = originalDebug;
 
-        // Restore date implementation
-        dateNowSpy.mockRestore();
+        vi.useRealTimers();
     });
 
     test("should create a dumper function", () => {

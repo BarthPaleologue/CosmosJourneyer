@@ -30,7 +30,7 @@ export function createAtmosphericScatteringScene(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine, { floatingOriginMode: true });
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
     const scalingFactor = 6_000e3;
