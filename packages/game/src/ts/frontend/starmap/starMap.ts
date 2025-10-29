@@ -21,7 +21,6 @@ import "@babylonjs/core/Culling/ray";
 import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
-import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -87,11 +86,6 @@ export class StarMap implements View {
 
     private readonly universeBackend: UniverseBackend;
 
-    /**
-     * The position of the center of the starmap in world space.
-     */
-    private readonly starMapCenterPosition: Vector3;
-
     private readonly allowedStarSectorRelativeCoordinates: Vector3[] = [];
 
     private readonly starTemplate: Mesh;
@@ -125,10 +119,6 @@ export class StarMap implements View {
      * The position of the star sector the player is currently in (relative to the global node).
      */
     private currentStarSectorCoordinates = Vector3.Zero();
-
-    private cameraPositionToCenter = Vector3.Zero();
-
-    private static readonly FLOATING_ORIGIN_DISTANCE = 1000;
 
     private static readonly FADE_OUT_ANIMATION = new Animation(
         "fadeIn",
@@ -168,7 +158,7 @@ export class StarMap implements View {
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
-        this.scene = new Scene(engine);
+        this.scene = new Scene(engine, { useFloatingOrigin: true });
         this.scene.clearColor = new Color4(0, 0, 0, 1);
         this.scene.useRightHandedSystem = true;
         this.scene.onDisposeObservable.addOnce(() => {
@@ -240,8 +230,6 @@ export class StarMap implements View {
         pipeline.bloomKernel = 128;
         pipeline.imageProcessing.exposure = 1.0;
         pipeline.imageProcessing.contrast = 1.0;
-
-        this.starMapCenterPosition = Vector3.Zero();
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.6 }, this.scene);
         this.starTemplate.isPickable = true;
@@ -410,7 +398,7 @@ export class StarMap implements View {
         this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
             if (activeCamera === null) throw new Error("No active camera!");
-            this.starMapUI.update(activeCamera.globalPosition, this.starMapCenterPosition);
+            this.starMapUI.update(activeCamera.globalPosition);
         });
 
         window.StarMap = this;
@@ -424,27 +412,18 @@ export class StarMap implements View {
     }
 
     private acknowledgeCameraMovement() {
-        const activeCamera = this.scene.activeCamera;
-        if (activeCamera === null) throw new Error("No active camera!");
-        // floating origin
-        if (activeCamera.globalPosition.length() > StarMap.FLOATING_ORIGIN_DISTANCE) {
-            this.translateCameraBackToOrigin(activeCamera);
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            console.warn("No active camera to acknowledge movement.");
+            return;
         }
 
-        this.cameraPositionToCenter = activeCamera.globalPosition.subtract(this.starMapCenterPosition);
+        const cameraPosition = camera.getWorldMatrix().getTranslation();
         this.currentStarSectorCoordinates = new Vector3(
-            Math.round(this.cameraPositionToCenter.x / Settings.STAR_SECTOR_SIZE),
-            Math.round(this.cameraPositionToCenter.y / Settings.STAR_SECTOR_SIZE),
-            Math.round(this.cameraPositionToCenter.z / Settings.STAR_SECTOR_SIZE),
+            Math.round(cameraPosition.x / Settings.STAR_SECTOR_SIZE),
+            Math.round(cameraPosition.y / Settings.STAR_SECTOR_SIZE),
+            Math.round(cameraPosition.z / Settings.STAR_SECTOR_SIZE),
         );
-    }
-
-    private translateCameraBackToOrigin(camera: Camera) {
-        const translationToOrigin = camera.globalPosition.negate();
-        this.controls.getTransform().position.addInPlace(translationToOrigin);
-        this.controls.getActiveCamera().getViewMatrix(true);
-        this.starMapCenterPosition.addInPlace(translationToOrigin);
-        for (const mesh of this.scene.meshes) mesh.position.addInPlace(translationToOrigin);
     }
 
     /**
@@ -497,7 +476,7 @@ export class StarMap implements View {
     private updateStarSectors() {
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) throw new Error("No active camera!");
-        const activeCameraPosition = activeCamera.globalPosition;
+        const activeCameraPosition = activeCamera.getWorldMatrix().getTranslation();
 
         // first remove all star sectors that are too far
         const currentSystemInstance =
@@ -535,7 +514,7 @@ export class StarMap implements View {
 
             const position = starSector.position;
             if (
-                position.subtract(this.cameraPositionToCenter).length() / Settings.STAR_SECTOR_SIZE >
+                position.subtract(activeCameraPosition).length() / Settings.STAR_SECTOR_SIZE >
                 StarMap.RENDER_RADIUS + 1
             ) {
                 for (const starInstance of starSector.starInstances)
@@ -555,10 +534,7 @@ export class StarMap implements View {
             if (this.loadedStarSectors.has(sectorKey)) continue; // already generated
 
             // don't generate star sectors that are not in the frustum
-            const bb = StarSectorView.GetBoundingBox(
-                coordinates.scale(Settings.STAR_SECTOR_SIZE),
-                this.starMapCenterPosition,
-            );
+            const bb = StarSectorView.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE));
             if (!activeCamera.isInFrustum(bb)) continue;
 
             this.registerStarSector(coordinates);
@@ -621,7 +597,7 @@ export class StarMap implements View {
         this.coordinatesToInstanceMap.set(JSON.stringify(starSystemCoordinates), initializedInstance);
         this.instanceToCoordinatesMap.set(initializedInstance, JSON.stringify(starSystemCoordinates));
 
-        initializedInstance.position = data.position.add(this.starMapCenterPosition);
+        initializedInstance.position.copyFrom(data.position);
 
         const objectColor = getRgbFromTemperature(stellarObjectModel.blackBodyTemperature);
         initializedInstance.instancedBuffers["color"] = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
@@ -675,9 +651,7 @@ export class StarMap implements View {
     }
 
     public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
-        const starSystemPosition = wrapVector3(
-            this.universeBackend.getSystemGalacticPosition(starSystemCoordinates),
-        ).add(this.starMapCenterPosition);
+        const starSystemPosition = wrapVector3(this.universeBackend.getSystemGalacticPosition(starSystemCoordinates));
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
             Vector3.Forward(this.scene.useRightHandedSystem),

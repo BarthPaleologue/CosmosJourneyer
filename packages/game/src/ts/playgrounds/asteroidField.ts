@@ -39,7 +39,7 @@ export async function createAsteroidFieldScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);

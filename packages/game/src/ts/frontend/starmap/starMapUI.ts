@@ -222,7 +222,7 @@ export class StarMapUI {
         });
     }
 
-    update(playerPosition: Vector3, centerOfUniversePosition: Vector3) {
+    update(playerPosition: Vector3) {
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -238,9 +238,8 @@ export class StarMapUI {
                 this.universeBackend.getSystemGalacticPosition(systemIcons.getSystemCoordinates()),
             );
 
-            const systemUniversePosition = systemPosition.add(centerOfUniversePosition);
             const screenCoordinates = Vector3.Project(
-                systemUniversePosition,
+                systemPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
@@ -249,7 +248,7 @@ export class StarMapUI {
             systemIcons.htmlRoot.style.left = `${screenCoordinates.x * 100}vw`;
             systemIcons.htmlRoot.style.top = `${screenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(systemUniversePosition, playerPosition);
+            const distance = Vector3.Distance(systemPosition, playerPosition);
             const offsetX = Math.max(40.0 / distance, 3);
             systemIcons.htmlRoot.style.transform = `translate(calc(-50% - ${offsetX}vw), -50%)`;
         });
@@ -263,11 +262,11 @@ export class StarMapUI {
         const scalingBase = 100;
         const minScale = 5.0;
         if (this.selectedSystem !== null) {
-            const selectedSystemWorldPosition = wrapVector3(
+            const selectedSystemPosition = wrapVector3(
                 this.universeBackend.getSystemGalacticPosition(this.selectedSystem),
-            ).addInPlace(centerOfUniversePosition);
+            );
             const selectedMeshScreenCoordinates = Vector3.Project(
-                selectedSystemWorldPosition,
+                selectedSystemPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
@@ -281,7 +280,7 @@ export class StarMapUI {
             this.selectedSystemCursorContainer.style.left = `${selectedMeshScreenCoordinates.x * 100}vw`;
             this.selectedSystemCursorContainer.style.top = `${selectedMeshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(selectedSystemWorldPosition, playerPosition);
+            const distance = Vector3.Distance(selectedSystemPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.selectedSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
 
@@ -300,11 +299,11 @@ export class StarMapUI {
             this.currentSystem !== null &&
             !starSystemCoordinatesEquals(this.hoveredSystem, this.currentSystem)
         ) {
-            const hoveredSystemWorldPosition = wrapVector3(
+            const hoveredSystemPosition = wrapVector3(
                 this.universeBackend.getSystemGalacticPosition(this.hoveredSystem),
-            ).addInPlace(centerOfUniversePosition);
+            );
             const meshScreenCoordinates = Vector3.Project(
-                hoveredSystemWorldPosition,
+                hoveredSystemPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
@@ -313,7 +312,7 @@ export class StarMapUI {
             this.hoveredSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.hoveredSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(hoveredSystemWorldPosition, playerPosition);
+            const distance = Vector3.Distance(hoveredSystemPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.hoveredSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
@@ -321,11 +320,11 @@ export class StarMapUI {
         }
 
         if (this.currentSystem !== null) {
-            const currentSystemWorldPosition = wrapVector3(
+            const currentSystemPosition = wrapVector3(
                 this.universeBackend.getSystemGalacticPosition(this.currentSystem),
-            ).addInPlace(centerOfUniversePosition);
+            );
             const meshScreenCoordinates = Vector3.Project(
-                currentSystemWorldPosition,
+                currentSystemPosition,
                 Matrix.IdentityReadOnly,
                 camera.getTransformationMatrix(),
                 camera.viewport,
@@ -334,7 +333,7 @@ export class StarMapUI {
             this.currentSystemCursorContainer.style.left = `${meshScreenCoordinates.x * 100}vw`;
             this.currentSystemCursorContainer.style.top = `${meshScreenCoordinates.y * 100}vh`;
 
-            const distance = Vector3.Distance(currentSystemWorldPosition, playerPosition);
+            const distance = Vector3.Distance(currentSystemPosition, playerPosition);
             const scale = Math.max(minScale, scalingBase / distance);
             this.currentSystemCursorContainer.style.setProperty("--dim", `${scale}vh`);
         } else {
