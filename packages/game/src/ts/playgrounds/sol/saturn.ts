@@ -40,7 +40,7 @@ export async function createSaturnScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
@@ -125,12 +125,6 @@ export async function createSaturnScene(
         controls.update(deltaSeconds);
 
         planet.updateMaterial([light], deltaSeconds);
-
-        const cameraPosition = controls.getTransform().position.clone();
-
-        controls.getTransform().position = Vector3.Zero();
-        planet.getTransform().position.subtractInPlace(cameraPosition);
-        light.position.subtractInPlace(cameraPosition);
 
         asteroidField?.update(camera.globalPosition, assets.objects.asteroids, deltaSeconds);
     });

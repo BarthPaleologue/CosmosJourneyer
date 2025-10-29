@@ -38,7 +38,7 @@ export async function createGasPlanetScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.setAll(0);
 
@@ -121,11 +121,11 @@ export async function createGasPlanetScene(
         controls.update(deltaSeconds);
         planet.updateMaterial([light], deltaSeconds);
 
-        const cameraPosition = controls.getTransform().position.clone();
+        /*const cameraPosition = controls.getTransform().position.clone();
 
         controls.getTransform().position = Vector3.Zero();
         planet.getTransform().position.subtractInPlace(cameraPosition);
-        light.position.subtractInPlace(cameraPosition);
+        light.position.subtractInPlace(cameraPosition);*/
     });
 
     return scene;

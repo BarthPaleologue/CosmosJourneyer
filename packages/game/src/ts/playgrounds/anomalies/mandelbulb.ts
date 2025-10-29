@@ -28,16 +28,15 @@ export function createMandelbulbScene(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
     const urlParams = new URLSearchParams(window.location.search);
 
-    const camera = new ArcRotateCamera("ArcRotateCamera", 0, 3.14 / 3, 30, Vector3.Zero(), scene);
+    const camera = new ArcRotateCamera("ArcRotateCamera", 0, 3.14 / 3, 3000e3, Vector3.Zero(), scene);
     camera.attachControl();
-    camera.lowerRadiusLimit = 0.5;
-    camera.wheelPrecision *= 100;
-    camera.minZ = 0.01;
+    camera.wheelPrecision /= 30e3;
+    camera.maxZ = 10e7;
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
@@ -49,7 +48,6 @@ export function createMandelbulbScene(
     );
 
     const anomaly = new EmptyCelestialBody(model, scene);
-    anomaly.getTransform().scalingDeterminant = 1 / 100e3;
 
     const pp = new MandelbulbPostProcess(anomaly.getTransform(), anomaly.getBoundingRadius(), model, scene, []);
 
