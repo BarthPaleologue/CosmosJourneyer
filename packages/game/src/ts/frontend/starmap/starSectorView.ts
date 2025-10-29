@@ -95,15 +95,11 @@ export class StarSectorView {
         return vector3ToString(this.coordinates);
     }
 
-    static GetBoundingBox(position: Vector3, globalNodePosition: Vector3): BoundingBox {
+    static GetBoundingBox(position: Vector3): BoundingBox {
         return new BoundingBox(
             new Vector3(-1, -1, -1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
             new Vector3(1, 1, 1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
-            Matrix.Translation(
-                position.x + globalNodePosition.x,
-                position.y + globalNodePosition.y,
-                position.z + globalNodePosition.z,
-            ),
+            Matrix.Translation(position.x, position.y, position.z),
         );
     }
 }
