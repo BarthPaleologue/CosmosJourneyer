@@ -123,6 +123,7 @@ export class StarMap {
         blackHoleMaterial.transparencyMode = 2;
         blackHoleMaterial.diffuseTexture = textures.blackHoleSprite;
         blackHoleMaterial.diffuseTexture.hasAlpha = true;
+        blackHoleMaterial.useAlphaFromDiffuseTexture = true;
         blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
         blackHoleMaterial.freeze();
 
