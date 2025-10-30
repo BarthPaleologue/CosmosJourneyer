@@ -19,9 +19,11 @@ import { ActionManager } from "@babylonjs/core/Actions/actionManager";
 import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
+import { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -49,160 +51,145 @@ export class StarMap {
     readonly onSystemHoverStart = new Observable<StarSystemCoordinates>();
     readonly onSystemHoverEnd = new Observable<StarSystemCoordinates>();
 
-    private static readonly FADE_OUT_ANIMATION = new Animation(
+    private readonly fadeOutAnimationDuration = 1000;
+    private readonly fadeOutAnimationFrameRate = 60;
+    private readonly fadeOutAnimation = new Animation(
         "fadeIn",
         "instancedBuffers.color.a",
-        60,
+        this.fadeOutAnimationFrameRate,
         Animation.ANIMATIONTYPE_FLOAT,
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
-    private static readonly FADE_OUT_DURATION = 1000;
 
-    private static readonly FADE_IN_ANIMATION = new Animation(
+    private readonly fadeInAnimationDuration = 1000;
+    private readonly fadeInAnimationFrameRate = 60;
+    private readonly fadeInAnimation = new Animation(
         "fadeIn",
         "instancedBuffers.color.a",
-        60,
+        this.fadeInAnimationFrameRate,
         Animation.ANIMATIONTYPE_FLOAT,
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
-    private static readonly FADE_IN_DURATION = 1000;
 
-    private static readonly SHIMMER_ANIMATION = new Animation(
+    private readonly shimmerAnimationDuration = 1000;
+    private readonly shimmerAnimationFrameRate = 60;
+    private readonly shimmerAnimation = new Animation(
         "shimmer",
         "instancedBuffers.color.a",
-        60,
+        this.shimmerAnimationFrameRate,
         Animation.ANIMATIONTYPE_FLOAT,
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
-    private static readonly SHIMMER_DURATION = 1000;
-
-    private readonly starBuildStack: BuildData[] = [];
 
     private readonly recycledStars: InstancedMesh[] = [];
     private readonly recycledBlackHoles: InstancedMesh[] = [];
 
-    static readonly GENERATION_RATE = 1000;
-    static readonly RENDER_RADIUS = 6;
+    /** Defines how many new stars are made each frame */
+    private readonly starBuildBatchSize = 100;
+    private readonly starBuildStack: BuildData[] = [];
+
+    /** Max loaded star sector count in any direction */
+    private readonly starSectorLoadRadius = 6;
+
+    /** Max distance at which stars are pickable in Lightyears */
+    private readonly pickMaxDistance = 50;
 
     private readonly loadedStarSectors: Map<string, StarSectorView> = new Map<string, StarSectorView>();
 
     private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
 
+    private starSectorSize = Settings.STAR_SECTOR_SIZE;
+
     constructor(universeBackend: UniverseBackend, textures: StarMapTextures, scene: Scene) {
         this.scene = scene;
         this.universeBackend = universeBackend;
 
         this.starTemplate = MeshBuilder.CreatePlane("star", { size: 0.6 }, this.scene);
-        this.starTemplate.isPickable = true;
         this.starTemplate.isVisible = false;
         this.starTemplate.hasVertexAlpha = true;
-
-        const starTexture = textures.starSprite;
-
-        const starMaterial = new StandardMaterial("starMaterial", this.scene);
-        starMaterial.emissiveTexture = starTexture;
-        starMaterial.transparencyMode = 2;
-        starMaterial.opacityTexture = starTexture;
-        starMaterial.opacityTexture.getAlphaFromRGB = true;
-        starMaterial.emissiveColor = Color3.White();
-        starMaterial.freeze();
-
-        this.starTemplate.material = starMaterial;
-
         this.starTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
-
         this.starTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.starTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
 
+        const starMaterial = new StandardMaterial("starMaterial", this.scene);
+        starMaterial.emissiveTexture = textures.starSprite;
+        starMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
+        starMaterial.opacityTexture = textures.starSprite;
+        starMaterial.opacityTexture.getAlphaFromRGB = true;
+        starMaterial.emissiveColor = Color3.White();
+
+        this.starTemplate.material = starMaterial;
+
         this.blackHoleTemplate = MeshBuilder.CreatePlane("blackHole", { size: 0.8 }, this.scene);
-        this.blackHoleTemplate.isPickable = true;
         this.blackHoleTemplate.isVisible = false;
+        this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
+        this.blackHoleTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
 
         const blackHoleMaterial = new StandardMaterial("blackHoleMaterial", this.scene);
-        blackHoleMaterial.transparencyMode = 2;
+        blackHoleMaterial.transparencyMode = Material.MATERIAL_ALPHABLEND;
         blackHoleMaterial.diffuseTexture = textures.blackHoleSprite;
         blackHoleMaterial.diffuseTexture.hasAlpha = true;
         blackHoleMaterial.useAlphaFromDiffuseTexture = true;
         blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
-        blackHoleMaterial.freeze();
 
         this.blackHoleTemplate.material = blackHoleMaterial;
 
-        this.blackHoleTemplate.billboardMode = Mesh.BILLBOARDMODE_ALL;
-
-        this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
-        this.blackHoleTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
-
-        StarMap.FADE_OUT_ANIMATION.setKeys([
+        this.fadeOutAnimation.setKeys([
             {
                 frame: 0,
                 value: 1,
             },
             {
-                frame: StarMap.FADE_OUT_DURATION / 60,
+                frame: this.fadeOutAnimationDuration / this.fadeOutAnimationFrameRate,
                 value: 0,
             },
         ]);
 
-        StarMap.FADE_IN_ANIMATION.setKeys([
+        this.fadeInAnimation.setKeys([
             {
                 frame: 0,
                 value: 0,
             },
             {
-                frame: StarMap.FADE_IN_DURATION / 60,
+                frame: this.fadeInAnimationDuration / this.fadeInAnimationFrameRate,
                 value: 1,
             },
         ]);
 
-        StarMap.SHIMMER_ANIMATION.setKeys([
+        this.shimmerAnimation.setKeys([
             {
                 frame: 0,
                 value: 1.0,
             },
             {
-                frame: StarMap.SHIMMER_DURATION / 60 / 2,
+                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate / 2,
                 value: 1.4,
             },
             {
-                frame: StarMap.SHIMMER_DURATION / 60,
+                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate,
                 value: 1.0,
             },
         ]);
     }
 
-    private buildNextStars(n: number): void {
-        for (let i = 0; i < n; i++) {
+    private buildNextStars(batchSize: number): void {
+        let builtCount = 0;
+        while (builtCount < batchSize) {
             const data = this.starBuildStack.pop();
-            if (data === undefined) return;
+            if (data === undefined) {
+                break;
+            }
 
             if (!this.loadedStarSectors.has(data.sectorString)) {
-                // if star sector was removed in the meantime we build another star
-                n++;
+                // Skip instances whose sector was unloaded before they got built.
                 continue;
             }
 
             this.createInstance(data);
+            builtCount++;
         }
-    }
-
-    /**
-     * Register a star sector at the given coordinates, it will be added to the generation queue
-     * @param coordinates The coordinates of the sector
-     * @param generateNow
-     */
-    private registerStarSector(coordinates: Vector3, generateNow = false): StarSectorView {
-        const starSector = new StarSectorView(coordinates, this.universeBackend);
-        this.loadedStarSectors.set(starSector.getKey(), starSector);
-
-        if (!generateNow) this.starBuildStack.push(...starSector.generate());
-        else {
-            const data = starSector.generate();
-            for (const d of data) this.createInstance(d);
-        }
-
-        return starSector;
     }
 
     private coordinatesToString(coordinates: StarSystemCoordinates): string {
@@ -213,9 +200,8 @@ export class StarMap {
         const starSystemCoordinates = data.coordinates;
         const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
-            throw new Error(
-                `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
-            );
+            console.warn(`Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`);
+            return;
         }
 
         //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
@@ -224,22 +210,22 @@ export class StarMap {
         const instanceName = `${starSystemModel.name} Billboard instance`;
 
         let instance: InstancedMesh | null = null;
-        let recycled = false;
-
         if (stellarObjectModel.type !== "blackHole") {
-            const recycledStar = this.recycledStars.shift();
+            const recycledStar = this.recycledStars.pop();
             if (recycledStar !== undefined) {
                 instance = recycledStar;
                 instance.name = instanceName;
-                recycled = true;
-            } else instance = this.starTemplate.createInstance(instanceName);
+            } else {
+                instance = this.starTemplate.createInstance(instanceName);
+            }
         } else {
-            const recycledBlackHole = this.recycledBlackHoles.shift();
+            const recycledBlackHole = this.recycledBlackHoles.pop();
             if (recycledBlackHole !== undefined) {
                 instance = recycledBlackHole;
                 instance.name = instanceName;
-                recycled = true;
-            } else instance = this.blackHoleTemplate.createInstance(instanceName);
+            } else {
+                instance = this.blackHoleTemplate.createInstance(instanceName);
+            }
         }
 
         const initializedInstance = instance;
@@ -253,10 +239,7 @@ export class StarMap {
         const objectColor = getRgbFromTemperature(stellarObjectModel.blackBodyTemperature);
         initializedInstance.instancedBuffers["color"] = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
 
-        if (recycled) {
-            initializedInstance.setEnabled(true);
-        }
-
+        initializedInstance.setEnabled(true);
         initializedInstance.isPickable = true;
         initializedInstance.actionManager?.dispose();
         initializedInstance.actionManager = new ActionManager(this.scene);
@@ -281,9 +264,11 @@ export class StarMap {
 
         this.fadeIn(initializedInstance);
 
-        if (stellarObjectModel.type === "blackHole")
+        if (stellarObjectModel.type === "blackHole") {
             this.loadedStarSectors.get(data.sectorString)?.blackHoleInstances.push(initializedInstance);
-        else this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
+        } else {
+            this.loadedStarSectors.get(data.sectorString)?.starInstances.push(initializedInstance);
+        }
     }
 
     private disposeStarSector(starSector: StarSectorView) {
@@ -297,36 +282,44 @@ export class StarMap {
         this.loadedStarSectors.delete(starSector.getKey());
     }
 
-    update(camera: Camera) {
+    public update(camera: Camera) {
         const cameraPosition = camera.getWorldMatrix().getTranslation();
 
         const currentStarSectorCoordinates = new Vector3(
-            Math.round(cameraPosition.x / Settings.STAR_SECTOR_SIZE),
-            Math.round(cameraPosition.y / Settings.STAR_SECTOR_SIZE),
-            Math.round(cameraPosition.z / Settings.STAR_SECTOR_SIZE),
+            Math.round(cameraPosition.x / this.starSectorSize),
+            Math.round(cameraPosition.y / this.starSectorSize),
+            Math.round(cameraPosition.z / this.starSectorSize),
         );
 
         for (const starSector of this.loadedStarSectors.values()) {
-            const pickMaxDistance = 45;
-            for (const instance of [...starSector.starInstances, ...starSector.blackHoleInstances]) {
+            for (const instance of starSector.starInstances) {
                 const distance2 = Vector3.DistanceSquared(instance.position, cameraPosition);
-                instance.isPickable = distance2 < pickMaxDistance ** 2;
+                instance.isPickable = distance2 < this.pickMaxDistance ** 2;
+            }
+
+            for (const instance of starSector.blackHoleInstances) {
+                const distance2 = Vector3.DistanceSquared(instance.position, cameraPosition);
+                instance.isPickable = distance2 < this.pickMaxDistance ** 2;
             }
 
             // remove all star sectors that are too far
             const distanceToCamera = Vector3.Distance(starSector.position, cameraPosition);
-            if (distanceToCamera / Settings.STAR_SECTOR_SIZE > StarMap.RENDER_RADIUS + 1) {
+            if (distanceToCamera / this.starSectorSize > this.starSectorLoadRadius + 1) {
                 this.disposeStarSector(starSector);
             }
         }
 
         // then generate missing sectors
-        for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
-            for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
-                for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
-                    if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue;
-                    const relativeCoordinate = new Vector3(x, y, z);
-                    const coordinates = currentStarSectorCoordinates.add(relativeCoordinate);
+        const tempVector1 = new Vector3();
+        const tempVector2 = new Vector3();
+        for (let x = -this.starSectorLoadRadius; x <= this.starSectorLoadRadius; x++) {
+            for (let y = -this.starSectorLoadRadius; y <= this.starSectorLoadRadius; y++) {
+                for (let z = -this.starSectorLoadRadius; z <= this.starSectorLoadRadius; z++) {
+                    if (x * x + y * y + z * z > this.starSectorLoadRadius * this.starSectorLoadRadius) {
+                        continue;
+                    }
+
+                    const coordinates = tempVector1.copyFromFloats(x, y, z).addInPlace(currentStarSectorCoordinates);
                     const sectorKey = vector3ToString(coordinates);
 
                     if (this.loadedStarSectors.has(sectorKey)) {
@@ -334,41 +327,65 @@ export class StarMap {
                     }
 
                     // don't generate star sectors that are not in the frustum
-                    const bb = StarSectorView.GetBoundingBox(coordinates.scale(Settings.STAR_SECTOR_SIZE));
+                    const bb = StarSectorView.GetBoundingBox(
+                        coordinates.scaleToRef(this.starSectorSize, tempVector2),
+                        this.starSectorSize,
+                    );
                     if (!camera.isInFrustum(bb)) {
                         continue;
                     }
 
-                    this.registerStarSector(coordinates);
+                    const starSector = new StarSectorView(coordinates, this.starSectorSize, this.universeBackend);
+                    this.loadedStarSectors.set(starSector.getKey(), starSector);
+                    this.starBuildStack.push(...starSector.generate());
                 }
             }
         }
 
-        this.buildNextStars(StarMap.GENERATION_RATE);
+        this.buildNextStars(this.starBuildBatchSize);
     }
 
     private fadeIn(instance: InstancedMesh) {
-        instance.animations = [StarMap.FADE_IN_ANIMATION];
-        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
-            instance.animations = [StarMap.SHIMMER_ANIMATION];
-            instance
-                .getScene()
-                .beginAnimation(instance, 0, StarMap.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
-        });
+        instance.animations = [this.fadeInAnimation];
+        instance
+            .getScene()
+            .beginAnimation(instance, 0, this.fadeInAnimationDuration / this.fadeInAnimationFrameRate, false, 1, () => {
+                this.startShimmering(instance);
+            });
+    }
+
+    private startShimmering(mesh: AbstractMesh) {
+        mesh.animations = [this.shimmerAnimation];
+        mesh.getScene().beginAnimation(
+            mesh,
+            0,
+            this.shimmerAnimationDuration / this.shimmerAnimationFrameRate,
+            true,
+            0.1 + Math.random() * 0.2,
+        );
     }
 
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: Array<InstancedMesh>) {
-        instance.animations = [StarMap.FADE_OUT_ANIMATION];
-        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
-            instance.setEnabled(false);
+        instance.animations = [this.fadeOutAnimation];
+        instance
+            .getScene()
+            .beginAnimation(
+                instance,
+                0,
+                this.fadeOutAnimationDuration / this.fadeOutAnimationFrameRate,
+                false,
+                1,
+                () => {
+                    instance.setEnabled(false);
 
-            this.instanceToCoordinatesMap.delete(instance);
-            recyclingList.push(instance);
+                    const coordinatesKey = this.instanceToCoordinatesMap.get(instance);
+                    if (coordinatesKey !== undefined) {
+                        this.coordinatesToInstanceMap.delete(coordinatesKey);
+                    }
 
-            const coordinatesKey = this.instanceToCoordinatesMap.get(instance);
-            if (coordinatesKey !== undefined) {
-                this.coordinatesToInstanceMap.delete(coordinatesKey);
-            }
-        });
+                    this.instanceToCoordinatesMap.delete(instance);
+                    recyclingList.push(instance);
+                },
+            );
     }
 }

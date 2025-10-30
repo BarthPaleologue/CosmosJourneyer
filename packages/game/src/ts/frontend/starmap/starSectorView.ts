@@ -27,8 +27,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { type DeepReadonly } from "@/utils/types";
 
-import { Settings } from "@/settings";
-
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
 }
@@ -59,9 +57,9 @@ export class StarSectorView {
         position: Vector3;
     }>;
 
-    constructor(coordinates: Vector3, universeBackend: UniverseBackend) {
-        this.coordinates = coordinates;
-        this.position = coordinates.scale(Settings.STAR_SECTOR_SIZE);
+    constructor(coordinates: Vector3, size: number, universeBackend: UniverseBackend) {
+        this.coordinates = coordinates.clone();
+        this.position = coordinates.scale(size);
 
         const systemModels = universeBackend.getSystemModelsInStarSector(
             this.coordinates.x,
@@ -95,10 +93,10 @@ export class StarSectorView {
         return vector3ToString(this.coordinates);
     }
 
-    static GetBoundingBox(position: Vector3): BoundingBox {
+    static GetBoundingBox(position: Vector3, size: number): BoundingBox {
         return new BoundingBox(
-            new Vector3(-1, -1, -1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
-            new Vector3(1, 1, 1).scaleInPlace(Settings.STAR_SECTOR_SIZE / 2),
+            new Vector3(-1, -1, -1).scaleInPlace(size / 2),
+            new Vector3(1, 1, 1).scaleInPlace(size / 2),
             Matrix.Translation(position.x, position.y, position.z),
         );
     }

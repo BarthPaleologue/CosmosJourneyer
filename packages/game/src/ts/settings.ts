@@ -44,9 +44,6 @@ export const Settings = {
 
     CREDIT_SYMBOL: "₽",
 
-    /**
-     * Size of each star
-     */
     STAR_SECTOR_SIZE: 20,
 
     /**
