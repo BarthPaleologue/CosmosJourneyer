@@ -7,7 +7,7 @@ test("The star map playground renders correctly", async ({ page }) => {
         shotName: "baseline",
         scene: "starMapView",
         flagToWait: "frozen",
-        urlParams: { freeze: 3 },
+        urlParams: { freeze: 60 },
     });
 });
 
@@ -17,7 +17,7 @@ test("The star map playground renders correctly when targeting another system", 
         scene: "starMapView",
         flagToWait: "frozen",
         urlParams: {
-            freeze: 3,
+            freeze: 60,
             systemCoordinates: encodeURIComponent(
                 JSON.stringify({
                     localX: -0.1547746381977455,
