@@ -18,12 +18,11 @@
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
-import { Scene } from "@babylonjs/core/scene";
+import { type Scene } from "@babylonjs/core/scene";
 
 import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
@@ -43,6 +42,7 @@ import { type View } from "@/frontend/view";
 
 import { type DeepReadonly } from "@/utils/types";
 
+import { type StarMapTextures } from "../assets/textures/starMap";
 import { type INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
 import { StarMapControls } from "./starMapControls";
@@ -90,20 +90,19 @@ export class StarMapView implements View {
 
     constructor(
         player: Player,
-        engine: AbstractEngine,
+        scene: Scene,
+        assets: StarMapTextures,
         encyclopaedia: EncyclopaediaGalactica,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
-        this.scene = new Scene(engine, { useFloatingOrigin: true });
-        this.scene.clearColor = new Color4(0, 0, 0, 1);
-        this.scene.useRightHandedSystem = true;
+        this.scene = scene;
         this.scene.onDisposeObservable.addOnce(() => {
             this.starMapUI.dispose();
         });
 
-        this.starMap = new StarMap(universeBackend, this.scene);
+        this.starMap = new StarMap(universeBackend, assets, this.scene);
         this.starMap.onSystemHoverStart.add((starSystemCoordinates) => {
             this.starMapUI.setHoveredSystem(starSystemCoordinates);
             this.soundPlayer.playNow(SoundType.HOVER);

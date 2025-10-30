@@ -22,12 +22,12 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { StarMap } from "@/frontend/starmap/starMap";
 
-export function createStarMapScene(
+export async function createStarMapScene(
     engine: AbstractEngine,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
@@ -36,7 +36,9 @@ export function createStarMapScene(
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
-    const starMap = new StarMap(universeBackend, scene);
+    const starMapTextures = await loadStarMapTextures(scene, progressMonitor);
+
+    const starMap = new StarMap(universeBackend, starMapTextures, scene);
 
     const defaultControls = new DefaultControls(scene);
 
@@ -46,5 +48,5 @@ export function createStarMapScene(
         starMap.update(defaultControls.getActiveCamera());
     });
 
-    return Promise.resolve(scene);
+    return scene;
 }

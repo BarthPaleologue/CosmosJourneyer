@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { type Scene } from "@babylonjs/core/scene";
+import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -24,6 +24,7 @@ import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordi
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
@@ -35,7 +36,6 @@ import { initI18n } from "@/i18n";
 
 export async function createStarMapViewScene(
     engine: AbstractEngine,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     await initI18n();
@@ -49,9 +49,16 @@ export async function createStarMapViewScene(
     const soundPlayerMock = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();
 
+    const scene = new Scene(engine, { useFloatingOrigin: true });
+    scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
+
+    const starMapViewAssets = await loadStarMapTextures(scene, progressMonitor);
+
     const starMap = new StarMapView(
         player,
-        engine,
+        scene,
+        starMapViewAssets,
         encyclopaediaGalactica,
         universeBackend,
         soundPlayerMock,
@@ -73,5 +80,5 @@ export async function createStarMapViewScene(
         starMap.focusOnSystem(StarSystemCoordinatesSchema.parse(systemCoordinates), true);
     }
 
-    return starMap.scene;
+    return scene;
 }

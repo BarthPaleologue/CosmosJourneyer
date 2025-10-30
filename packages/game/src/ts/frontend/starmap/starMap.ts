@@ -20,7 +20,6 @@ import { ExecuteCodeAction } from "@babylonjs/core/Actions/directActions";
 import { Animation } from "@babylonjs/core/Animations/animation";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
@@ -36,10 +35,8 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
+import type { StarMapTextures } from "../assets/textures/starMap";
 import { StarSectorView, vector3ToString, type BuildData } from "./starSectorView";
-
-import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
-import starTexturePath from "@assets/textures/starParticle.png";
 
 export class StarMap {
     private readonly scene: Scene;
@@ -92,7 +89,7 @@ export class StarMap {
     private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
 
-    constructor(universeBackend: UniverseBackend, scene: Scene) {
+    constructor(universeBackend: UniverseBackend, textures: StarMapTextures, scene: Scene) {
         this.scene = scene;
         this.universeBackend = universeBackend;
 
@@ -101,7 +98,7 @@ export class StarMap {
         this.starTemplate.isVisible = false;
         this.starTemplate.hasVertexAlpha = true;
 
-        const starTexture = new Texture(starTexturePath, this.scene);
+        const starTexture = textures.starSprite;
 
         const starMaterial = new StandardMaterial("starMaterial", this.scene);
         starMaterial.emissiveTexture = starTexture;
@@ -124,7 +121,7 @@ export class StarMap {
 
         const blackHoleMaterial = new StandardMaterial("blackHoleMaterial", this.scene);
         blackHoleMaterial.transparencyMode = 2;
-        blackHoleMaterial.diffuseTexture = new Texture(blackHoleTexture, this.scene);
+        blackHoleMaterial.diffuseTexture = textures.blackHoleSprite;
         blackHoleMaterial.diffuseTexture.hasAlpha = true;
         blackHoleMaterial.emissiveColor = new Color3(0.9, 1.0, 1.0);
         blackHoleMaterial.freeze();
