@@ -5,19 +5,19 @@ import { renderAndSnap } from "./utils/renderSnap";
 test("The star map playground renders correctly", async ({ page }) => {
     await renderAndSnap(page, {
         shotName: "baseline",
-        scene: "starMap",
+        scene: "starMapView",
         flagToWait: "frozen",
-        urlParams: { freeze: 3 },
+        urlParams: { freeze: 60 },
     });
 });
 
 test("The star map playground renders correctly when targeting another system", async ({ page }) => {
     await renderAndSnap(page, {
         shotName: "baselineOtherSystem",
-        scene: "starMap",
+        scene: "starMapView",
         flagToWait: "frozen",
         urlParams: {
-            freeze: 3,
+            freeze: 60,
             systemCoordinates: encodeURIComponent(
                 JSON.stringify({
                     localX: -0.1547746381977455,

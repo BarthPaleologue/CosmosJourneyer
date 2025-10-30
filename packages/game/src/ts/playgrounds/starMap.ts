@@ -16,62 +16,37 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { type Scene } from "@babylonjs/core/scene";
+import { Scene } from "@babylonjs/core/scene";
 
-import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordinates";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
+import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { StarMap } from "@/frontend/starmap/starMap";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-
-import { jsonSafeParse } from "@/utils/json";
-
-import { initI18n } from "@/i18n";
 
 export async function createStarMapScene(
     engine: AbstractEngine,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    await initI18n();
+    const scene = new Scene(engine, { useFloatingOrigin: true });
+    scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
-    const player = Player.Default(universeBackend);
+    const starMapTextures = await loadStarMapTextures(scene, progressMonitor);
 
-    const encyclopaediaGalactica = new EncyclopaediaGalacticaLocal(universeBackend);
+    const starMap = new StarMap(universeBackend, starMapTextures, scene);
 
-    const soundPlayerMock = new SoundPlayerMock();
-    const notificationManager = new NotificationManagerMock();
+    const defaultControls = new DefaultControls(scene);
 
-    const starMap = new StarMap(
-        player,
-        engine,
-        encyclopaediaGalactica,
-        universeBackend,
-        soundPlayerMock,
-        notificationManager,
-    );
-    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates);
+    scene.onBeforeRenderObservable.add(() => {
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        defaultControls.update(deltaSeconds);
+        starMap.update(defaultControls.getActiveCamera());
+    });
 
-    // Get system coordinates from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const customSystemCoordinates = urlParams.get("systemCoordinates");
-
-    // If system parameter was provided, focus on the specified system
-    if (customSystemCoordinates !== null) {
-        const systemCoordinates = jsonSafeParse(decodeURIComponent(customSystemCoordinates));
-        if (systemCoordinates === null) {
-            throw new Error("Invalid system coordinates json provided in URL parameters.");
-        }
-
-        starMap.focusOnSystem(StarSystemCoordinatesSchema.parse(systemCoordinates), true);
-    }
-
-    return starMap.scene;
+    return scene;
 }

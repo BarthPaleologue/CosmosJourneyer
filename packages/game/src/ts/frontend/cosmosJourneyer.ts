@@ -28,6 +28,7 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
@@ -51,7 +52,7 @@ import { positionNearObject } from "@/frontend/helpers/positionNearObject";
 import { UberScene } from "@/frontend/helpers/uberScene";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
-import { StarMap } from "@/frontend/starmap/starMap";
+import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
@@ -68,6 +69,7 @@ import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "./assets/textures/starMap";
 import { lookAt } from "./helpers/transform";
 import { NotificationManager, type INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
@@ -100,7 +102,7 @@ export class CosmosJourneyer {
     readonly assets: Assets;
 
     readonly starSystemView: StarSystemView;
-    readonly starMap: StarMap;
+    readonly starMap: StarMapView;
 
     readonly musicConductor: MusicConductor;
     readonly soundPlayer: ISoundPlayer;
@@ -142,6 +144,7 @@ export class CosmosJourneyer {
         engine: AbstractEngine,
         assets: Assets,
         starSystemView: StarSystemView,
+        starMapView: StarMapView,
         backend: ICosmosJourneyerBackend,
         soundPlayer: ISoundPlayer,
         tts: Tts,
@@ -187,15 +190,7 @@ export class CosmosJourneyer {
         this.tts = tts;
         this.notificationManager = notificationManager;
 
-        // Init starmap view
-        this.starMap = new StarMap(
-            this.player,
-            this.engine,
-            this.backend.encyclopaedia,
-            this.backend.universe,
-            this.soundPlayer,
-            this.notificationManager,
-        );
+        this.starMap = starMapView;
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
             this.starSystemView.setSystemAsTarget(systemCoordinates);
         });
@@ -292,7 +287,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
+            this.starMap.setCurrentStarSystem(starSystemModel.coordinates, false);
         });
 
         this.starSystemView.spaceStationLayer.onTakeOffObservable.add(async () => {
@@ -446,29 +441,35 @@ export class CosmosJourneyer {
 
         const player = Player.Default(backend.universe);
 
-        const mainScene = new UberScene(engine);
+        const starSystemViewScene = new UberScene(engine);
+        starSystemViewScene.useRightHandedSystem = true;
 
-        // The right-handed system allows to use directly GLTF models without having to flip them with a transform
-        mainScene.useRightHandedSystem = true;
+        const starMapScene = new Scene(engine, { useFloatingOrigin: true });
+        starMapScene.useRightHandedSystem = true;
 
         const mainHavokPlugin = new HavokPlugin(true, havokInstance);
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
-        mainScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
+        starSystemViewScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
         const loadingProgressMonitor = new LoadingProgressMonitor();
         loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const assets = await loadAssets(mainScene, loadingProgressMonitor);
+        const starSystemViewAssetsPromise = loadAssets(starSystemViewScene, loadingProgressMonitor);
 
-        const soundPlayer = new SoundPlayer(assets.audio.sounds);
-        const tts = new Tts(assets.audio.speakerVoiceLines);
+        const starMapViewAssetsPromise = loadStarMapTextures(starMapScene, loadingProgressMonitor);
+
+        const starSystemViewAssets = await starSystemViewAssetsPromise;
+        const starMapViewAssets = await starMapViewAssetsPromise;
+
+        const soundPlayer = new SoundPlayer(starSystemViewAssets.audio.sounds);
+        const tts = new Tts(starSystemViewAssets.audio.speakerVoiceLines);
         const notificationManager = new NotificationManager(soundPlayer);
 
         // Init star system view
         const starSystemView = new StarSystemView(
-            mainScene,
+            starSystemViewScene,
             player,
             engine,
             mainHavokPlugin,
@@ -477,7 +478,17 @@ export class CosmosJourneyer {
             soundPlayer,
             tts,
             notificationManager,
-            assets.rendering,
+            starSystemViewAssets.rendering,
+        );
+
+        const starMapView = new StarMapView(
+            player,
+            starMapScene,
+            starMapViewAssets,
+            backend.encyclopaedia,
+            backend.universe,
+            soundPlayer,
+            notificationManager,
         );
 
         await starSystemView.resetPlayer();
@@ -491,8 +502,9 @@ export class CosmosJourneyer {
         return new CosmosJourneyer(
             player,
             engine,
-            assets,
+            starSystemViewAssets,
             starSystemView,
+            starMapView,
             backend,
             soundPlayer,
             tts,
