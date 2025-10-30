@@ -44,7 +44,7 @@ import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
-import { createStarMapScene } from "./starMap";
+import { createStarMapViewScene } from "./starMapView";
 import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
@@ -67,7 +67,7 @@ export class PlaygroundRegistry {
         ["flightDemo", createFlightDemoScene],
         ["neutronStar", createNeutronStarScene],
         ["character", createCharacterDemoScene],
-        ["starMap", createStarMapScene],
+        ["starMapView", createStarMapViewScene],
         ["tutorial", createTutorialScene],
         ["asteroidField", createAsteroidFieldScene],
         ["starSystemView", createStarSystemViewScene],

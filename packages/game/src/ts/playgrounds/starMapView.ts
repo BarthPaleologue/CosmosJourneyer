@@ -26,14 +26,14 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
-import { StarMap } from "@/frontend/starmap/starMap";
+import { StarMapView } from "@/frontend/starmap/starMapView";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 
 import { jsonSafeParse } from "@/utils/json";
 
 import { initI18n } from "@/i18n";
 
-export async function createStarMapScene(
+export async function createStarMapViewScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor | null,
@@ -49,7 +49,7 @@ export async function createStarMapScene(
     const soundPlayerMock = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();
 
-    const starMap = new StarMap(
+    const starMap = new StarMapView(
         player,
         engine,
         encyclopaediaGalactica,

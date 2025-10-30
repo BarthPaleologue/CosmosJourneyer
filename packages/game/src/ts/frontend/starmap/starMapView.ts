@@ -68,11 +68,11 @@ import starTexturePath from "@assets/textures/starParticle.png";
 // register cosmos journeyer as part of window object
 declare global {
     interface Window {
-        StarMap: StarMap;
+        StarMap: StarMapView;
     }
 }
 
-export class StarMap implements View {
+export class StarMapView implements View {
     readonly scene: Scene;
     private readonly controls: StarMapControls;
 
@@ -271,39 +271,39 @@ export class StarMap implements View {
         this.blackHoleTemplate.registerInstancedBuffer("color", 4); // 4 is the stride size eg. 4 floats here
         this.blackHoleTemplate.instancedBuffers["color"] = new Color4(1.0, 1.0, 1.0, 1.0);
 
-        StarMap.FADE_OUT_ANIMATION.setKeys([
+        StarMapView.FADE_OUT_ANIMATION.setKeys([
             {
                 frame: 0,
                 value: 1,
             },
             {
-                frame: StarMap.FADE_OUT_DURATION / 60,
+                frame: StarMapView.FADE_OUT_DURATION / 60,
                 value: 0,
             },
         ]);
 
-        StarMap.FADE_IN_ANIMATION.setKeys([
+        StarMapView.FADE_IN_ANIMATION.setKeys([
             {
                 frame: 0,
                 value: 0,
             },
             {
-                frame: StarMap.FADE_IN_DURATION / 60,
+                frame: StarMapView.FADE_IN_DURATION / 60,
                 value: 1,
             },
         ]);
 
-        StarMap.SHIMMER_ANIMATION.setKeys([
+        StarMapView.SHIMMER_ANIMATION.setKeys([
             {
                 frame: 0,
                 value: 1.0,
             },
             {
-                frame: StarMap.SHIMMER_DURATION / 60 / 2,
+                frame: StarMapView.SHIMMER_DURATION / 60 / 2,
                 value: 1.4,
             },
             {
-                frame: StarMap.SHIMMER_DURATION / 60,
+                frame: StarMapView.SHIMMER_DURATION / 60,
                 value: 1.0,
             },
         ]);
@@ -319,10 +319,10 @@ export class StarMap implements View {
         );
 
         // then generate missing star sectors
-        for (let x = -StarMap.RENDER_RADIUS; x <= StarMap.RENDER_RADIUS; x++) {
-            for (let y = -StarMap.RENDER_RADIUS; y <= StarMap.RENDER_RADIUS; y++) {
-                for (let z = -StarMap.RENDER_RADIUS; z <= StarMap.RENDER_RADIUS; z++) {
-                    if (x * x + y * y + z * z > StarMap.RENDER_RADIUS * StarMap.RENDER_RADIUS) continue;
+        for (let x = -StarMapView.RENDER_RADIUS; x <= StarMapView.RENDER_RADIUS; x++) {
+            for (let y = -StarMapView.RENDER_RADIUS; y <= StarMapView.RENDER_RADIUS; y++) {
+                for (let z = -StarMapView.RENDER_RADIUS; z <= StarMapView.RENDER_RADIUS; z++) {
+                    if (x * x + y * y + z * z > StarMapView.RENDER_RADIUS * StarMapView.RENDER_RADIUS) continue;
                     this.allowedStarSectorRelativeCoordinates.push(new Vector3(x, y, z));
                 }
             }
@@ -515,7 +515,7 @@ export class StarMap implements View {
             const position = starSector.position;
             if (
                 position.subtract(activeCameraPosition).length() / Settings.STAR_SECTOR_SIZE >
-                StarMap.RENDER_RADIUS + 1
+                StarMapView.RENDER_RADIUS + 1
             ) {
                 for (const starInstance of starSector.starInstances)
                     this.fadeOutThenRecycle(starInstance, this.recycledStars);
@@ -540,7 +540,7 @@ export class StarMap implements View {
             this.registerStarSector(coordinates);
         }
 
-        this.buildNextStars(Math.min(2000, StarMap.GENERATION_RATE * this.controls.getSpeed()));
+        this.buildNextStars(Math.min(2000, StarMapView.GENERATION_RATE * this.controls.getSpeed()));
     }
 
     private buildNextStars(n: number): void {
@@ -717,18 +717,18 @@ export class StarMap implements View {
     }
 
     private fadeIn(instance: InstancedMesh) {
-        instance.animations = [StarMap.FADE_IN_ANIMATION];
-        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_IN_DURATION / 60, false, 1, () => {
-            instance.animations = [StarMap.SHIMMER_ANIMATION];
+        instance.animations = [StarMapView.FADE_IN_ANIMATION];
+        instance.getScene().beginAnimation(instance, 0, StarMapView.FADE_IN_DURATION / 60, false, 1, () => {
+            instance.animations = [StarMapView.SHIMMER_ANIMATION];
             instance
                 .getScene()
-                .beginAnimation(instance, 0, StarMap.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
+                .beginAnimation(instance, 0, StarMapView.SHIMMER_DURATION / 60, true, 0.1 + Math.random() * 0.2);
         });
     }
 
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: InstancedMesh[]) {
-        instance.animations = [StarMap.FADE_OUT_ANIMATION];
-        instance.getScene().beginAnimation(instance, 0, StarMap.FADE_OUT_DURATION / 60, false, 1, () => {
+        instance.animations = [StarMapView.FADE_OUT_ANIMATION];
+        instance.getScene().beginAnimation(instance, 0, StarMapView.FADE_OUT_DURATION / 60, false, 1, () => {
             instance.setEnabled(false);
 
             const seed = this.instanceToCoordinatesMap.get(instance);

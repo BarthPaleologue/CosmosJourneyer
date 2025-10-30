@@ -51,7 +51,7 @@ import { positionNearObject } from "@/frontend/helpers/positionNearObject";
 import { UberScene } from "@/frontend/helpers/uberScene";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
-import { StarMap } from "@/frontend/starmap/starMap";
+import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
@@ -100,7 +100,7 @@ export class CosmosJourneyer {
     readonly assets: Assets;
 
     readonly starSystemView: StarSystemView;
-    readonly starMap: StarMap;
+    readonly starMap: StarMapView;
 
     readonly musicConductor: MusicConductor;
     readonly soundPlayer: ISoundPlayer;
@@ -188,7 +188,7 @@ export class CosmosJourneyer {
         this.notificationManager = notificationManager;
 
         // Init starmap view
-        this.starMap = new StarMap(
+        this.starMap = new StarMapView(
             this.player,
             this.engine,
             this.backend.encyclopaedia,
