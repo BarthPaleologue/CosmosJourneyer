@@ -57,7 +57,7 @@ export async function createStarMapViewScene(
         soundPlayerMock,
         notificationManager,
     );
-    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates);
+    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates, true);
 
     // Get system coordinates from URL parameters
     const urlParams = new URLSearchParams(window.location.search);

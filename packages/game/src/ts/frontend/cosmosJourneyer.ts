@@ -292,7 +292,7 @@ export class CosmosJourneyer {
 
         this.starSystemView.onInitStarSystem.add(() => {
             const starSystemModel = this.starSystemView.getStarSystem().model;
-            this.starMap.setCurrentStarSystem(starSystemModel.coordinates);
+            this.starMap.setCurrentStarSystem(starSystemModel.coordinates, false);
         });
 
         this.starSystemView.spaceStationLayer.onTakeOffObservable.add(async () => {
