@@ -271,22 +271,18 @@ export function CreateWheel(
     tireMaterial: Material,
     scene: Scene,
 ) {
-    const rimRadius = radius * 0.5;
-    const tireThickness = thickness;
+    const rimRadius = radius * 0.7;
+    const tireRadius = radius - rimRadius;
 
-    const wheelThickness = tireThickness * 2;
-    const wheelMesh = MeshBuilder.CreateCylinder(
-        "Wheel",
-        { height: wheelThickness / 5, diameter: rimRadius * 2 },
-        scene,
-    );
+    const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: thickness, diameter: rimRadius * 2 }, scene);
     wheelMesh.rotation = new Vector3(0, 0, Math.PI / 2);
 
     const tireMesh = MeshBuilder.CreateTorus(
         "Tire",
-        { diameter: rimRadius * 2, thickness: tireThickness, tessellation: 24 },
+        { diameter: rimRadius * 2 + tireRadius, thickness: tireRadius, tessellation: 32 },
         scene,
     );
+    tireMesh.scaling.y = thickness / tireRadius;
     tireMesh.material = tireMaterial;
     tireMesh.parent = wheelMesh;
 

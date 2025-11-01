@@ -224,7 +224,7 @@ export function createWolfMk2(
     const vehicleBuilder = new VehicleBuilder(frameFloor);
 
     const wheelRadius = 0.7;
-    const wheelThickness = 0.8;
+    const wheelThickness = 1.0;
     const tireMaterial = new TireMaterial(tireTextures, scene);
 
     vehicleBuilder
