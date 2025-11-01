@@ -17,7 +17,8 @@
 
 import type { Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
@@ -33,6 +34,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
+import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
 import { Vehicle } from "./vehicle";
 
 export class VehicleBuilder {
@@ -277,12 +279,17 @@ export function CreateWheel(
     const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: thickness, diameter: rimRadius * 2 }, scene);
     wheelMesh.rotation = new Vector3(0, 0, Math.PI / 2);
 
-    const tireMesh = MeshBuilder.CreateTorus(
-        "Tire",
-        { diameter: rimRadius * 2 + tireRadius, thickness: tireRadius, tessellation: 32 },
-        scene,
-    );
-    tireMesh.scaling.y = thickness / tireRadius;
+    const tireVertexData = CreateTorusVertexData({
+        diameter: rimRadius * 2,
+        thickness: tireRadius * 2,
+        tessellation: 64,
+        minorLpExponent: 5,
+        sideOrientation: VertexData.BACKSIDE,
+    });
+
+    const tireMesh = new Mesh("Tire", scene);
+    tireVertexData.applyToMesh(tireMesh, false);
+    tireMesh.scaling.y = thickness / (2.0 * tireRadius);
     tireMesh.material = tireMaterial;
     tireMesh.parent = wheelMesh;
 
