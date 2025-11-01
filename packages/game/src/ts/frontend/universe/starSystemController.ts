@@ -50,6 +50,7 @@ import {
     type Planet,
     type StellarObject,
 } from "./architecture/orbitalObject";
+import { GravitySystem } from "./gravitySystem";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { type ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
 import { StarFieldBox } from "./starFieldBox";
@@ -94,6 +95,8 @@ export class StarSystemController {
 
     private readonly assets: RenderingAssets;
 
+    private readonly gravitySystem: GravitySystem;
+
     /**
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
@@ -123,6 +126,8 @@ export class StarSystemController {
         this.satellites = orbitalObjects.satellites;
         this.anomalies = orbitalObjects.anomalies;
         this.orbitalFacilities = orbitalObjects.orbitalFacilities;
+
+        this.gravitySystem = new GravitySystem(this.scene);
 
         this.getOrbitalObjects().forEach((object) => {
             this.objectToParents.set(
@@ -425,6 +430,15 @@ export class StarSystemController {
                 object.updateLOD(controls.getTransform().getAbsolutePosition(), chunkForge);
             }
         }
+
+        this.gravitySystem.applyGravity(
+            this.getCelestialBodies().map((body) => ({
+                name: body.model.name,
+                radius: body.getBoundingRadius(),
+                position: body.getTransform().getAbsolutePosition(),
+                mass: body.model.mass,
+            })),
+        );
 
         // Apply floating origin
         this.applyFloatingOrigin();
