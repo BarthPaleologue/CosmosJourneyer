@@ -96,9 +96,6 @@ export function positionNearObjectBrightSide(
         transformable.getTransform().setAbsolutePosition(displacement);
     }
 
-    starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
-    transformable.getTransform().setAbsolutePosition(Vector3.Zero());
-
     lookAt(
         transformable.getTransform(),
         object.getTransform().getAbsolutePosition(),
@@ -149,9 +146,6 @@ export function positionNearObjectWithStarVisible(
             -Math.PI / 16,
         );
     }
-
-    starSystem.translateEverythingNow(transformable.getTransform().getAbsolutePosition().negate());
-    transformable.getTransform().setAbsolutePosition(Vector3.Zero());
 
     const starDirection = nearestStar
         .getTransform()
