@@ -20,19 +20,24 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 
 import {
+    add,
     f,
+    getViewDirection,
     mul,
     outputFragColor,
     outputVertexPosition,
     pbr,
     perturbNormal,
+    splitVec,
     textureSample,
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
+    vec2,
     vertexAttribute,
 } from "../helpers/bsl";
 
@@ -42,11 +47,10 @@ export class TireMaterial {
     constructor(
         textures: {
             albedo: Texture;
-            metallic: Texture;
             roughness: Texture;
             normal: Texture;
             ambientOcclusion: Texture;
-            opacity: Texture;
+            height: Texture;
         },
         scene: Scene,
     ) {
@@ -65,29 +69,50 @@ export class TireMaterial {
 
         const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const scaledUV = mul(uv, f(2));
+        const splitUV = splitVec(uv);
 
-        const albedoTexture = textureSample(textures.albedo, scaledUV, {
+        const scaledUV = mul(vec2(splitUV.y, splitUV.x), f(5.0));
+
+        const cameraPosition = uniformCameraPosition();
+        const viewDirection = getViewDirection(positionW, cameraPosition);
+
+        const normalHeightMapTexture = uniformTexture2d(textures.normal).source;
+        const normalHeightMapValue = textureSample(normalHeightMapTexture, scaledUV);
+        const { output: perturbedNormal, uvOffset } = perturbNormal(
+            scaledUV,
+            positionW,
+            normalW,
+            normalHeightMapValue.rgb,
+            f(1),
+            {
+                parallax: {
+                    viewDirection: viewDirection,
+                    scale: f(0.04),
+                },
+            },
+        );
+
+        const sampleUV = add(scaledUV, uvOffset);
+
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const roughnessTexture = uniformTexture2d(textures.roughness).source;
+        const ambientOcclusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+
+        const albedo = textureSample(albedoTexture, sampleUV, {
             convertToLinearSpace: true,
         });
-        const metallic = textureSample(textures.metallic, scaledUV);
-        const roughness = textureSample(textures.roughness, scaledUV);
-        const normalMapValue = textureSample(textures.normal, scaledUV);
-        const ambientOcclusion = textureSample(textures.ambientOcclusion, scaledUV);
-        const opacityTexture = textureSample(textures.opacity, scaledUV);
-
-        const perturbedNormal = perturbNormal(scaledUV, positionW, normalW, normalMapValue.rgb, f(1));
+        const roughness = textureSample(roughnessTexture, sampleUV);
+        const ambientOcclusion = textureSample(ambientOcclusionTexture, sampleUV);
 
         const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
 
-        const pbrShading = pbr(metallic.r, roughness.r, perturbedNormal, normalW, view, cameraPosition, positionW, {
-            albedoRgb: albedoTexture.rgb,
+        const pbrShading = pbr(f(0.0), roughness.r, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            perturbedNormal,
             ambientOcclusion: ambientOcclusion.r,
-            opacity: opacityTexture.r,
         });
 
-        const fragOutput = outputFragColor(pbrShading.lighting, { alpha: pbrShading.alpha });
+        const fragOutput = outputFragColor(pbrShading.lighting);
 
         this.material.addOutputNode(vertexOutput);
         this.material.addOutputNode(fragOutput);
