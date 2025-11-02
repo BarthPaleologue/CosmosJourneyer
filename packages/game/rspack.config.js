@@ -1,3 +1,4 @@
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -11,6 +12,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isProduction = process.env.NODE_ENV === "production";
+
+const getLocalNetworkAddress = () => {
+    const networkInterfaces = os.networkInterfaces();
+    for (const networkInterface of Object.values(networkInterfaces)) {
+        if (!networkInterface) {
+            continue;
+        }
+
+        for (const address of networkInterface) {
+            if (address.family === "IPv4" && address.internal === false) {
+                return address.address;
+            }
+        }
+    }
+
+    return undefined;
+};
+
+const localNetworkAddress = isProduction ? undefined : getLocalNetworkAddress();
 
 // Define reusable paths
 const projectRoot = __dirname;
@@ -31,7 +51,10 @@ export default defineConfig({
     target: ["web", "es2022"],
     devtool: isProduction ? false : "source-map",
     devServer: {
+        server: "https",
         open: false,
+        host: "0.0.0.0",
+        allowedHosts: "all",
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
             "Cross-Origin-Embedder-Policy": "same-origin",
@@ -91,6 +114,9 @@ export default defineConfig({
             template: path.join(htmlPath, "index.html"),
             chunks: ["playground"],
             favicon: path.join(htmlPath, "../asset/favicon.png"),
+        }),
+        new rspack.DefinePlugin({
+            __DEV_SERVER_IP__: JSON.stringify(localNetworkAddress ?? ""),
         }),
     ],
     watchOptions: {

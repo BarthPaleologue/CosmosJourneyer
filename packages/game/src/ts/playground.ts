@@ -25,6 +25,9 @@ import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
 import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
+import { renderQrCodeOverlay } from "./playgrounds/utils";
+
+declare const __DEV_SERVER_IP__: string | undefined;
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -78,6 +81,22 @@ if (urlParams.get("physicsViewer") !== null) {
             physicsViewer.showBody(physicsBody);
         }
     });
+}
+
+if (urlParams.get("qr") !== null) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete("qr");
+    const localNetworkAddress =
+        typeof __DEV_SERVER_IP__ === "string" && __DEV_SERVER_IP__.length > 0 ? __DEV_SERVER_IP__ : undefined;
+    if (
+        localNetworkAddress !== undefined &&
+        (currentUrl.hostname === "localhost" || currentUrl.hostname === "127.0.0.1" || currentUrl.hostname === "[::1]")
+    ) {
+        currentUrl.hostname = localNetworkAddress;
+    }
+
+    const qrUrl = currentUrl.toString();
+    await renderQrCodeOverlay(qrUrl);
 }
 
 const maxFrameCounter = urlParams.get("freeze");
