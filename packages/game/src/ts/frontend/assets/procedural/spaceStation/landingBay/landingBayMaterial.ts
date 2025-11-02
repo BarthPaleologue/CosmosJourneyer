@@ -178,7 +178,7 @@ export class LandingBayMaterial extends NodeMaterial {
             finalMetallic,
             finalRoughness,
             finalAo,
-            perturbedNormal,
+            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,

@@ -63,7 +63,7 @@ export class ClimberRingMaterial extends NodeMaterial {
             metallicRoughnesstexture.r,
             metallicRoughnesstexture.g,
             aoTexture.r,
-            perturbedNormal,
+            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
