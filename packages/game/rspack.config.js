@@ -51,6 +51,7 @@ export default defineConfig({
     target: ["web", "es2022"],
     devtool: isProduction ? false : "source-map",
     devServer: {
+        server: "https",
         open: false,
         host: "0.0.0.0",
         allowedHosts: "all",
