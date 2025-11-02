@@ -59,6 +59,7 @@ import {
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
 import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
+import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDirectionBlock";
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
@@ -202,6 +203,20 @@ export function uniformFloat(
     inputBlock.matrixMode = 0;
 
     return inputBlock.output;
+}
+
+export function getViewDirection(
+    worldPosition: NodeMaterialConnectionPoint,
+    cameraPosition: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const viewDirection = new ViewDirectionBlock("viewDirection");
+    viewDirection.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    worldPosition.connectTo(viewDirection.worldPosition);
+    cameraPosition.connectTo(viewDirection.cameraPosition);
+
+    return viewDirection.output;
 }
 
 export type TextureBlockOptions = TargetOptions & {
