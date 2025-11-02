@@ -24,12 +24,12 @@ import { loadTextureAsync } from "../utils";
 import tireAOPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_ao_2k.jpg";
 import tireAlbedoPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_color_2k.jpg";
 import tireHeightPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_height_2k.jpg";
-import tireNormalPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_normal_2k.jpg";
+import tireNormalHeightPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_normal_height_2k.png";
 import tireRoughnessPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_roughness_2k.jpg";
 
 export type TireTextures = {
     albedo: Texture;
-    normal: Texture;
+    normalHeight: Texture;
     roughness: Texture;
     ambientOcclusion: Texture;
     height: Texture;
@@ -40,14 +40,14 @@ export async function loadTireTextures(
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<TireTextures> {
     const albedoPromise = loadTextureAsync("TireAlbedo", tireAlbedoPath, scene, progressMonitor);
-    const normalPromise = loadTextureAsync("TireNormal", tireNormalPath, scene, progressMonitor);
+    const normalHeightPromise = loadTextureAsync("TireNormalHeight", tireNormalHeightPath, scene, progressMonitor);
     const roughnessPromise = loadTextureAsync("TireRoughness", tireRoughnessPath, scene, progressMonitor);
     const ambientOcclusionPromise = loadTextureAsync("TireAmbientOcclusion", tireAOPath, scene, progressMonitor);
     const heightPromise = loadTextureAsync("TireHeight", tireHeightPath, scene, progressMonitor);
 
     return {
         albedo: await albedoPromise,
-        normal: await normalPromise,
+        normalHeight: await normalHeightPromise,
         roughness: await roughnessPromise,
         ambientOcclusion: await ambientOcclusionPromise,
         height: await heightPromise,
