@@ -63,9 +63,9 @@ export class VehicleBuilder {
         return this;
     }
 
-    build(assets: { tireMaterial: Material }, scene: Scene): this {
+    build(assets: { materials: { tire: Material; wheel: Material } }, scene: Scene): this {
         for (const wheel of this.wheels) {
-            wheel.mesh = CreateWheel(wheel.position, wheel.radius, wheel.thickness, assets.tireMaterial, scene);
+            wheel.mesh = CreateWheel(wheel.position, wheel.radius, wheel.thickness, assets.materials, scene);
             wheel.axleMesh = CreateAxle(wheel.position, wheel.radius, scene);
         }
 
@@ -270,7 +270,10 @@ export function CreateWheel(
     position: Vector3,
     radius: number,
     thickness: number,
-    tireMaterial: Material,
+    materials: {
+        wheel: Material;
+        tire: Material;
+    },
     scene: Scene,
 ) {
     const rimRadius = radius * 0.7;
@@ -290,9 +293,10 @@ export function CreateWheel(
     const tireMesh = new Mesh("Tire", scene);
     tireVertexData.applyToMesh(tireMesh, false);
     tireMesh.scaling.y = thickness / (2.0 * tireRadius);
-    tireMesh.material = tireMaterial;
+    tireMesh.material = materials.tire;
     tireMesh.parent = wheelMesh;
 
+    wheelMesh.material = materials.wheel;
     wheelMesh.bakeCurrentTransformIntoVertices();
     wheelMesh.position.copyFrom(position);
 

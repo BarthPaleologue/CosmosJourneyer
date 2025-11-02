@@ -31,6 +31,7 @@ import {
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadMaterialTextures } from "@/frontend/assets/textures/materials";
 import { loadTireTextures } from "@/frontend/assets/textures/materials/tire";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
@@ -48,7 +49,7 @@ export async function createRoverScene(
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
-    const sun = new DirectionalLight("sun", new Vector3(0.5, -1, -0.5), scene);
+    const sun = new DirectionalLight("sun", new Vector3(1, -1, -0.5), scene);
     sun.position = new Vector3(0, 50, 50);
     sun.autoUpdateExtends = true;
     scene.onAfterRenderObservable.addOnce(() => {
@@ -87,10 +88,20 @@ export async function createRoverScene(
 
     const tireTextures = await loadTireTextures(scene, progressMonitor);
 
-    const roverResult = createWolfMk2(tireTextures, scene, new Vector3(0, 10, 0), {
-        axis: new Vector3(0, 1, 0),
-        angle: Math.PI / 4,
-    });
+    const textures = await loadMaterialTextures(scene, progressMonitor);
+
+    const roverResult = createWolfMk2(
+        {
+            tire: tireTextures,
+            wheel: textures.crate,
+        },
+        scene,
+        new Vector3(0, 10, 0),
+        {
+            axis: new Vector3(0, 1, 0),
+            angle: Math.PI / 4,
+        },
+    );
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }
