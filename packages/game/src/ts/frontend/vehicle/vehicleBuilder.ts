@@ -276,7 +276,7 @@ export function CreateWheel(
     },
     scene: Scene,
 ) {
-    const rimRadius = radius * 0.7;
+    const rimRadius = radius * 0.6;
     const tireRadius = radius - rimRadius;
 
     const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: thickness, diameter: rimRadius * 2 }, scene);

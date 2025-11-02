@@ -21,20 +21,18 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
 
-import tireAOPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_ao_2k.jpg";
-import tireAlbedoPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_color_2k.jpg";
-import tireMetallicPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_metallic_2k.jpg";
-import tireNormalPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_normal_direct_2k.png";
-import tireOpacityPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_opacity_2k.jpg";
-import tireRoughnessPath from "@assets/metal_0054_2k_b3OPPy/metal_0054_roughness_2k.jpg";
+import tireAOPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_ao_2k.jpg";
+import tireAlbedoPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_color_2k.jpg";
+import tireHeightPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_height_2k.jpg";
+import tireNormalPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_normal_2k.jpg";
+import tireRoughnessPath from "@assets/plastic_0022_2k_TKmv2N/plastic_0022_roughness_2k.jpg";
 
 export type TireTextures = {
     albedo: Texture;
     normal: Texture;
-    metallic: Texture;
     roughness: Texture;
     ambientOcclusion: Texture;
-    opacity: Texture;
+    height: Texture;
 };
 
 export async function loadTireTextures(
@@ -43,17 +41,15 @@ export async function loadTireTextures(
 ): Promise<TireTextures> {
     const albedoPromise = loadTextureAsync("TireAlbedo", tireAlbedoPath, scene, progressMonitor);
     const normalPromise = loadTextureAsync("TireNormal", tireNormalPath, scene, progressMonitor);
-    const metallicPromise = loadTextureAsync("TireMetallic", tireMetallicPath, scene, progressMonitor);
     const roughnessPromise = loadTextureAsync("TireRoughness", tireRoughnessPath, scene, progressMonitor);
     const ambientOcclusionPromise = loadTextureAsync("TireAmbientOcclusion", tireAOPath, scene, progressMonitor);
-    const opacityPromise = loadTextureAsync("TireOpacity", tireOpacityPath, scene, progressMonitor);
+    const heightPromise = loadTextureAsync("TireHeight", tireHeightPath, scene, progressMonitor);
 
     return {
         albedo: await albedoPromise,
         normal: await normalPromise,
-        metallic: await metallicPromise,
         roughness: await roughnessPromise,
         ambientOcclusion: await ambientOcclusionPromise,
-        opacity: await opacityPromise,
+        height: await heightPromise,
     };
 }
