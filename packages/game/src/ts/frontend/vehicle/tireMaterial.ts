@@ -20,7 +20,9 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 
 import {
+    add,
     f,
+    getViewDirection,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -45,7 +47,7 @@ export class TireMaterial {
         textures: {
             albedo: Texture;
             roughness: Texture;
-            normal: Texture;
+            normalHeight: Texture;
             ambientOcclusion: Texture;
             height: Texture;
         },
@@ -68,19 +70,36 @@ export class TireMaterial {
 
         const splitUV = split(uv);
 
-        const scaledUV = mul(vec2(splitUV.y, splitUV.x), f(5.0));
+        const scaling = f(3);
+        const scaledUV = mul(vec2(splitUV.y, splitUV.x), scaling);
 
-        const albedoTexture = textureSample(textures.albedo, scaledUV, {
+        const cameraPosition = uniformCameraPosition();
+        const viewDirection = getViewDirection(positionW, cameraPosition);
+
+        const normalHeightMapValue = textureSample(textures.normalHeight, scaledUV);
+        const { output: perturbedNormal, uvOffset } = perturbNormal(
+            scaledUV,
+            positionW,
+            normalW,
+            normalHeightMapValue.rgb,
+            f(1),
+            {
+                parallax: {
+                    viewDirection: viewDirection,
+                    scale: f(0.04),
+                },
+            },
+        );
+
+        const sampleUV = add(scaledUV, uvOffset);
+
+        const albedoTexture = textureSample(textures.albedo, sampleUV, {
             convertToLinearSpace: true,
         });
-        const roughness = textureSample(textures.roughness, scaledUV);
-        const normalMapValue = textureSample(textures.normal, scaledUV);
-        const ambientOcclusion = textureSample(textures.ambientOcclusion, scaledUV);
-
-        const perturbedNormal = perturbNormal(scaledUV, positionW, normalW, normalMapValue.rgb, f(1));
+        const roughness = textureSample(textures.roughness, sampleUV);
+        const ambientOcclusion = textureSample(textures.ambientOcclusion, sampleUV);
 
         const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
 
         const pbrShading = pbr(f(0.0), roughness.r, perturbedNormal, normalW, view, cameraPosition, positionW, {
             albedoRgb: albedoTexture.rgb,
