@@ -23,6 +23,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { ok, type Result } from "@/utils/types";
 
+import type { PBRTextures } from "../assets/textures/materials";
 import type { TireTextures } from "../assets/textures/materials/tire";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
@@ -32,7 +33,10 @@ import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
 
 export function createWolfMk2(
-    tireTextures: TireTextures,
+    textures: {
+        tire: TireTextures;
+        wheel: PBRTextures;
+    },
     scene: Scene,
     spawnPosition: Vector3,
     spawnRotation: {
@@ -225,7 +229,13 @@ export function createWolfMk2(
 
     const wheelRadius = 0.7;
     const wheelThickness = 1.0;
-    const tireMaterial = new TireMaterial(tireTextures, scene);
+    const tireMaterial = new TireMaterial(textures.tire, scene);
+
+    const wheelMaterial = new PBRMaterial("wheelMaterial", scene);
+    wheelMaterial.albedoTexture = textures.wheel.albedo;
+    wheelMaterial.bumpTexture = textures.wheel.normal;
+    wheelMaterial.metallicTexture = textures.wheel.metallicRoughness;
+    wheelMaterial.useRoughnessFromMetallicTextureGreen = true;
 
     vehicleBuilder
         .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
@@ -234,7 +244,7 @@ export function createWolfMk2(
         .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
         .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .build({ tireMaterial: tireMaterial.get() }, scene)
+        .build({ materials: { tire: tireMaterial.get(), wheel: wheelMaterial } }, scene)
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle);
 
