@@ -62,7 +62,7 @@ export class SolarPanelMaterial extends NodeMaterial {
             metallicRoughness.r,
             metallicRoughness.g,
             null,
-            perturbedNormal,
+            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,

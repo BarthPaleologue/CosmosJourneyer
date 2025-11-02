@@ -59,6 +59,7 @@ import {
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
 import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
+import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDirectionBlock";
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
@@ -202,6 +203,20 @@ export function uniformFloat(
     inputBlock.matrixMode = 0;
 
     return inputBlock.output;
+}
+
+export function getViewDirection(
+    worldPosition: NodeMaterialConnectionPoint,
+    cameraPosition: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const viewDirection = new ViewDirectionBlock("viewDirection");
+    viewDirection.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    worldPosition.connectTo(viewDirection.worldPosition);
+    cameraPosition.connectTo(viewDirection.cameraPosition);
+
+    return viewDirection.output;
 }
 
 export type TextureBlockOptions = TargetOptions & {
@@ -799,6 +814,18 @@ export function max(
     return maxBlock.output;
 }
 
+export type PerturbNormalOptions = TargetOptions & {
+    parallax: {
+        viewDirection: NodeMaterialConnectionPoint;
+        scale: NodeMaterialConnectionPoint;
+    };
+};
+
+export type PerturbNormalOutput = {
+    output: PerturbNormalBlock["output"];
+    uvOffset: PerturbNormalBlock["uvOffset"];
+};
+
 /**
  * Perturbs the normal vector using the given parameters.
  * @param uv - The UV coordinates.
@@ -814,18 +841,21 @@ export function perturbNormal(
     normalWorldVec3: NodeMaterialConnectionPoint,
     normalTexture: NodeMaterialConnectionPoint,
     bumpStrengthFloat: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+    options?: Partial<PerturbNormalOptions>,
+): PerturbNormalOutput {
     const perturbedNormal = new PerturbNormalBlock("Perturb normal");
     perturbedNormal.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
+    perturbedNormal.useParallaxOcclusion = options?.parallax !== undefined;
 
     uv.connectTo(perturbedNormal.uv);
     positionWorldVec3.connectTo(perturbedNormal.worldPosition);
     normalWorldVec3.connectTo(perturbedNormal.worldNormal);
     normalTexture.connectTo(perturbedNormal.normalMapColor);
     bumpStrengthFloat.connectTo(perturbedNormal.strength);
+    options?.parallax?.scale.connectTo(perturbedNormal.parallaxScale);
+    options?.parallax?.viewDirection.connectTo(perturbedNormal.viewDirection);
 
-    return perturbedNormal.output;
+    return perturbedNormal;
 }
 
 export type PBRMetallicRoughnessMaterialOptions = TargetOptions & {

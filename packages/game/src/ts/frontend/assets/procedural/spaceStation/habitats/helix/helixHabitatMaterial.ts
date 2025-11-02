@@ -98,7 +98,7 @@ export class HelixHabitatMaterial extends NodeMaterial {
             metallicRoughness.r,
             metallicRoughness.g,
             occlusion.r,
-            perturbedNormal,
+            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,

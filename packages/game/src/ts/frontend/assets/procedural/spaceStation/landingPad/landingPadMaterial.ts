@@ -141,7 +141,7 @@ export class LandingPadMaterial extends NodeMaterial {
             finalMetallic,
             finalRoughness,
             finalAmbientOcclusion,
-            perturbedNormal,
+            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
