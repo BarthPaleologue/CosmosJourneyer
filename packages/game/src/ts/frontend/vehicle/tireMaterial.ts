@@ -26,6 +26,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    split,
     textureSample,
     transformDirection,
     transformPosition,
@@ -33,6 +34,7 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
+    vec2,
     vertexAttribute,
 } from "../helpers/bsl";
 
@@ -42,11 +44,10 @@ export class TireMaterial {
     constructor(
         textures: {
             albedo: Texture;
-            metallic: Texture;
             roughness: Texture;
             normal: Texture;
             ambientOcclusion: Texture;
-            opacity: Texture;
+            height: Texture;
         },
         scene: Scene,
     ) {
@@ -65,29 +66,28 @@ export class TireMaterial {
 
         const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const scaledUV = mul(uv, f(2));
+        const splitUV = split(uv);
+
+        const scaledUV = mul(vec2(splitUV.y, splitUV.x), f(5.0));
 
         const albedoTexture = textureSample(textures.albedo, scaledUV, {
             convertToLinearSpace: true,
         });
-        const metallic = textureSample(textures.metallic, scaledUV);
         const roughness = textureSample(textures.roughness, scaledUV);
         const normalMapValue = textureSample(textures.normal, scaledUV);
         const ambientOcclusion = textureSample(textures.ambientOcclusion, scaledUV);
-        const opacityTexture = textureSample(textures.opacity, scaledUV);
 
         const perturbedNormal = perturbNormal(scaledUV, positionW, normalW, normalMapValue.rgb, f(1));
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrShading = pbr(metallic.r, roughness.r, perturbedNormal, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(f(0.0), roughness.r, perturbedNormal, normalW, view, cameraPosition, positionW, {
             albedoRgb: albedoTexture.rgb,
             ambientOcclusion: ambientOcclusion.r,
-            opacity: opacityTexture.r,
         });
 
-        const fragOutput = outputFragColor(pbrShading.lighting, { alpha: pbrShading.alpha });
+        const fragOutput = outputFragColor(pbrShading.lighting);
 
         this.material.addOutputNode(vertexOutput);
         this.material.addOutputNode(fragOutput);
