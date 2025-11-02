@@ -48,7 +48,7 @@ export class TireMaterial {
         textures: {
             albedo: Texture;
             roughness: Texture;
-            normal: Texture;
+            normalHeight: Texture;
             ambientOcclusion: Texture;
             height: Texture;
         },
@@ -71,12 +71,13 @@ export class TireMaterial {
 
         const splitUV = splitVec(uv);
 
-        const scaledUV = mul(vec2(splitUV.y, splitUV.x), f(5.0));
+        const scaling = f(3);
+        const scaledUV = mul(vec2(splitUV.y, splitUV.x), scaling);
 
         const cameraPosition = uniformCameraPosition();
         const viewDirection = getViewDirection(positionW, cameraPosition);
 
-        const normalHeightMapTexture = uniformTexture2d(textures.normal).source;
+        const normalHeightMapTexture = uniformTexture2d(textures.normalHeight).source;
         const normalHeightMapValue = textureSample(normalHeightMapTexture, scaledUV);
         const { output: perturbedNormal, uvOffset } = perturbNormal(
             scaledUV,
