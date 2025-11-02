@@ -139,7 +139,7 @@ export async function createRoverScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
-        roverControls.update();
+        roverControls.update(deltaSeconds);
 
         if (scene.activeCamera !== roverControls.getActiveCamera()) {
             if (scene.activeCamera !== null) {

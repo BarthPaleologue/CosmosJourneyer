@@ -896,6 +896,12 @@ export class StarSystemView implements View {
             fuelRequiredForJump / spaceship.getTotalFuelCapacity(),
         );
 
+        const cameraPosition = this.scene.getActiveControls().getActiveCamera().getWorldMatrix().getTranslation();
+        const upDirection = cameraPosition
+            .subtract(nearestCelestialBody.getTransform().getAbsolutePosition())
+            .normalize();
+        this.vehicleControls.setUpDirection(upDirection);
+
         this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
 
         // update missions
