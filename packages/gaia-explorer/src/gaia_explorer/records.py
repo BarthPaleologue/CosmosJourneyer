@@ -20,12 +20,14 @@ class StarRecord:
     z: float
     temperature: Optional[float]
     source_id: Optional[int] = None
+    nature: Optional[str] = None
 
 
 def iter_star_records(
     rows: Table,
     name_overrides: Optional[Dict[int, str]] = None,
     temperature_overrides: Optional[Dict[int, float]] = None,
+    nature_overrides: Optional[Dict[int, str]] = None,
 ) -> Iterator[StarRecord]:
     for row in rows:
         sid_value = extract_row_value(row, "source_id")
@@ -38,16 +40,21 @@ def iter_star_records(
 
         override_name: Optional[str] = None
         override_temperature: Optional[float] = None
+        override_nature: Optional[str] = None
         if name_overrides is not None:
             if sid_int is not None:
                 override_name = name_overrides.get(sid_int)
         if temperature_overrides is not None:
             if sid_int is not None:
                 override_temperature = temperature_overrides.get(sid_int)
+        if nature_overrides is not None:
+            if sid_int is not None:
+                override_nature = nature_overrides.get(sid_int)
         star = row_to_star(
             row,
             override_name=override_name,
             override_temperature=override_temperature,
+            override_nature=override_nature,
         )
         if star is not None:
             yield star
@@ -57,6 +64,7 @@ def row_to_star(
     row: Row,
     override_name: Optional[str] = None,
     override_temperature: Optional[float] = None,
+    override_nature: Optional[str] = None,
 ) -> Optional[StarRecord]:
     source_id = extract_row_value(row, "source_id")
     if source_id is not None:
@@ -98,6 +106,7 @@ def row_to_star(
         z=z,
         temperature=temperature,
         source_id=source_id,
+        nature=override_nature,
     )
 
 

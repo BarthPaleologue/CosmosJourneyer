@@ -17,6 +17,8 @@ class ResolveSimbadNamesTests(unittest.TestCase):
         designation = "Gaia DR3 2635476908753563008"
 
         simbad_instance = mock_simbad_cls.return_value
+        simbad_instance.add_votable_fields.return_value = None
+
         result_table = Table(
             names=("SCRIPT_NUMBER_ID", "MAIN_ID", "IDS"),
             dtype=("int32", "U32", "U128"),

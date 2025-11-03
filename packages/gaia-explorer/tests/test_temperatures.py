@@ -1,13 +1,15 @@
 import sys
 import unittest
-from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from gaia_explorer.temperatures import estimate_temperature_from_bp_rp
-from gaia_explorer.temperatures import resolve_temperature_overrides
 from astropy.table import Table
+
+from gaia_explorer.metadata import SimbadMetadata
+from gaia_explorer.temperatures import estimate_temperature_from_bp_rp
+from gaia_explorer.temperatures import estimate_temperature_from_spectral_type
+from gaia_explorer.temperatures import resolve_temperature_overrides
 
 
 class TemperatureEstimationTests(unittest.TestCase):
@@ -32,35 +34,78 @@ class TemperatureEstimationTests(unittest.TestCase):
 
 
 class TemperatureFallbackTests(unittest.TestCase):
-    @patch("gaia_explorer.temperatures.Simbad")
-    def test_trappist_temperature_within_expected_range(self, mock_simbad) -> None:
+    def test_metadata_temperature_is_preferred(self) -> None:
         source_id = 2635476908753563008
-        designation = "Gaia DR3 2635476908753563008"
-
-        gaia_rows = Table(
-            names=("source_id", "designation", "teff_k", "bp_rp"),
-            dtype=("int64", "U40", "float64", "float64"),
+        rows = Table(
+            names=("source_id", "teff_k", "bp_rp"),
+            dtype=("int64", "float64", "float64"),
         )
-        gaia_rows.add_row((source_id, designation, float("nan"), 4.9))
+        rows.add_row((source_id, float("nan"), float("nan")))
 
-        simbad_rows = Table(
-            names=("main_id", "mesfe_h.teff", "user_specified_id", "object_number_id"),
-            dtype=("U32", "int32", "U40", "int32"),
+        metadata = {
+            source_id: SimbadMetadata(
+                name="TRAPPIST-1",
+                spectral_type="M8",
+                object_type="PM*",
+                effective_temperature=2450.0,
+            )
+        }
+
+        overrides = resolve_temperature_overrides(rows, metadata)
+        self.assertAlmostEqual(overrides[source_id], 2450.0)
+
+    def test_spectral_type_heuristic(self) -> None:
+        source_id = 123
+        rows = Table(
+            names=("source_id", "teff_k", "bp_rp"),
+            dtype=("int64", "float64", "float64"),
         )
-        simbad_rows.add_row(("TRAPPIST-1", 2400, designation, 253))
+        rows.add_row((source_id, float("nan"), float("nan")))
 
-        simbad_instance = mock_simbad.return_value
-        simbad_instance.query_objects.return_value = simbad_rows
+        metadata = {
+            source_id: SimbadMetadata(
+                name="Cool Companion",
+                spectral_type="M5V",
+                object_type="*",
+                effective_temperature=None,
+            )
+        }
 
-        overrides = resolve_temperature_overrides(
-            gaia_rows, name_overrides={source_id: "TRAPPIST-1"}, batch_size=10
-        )
-
+        overrides = resolve_temperature_overrides(rows, metadata)
         self.assertIn(source_id, overrides)
-        temperature = overrides[source_id]
-        self.assertGreaterEqual(temperature, 2350.0)
-        self.assertLessEqual(temperature, 2550.0)
-        simbad_instance.query_objects.assert_called()
+        self.assertTrue(2500.0 < overrides[source_id] < 3100.0)
+
+    def test_default_fallback_applied(self) -> None:
+        source_id = 999
+        rows = Table(
+            names=("source_id", "teff_k", "bp_rp"),
+            dtype=("int64", "float64", "float64"),
+        )
+        rows.add_row((source_id, float("nan"), float("nan")))
+
+        metadata: dict[int, SimbadMetadata] = {
+            source_id: SimbadMetadata(
+                name="Mystery Star",
+                spectral_type=None,
+                object_type=None,
+                effective_temperature=None,
+            )
+        }
+
+        overrides = resolve_temperature_overrides(rows, metadata)
+        self.assertEqual(overrides[source_id], 3500.0)
+
+
+class SpectralTypeEstimationTests(unittest.TestCase):
+    def test_white_dwarf_detection(self) -> None:
+        self.assertAlmostEqual(estimate_temperature_from_spectral_type("DA5"), 5000.0)
+        self.assertEqual(estimate_temperature_from_spectral_type("DB"), 12000.0)
+
+    def test_main_sequence_interpolation(self) -> None:
+        temp = estimate_temperature_from_spectral_type("K5")
+        self.assertIsNotNone(temp)
+        assert temp is not None
+        self.assertTrue(3600.0 < temp < 4100.0)
 
 
 if __name__ == "__main__":

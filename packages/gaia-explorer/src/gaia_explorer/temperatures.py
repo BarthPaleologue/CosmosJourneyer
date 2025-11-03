@@ -1,13 +1,13 @@
-"""Fallback temperature resolution helpers."""
+"""Fallback temperature helpers."""
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Optional, Set
 
-from astroquery.simbad import Simbad
-from astropy.table import Row, Table
+from astropy.table import Table
 
-from .records import extract_row_value, safe_float, safe_str
+from .metadata import SimbadMetadata
+from .records import extract_row_value, safe_float
 
 # Constants for the Ballesteros (2012) colour-temperature approximation.
 _BV_CONVERSION_OFFSET = 0.020
@@ -15,21 +15,75 @@ _BV_CONVERSION_SCALE = 1.289
 _BALLASTEROS_MIN_BV = -0.4
 _BALLASTEROS_MAX_BV = 2.0
 
+_DEFAULT_FALLBACK_TEMPERATURE = 3500.0
+_WHITE_DWARF_FALLBACK = 12000.0
+_NEUTRON_STAR_FALLBACK = 600000.0
+_BLACK_HOLE_FALLBACK = 100000.0
+
 
 def resolve_temperature_overrides(
     rows: Table,
-    name_overrides: Optional[Dict[int, str]] = None,
-    batch_size: int = 400,
+    metadata_map: Dict[int, SimbadMetadata],
 ) -> Dict[int, float]:
     """
     Build a map of {source_id: temperature} for stars lacking Gaia teff_gspphot.
 
     Resolution strategy:
-      1. Query SIMBAD for physical parameters (temperatures).
-      2. Retry unresolved stars using human-friendly names when available.
-      3. Fall back to a colour-based estimate using Gaia BP-RP.
+      1. Use SIMBAD-provided effective temperatures when available.
+      2. Fall back to colour-based estimation from Gaia BP-RP.
+      3. Estimate from spectral type / object type heuristics.
+      4. Default to a cool dwarf temperature as a last resort.
     """
-    missing: List[Tuple[int, str]] = []
+    missing_ids = _collect_missing_temperature_ids(rows)
+    if not missing_ids:
+        return {}
+
+    print(f"[temperature] attempting fallback for {len(missing_ids)} stars with missing Gaia Teff.")
+
+    overrides: Dict[int, float] = {}
+
+    # Pass 1 – direct SIMBAD Teff.
+    for sid in missing_ids:
+        meta = metadata_map.get(sid)
+        if meta and meta.effective_temperature is not None:
+            overrides[sid] = meta.effective_temperature
+    if overrides:
+        print(f"[temperature] SIMBAD provided temperatures for {len(overrides)} stars.")
+
+    # Pass 2 – Gaia colour-based estimate.
+    unresolved: Set[int] = set(missing_ids) - set(overrides)
+    if unresolved:
+        colour_overrides = _estimate_temperatures_from_color(rows, unresolved)
+        overrides.update(colour_overrides)
+
+    # Pass 3 – spectral type / object type heuristics.
+    unresolved = set(missing_ids) - set(overrides)
+    heuristic_overrides: Dict[int, float] = {}
+    for sid in unresolved:
+        meta = metadata_map.get(sid)
+        if not meta:
+            continue
+        temp = estimate_temperature_from_spectral_type(meta.spectral_type)
+        if temp is None:
+            temp = _default_temp_for_object_type(meta.object_type)
+        if temp is not None:
+            heuristic_overrides[sid] = temp
+    if heuristic_overrides:
+        print(f"[temperature] Spectral heuristics supplied temperatures for {len(heuristic_overrides)} stars.")
+        overrides.update(heuristic_overrides)
+
+    # Pass 4 – last resort default.
+    unresolved = set(missing_ids) - set(overrides)
+    if unresolved:
+        for sid in unresolved:
+            overrides[sid] = _DEFAULT_FALLBACK_TEMPERATURE
+        print(f"[temperature] Assigned default dwarf temperature to {len(unresolved)} stars.")
+
+    return overrides
+
+
+def _collect_missing_temperature_ids(rows: Table) -> Set[int]:
+    missing_ids: Set[int] = set()
     for row in rows:
         if safe_float(row, "teff_k") is not None:
             continue
@@ -40,170 +94,8 @@ def resolve_temperature_overrides(
             sid = int(sid_raw)
         except Exception:
             continue
-
-        designation = safe_str(row, "designation")
-        query_id = designation or f"Gaia DR3 {sid}"
-        missing.append((sid, query_id))
-
-    if not missing:
-        return {}
-
-    print(f"[temperature] attempting fallback for {len(missing)} stars with missing Gaia Teff.")
-    overrides: Dict[int, float] = {}
-
-    # Pass 1: query SIMBAD using Gaia DR3 designations.
-    overrides.update(_resolve_temperatures_from_simbad(missing, batch_size=batch_size))
-
-    # Pass 2: for any still unresolved, try proper names provided by SIMBAD name resolver.
-    if name_overrides:
-        unresolved_with_names = [
-            (sid, name_overrides[sid])
-            for sid, _ in missing
-            if sid not in overrides and sid in name_overrides
-        ]
-        if unresolved_with_names:
-            overrides.update(
-                _resolve_temperatures_from_simbad(unresolved_with_names, batch_size=batch_size)
-            )
-
-    # Pass 3: estimate temperatures from Gaia colours.
-    unresolved_ids: Set[int] = {sid for sid, _ in missing if sid not in overrides}
-    if unresolved_ids:
-        overrides.update(_estimate_temperatures_from_color(rows, unresolved_ids))
-
-    return overrides
-
-
-def _resolve_temperatures_from_simbad(
-    entries: Sequence[Tuple[int, str]],
-    batch_size: int = 400,
-) -> Dict[int, float]:
-    """Query SIMBAD for effective temperatures using the provided identifiers."""
-    query_ids: List[str] = []
-    source_ids: List[int] = []
-    seen: Set[Tuple[int, str]] = set()
-    for sid, identifier in entries:
-        key = (sid, identifier.strip() if identifier else "")
-        if not key[1] or key in seen:
-            continue
-        seen.add(key)
-        query_ids.append(key[1])
-        source_ids.append(sid)
-
-    if not query_ids:
-        return {}
-
-    sim = Simbad()
-    try:
-        sim.add_votable_fields("mesFe_h")
-    except Exception:
-        # Fall back to default columns if the table cannot be added (older SIMBAD versions).
-        pass
-    overrides: Dict[int, float] = {}
-
-    for start in range(0, len(query_ids), batch_size):
-        chunk_ids = query_ids[start : start + batch_size]
-        chunk_sids = source_ids[start : start + batch_size]
-        id_map = {identifier: sid for identifier, sid in zip(chunk_ids, chunk_sids)}
-        try:
-            table = sim.query_objects(chunk_ids)
-        except Exception:
-            continue
-        if table is None or len(table) == 0:
-            continue
-
-        temp_columns = _temperature_column_names(table)
-        if not temp_columns:
-            continue
-
-        index_column = None
-        for candidate in ("SCRIPT_NUMBER_ID", "OBJECT_NUMBER_ID"):
-            if candidate in table.colnames:
-                index_column = candidate
-                break
-            lower = candidate.lower()
-            if lower in table.colnames:
-                index_column = lower
-                break
-
-        identifier_column = _choose_table_column(table, ["user_specified_id", "typed_id"])
-
-        for row_index, row in enumerate(table):
-            temp = _extract_first_temperature(row, temp_columns)
-            if temp is None:
-                continue
-
-            sid: Optional[int] = None
-
-            if identifier_column:
-                identifier_value = extract_row_value(row, identifier_column)
-                if identifier_value is not None:
-                    sid = id_map.get(str(identifier_value).strip())
-
-            if sid is None and index_column:
-                try:
-                    chunk_index = int(row[index_column]) - 1
-                except Exception:
-                    chunk_index = None
-            else:
-                chunk_index = row_index
-
-            if sid is None:
-                if chunk_index is None or not (0 <= chunk_index < len(chunk_sids)):
-                    continue
-                sid = chunk_sids[chunk_index]
-
-            overrides.setdefault(sid, temp)
-
-    if overrides:
-        print(f"[temperature] SIMBAD provided temperatures for {len(overrides)} stars.")
-
-    return overrides
-
-
-def _choose_table_column(table: Table, candidates: Sequence[str]) -> Optional[str]:
-    """Return the first matching column name from candidates (case-insensitive)."""
-    if not table or not table.colnames:
-        return None
-    existing = set(table.colnames)
-    lower_map = {name.lower(): name for name in table.colnames}
-    for candidate in candidates:
-        if candidate in existing:
-            return candidate
-    for candidate in candidates:
-        lowered = candidate.lower()
-        if lowered in lower_map:
-            return lower_map[lowered]
-    return None
-
-
-def _temperature_column_names(table: Table) -> List[str]:
-    """Return the column names that carry effective temperature values."""
-    matches: List[str] = []
-    for name in table.colnames:
-        column = table[name]
-        ucd = str(column.meta.get("ucd", "")).lower()
-        if "phys.temperature.effective" in ucd:
-            matches.append(name)
-            continue
-        if "teff" in name.lower():
-            matches.append(name)
-    return matches
-
-
-def _extract_first_temperature(row: Row, columns: Sequence[str]) -> Optional[float]:
-    """Extract the first numeric temperature from the provided row."""
-    for column in columns:
-        value = extract_row_value(row, column)
-        if value is None:
-            continue
-        try:
-            temp = float(value)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(temp) and temp > 0:
-            return temp
-    return None
+        missing_ids.add(sid)
+    return missing_ids
 
 
 def _estimate_temperatures_from_color(rows: Table, unresolved_ids: Set[int]) -> Dict[int, float]:
@@ -236,7 +128,7 @@ def estimate_temperature_from_bp_rp(bp_rp: Optional[float]) -> Optional[float]:
 
     Conversion uses the Jordi et al. (2010) empirical BP-RP to B-V relation for dwarfs
     combined with the Ballesteros (2012) colour-temperature approximation.
-    Results are clamped to a conservative 2400 K – 15000 K range.
+    Results are clamped to 600 K – 40 000 K.
     """
     if bp_rp is None or not math.isfinite(bp_rp):
         return None
@@ -251,5 +143,99 @@ def estimate_temperature_from_bp_rp(bp_rp: Optional[float]) -> Optional[float]:
         return None
 
     temperature = 4600.0 * (1.0 / denominator1 + 1.0 / denominator2)
-    temperature = min(max(temperature, 2400.0), 15000.0)
+    temperature = min(max(temperature, 600.0), 40000.0)
     return temperature
+
+
+_SPECTRAL_SEQUENCE = ["O", "B", "A", "F", "G", "K", "M", "L", "T", "Y"]
+_SPECTRAL_BASE_TEMPS = {
+    "O": 30000.0,
+    "B": 20000.0,
+    "A": 8500.0,
+    "F": 6500.0,
+    "G": 5600.0,
+    "K": 4400.0,
+    "M": 3300.0,
+    "L": 2100.0,
+    "T": 1300.0,
+    "Y": 600.0,
+}
+
+
+def estimate_temperature_from_spectral_type(spectral_type: Optional[str]) -> Optional[float]:
+    """Estimate temperature from a SIMBAD spectral type string."""
+    if not spectral_type:
+        return None
+
+    s = spectral_type.strip()
+    if not s:
+        return None
+
+    upper = s.upper()
+
+    # White dwarf notation (DA, DB, DQ, DZ, DO, DC, etc.)
+    if upper.startswith("D"):
+        digits = _extract_numeric_component(upper)
+        if digits is not None:
+            return max(5000.0, min(40000.0, digits * 1000.0))
+        return _WHITE_DWARF_FALLBACK
+
+    # Handle sd (subdwarf) prefixes.
+    if upper.startswith("SD"):
+        upper = upper[2:]
+
+    base_letter = None
+    for ch in upper:
+        if ch in _SPECTRAL_BASE_TEMPS:
+            base_letter = ch
+            break
+
+    if base_letter is None:
+        return None
+
+    base_temp = _SPECTRAL_BASE_TEMPS[base_letter]
+
+    subclass = _extract_numeric_component(upper)
+    if subclass is None:
+        return base_temp
+
+    try:
+        index = _SPECTRAL_SEQUENCE.index(base_letter)
+    except ValueError:
+        return base_temp
+
+    next_index = min(index + 1, len(_SPECTRAL_SEQUENCE) - 1)
+    next_letter = _SPECTRAL_SEQUENCE[next_index]
+    next_temp = _SPECTRAL_BASE_TEMPS[next_letter]
+
+    fraction = max(0.0, min(1.0, subclass / 10.0))
+    interpolated = base_temp - fraction * (base_temp - next_temp)
+    return interpolated
+
+
+def _default_temp_for_object_type(object_type: Optional[str]) -> Optional[float]:
+    if not object_type:
+        return None
+    upper = object_type.upper()
+    if "WD" in upper:
+        return _WHITE_DWARF_FALLBACK
+    if "NS" in upper or "PSR" in upper:
+        return _NEUTRON_STAR_FALLBACK
+    if "BH" in upper:
+        return _BLACK_HOLE_FALLBACK
+    return None
+
+
+def _extract_numeric_component(text: str) -> Optional[float]:
+    digits = []
+    for ch in text:
+        if ch.isdigit() or ch == ".":
+            digits.append(ch)
+        elif digits:
+            break
+    if not digits:
+        return None
+    try:
+        return float("".join(digits))
+    except ValueError:
+        return None

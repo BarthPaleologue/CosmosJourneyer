@@ -209,11 +209,22 @@ def _pick_best_name(
     return best_label
 
 
+from .metadata import SimbadMetadata
+
+
 def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
+    """Legacy helper returning only the preferred names."""
+    metadata = resolve_simbad_metadata(rows, batch_size=batch_size)
+    return {sid: meta.name for sid, meta in metadata.items()}
+
+
+def resolve_simbad_metadata(
+    rows: Table, batch_size: int = 400
+) -> Dict[int, SimbadMetadata]:
     """
-    Resolve human-readable names by querying SIMBAD **by identifier**.
-    Uses row['designation'] ('Gaia DR3 <source_id>'); if missing, builds it.
-    Returns {source_id: resolved_name}.
+    Resolve SIMBAD metadata (preferred name, spectral type, object type, Teff).
+
+    Returns {source_id: SimbadMetadata}.
     """
     query_ids: List[str] = []
     sids: List[int] = []
@@ -232,9 +243,9 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
         return {}
 
     sim = Simbad()
-    sim.add_votable_fields("ids")  # MAIN_ID typically included by default
+    sim.add_votable_fields("ids", "sp_type", "otype", "mesFe_h")
 
-    result: Dict[int, str] = {}
+    result: Dict[int, SimbadMetadata] = {}
     enrichment_cache: Dict[str, List[str]] = {}
     for start in range(0, len(query_ids), batch_size):
         sub_ids = query_ids[start : start + batch_size]
@@ -249,6 +260,9 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
         idx_col = _choose_col(tbl, ["SCRIPT_NUMBER_ID", "OBJECT_NUMBER_ID"])
         main_col = _choose_col(tbl, ["MAIN_ID", "Main_id", "main_id"])
         ids_col = _choose_col(tbl, ["IDS", "ids"])
+        sp_col = _choose_col(tbl, ["SP_TYPE", "sp_type"])
+        otype_col = _choose_col(tbl, ["OTYPE", "otype"])
+        teff_col = _choose_col(tbl, ["MESFE_H.TEFF", "mesfe_h.teff"])
 
         if idx_col:
             for row in tbl:
@@ -268,7 +282,15 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
                             name = _pick_best_name(
                                 main_id, ids_field, sub_ids[idx], extra
                             )
-                    result[sid] = name
+                    spectral_type = safe_str(row, sp_col) if sp_col else None
+                    object_type = safe_str(row, otype_col) if otype_col else None
+                    teff = _safe_float(row, teff_col)
+                    result[sid] = SimbadMetadata(
+                        name=name,
+                        spectral_type=spectral_type,
+                        object_type=object_type,
+                        effective_temperature=teff,
+                    )
                 except Exception:
                     continue
         else:
@@ -287,7 +309,15 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
                         name = _pick_best_name(
                             main_id, ids_field, sub_ids[i], extra
                         )
-                result[sid] = name
+                spectral_type = safe_str(row, sp_col) if sp_col else None
+                object_type = safe_str(row, otype_col) if otype_col else None
+                teff = _safe_float(row, teff_col)
+                result[sid] = SimbadMetadata(
+                    name=name,
+                    spectral_type=spectral_type,
+                    object_type=object_type,
+                    effective_temperature=teff,
+                )
 
     print(f"[name-resolve] SIMBAD resolved {len(result)} of {len(sids)} objects.")
     return result
@@ -327,6 +357,35 @@ def _fetch_additional_identifiers(
             identifiers.append(ident)
     cache[query_id] = identifiers
     return identifiers
+
+
+def _choose_table_column(table: Table, candidates: Sequence[str]) -> Optional[str]:
+    """Select the first matching column from the provided candidate names."""
+    if table is None or not table.colnames:
+        return None
+    existing = set(table.colnames)
+    lower_map = {name.lower(): name for name in table.colnames}
+    for candidate in candidates:
+        if candidate in existing:
+            return candidate
+    for candidate in candidates:
+        lowered = candidate.lower()
+        if lowered in lower_map:
+            return lower_map[lowered]
+    return None
+
+
+def _safe_float(row, column: Optional[str]) -> Optional[float]:
+    if column is None:
+        return None
+    value = extract_row_value(row, column)
+    if value is None:
+        return None
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    return result
 
 
 def _choose_table_column(table: Table, candidates: Sequence[str]) -> Optional[str]:

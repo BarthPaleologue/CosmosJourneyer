@@ -52,11 +52,12 @@ from gaia_explorer import cli
 def stub_dependencies(monkeypatch):
     """Stub expensive dependencies so CLI tests stay fast and offline."""
     monkeypatch.setattr(cli, "query_gaia", lambda query: [])
-    monkeypatch.setattr(cli, "resolve_simbad_names", lambda rows: {})
+    monkeypatch.setattr(cli, "resolve_simbad_metadata", lambda rows: {})
+    monkeypatch.setattr(cli, "resolve_temperature_overrides", lambda rows, metadata_map: {})
     monkeypatch.setattr(
         cli,
         "iter_star_records",
-        lambda rows, name_overrides=None: iter(()),
+        lambda rows, name_overrides=None, temperature_overrides=None, nature_overrides=None: iter(()),
     )
     monkeypatch.setattr(
         cli,

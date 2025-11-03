@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 from .config import GridConfig, QueryConfig
-from .naming import resolve_simbad_names
+from .classification import classify_star
+from .metadata import SimbadMetadata
+from .naming import resolve_simbad_metadata
 from .output import build_output, dump_outputs
 from .query import query_gaia
-from .records import iter_star_records
+from .records import extract_row_value, iter_star_records, safe_float
 from .temperatures import resolve_temperature_overrides
 from .spatial import SpatialBinner
 
@@ -108,11 +110,24 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     rows = query_gaia(query)
 
-    # Resolve human-readable names once
-    name_map = resolve_simbad_names(rows)
-    temperature_overrides = resolve_temperature_overrides(
-        rows, name_overrides=name_map
-    )
+    metadata_map = resolve_simbad_metadata(rows)
+    name_map = {sid: meta.name for sid, meta in metadata_map.items()}
+    temperature_overrides = resolve_temperature_overrides(rows, metadata_map)
+
+    nature_overrides: Dict[int, str] = {}
+    for row in rows:
+        sid_raw = extract_row_value(row, "source_id")
+        if sid_raw is None:
+            continue
+        try:
+            sid = int(sid_raw)
+        except Exception:
+            continue
+        meta: Optional[SimbadMetadata] = metadata_map.get(sid)
+        temp = safe_float(row, "teff_k")
+        if temp is None:
+            temp = temperature_overrides.get(sid)
+        nature_overrides[sid] = classify_star(meta, temp)
 
     binner = SpatialBinner(grid)
     retained = 0
@@ -120,6 +135,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         rows,
         name_overrides=name_map,
         temperature_overrides=temperature_overrides,
+        nature_overrides=nature_overrides,
     ):
         if binner.add_star(star):
             retained += 1

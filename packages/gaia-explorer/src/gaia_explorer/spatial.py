@@ -57,6 +57,7 @@ class SpatialBinner:
                 "name": star.name,
                 "relative_position": [norm_x, norm_y, norm_z],
                 "temperature": star.temperature,
+                "nature": star.nature,
             }
         )
         return True
