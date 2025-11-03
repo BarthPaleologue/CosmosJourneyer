@@ -94,11 +94,17 @@ def _resolve_temperatures_from_simbad(
         return {}
 
     sim = Simbad()
+    try:
+        sim.add_votable_fields("mesFe_h")
+    except Exception:
+        # Fall back to default columns if the table cannot be added (older SIMBAD versions).
+        pass
     overrides: Dict[int, float] = {}
 
     for start in range(0, len(query_ids), batch_size):
         chunk_ids = query_ids[start : start + batch_size]
         chunk_sids = source_ids[start : start + batch_size]
+        id_map = {identifier: sid for identifier, sid in zip(chunk_ids, chunk_sids)}
         try:
             table = sim.query_objects(chunk_ids)
         except Exception:
@@ -115,13 +121,26 @@ def _resolve_temperatures_from_simbad(
             if candidate in table.colnames:
                 index_column = candidate
                 break
+            lower = candidate.lower()
+            if lower in table.colnames:
+                index_column = lower
+                break
+
+        identifier_column = _choose_table_column(table, ["user_specified_id", "typed_id"])
 
         for row_index, row in enumerate(table):
             temp = _extract_first_temperature(row, temp_columns)
             if temp is None:
                 continue
 
-            if index_column:
+            sid: Optional[int] = None
+
+            if identifier_column:
+                identifier_value = extract_row_value(row, identifier_column)
+                if identifier_value is not None:
+                    sid = id_map.get(str(identifier_value).strip())
+
+            if sid is None and index_column:
                 try:
                     chunk_index = int(row[index_column]) - 1
                 except Exception:
@@ -129,16 +148,33 @@ def _resolve_temperatures_from_simbad(
             else:
                 chunk_index = row_index
 
-            if chunk_index is None or not (0 <= chunk_index < len(chunk_sids)):
-                continue
+            if sid is None:
+                if chunk_index is None or not (0 <= chunk_index < len(chunk_sids)):
+                    continue
+                sid = chunk_sids[chunk_index]
 
-            sid = chunk_sids[chunk_index]
             overrides.setdefault(sid, temp)
 
     if overrides:
         print(f"[temperature] SIMBAD provided temperatures for {len(overrides)} stars.")
 
     return overrides
+
+
+def _choose_table_column(table: Table, candidates: Sequence[str]) -> Optional[str]:
+    """Return the first matching column name from candidates (case-insensitive)."""
+    if not table or not table.colnames:
+        return None
+    existing = set(table.colnames)
+    lower_map = {name.lower(): name for name in table.colnames}
+    for candidate in candidates:
+        if candidate in existing:
+            return candidate
+    for candidate in candidates:
+        lowered = candidate.lower()
+        if lowered in lower_map:
+            return lower_map[lowered]
+    return None
 
 
 def _temperature_column_names(table: Table) -> List[str]:
