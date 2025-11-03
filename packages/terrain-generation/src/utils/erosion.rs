@@ -25,7 +25,7 @@ fn curl3d(vector: &Vector3) -> Vector3 {
     Vector3::new(
         vector.z - vector.y,
         vector.x - vector.z,
-        vector.y - vector.x
+        vector.y - vector.x,
     )
 }
 

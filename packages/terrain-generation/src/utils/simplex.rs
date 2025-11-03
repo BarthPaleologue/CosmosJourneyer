@@ -35,7 +35,11 @@
 use crate::utils::vector3::Vector3;
 
 fn fast_floor(x: f32) -> f32 {
-    if f32::floor(x) <= x { f32::floor(x) } else { f32::floor(x) - 1.0 }
+    if f32::floor(x) <= x {
+        f32::floor(x)
+    } else {
+        f32::floor(x) - 1.0
+    }
 }
 
 /* Static data ---------------------- */
@@ -92,7 +96,7 @@ const GRAD3LUT: [[f32; 3]; 16] = [
     [1.0, 0.0, 1.0],
     [-1.0, 0.0, 1.0], // 4 repeats to make 16
     [0.0, 1.0, -1.0],
-    [0.0, -1.0, -1.0]
+    [0.0, -1.0, -1.0],
 ];
 const GRAD4LUT: [[f32; 4]; 32] = [
     [0.0, 1.0, 1.0, 1.0],
@@ -222,7 +226,6 @@ fn grad4(hash: usize) -> (f32, f32, f32, f32) {
     (gx, gy, gz, gw)
 }
 
-
 /* Skewing factors for 3D simplex grid:
  * F3 = 1/3
  * G3 = 1/6 */
@@ -239,8 +242,8 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
     let (mut gx0, mut gy0, mut gz0, mut gx1, mut gy1, mut gz1) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0); /* Gradients at simplex corners */
     let (mut gx2, mut gy2, mut gz2, mut gx3, mut gy3, mut gz3) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-
-    let (mut t20, mut t40, mut t21, mut t41, mut t22, mut t42, mut t23, mut t43) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    let (mut t20, mut t40, mut t21, mut t41, mut t22, mut t42, mut t23, mut t43) =
+        (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     /* Skew the input space to determine which simplex cell we're in */
     let s = (x + y + z) * F3; /* Very nice and simple skew factor for 3D */
@@ -270,26 +273,34 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
             i1 = 1;
             i2 = 1;
             j2 = 1;
-        } /* X Y Z order */ else if x0 >= z0 {
+        }
+        /* X Y Z order */
+        else if x0 >= z0 {
             i1 = 1;
             i2 = 1;
             k2 = 1;
-        } /* X Z Y order */ else {
+        }
+        /* X Z Y order */
+        else {
             k1 = 1;
             i2 = 1;
             k2 = 1;
         } /* Z X Y order */
     } else {
-// x0<y0
+        // x0<y0
         if y0 < z0 {
             k1 = 1;
             j2 = 1;
             k2 = 1;
-        } /* Z Y X order */ else if x0 < z0 {
+        }
+        /* Z Y X order */
+        else if x0 < z0 {
             j1 = 1;
             j2 = 1;
             k2 = 1;
-        } /* Y Z X order */ else {
+        }
+        /* Y Z X order */
+        else {
             j1 = 1;
             i2 = 1;
             j2 = 1;
@@ -363,7 +374,7 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
 
     /* Compute derivative, if requested by supplying non-null pointers
      * for the last three arguments */
-//if ((NULL != dnoise_dx) && (NULL != dnoise_dy) && (NULL != dnoise_dz)) {
+    //if ((NULL != dnoise_dx) && (NULL != dnoise_dy) && (NULL != dnoise_dz)) {
     /*  A straight, unoptimised calculation would be like:
      *     *dnoise_dx = -8.0f * t20 * t0 * x0 * dot(gx0, gy0, gz0, x0, y0, z0) + t40 * gx0;
      *    *dnoise_dy = -8.0f * t20 * t0 * y0 * dot(gx0, gy0, gz0, x0, y0, z0) + t40 * gy0;
@@ -403,7 +414,7 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
     dnoise_dx *= 28.0; /* Scale derivative to match the noise scaling */
     dnoise_dy *= 28.0;
     dnoise_dz *= 28.0;
-//}
+    //}
 
     gradient.x = dnoise_dx;
     gradient.y = dnoise_dy;
@@ -546,9 +557,9 @@ fn sdnoise4(x: f32, y: f32, z: f32, w: f32, gradient: &mut Vector3) -> f32 {
             PERM[ii
                 + i1 as usize
                 + PERM[jj
-                + j1 as usize
-                + PERM[kk + k1 as usize + PERM[ll + l1 as usize] as usize] as usize]
-                as usize] as usize,
+                    + j1 as usize
+                    + PERM[kk + k1 as usize + PERM[ll + l1 as usize] as usize] as usize]
+                    as usize] as usize,
         );
         n1 = t41 * (gx1 * x1 + gy1 * y1 + gz1 * z1 + gw1 * w1);
     } else {
@@ -563,9 +574,9 @@ fn sdnoise4(x: f32, y: f32, z: f32, w: f32, gradient: &mut Vector3) -> f32 {
             PERM[ii
                 + i2 as usize
                 + PERM[jj
-                + j2 as usize
-                + PERM[kk + k2 as usize + PERM[ll + l2 as usize] as usize] as usize]
-                as usize] as usize,
+                    + j2 as usize
+                    + PERM[kk + k2 as usize + PERM[ll + l2 as usize] as usize] as usize]
+                    as usize] as usize,
         );
         n2 = t42 * (gx2 * x2 + gy2 * y2 + gz2 * z2 + gw2 * w2);
     } else {
@@ -580,9 +591,9 @@ fn sdnoise4(x: f32, y: f32, z: f32, w: f32, gradient: &mut Vector3) -> f32 {
             PERM[ii
                 + i3 as usize
                 + PERM[jj
-                + j3 as usize
-                + PERM[kk + k3 as usize + PERM[ll + l3 as usize] as usize] as usize]
-                as usize] as usize,
+                    + j3 as usize
+                    + PERM[kk + k3 as usize + PERM[ll + l3 as usize] as usize] as usize]
+                    as usize] as usize,
         );
         n3 = t43 * (gx3 * x3 + gy3 * y3 + gz3 * z3 + gw3 * w3);
     } else {

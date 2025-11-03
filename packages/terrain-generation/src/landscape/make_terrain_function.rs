@@ -1,7 +1,7 @@
 use crate::landscape::constant_layers::zero_layer;
 use crate::landscape::continent_layer::continent_layer;
-use crate::landscape::simplex_noise_layer::simplex_noise_layer;
 use crate::landscape::mountain_layer::mountain_layer;
+use crate::landscape::simplex_noise_layer::simplex_noise_layer;
 use crate::terrain_settings::TerrainSettings;
 use crate::utils::math::{multiply, smoothstep};
 use crate::utils::vector3::Vector3;
