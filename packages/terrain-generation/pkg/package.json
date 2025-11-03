@@ -1,0 +1,19 @@
+{
+  "name": "terrain-generation",
+  "collaborators": [
+    "Barthélemy Paléologue"
+  ],
+  "version": "1.8.0",
+  "files": [
+    "terrain_generation_bg.wasm",
+    "terrain_generation.js",
+    "terrain_generation_bg.js",
+    "terrain_generation.d.ts"
+  ],
+  "module": "terrain_generation.js",
+  "types": "terrain_generation.d.ts",
+  "sideEffects": [
+    "./terrain_generation.js",
+    "./snippets/*"
+  ]
+}

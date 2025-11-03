@@ -96,8 +96,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       terrain-generation:
-        specifier: ^1.8.0
-        version: 1.8.0
+        specifier: workspace:^1.8.0
+        version: link:../terrain-generation
       zod:
         specifier: ^4.1.12
         version: 4.1.12
@@ -201,6 +201,8 @@ importers:
       vitest:
         specifier: ^4.0.4
         version: 4.0.4(@types/node@24.9.2)(jsdom@27.0.1(postcss@8.5.6))(less@4.3.0)(sass@1.93.2)(stylus@0.64.0)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+
+  packages/terrain-generation: {}
 
   packages/website:
     dependencies:
@@ -4253,9 +4255,6 @@ packages:
   tapable@2.3.0:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
-
-  terrain-generation@1.8.0:
-    resolution: {integrity: sha512-5YTRxvkxp//MERkp7ABzFfNViKXUoWxpVTGAI80d4sV2w5TDcLzh7ZkemXQGYvwQq4+yXdRwwJzrbPac4k0nrA==}
 
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
@@ -9129,8 +9128,6 @@ snapshots:
   symbol-tree@3.2.4: {}
 
   tapable@2.3.0: {}
-
-  terrain-generation@1.8.0: {}
 
   terser-webpack-plugin@5.3.14(webpack@5.102.1):
     dependencies:

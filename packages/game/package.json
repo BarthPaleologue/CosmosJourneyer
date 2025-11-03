@@ -62,7 +62,7 @@
         "i18next": "^25.6.0",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
-        "terrain-generation": "^1.8.0",
+        "terrain-generation": "workspace:^1.8.0",
         "zod": "^4.1.12"
     },
     "devDependencies": {

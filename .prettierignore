@@ -9,3 +9,4 @@ packages/game/doc
 coverage
 .eslintcache
 packages/website/public
+packages/terrain-generation/pkg
