@@ -24,6 +24,7 @@ def build_adql(config: QueryConfig) -> str:
       gs.parallax,
       gs.parallax_over_error,
       gs.ruwe,
+      gs.bp_rp,
       ap.teff_gspphot AS teff_k
     FROM gaiadr3.gaia_source AS gs
     LEFT JOIN gaiadr3.astrophysical_parameters AS ap

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Dict, Iterator, Optional, Tuple
 
 from astropy.table import Row, Table
 
@@ -19,26 +19,52 @@ class StarRecord:
     y: float
     z: float
     temperature: Optional[float]
+    source_id: Optional[int] = None
 
 
 def iter_star_records(
-    rows: Table, name_overrides: Optional[Dict[int, str]] = None
+    rows: Table,
+    name_overrides: Optional[Dict[int, str]] = None,
+    temperature_overrides: Optional[Dict[int, float]] = None,
 ) -> Iterator[StarRecord]:
     for row in rows:
+        sid_value = extract_row_value(row, "source_id")
+        sid_int: Optional[int] = None
+        if sid_value is not None:
+            try:
+                sid_int = int(sid_value)
+            except Exception:
+                sid_int = None
+
         override_name: Optional[str] = None
+        override_temperature: Optional[float] = None
         if name_overrides is not None:
-            sid = extract_row_value(row, "source_id")
-            if sid is not None:
-                try:
-                    override_name = name_overrides.get(int(sid))
-                except Exception:
-                    override_name = None
-        star = row_to_star(row, override_name=override_name)
+            if sid_int is not None:
+                override_name = name_overrides.get(sid_int)
+        if temperature_overrides is not None:
+            if sid_int is not None:
+                override_temperature = temperature_overrides.get(sid_int)
+        star = row_to_star(
+            row,
+            override_name=override_name,
+            override_temperature=override_temperature,
+        )
         if star is not None:
             yield star
 
 
-def row_to_star(row: Row, override_name: Optional[str] = None) -> Optional[StarRecord]:
+def row_to_star(
+    row: Row,
+    override_name: Optional[str] = None,
+    override_temperature: Optional[float] = None,
+) -> Optional[StarRecord]:
+    source_id = extract_row_value(row, "source_id")
+    if source_id is not None:
+        try:
+            source_id = int(source_id)
+        except Exception:
+            source_id = None
+
     parallax = safe_float(row, "parallax")
     ra = safe_float(row, "ra")
     dec = safe_float(row, "dec")
@@ -62,7 +88,17 @@ def row_to_star(row: Row, override_name: Optional[str] = None) -> Optional[StarR
     distance_ly = distance_pc * LIGHT_YEAR_PER_PARSEC
     x, y, z = to_cartesian(ra, dec, distance_ly)
 
-    return StarRecord(name=name, x=x, y=y, z=z, temperature=temperature)
+    if temperature is None and override_temperature is not None:
+        temperature = override_temperature
+
+    return StarRecord(
+        name=name,
+        x=x,
+        y=y,
+        z=z,
+        temperature=temperature,
+        source_id=source_id,
+    )
 
 
 def safe_float(row: Row, key: str) -> Optional[float]:

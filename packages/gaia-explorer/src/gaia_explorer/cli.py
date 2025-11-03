@@ -10,6 +10,7 @@ from .naming import resolve_simbad_names
 from .output import build_output, dump_outputs
 from .query import query_gaia
 from .records import iter_star_records
+from .temperatures import resolve_temperature_overrides
 from .spatial import SpatialBinner
 
 
@@ -109,10 +110,17 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     # Resolve human-readable names once
     name_map = resolve_simbad_names(rows)
+    temperature_overrides = resolve_temperature_overrides(
+        rows, name_overrides=name_map
+    )
 
     binner = SpatialBinner(grid)
     retained = 0
-    for star in iter_star_records(rows, name_overrides=name_map):
+    for star in iter_star_records(
+        rows,
+        name_overrides=name_map,
+        temperature_overrides=temperature_overrides,
+    ):
         if binner.add_star(star):
             retained += 1
 
