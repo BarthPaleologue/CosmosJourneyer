@@ -1,0 +1,78 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory;
+export function __wbg_builddata_free(a: number): void;
+export function __wbg_get_builddata_planet_diameter(a: number): number;
+export function __wbg_set_builddata_planet_diameter(a: number, b: number): void;
+export function __wbg_get_builddata_chunk_depth(a: number): number;
+export function __wbg_set_builddata_chunk_depth(a: number, b: number): void;
+export function __wbg_get_builddata_chunk_tree_direction(a: number): number;
+export function __wbg_set_builddata_chunk_tree_direction(a: number, b: number): void;
+export function __wbg_get_builddata_chunk_cube_position_x(a: number): number;
+export function __wbg_set_builddata_chunk_cube_position_x(a: number, b: number): void;
+export function __wbg_get_builddata_chunk_cube_position_y(a: number): number;
+export function __wbg_set_builddata_chunk_cube_position_y(a: number, b: number): void;
+export function __wbg_get_builddata_chunk_cube_position_z(a: number): number;
+export function __wbg_set_builddata_chunk_cube_position_z(a: number, b: number): void;
+export function __wbg_get_builddata_planet_seed(a: number): number;
+export function __wbg_set_builddata_planet_seed(a: number, b: number): void;
+export function __wbg_get_builddata_resolution(a: number): number;
+export function __wbg_set_builddata_resolution(a: number, b: number): void;
+export function __wbg_get_builddata_terrain_settings(a: number): number;
+export function __wbg_set_builddata_terrain_settings(a: number, b: number): void;
+export function builddata_new(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number,
+    g: number,
+    h: number,
+    i: number,
+): number;
+export function s_min(a: number, b: number, c: number): number;
+export function s_max(a: number, b: number, c: number): number;
+export function gcd(a: number, b: number): number;
+export function clamp(a: number, b: number, c: number): number;
+export function __wbg_returndata_free(a: number): void;
+export function __wbg_get_returndata_nb_instances_created(a: number): number;
+export function __wbg_set_returndata_nb_instances_created(a: number, b: number): void;
+export function __wbg_get_returndata_average_height(a: number): number;
+export function __wbg_set_returndata_average_height(a: number, b: number): void;
+export function build_chunk_vertex_data(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number,
+    g: number,
+    h: number,
+    i: number,
+    j: number,
+    k: number,
+    l: number,
+    m: number,
+    n: number,
+    o: number,
+    p: number,
+    q: number,
+): number;
+export function __wbg_terrainsettings_free(a: number): void;
+export function __wbg_get_terrainsettings_continents_frequency(a: number): number;
+export function __wbg_set_terrainsettings_continents_frequency(a: number, b: number): void;
+export function __wbg_get_terrainsettings_bumps_frequency(a: number): number;
+export function __wbg_set_terrainsettings_bumps_frequency(a: number, b: number): void;
+export function __wbg_get_terrainsettings_mountains_frequency(a: number): number;
+export function __wbg_set_terrainsettings_mountains_frequency(a: number, b: number): void;
+export function __wbg_get_terrainsettings_continents_fragmentation(a: number): number;
+export function __wbg_set_terrainsettings_continents_fragmentation(a: number, b: number): void;
+export function __wbg_get_terrainsettings_continent_base_height(a: number): number;
+export function __wbg_set_terrainsettings_continent_base_height(a: number, b: number): void;
+export function __wbg_get_terrainsettings_max_mountain_height(a: number): number;
+export function __wbg_set_terrainsettings_max_mountain_height(a: number, b: number): void;
+export function __wbg_get_terrainsettings_max_bump_height(a: number): number;
+export function __wbg_set_terrainsettings_max_bump_height(a: number, b: number): void;
+export function terrainsettings_new(): number;
+export function __wbindgen_malloc(a: number, b: number): number;

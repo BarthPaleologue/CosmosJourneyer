@@ -1,0 +1,56 @@
+{
+    "name": "terrain-generation",
+    "version": "1.8.0",
+    "private": false,
+    "description": "Rust-powered terrain generation for Cosmos Journeyer compiled to WebAssembly for fast planetary rendering.",
+    "license": "Apache-2.0",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer"
+    },
+    "homepage": "https://cosmosjourneyer.com",
+    "bugs": {
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
+        "email": "barth.paleologue@cosmosjourneyer.com"
+    },
+    "author": {
+        "name": "Barthélemy Paléologue",
+        "email": "barth.paleologue@cosmosjourneyer.com",
+        "url": "https://barth.paleologue.fr"
+    },
+    "keywords": [
+        "terrain",
+        "procedural-generation",
+        "wasm",
+        "rust",
+        "cosmos-journeyer"
+    ],
+    "files": [
+        "pkg",
+        "src",
+        "Cargo.toml",
+        "Cargo.lock",
+        "README.md",
+        "LICENSE"
+    ],
+    "exports": {
+        ".": {
+            "types": "./pkg/terrain_generation.d.ts",
+            "import": "./pkg/terrain_generation.js"
+        }
+    },
+    "module": "./pkg/terrain_generation.js",
+    "types": "./pkg/terrain_generation.d.ts",
+    "sideEffects": [
+        "./pkg/terrain_generation.js",
+        "./pkg/snippets/*"
+    ],
+    "scripts": {
+        "build": "if command -v wasm-pack >/dev/null 2>&1; then wasm-pack build --release --out-dir pkg --target bundler --out-name terrain_generation; else echo \"wasm-pack not found; skipping WebAssembly rebuild\"; fi",
+        "build:dev": "if command -v wasm-pack >/dev/null 2>&1; then wasm-pack build --dev --out-dir pkg --target bundler --out-name terrain_generation; else echo \"wasm-pack not found; skipping WebAssembly rebuild\"; fi",
+        "format": "if command -v cargo >/dev/null 2>&1; then cargo fmt; else echo \"cargo not found; skipping Rust formatting\"; fi",
+        "lint": "if command -v cargo >/dev/null 2>&1; then cargo clippy --all-targets --all-features -- -D warnings; else echo \"cargo not found; skipping Rust lint\"; fi",
+        "test": "if command -v cargo >/dev/null 2>&1; then cargo test; else echo \"cargo not found; skipping Rust tests\"; fi"
+    }
+}
