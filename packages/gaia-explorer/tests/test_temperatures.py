@@ -1,10 +1,13 @@
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from gaia_explorer.temperatures import estimate_temperature_from_bp_rp
+from gaia_explorer.temperatures import resolve_temperature_overrides
+from astropy.table import Table
 
 
 class TemperatureEstimationTests(unittest.TestCase):
@@ -26,6 +29,38 @@ class TemperatureEstimationTests(unittest.TestCase):
     def test_invalid_input_returns_none(self) -> None:
         self.assertIsNone(estimate_temperature_from_bp_rp(None))
         self.assertIsNone(estimate_temperature_from_bp_rp(float("nan")))
+
+
+class TemperatureFallbackTests(unittest.TestCase):
+    @patch("gaia_explorer.temperatures.Simbad")
+    def test_trappist_temperature_within_expected_range(self, mock_simbad) -> None:
+        source_id = 2635476908753563008
+        designation = "Gaia DR3 2635476908753563008"
+
+        gaia_rows = Table(
+            names=("source_id", "designation", "teff_k", "bp_rp"),
+            dtype=("int64", "U40", "float64", "float64"),
+        )
+        gaia_rows.add_row((source_id, designation, float("nan"), 4.9))
+
+        simbad_rows = Table(
+            names=("main_id", "mesfe_h.teff", "user_specified_id", "object_number_id"),
+            dtype=("U32", "int32", "U40", "int32"),
+        )
+        simbad_rows.add_row(("TRAPPIST-1", 2400, designation, 253))
+
+        simbad_instance = mock_simbad.return_value
+        simbad_instance.query_objects.return_value = simbad_rows
+
+        overrides = resolve_temperature_overrides(
+            gaia_rows, name_overrides={source_id: "TRAPPIST-1"}, batch_size=10
+        )
+
+        self.assertIn(source_id, overrides)
+        temperature = overrides[source_id]
+        self.assertGreaterEqual(temperature, 2350.0)
+        self.assertLessEqual(temperature, 2550.0)
+        simbad_instance.query_objects.assert_called()
 
 
 if __name__ == "__main__":
