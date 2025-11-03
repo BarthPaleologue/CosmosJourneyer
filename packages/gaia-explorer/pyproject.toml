@@ -14,6 +14,7 @@ dependencies = [
 
 [project.scripts]
 gaia-explorer = "gaia_explorer.cli:main"
+gaia-explorer-validate = "gaia_explorer.validation:main"
 
 [tool.uv]
 package = true

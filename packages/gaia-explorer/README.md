@@ -31,6 +31,14 @@ uv run gaia-explorer \
 
 Outputs are written to `out/` inside this project. The binary output is written next to the JSON file using the same base name with the `.json.gz` suffix unless `--binary-output` is provided.
 
+After generating a dataset you can validate it locally:
+
+```bash
+uv run gaia-explorer-validate
+```
+
+The validator checks that every star has a temperature and `nature`, that temperatures sit within plausible bounds, and that classifications use the supported categories.
+
 ## Development
 
 This project follows uv's standard layout. Install uv and run `uv run gaia-explorer --help` to see the complete CLI reference. Because the tool queries the Gaia archive directly, make sure the execution environment has Internet access.
