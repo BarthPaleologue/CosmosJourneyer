@@ -64,6 +64,10 @@ _WELL_KNOWN_PROPER = {
     "Alpha Centauri", "Tau Ceti", "Epsilon Indi",
 }
 
+_WELL_KNOWN_PROPER_CANON = {
+    name.lower(): name for name in _WELL_KNOWN_PROPER
+}
+
 # Catalog ranking, higher is better (after proper name and Bayer/Flamsteed)
 _CATALOG_RANKS = [
     (re.compile(r"^\s*GJ\s*\d+\w*$", re.I), 88, lambda s: re.sub(r"\s+", " ", s.upper().replace("GLIESE", "GJ").replace("GL", "GJ"))),
@@ -141,8 +145,9 @@ def _score_identifier(raw: str) -> Tuple[int, str]:
         return (0, "")
 
     # Prefer well-known proper names found as aliases
-    if s in _WELL_KNOWN_PROPER:
-        return (120, s)
+    canonical = _WELL_KNOWN_PROPER_CANON.get(s.lower())
+    if canonical:
+        return (120, canonical)
 
     # Bayer/Flamsteed expansion
     expanded = _expand_bayer_flamsteed(s)
@@ -158,7 +163,12 @@ def _score_identifier(raw: str) -> Tuple[int, str]:
     return (40, s)
 
 
-def _pick_best_name(main_id: Optional[str], ids_field: Optional[object], fallback_query_id: str) -> str:
+def _pick_best_name(
+    main_id: Optional[str],
+    ids_field: Optional[object],
+    fallback_query_id: str,
+    extra_candidates: Optional[Sequence[str]] = None,
+) -> str:
     """
     Build a candidate pool from MAIN_ID + IDS list, then choose highest score.
     Prefer proper names and full Bayer/Flamsteed expansions.
@@ -180,6 +190,13 @@ def _pick_best_name(main_id: Optional[str], ids_field: Optional[object], fallbac
                     candidates.append(ident)
         except Exception:
             pass
+
+    if extra_candidates:
+        for ident in extra_candidates:
+            ident = ident.strip()
+            if not ident:
+                continue
+            candidates.append(ident[5:].strip() if ident.startswith("NAME ") else ident)
 
     candidates.append(fallback_query_id)
 
@@ -218,6 +235,7 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
     sim.add_votable_fields("ids")  # MAIN_ID typically included by default
 
     result: Dict[int, str] = {}
+    enrichment_cache: Dict[str, List[str]] = {}
     for start in range(0, len(query_ids), batch_size):
         sub_ids = query_ids[start : start + batch_size]
         sub_sids = sids[start : start + batch_size]
@@ -239,7 +257,17 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
                     sid = sub_sids[idx]
                     main_id = str(row[main_col]).strip() if main_col else None
                     ids_field = row[ids_col] if ids_col else None
-                    name = _pick_best_name(main_id, ids_field, sub_ids[idx])
+                    name = _pick_best_name(
+                        main_id, ids_field, sub_ids[idx]
+                    )
+                    if _needs_enrichment(name):
+                        extra = _fetch_additional_identifiers(
+                            sub_ids[idx], cache=enrichment_cache
+                        )
+                        if extra:
+                            name = _pick_best_name(
+                                main_id, ids_field, sub_ids[idx], extra
+                            )
                     result[sid] = name
                 except Exception:
                     continue
@@ -251,7 +279,67 @@ def resolve_simbad_names(rows: Table, batch_size: int = 400) -> Dict[int, str]:
                 main_id = str(row[main_col]).strip() if main_col else None
                 ids_field = row[ids_col] if ids_col else None
                 name = _pick_best_name(main_id, ids_field, sub_ids[i])
+                if _needs_enrichment(name):
+                    extra = _fetch_additional_identifiers(
+                        sub_ids[i], cache=enrichment_cache
+                    )
+                    if extra:
+                        name = _pick_best_name(
+                            main_id, ids_field, sub_ids[i], extra
+                        )
                 result[sid] = name
 
     print(f"[name-resolve] SIMBAD resolved {len(result)} of {len(sids)} objects.")
     return result
+
+
+_ENRICH_LABELS = {"GJ 699", "GLIESE 699"}
+
+
+def _needs_enrichment(label: str) -> bool:
+    """Return True if we should attempt to fetch additional identifiers."""
+    if not label:
+        return False
+    return label.upper() in _ENRICH_LABELS
+
+
+def _fetch_additional_identifiers(
+    query_id: str, cache: Dict[str, List[str]]
+) -> List[str]:
+    """Fetch the extended identifier list from SIMBAD for a specific object."""
+    cached = cache.get(query_id)
+    if cached is not None:
+        return cached
+    try:
+        tbl = Simbad.query_objectids(query_id)
+    except Exception:
+        cache[query_id] = []
+        return []
+    if tbl is None or len(tbl) == 0:
+        cache[query_id] = []
+        return []
+
+    id_column = _choose_table_column(tbl, ["ID", "id"])
+    identifiers: List[str] = []
+    for row in tbl:
+        ident = safe_str(row, id_column) if id_column else None
+        if ident:
+            identifiers.append(ident)
+    cache[query_id] = identifiers
+    return identifiers
+
+
+def _choose_table_column(table: Table, candidates: Sequence[str]) -> Optional[str]:
+    """Select the first matching column from the provided candidate names."""
+    if table is None or not table.colnames:
+        return None
+    existing = set(table.colnames)
+    lower_map = {name.lower(): name for name in table.colnames}
+    for candidate in candidates:
+        if candidate in existing:
+            return candidate
+    for candidate in candidates:
+        lowered = candidate.lower()
+        if lowered in lower_map:
+            return lower_map[lowered]
+    return None
