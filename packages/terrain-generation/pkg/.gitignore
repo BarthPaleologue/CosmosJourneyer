@@ -1,10 +1,1 @@
-# wasm-pack generates this directory. We keep specific artifacts under version control.
 *
-!.gitignore
-!README.md
-!package.json
-!terrain_generation.js
-!terrain_generation.d.ts
-!terrain_generation_bg.js
-!terrain_generation_bg.wasm
-!terrain_generation_bg.wasm.d.ts

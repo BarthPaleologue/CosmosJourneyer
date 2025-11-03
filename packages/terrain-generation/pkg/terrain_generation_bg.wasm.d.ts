@@ -1,25 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function build_chunk_vertex_data(
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-    g: number,
-    h: number,
-    i: number,
-    j: number,
-    k: number,
-    l: number,
-    m: number,
-    n: number,
-    o: number,
-    p: number,
-    q: number,
-): number;
+export function build_chunk_vertex_data(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number): number;
 export function __wbg_builddata_free(a: number): void;
 export function __wbg_get_builddata_planet_diameter(a: number): number;
 export function __wbg_set_builddata_planet_diameter(a: number, b: number): void;
@@ -39,17 +21,7 @@ export function __wbg_get_builddata_resolution(a: number): number;
 export function __wbg_set_builddata_resolution(a: number, b: number): void;
 export function __wbg_get_builddata_terrain_settings(a: number): number;
 export function __wbg_set_builddata_terrain_settings(a: number, b: number): void;
-export function builddata_new(
-    a: number,
-    b: number,
-    c: number,
-    d: number,
-    e: number,
-    f: number,
-    g: number,
-    h: number,
-    i: number,
-): number;
+export function builddata_new(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): number;
 export function __wbg_terrainsettings_free(a: number): void;
 export function __wbg_get_terrainsettings_continents_frequency(a: number): number;
 export function __wbg_set_terrainsettings_continents_frequency(a: number, b: number): void;
