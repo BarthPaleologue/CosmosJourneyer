@@ -1,8 +1,10 @@
 use terrain_generation::terrain_settings::TerrainSettings;
 
-pub static OCEAN_DEPTH: f32 = 7e3;
+#[allow(dead_code)]
+pub const OCEAN_DEPTH: f32 = 7e3;
 
-pub static SETTINGS: TerrainSettings = TerrainSettings {
+#[allow(dead_code)]
+pub const SETTINGS: TerrainSettings = TerrainSettings {
     continents_frequency: 1.0,
     bumps_frequency: 10.0,
     mountains_frequency: 20.0,
@@ -14,4 +16,5 @@ pub static SETTINGS: TerrainSettings = TerrainSettings {
 
 pub const SEED: f32 = 11.0;
 
-pub static PLANET_RADIUS: f32 = 1000e3;
+#[allow(dead_code)]
+pub const PLANET_RADIUS: f32 = 1000e3;

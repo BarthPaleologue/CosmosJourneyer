@@ -20,8 +20,8 @@ pub fn simplex() {
 
     for u in 0..width {
         for v in 0..height {
-            let phi = 2.0 * 3.14 * (u as f32 / width as f32);
-            let theta = 3.14 * (v as f32 / height as f32);
+            let phi = 2.0 * std::f32::consts::PI * (u as f32 / width as f32);
+            let theta = std::f32::consts::PI * (v as f32 / height as f32);
             let sample_point_sphere = Vector3::new(
                 5.0 * f32::sin(theta) * f32::cos(phi),
                 5.0 * f32::cos(theta),

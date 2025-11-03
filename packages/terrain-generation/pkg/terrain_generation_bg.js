@@ -56,62 +56,6 @@ function _assertClass(instance, klass) {
     }
     return instance.ptr;
 }
-/**
- *
- * * Smooth minimum between a and b
- * * @param a the first value
- * * @param b the second value
- * * @param k the smoothness factor
- * * @returns the smooth minimum between a and b
- *
- * @param {number} a
- * @param {number} b
- * @param {number} k
- * @returns {number}
- */
-export function s_min(a, b, k) {
-    const ret = wasm.s_min(a, b, k);
-    return ret;
-}
-
-/**
- *
- * * Smooth maximum between a and b
- * * @param a the first value
- * * @param b the second value
- * * @param k the smoothness factor (should be > 1)
- * * @returns the smooth maximum between a and b
- *
- * @param {number} a
- * @param {number} b
- * @param {number} k
- * @returns {number}
- */
-export function s_max(a, b, k) {
-    const ret = wasm.s_max(a, b, k);
-    return ret;
-}
-
-/**
- * @param {number} a
- * @param {number} b
- * @returns {number}
- */
-export function gcd(a, b) {
-    const ret = wasm.gcd(a, b);
-    return ret;
-}
-
-/**
- * @param {number} x
- * @param {number} min
- * @param {number} max
- * @returns {number}
- */
-export function clamp(x, min, max) {
-    const ret = wasm.clamp(x, min, max);
-    return ret;
-}
 
 let cachedFloat32Memory0 = null;
 
@@ -210,6 +154,63 @@ export function build_chunk_vertex_data(
         scatter_per_square_meter,
     );
     return ReturnData.__wrap(ret);
+}
+
+/**
+ *
+ * * Smooth minimum between a and b
+ * * @param a the first value
+ * * @param b the second value
+ * * @param k the smoothness factor
+ * * @returns the smooth minimum between a and b
+ *
+ * @param {number} a
+ * @param {number} b
+ * @param {number} k
+ * @returns {number}
+ */
+export function s_min(a, b, k) {
+    const ret = wasm.s_min(a, b, k);
+    return ret;
+}
+
+/**
+ *
+ * * Smooth maximum between a and b
+ * * @param a the first value
+ * * @param b the second value
+ * * @param k the smoothness factor (should be > 1)
+ * * @returns the smooth maximum between a and b
+ *
+ * @param {number} a
+ * @param {number} b
+ * @param {number} k
+ * @returns {number}
+ */
+export function s_max(a, b, k) {
+    const ret = wasm.s_max(a, b, k);
+    return ret;
+}
+
+/**
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */
+export function gcd(a, b) {
+    const ret = wasm.gcd(a, b);
+    return ret;
+}
+
+/**
+ * @param {number} x
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+export function clamp(x, min, max) {
+    const ret = wasm.clamp(x, min, max);
+    return ret;
 }
 
 /**

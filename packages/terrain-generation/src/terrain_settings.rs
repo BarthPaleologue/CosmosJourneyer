@@ -16,7 +16,13 @@ pub struct TerrainSettings {
 impl TerrainSettings {
     #[wasm_bindgen(constructor)]
     pub fn new() -> TerrainSettings {
-        TerrainSettings {
+        TerrainSettings::default()
+    }
+}
+
+impl Default for TerrainSettings {
+    fn default() -> Self {
+        Self {
             continents_frequency: 1.0,
             bumps_frequency: 1.0,
             mountains_frequency: 1.0,

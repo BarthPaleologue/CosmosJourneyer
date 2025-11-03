@@ -27,6 +27,7 @@ pub struct BuildData {
 #[wasm_bindgen]
 impl BuildData {
     #[wasm_bindgen(constructor)]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         planet_diameter: f32,
         chunk_depth: u32,

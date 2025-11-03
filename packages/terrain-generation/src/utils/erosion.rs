@@ -13,7 +13,7 @@ fn hash(p: &Vector3) -> Vector3 // this hash is not production ready, please
     );
 
     new_p.map_in_place(f32::sin);
-    new_p *= 43758.5453123;
+    new_p *= 43_758.547;
     new_p.map_in_place(f32::fract);
     new_p *= 2.0;
     new_p -= 1.0;
@@ -30,7 +30,7 @@ fn curl3d(vector: &Vector3) -> Vector3 {
 }
 
 fn smoothstep(edge0: f32, edge1: f32, x: f32) -> f32 {
-    let t = f32::min(f32::max((x - edge0) / (edge1 - edge0), 0.0), 1.0);
+    let t = ((x - edge0) / (edge1 - edge0)).clamp(0.0, 1.0);
     t * t * (3.0 - 2.0 * t)
 }
 
@@ -51,12 +51,13 @@ pub fn erosion(p: &Vector3, dir: &Vector3) -> (f32, Vector3) {
         for j in -2..=1 {
             for k in -2..=1 {
                 let o = Vector3::new(i as f32, j as f32, k as f32);
-                let h = hash(&(&ip - &o)) * 0.5;
+                let offset = &ip - &o;
+                let h = hash(&offset) * 0.5;
                 let pp = &fp + &o - h;
                 let d = Vector3::dot(&pp, &pp);
                 let w = f32::exp(-d * 2.0);
                 wt += w;
-                let mag = Vector3::dot(&pp, &dir);
+                let mag = Vector3::dot(&pp, dir);
                 let grad = (&pp + dir) * (-f32::sin(mag * f)) * w;
                 va += f32::cos(mag * f) * w;
                 gradient += grad;
@@ -84,13 +85,13 @@ pub fn erode3d(p: &Vector3, noise_value: f32, out_gradient: &mut Vector3) -> f32
     let mut erosion_gradient = Vector3::zero();
     let mut a = 0.7 * (smoothstep(0.1, 0.5, noise_value * 0.5 + 0.5)); //smooth the valleys
     let mut f = 1.0;
-    for i in 0..5 {
+    for _ in 0..5 {
         let sample_point = p * f;
         let mut local_dir = curl3d(&erosion_gradient);
         local_dir -= &normal * Vector3::dot(&local_dir, &normal);
 
-        let (mut local_elevation, mut local_gradient) =
-            erosion(&sample_point, &(&dir + &local_dir));
+        let sample_direction = &dir + &local_dir;
+        let (mut local_elevation, mut local_gradient) = erosion(&sample_point, &sample_direction);
 
         local_elevation *= a;
         local_gradient *= a * f;

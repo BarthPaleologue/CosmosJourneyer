@@ -1,6 +1,30 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+ * Fills the given buffers with the vertex data from the chunk
+ * * `data` - The data needed to guide the build process
+ * * `positions` - A mutable reference to the buffer that will be filled with vertex positions
+ * * `indices` - A mutable reference to the buffer that will be filled with the face indices
+ * * `normals` - A mutable reference to the buffer that will be filled with the vertex normals
+ * @param {BuildData} data
+ * @param {Float32Array} positions
+ * @param {Uint16Array} indices
+ * @param {Float32Array} normals
+ * @param {Float32Array} instances_matrix_buffer
+ * @param {Float32Array} aligned_instances_matrix_buffer
+ * @param {number} scatter_per_square_meter
+ * @returns {ReturnData}
+ */
+export function build_chunk_vertex_data(
+    data: BuildData,
+    positions: Float32Array,
+    indices: Uint16Array,
+    normals: Float32Array,
+    instances_matrix_buffer: Float32Array,
+    aligned_instances_matrix_buffer: Float32Array,
+    scatter_per_square_meter: number,
+): ReturnData;
+/**
  *
  * * Smooth minimum between a and b
  * * @param a the first value
@@ -41,30 +65,6 @@ export function gcd(a: number, b: number): number;
  * @returns {number}
  */
 export function clamp(x: number, min: number, max: number): number;
-/**
- * Fills the given buffers with the vertex data from the chunk
- * * `data` - The data needed to guide the build process
- * * `positions` - A mutable reference to the buffer that will be filled with vertex positions
- * * `indices` - A mutable reference to the buffer that will be filled with the face indices
- * * `normals` - A mutable reference to the buffer that will be filled with the vertex normals
- * @param {BuildData} data
- * @param {Float32Array} positions
- * @param {Uint16Array} indices
- * @param {Float32Array} normals
- * @param {Float32Array} instances_matrix_buffer
- * @param {Float32Array} aligned_instances_matrix_buffer
- * @param {number} scatter_per_square_meter
- * @returns {ReturnData}
- */
-export function build_chunk_vertex_data(
-    data: BuildData,
-    positions: Float32Array,
-    indices: Uint16Array,
-    normals: Float32Array,
-    instances_matrix_buffer: Float32Array,
-    aligned_instances_matrix_buffer: Float32Array,
-    scatter_per_square_meter: number,
-): ReturnData;
 /**
  */
 export enum Direction {

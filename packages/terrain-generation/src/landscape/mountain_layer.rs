@@ -1,4 +1,4 @@
-use crate::utils::math::{pow, s_abs, s_max_gradient};
+use crate::utils::math::{s_abs, s_max_gradient};
 use crate::utils::simplex::simplex411;
 use crate::utils::vector3::Vector3;
 

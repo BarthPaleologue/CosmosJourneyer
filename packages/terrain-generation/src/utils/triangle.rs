@@ -3,6 +3,7 @@ use crate::utils::quaternion::Quaternion;
 use crate::utils::random::random01;
 use crate::utils::vector3::Vector3;
 
+#[allow(clippy::too_many_arguments)]
 pub fn triangle_area(
     x1: f32,
     y1: f32,
@@ -98,6 +99,7 @@ pub fn random_point_in_triangle_from_buffer(
     [x, y, z, nx, ny, nz]
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn scatter_in_triangle(
     chunk_position: &Vector3,
     scatter_per_square_meter: f32,

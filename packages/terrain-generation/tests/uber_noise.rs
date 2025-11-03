@@ -101,6 +101,4 @@ pub fn test_uber_noise() {
     app.scene.add_mesh(procedural_plane);
 
     start_gilgamesh(app);
-
-    assert!(true);
 }

@@ -84,8 +84,8 @@ fn terrain_function() {
 
     for u in 0..width {
         for v in 0..height {
-            let phi = 2.0 * 3.14 * (u as f32 / width as f32);
-            let theta = 3.14 * (v as f32 / height as f32);
+            let phi = 2.0 * std::f32::consts::PI * (u as f32 / width as f32);
+            let theta = std::f32::consts::PI * (v as f32 / height as f32);
             let mut sample_point = Vector3::new(
                 PLANET_RADIUS * f32::sin(theta) * f32::cos(phi),
                 PLANET_RADIUS * f32::cos(theta),
@@ -115,9 +115,9 @@ fn terrain_function() {
             };
 
             let image_value = (255.0 * (new_elevation - PLANET_RADIUS)
-                / (&SETTINGS.continent_base_height
-                    + &SETTINGS.max_bump_height
-                    + &SETTINGS.max_mountain_height)) as u8;
+                / (SETTINGS.continent_base_height
+                    + SETTINGS.max_bump_height
+                    + SETTINGS.max_mountain_height)) as u8;
             *(value_image.get_pixel_mut(u, v)) = Luma([image_value]);
 
             gradient += 1.0;

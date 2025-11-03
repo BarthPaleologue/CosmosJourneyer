@@ -60,6 +60,14 @@ pub fn build_chunk_data() {
         scatter_per_square_meter,
     );
 
+    assert!(
+        nb_instances.nb_instances_created <= max_nb_instances,
+        "generated {} instances but buffer allows {}",
+        nb_instances.nb_instances_created,
+        max_nb_instances
+    );
+    assert!(nb_instances.average_height.is_finite());
+
     println!("matrix_buffer: {:?}", instances_matrix_buffer);
     println!(
         "aligned_matrix_buffer: {:?}",
@@ -72,14 +80,10 @@ pub fn build_chunk_data() {
     );
 
     // writing the data to images for verification purposes
-    let mut chunk_normals_image = ImageBuffer::<Rgb<u8>, Vec<u8>>::new(
-        build_data.resolution as u32,
-        build_data.resolution as u32,
-    );
-    let mut chunk_elevation_image = ImageBuffer::<Luma<u8>, Vec<u8>>::new(
-        build_data.resolution as u32,
-        build_data.resolution as u32,
-    );
+    let mut chunk_normals_image =
+        ImageBuffer::<Rgb<u8>, Vec<u8>>::new(build_data.resolution, build_data.resolution);
+    let mut chunk_elevation_image =
+        ImageBuffer::<Luma<u8>, Vec<u8>>::new(build_data.resolution, build_data.resolution);
 
     for u in 0..build_data.resolution {
         for v in 0..build_data.resolution {
@@ -93,8 +97,7 @@ pub fn build_chunk_data() {
             let normal_g = ((normal_y + 1.0) * 255.0 / 2.0) as u8;
             let normal_b = ((normal_z + 1.0) * 255.0 / 2.0) as u8;
 
-            *(chunk_normals_image.get_pixel_mut(u as u32, v as u32)) =
-                Rgb([normal_r, normal_g, normal_b]);
+            *(chunk_normals_image.get_pixel_mut(u, v)) = Rgb([normal_r, normal_g, normal_b]);
 
             let pos_x = positions[((u * build_data.resolution + v) * 3) as usize];
             let pos_y = positions[((u * build_data.resolution + v) * 3 + 1) as usize];
@@ -104,13 +107,13 @@ pub fn build_chunk_data() {
             let position = Vector3::new(pos_x, pos_y, pos_z + build_data.chunk_cube_position_z);
             let elevation = position.length();
 
-            let elevation01 = (elevation - (&build_data.planet_diameter / 2.0))
-                / (&build_data.terrain_settings.continent_base_height
-                    + &build_data.terrain_settings.max_mountain_height
-                    + &build_data.terrain_settings.max_bump_height);
-            assert!(0.0 <= elevation01 && elevation01 <= 1.0);
+            let elevation01 = (elevation - (build_data.planet_diameter / 2.0))
+                / (build_data.terrain_settings.continent_base_height
+                    + build_data.terrain_settings.max_mountain_height
+                    + build_data.terrain_settings.max_bump_height);
+            assert!((0.0..=1.0).contains(&elevation01));
             let elevation255 = (elevation01 * 255.0) as u8;
-            *(chunk_elevation_image.get_pixel_mut(u as u32, v as u32)) = Luma([elevation255]);
+            *(chunk_elevation_image.get_pixel_mut(u, v)) = Luma([elevation255]);
         }
     }
 
