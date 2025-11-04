@@ -1,0 +1,20 @@
+[project]
+name = "gaia-explorer"
+version = "0.1.0"
+description = "Tools for voxelizing Gaia catalogue data into spatial cubes"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Cosmos Journeyer Contributors" }
+]
+dependencies = [
+  "astroquery>=0.4.7",
+  "astropy>=6.0",
+]
+
+[project.scripts]
+gaia-explorer = "gaia_explorer.cli:main"
+gaia-explorer-validate = "gaia_explorer.validation:main"
+
+[tool.uv]
+package = true
