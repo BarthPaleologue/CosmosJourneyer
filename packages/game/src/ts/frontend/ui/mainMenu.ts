@@ -353,7 +353,7 @@ export class MainMenu {
             if (!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
             if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
             else {
-                this.scene.onBeforePhysicsObservable.removeCallback(animationCallback);
+                this.scene.onBeforeRenderObservable.removeCallback(animationCallback);
                 this.htmlRoot.style.display = "none";
 
                 this.starSystemView.setUIEnabled(true);
@@ -363,7 +363,7 @@ export class MainMenu {
             }
         };
 
-        this.scene.onBeforePhysicsObservable.add(animationCallback, undefined, true);
+        this.scene.onBeforeRenderObservable.add(animationCallback, undefined, true);
 
         this.hideMenu();
         this.hideVersion();
