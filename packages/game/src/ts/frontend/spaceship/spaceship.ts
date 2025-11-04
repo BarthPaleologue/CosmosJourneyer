@@ -589,6 +589,7 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
+        this.getTransform().computeWorldMatrix(true);
         const thrusters = this.getInternals().getThrusters();
         this.mainEngineTargetSpeed = this.mainEngineThrottle * (thrusters?.maxSpeed ?? 0);
         if (this.targetLandingPad !== null) {

@@ -349,7 +349,7 @@ export class StarSystemView implements View {
                 rotationAngle * 2,
             );
             await new Promise<void>((resolve) => {
-                const observer = this.scene.onBeforePhysicsObservable.add(() => {
+                const observer = this.scene.onBeforeRenderObservable.add(() => {
                     rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
                     if (rotationAnimation.isFinished()) {
                         observer.remove();
@@ -460,19 +460,9 @@ export class StarSystemView implements View {
 
         this.postProcessManager = new PostProcessManager(assets.textures, this.scene);
 
-        // main update loop for the star system
-        this.scene.onBeforePhysicsObservable.add(() => {
-            const deltaSeconds = engine.getDeltaTime() / 1000;
-            this.updateBeforePhysics(deltaSeconds * Settings.TIME_MULTIPLIER);
-        });
-
         this.scene.onBeforeRenderObservable.add(() => {
             const deltaSeconds = (engine.getDeltaTime() * Settings.TIME_MULTIPLIER) / 1000;
             this.updateBeforeRender(deltaSeconds);
-        });
-
-        this.scene.onAfterRenderObservable.add(() => {
-            this.updateAfterRender();
         });
 
         this.spaceShipLayer.setVisibility(false);
@@ -720,27 +710,6 @@ export class StarSystemView implements View {
         return this._isLoadingSystem;
     }
 
-    /**
-     * Updates the system view. It updates the underlying star system, the UI, the chunk forge and the controls
-     * @param deltaSeconds the time elapsed since the last update in seconds
-     */
-    public updateBeforePhysics(deltaSeconds: number) {
-        if (this._isLoadingSystem) return;
-
-        const starSystem = this.getStarSystem();
-
-        this.chunkForge.update(this.assets);
-
-        starSystem.update(deltaSeconds, this.chunkForge);
-
-        const nearestCelestialBody = starSystem.getNearestCelestialBody(
-            this.scene.getActiveControls().getActiveCamera().getWorldMatrix().getTranslation(),
-        );
-
-        this.postProcessManager.setCelestialBody(nearestCelestialBody);
-        this.postProcessManager.update(deltaSeconds);
-    }
-
     public updateBeforeRender(deltaSeconds: number) {
         if (this._isLoadingSystem) return;
 
@@ -753,23 +722,39 @@ export class StarSystemView implements View {
             this.scene.setActiveCamera(this.scene.getActiveControls().getActiveCamera());
         }
 
+        const activeControls = this.scene.getActiveControls();
+
+        this.chunkForge.update(this.assets);
+
+        starSystem.update(deltaSeconds, this.chunkForge);
+
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            activeControls.getTransform().getAbsolutePosition(),
         );
         const nearestCelestialBody = starSystem.getNearestCelestialBody(
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
+            activeControls.getTransform().getAbsolutePosition(),
         );
 
-        const spaceship = this.spaceshipControls.getSpaceship();
-        const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
+        this.postProcessManager.setCelestialBody(nearestCelestialBody);
+        this.postProcessManager.update(deltaSeconds);
 
+        const spaceship = this.spaceshipControls.getSpaceship();
+        spaceship.setNearestOrbitalObject(nearestOrbitalObject);
+        spaceship.setNearestCelestialBody(nearestCelestialBody);
+        spaceship.setClosestWalkableObject(nearestCelestialBody);
+
+        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
+            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
+        } else {
+            this.spaceshipControls.setClosestLandableFacility(null);
+        }
+
+        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
+
+        const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (
             shipDiscoveryScanner !== null &&
-            isScannerInRange(
-                shipDiscoveryScanner,
-                this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-                nearestCelestialBody,
-            )
+            isScannerInRange(shipDiscoveryScanner, spaceship.getTransform().getAbsolutePosition(), nearestCelestialBody)
         ) {
             const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
@@ -787,19 +772,7 @@ export class StarSystemView implements View {
             }
         }
 
-        spaceship.setNearestOrbitalObject(nearestOrbitalObject);
-        spaceship.setNearestCelestialBody(nearestCelestialBody);
-
-        const warpDrive = spaceship.getInternals().getWarpDrive();
-        if (warpDrive !== null && warpDrive.isEnabled()) {
-            this.spaceShipLayer.displaySpeed(warpDrive.getThrottle(), spaceship.getSpeed());
-        } else {
-            this.spaceShipLayer.displaySpeed(spaceship.getThrottle(), spaceship.getSpeed());
-        }
-
-        //const currentSystemPosition = getStarGalacticPosition(starSystem.model.coordinates);
-        //const nextSystemPosition = this.player.currentItinerary.length > 1 ? getStarGalacticPosition(this.player.currentItinerary[1]) : currentSystemPosition;
-        //const distanceLY = Vector3.Distance(currentSystemPosition, nextSystemPosition);
+        this.spaceShipLayer.displaySpeed(spaceship.getThrottle(), spaceship.getSpeed());
 
         const target = this.targetCursorLayer.getTarget();
 
@@ -813,21 +786,13 @@ export class StarSystemView implements View {
                   )
                 : 0;
 
+        const warpDrive = spaceship.getInternals().getWarpDrive();
         const fuelRequiredForJump = warpDrive?.getHyperJumpFuelConsumption(distanceLY) ?? 0;
 
         this.spaceShipLayer.displayFuel(
             spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),
             fuelRequiredForJump / spaceship.getTotalFuelCapacity(),
         );
-
-        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
-        spaceship.setClosestWalkableObject(nearestOrbitalObject);
-
-        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
-        } else {
-            this.spaceshipControls.setClosestLandableFacility(null);
-        }
 
         this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
 
@@ -876,25 +841,6 @@ export class StarSystemView implements View {
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds,
         );
-    }
-
-    public updateAfterRender() {
-        if (this._isLoadingSystem) return;
-
-        const starSystem = this.getStarSystem();
-        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
-        if (this.characterControls === null) throw new Error("Character controls is null");
-
-        const activeControls = this.scene.getActiveControls();
-
-        const spaceship = this.spaceshipControls.getSpaceship();
-
-        const missionContext: MissionContext = {
-            currentSystem: starSystem,
-            currentItinerary: this.player.currentItinerary,
-            playerPosition: activeControls.getTransform().getAbsolutePosition(),
-            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2,
-        };
 
         this.spaceShipLayer.update(
             activeControls.getTransform(),

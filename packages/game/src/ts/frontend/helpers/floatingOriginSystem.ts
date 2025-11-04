@@ -17,7 +17,6 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Scene } from "@babylonjs/core/scene";
 
 export class FloatingOriginSystem {
@@ -40,13 +39,14 @@ export class FloatingOriginSystem {
         const offset = observerPosition.clone().negateInPlace();
         this.originOffset.addInPlace(offset);
 
-        // find all physics bodies that have disablePreStep=true
-        const physicsBodies: Array<PhysicsBody> = [];
+        // find all physics bodies that have disablePreStep=true and temporarily disable it to avoid issues during rebasing
         for (const mesh of [...this.scene.meshes, ...this.scene.transformNodes]) {
             const physicsBody = mesh.physicsBody;
             if (physicsBody !== null && physicsBody !== undefined && physicsBody.disablePreStep) {
                 physicsBody.disablePreStep = false;
-                physicsBodies.push(physicsBody);
+                this.scene.onAfterPhysicsObservable.addOnce(() => {
+                    physicsBody.disablePreStep = true;
+                });
             }
         }
 
@@ -55,12 +55,6 @@ export class FloatingOriginSystem {
                 rootNode.setAbsolutePosition(rootNode.getAbsolutePosition().add(offset));
                 rootNode.computeWorldMatrix(true);
             }
-        }
-
-        for (const body of physicsBodies) {
-            this.scene.onAfterPhysicsObservable.addOnce(() => {
-                body.disablePreStep = true;
-            });
         }
     }
 
