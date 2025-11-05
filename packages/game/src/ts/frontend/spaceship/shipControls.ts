@@ -421,7 +421,6 @@ export class ShipControls implements Controls {
 
     setSpaceship(ship: Spaceship) {
         this.spaceship = ship;
-        this.thirdPersonCamera.parent = this.thirdPersonCameraTransform;
         this.firstPersonCamera.parent = this.getTransform();
 
         this.spaceship.onFuelScoopStart.add(() => {

@@ -122,7 +122,7 @@ export async function createGravitySystemScene(
 
     let elapsedSeconds = 0.0;
     const orbitalPeriod = 10;
-    scene.onBeforePhysicsObservable.add(() => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         elapsedSeconds += deltaSeconds;
 

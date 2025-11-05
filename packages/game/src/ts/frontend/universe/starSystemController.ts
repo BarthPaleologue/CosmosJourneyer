@@ -419,10 +419,8 @@ export class StarSystemController {
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      */
     public update(deltaSeconds: number, chunkForge: ChunkForge): void {
-        // Update orbital simulation first
         this.updateOrbitalSimulation(deltaSeconds);
 
-        // Now update ship controls and other time-sensitive systems
         const controls = this.scene.getActiveControls();
         controls.update(deltaSeconds);
 
@@ -443,10 +441,9 @@ export class StarSystemController {
             })),
         );
 
-        this.floatingOriginSystem.update(this.scene.getActiveControls().getTransform().getAbsolutePosition());
+        this.floatingOriginSystem.update(controls.getTransform().getAbsolutePosition());
         this.floatingOriginSystem.getOffsetToRef(this.referencePosition);
 
-        // Update shaders
         this.updateShaders(deltaSeconds);
     }
 
@@ -454,7 +451,7 @@ export class StarSystemController {
      * Updates the material shaders of all the bodies in the system with the given delta time
      * @param deltaSeconds The time elapsed in seconds since the last update
      */
-    public updateShaders(deltaSeconds: number) {
+    private updateShaders(deltaSeconds: number) {
         const stellarObjects = this.getStellarObjects();
         const planetaryMassObjects = this.getPlanetaryMassObjects();
 
@@ -469,8 +466,6 @@ export class StarSystemController {
             //FIXME: this needs to be refactored to be future proof when adding new stellar objects
             if (stellarObject instanceof Star) stellarObject.updateMaterial(deltaSeconds);
         }
-
-        this.scene.activeCamera?.getViewMatrix(true);
     }
 
     addSystemTarget(targetCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): SystemTarget | null {

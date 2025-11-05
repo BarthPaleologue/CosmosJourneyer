@@ -82,7 +82,7 @@ export async function createNeutronStarScene(
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), neutronStar.getTransform().position, scene.useRightHandedSystem);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         defaultControls.update(deltaSeconds);
         neutronStar.getTransform().rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.siderealDaySeconds);

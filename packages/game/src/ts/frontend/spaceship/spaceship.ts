@@ -274,7 +274,6 @@ export class Spaceship implements Transformable {
         }
 
         warpDrive.enable();
-        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
 
         this.aggregate.body.setLinearVelocity(Vector3.Zero());
         this.aggregate.body.setAngularVelocity(Vector3.Zero());
@@ -292,7 +291,6 @@ export class Spaceship implements Transformable {
         }
 
         warpDrive.disengage();
-        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.play();
         this.onWarpDriveDisabled.notifyObservers(false);
@@ -305,7 +303,6 @@ export class Spaceship implements Transformable {
         }
 
         warpDrive.emergencyStop();
-        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
 
         this.disableWarpDriveSound.play();
         this.onWarpDriveDisabled.notifyObservers(true);
@@ -393,10 +390,6 @@ export class Spaceship implements Transformable {
     private completeLanding() {
         this.state = ShipState.LANDED;
 
-        this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-        this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-
         if (this.targetLandingPad !== null) {
             this.getTransform().setParent(this.targetLandingPad.getTransform());
         }
@@ -410,10 +403,6 @@ export class Spaceship implements Transformable {
         this.state = ShipState.FLYING;
 
         this.getTransform().setParent(null);
-
-        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
-        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.landingComputer?.setTarget(null);
 
@@ -451,10 +440,6 @@ export class Spaceship implements Transformable {
         translate(this.getTransform(), this.getTransform().up.scale(5));
 
         this.state = ShipState.FLYING;
-        this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
-
-        this.aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS | CollisionMask.ENVIRONMENT;
-        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
         this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
 
@@ -535,6 +520,7 @@ export class Spaceship implements Transformable {
             if (this.nearestOrbitalObject !== null) {
                 if (!canEngageWarpDrive(this.getTransform(), this.getSpeed(), this.nearestOrbitalObject)) {
                     this.emergencyStopWarpDrive();
+                    return;
                 }
 
                 const distanceToClosestOrbitalObject = Vector3.Distance(
@@ -589,17 +575,53 @@ export class Spaceship implements Transformable {
     }
 
     public update(deltaSeconds: number) {
+        this.getTransform().computeWorldMatrix(true);
         const thrusters = this.getInternals().getThrusters();
         this.mainEngineTargetSpeed = this.mainEngineThrottle * (thrusters?.maxSpeed ?? 0);
         if (this.targetLandingPad !== null) {
             this.mainEngineTargetSpeed /= 8;
         }
 
+        const warpDrive = this.getInternals().getWarpDrive();
+        const fuelToBurn =
+            warpDrive !== null && warpDrive.isEnabled()
+                ? deltaSeconds * warpDrive.getFuelConsumptionRate(this.getSpeed())
+                : deltaSeconds * this.mainEngineThrottle * 0.02;
+        if (fuelToBurn < this.getRemainingFuel()) {
+            this.burnFuel(fuelToBurn);
+        } else {
+            this.emergencyStopWarpDrive();
+            this.mainEngineThrottle = 0;
+        }
+
         this.updateWarpDrive(deltaSeconds);
 
         this.handleFuelScoop(deltaSeconds);
 
-        const warpDrive = this.getInternals().getWarpDrive();
+        const currentMotionType = this.aggregate.body.getMotionType();
+        switch (this.state) {
+            case ShipState.LANDED:
+                if (currentMotionType !== PhysicsMotionType.STATIC) {
+                    this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+                    this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+                }
+                break;
+            case ShipState.FLYING:
+            case ShipState.LANDING:
+                if (warpDrive !== null && warpDrive.isEnabled()) {
+                    if (currentMotionType !== PhysicsMotionType.ANIMATED) {
+                        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+                        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
+                        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+                    }
+                } else if (currentMotionType !== PhysicsMotionType.DYNAMIC) {
+                    this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
+                    this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+                }
+                break;
+        }
 
         // Low fuel warning check
         const fuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
@@ -697,17 +719,6 @@ export class Spaceship implements Transformable {
 
         if (this.isAutoPiloted()) {
             this.setMainEngineThrottle(0);
-        }
-
-        const fuelToBurn =
-            warpDrive !== null && warpDrive.isEnabled()
-                ? deltaSeconds * warpDrive.getFuelConsumptionRate(this.getSpeed())
-                : deltaSeconds * this.mainEngineThrottle * 0.02;
-        if (fuelToBurn < this.getRemainingFuel()) {
-            this.burnFuel(fuelToBurn);
-        } else {
-            this.emergencyStopWarpDrive();
-            this.mainEngineThrottle = 0;
         }
     }
 

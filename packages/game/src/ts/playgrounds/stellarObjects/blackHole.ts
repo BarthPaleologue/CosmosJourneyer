@@ -29,16 +29,12 @@ import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
 
-import { enablePhysics } from "../utils";
-
 export async function createBlackHoleScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
-
-    await enablePhysics(scene);
 
     const textures = await loadEnvironmentTextures(scene, progressMonitor);
 
@@ -64,7 +60,7 @@ export async function createBlackHoleScene(
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), blackHole.getTransform().position, scene.useRightHandedSystem);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         defaultControls.update(deltaSeconds);
         blackHolePostProcess.update(deltaSeconds);

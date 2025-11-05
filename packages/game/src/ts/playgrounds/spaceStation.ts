@@ -96,7 +96,7 @@ export async function createSpaceStationScene(
 
     lookAt(defaultControls.getTransform(), spaceStation.getTransform().position, scene.useRightHandedSystem);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
         defaultControls.update(deltaSeconds);
