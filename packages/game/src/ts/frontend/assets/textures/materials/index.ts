@@ -20,6 +20,7 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
+import { loadStyroFoamTextures, type StyroFoamTextures } from "./styrofoam";
 import { loadTireTextures, type TireTextures } from "./tire";
 
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
@@ -57,6 +58,7 @@ export type AllMaterialTextures = {
     concrete: PBRTextures;
     crate: PBRTextures;
     tire: TireTextures;
+    styroFoam: StyroFoamTextures;
     tree: Pick<PBRTextures, "albedo">;
 };
 
@@ -153,6 +155,8 @@ export async function loadMaterialTextures(
 
     const tirePromise = loadTireTextures(scene, progressMonitor);
 
+    const styroFoamPromise = loadStyroFoamTextures(scene, progressMonitor);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
@@ -190,5 +194,6 @@ export async function loadMaterialTextures(
             albedo: treeAlbedo,
         },
         tire: await tirePromise,
+        styroFoam: await styroFoamPromise,
     };
 }
