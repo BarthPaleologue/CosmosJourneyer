@@ -858,18 +858,25 @@ export function perturbNormal(
     return perturbedNormal;
 }
 
-export type PBRMetallicRoughnessMaterialOptions = TargetOptions & {
+export type PBROptions = TargetOptions & {
     useEnergyConservation: boolean;
     useRadianceOcclusion: boolean;
     useHorizonOcclusion: boolean;
+    albedoRgb: NodeMaterialConnectionPoint;
+    ambientOcclusion: NodeMaterialConnectionPoint;
+    opacity: NodeMaterialConnectionPoint;
+};
+
+export type PBROutput = {
+    lighting: PBRMetallicRoughnessBlock["lighting"];
+    alpha: PBRMetallicRoughnessBlock["alpha"];
+    shadow: PBRMetallicRoughnessBlock["shadow"];
 };
 
 /**
  * Creates a PBR metallic roughness material using the given parameters.
- * @param albedoRgb - The albedo color.
  * @param metallicFloat - The metallic value.
  * @param roughnessFloat - The roughness value.
- * @param ambientOcclusionFloat - The ambient occlusion value (optional).
  * @param perturbedNormalVec3 - The perturbed normal vector.
  * @param normalWorldVec3 - The world normal vector.
  * @param viewMat4 - The view matrix.
@@ -877,40 +884,41 @@ export type PBRMetallicRoughnessMaterialOptions = TargetOptions & {
  * @param positionWorldVec3 - The world position vector.
  * @param options - Optional properties for the PBR material.
  */
-export function pbrMetallicRoughnessMaterial(
-    albedoRgb: NodeMaterialConnectionPoint,
+export function pbr(
     metallicFloat: NodeMaterialConnectionPoint,
     roughnessFloat: NodeMaterialConnectionPoint,
-    ambientOcclusionFloat: NodeMaterialConnectionPoint | null,
     perturbedNormalVec3: NodeMaterialConnectionPoint,
     normalWorldVec3: NodeMaterialConnectionPoint,
     viewMat4: NodeMaterialConnectionPoint,
     cameraPositionVec3: NodeMaterialConnectionPoint,
     positionWorldVec3: NodeMaterialConnectionPoint,
-    options?: Partial<PBRMetallicRoughnessMaterialOptions>,
-): NodeMaterialConnectionPoint {
+    options?: Partial<PBROptions>,
+): PBROutput {
     const PBRMetallicRoughness = new PBRMetallicRoughnessBlock("PBRMetallicRoughness");
     PBRMetallicRoughness.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
     PBRMetallicRoughness.useEnergyConservation = options?.useEnergyConservation ?? true;
     PBRMetallicRoughness.useRadianceOcclusion = options?.useRadianceOcclusion ?? true;
     PBRMetallicRoughness.useHorizonOcclusion = options?.useHorizonOcclusion ?? true;
 
-    albedoRgb.connectTo(PBRMetallicRoughness.baseColor);
     metallicFloat.connectTo(PBRMetallicRoughness.metallic);
     roughnessFloat.connectTo(PBRMetallicRoughness.roughness);
-    ambientOcclusionFloat?.connectTo(PBRMetallicRoughness.ambientOcc);
     perturbedNormalVec3.connectTo(PBRMetallicRoughness.perturbedNormal);
     normalWorldVec3.connectTo(PBRMetallicRoughness.worldNormal);
     viewMat4.connectTo(PBRMetallicRoughness.view);
     cameraPositionVec3.connectTo(PBRMetallicRoughness.cameraPosition);
     positionWorldVec3.connectTo(PBRMetallicRoughness.worldPosition);
 
-    return PBRMetallicRoughness.lighting;
+    options?.albedoRgb?.connectTo(PBRMetallicRoughness.baseColor);
+    options?.ambientOcclusion?.connectTo(PBRMetallicRoughness.ambientOcc);
+    options?.opacity?.connectTo(PBRMetallicRoughness.opacity);
+
+    return PBRMetallicRoughness;
 }
 
 export type OutputFragColorOptions = {
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
+    alpha: NodeMaterialConnectionPoint;
 };
 
 /**
@@ -928,6 +936,7 @@ export function outputFragColor(
     FragmentOutput.convertToLinearSpace = options?.convertToLinearSpace ?? false;
 
     colorRgb.connectTo(FragmentOutput.rgb);
+    options?.alpha?.connectTo(FragmentOutput.a);
 
     return FragmentOutput;
 }

@@ -58,19 +58,21 @@ export class ClimberRingMaterial extends NodeMaterial {
         const view = BSL.uniformView();
         const cameraPosition = BSL.uniformCameraPosition();
 
-        const pbrColor = BSL.pbrMetallicRoughnessMaterial(
-            albedoTexture.rgb,
+        const pbrColor = BSL.pbr(
             metallicRoughnesstexture.r,
             metallicRoughnesstexture.g,
-            aoTexture.r,
             perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
+            {
+                albedoRgb: albedoTexture.rgb,
+                ambientOcclusion: aoTexture.r,
+            },
         );
 
-        const fragmentOutput = BSL.outputFragColor(pbrColor);
+        const fragmentOutput = BSL.outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragmentOutput);
