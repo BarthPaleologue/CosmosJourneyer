@@ -11,5 +11,7 @@
 
     "includeVersion": true,
     "excludeInternal": true,
-    "excludePrivate": true
+    "excludePrivate": true,
+
+    "treatWarningsAsErrors": true
 }
