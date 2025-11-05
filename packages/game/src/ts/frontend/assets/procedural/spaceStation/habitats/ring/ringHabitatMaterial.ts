@@ -29,7 +29,7 @@ import {
     mul,
     outputFragColor,
     outputVertexPosition,
-    pbrMetallicRoughnessMaterial,
+    pbr,
     perturbNormal,
     smoothstep,
     split,
@@ -87,16 +87,18 @@ export class RingHabitatMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbrMetallicRoughnessMaterial(
-            albedo.rgb,
+        const pbrLighting = pbr(
             metallicRoughness.r,
             metallicRoughness.g,
-            occlusion.r,
             perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
+            {
+                albedoRgb: albedo.rgb,
+                ambientOcclusion: occlusion.r,
+            },
         );
 
         const lightEmission = mul(
@@ -112,7 +114,7 @@ export class RingHabitatMaterial extends NodeMaterial {
 
         const lightColor = vec3(f(1), f(1), f(0.7));
 
-        const finalColor = add(pbrColor, mul(lightEmission, lightColor));
+        const finalColor = add(pbrLighting.lighting, mul(lightEmission, lightColor));
         const fragOutput = outputFragColor(finalColor);
 
         this.addOutputNode(fragOutput);

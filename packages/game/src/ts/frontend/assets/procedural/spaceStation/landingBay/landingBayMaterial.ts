@@ -33,7 +33,7 @@ import {
     mul,
     outputFragColor,
     outputVertexPosition,
-    pbrMetallicRoughnessMaterial,
+    pbr,
     perturbNormal,
     remap,
     split,
@@ -173,19 +173,21 @@ export class LandingBayMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbrMetallicRoughnessMaterial(
-            finalAlbedo,
+        const pbrColor = pbr(
             finalMetallic,
             finalRoughness,
-            finalAo,
             perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
+            {
+                albedoRgb: finalAlbedo,
+                ambientOcclusion: finalAo,
+            },
         );
 
-        const fragOutput = outputFragColor(pbrColor);
+        const fragOutput = outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(fragOutput);
 

@@ -32,7 +32,7 @@ import {
     mul,
     outputFragColor,
     outputVertexPosition,
-    pbrMetallicRoughnessMaterial,
+    pbr,
     perturbNormal,
     split,
     step,
@@ -136,21 +136,23 @@ export class LandingPadMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrLighting = pbrMetallicRoughnessMaterial(
-            finalAlbedo,
+        const pbrLighting = pbr(
             finalMetallic,
             finalRoughness,
-            finalAmbientOcclusion,
             perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
+            {
+                albedoRgb: finalAlbedo,
+                ambientOcclusion: finalAmbientOcclusion,
+            },
         );
 
         const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));
 
-        const fragOutput = outputFragColor(add(pbrLighting, additionalLight));
+        const fragOutput = outputFragColor(add(pbrLighting.lighting, additionalLight));
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragOutput);

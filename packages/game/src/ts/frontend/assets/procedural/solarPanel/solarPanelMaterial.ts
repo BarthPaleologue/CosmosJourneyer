@@ -57,19 +57,18 @@ export class SolarPanelMaterial extends NodeMaterial {
         const view = BSL.uniformView();
         const cameraPosition = BSL.uniformCameraPosition();
 
-        const pbrLighting = BSL.pbrMetallicRoughnessMaterial(
-            albedoTexture.rgb,
+        const pbrLighting = BSL.pbr(
             metallicRoughness.r,
             metallicRoughness.g,
-            null,
             perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
+            { albedoRgb: albedoTexture.rgb },
         );
 
-        const fragOutput = BSL.outputFragColor(pbrLighting);
+        const fragOutput = BSL.outputFragColor(pbrLighting.lighting);
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragOutput);
