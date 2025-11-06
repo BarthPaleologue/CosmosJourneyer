@@ -487,7 +487,11 @@ export class StarSystemView implements View {
                 const spawnRotationAngle = Math.acos(clamp(Vector3.Dot(Vector3.Up(), up), -1, 1));
 
                 const roverResult = createWolfMk2(
-                    { tire: this.assets.textures.materials.tire, wheel: this.assets.textures.materials.crate },
+                    {
+                        tire: this.assets.textures.materials.tire,
+                        wheel: this.assets.textures.materials.crate,
+                        canopyFrame: this.assets.textures.materials.styroFoam,
+                    },
                     this.scene,
                     spawnPosition,
                     {

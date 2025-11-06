@@ -24,9 +24,11 @@ import type { Scene } from "@babylonjs/core/scene";
 import { ok, type Result } from "@/utils/types";
 
 import type { PBRTextures } from "../assets/textures/materials";
+import type { StyroFoamTextures } from "../assets/textures/materials/styrofoam";
 import type { TireTextures } from "../assets/textures/materials/tire";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
+import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
@@ -36,6 +38,7 @@ export function createWolfMk2(
     textures: {
         tire: TireTextures;
         wheel: PBRTextures;
+        canopyFrame: StyroFoamTextures;
     },
     scene: Scene,
     spawnPosition: Vector3,
@@ -212,6 +215,9 @@ export function createWolfMk2(
             glassPanels.parent = canopyFrame;
             glassPanels.material = glass;
         }
+
+        const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
+        canopyFrame.material = canopyFrameMaterial.get();
     }
 
     const wheelDistanceFromCenter = roverHalfWidth + 1.0;

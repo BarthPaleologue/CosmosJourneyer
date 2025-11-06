@@ -86,14 +86,13 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const tireTextures = await loadTireTextures(scene, progressMonitor);
-
     const textures = await loadMaterialTextures(scene, progressMonitor);
 
     const roverResult = createWolfMk2(
         {
-            tire: tireTextures,
+            tire: textures.tire,
             wheel: textures.crate,
+            canopyFrame: textures.styroFoam,
         },
         scene,
         new Vector3(0, 10, 0),
