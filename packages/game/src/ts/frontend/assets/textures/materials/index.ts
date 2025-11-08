@@ -21,6 +21,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
 import { loadConcreteTextures } from "./concrete";
+import { loadSolarPanelTextures, type SolarPanelTextures } from "./solarPanel";
 import { loadStyroFoamTextures, type StyroFoamTextures } from "./styrofoam";
 import { loadTireTextures, type TireTextures } from "./tire";
 
@@ -32,9 +33,6 @@ import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRou
 import metalPanelsAlbedo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsAmbientOcclusion from "@assets/metalPanelMaterial/sci-fi-panel1-ao.webp";
 import metalPanelsNormal from "@assets/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
-import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
-import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
-import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
 import spaceStationMetallicRoughness from "@assets/spaceStationMaterial/metallicRoughness.webp";
 import spaceStationAlbedo from "@assets/spaceStationMaterial/spaceship-panels1-albedo.webp";
 import spaceStationAmbientOcclusion from "@assets/spaceStationMaterial/spaceship-panels1-ao.webp";
@@ -49,7 +47,7 @@ export type PBRTextures = {
 };
 
 export type AllMaterialTextures = {
-    solarPanel: Omit<PBRTextures, "ambientOcclusion">;
+    solarPanel: SolarPanelTextures;
     spaceStation: PBRTextures;
     metalPanels: PBRTextures;
     concrete: PBRTextures;
@@ -63,17 +61,6 @@ export async function loadMaterialTextures(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<AllMaterialTextures> {
-    // Material textures
-    // Solar Panel
-    const solarPanelAlbedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedo, scene, progressMonitor);
-    const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal, scene, progressMonitor);
-    const solarPanelMetallicRoughnessPromise = loadTextureAsync(
-        "SolarPanelMetallicRoughness",
-        solarPanelMetallicRoughness,
-        scene,
-        progressMonitor,
-    );
-
     // Space Station
     const spaceStationAlbedoPromise = loadTextureAsync(
         "SpaceStationAlbedo",
@@ -140,15 +127,13 @@ export async function loadMaterialTextures(
 
     const styroFoamPromise = loadStyroFoamTextures(scene, progressMonitor);
 
+    const solarPanelPromise = loadSolarPanelTextures(scene, progressMonitor);
+
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
     return {
-        solarPanel: {
-            albedo: await solarPanelAlbedoPromise,
-            normal: await solarPanelNormalPromise,
-            metallicRoughness: await solarPanelMetallicRoughnessPromise,
-        },
+        solarPanel: await solarPanelPromise,
         spaceStation: {
             albedo: await spaceStationAlbedoPromise,
             normal: await spaceStationNormalPromise,
