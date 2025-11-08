@@ -19,56 +19,66 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
-import * as BSL from "@/frontend/helpers/bsl";
+import {
+    float,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbr,
+    perturbNormal,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vertexAttribute,
+    xz,
+} from "@/frontend/helpers/bsl";
+
+import type { SolarPanelTextures } from "../../textures/materials/solarPanel";
 
 export class SolarPanelMaterial extends NodeMaterial {
-    constructor(textures: Omit<PBRTextures, "ambientOcclusion">, scene: Scene) {
+    constructor(textures: SolarPanelTextures, scene: Scene) {
         super("SolarPanelNodeMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
-        // Vertex Shader
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
 
-        const position = BSL.vertexAttribute("position");
-        const normal = BSL.vertexAttribute("normal");
+        const positionXZ = xz(position);
+        const uv = mul(positionXZ, float(1));
 
-        const positionXZ = BSL.xz(position);
-        const uv = BSL.mul(positionXZ, BSL.float(0.01));
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
 
-        const world = BSL.uniformWorld();
-        const positionW = BSL.transformPosition(world, position);
-        const normalW = BSL.transformDirection(world, normal);
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const viewProjection = BSL.uniformViewProjection();
-        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
+        const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
+        const cameraPosition = uniformCameraPosition();
 
-        // Fragment Shader
+        const normalHeightMapValue = textureSample(textures.normal, uv);
+        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalHeightMapValue.rgb, float(1));
 
-        const albedoTexture = BSL.textureSample(textures.albedo, uv, {
+        const sampleUV = uv;
+
+        const albedoTexture = textureSample(textures.albedo, sampleUV, {
             convertToLinearSpace: true,
         });
-        const metallicRoughness = BSL.textureSample(textures.metallicRoughness, uv);
-        const normalMapValue = BSL.textureSample(textures.normal, uv);
+        const metallic = textureSample(textures.metallic, sampleUV);
+        const roughness = textureSample(textures.roughness, sampleUV);
 
-        const perturbedNormal = BSL.perturbNormal(uv, positionW, normalW, normalMapValue.rgb, BSL.float(1));
+        const view = uniformView();
 
-        const view = BSL.uniformView();
-        const cameraPosition = BSL.uniformCameraPosition();
+        const pbrLighting = pbr(metallic.r, roughness.r, perturbedNormal, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedoTexture.rgb,
+        });
 
-        const pbrLighting = BSL.pbr(
-            metallicRoughness.r,
-            metallicRoughness.g,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            { albedoRgb: albedoTexture.rgb },
-        );
-
-        const fragOutput = BSL.outputFragColor(pbrLighting.lighting);
+        const fragOutput = outputFragColor(pbrLighting.lighting);
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragOutput);
