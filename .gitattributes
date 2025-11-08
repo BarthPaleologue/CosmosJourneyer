@@ -13,3 +13,4 @@ packages/game/src/asset/loadingScreens/*.webp filter=lfs diff=lfs merge=lfs -tex
 packages/game/src/asset/metal_0054_2k_b3OPPy filter=lfs diff=lfs merge=lfs -text
 packages/game/src/asset/plastic_0022_2k_TKmv2N filter=lfs diff=lfs merge=lfs -text
 packages/game/src/asset/styrofoam-bl filter=lfs diff=lfs merge=lfs -text
+packages/game/src/asset/others_0013_2k_4LqXNJ filter=lfs diff=lfs merge=lfs -text
