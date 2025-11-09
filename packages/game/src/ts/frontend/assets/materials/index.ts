@@ -24,23 +24,21 @@ import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { type Textures } from "../textures";
+import { CrateMaterial } from "./crate";
 
 export type Materials = {
     readonly butterfly: ButterflyMaterial;
     readonly butterflyDepth: ButterflyMaterial;
     readonly grass: GrassMaterial;
     readonly grassDepth: GrassMaterial;
-    readonly crate: PBRMetallicRoughnessMaterial;
+    readonly crate: CrateMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: PBRMetallicRoughnessMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
-    const crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-    crateMaterial.baseTexture = textures.materials.crate.albedo;
-    crateMaterial.normalTexture = textures.materials.crate.normal;
-    crateMaterial.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
+    const crateMaterial = new CrateMaterial(textures.materials.crate, scene);
 
     const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
     treeMaterial.backFaceCulling = false;
