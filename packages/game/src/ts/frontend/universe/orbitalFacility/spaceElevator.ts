@@ -109,7 +109,12 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         this.climber = new SpaceElevatorClimber(
             assets.materials.solarPanel,
-            assets.textures.materials.crate,
+            {
+                albedo: assets.textures.materials.crate.albedo,
+                normal: assets.textures.materials.crate.normalHeight,
+                ambientOcclusion: assets.textures.materials.crate.ambientOcclusion,
+                metallicRoughness: assets.textures.materials.crate.metallicRoughness,
+            },
             assets.textures.materials.metalPanels,
             scene,
         );

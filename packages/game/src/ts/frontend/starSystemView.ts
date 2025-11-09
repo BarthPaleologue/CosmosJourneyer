@@ -489,8 +489,9 @@ export class StarSystemView implements View {
                 const roverResult = createWolfMk2(
                     {
                         tire: this.assets.textures.materials.tire,
-                        wheel: this.assets.textures.materials.crate,
+                        wheelMaterial: this.assets.materials.crate.get(),
                         canopyFrame: this.assets.textures.materials.styroFoam,
+                        solarPanelMaterial: this.assets.materials.solarPanel,
                     },
                     this.scene,
                     spawnPosition,

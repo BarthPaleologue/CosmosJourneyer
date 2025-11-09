@@ -28,11 +28,12 @@ import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial"
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
 import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
 import { type Textures } from "../textures";
+import { CrateMaterial } from "./crate";
 
 export type Materials = {
     readonly butterfly: Material;
     readonly grass: Material;
-    readonly crate: PBRMetallicRoughnessMaterial;
+    readonly crate: CrateMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: Material;
@@ -41,10 +42,7 @@ export type Materials = {
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
-    const crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-    crateMaterial.baseTexture = textures.materials.crate.albedo;
-    crateMaterial.normalTexture = textures.materials.crate.normal;
-    crateMaterial.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
+    const crateMaterial = new CrateMaterial(textures.materials.crate, scene);
 
     const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
     treeMaterial.backFaceCulling = false;
