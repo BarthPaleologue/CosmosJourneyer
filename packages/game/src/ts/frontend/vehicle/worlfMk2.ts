@@ -17,10 +17,12 @@
 
 import type { Material } from "@babylonjs/core/Materials/material";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
+import earcut from "earcut";
 
 import { ok, type Result } from "@/utils/types";
 
@@ -39,6 +41,7 @@ export function createWolfMk2(
         tire: TireTextures;
         wheelMaterial: Material;
         canopyFrame: StyroFoamTextures;
+        solarPanelMaterial: Material;
     },
     scene: Scene,
     spawnPosition: Vector3,
@@ -55,69 +58,84 @@ export function createWolfMk2(
 
     const roverLength = 6.0;
 
-    const frameFloor = MeshBuilder.CreateBox(
-        "Frame",
-        { height: 0.2, width: roverHalfWidth * 2, depth: roverLength },
-        scene,
-    );
-    frameFloor.position.y = 0.5;
-    frameFloor.material = frameMat;
-
     const roverHeight = 2.0;
 
-    const frameRoof = MeshBuilder.CreateBox(
-        "FrameRoof",
+    const heightOfMaxWidth = roverHeight * 0.7;
+    const maxHalfWidth = roverHalfWidth * 1.4;
+
+    const topHalfWidth = roverHalfWidth * 0.8;
+
+    const wallThickness = 0.02;
+
+    const section = [
+        new Vector3(-roverHalfWidth, 0, 0),
+        new Vector3(roverHalfWidth, 0, 0),
+        new Vector3(maxHalfWidth, 0, heightOfMaxWidth),
+        new Vector3(topHalfWidth, 0, roverHeight),
+        new Vector3(-topHalfWidth, 0, roverHeight),
+        new Vector3(-maxHalfWidth, 0, heightOfMaxWidth),
+    ];
+
+    const sectionBarycenter = section.reduce((acc, v) => acc.addInPlace(v), Vector3.Zero()).scale(1 / section.length);
+
+    const sectionHole = section.map((v) => {
+        const holeVertex = v.subtract(sectionBarycenter);
+        const distanceFromCenter = holeVertex.length();
+        holeVertex.scaleInPlace((distanceFromCenter - wallThickness) / distanceFromCenter);
+        return holeVertex.addInPlace(sectionBarycenter);
+    });
+
+    const frame = MeshBuilder.ExtrudePolygon(
+        "backDoor",
+        { shape: section, holes: [sectionHole], depth: roverLength },
+        scene,
+        earcut,
+    );
+    frame.rotate(Axis.X, -Math.PI / 2);
+    frame.position.z = -roverLength / 2;
+    frame.bakeCurrentTransformIntoVertices();
+    frame.position.y = 0.5;
+
+    const backDoorThickness = 0.1;
+    const backDoor = MeshBuilder.ExtrudePolygon(
+        "backDoor",
+        { shape: section, depth: backDoorThickness },
+        scene,
+        earcut,
+    );
+    backDoor.rotate(Axis.X, -Math.PI / 2);
+    backDoor.parent = frame;
+    backDoor.position = new Vector3(0, 0, -roverLength / 2 - backDoorThickness);
+    backDoor.material = frameMat;
+
+    const roofSolarPanelRotationAngle = Math.atan2(roverHeight - heightOfMaxWidth, topHalfWidth - maxHalfWidth);
+    const roofSolarPanel1 = MeshBuilder.CreateBox(
+        "RoofSolarPanel1",
         {
-            height: 0.2,
-            width: roverHalfWidth * 2,
-            depth: roverLength,
+            height: 0.05,
+            width: roverHalfWidth - 0.2,
+            depth: roverLength * 0.8,
         },
         scene,
     );
-    frameRoof.material = frameMat;
-    frameRoof.position = new Vector3(0, roverHeight, 0);
-    frameRoof.parent = frameFloor;
+    roofSolarPanel1.material = textures.solarPanelMaterial;
+    roofSolarPanel1.rotate(Axis.Z, roofSolarPanelRotationAngle);
+    roofSolarPanel1.position = new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, 0);
+    roofSolarPanel1.parent = frame;
 
-    const frameBackDoor = MeshBuilder.CreateBox(
-        "FrameBackDoor",
+    const roofSolarPanel2 = MeshBuilder.CreateBox(
+        "RoofSolarPanel2",
         {
-            height: roverHeight,
-            width: roverHalfWidth * 2,
-            depth: 0.2,
+            height: 0.05,
+            width: roverHalfWidth - 0.2,
+            depth: roverLength * 0.8,
         },
         scene,
     );
-    frameBackDoor.material = frameMat;
-    frameBackDoor.position = new Vector3(0, roverHeight / 2, -roverLength / 2);
-    frameBackDoor.parent = frameFloor;
-
-    const doorWidth = 1.0;
-
-    const frameLeftWall = MeshBuilder.CreateBox(
-        "FrameLeftWall",
-        {
-            height: roverHeight,
-            width: 0.2,
-            depth: roverLength - doorWidth,
-        },
-        scene,
-    );
-    frameLeftWall.material = frameMat;
-    frameLeftWall.position = new Vector3(roverHalfWidth, roverHeight / 2, -doorWidth / 2);
-    frameLeftWall.parent = frameFloor;
-
-    const frameRightWall = MeshBuilder.CreateBox(
-        "FrameRightWall",
-        {
-            height: roverHeight,
-            width: 0.2,
-            depth: roverLength,
-        },
-        scene,
-    );
-    frameRightWall.material = frameMat;
-    frameRightWall.position = new Vector3(-roverHalfWidth, roverHeight / 2, 0);
-    frameRightWall.parent = frameFloor;
+    roofSolarPanel2.material = textures.solarPanelMaterial;
+    roofSolarPanel2.rotate(Axis.Z, -roofSolarPanelRotationAngle);
+    roofSolarPanel2.position = new Vector3(-(topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, 0);
+    roofSolarPanel2.parent = frame;
 
     const canopyHeight = roverHeight;
 
@@ -201,7 +219,7 @@ export function createWolfMk2(
     const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.05, scene);
     if (canopyFrame !== null) {
         canopyFrame.position = new Vector3(0, 0, roverLength / 2);
-        canopyFrame.parent = frameFloor;
+        canopyFrame.parent = frame;
         canopyFrame.material = frameMat;
 
         const glassPanels = createPanelsFromFrame(
@@ -231,7 +249,7 @@ export function createWolfMk2(
     const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
     const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
 
-    const vehicleBuilder = new VehicleBuilder(frameFloor);
+    const vehicleBuilder = new VehicleBuilder(frame);
 
     const wheelRadius = 0.7;
     const wheelThickness = 0.8;
