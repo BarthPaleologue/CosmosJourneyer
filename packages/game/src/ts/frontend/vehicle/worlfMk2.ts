@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Material } from "@babylonjs/core/Materials/material";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -23,7 +24,6 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { ok, type Result } from "@/utils/types";
 
-import type { PBRTextures } from "../assets/textures/materials";
 import type { StyroFoamTextures } from "../assets/textures/materials/styrofoam";
 import type { TireTextures } from "../assets/textures/materials/tire";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
@@ -37,7 +37,7 @@ import { WireframeTopology } from "./wireframeTopology";
 export function createWolfMk2(
     textures: {
         tire: TireTextures;
-        wheel: PBRTextures;
+        wheelMaterial: Material;
         canopyFrame: StyroFoamTextures;
     },
     scene: Scene,
@@ -237,12 +237,6 @@ export function createWolfMk2(
     const wheelThickness = 0.8;
     const tireMaterial = new TireMaterial(textures.tire, scene);
 
-    const wheelMaterial = new PBRMaterial("wheelMaterial", scene);
-    wheelMaterial.albedoTexture = textures.wheel.albedo;
-    wheelMaterial.bumpTexture = textures.wheel.normal;
-    wheelMaterial.metallicTexture = textures.wheel.metallicRoughness;
-    wheelMaterial.useRoughnessFromMetallicTextureGreen = true;
-
     vehicleBuilder
         .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
@@ -250,7 +244,7 @@ export function createWolfMk2(
         .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
         .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .build({ materials: { tire: tireMaterial.get(), wheel: wheelMaterial } }, scene)
+        .build({ materials: { tire: tireMaterial.get(), wheel: textures.wheelMaterial } }, scene)
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle);
 
