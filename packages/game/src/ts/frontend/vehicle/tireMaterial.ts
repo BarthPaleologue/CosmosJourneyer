@@ -49,7 +49,6 @@ export class TireMaterial {
             roughness: Texture;
             normalHeight: Texture;
             ambientOcclusion: Texture;
-            height: Texture;
         },
         scene: Scene,
     ) {
