@@ -82,7 +82,7 @@ export async function loadObjects(
 
     const crate = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
     crate.isVisible = false;
-    crate.material = materials.crate;
+    crate.material = materials.crate.get();
 
     const wandererContainer = await wandererPromise;
     const wanderer = wandererContainer.rootNodes[0];
