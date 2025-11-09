@@ -21,10 +21,10 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { ButterflyMaterial } from "./procedural/butterfly/butterflyMaterial";
-import { GrassMaterial } from "./procedural/grass/grassMaterial";
-import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
-import { type Textures } from "./textures";
+import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
+import { GrassMaterial } from "../procedural/grass/grassMaterial";
+import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
+import { type Textures } from "../textures";
 
 export type Materials = {
     readonly butterfly: Material;
