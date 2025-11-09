@@ -28,6 +28,7 @@ import { ok, type Result } from "@/utils/types";
 
 import type { StyroFoamTextures } from "../assets/textures/materials/styrofoam";
 import type { TireTextures } from "../assets/textures/materials/tire";
+import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { CanopyFrameMaterial } from "./canopyFrameMaterial";
@@ -67,7 +68,7 @@ export function createWolfMk2(
 
     const wallThickness = 0.02;
 
-    const section = [
+    const sectionHarsh = [
         new Vector3(-roverHalfWidth, 0, 0),
         new Vector3(roverHalfWidth, 0, 0),
         new Vector3(maxHalfWidth, 0, heightOfMaxWidth),
@@ -75,6 +76,8 @@ export function createWolfMk2(
         new Vector3(-topHalfWidth, 0, roverHeight),
         new Vector3(-maxHalfWidth, 0, heightOfMaxWidth),
     ];
+
+    const section = bevelPolygon(sectionHarsh, 10, 0.05);
 
     const sectionBarycenter = section.reduce((acc, v) => acc.addInPlace(v), Vector3.Zero()).scale(1 / section.length);
 
