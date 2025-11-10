@@ -44,6 +44,7 @@ export function createWolfMk2(
         wheelMaterial: Material;
         canopyFrame: StyroFoamTextures;
         solarPanelMaterial: Material;
+        backDoorMaterial: Material;
     },
     scene: Scene,
     spawnPosition: Vector3,
@@ -189,7 +190,7 @@ export function createWolfMk2(
 
     const middleOverhang = 0.7;
     const middleHeight = canopyHeight * 0.2;
-    const middleHalfWidth = roverHalfWidth + 0.4;
+    const middleHalfWidth = (roverHalfWidth + maxHalfWidth) / 2;
 
     const middleLeft = canopyTopology.addVertex(-middleHalfWidth, middleHeight, middleOverhang);
     const middleRight = canopyTopology.addVertex(middleHalfWidth, middleHeight, middleOverhang);
@@ -197,8 +198,8 @@ export function createWolfMk2(
     const centerRight = canopyTopology.addVertex(middleHalfWidth * 0.4, middleHeight, middleOverhang);
 
     const frontOverhang = middleOverhang + 0.3;
-    const frontHalfWidth = roverHalfWidth * 0.9;
-    const frontHeight = middleHeight + 1.0;
+    const frontHalfWidth = middleHalfWidth * 0.7;
+    const frontHeight = middleHeight + 0.9;
 
     const frontLeft = canopyTopology.addVertex(-frontHalfWidth, frontHeight, frontOverhang);
     const frontRight = canopyTopology.addVertex(frontHalfWidth, frontHeight, frontOverhang);
@@ -206,10 +207,20 @@ export function createWolfMk2(
     const topOverhang = 0.0;
     const topHeight = canopyHeight;
 
-    const topLeft = canopyTopology.addVertex(-frontHalfWidth - 0.3, topHeight, topOverhang);
-    const topMidLeft = canopyTopology.addVertex(-frontHalfWidth * 0.5, topHeight, topOverhang);
-    const topMidRight = canopyTopology.addVertex(frontHalfWidth * 0.5, topHeight, topOverhang);
-    const topRight = canopyTopology.addVertex(frontHalfWidth + 0.3, topHeight, topOverhang);
+    const heightFractionOfTop = heightOfMaxWidth / roverHeight;
+
+    const topLeft = canopyTopology.addVertex(
+        -maxHalfWidth,
+        heightOfMaxWidth,
+        topOverhang - frameSheerAmount * heightFractionOfTop,
+    );
+    const topMidLeft = canopyTopology.addVertex(-topHalfWidth, topHeight, topOverhang - frameSheerAmount);
+    const topMidRight = canopyTopology.addVertex(topHalfWidth, topHeight, topOverhang - frameSheerAmount);
+    const topRight = canopyTopology.addVertex(
+        maxHalfWidth,
+        heightOfMaxWidth,
+        topOverhang - frameSheerAmount * heightFractionOfTop,
+    );
 
     canopyTopology.connect(frontLeft, topLeft);
     canopyTopology.connect(frontLeft, topMidLeft);
@@ -230,6 +241,9 @@ export function createWolfMk2(
 
     canopyTopology.connect(centerLeft, bottomLeft);
     canopyTopology.connect(centerRight, bottomRight);
+
+    canopyTopology.connect(bottomLeft, topLeft);
+    canopyTopology.connect(bottomRight, topRight);
 
     canopyTopology.connect(frontRight, centerRight);
     canopyTopology.connect(frontLeft, centerLeft);
