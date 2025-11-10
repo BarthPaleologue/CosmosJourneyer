@@ -37,6 +37,7 @@
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
+import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/imageSourceBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
@@ -56,6 +57,7 @@ import {
     TrigonometryBlock,
     TrigonometryBlockOperations,
 } from "@babylonjs/core/Materials/Node/Blocks/trigonometryBlock";
+import { TriPlanarBlock } from "@babylonjs/core/Materials/Node/Blocks/triPlanarBlock";
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
 import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
@@ -246,6 +248,77 @@ export function textureSample(
     uv.connectTo(textureBlock.uv);
 
     return textureBlock;
+}
+
+export type UniformTexture2d = {
+    source: ImageSourceBlock["source"];
+    dimensions: ImageSourceBlock["dimensions"];
+};
+
+export function uniformTexture2d(texture: Texture, options?: Partial<TargetOptions>): UniformTexture2d {
+    const imageSourceBlock = new ImageSourceBlock(`${texture.name}SourceBlock`);
+    imageSourceBlock.target = options?.target ?? Target.VERT_AND_FRAG;
+    imageSourceBlock.texture = texture;
+
+    return imageSourceBlock;
+}
+
+export type TriPlanarSampleOptions = TargetOptions & {
+    sharpness: NodeMaterialConnectionPoint;
+    convertToLinearSpace: boolean;
+    convertToGammaSpace: boolean;
+};
+
+/**
+ * Samples a texture using triplanar mapping based on the position and normal.
+ * @param texture - The texture to sample.
+ * @param position - The world position.
+ * @param normal - The world normal.
+ * @param options - Optional properties for the triplanar sampling.
+ */
+export function textureTriPlanarSample(
+    texture: Texture,
+    position: NodeMaterialConnectionPoint,
+    normal: NodeMaterialConnectionPoint,
+    options?: Partial<TriPlanarSampleOptions>,
+) {
+    const triPlanarBlock = new TriPlanarBlock("TriPlanar");
+    triPlanarBlock.texture = texture;
+
+    triPlanarBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
+    triPlanarBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
+
+    position.connectTo(triPlanarBlock.position);
+    normal.connectTo(triPlanarBlock.normal);
+
+    options?.sharpness?.connectTo(triPlanarBlock.sharpness);
+
+    return triPlanarBlock;
+}
+
+export function triPlanarMapping(
+    textures: [NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?],
+    position: NodeMaterialConnectionPoint,
+    normal: NodeMaterialConnectionPoint,
+    options?: Partial<TriPlanarSampleOptions>,
+) {
+    const triPlanarBlock = new TriPlanarBlock("TriPlanar");
+
+    textures[0]?.connectTo(triPlanarBlock.source);
+    textures[1]?.connectTo(triPlanarBlock.sourceY);
+    if (triPlanarBlock.sourceZ !== null) {
+        textures[2]?.connectTo(triPlanarBlock.sourceZ);
+    }
+
+    triPlanarBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
+    triPlanarBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
+
+    position.connectTo(triPlanarBlock.position);
+    normal.connectTo(triPlanarBlock.normal);
+
+    options?.sharpness?.connectTo(triPlanarBlock.sharpness);
+
+    return triPlanarBlock;
 }
 
 /**
