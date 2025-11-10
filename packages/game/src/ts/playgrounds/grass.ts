@@ -27,6 +27,8 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
+import { createSky } from "./utils";
+
 export async function createGrassScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
@@ -55,6 +57,8 @@ export async function createGrassScene(
         scene,
     );
     lightSphere.position = light.position;
+
+    createSky(light.position, scene);
 
     const ground = MeshBuilder.CreateGround(
         "ground",
