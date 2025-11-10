@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Material } from "@babylonjs/core/Materials/material";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -26,26 +25,18 @@ import earcut from "earcut";
 
 import { ok, type Result } from "@/utils/types";
 
-import type { StyroFoamTextures } from "../assets/textures/materials/styrofoam";
-import type { TireTextures } from "../assets/textures/materials/tire";
+import type { RenderingAssets } from "../assets/renderingAssets";
 import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { sheerAlongY } from "../helpers/sheer";
-import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
 
 export function createWolfMk2(
-    textures: {
-        tire: TireTextures;
-        wheelMaterial: Material;
-        canopyFrame: StyroFoamTextures;
-        solarPanelMaterial: Material;
-        backDoorMaterial: Material;
-    },
+    assets: Omit<RenderingAssets, "objects">,
     scene: Scene,
     spawnPosition: Vector3,
     spawnRotation: {
@@ -55,7 +46,9 @@ export function createWolfMk2(
 ): Result<Vehicle, string> {
     const frameMat = new PBRMaterial("frame", scene);
     frameMat.metallic = 0;
-    frameMat.roughness = 1.0;
+    frameMat.roughness = 0.5;
+    frameMat.albedoColor.set(0.9, 0.9, 0.9);
+    frameMat.specularIntensity = 0.5;
 
     const roverHalfWidth = 1.2;
 
@@ -96,6 +89,7 @@ export function createWolfMk2(
         scene,
         earcut,
     );
+    frame.material = frameMat;
 
     const frameSheerAmount = 0.8;
     const sheerAngle = Math.atan2(frameSheerAmount, roverHeight);
@@ -128,7 +122,7 @@ export function createWolfMk2(
     backDoor.rotate(Axis.X, -Math.PI / 2 - sheerAngle);
     backDoor.parent = frame;
     backDoor.position = new Vector3(0, 0, -roverLength / 2 - backDoorThickness);
-    backDoor.material = textures.backDoorMaterial;
+    backDoor.material = frameMat;
 
     const roofSolarPanelZOffset = -frameSheerAmount;
 
@@ -142,7 +136,7 @@ export function createWolfMk2(
         },
         scene,
     );
-    roofSolarPanel1.material = textures.solarPanelMaterial;
+    roofSolarPanel1.material = assets.materials.solarPanel;
     roofSolarPanel1.rotate(Axis.Z, roofSolarPanelRotationAngle);
     roofSolarPanel1.position = new Vector3(
         (topHalfWidth + maxHalfWidth) / 2,
@@ -160,7 +154,7 @@ export function createWolfMk2(
         },
         scene,
     );
-    roofSolarPanel2.material = textures.solarPanelMaterial;
+    roofSolarPanel2.material = assets.materials.solarPanel;
     roofSolarPanel2.rotate(Axis.Z, -roofSolarPanelRotationAngle);
     roofSolarPanel2.position = new Vector3(
         -(topHalfWidth + maxHalfWidth) / 2,
@@ -178,7 +172,7 @@ export function createWolfMk2(
         },
         scene,
     );
-    roofSolarPanel3.material = textures.solarPanelMaterial;
+    roofSolarPanel3.material = assets.materials.solarPanel;
     roofSolarPanel3.position = new Vector3(0, roverHeight + 0.02, roofSolarPanelZOffset);
     roofSolarPanel3.parent = frame;
 
@@ -292,8 +286,8 @@ export function createWolfMk2(
             glassPanels.material = glass;
         }
 
-        const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
-        canopyFrame.material = canopyFrameMaterial.get();
+        //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
+        //canopyFrame.material = canopyFrameMaterial.get();
     }
 
     const wheelDistanceFromCenter = roverHalfWidth + 1.0;
@@ -311,7 +305,7 @@ export function createWolfMk2(
 
     const wheelRadius = 0.7;
     const wheelThickness = 0.8;
-    const tireMaterial = new TireMaterial(textures.tire, scene);
+    const tireMaterial = new TireMaterial(assets.textures.materials.tire, scene);
 
     vehicleBuilder
         .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
@@ -320,7 +314,7 @@ export function createWolfMk2(
         .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
         .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .build({ materials: { tire: tireMaterial.get(), wheel: textures.wheelMaterial } }, scene)
+        .build({ materials: { tire: tireMaterial.get(), wheel: assets.materials.crate.get() } }, scene)
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle);
 
