@@ -31,6 +31,7 @@ import type { TireTextures } from "../assets/textures/materials/tire";
 import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
+import { sheerAlongY } from "../helpers/sheer";
 import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
@@ -94,6 +95,12 @@ export function createWolfMk2(
         scene,
         earcut,
     );
+
+    const frameSheerAmount = 0.8;
+    const sheerAngle = Math.atan2(frameSheerAmount, roverHeight);
+    const sheerScaling = Math.hypot(roverHeight, frameSheerAmount) / roverHeight;
+
+    sheerAlongY(frame, frameSheerAmount);
     frame.rotate(Axis.X, -Math.PI / 2);
     frame.position.z = -roverLength / 2;
     frame.bakeCurrentTransformIntoVertices();
@@ -116,10 +123,13 @@ export function createWolfMk2(
         scene,
         earcut,
     );
-    backDoor.rotate(Axis.X, -Math.PI / 2);
+    backDoor.scaling.z = sheerScaling;
+    backDoor.rotate(Axis.X, -Math.PI / 2 - sheerAngle);
     backDoor.parent = frame;
     backDoor.position = new Vector3(0, 0, -roverLength / 2 - backDoorThickness);
-    backDoor.material = frameMat;
+    backDoor.material = textures.backDoorMaterial;
+
+    const roofSolarPanelZOffset = -frameSheerAmount;
 
     const roofSolarPanelRotationAngle = Math.atan2(roverHeight - heightOfMaxWidth, topHalfWidth - maxHalfWidth);
     const roofSolarPanel1 = MeshBuilder.CreateBox(
@@ -133,7 +143,11 @@ export function createWolfMk2(
     );
     roofSolarPanel1.material = textures.solarPanelMaterial;
     roofSolarPanel1.rotate(Axis.Z, roofSolarPanelRotationAngle);
-    roofSolarPanel1.position = new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, 0);
+    roofSolarPanel1.position = new Vector3(
+        (topHalfWidth + maxHalfWidth) / 2,
+        (heightOfMaxWidth + roverHeight) / 2,
+        roofSolarPanelZOffset,
+    );
     roofSolarPanel1.parent = frame;
 
     const roofSolarPanel2 = MeshBuilder.CreateBox(
@@ -147,7 +161,11 @@ export function createWolfMk2(
     );
     roofSolarPanel2.material = textures.solarPanelMaterial;
     roofSolarPanel2.rotate(Axis.Z, -roofSolarPanelRotationAngle);
-    roofSolarPanel2.position = new Vector3(-(topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, 0);
+    roofSolarPanel2.position = new Vector3(
+        -(topHalfWidth + maxHalfWidth) / 2,
+        (heightOfMaxWidth + roverHeight) / 2,
+        roofSolarPanelZOffset,
+    );
     roofSolarPanel2.parent = frame;
 
     const canopyHeight = roverHeight;
