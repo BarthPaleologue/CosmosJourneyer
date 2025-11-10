@@ -112,7 +112,7 @@ export class VehicleBuilder {
         const frameAggregate = new PhysicsAggregate(this.frame, PhysicsShapeType.MESH, {
             mass: 2000,
             restitution: 0,
-            friction: 0,
+            friction: 1,
             center: new Vector3(0, -2.5, 0),
         });
         FilterMeshCollisions(frameAggregate.shape);
@@ -146,7 +146,7 @@ export class VehicleBuilder {
                 wheel.thickness,
                 150,
                 0,
-                2.5,
+                1.5,
                 scene,
             );
             FilterMeshCollisions(wheelShape);
