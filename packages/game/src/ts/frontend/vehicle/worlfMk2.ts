@@ -168,6 +168,19 @@ export function createWolfMk2(
     );
     roofSolarPanel2.parent = frame;
 
+    const roofSolarPanel3 = MeshBuilder.CreateBox(
+        "RoofSolarPanel3",
+        {
+            height: 0.05,
+            width: roverHalfWidth * 1.2,
+            depth: roverLength * 0.8,
+        },
+        scene,
+    );
+    roofSolarPanel3.material = textures.solarPanelMaterial;
+    roofSolarPanel3.position = new Vector3(0, roverHeight + 0.02, roofSolarPanelZOffset);
+    roofSolarPanel3.parent = frame;
+
     const canopyHeight = roverHeight;
 
     const canopyTopology = new WireframeTopology();
