@@ -274,7 +274,7 @@ export function createWolfMk2(
     glass.indexOfRefraction = 1.5;
     glass.backFaceCulling = false;
 
-    const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.05, scene);
+    const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.03, scene);
     if (canopyFrame !== null) {
         canopyFrame.position = new Vector3(0, 0, roverLength / 2);
         canopyFrame.parent = frame;
