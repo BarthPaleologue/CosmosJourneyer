@@ -35,7 +35,7 @@ import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
-import { enablePhysics } from "./utils";
+import { createSky, enablePhysics } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
@@ -54,6 +54,8 @@ export async function createCharacterDemoScene(
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
+
+    createSky(light.direction.scale(-1), scene);
 
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;

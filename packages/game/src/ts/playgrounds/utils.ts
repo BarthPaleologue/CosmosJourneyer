@@ -18,9 +18,12 @@
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { ReflectionProbe } from "@babylonjs/core/Probes/reflectionProbe";
 import { type Scene } from "@babylonjs/core/scene";
 import HavokPhysics, { type HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { SkyMaterial } from "@babylonjs/materials";
 import * as QRCode from "qrcode";
 
 export async function enablePhysics(scene: Scene, gravity = Vector3.Zero(), havokInstance?: HavokPhysicsWithBindings) {
@@ -28,6 +31,26 @@ export async function enablePhysics(scene: Scene, gravity = Vector3.Zero(), havo
     scene.enablePhysics(gravity, havokPlugin);
 
     return havokPlugin;
+}
+
+export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<{ size: number }>): void {
+    const skyMaterial = new SkyMaterial("skyMaterial", scene);
+    skyMaterial.backFaceCulling = false;
+    skyMaterial.sunPosition = sunPosition;
+    skyMaterial.useSunPosition = true;
+
+    const skybox = MeshBuilder.CreateBox("skyBox", { size: options?.size ?? 1e3 }, scene);
+    skybox.material = skyMaterial;
+    skybox.infiniteDistance = true;
+    skybox.isPickable = false;
+    skybox.ignoreCameraMaxZ = true;
+
+    const rp = new ReflectionProbe("ref", 512, scene);
+    rp.renderList?.push(skybox);
+
+    scene.customRenderTargets.push(rp.cubeTexture);
+
+    scene.environmentTexture = rp.cubeTexture;
 }
 
 export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
