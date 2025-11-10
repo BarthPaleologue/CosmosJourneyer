@@ -99,7 +99,17 @@ export function createWolfMk2(
     frame.bakeCurrentTransformIntoVertices();
     frame.position.y = 0.5;
 
-    const backDoorThickness = 0.1;
+    const backDoorThickness = wallThickness;
+    const backdoorJoint = MeshBuilder.CreateCylinder(
+        "backdoorJoint",
+        { diameter: backDoorThickness, height: roverHalfWidth * 2, tessellation: 12 },
+        scene,
+    );
+    backdoorJoint.rotate(Axis.Z, Math.PI / 2);
+    backdoorJoint.bakeCurrentTransformIntoVertices();
+    backdoorJoint.parent = frame;
+    backdoorJoint.position = new Vector3(0, 0, -roverLength / 2);
+
     const backDoor = MeshBuilder.ExtrudePolygon(
         "backDoor",
         { shape: section, depth: backDoorThickness },
