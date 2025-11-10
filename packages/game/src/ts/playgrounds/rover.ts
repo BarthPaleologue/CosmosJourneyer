@@ -92,10 +92,8 @@ export async function createRoverScene(
 
     const roverResult = createWolfMk2(
         {
-            tire: textures.materials.tire,
-            wheelMaterial: materials.crate.get(),
-            canopyFrame: textures.materials.styroFoam,
-            solarPanelMaterial: materials.solarPanel,
+            textures,
+            materials,
         },
         scene,
         new Vector3(0, 10, 0),

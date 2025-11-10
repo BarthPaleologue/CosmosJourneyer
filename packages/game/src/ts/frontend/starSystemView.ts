@@ -486,20 +486,10 @@ export class StarSystemView implements View {
                 const spawnRotationAxis = Vector3.Cross(Vector3.Up(), up).normalize();
                 const spawnRotationAngle = Math.acos(clamp(Vector3.Dot(Vector3.Up(), up), -1, 1));
 
-                const roverResult = createWolfMk2(
-                    {
-                        tire: this.assets.textures.materials.tire,
-                        wheelMaterial: this.assets.materials.crate.get(),
-                        canopyFrame: this.assets.textures.materials.styroFoam,
-                        solarPanelMaterial: this.assets.materials.solarPanel,
-                    },
-                    this.scene,
-                    spawnPosition,
-                    {
-                        axis: spawnRotationAxis,
-                        angle: spawnRotationAngle,
-                    },
-                );
+                const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, {
+                    axis: spawnRotationAxis,
+                    angle: spawnRotationAngle,
+                });
                 if (!roverResult.success) {
                     throw new Error("The rover had a stroke");
                 }
