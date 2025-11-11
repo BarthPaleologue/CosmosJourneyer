@@ -38,9 +38,14 @@ import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder
 import type { RenderingAssets } from "../assets/renderingAssets";
 import { Vehicle } from "./vehicle";
 
-/*type PartFixedConnection = {
+type PartFixedConnection = {
     type: "fixed";
-};*/
+    rotation?: {
+        x?: number;
+        y?: number;
+        z?: number;
+    };
+};
 
 type PartHingeConnection = {
     type: "hinge";
@@ -51,7 +56,7 @@ type PartHingeConnection = {
     };
 };
 
-type PartConnection = PartHingeConnection;
+type PartConnection = PartFixedConnection | PartHingeConnection;
 
 export class VehicleBuilder {
     private readonly frame: Mesh;
@@ -156,9 +161,43 @@ export class VehicleBuilder {
             const positionInFrameSpace = mesh.position.clone();
             mesh.setParent(null);
             const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
+            FilterMeshCollisions(partAggregate.shape);
 
             let joint: Physics6DoFConstraint;
             switch (connection.type) {
+                case "fixed":
+                    joint = new Physics6DoFConstraint(
+                        {
+                            pivotA: positionInFrameSpace,
+                            pivotB: Vector3.Zero(),
+                        },
+                        [
+                            {
+                                axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
+                                minLimit: 0,
+                                maxLimit: 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_X,
+                                minLimit: connection.rotation?.x ?? 0,
+                                maxLimit: connection.rotation?.x ?? 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_Y,
+                                minLimit: connection.rotation?.y ?? 0,
+                                maxLimit: connection.rotation?.y ?? 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_Z,
+                                minLimit: connection.rotation?.z ?? 0,
+                                maxLimit: connection.rotation?.z ?? 0,
+                            },
+                        ],
+                        this.scene,
+                    );
+
+                    frameAggregate.body.addConstraint(partAggregate.body, joint);
+                    break;
                 case "hinge":
                     joint = new Physics6DoFConstraint(
                         {
