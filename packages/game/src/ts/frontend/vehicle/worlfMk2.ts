@@ -19,6 +19,13 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import {
+    PhysicsConstraintAxis,
+    PhysicsConstraintMotorType,
+    PhysicsShapeType,
+} from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { Scene } from "@babylonjs/core/scene";
 import earcut from "earcut";
 
@@ -100,16 +107,6 @@ export function createWolfMk2(
     frame.position.y = 0.5;
 
     const backDoorThickness = wallThickness;
-    const backdoorJoint = MeshBuilder.CreateCylinder(
-        "backdoorJoint",
-        { diameter: backDoorThickness, height: roverHalfWidth * 2, tessellation: 12 },
-        scene,
-    );
-    backdoorJoint.rotate(Axis.Z, Math.PI / 2);
-    backdoorJoint.bakeCurrentTransformIntoVertices();
-    backdoorJoint.parent = frame;
-    backdoorJoint.position = new Vector3(0, 0, -roverLength / 2);
-
     const backDoor = MeshBuilder.ExtrudePolygon(
         "backDoor",
         { shape: section, depth: backDoorThickness },
@@ -294,16 +291,76 @@ export function createWolfMk2(
     const wheelRadius = 0.7;
     const wheelThickness = 0.8;
 
-    return ok(
-        vehicleBuilder
-            .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-            .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
-            .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
-            .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
-            .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-            .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-            .translateSpawn(spawnPosition)
-            .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
-            .assemble(),
+    const vehicle = vehicleBuilder
+        .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
+        .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
+        .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .translateSpawn(spawnPosition)
+        .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
+        .assemble();
+
+    backDoor.setParent(null);
+
+    const backDoorMass = 100;
+    const backDoorAggregate = new PhysicsAggregate(
+        backDoor,
+        PhysicsShapeType.CONVEX_HULL,
+        { mass: backDoorMass },
+        scene,
     );
+
+    // Math.PI is corresponds to horizontal angle, toward the rear of the vehicle
+    const hingeLowerAngle = (2 * Math.PI) / 3;
+    const hingeUpperAngle = (3 * Math.PI) / 2 - sheerAngle;
+
+    const motorizedHinge = new Physics6DoFConstraint(
+        {
+            pivotA: new Vector3(0, 0, -roverLength / 2),
+            pivotB: Vector3.Zero(),
+        },
+        [
+            {
+                axis: PhysicsConstraintAxis.LINEAR_Y,
+                minLimit: 0,
+                maxLimit: 0,
+            },
+            {
+                axis: PhysicsConstraintAxis.LINEAR_Z,
+                minLimit: 0,
+                maxLimit: 0,
+            },
+            {
+                axis: PhysicsConstraintAxis.LINEAR_X,
+                minLimit: 0,
+                maxLimit: 0,
+            },
+            {
+                axis: PhysicsConstraintAxis.ANGULAR_X,
+                minLimit: hingeLowerAngle,
+                maxLimit: hingeUpperAngle,
+            },
+            {
+                axis: PhysicsConstraintAxis.ANGULAR_Y,
+                minLimit: 0,
+                maxLimit: 0,
+            },
+            {
+                axis: PhysicsConstraintAxis.ANGULAR_Z,
+                minLimit: 0,
+                maxLimit: 0,
+            },
+        ],
+        scene,
+    );
+
+    frame.physicsBody?.addConstraint(backDoorAggregate.body, motorizedHinge);
+
+    motorizedHinge.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_X, PhysicsConstraintMotorType.VELOCITY);
+    motorizedHinge.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 1.0);
+    motorizedHinge.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, 100 * backDoorMass);
+
+    return ok(vehicle);
 }
