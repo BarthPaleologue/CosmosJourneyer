@@ -178,3 +178,7 @@ export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
         qrOverlay.remove();
     }
 }
+
+export function addToWindow(name: string, value: unknown) {
+    (window as typeof window & { [name]: unknown })[name] = value;
+}
