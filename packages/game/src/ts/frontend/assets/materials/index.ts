@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -38,6 +39,7 @@ export type Materials = {
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: PBRMetallicRoughnessMaterial;
     readonly tire: TireMaterial;
+    readonly glass: PBRMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -55,6 +57,16 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
 
     const tireMaterial = new TireMaterial(textures.materials.tire, scene);
 
+    const glass = new PBRMaterial("glass", scene);
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+    glass.metallic = 0;
+    glass.roughness = 0.05;
+    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    glass.alpha = 0.1;
+    glass.indexOfRefraction = 1.5;
+    glass.backFaceCulling = false;
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
         butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
@@ -65,6 +77,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         tree: treeMaterial,
         tank: tankMaterial,
         tire: tireMaterial,
+        glass: glass,
     };
 }
 
