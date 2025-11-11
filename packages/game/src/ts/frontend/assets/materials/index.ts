@@ -42,6 +42,7 @@ export type Materials = {
     readonly landingPad: Material;
     readonly metalSection: Material;
     readonly tire: TireMaterial;
+    readonly glass: PBRMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -66,6 +67,16 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
 
     const tireMaterial = new TireMaterial(textures.materials.tire, scene);
 
+    const glass = new PBRMaterial("glass", scene);
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+    glass.metallic = 0;
+    glass.roughness = 0.05;
+    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    glass.alpha = 0.1;
+    glass.indexOfRefraction = 1.5;
+    glass.backFaceCulling = false;
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
@@ -76,6 +87,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
         metalSection: metalSectionMaterial,
         tire: tireMaterial,
+        glass: glass,
     };
 }
 
