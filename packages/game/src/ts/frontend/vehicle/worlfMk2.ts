@@ -48,25 +48,25 @@ export function createWolfMk2(
     frameMat.albedoColor.set(0.9, 0.9, 0.9);
     frameMat.specularIntensity = 0.5;
 
-    const roverHalfWidth = 1.2;
+    const frameHalfWidth = 1.2;
 
-    const roverLength = 6.0;
+    const frameLength = 6.0;
 
-    const roverHeight = 2.0;
+    const frameHeight = 2.0;
 
-    const heightOfMaxWidth = roverHeight * 0.7;
-    const maxHalfWidth = roverHalfWidth * 1.4;
+    const heightOfMaxWidth = frameHeight * 0.7;
+    const maxHalfWidth = frameHalfWidth * 1.4;
 
-    const topHalfWidth = roverHalfWidth * 0.8;
+    const topHalfWidth = frameHalfWidth * 0.8;
 
-    const wallThickness = 0.02;
+    const frameThickness = 0.02;
 
     const sectionHarsh = [
-        new Vector3(-roverHalfWidth, 0, 0),
-        new Vector3(roverHalfWidth, 0, 0),
+        new Vector3(-frameHalfWidth, 0, 0),
+        new Vector3(frameHalfWidth, 0, 0),
         new Vector3(maxHalfWidth, 0, heightOfMaxWidth),
-        new Vector3(topHalfWidth, 0, roverHeight),
-        new Vector3(-topHalfWidth, 0, roverHeight),
+        new Vector3(topHalfWidth, 0, frameHeight),
+        new Vector3(-topHalfWidth, 0, frameHeight),
         new Vector3(-maxHalfWidth, 0, heightOfMaxWidth),
     ];
 
@@ -77,29 +77,29 @@ export function createWolfMk2(
     const sectionHole = section.map((v) => {
         const holeVertex = v.subtract(sectionBarycenter);
         const distanceFromCenter = holeVertex.length();
-        holeVertex.scaleInPlace((distanceFromCenter - wallThickness) / distanceFromCenter);
+        holeVertex.scaleInPlace((distanceFromCenter - frameThickness) / distanceFromCenter);
         return holeVertex.addInPlace(sectionBarycenter);
     });
 
     const frame = MeshBuilder.ExtrudePolygon(
         "backDoor",
-        { shape: section, holes: [sectionHole], depth: roverLength },
+        { shape: section, holes: [sectionHole], depth: frameLength },
         scene,
         earcut,
     );
     frame.material = frameMat;
 
     const frameSheerAmount = 0.8;
-    const sheerAngle = Math.atan2(frameSheerAmount, roverHeight);
-    const sheerScaling = Math.hypot(roverHeight, frameSheerAmount) / roverHeight;
+    const sheerAngle = Math.atan2(frameSheerAmount, frameHeight);
+    const sheerScaling = Math.hypot(frameHeight, frameSheerAmount) / frameHeight;
 
     sheerAlongY(frame, frameSheerAmount);
     frame.rotate(Axis.X, -Math.PI / 2);
-    frame.position.z = -roverLength / 2;
+    frame.position.z = -frameLength / 2;
     frame.bakeCurrentTransformIntoVertices();
     frame.position.y = 0.5;
 
-    const backDoorThickness = wallThickness;
+    const backDoorThickness = frameThickness;
     const backDoor = MeshBuilder.ExtrudePolygon(
         "backDoor",
         { shape: section, depth: backDoorThickness },
@@ -112,13 +112,13 @@ export function createWolfMk2(
 
     const roofSolarPanelZOffset = -frameSheerAmount;
 
-    const roofSolarPanelRotationAngle = Math.atan2(roverHeight - heightOfMaxWidth, topHalfWidth - maxHalfWidth);
+    const roofSolarPanelRotationAngle = Math.atan2(frameHeight - heightOfMaxWidth, topHalfWidth - maxHalfWidth);
     const roofSolarPanel1 = MeshBuilder.CreateBox(
         "RoofSolarPanel1",
         {
             height: 0.05,
-            width: roverHalfWidth - 0.2,
-            depth: roverLength * 0.8,
+            width: frameHalfWidth - 0.2,
+            depth: frameLength * 0.8,
         },
         scene,
     );
@@ -129,8 +129,8 @@ export function createWolfMk2(
         "RoofSolarPanel2",
         {
             height: 0.05,
-            width: roverHalfWidth - 0.2,
-            depth: roverLength * 0.8,
+            width: frameHalfWidth - 0.2,
+            depth: frameLength * 0.8,
         },
         scene,
     );
@@ -141,22 +141,22 @@ export function createWolfMk2(
         "RoofSolarPanel3",
         {
             height: 0.05,
-            width: roverHalfWidth * 1.2,
-            depth: roverLength * 0.8,
+            width: frameHalfWidth * 1.2,
+            depth: frameLength * 0.8,
         },
         scene,
     );
     roofSolarPanel3.material = assets.materials.solarPanel;
 
-    const canopyHeight = roverHeight;
+    const canopyHeight = frameHeight;
 
     const canopyTopology = new WireframeTopology();
-    const bottomLeft = canopyTopology.addVertex(-roverHalfWidth, 0, 0);
-    const bottomRight = canopyTopology.addVertex(roverHalfWidth, 0, 0);
+    const bottomLeft = canopyTopology.addVertex(-frameHalfWidth, 0, 0);
+    const bottomRight = canopyTopology.addVertex(frameHalfWidth, 0, 0);
 
     const middleOverhang = 0.7;
     const middleHeight = canopyHeight * 0.2;
-    const middleHalfWidth = (roverHalfWidth + maxHalfWidth) / 2;
+    const middleHalfWidth = (frameHalfWidth + maxHalfWidth) / 2;
 
     const middleLeft = canopyTopology.addVertex(-middleHalfWidth, middleHeight, middleOverhang);
     const middleRight = canopyTopology.addVertex(middleHalfWidth, middleHeight, middleOverhang);
@@ -173,7 +173,7 @@ export function createWolfMk2(
     const topOverhang = 0.0;
     const topHeight = canopyHeight;
 
-    const heightFractionOfTop = heightOfMaxWidth / roverHeight;
+    const heightFractionOfTop = heightOfMaxWidth / frameHeight;
 
     const topLeft = canopyTopology.addVertex(
         -maxHalfWidth,
@@ -246,16 +246,16 @@ export function createWolfMk2(
     //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
     //canopyFrame.material = canopyFrameMaterial.get();
 
-    const wheelDistanceFromCenter = roverHalfWidth + 1.0;
+    const wheelDistanceFromCenter = frameHalfWidth + 1.0;
 
     const wheelSpread = 0.4;
 
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, roverLength * wheelSpread);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, roverLength * wheelSpread);
+    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, frameLength * wheelSpread);
+    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, frameLength * wheelSpread);
     const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
     const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
+    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -frameLength * wheelSpread);
+    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -frameLength * wheelSpread);
 
     const vehicleBuilder = new VehicleBuilder(frame, assets, scene);
 
@@ -271,7 +271,7 @@ export function createWolfMk2(
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
         .addPart(
             roofSolarPanel1,
-            new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, roofSolarPanelZOffset),
+            new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + frameHeight) / 2, roofSolarPanelZOffset),
             100,
             { type: "fixed", rotation: { z: -roofSolarPanelRotationAngle } },
         )
@@ -279,15 +279,15 @@ export function createWolfMk2(
             roofSolarPanel2,
             new Vector3(
                 -(topHalfWidth + maxHalfWidth) / 2,
-                (heightOfMaxWidth + roverHeight) / 2,
+                (heightOfMaxWidth + frameHeight) / 2,
                 roofSolarPanelZOffset,
             ),
             100,
             { type: "fixed", rotation: { z: roofSolarPanelRotationAngle } },
         )
-        .addPart(roofSolarPanel3, new Vector3(0, roverHeight + 0.02, roofSolarPanelZOffset), 100, { type: "fixed" })
-        .addPart(canopyFrame, new Vector3(0, 0, roverLength / 2), 100, { type: "fixed" })
-        .addPart(backDoor, new Vector3(0, 0, -roverLength / 2 - backDoorThickness), 100, {
+        .addPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, { type: "fixed" })
+        .addPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, { type: "fixed" })
+        .addPart(backDoor, new Vector3(0, 0, -frameLength / 2 - backDoorThickness), 100, {
             type: "hinge",
             axis: "x",
             range: {
