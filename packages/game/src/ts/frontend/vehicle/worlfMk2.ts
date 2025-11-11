@@ -17,7 +17,6 @@
 
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
@@ -257,16 +256,6 @@ export function createWolfMk2(
         return edgesResult;
     }
 
-    const glass = new PBRMaterial("glass", scene);
-    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
-    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
-    glass.metallic = 0;
-    glass.roughness = 0.05;
-    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
-    glass.alpha = 0.1;
-    glass.indexOfRefraction = 1.5;
-    glass.backFaceCulling = false;
-
     const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.03, scene);
     if (canopyFrame !== null) {
         canopyFrame.position = new Vector3(0, 0, roverLength / 2);
@@ -282,7 +271,7 @@ export function createWolfMk2(
         );
         if (glassPanels !== null) {
             glassPanels.parent = canopyFrame;
-            glassPanels.material = glass;
+            glassPanels.material = assets.materials.glass;
         }
 
         //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
