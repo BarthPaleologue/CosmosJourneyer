@@ -30,13 +30,12 @@ import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { sheerAlongY } from "../helpers/sheer";
-import { TireMaterial } from "./tireMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
 
 export function createWolfMk2(
-    assets: Omit<RenderingAssets, "objects">,
+    assets: RenderingAssets,
     scene: Scene,
     spawnPosition: Vector3,
     spawnRotation: {
@@ -301,22 +300,21 @@ export function createWolfMk2(
     const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
     const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -roverLength * wheelSpread);
 
-    const vehicleBuilder = new VehicleBuilder(frame);
+    const vehicleBuilder = new VehicleBuilder(frame, assets, scene);
 
     const wheelRadius = 0.7;
     const wheelThickness = 0.8;
-    const tireMaterial = new TireMaterial(assets.textures.materials.tire, scene);
 
-    vehicleBuilder
-        .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
-        .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
-        .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .build({ materials: { tire: tireMaterial.get(), wheel: assets.materials.crate.get() } }, scene)
-        .translateSpawn(spawnPosition)
-        .rotateSpawn(spawnRotation.axis, spawnRotation.angle);
-
-    return ok(vehicleBuilder.assemble(scene));
+    return ok(
+        vehicleBuilder
+            .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+            .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
+            .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
+            .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
+            .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
+            .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
+            .translateSpawn(spawnPosition)
+            .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
+            .assemble(),
+    );
 }
