@@ -22,7 +22,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import earcut from "earcut";
 
-import { ok, type Result } from "@/utils/types";
+import { err, ok, type Result } from "@/utils/types";
 
 import type { RenderingAssets } from "../assets/renderingAssets";
 import { bevelPolygon } from "../helpers/bevel";
@@ -122,14 +122,8 @@ export function createWolfMk2(
         },
         scene,
     );
-    roofSolarPanel1.material = assets.materials.solarPanel;
     roofSolarPanel1.rotate(Axis.Z, roofSolarPanelRotationAngle);
-    roofSolarPanel1.position = new Vector3(
-        (topHalfWidth + maxHalfWidth) / 2,
-        (heightOfMaxWidth + roverHeight) / 2,
-        roofSolarPanelZOffset,
-    );
-    roofSolarPanel1.parent = frame;
+    roofSolarPanel1.material = assets.materials.solarPanel;
 
     const roofSolarPanel2 = MeshBuilder.CreateBox(
         "RoofSolarPanel2",
@@ -142,12 +136,6 @@ export function createWolfMk2(
     );
     roofSolarPanel2.material = assets.materials.solarPanel;
     roofSolarPanel2.rotate(Axis.Z, -roofSolarPanelRotationAngle);
-    roofSolarPanel2.position = new Vector3(
-        -(topHalfWidth + maxHalfWidth) / 2,
-        (heightOfMaxWidth + roverHeight) / 2,
-        roofSolarPanelZOffset,
-    );
-    roofSolarPanel2.parent = frame;
 
     const roofSolarPanel3 = MeshBuilder.CreateBox(
         "RoofSolarPanel3",
@@ -159,8 +147,6 @@ export function createWolfMk2(
         scene,
     );
     roofSolarPanel3.material = assets.materials.solarPanel;
-    roofSolarPanel3.position = new Vector3(0, roverHeight + 0.02, roofSolarPanelZOffset);
-    roofSolarPanel3.parent = frame;
 
     const canopyHeight = roverHeight;
 
@@ -245,26 +231,20 @@ export function createWolfMk2(
     }
 
     const canopyFrame = createEdgeTubeFrame("canopyFrame", positionsResult.value, edgesResult.value, 0.03, scene);
-    if (canopyFrame !== null) {
-        canopyFrame.position = new Vector3(0, 0, roverLength / 2);
-        canopyFrame.parent = frame;
-        canopyFrame.material = frameMat;
-
-        const glassPanels = createPanelsFromFrame(
-            "canopyPanels",
-            positionsResult.value,
-            edgesResult.value,
-            0.01,
-            scene,
-        );
-        if (glassPanels !== null) {
-            glassPanels.parent = canopyFrame;
-            glassPanels.material = assets.materials.glass;
-        }
-
-        //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
-        //canopyFrame.material = canopyFrameMaterial.get();
+    if (canopyFrame === null) {
+        return err("Failed to create canopy frame");
     }
+
+    canopyFrame.material = frameMat;
+
+    const glassPanels = createPanelsFromFrame("canopyPanels", positionsResult.value, edgesResult.value, 0.01, scene);
+    if (glassPanels !== null) {
+        glassPanels.parent = canopyFrame;
+        glassPanels.material = assets.materials.glass;
+    }
+
+    //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
+    //canopyFrame.material = canopyFrameMaterial.get();
 
     const wheelDistanceFromCenter = roverHalfWidth + 1.0;
 
@@ -289,6 +269,24 @@ export function createWolfMk2(
         .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
         .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addPart(
+            roofSolarPanel1,
+            new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + roverHeight) / 2, roofSolarPanelZOffset),
+            100,
+            { type: "fixed", rotation: { z: -roofSolarPanelRotationAngle } },
+        )
+        .addPart(
+            roofSolarPanel2,
+            new Vector3(
+                -(topHalfWidth + maxHalfWidth) / 2,
+                (heightOfMaxWidth + roverHeight) / 2,
+                roofSolarPanelZOffset,
+            ),
+            100,
+            { type: "fixed", rotation: { z: roofSolarPanelRotationAngle } },
+        )
+        .addPart(roofSolarPanel3, new Vector3(0, roverHeight + 0.02, roofSolarPanelZOffset), 100, { type: "fixed" })
+        .addPart(canopyFrame, new Vector3(0, 0, roverLength / 2), 100, { type: "fixed" })
         .addPart(backDoor, new Vector3(0, 0, -roverLength / 2 - backDoorThickness), 100, {
             type: "hinge",
             axis: "x",
