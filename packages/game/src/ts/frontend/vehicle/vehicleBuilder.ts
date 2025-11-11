@@ -38,6 +38,21 @@ import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder
 import type { RenderingAssets } from "../assets/renderingAssets";
 import { Vehicle } from "./vehicle";
 
+/*type PartFixedConnection = {
+    type: "fixed";
+};*/
+
+type PartHingeConnection = {
+    type: "hinge";
+    axis: "x" | "y" | "z";
+    range: {
+        min: number;
+        max: number;
+    };
+};
+
+type PartConnection = PartHingeConnection;
+
 export class VehicleBuilder {
     private readonly frame: Mesh;
 
@@ -49,6 +64,12 @@ export class VehicleBuilder {
         steerable: boolean;
         mesh: Mesh;
         axleMesh: Mesh;
+    }> = [];
+
+    private readonly parts: Array<{
+        mesh: Mesh;
+        mass: number;
+        connection: PartConnection;
     }> = [];
 
     private spawnPosition = Vector3.Zero();
@@ -78,6 +99,15 @@ export class VehicleBuilder {
         );
         const axleMesh = CreateAxle(position, radius, this.scene);
         this.wheels.push({ position, radius, thickness, powered, steerable, mesh: wheelMesh, axleMesh: axleMesh });
+        return this;
+    }
+
+    addPart(part: Mesh, position: Vector3, mass: number, connection: PartConnection): this {
+        part.parent = this.frame;
+        part.position = position;
+
+        this.parts.push({ mesh: part, mass, connection });
+
         return this;
     }
 
@@ -121,6 +151,53 @@ export class VehicleBuilder {
             center: new Vector3(0, -2.5, 0),
         });
         FilterMeshCollisions(frameAggregate.shape);
+
+        for (const { mesh, mass, connection } of this.parts) {
+            const positionInFrameSpace = mesh.position.clone();
+            mesh.setParent(null);
+            const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
+
+            let joint: Physics6DoFConstraint;
+            switch (connection.type) {
+                case "hinge":
+                    joint = new Physics6DoFConstraint(
+                        {
+                            pivotA: positionInFrameSpace,
+                            pivotB: Vector3.Zero(),
+                        },
+                        [
+                            {
+                                axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
+                                minLimit: 0,
+                                maxLimit: 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_X,
+                                minLimit: connection.axis === "x" ? connection.range.min : 0,
+                                maxLimit: connection.axis === "x" ? connection.range.max : 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_Y,
+                                minLimit: connection.axis === "y" ? connection.range.min : 0,
+                                maxLimit: connection.axis === "y" ? connection.range.max : 0,
+                            },
+                            {
+                                axis: PhysicsConstraintAxis.ANGULAR_Z,
+                                minLimit: connection.axis === "z" ? connection.range.min : 0,
+                                maxLimit: connection.axis === "z" ? connection.range.max : 0,
+                            },
+                        ],
+                        this.scene,
+                    );
+
+                    frameAggregate.body.addConstraint(partAggregate.body, joint);
+
+                    joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_X, PhysicsConstraintMotorType.VELOCITY);
+                    joint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, -1.0);
+                    joint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, 100 * mass);
+                    break;
+            }
+        }
 
         const motorConstraints: Array<Physics6DoFConstraint> = [];
         const steeringConstraints: Array<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }> = [];
