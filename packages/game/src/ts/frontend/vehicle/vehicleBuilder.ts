@@ -35,6 +35,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { CollisionMask } from "@/settings";
 
 import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
+import type { RenderingAssets } from "../assets/renderingAssets";
 import { Vehicle } from "./vehicle";
 
 export class VehicleBuilder {
@@ -46,29 +47,37 @@ export class VehicleBuilder {
         thickness: number;
         powered: boolean;
         steerable: boolean;
-        mesh?: Mesh;
-        axleMesh?: Mesh;
+        mesh: Mesh;
+        axleMesh: Mesh;
     }> = [];
 
     private spawnPosition = Vector3.Zero();
 
     private spawnRotation = Quaternion.Identity();
 
-    constructor(frame: Mesh) {
+    private readonly assets: RenderingAssets;
+
+    private readonly scene: Scene;
+
+    constructor(frame: Mesh, assets: RenderingAssets, scene: Scene) {
         this.frame = frame;
+        this.assets = assets;
+        this.scene = scene;
     }
 
     addWheel(position: Vector3, radius: number, thickness: number, powered: boolean, steerable: boolean): this {
-        this.wheels.push({ position, radius, thickness, powered, steerable });
-        return this;
-    }
-
-    build(assets: { materials: { tire: Material; wheel: Material } }, scene: Scene): this {
-        for (const wheel of this.wheels) {
-            wheel.mesh = CreateWheel(wheel.position, wheel.radius, wheel.thickness, assets.materials, scene);
-            wheel.axleMesh = CreateAxle(wheel.position, wheel.radius, scene);
-        }
-
+        const wheelMesh = CreateWheel(
+            position,
+            radius,
+            thickness,
+            {
+                wheel: this.assets.materials.crate.get(),
+                tire: this.assets.materials.tire.get(),
+            },
+            this.scene,
+        );
+        const axleMesh = CreateAxle(position, radius, this.scene);
+        this.wheels.push({ position, radius, thickness, powered, steerable, mesh: wheelMesh, axleMesh: axleMesh });
         return this;
     }
 
@@ -97,18 +106,14 @@ export class VehicleBuilder {
         const transforms: Array<TransformNode> = [];
         transforms.push(this.frame);
         for (const wheel of this.wheels) {
-            if (wheel.mesh !== undefined) {
-                transforms.push(wheel.mesh);
-            }
-            if (wheel.axleMesh !== undefined) {
-                transforms.push(wheel.axleMesh);
-            }
+            transforms.push(wheel.mesh);
+            transforms.push(wheel.axleMesh);
         }
 
         return transforms;
     }
 
-    assemble(scene: Scene): Vehicle {
+    assemble(): Vehicle {
         const frameAggregate = new PhysicsAggregate(this.frame, PhysicsShapeType.MESH, {
             mass: 2000,
             restitution: 0,
@@ -120,17 +125,13 @@ export class VehicleBuilder {
         const motorConstraints: Array<Physics6DoFConstraint> = [];
         const steeringConstraints: Array<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }> = [];
         for (const wheel of this.wheels) {
-            if (wheel.mesh === undefined || wheel.axleMesh === undefined) {
-                throw new Error("VehicleBuilder: Wheel or axle mesh is undefined. Did you forget to call build()?");
-            }
-
             const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(
                 wheel.axleMesh,
                 wheel.radius,
                 190,
                 0,
                 0,
-                scene,
+                this.scene,
             );
             FilterMeshCollisions(axleShape);
 
@@ -147,7 +148,7 @@ export class VehicleBuilder {
                 150,
                 0,
                 1.5,
-                scene,
+                this.scene,
             );
             FilterMeshCollisions(wheelShape);
 
@@ -157,7 +158,7 @@ export class VehicleBuilder {
                 physicsShape: wheelShape,
             };
 
-            const wheelAxleConstraint = AttachWheelToAxle(axle, wheelObj, scene);
+            const wheelAxleConstraint = AttachWheelToAxle(axle, wheelObj, this.scene);
             if (wheel.powered) {
                 wheelAxleConstraint.setAxisMotorType(
                     PhysicsConstraintAxis.ANGULAR_X,
@@ -168,7 +169,7 @@ export class VehicleBuilder {
             const frameAxleConstraint = AttachAxleToFrame(
                 axle.physicsBody,
                 frameAggregate.body,
-                scene,
+                this.scene,
                 wheel.steerable,
             );
 

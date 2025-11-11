@@ -30,9 +30,8 @@ import {
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { initMaterials } from "@/frontend/assets/materials";
 import { loadCharacters } from "@/frontend/assets/objects/characters";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
@@ -86,22 +85,12 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
     shadowGenerator.addShadowCaster(character.character);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
 
-    const materials = initMaterials(textures, scene);
-
-    const roverResult = createWolfMk2(
-        {
-            textures,
-            materials,
-        },
-        scene,
-        new Vector3(0, 10, 0),
-        {
-            axis: new Vector3(0, 1, 0),
-            angle: Math.PI / 4,
-        },
-    );
+    const roverResult = createWolfMk2(assets, scene, new Vector3(0, 10, 0), {
+        axis: new Vector3(0, 1, 0),
+        angle: Math.PI / 4,
+    });
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }

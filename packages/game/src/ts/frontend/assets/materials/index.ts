@@ -22,6 +22,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
+
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
@@ -39,6 +41,7 @@ export type Materials = {
     readonly tank: Material;
     readonly landingPad: Material;
     readonly metalSection: Material;
+    readonly tire: TireMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -61,6 +64,8 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         scene,
     );
 
+    const tireMaterial = new TireMaterial(textures.materials.tire, scene);
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
@@ -70,6 +75,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         tank: tankMaterial,
         landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
         metalSection: metalSectionMaterial,
+        tire: tireMaterial,
     };
 }
 
