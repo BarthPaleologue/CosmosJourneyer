@@ -36,6 +36,7 @@ import { createGasPlanetScene } from "./gasPlanet";
 import { createGrassScene } from "./grass";
 import { createGravitySystemScene } from "./gravitySystem";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
+import { createInteractionDemo } from "./interaction";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
@@ -92,6 +93,7 @@ export class PlaygroundRegistry {
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
         ["gravitySystem", createGravitySystemScene],
+        ["interaction", createInteractionDemo],
     ]);
 
     register(
