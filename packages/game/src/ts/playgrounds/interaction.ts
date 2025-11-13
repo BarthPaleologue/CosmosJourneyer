@@ -32,11 +32,14 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
+import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 
+import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics } from "./utils";
@@ -47,6 +50,8 @@ export async function createInteractionDemo(
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
+
+    await initI18n();
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
@@ -104,7 +109,21 @@ export async function createInteractionDemo(
 
     const interactableMembership = 0x1 << 5;
 
-    const interactionSystem = new InteractionSystem(interactableMembership, scene);
+    const soundPlayer = new SoundPlayerMock();
+
+    const interactionSystem = new InteractionSystem(interactableMembership, scene, async (interactions) => {
+        console.log("performing choice");
+        const hasPointerLock = engine.isPointerLock;
+        if (hasPointerLock) {
+            document.exitPointerLock();
+        }
+        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+        if (hasPointerLock) {
+            await engine.getRenderingCanvas()?.requestPointerLock();
+        }
+        console.log("chosen");
+        return choice;
+    });
 
     const interactionLayer = new InteractionLayer(interactionSystem);
     document.body.appendChild(interactionLayer.root);
@@ -154,11 +173,39 @@ export async function createInteractionDemo(
                     );
                 },
             },
+            {
+                label: "spin",
+                perform: () => {
+                    boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                },
+            },
+            {
+                label: "change color",
+                perform: () => {
+                    box.material = new PBRMaterial("boxMaterial", scene);
+                    (box.material as PBRMaterial).albedoColor = Color3.Random();
+                    (box.material as PBRMaterial).metallic = 0;
+                    (box.material as PBRMaterial).roughness = 0.7;
+                },
+            },
+            {
+                label: "delete",
+                perform: () => {
+                    box.dispose();
+                },
+            },
+            {
+                label: "nothing",
+                perform: () => {
+                    // do nothing
+                },
+            },
         ]);
     }
 
     scene.onBeforeRenderObservable.add(() => {
-        interactionSystem.update();
+        const deltaSeconds = engine.getDeltaTime() / 1000;
+        interactionSystem.update(deltaSeconds);
 
         if (character.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
@@ -168,7 +215,6 @@ export async function createInteractionDemo(
             scene.activeCamera = camera;
         }
 
-        const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
     });
 

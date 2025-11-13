@@ -22,8 +22,15 @@ import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import Action from "@brianchirls/game-input/Action";
+import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
+import ReleaseInteraction from "@brianchirls/game-input/interactions/ReleaseInteraction";
 
-type Interaction = {
+import type { NonEmptyArray } from "@/utils/types";
+
+import { InputDevices } from "../devices";
+
+export type Interaction = {
     label: string;
     perform: () => void;
 };
@@ -39,36 +46,90 @@ export class InteractionSystem {
 
     private currentTarget: PhysicsBody | null = null;
 
-    private interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
+    private interactions: Map<PhysicsBody, () => NonEmptyArray<Interaction>> = new Map();
 
-    readonly onTargetChanged = new Observable<Array<Interaction> | null>();
+    readonly onTargetChanged = new Observable<NonEmptyArray<Interaction> | null>();
 
-    constructor(mask: number, scene: Scene) {
+    readonly onChoiceStarted = new Observable<void>();
+
+    readonly onChoiceEnded = new Observable<void>();
+
+    private longPressTimer: number | null = null;
+
+    private longPressThreshold = 0.3;
+
+    private shouldCancelShortPress = false;
+
+    private readonly choiceHandler: (interactions: NonEmptyArray<Interaction>) => Promise<Interaction | null>;
+
+    constructor(
+        mask: number,
+        scene: Scene,
+        choiceHandler: (interactions: NonEmptyArray<Interaction>) => Promise<Interaction | null>,
+    ) {
         this.scene = scene;
         this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
         this.mask = mask;
+        this.choiceHandler = choiceHandler;
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key !== "e" && e.key !== "E") {
+        const interactAction = new Action({
+            bindings: [InputDevices.KEYBOARD.getControl("KeyE")],
+        });
+
+        const interactPressInteraction = new PressInteraction(interactAction);
+        const interactReleaseInteraction = new ReleaseInteraction(interactAction);
+
+        interactPressInteraction.on("start", () => {
+            this.longPressTimer = 0;
+        });
+
+        interactReleaseInteraction.on("complete", () => {
+            if (this.shouldCancelShortPress) {
+                this.shouldCancelShortPress = false;
                 return;
             }
 
-            if (this.currentTarget === null) {
-                return;
-            }
+            this.longPressTimer = null;
 
-            const interactionGetter = this.interactions.get(this.currentTarget);
-            if (interactionGetter === undefined) {
-                return;
-            }
-
-            interactionGetter().forEach((interaction) => {
-                interaction.perform();
-            });
+            this.performShortAction();
         });
     }
 
-    register(object: { body: PhysicsBody; shape: PhysicsShape }, interactionGetter: () => Array<Interaction>): void {
+    private performShortAction() {
+        if (this.currentTarget === null) {
+            return;
+        }
+
+        const interactionGetter = this.interactions.get(this.currentTarget);
+        if (interactionGetter === undefined) {
+            return;
+        }
+
+        const interactions = interactionGetter();
+        interactions[0].perform();
+    }
+
+    private async performLongAction() {
+        if (this.currentTarget === null) {
+            return;
+        }
+
+        const interactionGetter = this.interactions.get(this.currentTarget);
+        if (interactionGetter === undefined) {
+            return;
+        }
+
+        const interactions = interactionGetter();
+        this.onChoiceStarted.notifyObservers();
+        const chosenInteraction = await this.choiceHandler(interactions);
+        this.onChoiceEnded.notifyObservers();
+        chosenInteraction?.perform();
+    }
+
+    register(
+        object: { body: PhysicsBody; shape: PhysicsShape },
+        interactionGetter: () => NonEmptyArray<Interaction>,
+    ): void {
         object.shape.filterMembershipMask |= this.mask;
 
         this.interactions.set(object.body, interactionGetter);
@@ -76,6 +137,10 @@ export class InteractionSystem {
         object.body.transformNode.onDisposeObservable.addOnce(() => {
             this.interactions.delete(object.body);
         });
+    }
+
+    public getCurrentTarget(): PhysicsBody | null {
+        return this.currentTarget;
     }
 
     private setCurrentTarget(target: PhysicsBody | null) {
@@ -101,12 +166,23 @@ export class InteractionSystem {
         if (transform instanceof AbstractMesh) {
             transform.renderOverlay = true;
             transform.overlayColor.set(0.5, 0.5, 1);
+            transform.overlayAlpha = 0.2;
             transform.enableEdgesRendering();
             transform.edgesColor.set(0.5, 0.5, 1, 1);
         }
     }
 
-    update() {
+    update(deltaSeconds: number) {
+        if (this.longPressTimer !== null) {
+            this.longPressTimer += deltaSeconds;
+            if (this.longPressTimer >= this.longPressThreshold) {
+                this.shouldCancelShortPress = true;
+                this.longPressTimer = null;
+
+                void this.performLongAction();
+            }
+        }
+
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) {
             console.warn("No active camera in scene");
