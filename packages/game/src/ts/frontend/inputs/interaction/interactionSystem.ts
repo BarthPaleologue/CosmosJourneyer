@@ -26,8 +26,6 @@ import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import ReleaseInteraction from "@brianchirls/game-input/interactions/ReleaseInteraction";
 
-import type { NonEmptyArray } from "@/utils/types";
-
 import { InputDevices } from "../devices";
 
 export type Interaction = {
@@ -46,9 +44,9 @@ export class InteractionSystem {
 
     private currentTarget: PhysicsBody | null = null;
 
-    private interactions: Map<PhysicsBody, () => NonEmptyArray<Interaction>> = new Map();
+    private interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
 
-    readonly onTargetChanged = new Observable<NonEmptyArray<Interaction> | null>();
+    readonly onTargetChanged = new Observable<Array<Interaction> | null>();
 
     readonly onChoiceStarted = new Observable<void>();
 
@@ -60,7 +58,7 @@ export class InteractionSystem {
 
     private shouldCancelShortPress = false;
 
-    private readonly choiceHandler: (interactions: NonEmptyArray<Interaction>) => Promise<Interaction | null>;
+    private readonly choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>;
 
     readonly pressInteraction: PressInteraction;
 
@@ -69,7 +67,7 @@ export class InteractionSystem {
     constructor(
         mask: number,
         scene: Scene,
-        choiceHandler: (interactions: NonEmptyArray<Interaction>) => Promise<Interaction | null>,
+        choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>,
     ) {
         this.scene = scene;
         this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
@@ -110,7 +108,7 @@ export class InteractionSystem {
         }
 
         const interactions = interactionGetter();
-        interactions[0].perform();
+        interactions[0]?.perform();
     }
 
     private async performLongAction() {
@@ -130,10 +128,7 @@ export class InteractionSystem {
         chosenInteraction?.perform();
     }
 
-    register(
-        object: { body: PhysicsBody; shape: PhysicsShape },
-        interactionGetter: () => NonEmptyArray<Interaction>,
-    ): void {
+    register(object: { body: PhysicsBody; shape: PhysicsShape }, interactionGetter: () => Array<Interaction>): void {
         object.shape.filterMembershipMask |= this.mask;
 
         this.interactions.set(object.body, interactionGetter);
