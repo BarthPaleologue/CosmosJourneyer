@@ -1,15 +1,18 @@
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import type { NonEmptyArray } from "@/utils/types";
-
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 export function radialChoiceModal<T>(
-    choices: NonEmptyArray<T>,
+    choices: Array<T>,
     toString: (value: T) => string,
     soundPlayer: ISoundPlayer,
 ): Promise<T | null> {
+    const defaultChoice = choices[0];
+    if (defaultChoice === undefined) {
+        return Promise.resolve(null);
+    }
+
     let resolveChoice!: (value: T | null) => void;
     const promise = new Promise<T | null>((res) => {
         resolveChoice = res;
@@ -28,7 +31,16 @@ export function radialChoiceModal<T>(
     overlay.tabIndex = -1;
 
     const circleSize = 500;
-    const buttonRadius = circleSize / 2 - 70;
+    const center = circleSize / 2;
+    const svgNamespace = "http://www.w3.org/2000/svg";
+    const angleStep = (Math.PI * 2) / choices.length;
+    const angleGap = Math.min(0.2, angleStep * 0.15);
+    const startAngle = -Math.PI / 2;
+    const outerRadius = center - 20;
+    const innerRadius = outerRadius - 110;
+    const labelRadius = (outerRadius + innerRadius) / 2;
+    const baseSegmentColor = "rgba(255, 255, 255, 0.92)";
+    const activeSegmentColor = "rgba(255, 196, 0, 0.9)";
 
     const circle = document.createElement("div");
     circle.style.position = "relative";
@@ -41,6 +53,14 @@ export function radialChoiceModal<T>(
     circle.style.justifyContent = "center";
     overlay.appendChild(circle);
 
+    const svg = document.createElementNS(svgNamespace, "svg");
+    svg.setAttribute("viewBox", `0 0 ${circleSize} ${circleSize}`);
+    svg.style.width = "100%";
+    svg.style.height = "100%";
+    svg.style.position = "absolute";
+    svg.style.inset = "0";
+    circle.appendChild(svg);
+
     const currentLabel = document.createElement("div");
     currentLabel.style.color = "white";
     currentLabel.style.fontFamily = Settings.MAIN_FONT;
@@ -48,22 +68,24 @@ export function radialChoiceModal<T>(
     currentLabel.style.textAlign = "center";
     currentLabel.style.pointerEvents = "none";
     currentLabel.style.maxWidth = "60%";
+    currentLabel.style.zIndex = "2";
     circle.appendChild(currentLabel);
 
-    const buttons: HTMLButtonElement[] = [];
-    const buttonOffsets: Array<{ x: number; y: number }> = [];
-    const angleStep = (Math.PI * 2) / choices.length;
-    const center = circleSize / 2;
+    const segments: Array<{ path: SVGPathElement; label: SVGTextElement; center: { x: number; y: number } }> = [];
     let selectedIndex = 0;
 
-    const getChoice = (index: number): T => choices[index] ?? choices[0];
+    const getChoice = (index: number): T => choices[index] ?? defaultChoice;
 
     const setSelectedIndex = (index: number) => {
         selectedIndex = (index + choices.length) % choices.length;
-        buttons.forEach((button, idx) => {
+        segments.forEach(({ path, label }, idx) => {
             const isActive = idx === selectedIndex;
-            button.style.transform = isActive ? "translate(-50%, -50%) scale(1.08)" : "translate(-50%, -50%)";
-            button.classList.toggle("active", isActive);
+            path.style.fill = isActive ? activeSegmentColor : baseSegmentColor;
+            path.style.filter = isActive
+                ? "drop-shadow(0 0 12px rgba(0,0,0,0.4))"
+                : "drop-shadow(0 0 6px rgba(0,0,0,0.55))";
+            label.style.fill = isActive ? "rgba(20, 20, 20, 0.95)" : "rgba(35, 35, 35, 0.85)";
+            label.style.fontWeight = isActive ? "600" : "400";
         });
         currentLabel.textContent = toString(getChoice(selectedIndex));
     };
@@ -105,11 +127,11 @@ export function radialChoiceModal<T>(
         const rect = circle.getBoundingClientRect();
         const pointerX = event.clientX - (rect.left + rect.width / 2);
         const pointerY = event.clientY - (rect.top + rect.height / 2);
-        let closestIndex = 0;
+        let closestIndex = selectedIndex;
         let closestDistanceSq = Number.POSITIVE_INFINITY;
-        buttonOffsets.forEach((offset, idx) => {
-            const dx = pointerX - offset.x;
-            const dy = pointerY - offset.y;
+        segments.forEach(({ center }, idx) => {
+            const dx = pointerX - center.x;
+            const dy = pointerY - center.y;
             const distanceSq = dx * dx + dy * dy;
             if (distanceSq < closestDistanceSq) {
                 closestDistanceSq = distanceSq;
@@ -121,32 +143,70 @@ export function radialChoiceModal<T>(
         }
     };
 
+    const polarToCartesian = (angle: number, radius: number) => ({
+        x: center + Math.cos(angle) * radius,
+        y: center + Math.sin(angle) * radius,
+    });
+
+    const segmentPath = (start: number, end: number) => {
+        const outerStart = polarToCartesian(start, outerRadius);
+        const outerEnd = polarToCartesian(end, outerRadius);
+        const innerStart = polarToCartesian(end, innerRadius);
+        const innerEnd = polarToCartesian(start, innerRadius);
+        const largeArcFlag = end - start <= Math.PI ? "0" : "1";
+
+        return [
+            `M ${outerStart.x} ${outerStart.y}`,
+            `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${outerEnd.x} ${outerEnd.y}`,
+            `L ${innerStart.x} ${innerStart.y}`,
+            `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerEnd.x} ${innerEnd.y}`,
+            "Z",
+        ].join(" ");
+    };
+
     for (const [index, choice] of choices.entries()) {
-        const angle = angleStep * index - Math.PI / 2;
-        const offsetX = Math.cos(angle) * buttonRadius;
-        const offsetY = Math.sin(angle) * buttonRadius;
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = toString(choice);
-        button.style.position = "absolute";
-        button.style.left = `${center + offsetX}px`;
-        button.style.top = `${center + offsetY}px`;
-        button.style.transform = "translate(-50%, -50%) scale(1)";
-        button.style.padding = "8px 16px";
-        button.style.borderRadius = "999px";
-        button.style.transition = "transform 0.1s ease-in-out, background 0.1s ease";
-        button.style.fontSize = "1.5em";
-        button.style.lineHeight = "1.5em";
-        button.addEventListener("click", (event) => {
+        const rawStart = startAngle + angleStep * index;
+        const start = rawStart + angleGap / 2;
+        const end = rawStart + angleStep - angleGap / 2;
+        const midAngle = (start + end) / 2;
+
+        const group = document.createElementNS(svgNamespace, "g");
+        group.style.cursor = "pointer";
+
+        const path = document.createElementNS(svgNamespace, "path");
+        path.setAttribute("d", segmentPath(start, end));
+        path.style.fill = baseSegmentColor;
+        path.style.stroke = "rgba(0, 0, 0, 0.5)";
+        path.style.strokeWidth = "2";
+        path.style.transition = "fill 0.12s ease, filter 0.12s ease";
+
+        const text = document.createElementNS(svgNamespace, "text");
+        const textPos = polarToCartesian(midAngle, labelRadius);
+        const relativeCenter = {
+            x: Math.cos(midAngle) * labelRadius,
+            y: Math.sin(midAngle) * labelRadius,
+        };
+        text.setAttribute("x", textPos.x.toString());
+        text.setAttribute("y", textPos.y.toString());
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.textContent = toString(choice);
+        text.style.fontFamily = Settings.MAIN_FONT;
+        text.style.fontSize = "24px";
+        text.style.pointerEvents = "none";
+
+        group.appendChild(path);
+        group.appendChild(text);
+        group.addEventListener("mouseenter", () => {
+            setSelectedIndex(index);
+        });
+        group.addEventListener("click", (event) => {
             event.stopPropagation();
             finish(choice);
         });
-        button.addEventListener("mouseenter", () => {
-            setSelectedIndex(index);
-        });
-        buttons.push(button);
-        buttonOffsets.push({ x: offsetX, y: offsetY });
-        circle.appendChild(button);
+
+        segments.push({ path, label: text, center: relativeCenter });
+        svg.appendChild(group);
     }
 
     document.body.appendChild(overlay);
