@@ -16,7 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
+    AbstractEngine,
     AbstractMesh,
+    Animation,
     CascadedShadowGenerator,
     Color3,
     DirectionalLight,
@@ -24,12 +26,13 @@ import {
     MeshBuilder,
     PBRMaterial,
     PhysicsAggregate,
+    PhysicsMotionType,
     PhysicsShapeType,
+    Scene,
+    Vector3,
 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Scene } from "@babylonjs/core/scene";
 
+import { loadSounds } from "@/frontend/assets/audio/sounds";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -60,6 +63,8 @@ export async function createInteractionDemo(
     });
 
     const characters = await loadCharacters(scene, progressMonitor);
+
+    const sounds = await loadSounds(progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(0, -1, -1), scene);
     light.autoCalcShadowZBounds = true;
@@ -97,6 +102,7 @@ export async function createInteractionDemo(
     shadowGenerator.transparencyShadow = true;
     shadowGenerator.autoCalcDepthBounds = true;
     shadowGenerator.stabilizeCascades = true;
+    shadowGenerator.bias *= 20;
     shadowGenerator.shadowMaxZ = groundSize * 4;
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
@@ -135,77 +141,121 @@ export async function createInteractionDemo(
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
         const size = 0.2 + Math.random();
-        const box = MeshBuilder.CreateBox(`box${i}`, { size }, scene);
-        box.position = new Vector3((Math.random() - 0.5) * groundSize, size / 2, (Math.random() - 0.5) * groundSize);
-        box.rotation.y = Math.random();
+        const position = new Vector3((Math.random() - 0.5) * groundSize, size / 2, (Math.random() - 0.5) * groundSize);
 
-        const boxMaterial = new PBRMaterial("boxMaterial", scene);
-        boxMaterial.albedoColor = Color3.Random();
-        boxMaterial.metallic = 0;
-        boxMaterial.roughness = 0.7;
-        box.material = boxMaterial;
+        const box = spawnBoxAtPosition({ position, size }, scene, interactionSystem);
+        if (box.transformNode instanceof AbstractMesh) {
+            shadowGenerator.addShadowCaster(box.transformNode);
+        }
+    }
 
-        shadowGenerator.addShadowCaster(box);
+    const pillarHeight = 1.0;
+    const pillar = MeshBuilder.CreateBox("pillar", { width: 0.3, depth: 0.3, height: pillarHeight }, scene);
+    pillar.position.z = 2;
+    pillar.position.y = pillarHeight / 2;
+    pillar.receiveShadows = true;
+    shadowGenerator.addShadowCaster(pillar);
 
-        const boxAggregate = new PhysicsAggregate(
-            box,
-            PhysicsShapeType.BOX,
-            { mass: 50, restitution: 0.3, friction: 1 },
-            scene,
+    const pillarMaterial = new PBRMaterial("pillarMaterial", scene);
+    pillarMaterial.albedoColor = new Color3(0.4, 0.4, 0.4);
+    pillarMaterial.roughness = 0.9;
+    pillarMaterial.metallic = 0;
+    pillar.material = pillarMaterial;
+
+    const buttonThickness = 0.1;
+    const button = MeshBuilder.CreateCylinder("button", { diameter: 0.25, height: buttonThickness }, scene);
+    button.position = pillar.position.add(new Vector3(0, pillarHeight / 2 + buttonThickness / 2, 0));
+    button.receiveShadows = true;
+    shadowGenerator.addShadowCaster(button);
+
+    const buttonMaterial = new PBRMaterial("buttonMaterial", scene);
+    buttonMaterial.albedoColor = new Color3(1, 0, 0);
+    buttonMaterial.roughness = 0.5;
+    buttonMaterial.metallic = 0;
+    button.material = buttonMaterial;
+
+    const buttonAggregate = new PhysicsAggregate(button, PhysicsShapeType.CYLINDER, { mass: 0 }, scene);
+    buttonAggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+    buttonAggregate.body.disablePreStep = false;
+
+    let isButtonBeingPressed = false;
+    const buttonRestPositionY = button.position.y;
+    const buttonPressDepth = 0.05;
+    const buttonAnimationFrameRate = 60;
+    const buttonHalfAnimationFrames = Math.round(buttonAnimationFrameRate * 0.1);
+
+    const animateButtonPress = (): void => {
+        const pressedPositionY = buttonRestPositionY - buttonPressDepth;
+        Animation.CreateAndStartAnimation(
+            "buttonPressDown",
+            button,
+            "position.y",
+            buttonAnimationFrameRate,
+            buttonHalfAnimationFrames,
+            buttonRestPositionY,
+            pressedPositionY,
+            Animation.ANIMATIONLOOPMODE_CONSTANT,
+            undefined,
+            () => {
+                Animation.CreateAndStartAnimation(
+                    "buttonPressUp",
+                    button,
+                    "position.y",
+                    buttonAnimationFrameRate,
+                    buttonHalfAnimationFrames,
+                    pressedPositionY,
+                    buttonRestPositionY,
+                    Animation.ANIMATIONLOOPMODE_CONSTANT,
+                    undefined,
+                    () => {
+                        isButtonBeingPressed = false;
+                    },
+                );
+            },
         );
-        boxAggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+    };
 
-        interactionSystem.register({ body: boxAggregate.body, shape: boxAggregate.shape }, () => [
+    interactionSystem.register(buttonAggregate, () => {
+        if (isButtonBeingPressed) {
+            return [];
+        }
+
+        return [
             {
-                label: "push",
+                label: "Spawn Box",
                 perform: () => {
-                    const cameraRay = scene.activeCamera?.getForwardRay(
-                        1,
-                        scene.activeCamera.getWorldMatrix(),
-                        scene.activeCamera.getWorldMatrix().getTranslation(),
-                    );
-                    if (cameraRay === undefined) {
+                    if (isButtonBeingPressed) {
+                        return;
+                    }
+                    isButtonBeingPressed = true;
+                    animateButtonPress();
+
+                    sounds.menuSelect.setVolume(5);
+                    sounds.menuSelect.play();
+
+                    const boxSize = 0.3 + Math.random() * 0.3;
+                    const camera = scene.activeCamera;
+                    if (camera === null) {
                         return;
                     }
 
-                    boxAggregate.body.applyImpulse(
-                        cameraRay.direction.scale(200).add(Vector3.Up().scale(200)),
-                        boxAggregate.body.getObjectCenterWorld(),
+                    const cameraRay = camera.getForwardRay(
+                        5,
+                        camera.getWorldMatrix(),
+                        camera.getWorldMatrix().getTranslation(),
                     );
-                    boxAggregate.body.applyAngularImpulse(
-                        new Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10),
-                    );
+
+                    const boxPosition = cameraRay.origin.add(cameraRay.direction.scale(7));
+                    boxPosition.y = 3 + Math.max(boxPosition.y, boxSize / 2);
+
+                    const box = spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
+                    if (box.transformNode instanceof AbstractMesh) {
+                        shadowGenerator.addShadowCaster(box.transformNode);
+                    }
                 },
             },
-            {
-                label: "spin",
-                perform: () => {
-                    boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
-                },
-            },
-            {
-                label: "change color",
-                perform: () => {
-                    box.material = new PBRMaterial("boxMaterial", scene);
-                    (box.material as PBRMaterial).albedoColor = Color3.Random();
-                    (box.material as PBRMaterial).metallic = 0;
-                    (box.material as PBRMaterial).roughness = 0.7;
-                },
-            },
-            {
-                label: "delete",
-                perform: () => {
-                    box.dispose();
-                },
-            },
-            {
-                label: "nothing",
-                perform: () => {
-                    // do nothing
-                },
-            },
-        ]);
-    }
+        ];
+    });
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -223,4 +273,76 @@ export async function createInteractionDemo(
     });
 
     return scene;
+}
+
+function spawnBoxAtPosition(
+    { position, size }: { position: Vector3; size: number },
+    scene: Scene,
+    interactionSystem: InteractionSystem,
+): PhysicsAggregate {
+    const box = MeshBuilder.CreateBox(`box`, { size }, scene);
+    box.position = position;
+    box.rotation.y = Math.random();
+    box.receiveShadows = true;
+
+    const boxMaterial = new PBRMaterial("boxMaterial", scene);
+    boxMaterial.albedoColor = Color3.Random();
+    boxMaterial.metallic = 0;
+    boxMaterial.roughness = 0.7;
+    box.material = boxMaterial;
+
+    const boxAggregate = new PhysicsAggregate(
+        box,
+        PhysicsShapeType.BOX,
+        { mass: 50, restitution: 0.3, friction: 1 },
+        scene,
+    );
+    boxAggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
+
+    interactionSystem.register(boxAggregate, () => [
+        {
+            label: "push",
+            perform: () => {
+                const cameraRay = scene.activeCamera?.getForwardRay(
+                    1,
+                    scene.activeCamera.getWorldMatrix(),
+                    scene.activeCamera.getWorldMatrix().getTranslation(),
+                );
+                if (cameraRay === undefined) {
+                    return;
+                }
+
+                boxAggregate.body.applyImpulse(
+                    cameraRay.direction.scale(200).add(Vector3.Up().scale(200)),
+                    boxAggregate.body.getObjectCenterWorld(),
+                );
+                boxAggregate.body.applyAngularImpulse(
+                    new Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10),
+                );
+            },
+        },
+        {
+            label: "spin",
+            perform: () => {
+                boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+            },
+        },
+        {
+            label: "change color",
+            perform: () => {
+                box.material = new PBRMaterial("boxMaterial", scene);
+                (box.material as PBRMaterial).albedoColor = Color3.Random();
+                (box.material as PBRMaterial).metallic = 0;
+                (box.material as PBRMaterial).roughness = 0.7;
+            },
+        },
+        {
+            label: "delete",
+            perform: () => {
+                box.dispose();
+            },
+        },
+    ]);
+
+    return boxAggregate;
 }
