@@ -64,15 +64,15 @@ export class InteractionLayer {
         this.root.appendChild(this.crosshair);
 
         this.interactionSystem = interactionSystem;
-        this.interactionSystem.onTargetChanged.add((target) => {
-            if (target === null) {
+        this.interactionSystem.onTargetChanged.add((availableInteractions) => {
+            if (availableInteractions === null || availableInteractions[0] === undefined) {
                 this.interactionText.style.display = "none";
                 this.crosshair.style.display = "block";
             } else {
                 const keys = pressInteractionToStrings(interactionSystem.pressInteraction, null);
                 const keyString = keys.join(" / ");
                 this.interactionText.style.display = "block";
-                this.interactionText.innerText = `[${keyString}] ${target[0].label}`;
+                this.interactionText.innerText = `[${keyString}] ${availableInteractions[0].label}`;
                 this.crosshair.style.display = "none";
             }
         });
