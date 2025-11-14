@@ -112,6 +112,10 @@ export async function createInteractionDemo(
     const soundPlayer = new SoundPlayerMock();
 
     const interactionSystem = new InteractionSystem(interactableMembership, scene, async (interactions) => {
+        if (interactions.length === 0) {
+            return null;
+        }
+
         console.log("performing choice");
         const hasPointerLock = engine.isPointerLock;
         if (hasPointerLock) {
