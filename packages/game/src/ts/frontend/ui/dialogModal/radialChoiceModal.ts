@@ -87,7 +87,7 @@ export function radialChoiceModal<T>(
     currentLabel.style.zIndex = "2";
     circle.appendChild(currentLabel);
 
-    const segments: Array<{ path: SVGPathElement; label: SVGTextElement; center: { x: number; y: number } }> = [];
+    const segments: Array<{ path: SVGPathElement; label: HTMLDivElement; center: { x: number; y: number } }> = [];
     let selectedIndex = 0;
 
     const getChoice = (index: number): T => choices[index] ?? defaultChoice;
@@ -100,7 +100,7 @@ export function radialChoiceModal<T>(
             path.style.filter = isActive
                 ? "drop-shadow(0 0 12px rgba(0,0,0,0.4))"
                 : "drop-shadow(0 0 6px rgba(0,0,0,0.55))";
-            label.style.fill = isActive ? "rgba(20, 20, 20, 0.95)" : "rgba(35, 35, 35, 0.85)";
+            label.style.color = isActive ? "rgba(20, 20, 20, 0.95)" : "rgba(35, 35, 35, 0.85)";
             label.style.fontWeight = isActive ? "600" : "400";
         });
         currentLabel.textContent = toString(getChoice(selectedIndex));
@@ -196,23 +196,44 @@ export function radialChoiceModal<T>(
         path.style.strokeWidth = "2";
         path.style.transition = "fill 0.12s ease, filter 0.12s ease";
 
-        const text = document.createElementNS(svgNamespace, "text");
         const textPos = polarToCartesian(midAngle, labelRadius);
         const relativeCenter = {
             x: Math.cos(midAngle) * labelRadius,
             y: Math.sin(midAngle) * labelRadius,
         };
-        text.setAttribute("x", textPos.x.toString());
-        text.setAttribute("y", textPos.y.toString());
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("dominant-baseline", "middle");
+        const segmentArcLength = labelRadius * (end - start);
+        const labelWidth = Math.max(Math.min(segmentArcLength * 0.75, 160), 70);
+        const labelHeight = 70;
+        const textForeignObject = document.createElementNS(svgNamespace, "foreignObject");
+        textForeignObject.setAttribute("x", (textPos.x - labelWidth / 2).toString());
+        textForeignObject.setAttribute("y", (textPos.y - labelHeight / 2).toString());
+        textForeignObject.setAttribute("width", labelWidth.toString());
+        textForeignObject.setAttribute("height", labelHeight.toString());
+        textForeignObject.style.pointerEvents = "none";
+
+        const text = document.createElement("div");
         text.textContent = toString(choice);
         text.style.fontFamily = Settings.MAIN_FONT;
-        text.style.fontSize = "24px";
+        text.style.fontSize = "20px";
+        text.style.lineHeight = "1.25";
+        text.style.color = "rgba(35, 35, 35, 0.85)";
+        text.style.fontWeight = "400";
+        text.style.display = "flex";
+        text.style.alignItems = "center";
+        text.style.justifyContent = "center";
+        text.style.textAlign = "center";
+        text.style.width = "100%";
+        text.style.height = "100%";
+        text.style.boxSizing = "border-box";
+        text.style.padding = "6px 10px";
+        text.style.wordBreak = "break-word";
+        text.style.overflowWrap = "anywhere";
         text.style.pointerEvents = "none";
 
+        textForeignObject.appendChild(text);
+
         group.appendChild(path);
-        group.appendChild(text);
+        group.appendChild(textForeignObject);
         group.addEventListener("mouseenter", () => {
             setSelectedIndex(index);
         });
