@@ -19,6 +19,7 @@ import type { NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import { pressInteractionToStrings } from "../helpers/inputControlsString";
 import type { Interaction, InteractionSystem } from "../inputs/interaction/interactionSystem";
 
 export class InteractionLayer {
@@ -68,8 +69,10 @@ export class InteractionLayer {
                 this.interactionText.style.display = "none";
                 this.crosshair.style.display = "block";
             } else {
+                const keys = pressInteractionToStrings(interactionSystem.pressInteraction, null);
+                const keyString = keys.join(" / ");
                 this.interactionText.style.display = "block";
-                this.interactionText.innerText = `[E] ${target[0].label}`;
+                this.interactionText.innerText = `[${keyString}] ${target[0].label}`;
                 this.crosshair.style.display = "none";
             }
         });

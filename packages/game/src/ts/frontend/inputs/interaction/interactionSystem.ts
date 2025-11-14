@@ -62,6 +62,10 @@ export class InteractionSystem {
 
     private readonly choiceHandler: (interactions: NonEmptyArray<Interaction>) => Promise<Interaction | null>;
 
+    readonly pressInteraction: PressInteraction;
+
+    readonly releaseInteraction: ReleaseInteraction;
+
     constructor(
         mask: number,
         scene: Scene,
@@ -76,14 +80,14 @@ export class InteractionSystem {
             bindings: [InputDevices.KEYBOARD.getControl("KeyE")],
         });
 
-        const interactPressInteraction = new PressInteraction(interactAction);
-        const interactReleaseInteraction = new ReleaseInteraction(interactAction);
+        this.pressInteraction = new PressInteraction(interactAction);
+        this.releaseInteraction = new ReleaseInteraction(interactAction);
 
-        interactPressInteraction.on("start", () => {
+        this.pressInteraction.on("start", () => {
             this.longPressTimer = 0;
         });
 
-        interactReleaseInteraction.on("complete", () => {
+        this.releaseInteraction.on("complete", () => {
             if (this.shouldCancelShortPress) {
                 this.shouldCancelShortPress = false;
                 return;
