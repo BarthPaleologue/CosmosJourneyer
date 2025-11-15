@@ -32,6 +32,11 @@ export type Interaction = {
     perform: () => void;
 };
 
+export interface Interactive {
+    getPhysicsAggregate(): { body: PhysicsBody; shape: PhysicsShape };
+    getInteractions(): Array<Interaction>;
+}
+
 export class InteractionSystem {
     private readonly scene: Scene;
 
@@ -118,16 +123,14 @@ export class InteractionSystem {
         return this.isMakingChoiceFlag;
     }
 
-    public register(
-        object: { body: PhysicsBody; shape: PhysicsShape },
-        interactionGetter: () => Array<Interaction>,
-    ): void {
-        object.shape.filterMembershipMask |= this.mask;
+    public register(interactiveObject: Interactive): void {
+        const { body, shape } = interactiveObject.getPhysicsAggregate();
+        shape.filterMembershipMask |= this.mask;
 
-        this.interactions.set(object.body, interactionGetter);
+        this.interactions.set(body, () => interactiveObject.getInteractions());
 
-        object.body.transformNode.onDisposeObservable.addOnce(() => {
-            this.interactions.delete(object.body);
+        body.transformNode.onDisposeObservable.addOnce(() => {
+            this.interactions.delete(body);
         });
     }
 
