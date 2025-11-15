@@ -15,12 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { NonEmptyArray } from "@/utils/types";
-
 import { Settings } from "@/settings";
 
 import { pressInteractionToStrings } from "../helpers/inputControlsString";
-import type { Interaction, InteractionSystem } from "../inputs/interaction/interactionSystem";
+import type { InteractionSystem } from "../inputs/interaction/interactionSystem";
 
 export class InteractionLayer {
     readonly root: HTMLDivElement;
@@ -64,66 +62,24 @@ export class InteractionLayer {
         this.root.appendChild(this.crosshair);
 
         this.interactionSystem = interactionSystem;
-        this.interactionSystem.onTargetChanged.add((availableInteractions) => {
-            if (availableInteractions === null || availableInteractions[0] === undefined) {
-                this.interactionText.style.display = "none";
-                this.crosshair.style.display = "block";
-            } else {
-                const keys = pressInteractionToStrings(interactionSystem.pressInteraction, null);
-                const keyString = keys.join(" / ");
-                this.interactionText.style.display = "block";
-                this.interactionText.innerText = `[${keyString}] ${availableInteractions[0].label}`;
-                this.crosshair.style.display = "none";
-            }
-        });
-
-        this.interactionSystem.onChoiceStarted.add(() => {
-            this.interactionText.style.display = "none";
-        });
-
-        this.interactionSystem.onChoiceEnded.add(() => {
-            this.interactionText.style.display = "block";
-        });
     }
 
-    chooseInteraction(interactions: NonEmptyArray<Interaction>): Promise<Interaction> {
-        // display a circle with options around the crosshair
-        // await user choice
-        const circle = document.createElement("div");
-        circle.style.position = "absolute";
-        circle.style.top = "50%";
-        circle.style.left = "50%";
-        circle.style.transform = "translate(-50%, -50%)";
-        circle.style.width = "200px";
-        circle.style.height = "200px";
-        circle.style.borderRadius = "50%";
-        circle.style.pointerEvents = "auto";
-        circle.style.display = "flex";
-        circle.style.alignItems = "center";
-        circle.style.justifyContent = "center";
-        circle.style.background = "rgba(0, 0, 0, 0.5)";
+    update() {
+        const currentInteractions = this.interactionSystem.getCurrentInteractions();
 
-        this.root.appendChild(circle);
-
-        for (const interaction of interactions) {
-            const button = document.createElement("button");
-            button.innerText = interaction.label;
-            button.style.margin = "10px";
-            button.style.padding = "10px";
-            button.style.fontSize = "18px";
-            button.style.cursor = "pointer";
-            button.onclick = () => {
-                this.root.removeChild(circle);
-                resolve(interaction);
-            };
-            circle.appendChild(button);
+        if (
+            this.interactionSystem.isMakingChoice() ||
+            currentInteractions === null ||
+            currentInteractions[0] === undefined
+        ) {
+            this.interactionText.style.display = "none";
+            this.crosshair.style.display = "block";
+        } else {
+            const keys = pressInteractionToStrings(this.interactionSystem.pressInteraction, null);
+            const keyString = keys.join(" / ");
+            this.interactionText.style.display = "block";
+            this.interactionText.innerText = `[${keyString}] ${currentInteractions[0].label}`;
+            this.crosshair.style.display = "none";
         }
-
-        let resolve: (interaction: Interaction) => void;
-        const promise = new Promise<Interaction>((res) => {
-            resolve = res;
-        });
-
-        return promise;
     }
 }

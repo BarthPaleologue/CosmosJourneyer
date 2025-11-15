@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractEngine,
     AbstractMesh,
     Animation,
     CascadedShadowGenerator,
@@ -30,6 +29,7 @@ import {
     PhysicsShapeType,
     Scene,
     Vector3,
+    type AbstractEngine,
 } from "@babylonjs/core";
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
@@ -260,6 +260,7 @@ export async function createInteractionDemo(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         interactionSystem.update(deltaSeconds);
+        interactionLayer.update();
 
         if (character.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
