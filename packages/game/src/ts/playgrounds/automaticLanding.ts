@@ -15,7 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PhysicsAggregate, PhysicsShapeType, Quaternion } from "@babylonjs/core";
+import {
+    DirectionalLight,
+    MeshBuilder,
+    PBRMaterial,
+    PhysicsAggregate,
+    PhysicsShapeType,
+    Quaternion,
+} from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -32,7 +39,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 
 import { CollisionMask } from "@/settings";
 
-import { enablePhysics } from "./utils";
+import { enablePhysics, enableShadows } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
@@ -69,12 +76,22 @@ export async function createAutomaticLandingScene(
     ground.position.y = -2;
     ground.position.x = 75;
 
+    const groundMaterial = new PBRMaterial("groundMaterial", scene);
+    groundMaterial.albedoColor.set(0.5, 0.5, 0.2);
+    groundMaterial.metallic = 0;
+    groundMaterial.roughness = 0.9;
+    ground.material = groundMaterial;
+
     const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene);
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
     groundAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
+    const sun = new DirectionalLight("sun", new Vector3(1, -2, -1), scene);
+
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
-    hemi.intensity = 0.7;
+    hemi.intensity = 0.1;
+
+    enableShadows(sun);
 
     ship.engageLandingOnPad(landingPad);
     //ship.engageSurfaceLanding(ground);
