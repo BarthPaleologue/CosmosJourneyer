@@ -17,10 +17,13 @@
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { ReflectionProbe } from "@babylonjs/core/Probes/reflectionProbe";
+import type { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import { type Scene } from "@babylonjs/core/scene";
 import HavokPhysics, { type HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { SkyMaterial } from "@babylonjs/materials";
@@ -51,6 +54,52 @@ export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<
     scene.customRenderTargets.push(rp.cubeTexture);
 
     scene.environmentTexture = rp.cubeTexture;
+}
+
+export function enableShadows(
+    light: DirectionalLight,
+    options?: Partial<{
+        maxZ: number;
+        cascadeCount: number;
+        resolution: number;
+        debug: boolean;
+        depthRenderer: DepthRenderer;
+    }>,
+): CascadedShadowGenerator {
+    const shadowGenerator = new CascadedShadowGenerator(options?.resolution ?? 2048, light);
+    shadowGenerator.transparencyShadow = true;
+
+    // see https://doc.babylonjs.com/features/featuresDeepDive/lights/shadows_csm#optimizing-for-quality
+    shadowGenerator.stabilizeCascades = false;
+    shadowGenerator.autoCalcDepthBounds = true;
+    shadowGenerator.lambda = 1;
+    shadowGenerator.usePercentageCloserFiltering = true;
+    shadowGenerator.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
+    shadowGenerator.depthClamp = true;
+    shadowGenerator.numCascades = options?.cascadeCount ?? 4;
+
+    shadowGenerator.shadowMaxZ = options?.maxZ ?? 200;
+    shadowGenerator.bias *= 50;
+    shadowGenerator.normalBias *= 50;
+    shadowGenerator.debug = options?.debug ?? false;
+
+    light.getScene().onNewMeshAddedObservable.add((mesh) => {
+        if (mesh.infiniteDistance) {
+            return;
+        }
+
+        shadowGenerator.addShadowCaster(mesh);
+        mesh.receiveShadows = true;
+    });
+
+    const depthRenderer = options?.depthRenderer ?? light.getScene().enableDepthRenderer();
+    light.getScene().onBeforeCameraRenderObservable.add((camera) => {
+        depthRenderer.getDepthMap().activeCamera = camera;
+        shadowGenerator.setDepthRenderer(depthRenderer);
+        shadowGenerator.autoCalcDepthBounds = true;
+    });
+
+    return shadowGenerator;
 }
 
 export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
