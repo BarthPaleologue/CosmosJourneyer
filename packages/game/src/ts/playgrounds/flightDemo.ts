@@ -17,6 +17,7 @@
 
 import {
     Color3,
+    DirectionalLight,
     MeshBuilder,
     PBRMetallicRoughnessMaterial,
     SolidParticleSystem,
@@ -35,7 +36,7 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 
-import { enablePhysics } from "./utils";
+import { enablePhysics, enableShadows } from "./utils";
 
 export async function createFlightDemoScene(
     engine: AbstractEngine,
@@ -63,8 +64,10 @@ export async function createFlightDemoScene(
 
     SpaceShipControlsInputs.setEnabled(true);
 
+    const sun = new DirectionalLight("sun", new Vector3(1, -1, 0), scene);
+
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
-    hemi.intensity = 1.0;
+    hemi.intensity = 0.1;
 
     // Shape to follow
     const box = MeshBuilder.CreateBox("box", { size: 50 }, scene);
@@ -93,6 +96,8 @@ export async function createFlightDemoScene(
     mesh.material = material;
 
     box.setEnabled(false);
+
+    enableShadows(sun, { maxZ: 3e3 });
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
