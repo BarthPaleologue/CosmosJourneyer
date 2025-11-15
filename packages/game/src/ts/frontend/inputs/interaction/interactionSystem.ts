@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Ray } from "@babylonjs/core/Culling/ray.core";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
@@ -46,12 +46,6 @@ export class InteractionSystem {
 
     private interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
 
-    readonly onTargetChanged = new Observable<Array<Interaction> | null>();
-
-    readonly onChoiceStarted = new Observable<void>();
-
-    readonly onChoiceEnded = new Observable<void>();
-
     private longPressTimer: number | null = null;
 
     private longPressThreshold = 0.3;
@@ -63,6 +57,8 @@ export class InteractionSystem {
     readonly pressInteraction: PressInteraction;
 
     readonly releaseInteraction: ReleaseInteraction;
+
+    private isMakingChoiceFlag = false;
 
     constructor(
         mask: number,
@@ -93,42 +89,40 @@ export class InteractionSystem {
 
             this.longPressTimer = null;
 
-            this.performShortAction();
+            this.performFirstAction();
         });
     }
 
-    private performShortAction() {
-        if (this.currentTarget === null) {
+    private performFirstAction() {
+        const interactions = this.getCurrentInteractions();
+        if (interactions === null || interactions[0] === undefined) {
             return;
         }
 
-        const interactionGetter = this.interactions.get(this.currentTarget);
-        if (interactionGetter === undefined) {
-            return;
-        }
-
-        const interactions = interactionGetter();
-        interactions[0]?.perform();
+        interactions[0].perform();
     }
 
-    private async performLongAction() {
-        if (this.currentTarget === null) {
+    private async chooseAction() {
+        const interactions = this.getCurrentInteractions();
+        if (interactions === null || interactions.length < 2) {
             return;
         }
 
-        const interactionGetter = this.interactions.get(this.currentTarget);
-        if (interactionGetter === undefined) {
-            return;
-        }
-
-        const interactions = interactionGetter();
-        this.onChoiceStarted.notifyObservers();
+        this.isMakingChoiceFlag = true;
         const chosenInteraction = await this.choiceHandler(interactions);
-        this.onChoiceEnded.notifyObservers();
+        this.isMakingChoiceFlag = false;
+
         chosenInteraction?.perform();
     }
 
-    register(object: { body: PhysicsBody; shape: PhysicsShape }, interactionGetter: () => Array<Interaction>): void {
+    public isMakingChoice(): boolean {
+        return this.isMakingChoiceFlag;
+    }
+
+    public register(
+        object: { body: PhysicsBody; shape: PhysicsShape },
+        interactionGetter: () => Array<Interaction>,
+    ): void {
         object.shape.filterMembershipMask |= this.mask;
 
         this.interactions.set(object.body, interactionGetter);
@@ -138,18 +132,23 @@ export class InteractionSystem {
         });
     }
 
-    public getCurrentTarget(): PhysicsBody | null {
-        return this.currentTarget;
+    public getCurrentInteractions(): Array<Interaction> | null {
+        if (this.currentTarget === null) {
+            return null;
+        }
+
+        const interactionGetter = this.interactions.get(this.currentTarget);
+        if (interactionGetter === undefined) {
+            return null;
+        }
+
+        return [...interactionGetter()];
     }
 
     private setCurrentTarget(target: PhysicsBody | null) {
         if (this.currentTarget === target) {
             return;
         }
-
-        const interactionGetter = target === null ? null : (this.interactions.get(target) ?? null);
-        const interactions = interactionGetter === null ? null : interactionGetter();
-        this.onTargetChanged.notifyObservers(interactions);
 
         if (this.currentTarget !== null) {
             const transform = this.currentTarget.transformNode;
@@ -171,16 +170,49 @@ export class InteractionSystem {
         }
     }
 
-    update(deltaSeconds: number) {
-        if (this.longPressTimer !== null) {
-            this.longPressTimer += deltaSeconds;
-            if (this.longPressTimer >= this.longPressThreshold) {
-                this.shouldCancelShortPress = true;
-                this.longPressTimer = null;
+    public getCurrentTarget(): PhysicsBody | null {
+        return this.currentTarget;
+    }
 
-                void this.performLongAction();
-            }
+    private updateLongPressTimer(deltaSeconds: number) {
+        if (this.longPressTimer === null) {
+            return;
         }
+
+        this.longPressTimer += deltaSeconds;
+        if (this.longPressTimer < this.longPressThreshold) {
+            return;
+        }
+
+        this.longPressTimer = null;
+
+        const interactions = this.getCurrentInteractions();
+        if (interactions === null || interactions.length < 2) {
+            return;
+        }
+
+        this.shouldCancelShortPress = true;
+        void this.chooseAction();
+    }
+
+    private pickWithRay(ray: Ray) {
+        const start = ray.origin;
+        const end = start.add(ray.direction.scale(ray.length));
+        this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
+            collideWith: this.mask,
+        });
+
+        const physicsBody = this.raycastResult.body;
+        if (physicsBody === undefined) {
+            this.setCurrentTarget(null);
+            return;
+        }
+
+        this.setCurrentTarget(physicsBody);
+    }
+
+    public update(deltaSeconds: number) {
+        this.updateLongPressTimer(deltaSeconds);
 
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) {
@@ -195,18 +227,6 @@ export class InteractionSystem {
             activeCamera.getWorldMatrix().getTranslation(),
         );
 
-        const start = cameraRay.origin;
-        const end = start.add(cameraRay.direction.scale(rayLength));
-        this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-            collideWith: this.mask,
-        });
-
-        const physicsBody = this.raycastResult.body;
-        if (physicsBody === undefined) {
-            this.setCurrentTarget(null);
-            return;
-        }
-
-        this.setCurrentTarget(physicsBody);
+        this.pickWithRay(cameraRay);
     }
 }
