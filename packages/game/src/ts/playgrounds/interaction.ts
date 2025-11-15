@@ -260,7 +260,7 @@ export async function createInteractionDemo(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         interactionSystem.update(deltaSeconds);
-        interactionLayer.update();
+        interactionLayer.update(deltaSeconds);
 
         if (character.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
