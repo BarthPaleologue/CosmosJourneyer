@@ -19,12 +19,12 @@ import {
     ArcRotateCamera,
     Color3,
     DirectionalLight,
+    HemisphericLight,
     MeshBuilder,
     PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
-    ShadowGenerator,
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
@@ -32,7 +32,7 @@ import {
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
-import { enablePhysics } from "./utils";
+import { enablePhysics, enableShadows } from "./utils";
 
 export async function createGravitySystemScene(
     engine: AbstractEngine,
@@ -45,26 +45,16 @@ export async function createGravitySystemScene(
     await enablePhysics(scene);
 
     const sun = new DirectionalLight("sun", new Vector3(0.5, -1, -0.5), scene);
-    sun.position = new Vector3(0, 50, 50);
-    sun.autoUpdateExtends = true;
-    scene.onAfterRenderObservable.addOnce(() => {
-        sun.autoUpdateExtends = false;
-    });
 
-    const shadowGenerator = new ShadowGenerator(2048, sun);
-    shadowGenerator.useExponentialShadowMap = true;
-    shadowGenerator.usePercentageCloserFiltering = true;
-    shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.transparencyShadow = true;
+    const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
+    hemi.intensity = 0.1;
 
     const sphere1Radius = 10;
 
     const sphere1 = MeshBuilder.CreateSphere("ground", { diameter: sphere1Radius * 2 }, scene);
-    sphere1.receiveShadows = true;
 
     const sphere2Radius = sphere1Radius / 3;
     const sphere2 = MeshBuilder.CreateSphere("sphere2", { diameter: sphere2Radius * 2 }, scene);
-    sphere2.receiveShadows = true;
     sphere2.position.x = sphere1Radius * 4;
 
     const groundMaterial = new PBRMaterial("groundMaterial", scene);
@@ -98,7 +88,6 @@ export async function createGravitySystemScene(
         const box = MeshBuilder.CreateBox(`box${i}`, { size: 0.2 + Math.random() }, scene);
         box.position = randomDirection().scaleInPlace(sphere1Radius + Math.random() * 40);
         box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
-        shadowGenerator.addShadowCaster(box);
 
         const boxMaterial = new PBRMaterial("boxMaterial", scene);
         boxMaterial.albedoColor = Color3.Random();
@@ -117,6 +106,8 @@ export async function createGravitySystemScene(
 
     const camera = new ArcRotateCamera("Camera", Math.PI / 3, Math.PI / 3, sphere1Radius * 8, Vector3.Zero(), scene);
     camera.attachControl();
+
+    enableShadows(sun);
 
     const gravitySystem = new GravitySystem(scene);
 
