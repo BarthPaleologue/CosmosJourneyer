@@ -17,7 +17,6 @@
 
 import {
     AbstractMesh,
-    CascadedShadowGenerator,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -44,7 +43,7 @@ import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
-import { createSky, enablePhysics } from "./utils";
+import { createSky, enablePhysics, enableShadows } from "./utils";
 
 export async function createInteractionDemo(
     engine: AbstractEngine,
@@ -66,7 +65,6 @@ export async function createInteractionDemo(
     const sounds = await loadSounds(progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(0, -1, -1), scene);
-    light.autoCalcShadowZBounds = true;
 
     createSky(light.direction.scale(-1), scene);
 
@@ -81,7 +79,6 @@ export async function createInteractionDemo(
     groundMaterial.roughness = 0.7;
     groundMaterial.metallic = 0;
     ground.material = groundMaterial;
-    ground.receiveShadows = true;
 
     const groundAggregate = new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
@@ -97,26 +94,12 @@ export async function createInteractionDemo(
 
     CharacterInputs.setEnabled(true);
 
-    const shadowGenerator = new CascadedShadowGenerator(2048, light);
-    shadowGenerator.transparencyShadow = true;
-    shadowGenerator.autoCalcDepthBounds = true;
-    shadowGenerator.stabilizeCascades = true;
-    shadowGenerator.bias *= 20;
-    shadowGenerator.shadowMaxZ = groundSize * 4;
-
-    const depthRenderer = scene.enableDepthRenderer(null, false, true);
-    scene.onBeforeCameraRenderObservable.add((camera) => {
-        depthRenderer.getDepthMap().activeCamera = camera;
-        shadowGenerator.setDepthRenderer(depthRenderer);
-    });
-
-    shadowGenerator.addShadowCaster(character.character);
-
-    const interactiveMembership = 0x1 << 5;
+    enableShadows(light);
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactionSystem = new InteractionSystem(interactiveMembership, scene, async (interactions) => {
+    const interactiveMask = 0x1 << 5;
+    const interactionSystem = new InteractionSystem(interactiveMask, scene, async (interactions) => {
         if (interactions.length === 0) {
             return null;
         }
@@ -141,19 +124,13 @@ export async function createInteractionDemo(
     for (let i = 0; i < 200; i++) {
         const size = 0.2 + Math.random();
         const position = new Vector3((Math.random() - 0.5) * groundSize, size / 2, (Math.random() - 0.5) * groundSize);
-
-        const box = spawnBoxAtPosition({ position, size }, scene, interactionSystem);
-        if (box.transformNode instanceof AbstractMesh) {
-            shadowGenerator.addShadowCaster(box.transformNode);
-        }
+        spawnBoxAtPosition({ position, size }, scene, interactionSystem);
     }
 
     const pillarHeight = 1.0;
     const pillar = MeshBuilder.CreateBox("pillar", { width: 0.3, depth: 0.3, height: pillarHeight }, scene);
     pillar.position.z = 2;
     pillar.position.y = pillarHeight / 2;
-    pillar.receiveShadows = true;
-    shadowGenerator.addShadowCaster(pillar);
 
     const pillarMaterial = new PBRMaterial("pillarMaterial", scene);
     pillarMaterial.albedoColor = new Color3(0.4, 0.4, 0.4);
@@ -183,16 +160,12 @@ export async function createInteractionDemo(
                 const boxPosition = cameraRay.origin.add(cameraRay.direction.scale(7));
                 boxPosition.y = 3 + Math.max(boxPosition.y, boxSize / 2);
 
-                const box = spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
-                if (box.transformNode instanceof AbstractMesh) {
-                    shadowGenerator.addShadowCaster(box.transformNode);
-                }
+                spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
             },
         },
         scene,
     );
     button.getTransform().position = pillar.position.add(new Vector3(0, pillarHeight / 2 + 0.05, 0));
-    shadowGenerator.addShadowCaster(button.mesh);
 
     interactionSystem.register(button);
 
@@ -223,7 +196,6 @@ function spawnBoxAtPosition(
     const box = MeshBuilder.CreateBox(`box`, { size }, scene);
     box.position = position;
     box.rotation.y = Math.random();
-    box.receiveShadows = true;
 
     const boxMaterial = new PBRMaterial("boxMaterial", scene);
     boxMaterial.albedoColor = Color3.Random();
