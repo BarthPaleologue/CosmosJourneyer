@@ -24,7 +24,6 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
-    ShadowGenerator,
 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -35,7 +34,7 @@ import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
-import { createSky, enablePhysics } from "./utils";
+import { createSky, enablePhysics, enableShadows } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
@@ -60,9 +59,6 @@ export async function createCharacterDemoScene(
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const shadowGenerator = new ShadowGenerator(1024, light);
-    shadowGenerator.useBlurExponentialShadowMap = true;
-
     const characterObject = characters.default.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
         throw new Error("Character object is null");
@@ -73,6 +69,8 @@ export async function createCharacterDemoScene(
     const character = new CharacterControls(characterObject, scene);
     character.getTransform().position.y = groundRadius;
 
+    enableShadows(light);
+
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("thirdPerson") !== null) {
         character.setThirdPersonCameraActive();
@@ -82,8 +80,6 @@ export async function createCharacterDemoScene(
 
     CharacterInputs.setEnabled(true);
 
-    shadowGenerator.addShadowCaster(character.character);
-
     const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
     new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
@@ -91,7 +87,6 @@ export async function createCharacterDemoScene(
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
-    ground.receiveShadows = true;
 
     character.setClosestWalkableObject({
         getTransform: () => ground,
