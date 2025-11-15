@@ -17,7 +17,6 @@
 
 import {
     AbstractMesh,
-    Animation,
     CascadedShadowGenerator,
     Color3,
     DirectionalLight,
@@ -25,7 +24,6 @@ import {
     MeshBuilder,
     PBRMaterial,
     PhysicsAggregate,
-    PhysicsMotionType,
     PhysicsShapeType,
     Scene,
     Vector3,
@@ -39,6 +37,7 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
+import { Button } from "@/frontend/ui/3d/button";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 
@@ -113,11 +112,11 @@ export async function createInteractionDemo(
 
     shadowGenerator.addShadowCaster(character.character);
 
-    const interactableMembership = 0x1 << 5;
+    const interactiveMembership = 0x1 << 5;
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactionSystem = new InteractionSystem(interactableMembership, scene, async (interactions) => {
+    const interactionSystem = new InteractionSystem(interactiveMembership, scene, async (interactions) => {
         if (interactions.length === 0) {
             return null;
         }
@@ -162,100 +161,40 @@ export async function createInteractionDemo(
     pillarMaterial.metallic = 0;
     pillar.material = pillarMaterial;
 
-    const buttonThickness = 0.1;
-    const button = MeshBuilder.CreateCylinder("button", { diameter: 0.25, height: buttonThickness }, scene);
-    button.position = pillar.position.add(new Vector3(0, pillarHeight / 2 + buttonThickness / 2, 0));
-    button.receiveShadows = true;
-    shadowGenerator.addShadowCaster(button);
+    const button = new Button(
+        {
+            label: "Spawn Box",
+            perform: () => {
+                sounds.menuSelect.setVolume(5);
+                sounds.menuSelect.play();
 
-    const buttonMaterial = new PBRMaterial("buttonMaterial", scene);
-    buttonMaterial.albedoColor = new Color3(1, 0, 0);
-    buttonMaterial.roughness = 0.5;
-    buttonMaterial.metallic = 0;
-    button.material = buttonMaterial;
+                const boxSize = 0.3 + Math.random() * 0.3;
+                const camera = scene.activeCamera;
+                if (camera === null) {
+                    return;
+                }
 
-    const buttonAggregate = new PhysicsAggregate(button, PhysicsShapeType.CYLINDER, { mass: 0 }, scene);
-    buttonAggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
-    buttonAggregate.body.disablePreStep = false;
-
-    let isButtonBeingPressed = false;
-    const buttonRestPositionY = button.position.y;
-    const buttonPressDepth = 0.05;
-    const buttonAnimationFrameRate = 60;
-    const buttonHalfAnimationFrames = Math.round(buttonAnimationFrameRate * 0.1);
-
-    const animateButtonPress = (): void => {
-        const pressedPositionY = buttonRestPositionY - buttonPressDepth;
-        Animation.CreateAndStartAnimation(
-            "buttonPressDown",
-            button,
-            "position.y",
-            buttonAnimationFrameRate,
-            buttonHalfAnimationFrames,
-            buttonRestPositionY,
-            pressedPositionY,
-            Animation.ANIMATIONLOOPMODE_CONSTANT,
-            undefined,
-            () => {
-                Animation.CreateAndStartAnimation(
-                    "buttonPressUp",
-                    button,
-                    "position.y",
-                    buttonAnimationFrameRate,
-                    buttonHalfAnimationFrames,
-                    pressedPositionY,
-                    buttonRestPositionY,
-                    Animation.ANIMATIONLOOPMODE_CONSTANT,
-                    undefined,
-                    () => {
-                        isButtonBeingPressed = false;
-                    },
+                const cameraRay = camera.getForwardRay(
+                    5,
+                    camera.getWorldMatrix(),
+                    camera.getWorldMatrix().getTranslation(),
                 );
+
+                const boxPosition = cameraRay.origin.add(cameraRay.direction.scale(7));
+                boxPosition.y = 3 + Math.max(boxPosition.y, boxSize / 2);
+
+                const box = spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
+                if (box.transformNode instanceof AbstractMesh) {
+                    shadowGenerator.addShadowCaster(box.transformNode);
+                }
             },
-        );
-    };
+        },
+        scene,
+    );
+    button.getTransform().position = pillar.position.add(new Vector3(0, pillarHeight / 2 + 0.05, 0));
+    shadowGenerator.addShadowCaster(button.mesh);
 
-    interactionSystem.register(buttonAggregate, () => {
-        if (isButtonBeingPressed) {
-            return [];
-        }
-
-        return [
-            {
-                label: "Spawn Box",
-                perform: () => {
-                    if (isButtonBeingPressed) {
-                        return;
-                    }
-                    isButtonBeingPressed = true;
-                    animateButtonPress();
-
-                    sounds.menuSelect.setVolume(5);
-                    sounds.menuSelect.play();
-
-                    const boxSize = 0.3 + Math.random() * 0.3;
-                    const camera = scene.activeCamera;
-                    if (camera === null) {
-                        return;
-                    }
-
-                    const cameraRay = camera.getForwardRay(
-                        5,
-                        camera.getWorldMatrix(),
-                        camera.getWorldMatrix().getTranslation(),
-                    );
-
-                    const boxPosition = cameraRay.origin.add(cameraRay.direction.scale(7));
-                    boxPosition.y = 3 + Math.max(boxPosition.y, boxSize / 2);
-
-                    const box = spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
-                    if (box.transformNode instanceof AbstractMesh) {
-                        shadowGenerator.addShadowCaster(box.transformNode);
-                    }
-                },
-            },
-        ];
-    });
+    interactionSystem.register(button);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -300,50 +239,53 @@ function spawnBoxAtPosition(
     );
     boxAggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
-    interactionSystem.register(boxAggregate, () => [
-        {
-            label: "push",
-            perform: () => {
-                const cameraRay = scene.activeCamera?.getForwardRay(
-                    1,
-                    scene.activeCamera.getWorldMatrix(),
-                    scene.activeCamera.getWorldMatrix().getTranslation(),
-                );
-                if (cameraRay === undefined) {
-                    return;
-                }
+    interactionSystem.register({
+        getPhysicsAggregate: () => boxAggregate,
+        getInteractions: () => [
+            {
+                label: "push",
+                perform: () => {
+                    const cameraRay = scene.activeCamera?.getForwardRay(
+                        1,
+                        scene.activeCamera.getWorldMatrix(),
+                        scene.activeCamera.getWorldMatrix().getTranslation(),
+                    );
+                    if (cameraRay === undefined) {
+                        return;
+                    }
 
-                boxAggregate.body.applyImpulse(
-                    cameraRay.direction.scale(200).add(Vector3.Up().scale(200)),
-                    boxAggregate.body.getObjectCenterWorld(),
-                );
-                boxAggregate.body.applyAngularImpulse(
-                    new Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10),
-                );
+                    boxAggregate.body.applyImpulse(
+                        cameraRay.direction.scale(200).add(Vector3.Up().scale(200)),
+                        boxAggregate.body.getObjectCenterWorld(),
+                    );
+                    boxAggregate.body.applyAngularImpulse(
+                        new Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10),
+                    );
+                },
             },
-        },
-        {
-            label: "spin",
-            perform: () => {
-                boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+            {
+                label: "spin",
+                perform: () => {
+                    boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                },
             },
-        },
-        {
-            label: "change color",
-            perform: () => {
-                box.material = new PBRMaterial("boxMaterial", scene);
-                (box.material as PBRMaterial).albedoColor = Color3.Random();
-                (box.material as PBRMaterial).metallic = 0;
-                (box.material as PBRMaterial).roughness = 0.7;
+            {
+                label: "change color",
+                perform: () => {
+                    box.material = new PBRMaterial("boxMaterial", scene);
+                    (box.material as PBRMaterial).albedoColor = Color3.Random();
+                    (box.material as PBRMaterial).metallic = 0;
+                    (box.material as PBRMaterial).roughness = 0.7;
+                },
             },
-        },
-        {
-            label: "delete",
-            perform: () => {
-                box.dispose();
+            {
+                label: "delete",
+                perform: () => {
+                    box.dispose();
+                },
             },
-        },
-    ]);
+        ],
+    });
 
     return boxAggregate;
 }
