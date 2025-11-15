@@ -19,12 +19,12 @@ import {
     AbstractMesh,
     Color3,
     DirectionalLight,
+    HemisphericLight,
     MeshBuilder,
     PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
     Scene,
-    ShadowGenerator,
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
@@ -37,7 +37,7 @@ import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
 
-import { createSky, enablePhysics } from "./utils";
+import { createSky, enablePhysics, enableShadows } from "./utils";
 
 export async function createRoverScene(
     engine: AbstractEngine,
@@ -49,19 +49,11 @@ export async function createRoverScene(
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
     const sun = new DirectionalLight("sun", new Vector3(1, -1, -0.5), scene);
-    sun.position = new Vector3(0, 50, 50);
-    sun.autoUpdateExtends = true;
-    scene.onAfterRenderObservable.addOnce(() => {
-        sun.autoUpdateExtends = false;
-    });
+
+    const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
+    hemi.intensity = 0.02;
 
     createSky(sun.direction.scale(-1), scene);
-
-    const shadowGenerator = new ShadowGenerator(2048, sun);
-    shadowGenerator.useExponentialShadowMap = true;
-    shadowGenerator.usePercentageCloserFiltering = true;
-    shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.transparencyShadow = true;
 
     const ground = MeshBuilder.CreateGround("ground", { width: 300, height: 300 }, scene);
     ground.receiveShadows = true;
@@ -83,7 +75,8 @@ export async function createRoverScene(
 
     const character = new CharacterControls(characterObject, scene);
     character.getTransform().position = new Vector3(10, 0, -10);
-    shadowGenerator.addShadowCaster(character.character);
+
+    enableShadows(sun);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -96,8 +89,6 @@ export async function createRoverScene(
     }
 
     const rover = roverResult.value;
-
-    shadowGenerator.addShadowCaster(rover.frame.mesh);
 
     const roverControls = new VehicleControls(scene);
     roverControls.setVehicle(rover);
@@ -112,7 +103,6 @@ export async function createRoverScene(
         const box = MeshBuilder.CreateBox(`box${i}`, { size: 0.2 + Math.random() }, scene);
         box.position = new Vector3((Math.random() - 0.5) * 200, 0, (Math.random() - 0.5) * 200);
         box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
-        shadowGenerator.addShadowCaster(box);
 
         const boxMaterial = new PBRMaterial("boxMaterial", scene);
         boxMaterial.albedoColor = Color3.Random();
