@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Ray } from "@babylonjs/core/Culling/ray.core";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
@@ -145,31 +144,6 @@ export class InteractionSystem {
         return [...interactionGetter()];
     }
 
-    private setCurrentTarget(target: PhysicsBody | null) {
-        if (this.currentTarget === target) {
-            return;
-        }
-
-        if (this.currentTarget !== null) {
-            const transform = this.currentTarget.transformNode;
-            if (transform instanceof AbstractMesh) {
-                transform.renderOverlay = false;
-                transform.disableEdgesRendering();
-            }
-        }
-
-        this.currentTarget = target;
-
-        const transform = target?.transformNode;
-        if (transform instanceof AbstractMesh) {
-            transform.renderOverlay = true;
-            transform.overlayColor.set(0.5, 0.5, 1);
-            transform.overlayAlpha = 0.2;
-            transform.enableEdgesRendering();
-            transform.edgesColor.set(0.5, 0.5, 1, 1);
-        }
-    }
-
     public getCurrentTarget(): PhysicsBody | null {
         return this.currentTarget;
     }
@@ -204,11 +178,11 @@ export class InteractionSystem {
 
         const physicsBody = this.raycastResult.body;
         if (physicsBody === undefined) {
-            this.setCurrentTarget(null);
+            this.currentTarget = null;
             return;
         }
 
-        this.setCurrentTarget(physicsBody);
+        this.currentTarget = physicsBody;
     }
 
     public update(deltaSeconds: number) {
