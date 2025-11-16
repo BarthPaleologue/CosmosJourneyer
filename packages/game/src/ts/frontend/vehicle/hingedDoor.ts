@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PhysicsViewer } from "@babylonjs/core";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
@@ -45,19 +46,21 @@ export class HingedDoor implements Interactive {
         this.hingeAggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
 
         this.hinge = hinge;
+        this.hinge.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 1e5);
+
+        const pv = new PhysicsViewer();
+        pv.showConstraint(this.hinge);
 
         this.close();
     }
 
     open() {
         this.hinge.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, -1.0);
-        this.hinge.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 1e5);
         this.state = "opening";
     }
 
     close() {
         this.hinge.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, 1.0);
-        this.hinge.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 1e5);
         this.state = "closing";
     }
 
