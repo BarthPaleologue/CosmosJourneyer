@@ -29,14 +29,21 @@ import {
     type AbstractEngine,
 } from "@babylonjs/core";
 
+import { loadSounds } from "@/frontend/assets/audio/sounds";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
+import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
+import { radialChoiceModal } from "@/frontend/ui/dialogModal";
+import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
+
+import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
 
@@ -49,9 +56,33 @@ export async function createRoverScene(
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
+    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const sounds = await loadSounds(progressMonitor);
+
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
+
+    const soundPlayer = new SoundPlayer(sounds);
+    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
+        if (interactions.length === 0) {
+            return null;
+        }
+
+        const hasPointerLock = engine.isPointerLock;
+        if (hasPointerLock) {
+            document.exitPointerLock();
+        }
+        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+        if (hasPointerLock) {
+            await engine.getRenderingCanvas()?.requestPointerLock();
+        }
+
+        return choice;
+    });
+
+    const interactionLayer = new InteractionLayer(interactionSystem);
+    document.body.appendChild(interactionLayer.root);
 
     const sun = new DirectionalLight("sun", new Vector3(1, -1, -0.5), scene);
 
@@ -70,9 +101,13 @@ export async function createRoverScene(
     groundMaterial.roughness = 0.7;
     ground.material = groundMaterial;
 
-    new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0, friction: 2 }, scene);
-
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const groundAggregate = new PhysicsAggregate(
+        ground,
+        PhysicsShapeType.BOX,
+        { mass: 0, restitution: 0, friction: 2 },
+        scene,
+    );
+    groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
 
     const characterObject = assets.objects.characters.default.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
@@ -116,14 +151,24 @@ export async function createRoverScene(
 
     setRoverActive();
 
+    interactionSystem.register({
+        getPhysicsAggregate: () => rover.frame,
+        getInteractions: () => [
+            {
+                label: "Drive",
+                perform: () => {
+                    setRoverActive();
+                },
+            },
+        ],
+    });
+
     document.addEventListener("keydown", (event) => {
         if (event.key !== "e") {
             return;
         }
         if (activeControls === roverControls) {
             setCharacterActive();
-        } else {
-            setRoverActive();
         }
     });
 
@@ -139,13 +184,31 @@ export async function createRoverScene(
         boxMaterial.roughness = 0.7;
         box.material = boxMaterial;
 
-        new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
+        const boxAggregate = new PhysicsAggregate(
+            box,
+            PhysicsShapeType.BOX,
+            { mass: 50, restitution: 0.3, friction: 1 },
+            scene,
+        );
+        interactionSystem.register({
+            getPhysicsAggregate: () => boxAggregate,
+            getInteractions: () => [
+                {
+                    label: "spin",
+                    perform: () => {
+                        boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                    },
+                },
+            ],
+        });
     }
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
         roverControls.update(deltaSeconds);
+        interactionSystem.update(deltaSeconds);
+        interactionLayer.update(deltaSeconds);
 
         if (scene.activeCamera !== activeControls.getActiveCamera()) {
             if (scene.activeCamera !== null) {

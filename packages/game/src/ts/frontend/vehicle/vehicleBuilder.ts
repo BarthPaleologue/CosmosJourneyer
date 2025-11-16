@@ -299,15 +299,7 @@ export class VehicleBuilder {
             }
         }
 
-        return new Vehicle(
-            {
-                mesh: this.frame,
-                physicsBody: frameAggregate.body,
-                physicsShape: frameAggregate.shape,
-            },
-            motorConstraints,
-            steeringConstraints,
-        );
+        return new Vehicle(frameAggregate, motorConstraints, steeringConstraints);
     }
 }
 

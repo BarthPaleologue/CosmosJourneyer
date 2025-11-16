@@ -15,12 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
 import { clamp } from "@/utils/math";
 
@@ -29,7 +27,7 @@ import type { Transformable } from "../universe/architecture/transformable";
 export type SteeringMode = "counterPhase" | "inPhase";
 
 export class Vehicle implements Transformable {
-    readonly frame: { mesh: Mesh; physicsBody: PhysicsBody; physicsShape: PhysicsShape };
+    readonly frame: PhysicsAggregate;
 
     readonly motorConstraints: ReadonlyArray<Physics6DoFConstraint>;
     readonly steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>;
@@ -44,7 +42,7 @@ export class Vehicle implements Transformable {
     readonly maxSteeringAngle = Math.PI / 4;
 
     constructor(
-        frame: { mesh: Mesh; physicsBody: PhysicsBody; physicsShape: PhysicsShape },
+        frame: PhysicsAggregate,
         motorConstraints: ReadonlyArray<Physics6DoFConstraint>,
         steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>,
     ) {
@@ -105,6 +103,6 @@ export class Vehicle implements Transformable {
     }
 
     getTransform(): TransformNode {
-        return this.frame.mesh;
+        return this.frame.transformNode;
     }
 }
