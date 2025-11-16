@@ -38,8 +38,7 @@ import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder
 import type { RenderingAssets } from "../assets/renderingAssets";
 import { Vehicle } from "./vehicle";
 
-type PartFixedConnection = {
-    type: "fixed";
+type FixationModel = {
     rotation?: {
         x?: number;
         y?: number;
@@ -47,8 +46,7 @@ type PartFixedConnection = {
     };
 };
 
-type PartHingeConnection = {
-    type: "hinge";
+type HingeModel = {
     axis: "x" | "y" | "z";
     range: {
         min: number;
@@ -56,7 +54,7 @@ type PartHingeConnection = {
     };
 };
 
-type PartConnection = PartFixedConnection | PartHingeConnection;
+//type PartConnection = PartFixedConnection | PartHingeConnection;
 
 export class VehicleBuilder {
     private readonly frame: Mesh;
@@ -71,10 +69,16 @@ export class VehicleBuilder {
         axleMesh: Mesh;
     }> = [];
 
-    private readonly parts: Array<{
+    private readonly fixedParts: Array<{
         mesh: Mesh;
         mass: number;
-        connection: PartConnection;
+        connection: FixationModel;
+    }> = [];
+
+    private readonly doorParts: Array<{
+        mesh: Mesh;
+        mass: number;
+        connection: HingeModel;
     }> = [];
 
     private spawnPosition = Vector3.Zero();
@@ -107,11 +111,20 @@ export class VehicleBuilder {
         return this;
     }
 
-    addPart(part: Mesh, position: Vector3, mass: number, connection: PartConnection): this {
+    addFixedPart(part: Mesh, position: Vector3, mass: number, connection: FixationModel): this {
         part.parent = this.frame;
         part.position = position;
 
-        this.parts.push({ mesh: part, mass, connection });
+        this.fixedParts.push({ mesh: part, mass, connection });
+
+        return this;
+    }
+
+    addDoorPart(part: Mesh, position: Vector3, mass: number, connection: HingeModel): this {
+        part.parent = this.frame;
+        part.position = position;
+
+        this.doorParts.push({ mesh: part, mass, connection });
 
         return this;
     }
@@ -148,7 +161,7 @@ export class VehicleBuilder {
         return transforms;
     }
 
-    assemble(): Vehicle {
+    build(): Vehicle {
         const frameAggregate = new PhysicsAggregate(this.frame, PhysicsShapeType.MESH, {
             mass: 2000,
             restitution: 0,
@@ -157,85 +170,86 @@ export class VehicleBuilder {
         });
         FilterMeshCollisions(frameAggregate.shape);
 
-        for (const { mesh, mass, connection } of this.parts) {
+        for (const { mesh, mass, connection } of this.fixedParts) {
             const positionInFrameSpace = mesh.position.clone();
             mesh.setParent(null);
             const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
             FilterMeshCollisions(partAggregate.shape);
 
-            let joint: Physics6DoFConstraint;
-            switch (connection.type) {
-                case "fixed":
-                    joint = new Physics6DoFConstraint(
-                        {
-                            pivotA: positionInFrameSpace,
-                            pivotB: Vector3.Zero(),
-                        },
-                        [
-                            {
-                                axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
-                                minLimit: 0,
-                                maxLimit: 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_X,
-                                minLimit: connection.rotation?.x ?? 0,
-                                maxLimit: connection.rotation?.x ?? 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_Y,
-                                minLimit: connection.rotation?.y ?? 0,
-                                maxLimit: connection.rotation?.y ?? 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_Z,
-                                minLimit: connection.rotation?.z ?? 0,
-                                maxLimit: connection.rotation?.z ?? 0,
-                            },
-                        ],
-                        this.scene,
-                    );
+            const joint = new Physics6DoFConstraint(
+                {
+                    pivotA: positionInFrameSpace,
+                    pivotB: Vector3.Zero(),
+                },
+                [
+                    {
+                        axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
+                        minLimit: 0,
+                        maxLimit: 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_X,
+                        minLimit: connection.rotation?.x ?? 0,
+                        maxLimit: connection.rotation?.x ?? 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_Y,
+                        minLimit: connection.rotation?.y ?? 0,
+                        maxLimit: connection.rotation?.y ?? 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_Z,
+                        minLimit: connection.rotation?.z ?? 0,
+                        maxLimit: connection.rotation?.z ?? 0,
+                    },
+                ],
+                this.scene,
+            );
 
-                    frameAggregate.body.addConstraint(partAggregate.body, joint);
-                    break;
-                case "hinge":
-                    joint = new Physics6DoFConstraint(
-                        {
-                            pivotA: positionInFrameSpace,
-                            pivotB: Vector3.Zero(),
-                        },
-                        [
-                            {
-                                axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
-                                minLimit: 0,
-                                maxLimit: 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_X,
-                                minLimit: connection.axis === "x" ? connection.range.min : 0,
-                                maxLimit: connection.axis === "x" ? connection.range.max : 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_Y,
-                                minLimit: connection.axis === "y" ? connection.range.min : 0,
-                                maxLimit: connection.axis === "y" ? connection.range.max : 0,
-                            },
-                            {
-                                axis: PhysicsConstraintAxis.ANGULAR_Z,
-                                minLimit: connection.axis === "z" ? connection.range.min : 0,
-                                maxLimit: connection.axis === "z" ? connection.range.max : 0,
-                            },
-                        ],
-                        this.scene,
-                    );
+            frameAggregate.body.addConstraint(partAggregate.body, joint);
+        }
 
-                    frameAggregate.body.addConstraint(partAggregate.body, joint);
+        for (const { mesh, mass, connection } of this.doorParts) {
+            const positionInFrameSpace = mesh.position.clone();
+            mesh.setParent(null);
+            const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
+            FilterMeshCollisions(partAggregate.shape);
 
-                    joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_X, PhysicsConstraintMotorType.VELOCITY);
-                    joint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, -1.0);
-                    joint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, 100 * mass);
-                    break;
-            }
+            const joint = new Physics6DoFConstraint(
+                {
+                    pivotA: positionInFrameSpace,
+                    pivotB: Vector3.Zero(),
+                },
+                [
+                    {
+                        axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
+                        minLimit: 0,
+                        maxLimit: 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_X,
+                        minLimit: connection.axis === "x" ? connection.range.min : 0,
+                        maxLimit: connection.axis === "x" ? connection.range.max : 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_Y,
+                        minLimit: connection.axis === "y" ? connection.range.min : 0,
+                        maxLimit: connection.axis === "y" ? connection.range.max : 0,
+                    },
+                    {
+                        axis: PhysicsConstraintAxis.ANGULAR_Z,
+                        minLimit: connection.axis === "z" ? connection.range.min : 0,
+                        maxLimit: connection.axis === "z" ? connection.range.max : 0,
+                    },
+                ],
+                this.scene,
+            );
+
+            frameAggregate.body.addConstraint(partAggregate.body, joint);
+
+            joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_X, PhysicsConstraintMotorType.VELOCITY);
+            joint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, -1.0);
+            joint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, 100 * mass);
         }
 
         const motorConstraints: Array<Physics6DoFConstraint> = [];

@@ -269,13 +269,13 @@ export function createWolfMk2(
         .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
         .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addPart(
+        .addFixedPart(
             roofSolarPanel1,
             new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + frameHeight) / 2, roofSolarPanelZOffset),
             100,
-            { type: "fixed", rotation: { z: -roofSolarPanelRotationAngle } },
+            { rotation: { z: -roofSolarPanelRotationAngle } },
         )
-        .addPart(
+        .addFixedPart(
             roofSolarPanel2,
             new Vector3(
                 -(topHalfWidth + maxHalfWidth) / 2,
@@ -283,12 +283,11 @@ export function createWolfMk2(
                 roofSolarPanelZOffset,
             ),
             100,
-            { type: "fixed", rotation: { z: roofSolarPanelRotationAngle } },
+            { rotation: { z: roofSolarPanelRotationAngle } },
         )
-        .addPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, { type: "fixed" })
-        .addPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, { type: "fixed" })
-        .addPart(backDoor, new Vector3(0, 0, -frameLength / 2 - backDoorThickness), 100, {
-            type: "hinge",
+        .addFixedPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, {})
+        .addFixedPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, {})
+        .addDoorPart(backDoor, new Vector3(0, 0, -frameLength / 2 - backDoorThickness), 100, {
             axis: "x",
             range: {
                 min: (2 * Math.PI) / 3,
@@ -297,7 +296,7 @@ export function createWolfMk2(
         })
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
-        .assemble();
+        .build();
 
     return ok(vehicle);
 }
