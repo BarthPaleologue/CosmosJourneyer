@@ -98,8 +98,7 @@ export async function createInteractionDemo(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactiveMask = 0x1 << 5;
-    const interactionSystem = new InteractionSystem(interactiveMask, scene, async (interactions) => {
+    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
         if (interactions.length === 0) {
             return null;
         }
