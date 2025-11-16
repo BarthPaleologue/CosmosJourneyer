@@ -17,6 +17,7 @@
 
 import {
     AbstractMesh,
+    Axis,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -24,6 +25,7 @@ import {
     PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
+    Quaternion,
     Scene,
     Vector3,
     type AbstractEngine,
@@ -39,6 +41,7 @@ import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSyst
 import { Button } from "@/frontend/ui/3d/button";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
+import { HingedDoorBuilder } from "@/frontend/vehicle/hingedDoorBuilder";
 
 import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
@@ -171,6 +174,19 @@ export async function createInteractionDemo(
     button.getTransform().position = pillar.position.add(new Vector3(0, pillarHeight / 2 + 0.05, 0));
 
     interactionSystem.register(button);
+
+    const doorHeight = 2;
+    const doorWidth = 1;
+    const doorMesh = MeshBuilder.CreateBox("door", { height: doorHeight, width: doorWidth, depth: 0.05 }, scene);
+    doorMesh.position.x = doorWidth / 2;
+    doorMesh.bakeCurrentTransformIntoVertices();
+
+    const door = new HingedDoorBuilder(doorMesh, doorHeight, scene)
+        .setPosition(new Vector3(-3, doorHeight / 2, 3))
+        .setRotation(Quaternion.RotationAxis(Axis.X, Math.PI / 3))
+        .build();
+
+    interactionSystem.register(door);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
