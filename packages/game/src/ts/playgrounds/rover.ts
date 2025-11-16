@@ -30,9 +30,10 @@ import {
 } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
@@ -47,6 +48,10 @@ export async function createRoverScene(
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
+
+    engine.getRenderingCanvas()?.addEventListener("click", async () => {
+        await engine.getRenderingCanvas()?.requestPointerLock();
+    });
 
     const sun = new DirectionalLight("sun", new Vector3(1, -1, -0.5), scene);
 
@@ -67,8 +72,9 @@ export async function createRoverScene(
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0, friction: 2 }, scene);
 
-    const characters = await loadCharacters(scene, progressMonitor);
-    const characterObject = characters.default.instantiateHierarchy(null);
+    const assets = await loadRenderingAssets(scene, progressMonitor);
+
+    const characterObject = assets.objects.characters.default.instantiateHierarchy(null);
     if (!(characterObject instanceof AbstractMesh)) {
         throw new Error("Character object is null");
     }
@@ -77,8 +83,6 @@ export async function createRoverScene(
     character.getTransform().position = new Vector3(10, 0, -10);
 
     enableShadows(sun);
-
-    const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const roverResult = createWolfMk2(assets, scene, new Vector3(0, 10, 0), {
         axis: new Vector3(0, 1, 0),
@@ -94,9 +98,34 @@ export async function createRoverScene(
     roverControls.setVehicle(rover);
     roverControls.switchToThirdPersonCamera();
 
-    const camera = roverControls.getActiveCamera();
-    scene.activeCamera = camera;
-    camera.attachControl();
+    let activeControls: Controls = roverControls;
+
+    const setRoverActive = () => {
+        activeControls = roverControls;
+        VehicleInputs.setEnabled(true);
+        CharacterInputs.setEnabled(false);
+        character.setThirdPersonCameraActive();
+    };
+
+    const setCharacterActive = () => {
+        activeControls = character;
+        character.setFirstPersonCameraActive();
+        VehicleInputs.setEnabled(false);
+        CharacterInputs.setEnabled(true);
+    };
+
+    setRoverActive();
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "e") {
+            return;
+        }
+        if (activeControls === roverControls) {
+            setCharacterActive();
+        } else {
+            setRoverActive();
+        }
+    });
 
     //spawn a bunch of boxes
     for (let i = 0; i < 200; i++) {
@@ -113,18 +142,16 @@ export async function createRoverScene(
         new PhysicsAggregate(box, PhysicsShapeType.BOX, { mass: 50, restitution: 0.3, friction: 1 }, scene);
     }
 
-    VehicleInputs.setEnabled(true);
-
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         character.update(deltaSeconds);
         roverControls.update(deltaSeconds);
 
-        if (scene.activeCamera !== roverControls.getActiveCamera()) {
+        if (scene.activeCamera !== activeControls.getActiveCamera()) {
             if (scene.activeCamera !== null) {
                 scene.activeCamera.detachControl();
             }
-            scene.activeCamera = roverControls.getActiveCamera();
+            scene.activeCamera = activeControls.getActiveCamera();
             scene.activeCamera.attachControl();
         }
     });
