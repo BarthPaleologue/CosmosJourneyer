@@ -45,6 +45,8 @@ export class HingedDoor implements Interactive {
         this.hingeAggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
 
         this.hinge = hinge;
+
+        this.close();
     }
 
     open() {

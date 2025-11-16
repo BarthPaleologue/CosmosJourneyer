@@ -30,7 +30,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { HingedDoor } from "./hingedDoor";
 
 export class HingedDoorBuilder {
-    private readonly hingeMesh: Mesh;
+    readonly hingeMesh: Mesh;
     private readonly doorMesh: Mesh;
 
     private readonly scene: Scene;
@@ -41,7 +41,11 @@ export class HingedDoorBuilder {
     constructor(doorMesh: Mesh, hingeLength: number, scene: Scene) {
         this.scene = scene;
 
-        this.hingeMesh = MeshBuilder.CreateCylinder("Hinge", { height: hingeLength, diameter: 0.1 }, scene);
+        this.hingeMesh = MeshBuilder.CreateCylinder(
+            "Hinge",
+            { height: hingeLength, diameter: 0.1, tessellation: 4 },
+            scene,
+        );
         this.doorMesh = doorMesh;
         this.doorMesh.parent = this.hingeMesh;
     }
@@ -56,12 +60,27 @@ export class HingedDoorBuilder {
         return this;
     }
 
+    setMinAngle(angle: number | null) {
+        this.minAngle = angle;
+        return this;
+    }
+
+    setMaxAngle(angle: number | null) {
+        this.maxAngle = angle;
+        return this;
+    }
+
     build() {
-        const hingeAggregate = new PhysicsAggregate(this.hingeMesh, PhysicsShapeType.CYLINDER, { mass: 0 }, this.scene);
+        const hingeAggregate = new PhysicsAggregate(
+            this.hingeMesh,
+            PhysicsShapeType.CYLINDER,
+            { mass: 10 },
+            this.scene,
+        );
 
         this.doorMesh.setParent(null);
 
-        const doorAggregate = new PhysicsAggregate(this.doorMesh, PhysicsShapeType.MESH, { mass: 10 }, this.scene);
+        const doorAggregate = new PhysicsAggregate(this.doorMesh, PhysicsShapeType.MESH, { mass: 100 }, this.scene);
 
         const joint = new Physics6DoFConstraint(
             {
@@ -94,10 +113,7 @@ export class HingedDoorBuilder {
         );
 
         hingeAggregate.body.addConstraint(doorAggregate.body, joint);
-
         joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_Y, PhysicsConstraintMotorType.VELOCITY);
-        joint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, 0.0);
-        joint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 1e5);
 
         return new HingedDoor(doorAggregate, hingeAggregate, joint);
     }
