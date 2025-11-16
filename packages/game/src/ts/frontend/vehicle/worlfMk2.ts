@@ -109,7 +109,7 @@ export function createWolfMk2(
     );
     backDoor.scaling.z = sheerScaling;
     backDoor.rotate(Axis.Y, Math.PI);
-    backDoor.rotate(Axis.Z, -Math.PI / 2);
+    backDoor.rotate(Axis.Z, Math.PI / 2);
     backDoor.bakeCurrentTransformIntoVertices();
     backDoor.material = frameMat;
 
@@ -293,11 +293,9 @@ export function createWolfMk2(
         .addDoorPart(
             new HingedDoorBuilder(backDoor, 1, scene)
                 .setPosition(new Vector3(0, 0, -frameLength / 2 - backDoorThickness))
-                .setRotation(Quaternion.RotationAxis(Axis.Z, Math.PI / 2)),
-            //.setMinAngle(0)
-            //.setMaxAngle(0),
-            //.setMinAngle(Math.PI / 4)
-            //.setMaxAngle(-Math.PI / 2 + sheerAngle),
+                .setRotation(Quaternion.RotationAxis(Axis.Z, Math.PI / 2))
+                .setMinAngle(Math.PI - Math.PI / 2 + sheerAngle)
+                .setMaxAngle(Math.PI + Math.PI / 4),
             {
                 rotation: { z: -Math.PI / 2 },
             },
