@@ -17,7 +17,7 @@
 
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import earcut from "earcut";
@@ -29,6 +29,7 @@ import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { sheerAlongY } from "../helpers/sheer";
+import { HingedDoorBuilder } from "./hingedDoorBuilder";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
@@ -107,7 +108,9 @@ export function createWolfMk2(
         earcut,
     );
     backDoor.scaling.z = sheerScaling;
-    backDoor.rotate(Axis.X, -Math.PI / 2 - sheerAngle);
+    backDoor.rotate(Axis.Y, Math.PI);
+    backDoor.rotate(Axis.Z, -Math.PI / 2);
+    backDoor.bakeCurrentTransformIntoVertices();
     backDoor.material = frameMat;
 
     const roofSolarPanelZOffset = -frameSheerAmount;
@@ -287,13 +290,18 @@ export function createWolfMk2(
         )
         .addFixedPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, {})
         .addFixedPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, {})
-        .addDoorPart(backDoor, new Vector3(0, 0, -frameLength / 2 - backDoorThickness), 100, {
-            axis: "x",
-            range: {
-                min: (2 * Math.PI) / 3,
-                max: (3 * Math.PI) / 2 - sheerAngle,
+        .addDoorPart(
+            new HingedDoorBuilder(backDoor, 1, scene)
+                .setPosition(new Vector3(0, 0, -frameLength / 2 - backDoorThickness))
+                .setRotation(Quaternion.RotationAxis(Axis.Z, Math.PI / 2)),
+            //.setMinAngle(0)
+            //.setMaxAngle(0),
+            //.setMinAngle(Math.PI / 4)
+            //.setMaxAngle(-Math.PI / 2 + sheerAngle),
+            {
+                rotation: { z: -Math.PI / 2 },
             },
-        })
+        )
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
         .build();

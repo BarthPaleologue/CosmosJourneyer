@@ -163,6 +163,10 @@ export async function createRoverScene(
         ],
     });
 
+    for (const door of rover.doors) {
+        interactionSystem.register(door);
+    }
+
     document.addEventListener("keydown", (event) => {
         if (event.key !== "e") {
             return;
