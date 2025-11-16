@@ -103,7 +103,6 @@ export async function createInteractionDemo(
             return null;
         }
 
-        console.log("performing choice");
         const hasPointerLock = engine.isPointerLock;
         if (hasPointerLock) {
             document.exitPointerLock();
@@ -112,7 +111,6 @@ export async function createInteractionDemo(
         if (hasPointerLock) {
             await engine.getRenderingCanvas()?.requestPointerLock();
         }
-        console.log("chosen");
         return choice;
     });
 
