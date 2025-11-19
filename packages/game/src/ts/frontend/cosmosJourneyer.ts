@@ -446,6 +446,7 @@ export class CosmosJourneyer {
 
         const starMapScene = new Scene(engine, { useFloatingOrigin: true });
         starMapScene.useRightHandedSystem = true;
+        starMapScene.clearColor.set(0, 0, 0, 1);
 
         const mainHavokPlugin = new HavokPlugin(true, havokInstance);
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
