@@ -542,8 +542,6 @@ export class Spaceship implements Transformable {
         const warpSpeed = this.aggregate.transformNode.forward.scale(warpDrive.getWarpSpeed());
         this.warpTunnel.update(deltaSeconds);
 
-        const currentForwardSpeed = Vector3.Dot(warpSpeed, this.aggregate.transformNode.forward);
-
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
 
@@ -589,12 +587,12 @@ export class Spaceship implements Transformable {
 
             this.soundInstances.thruster.setVolume(0);
 
-            if (currentForwardSpeed < warpDrive.getWarpSpeed()) {
+            if (!warpDrive.isAccelerating()) {
+                this.soundInstances.acceleratingWarpDrive.setVolume(0);
+                this.soundInstances.deceleratingWarpDrive.setVolume(this.warpDriveSoundMaxVolume);
+            } else {
                 this.soundInstances.acceleratingWarpDrive.setVolume(this.warpDriveSoundMaxVolume);
                 this.soundInstances.deceleratingWarpDrive.setVolume(0);
-            } else {
-                this.soundInstances.deceleratingWarpDrive.setVolume(this.warpDriveSoundMaxVolume);
-                this.soundInstances.acceleratingWarpDrive.setVolume(0);
             }
         }
 
