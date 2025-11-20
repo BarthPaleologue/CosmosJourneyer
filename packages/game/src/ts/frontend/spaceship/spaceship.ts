@@ -583,12 +583,14 @@ export class Spaceship implements Transformable {
 
             this.soundInstances.thruster.setVolume(0);
 
-            if (currentForwardSpeed < warpDrive.getWarpSpeed()) {
+            if (!warpDrive.isAccelerating()) {
+                console.log("Decelerating", currentForwardSpeed, warpDrive.getWarpSpeed());
+                this.soundInstances.acceleratingWarpDrive.setVolume(0);
+                this.soundInstances.deceleratingWarpDrive.setVolume(1);
+            } else {
+                console.log("Accelerating", currentForwardSpeed, warpDrive.getWarpSpeed());
                 this.soundInstances.acceleratingWarpDrive.setVolume(1);
                 this.soundInstances.deceleratingWarpDrive.setVolume(0);
-            } else {
-                this.soundInstances.deceleratingWarpDrive.setVolume(1);
-                this.soundInstances.acceleratingWarpDrive.setVolume(0);
             }
         }
 
