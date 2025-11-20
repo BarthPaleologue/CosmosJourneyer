@@ -18,6 +18,7 @@
 import {
     AbstractMesh,
     Color3,
+    CreateAudioEngineAsync,
     DirectionalLight,
     HemisphericLight,
     MeshBuilder,
@@ -36,12 +37,15 @@ import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
+
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
 import { CollisionMask } from "@/settings";
 
@@ -56,32 +60,51 @@ export async function createRoverScene(
 
     await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
+    const audioEngine = await CreateAudioEngineAsync();
+
     const assets = await loadRenderingAssets(scene, progressMonitor);
-    const sounds = await loadSounds(progressMonitor);
+    const sounds = await loadSounds(audioEngine, progressMonitor);
 
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
+    const humanoidInstance = assets.objects.humanoids.default.spawn();
+    if (!humanoidInstance.success) {
+        throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
+    }
+
+    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, scene);
+
+    const character = new CharacterControls(humanoidAvatar, scene);
+    character.getTransform().position = new Vector3(10, 0, -10);
+
     const soundPlayer = new SoundPlayer(sounds);
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        [character.firstPersonCamera],
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        const hasPointerLock = engine.isPointerLock;
-        if (hasPointerLock) {
-            document.exitPointerLock();
-        }
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
-        if (hasPointerLock) {
-            await engine.getRenderingCanvas()?.requestPointerLock();
-        }
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
 
-        return choice;
-    });
+            return choice;
+        },
+    );
 
-    const interactionLayer = new InteractionLayer(interactionSystem);
+    const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
+
+    const interactionLayer = new InteractionLayer(interactionSystem, keyboardLayoutMap);
     document.body.appendChild(interactionLayer.root);
 
     const sun = new DirectionalLight("sun", new Vector3(1, -1, -0.5), scene);
@@ -108,14 +131,6 @@ export async function createRoverScene(
         scene,
     );
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-
-    const characterObject = assets.objects.characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
-    }
-
-    const character = new CharacterControls(characterObject, scene);
-    character.getTransform().position = new Vector3(10, 0, -10);
 
     enableShadows(sun);
 
