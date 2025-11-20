@@ -63,23 +63,36 @@ export async function createRoverScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
+    const characterObject = assets.objects.characters.default.instantiateHierarchy(null);
+    if (!(characterObject instanceof AbstractMesh)) {
+        throw new Error("Character object is null");
+    }
+
+    const character = new CharacterControls(characterObject, scene);
+    character.getTransform().position = new Vector3(10, 0, -10);
+
     const soundPlayer = new SoundPlayer(sounds);
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        [character.firstPersonCamera],
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        const hasPointerLock = engine.isPointerLock;
-        if (hasPointerLock) {
-            document.exitPointerLock();
-        }
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
-        if (hasPointerLock) {
-            await engine.getRenderingCanvas()?.requestPointerLock();
-        }
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
 
-        return choice;
-    });
+            return choice;
+        },
+    );
 
     const interactionLayer = new InteractionLayer(interactionSystem);
     document.body.appendChild(interactionLayer.root);
@@ -108,14 +121,6 @@ export async function createRoverScene(
         scene,
     );
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-
-    const characterObject = assets.objects.characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
-    }
-
-    const character = new CharacterControls(characterObject, scene);
-    character.getTransform().position = new Vector3(10, 0, -10);
 
     enableShadows(sun);
 
