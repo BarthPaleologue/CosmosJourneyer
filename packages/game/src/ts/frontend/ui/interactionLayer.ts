@@ -81,6 +81,20 @@ export class InteractionLayer {
 
     public update(deltaSeconds: number) {
         this.updateFadeAnimations(deltaSeconds);
+
+        const activeCamera = this.interactionSystem.scene.activeCamera;
+        if (activeCamera === null) {
+            console.warn("No active camera in scene");
+            return;
+        }
+
+        if (!this.interactionSystem.isEnabledForCamera(activeCamera)) {
+            this.setVisible(false);
+            return;
+        } else {
+            this.setVisible(true);
+        }
+
         const currentInteractions = this.interactionSystem.getCurrentInteractions();
 
         if (
@@ -160,5 +174,9 @@ export class InteractionLayer {
                 this.bodiesToFadeOut.delete(body);
             }
         }
+    }
+
+    public setVisible(isVisible: boolean) {
+        this.root.style.display = isVisible ? "flex" : "none";
     }
 }

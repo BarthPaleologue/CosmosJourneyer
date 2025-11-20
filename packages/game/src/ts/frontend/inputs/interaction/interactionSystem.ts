@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Ray } from "@babylonjs/core/Culling/ray.core";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -38,7 +39,7 @@ export interface Interactive {
 }
 
 export class InteractionSystem {
-    private readonly scene: Scene;
+    readonly scene: Scene;
 
     private readonly physicsEngine: PhysicsEngineV2;
 
@@ -64,15 +65,20 @@ export class InteractionSystem {
 
     private isMakingChoiceFlag = false;
 
+    private readonly cameras: Array<Camera>;
+
     constructor(
         mask: number,
         scene: Scene,
+        cameras: ReadonlyArray<Camera>,
         choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>,
     ) {
         this.scene = scene;
         this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
         this.mask = mask;
         this.choiceHandler = choiceHandler;
+
+        this.cameras = [...cameras];
 
         const interactAction = new Action({
             bindings: [InputDevices.KEYBOARD.getControl("KeyE")],
@@ -95,6 +101,10 @@ export class InteractionSystem {
 
             this.performFirstAction();
         });
+    }
+
+    public isEnabledForCamera(camera: Camera): boolean {
+        return this.cameras.includes(camera);
     }
 
     private performFirstAction() {
@@ -189,13 +199,18 @@ export class InteractionSystem {
     }
 
     public update(deltaSeconds: number) {
-        this.updateLongPressTimer(deltaSeconds);
-
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) {
             console.warn("No active camera in scene");
             return;
         }
+
+        if (!this.isEnabledForCamera(activeCamera)) {
+            this.currentTarget = null;
+            return;
+        }
+
+        this.updateLongPressTimer(deltaSeconds);
 
         const rayLength = 5;
         const cameraRay = activeCamera.getForwardRay(
