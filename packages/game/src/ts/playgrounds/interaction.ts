@@ -101,21 +101,26 @@ export async function createInteractionDemo(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        [character.firstPersonCamera],
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        const hasPointerLock = engine.isPointerLock;
-        if (hasPointerLock) {
-            document.exitPointerLock();
-        }
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
-        if (hasPointerLock) {
-            await engine.getRenderingCanvas()?.requestPointerLock();
-        }
-        return choice;
-    });
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
+            return choice;
+        },
+    );
 
     const interactionLayer = new InteractionLayer(interactionSystem);
     document.body.appendChild(interactionLayer.root);
