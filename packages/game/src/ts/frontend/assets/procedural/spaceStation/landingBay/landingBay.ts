@@ -208,6 +208,11 @@ export class LandingBay {
             const distanceThreshold = 12e3;
             const isEnabled = padCameraDistance2 < distanceThreshold * distanceThreshold;
             landingPad.getTransform().setEnabled(isEnabled);
+            if (isEnabled) {
+                landingPad.enablePhysics(this.getTransform().getScene());
+            } else {
+                landingPad.disablePhysics();
+            }
         });
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
