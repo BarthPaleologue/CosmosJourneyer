@@ -62,10 +62,20 @@ loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
     const inspectorRoot = document.createElement("div");
-    document.body.appendChild(inspectorRoot);
     inspectorRoot.id = "inspectorLayer";
+    document.body.appendChild(inspectorRoot);
     await scene.debugLayer.show({
         globalRoot: inspectorRoot,
+    });
+
+    document.addEventListener("keypress", async (e) => {
+        if (e.key === "i") {
+            if (scene.debugLayer.isVisible()) {
+                scene.debugLayer.hide();
+            } else {
+                await scene.debugLayer.show({ globalRoot: inspectorRoot });
+            }
+        }
     });
 }
 
