@@ -63,7 +63,6 @@ import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer"
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
@@ -81,7 +80,6 @@ import { type DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { AiPlayerControls } from "./player/aiPlayerControls";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
 import { type INotificationManager } from "./ui/notificationManager";
@@ -120,8 +118,6 @@ export class StarSystemView implements View {
     private isUiEnabled = true;
 
     private readonly player: Player;
-
-    private readonly aiPlayers: AiPlayerControls[] = [];
 
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
@@ -402,8 +398,6 @@ export class StarSystemView implements View {
             const shipControls = this.getSpaceshipControls();
             const spaceship = shipControls.getSpaceship();
 
-            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-
             if (this.scene.getActiveControls() === shipControls) {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
@@ -495,11 +489,6 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.aiPlayers.forEach((aiPlayer) => {
-                aiPlayer.dispose(this.soundPlayer);
-            });
-            this.aiPlayers.length = 0;
-
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
@@ -542,22 +531,6 @@ export class StarSystemView implements View {
             spaceStation.getSubTargets().forEach((landingPad) => {
                 this.targetCursorLayer.addObject(landingPad);
             });
-
-            for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.universeBackend, this.scene, this.assets, this.soundPlayer);
-
-                const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
-                    minimumPadSize: LandingPadSize.SMALL,
-                });
-
-                if (landingPad === null) {
-                    aiPlayer.dispose(this.soundPlayer);
-                    break;
-                }
-
-                this.aiPlayers.push(aiPlayer);
-                aiPlayer.spaceshipControls.spaceship.spawnOnPad(landingPad);
-            }
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
