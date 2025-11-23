@@ -56,7 +56,7 @@ import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager"
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { alertModal } from "@/frontend/ui/dialogModal";
+import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
@@ -78,10 +78,12 @@ import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
+import { CollisionMask, Settings } from "@/settings";
 
+import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
+import { InteractionLayer } from "./ui/interactionLayer";
 import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
@@ -218,6 +220,9 @@ export class StarSystemView implements View {
     private readonly tts: ITts;
     private readonly notificationManager: INotificationManager;
 
+    private readonly interactionSystem: InteractionSystem;
+    private readonly interactionLayer: InteractionLayer;
+
     private readonly assets: RenderingAssets;
 
     /**
@@ -256,6 +261,25 @@ export class StarSystemView implements View {
         this.tts = tts;
         this.notificationManager = notificationManager;
         this.assets = assets;
+
+        this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, [], async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
+
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
+            return choice;
+        });
+
+        this.interactionLayer = new InteractionLayer(this.interactionSystem);
+        document.body.appendChild(this.interactionLayer.root);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap ?? new Map<string, string>();
@@ -418,28 +442,6 @@ export class StarSystemView implements View {
 
                 spaceship.acceleratingWarpDriveSound.setVolume(0);
                 spaceship.deceleratingWarpDriveSound.setVolume(0);
-            } else if (this.scene.getActiveControls() === characterControls) {
-                characterControls.getTransform().setEnabled(false);
-                CharacterInputs.setEnabled(false);
-
-                await this.scene.setActiveControls(shipControls);
-                SpaceShipControlsInputs.setEnabled(true);
-
-                if (spaceship.isLanded()) {
-                    const bindings = SpaceShipControlsInputs.map.upDown.bindings;
-                    const control = bindings[0]?.control;
-                    if (!(control instanceof AxisComposite)) {
-                        throw new Error("Up down is not an axis composite");
-                    }
-                    this.notificationManager.create(
-                        NotificationOrigin.SPACESHIP,
-                        NotificationIntent.INFO,
-                        i18n.t("notifications:howToLiftOff", {
-                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1],
-                        }),
-                        5000,
-                    );
-                }
             }
         });
 
@@ -645,6 +647,44 @@ export class StarSystemView implements View {
         );
         this.player.instancedSpaceships.push(spaceship);
 
+        this.interactionSystem.register({
+            getPhysicsAggregate: () => spaceship.aggregate,
+            getInteractions: () => {
+                return [
+                    {
+                        label: i18n.t("interactions:pilot"),
+                        perform: async () => {
+                            const shipControls = this.getSpaceshipControls();
+                            const characterControls = this.getCharacterControls();
+
+                            characterControls.getTransform().setEnabled(false);
+                            CharacterInputs.setEnabled(false);
+
+                            await this.scene.setActiveControls(shipControls);
+                            SpaceShipControlsInputs.setEnabled(true);
+                            this.spaceShipLayer.setVisibility(true);
+
+                            if (spaceship.isLanded()) {
+                                const bindings = SpaceShipControlsInputs.map.upDown.bindings;
+                                const control = bindings[0]?.control;
+                                if (!(control instanceof AxisComposite)) {
+                                    throw new Error("Up down is not an axis composite");
+                                }
+                                this.notificationManager.create(
+                                    NotificationOrigin.SPACESHIP,
+                                    NotificationIntent.INFO,
+                                    i18n.t("notifications:howToLiftOff", {
+                                        bindingsString: axisCompositeToString(control, this.keyboardLayoutMap)[1]?.[1],
+                                    }),
+                                    5000,
+                                );
+                            }
+                        },
+                    },
+                ];
+            },
+        });
+
         if (this.spaceshipControls === null) {
             this.spaceshipControls = new ShipControls(
                 spaceship,
@@ -669,6 +709,7 @@ export class StarSystemView implements View {
                 this.characterControls = new CharacterControls(character, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+                this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
             }
         }
 
@@ -814,6 +855,9 @@ export class StarSystemView implements View {
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds,
         );
+
+        this.interactionSystem.update(deltaSeconds);
+        this.interactionLayer.update(deltaSeconds);
 
         this.spaceShipLayer.update(
             activeControls.getTransform(),
