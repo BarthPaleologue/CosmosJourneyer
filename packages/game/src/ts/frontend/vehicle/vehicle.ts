@@ -110,4 +110,20 @@ export class Vehicle implements Transformable {
     getTransform(): TransformNode {
         return this.frame.transformNode;
     }
+
+    dispose() {
+        for (const door of this.doors) {
+            door.dispose();
+        }
+
+        for (const motor of this.motorConstraints) {
+            motor.dispose();
+        }
+
+        for (const { constraint } of this.steeringConstraints) {
+            constraint.dispose();
+        }
+
+        this.frame.dispose();
+    }
 }

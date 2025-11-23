@@ -94,4 +94,10 @@ export class HingedDoor implements Interactive {
                 ];
         }
     }
+
+    dispose() {
+        this.doorAggregate.dispose();
+        this.hingeAggregate.dispose();
+        this.hinge.dispose();
+    }
 }
