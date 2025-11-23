@@ -99,8 +99,12 @@ export class VehicleControls implements Controls {
         this.activeCamera = this.thirdPersonCamera;
     }
 
-    setVehicle(vehicle: Vehicle) {
+    setVehicle(vehicle: Vehicle | null) {
         this.vehicle = vehicle;
+        if (vehicle === null) {
+            return;
+        }
+
         this.thirdPersonTransform.position.copyFrom(
             vehicle
                 .getTransform()
