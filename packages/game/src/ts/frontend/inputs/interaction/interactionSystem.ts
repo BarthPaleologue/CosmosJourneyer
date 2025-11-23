@@ -30,7 +30,7 @@ import { InputDevices } from "../devices";
 
 export type Interaction = {
     label: string;
-    perform: () => void;
+    perform: () => Promise<void>;
 };
 
 export interface Interactive {
@@ -91,7 +91,7 @@ export class InteractionSystem {
             this.longPressTimer = 0;
         });
 
-        this.releaseInteraction.on("complete", () => {
+        this.releaseInteraction.on("complete", async () => {
             if (this.shouldCancelShortPress) {
                 this.shouldCancelShortPress = false;
                 return;
@@ -99,7 +99,7 @@ export class InteractionSystem {
 
             this.longPressTimer = null;
 
-            this.performFirstAction();
+            await this.performFirstAction();
         });
     }
 
@@ -107,13 +107,13 @@ export class InteractionSystem {
         return this.cameras.includes(camera);
     }
 
-    private performFirstAction() {
+    private async performFirstAction() {
         const interactions = this.getCurrentInteractions();
         if (interactions === null || interactions[0] === undefined) {
             return;
         }
 
-        interactions[0].perform();
+        await interactions[0].perform();
     }
 
     private async chooseAction() {
@@ -126,7 +126,7 @@ export class InteractionSystem {
         const chosenInteraction = await this.choiceHandler(interactions);
         this.isMakingChoiceFlag = false;
 
-        chosenInteraction?.perform();
+        await chosenInteraction?.perform();
     }
 
     public isMakingChoice(): boolean {
@@ -216,7 +216,7 @@ export class InteractionSystem {
         const cameraRay = activeCamera.getForwardRay(
             rayLength,
             activeCamera.getWorldMatrix(),
-            activeCamera.getWorldMatrix().getTranslation(),
+            activeCamera.globalPosition,
         );
 
         this.pickWithRay(cameraRay);

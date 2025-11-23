@@ -71,9 +71,9 @@ export class Button implements Transformable, Interactive {
         return [
             {
                 label: this.interaction.label,
-                perform: () => {
+                perform: async () => {
                     this.startPressAnimation();
-                    this.interaction.perform();
+                    await this.interaction.perform();
                 },
             },
         ];

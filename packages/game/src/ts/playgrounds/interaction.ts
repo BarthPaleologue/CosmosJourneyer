@@ -150,7 +150,7 @@ export async function createInteractionDemo(
                 const boxSize = 0.3 + Math.random() * 0.3;
                 const camera = scene.activeCamera;
                 if (camera === null) {
-                    return;
+                    return Promise.resolve();
                 }
 
                 const cameraRay = camera.getForwardRay(
@@ -163,6 +163,7 @@ export async function createInteractionDemo(
                 boxPosition.y = 3 + Math.max(boxPosition.y, boxSize / 2);
 
                 spawnBoxAtPosition({ position: boxPosition, size: boxSize }, scene, interactionSystem);
+                return Promise.resolve();
             },
         },
         scene,
@@ -225,7 +226,7 @@ function spawnBoxAtPosition(
                         scene.activeCamera.getWorldMatrix().getTranslation(),
                     );
                     if (cameraRay === undefined) {
-                        return;
+                        return Promise.resolve();
                     }
 
                     boxAggregate.body.applyImpulse(
@@ -235,12 +236,14 @@ function spawnBoxAtPosition(
                     boxAggregate.body.applyAngularImpulse(
                         new Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10),
                     );
+                    return Promise.resolve();
                 },
             },
             {
                 label: "spin",
                 perform: () => {
                     boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                    return Promise.resolve();
                 },
             },
             {
@@ -250,12 +253,14 @@ function spawnBoxAtPosition(
                     (box.material as PBRMaterial).albedoColor = Color3.Random();
                     (box.material as PBRMaterial).metallic = 0;
                     (box.material as PBRMaterial).roughness = 0.7;
+                    return Promise.resolve();
                 },
             },
             {
                 label: "delete",
                 perform: () => {
                     box.dispose();
+                    return Promise.resolve();
                 },
             },
         ],
