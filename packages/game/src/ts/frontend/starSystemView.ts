@@ -496,6 +496,29 @@ export class StarSystemView implements View {
 
                 const rover = roverResult.value;
                 this.vehicleControls.setVehicle(rover);
+
+                this.interactionSystem.register({
+                    getPhysicsAggregate: () => rover.frame,
+                    getInteractions: () => [
+                        {
+                            label: i18n.t("interactions:enterVehicle", { vehicle: "Wolf Mk2" }),
+                            perform: async () => {
+                                await this.switchToVehicleControls();
+                            },
+                        },
+                    ],
+                });
+            } else if (this.scene.getActiveControls() === this.vehicleControls) {
+                characterControls.getTransform().setEnabled(true);
+                CharacterInputs.setEnabled(true);
+
+                const vehiclePosition = this.vehicleControls.getTransform().getAbsolutePosition();
+
+                characterControls
+                    .getTransform()
+                    .setAbsolutePosition(vehiclePosition.add(this.vehicleControls.getTransform().forward.scale(10)));
+
+                await this.scene.setActiveControls(characterControls);
             }
         });
 
@@ -720,6 +743,9 @@ export class StarSystemView implements View {
                             characterControls.getTransform().setEnabled(false);
                             CharacterInputs.setEnabled(false);
 
+                            this.vehicleControls.getVehicle()?.dispose();
+                            this.vehicleControls.setVehicle(null);
+
                             await this.scene.setActiveControls(shipControls);
                             SpaceShipControlsInputs.setEnabled(true);
                             this.spaceShipLayer.setVisibility(true);
@@ -754,13 +780,6 @@ export class StarSystemView implements View {
                 this.notificationManager,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
-
-            document.addEventListener("keydown", async (e) => {
-                if (e.key !== "r") {
-                    return;
-                }
-                await this.switchToVehicleControls();
-            });
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
             this.spaceshipControls.reset();
