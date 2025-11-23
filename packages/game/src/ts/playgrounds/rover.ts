@@ -58,7 +58,7 @@ export async function createRoverScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
     const audioEngine = await CreateAudioEngineAsync();
 
@@ -69,12 +69,12 @@ export async function createRoverScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const humanoidInstance = assets.objects.humanoids.default.spawn();
+    const humanoidInstance = assets.objects.humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, scene);
+    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, physicsEngine, scene);
 
     const character = new CharacterControls(humanoidAvatar, scene);
     character.getTransform().position = new Vector3(10, 0, -10);
