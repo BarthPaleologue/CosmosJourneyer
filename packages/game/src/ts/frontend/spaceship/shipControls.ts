@@ -357,7 +357,7 @@ export class ShipControls implements Controls {
 
                 const angularImpulse = Vector3.Zero();
 
-                const authority = 0.7;
+                const authority = 70_000;
 
                 const currentRoll = angularVelocity.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;

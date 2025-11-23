@@ -356,12 +356,12 @@ export class LandingComputer {
         const targetRotationSpeed =
             Math.sign(rotationAngle) * Math.min(maxRotationSpeed, 0.4 * Math.sqrt(Math.abs(rotationAngle)));
 
-        const rotationImpulseStrength = 10 * (targetRotationSpeed - currentRotationSpeed);
+        const rotationImpulseStrength = 10 * mass * (targetRotationSpeed - currentRotationSpeed);
 
         this.aggregate.body.applyAngularImpulse(rotationAxis.scale(rotationImpulseStrength));
 
         const otherRotationSpeed = angularVelocity.subtract(rotationAxis.scale(currentRotationSpeed));
-        this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-2));
+        this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-0.2 * mass));
 
         if (this.elapsedSeconds > this.maxSecondsPerPlan) {
             this.setTarget(null);
