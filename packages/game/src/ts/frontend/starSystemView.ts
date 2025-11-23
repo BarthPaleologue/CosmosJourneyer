@@ -47,7 +47,7 @@ import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotati
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
+import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
@@ -425,16 +425,20 @@ export class StarSystemView implements View {
             if (this.scene.getActiveControls() === shipControls) {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
-                characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
-                translate(
-                    characterControls.getTransform(),
-                    shipControls.getTransform().forward.scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
-                );
 
-                setRotationQuaternion(
-                    characterControls.getTransform(),
-                    getRotationQuaternion(shipControls.getTransform()).clone(),
-                );
+                const shipPosition = spaceship.getTransform().getAbsolutePosition();
+                const nearestPlanet = this.getStarSystem().getNearestCelestialBody(shipPosition);
+
+                const shipForward = shipControls.getTransform().forward;
+
+                const up = shipPosition.subtract(nearestPlanet.getTransform().getAbsolutePosition()).normalize();
+
+                const left = Vector3.Cross(Vector3.Up(), up).normalize();
+
+                characterControls
+                    .getTransform()
+                    .setAbsolutePosition(shipPosition.add(shipForward.scale(20)).add(left.scale(10)));
+
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
 
