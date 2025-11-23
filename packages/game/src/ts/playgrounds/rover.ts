@@ -173,10 +173,15 @@ export async function createRoverScene(
                 label: "Drive",
                 perform: () => {
                     setRoverActive();
+                    return Promise.resolve();
                 },
             },
         ],
     });
+
+    for (const door of rover.doors) {
+        interactionSystem.register(door);
+    }
 
     document.addEventListener("keydown", (event) => {
         if (event.key !== "e") {
@@ -212,6 +217,7 @@ export async function createRoverScene(
                     label: "spin",
                     perform: () => {
                         boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                        return Promise.resolve();
                     },
                 },
             ],

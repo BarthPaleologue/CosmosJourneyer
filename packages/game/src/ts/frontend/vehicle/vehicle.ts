@@ -23,11 +23,14 @@ import { type Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsCo
 import { clamp } from "@/utils/math";
 
 import type { Transformable } from "../universe/architecture/transformable";
+import type { Door } from "./door";
 
 export type SteeringMode = "counterPhase" | "inPhase";
 
 export class Vehicle implements Transformable {
     readonly frame: PhysicsAggregate;
+
+    readonly doors: ReadonlyArray<Door>;
 
     readonly motorConstraints: ReadonlyArray<Physics6DoFConstraint>;
     readonly steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>;
@@ -43,10 +46,12 @@ export class Vehicle implements Transformable {
 
     constructor(
         frame: PhysicsAggregate,
+        doors: ReadonlyArray<Door>,
         motorConstraints: ReadonlyArray<Physics6DoFConstraint>,
         steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>,
     ) {
         this.frame = frame;
+        this.doors = [...doors];
         this.motorConstraints = [...motorConstraints];
         this.steeringConstraints = [...steeringConstraints];
     }
@@ -104,5 +109,21 @@ export class Vehicle implements Transformable {
 
     getTransform(): TransformNode {
         return this.frame.transformNode;
+    }
+
+    dispose() {
+        for (const door of this.doors) {
+            door.dispose();
+        }
+
+        for (const motor of this.motorConstraints) {
+            motor.dispose();
+        }
+
+        for (const { constraint } of this.steeringConstraints) {
+            constraint.dispose();
+        }
+
+        this.frame.dispose();
     }
 }

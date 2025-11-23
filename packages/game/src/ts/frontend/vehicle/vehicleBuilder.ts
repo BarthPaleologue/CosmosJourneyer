@@ -36,6 +36,8 @@ import { CollisionMask } from "@/settings";
 
 import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
 import type { RenderingAssets } from "../assets/renderingAssets";
+import type { Door } from "./door";
+import { HingedDoor } from "./hingedDoor";
 import { Vehicle } from "./vehicle";
 
 type FixationModel = {
@@ -43,14 +45,6 @@ type FixationModel = {
         x?: number;
         y?: number;
         z?: number;
-    };
-};
-
-type HingeModel = {
-    axis: "x" | "y" | "z";
-    range: {
-        min: number;
-        max: number;
     };
 };
 
@@ -75,10 +69,11 @@ export class VehicleBuilder {
         connection: FixationModel;
     }> = [];
 
-    private readonly doorParts: Array<{
-        mesh: Mesh;
+    private readonly hingedDoorParts: Array<{
+        doorMesh: Mesh;
         mass: number;
-        connection: HingeModel;
+        axis: PhysicsConstraintAxis;
+        angles: { closed: number; opened: number };
     }> = [];
 
     private spawnPosition = Vector3.Zero();
@@ -120,12 +115,17 @@ export class VehicleBuilder {
         return this;
     }
 
-    addDoorPart(part: Mesh, position: Vector3, mass: number, connection: HingeModel): this {
-        part.parent = this.frame;
-        part.position = position;
+    addHingedDoor(
+        doorMesh: Mesh,
+        position: Vector3,
+        mass: number,
+        axis: PhysicsConstraintAxis,
+        angles: { closed: number; opened: number },
+    ): this {
+        doorMesh.parent = this.frame;
+        doorMesh.position = position;
 
-        this.doorParts.push({ mesh: part, mass, connection });
-
+        this.hingedDoorParts.push({ doorMesh, mass, axis, angles });
         return this;
     }
 
@@ -209,11 +209,12 @@ export class VehicleBuilder {
             frameAggregate.body.addConstraint(partAggregate.body, joint);
         }
 
-        for (const { mesh, mass, connection } of this.doorParts) {
-            const positionInFrameSpace = mesh.position.clone();
-            mesh.setParent(null);
-            const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
-            FilterMeshCollisions(partAggregate.shape);
+        const doors: Array<Door> = [];
+        for (const { doorMesh, mass, axis, angles } of this.hingedDoorParts) {
+            const positionInFrameSpace = doorMesh.position.clone();
+            doorMesh.setParent(null);
+            const doorAggregate = new PhysicsAggregate(doorMesh, PhysicsShapeType.MESH, { mass }, this.scene);
+            FilterMeshCollisions(doorAggregate.shape);
 
             const joint = new Physics6DoFConstraint(
                 {
@@ -226,30 +227,30 @@ export class VehicleBuilder {
                         minLimit: 0,
                         maxLimit: 0,
                     },
-                    {
-                        axis: PhysicsConstraintAxis.ANGULAR_X,
-                        minLimit: connection.axis === "x" ? connection.range.min : 0,
-                        maxLimit: connection.axis === "x" ? connection.range.max : 0,
-                    },
+                    /*{
+                axis: PhysicsConstraintAxis.ANGULAR_X,
+                minLimit: 0,
+                maxLimit: 0,
+            },*/
                     {
                         axis: PhysicsConstraintAxis.ANGULAR_Y,
-                        minLimit: connection.axis === "y" ? connection.range.min : 0,
-                        maxLimit: connection.axis === "y" ? connection.range.max : 0,
+                        minLimit: 0,
+                        maxLimit: 0,
                     },
                     {
                         axis: PhysicsConstraintAxis.ANGULAR_Z,
-                        minLimit: connection.axis === "z" ? connection.range.min : 0,
-                        maxLimit: connection.axis === "z" ? connection.range.max : 0,
+                        minLimit: 0,
+                        maxLimit: 0,
                     },
                 ],
                 this.scene,
             );
 
-            frameAggregate.body.addConstraint(partAggregate.body, joint);
+            frameAggregate.body.addConstraint(doorAggregate.body, joint);
 
-            joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_X, PhysicsConstraintMotorType.VELOCITY);
-            joint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, -1.0);
-            joint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, 100 * mass);
+            const door = new HingedDoor(doorAggregate, joint, axis, angles);
+
+            doors.push(door);
         }
 
         const motorConstraints: Array<Physics6DoFConstraint> = [];
@@ -313,7 +314,7 @@ export class VehicleBuilder {
             }
         }
 
-        return new Vehicle(frameAggregate, motorConstraints, steeringConstraints);
+        return new Vehicle(frameAggregate, doors, motorConstraints, steeringConstraints);
     }
 }
 
