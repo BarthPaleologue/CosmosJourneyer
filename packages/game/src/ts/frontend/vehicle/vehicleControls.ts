@@ -25,6 +25,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { Controls } from "../controls";
 import { lerpSmooth } from "../helpers/animations/interpolations";
 import { setUpVector } from "../helpers/transform";
+import { toggleDoor } from "./door";
 import { type Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
 
@@ -64,6 +65,16 @@ export class VehicleControls implements Controls {
                 this.switchToThirdPersonCamera();
             } else {
                 this.switchToFirstPersonCamera();
+            }
+        });
+
+        VehicleInputs.map.toggleDoors.on("complete", () => {
+            if (this.vehicle === null) {
+                return;
+            }
+
+            for (const door of this.vehicle.doors) {
+                toggleDoor(door);
             }
         });
     }

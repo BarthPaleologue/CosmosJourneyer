@@ -176,6 +176,12 @@ export async function createInteractionDemo(
 
     interactionSystem.register(button);
 
+    const doorHeight = 2;
+    const doorWidth = 1;
+    const doorMesh = MeshBuilder.CreateBox("door", { height: doorHeight, width: doorWidth, depth: 0.05 }, scene);
+    doorMesh.position.x = doorWidth / 2;
+    doorMesh.bakeCurrentTransformIntoVertices();
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         interactionSystem.update(deltaSeconds);

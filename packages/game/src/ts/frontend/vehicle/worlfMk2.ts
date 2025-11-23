@@ -19,6 +19,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { Scene } from "@babylonjs/core/scene";
 import earcut from "earcut";
 
@@ -29,6 +30,7 @@ import { bevelPolygon } from "../helpers/bevel";
 import { createEdgeTubeFrame } from "../helpers/meshFrame";
 import { createPanelsFromFrame } from "../helpers/panelsFromFrame";
 import { sheerAlongY } from "../helpers/sheer";
+import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
 import { WireframeTopology } from "./wireframeTopology";
@@ -82,7 +84,7 @@ export function createWolfMk2(
     });
 
     const frame = MeshBuilder.ExtrudePolygon(
-        "backDoor",
+        "frame",
         { shape: section, holes: [sectionHole], depth: frameLength },
         scene,
         earcut,
@@ -107,7 +109,8 @@ export function createWolfMk2(
         earcut,
     );
     backDoor.scaling.z = sheerScaling;
-    backDoor.rotate(Axis.X, -Math.PI / 2 - sheerAngle);
+    backDoor.rotate(Axis.Y, Math.PI);
+    backDoor.bakeCurrentTransformIntoVertices();
     backDoor.material = frameMat;
 
     const roofSolarPanelZOffset = -frameSheerAmount;
@@ -243,8 +246,8 @@ export function createWolfMk2(
         glassPanels.material = assets.materials.glass;
     }
 
-    //const canopyFrameMaterial = new CanopyFrameMaterial(textures.canopyFrame, scene);
-    //canopyFrame.material = canopyFrameMaterial.get();
+    const canopyFrameMaterial = new CanopyFrameMaterial(assets.textures.materials.styroFoam, scene);
+    canopyFrame.material = canopyFrameMaterial.get();
 
     const wheelDistanceFromCenter = frameHalfWidth + 1.0;
 
@@ -287,13 +290,16 @@ export function createWolfMk2(
         )
         .addFixedPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, {})
         .addFixedPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, {})
-        .addDoorPart(backDoor, new Vector3(0, 0, -frameLength / 2 - backDoorThickness), 100, {
-            axis: "x",
-            range: {
-                min: (2 * Math.PI) / 3,
-                max: (3 * Math.PI) / 2 - sheerAngle,
+        .addHingedDoor(
+            backDoor,
+            new Vector3(0, 0, -frameLength / 2 - backDoorThickness),
+            100,
+            PhysicsConstraintAxis.ANGULAR_X,
+            {
+                closed: Math.PI / 2 - sheerAngle,
+                opened: -Math.PI / 4,
             },
-        })
+        )
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
         .build();
