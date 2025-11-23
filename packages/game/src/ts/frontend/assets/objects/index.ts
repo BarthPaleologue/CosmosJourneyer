@@ -89,10 +89,7 @@ export async function loadObjects(
     if (!(wanderer instanceof Mesh)) {
         throw new Error("Wanderer root node is not a Mesh");
     }
-
-    for (const mesh of wanderer.getChildMeshes()) {
-        mesh.isVisible = false;
-    }
+    wanderer.setEnabled(false);
 
     wandererContainer.addAllToScene();
 

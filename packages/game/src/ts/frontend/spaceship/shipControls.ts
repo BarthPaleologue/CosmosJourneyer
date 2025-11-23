@@ -343,7 +343,7 @@ export class ShipControls implements Controls {
                     spaceship.cancelLanding();
                 }
                 spaceship.aggregate.body.applyForce(
-                    this.getTransform().up.scale(9.8 * 10 * SpaceShipControlsInputs.map.upDown.value),
+                    this.getTransform().up.scale(9.8 * 10_000 * SpaceShipControlsInputs.map.upDown.value),
                     spaceship.aggregate.body.getObjectCenterWorld(),
                 );
             }
@@ -357,7 +357,7 @@ export class ShipControls implements Controls {
 
                 const angularImpulse = Vector3.Zero();
 
-                const authority = 0.7;
+                const authority = 70_000;
 
                 const currentRoll = angularVelocity.dot(shipForward);
                 const targetRoll = this.spaceship.maxRollSpeed * inputRoll;
