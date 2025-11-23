@@ -65,7 +65,7 @@ export class InteractionSystem {
 
     private isMakingChoiceFlag = false;
 
-    private readonly cameras: Array<Camera>;
+    private readonly cameras: Set<Camera>;
 
     constructor(
         mask: number,
@@ -78,7 +78,7 @@ export class InteractionSystem {
         this.mask = mask;
         this.choiceHandler = choiceHandler;
 
-        this.cameras = [...cameras];
+        this.cameras = new Set(cameras);
 
         const interactAction = new Action({
             bindings: [InputDevices.KEYBOARD.getControl("KeyE")],
@@ -104,7 +104,15 @@ export class InteractionSystem {
     }
 
     public isEnabledForCamera(camera: Camera): boolean {
-        return this.cameras.includes(camera);
+        return this.cameras.has(camera);
+    }
+
+    public setEnabledForCamera(camera: Camera, enabled: boolean): void {
+        if (enabled) {
+            this.cameras.add(camera);
+        } else {
+            this.cameras.delete(camera);
+        }
     }
 
     private async performFirstAction() {
