@@ -163,6 +163,7 @@ export async function createRoverScene(
                 label: "Drive",
                 perform: () => {
                     setRoverActive();
+                    return Promise.resolve();
                 },
             },
         ],
@@ -206,6 +207,7 @@ export async function createRoverScene(
                     label: "spin",
                     perform: () => {
                         boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
+                        return Promise.resolve();
                     },
                 },
             ],

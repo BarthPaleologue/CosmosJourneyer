@@ -77,6 +77,7 @@ export class HingedDoor implements Interactive {
                         label: "Close",
                         perform: () => {
                             this.close();
+                            return Promise.resolve();
                         },
                     },
                 ];
@@ -87,6 +88,7 @@ export class HingedDoor implements Interactive {
                         label: "Open",
                         perform: () => {
                             this.open();
+                            return Promise.resolve();
                         },
                     },
                 ];
