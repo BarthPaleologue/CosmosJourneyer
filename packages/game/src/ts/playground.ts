@@ -37,7 +37,7 @@ canvas.height = window.innerHeight;
 
 const loadingScreen = new LoadingScreen(canvas);
 
-const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true });
+const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true, audioEngine: true });
 engine.useReverseDepthBuffer = true;
 engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();

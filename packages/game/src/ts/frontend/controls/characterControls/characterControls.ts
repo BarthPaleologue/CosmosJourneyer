@@ -80,8 +80,8 @@ export class CharacterControls implements Controls {
 
     readonly headTransform: TransformNode;
 
-    private readonly firstPersonCamera: FreeCamera;
-    private readonly thirdPersonCamera: ArcRotateCamera;
+    readonly firstPersonCamera: FreeCamera;
+    readonly thirdPersonCamera: ArcRotateCamera;
     private activeCamera: Camera;
 
     private readonly characterWalkSpeed = 1.8;
