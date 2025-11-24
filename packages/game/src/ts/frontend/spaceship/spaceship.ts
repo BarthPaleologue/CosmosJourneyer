@@ -17,8 +17,7 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import { type AbstractMesh, type TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import {
@@ -27,7 +26,6 @@ import {
     type IPhysicsCollisionEvent,
 } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -74,7 +72,7 @@ export class Spaceship implements Transformable {
 
     readonly name: string;
 
-    readonly instanceRoot: TransformNode;
+    readonly frame: AbstractMesh;
 
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
@@ -84,7 +82,7 @@ export class Spaceship implements Transformable {
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
 
-    private readonly thrusterForce = 8000;
+    private readonly thrusterForce = 8_000_000;
 
     readonly maxRollSpeed = 2.0;
     readonly maxYawSpeed = 1.0;
@@ -151,42 +149,45 @@ export class Spaceship implements Transformable {
 
         this.shipType = serializedSpaceShip.type;
 
-        const root = assets.objects.wanderer.instantiateHierarchy(null);
-        if (root === null) {
-            throw new Error("Wanderer object not found");
+        const root = assets.objects.wanderer.clone("WandererRoot");
+        const frame = root.getChildMeshes(false, (mesh) => mesh.name.includes("frame"))[0];
+        if (frame === undefined) {
+            throw new Error("Wanderer frame not found");
         }
+        frame.setParent(null);
+        root.dispose();
 
-        this.instanceRoot = root;
-        this.instanceRoot.rotationQuaternion = Quaternion.Identity();
+        this.frame = frame;
 
         this.aggregate = new PhysicsAggregate(
-            this.instanceRoot,
-            PhysicsShapeType.CONTAINER,
+            frame,
+            PhysicsShapeType.MESH,
             {
-                mass: 10,
+                mass: 10_000,
                 restitution: 0.2,
             },
             scene,
         );
-        for (const child of this.instanceRoot.getChildMeshes()) {
-            if (child.name.includes("mainThruster")) {
-                const mainThruster = new Thruster(child, this.instanceRoot.forward.negate(), this.aggregate);
-                this.mainThrusters.push(mainThruster);
-                continue;
-            }
-            const childShape = new PhysicsShapeMesh(child as Mesh, scene);
-            childShape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-            childShape.filterCollideMask = CollisionMask.EVERYTHING;
-            this.aggregate.shape.addChildFromParent(this.instanceRoot, childShape, child);
-        }
+        this.aggregate.body.setMassProperties({ centerOfMass: Vector3.Zero(), mass: 10_000 });
+
         this.aggregate.body.disablePreStep = false;
         this.aggregate.body.setAngularDamping(0.9);
 
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
         this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
 
+        console.log(this.aggregate.body.getObjectCenterWorld(), this.aggregate.body.getMassProperties().centerOfMass);
+
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
+
+        for (const child of this.frame.getChildMeshes()) {
+            if (child.name.includes("mainThruster")) {
+                const mainThruster = new Thruster(child, this.frame.forward.negate(), this.aggregate);
+                this.mainThrusters.push(mainThruster);
+                continue;
+            }
+        }
 
         this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
 
@@ -255,7 +256,7 @@ export class Spaceship implements Transformable {
     }
 
     public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
-        this.instanceRoot.setEnabled(enabled);
+        this.getTransform().setEnabled(enabled);
         setEnabledBody(this.aggregate.body, enabled, havokPlugin);
     }
 
@@ -441,7 +442,10 @@ export class Spaceship implements Transformable {
 
         this.state = ShipState.FLYING;
 
-        this.aggregate.body.applyImpulse(this.getTransform().up.scale(200), this.getTransform().getAbsolutePosition());
+        this.aggregate.body.applyImpulse(
+            this.getTransform().up.scale(200_000),
+            this.getTransform().getAbsolutePosition(),
+        );
 
         this.onTakeOff.notifyObservers();
     }
@@ -604,7 +608,6 @@ export class Spaceship implements Transformable {
                 if (currentMotionType !== PhysicsMotionType.STATIC) {
                     this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
                     this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
-                    this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
                 }
                 break;
             case ShipState.FLYING:
@@ -613,12 +616,10 @@ export class Spaceship implements Transformable {
                     if (currentMotionType !== PhysicsMotionType.ANIMATED) {
                         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
                         this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
-                        this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
                     }
                 } else if (currentMotionType !== PhysicsMotionType.DYNAMIC) {
                     this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
                     this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
-                    this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
                 }
                 break;
         }
@@ -636,7 +637,7 @@ export class Spaceship implements Transformable {
 
         if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
-            const forwardDirection = this.getTransform().getDirection(Vector3.Forward(this.scene.useRightHandedSystem));
+            const forwardDirection = this.getTransform().forward;
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
             if (this.mainEngineThrottle !== 0) {
@@ -664,7 +665,7 @@ export class Spaceship implements Transformable {
 
                 // damp other speed
                 const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
-                this.aggregate.body.applyForce(otherSpeed.scale(-5), this.aggregate.body.getObjectCenterWorld());
+                this.aggregate.body.applyForce(otherSpeed.scale(-5000), this.aggregate.body.getObjectCenterWorld());
             }
 
             this.mainThrusters.forEach((thruster) => {
@@ -803,7 +804,7 @@ export class Spaceship implements Transformable {
         this.warpTunnel.dispose();
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
-        this.instanceRoot.dispose();
+        this.frame.dispose();
 
         this.onWarpDriveEnabled.clear();
         this.onWarpDriveDisabled.clear();

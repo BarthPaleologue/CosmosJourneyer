@@ -47,7 +47,7 @@ import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotati
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion, translate } from "@/frontend/helpers/transform";
+import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
@@ -56,14 +56,13 @@ import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager"
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { alertModal } from "@/frontend/ui/dialogModal";
+import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
@@ -79,11 +78,12 @@ import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
-import { Settings } from "@/settings";
+import { CollisionMask, Settings } from "@/settings";
 
-import { AiPlayerControls } from "./player/aiPlayerControls";
+import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
+import { InteractionLayer } from "./ui/interactionLayer";
 import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
@@ -120,8 +120,6 @@ export class StarSystemView implements View {
     private isUiEnabled = true;
 
     private readonly player: Player;
-
-    private readonly aiPlayers: AiPlayerControls[] = [];
 
     private readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
@@ -222,6 +220,9 @@ export class StarSystemView implements View {
     private readonly tts: ITts;
     private readonly notificationManager: INotificationManager;
 
+    private readonly interactionSystem: InteractionSystem;
+    private readonly interactionLayer: InteractionLayer;
+
     private readonly assets: RenderingAssets;
 
     /**
@@ -260,6 +261,25 @@ export class StarSystemView implements View {
         this.tts = tts;
         this.notificationManager = notificationManager;
         this.assets = assets;
+
+        this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, [], async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
+
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
+            return choice;
+        });
+
+        this.interactionLayer = new InteractionLayer(this.interactionSystem);
+        document.body.appendChild(this.interactionLayer.root);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap ?? new Map<string, string>();
@@ -402,21 +422,23 @@ export class StarSystemView implements View {
             const shipControls = this.getSpaceshipControls();
             const spaceship = shipControls.getSpaceship();
 
-            const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-
             if (this.scene.getActiveControls() === shipControls) {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
-                characterControls.getTransform().setAbsolutePosition(shipControls.getTransform().absolutePosition);
-                translate(
-                    characterControls.getTransform(),
-                    shipControls.getTransform().forward.scale(3 + shipControls.getSpaceship().boundingExtent.z / 2),
-                );
 
-                setRotationQuaternion(
-                    characterControls.getTransform(),
-                    getRotationQuaternion(shipControls.getTransform()).clone(),
-                );
+                const shipPosition = spaceship.getTransform().getAbsolutePosition();
+                const nearestPlanet = this.getStarSystem().getNearestCelestialBody(shipPosition);
+
+                const shipForward = shipControls.getTransform().forward;
+
+                const up = shipPosition.subtract(nearestPlanet.getTransform().getAbsolutePosition()).normalize();
+
+                const left = Vector3.Cross(Vector3.Up(), up).normalize();
+
+                characterControls
+                    .getTransform()
+                    .setAbsolutePosition(shipPosition.add(shipForward.scale(20)).add(left.scale(10)));
+
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
 
@@ -424,28 +446,6 @@ export class StarSystemView implements View {
 
                 spaceship.acceleratingWarpDriveSound.setVolume(0);
                 spaceship.deceleratingWarpDriveSound.setVolume(0);
-            } else if (this.scene.getActiveControls() === characterControls) {
-                characterControls.getTransform().setEnabled(false);
-                CharacterInputs.setEnabled(false);
-
-                await this.scene.setActiveControls(shipControls);
-                SpaceShipControlsInputs.setEnabled(true);
-
-                if (spaceship.isLanded()) {
-                    const bindings = SpaceShipControlsInputs.map.upDown.bindings;
-                    const control = bindings[0]?.control;
-                    if (!(control instanceof AxisComposite)) {
-                        throw new Error("Up down is not an axis composite");
-                    }
-                    this.notificationManager.create(
-                        NotificationOrigin.SPACESHIP,
-                        NotificationIntent.INFO,
-                        i18n.t("notifications:howToLiftOff", {
-                            bindingsString: axisCompositeToString(control, keyboardLayoutMap)[1]?.[1],
-                        }),
-                        5000,
-                    );
-                }
             }
         });
 
@@ -495,11 +495,6 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.aiPlayers.forEach((aiPlayer) => {
-                aiPlayer.dispose(this.soundPlayer);
-            });
-            this.aiPlayers.length = 0;
-
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
@@ -542,22 +537,6 @@ export class StarSystemView implements View {
             spaceStation.getSubTargets().forEach((landingPad) => {
                 this.targetCursorLayer.addObject(landingPad);
             });
-
-            for (let i = 0; i < Math.ceil(Math.random() * 15); i++) {
-                const aiPlayer = new AiPlayerControls(this.universeBackend, this.scene, this.assets, this.soundPlayer);
-
-                const landingPad = spaceStation.getLandingPadManager().handleLandingRequest({
-                    minimumPadSize: LandingPadSize.SMALL,
-                });
-
-                if (landingPad === null) {
-                    aiPlayer.dispose(this.soundPlayer);
-                    break;
-                }
-
-                this.aiPlayers.push(aiPlayer);
-                aiPlayer.spaceshipControls.spaceship.spawnOnPad(landingPad);
-            }
         });
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -672,6 +651,44 @@ export class StarSystemView implements View {
         );
         this.player.instancedSpaceships.push(spaceship);
 
+        this.interactionSystem.register({
+            getPhysicsAggregate: () => spaceship.aggregate,
+            getInteractions: () => {
+                return [
+                    {
+                        label: i18n.t("interactions:pilot"),
+                        perform: async () => {
+                            const shipControls = this.getSpaceshipControls();
+                            const characterControls = this.getCharacterControls();
+
+                            characterControls.getTransform().setEnabled(false);
+                            CharacterInputs.setEnabled(false);
+
+                            await this.scene.setActiveControls(shipControls);
+                            SpaceShipControlsInputs.setEnabled(true);
+                            this.spaceShipLayer.setVisibility(true);
+
+                            if (spaceship.isLanded()) {
+                                const bindings = SpaceShipControlsInputs.map.upDown.bindings;
+                                const control = bindings[0]?.control;
+                                if (!(control instanceof AxisComposite)) {
+                                    throw new Error("Up down is not an axis composite");
+                                }
+                                this.notificationManager.create(
+                                    NotificationOrigin.SPACESHIP,
+                                    NotificationIntent.INFO,
+                                    i18n.t("notifications:howToLiftOff", {
+                                        bindingsString: axisCompositeToString(control, this.keyboardLayoutMap)[1]?.[1],
+                                    }),
+                                    5000,
+                                );
+                            }
+                        },
+                    },
+                ];
+            },
+        });
+
         if (this.spaceshipControls === null) {
             this.spaceshipControls = new ShipControls(
                 spaceship,
@@ -696,6 +713,7 @@ export class StarSystemView implements View {
                 this.characterControls = new CharacterControls(character, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+                this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
             }
         }
 
@@ -841,6 +859,9 @@ export class StarSystemView implements View {
             this.scene.getActiveControls().getTransform().getAbsolutePosition(),
             deltaSeconds,
         );
+
+        this.interactionSystem.update(deltaSeconds);
+        this.interactionLayer.update(deltaSeconds);
 
         this.spaceShipLayer.update(
             activeControls.getTransform(),

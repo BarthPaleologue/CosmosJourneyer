@@ -18,7 +18,7 @@ import { LandingPadMaterial } from "./landingPadMaterial";
 
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
-    private readonly deckAggregate: PhysicsAggregate;
+    private deckAggregate: PhysicsAggregate | null = null;
 
     private readonly deckMaterial: LandingPadMaterial;
 
@@ -64,10 +64,7 @@ export class LandingPad implements ILandingPad {
         );
         this.deck.material = this.deckMaterial;
 
-        this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
-        this.deckAggregate.body.disablePreStep = false;
-        this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+        this.enablePhysics(scene);
 
         const nbBoxes = Math.floor(Math.random() * 5);
         this.scatterAssets(assets.objects.crate, nbBoxes);
@@ -109,6 +106,26 @@ export class LandingPad implements ILandingPad {
         }
     }
 
+    disablePhysics() {
+        if (this.deckAggregate === null) {
+            return;
+        }
+
+        this.deckAggregate.dispose();
+        this.deckAggregate = null;
+    }
+
+    enablePhysics(scene: Scene) {
+        if (this.deckAggregate !== null) {
+            return;
+        }
+
+        this.deckAggregate = new PhysicsAggregate(this.deck, PhysicsShapeType.BOX, { mass: 0, friction: 10 }, scene);
+        this.deckAggregate.body.disablePreStep = false;
+        this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+    }
+
     getPadNumber(): number {
         return this.padNumber;
     }
@@ -131,7 +148,7 @@ export class LandingPad implements ILandingPad {
 
     dispose() {
         this.deck.dispose();
-        this.deckAggregate.dispose();
+        this.deckAggregate?.dispose();
         this.deckMaterial.dispose();
         this.crates.forEach((crate) => {
             crate.dispose();
