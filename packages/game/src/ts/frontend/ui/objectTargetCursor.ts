@@ -140,6 +140,7 @@ export class ObjectTargetCursor {
     }
 
     update(camera: Camera) {
+        this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
         const cameraToObject = objectRay.scale(1 / distance);
