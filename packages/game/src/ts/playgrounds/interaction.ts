@@ -109,14 +109,11 @@ export async function createInteractionDemo(
                 return null;
             }
 
-            const hasPointerLock = engine.isPointerLock;
-            if (hasPointerLock) {
-                document.exitPointerLock();
-            }
-            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
-            if (hasPointerLock) {
-                await engine.getRenderingCanvas()?.requestPointerLock();
-            }
+            scene.activeCamera?.detachControl();
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
+                useVirtualCursor: engine.isPointerLock,
+            });
+            scene.activeCamera?.attachControl(true);
             return choice;
         },
     );

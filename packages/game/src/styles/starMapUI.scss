@@ -1,4 +1,5 @@
 @use "variables";
+@use "virtualCursor";
 
 @keyframes loadingAnimation {
     0% {
@@ -14,18 +15,7 @@
     z-index: 30;
 
     .cursor {
-        position: absolute;
-        width: 2vh;
-        height: 2vh;
-        z-index: 31;
-        transform: translate(-50%, -50%);
-        outline: white 0.3vh solid;
-        background: rgba(0, 0, 0, 0.8);
-        border-radius: 50%;
-        pointer-events: none;
-        transform-origin: center;
-        scale: 1;
-        transition: scale variables.$transition-time variables.$bezier-overshoot;
+        @extend .virtualCursor;
     }
 
     .systemIcons {
