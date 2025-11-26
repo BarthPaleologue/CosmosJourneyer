@@ -44,7 +44,9 @@ export class InteractionLayer {
     private readonly fadeOutSeconds = 0.1;
     private readonly fadeInSeconds = 0.1;
 
-    constructor(interactionSystem: InteractionSystem) {
+    private readonly keyboardLayoutMap: Map<string, string> | null;
+
+    constructor(interactionSystem: InteractionSystem, keyboardLayoutMap: Map<string, string> | null) {
         this.root = document.createElement("div");
         this.root.style.position = "absolute";
         this.root.style.top = "0";
@@ -77,6 +79,7 @@ export class InteractionLayer {
         this.root.appendChild(this.crosshair);
 
         this.interactionSystem = interactionSystem;
+        this.keyboardLayoutMap = keyboardLayoutMap;
     }
 
     public update(deltaSeconds: number) {
@@ -105,7 +108,7 @@ export class InteractionLayer {
             this.interactionText.style.display = "none";
             this.crosshair.style.display = "block";
         } else {
-            const keys = pressInteractionToStrings(this.interactionSystem.pressInteraction, null);
+            const keys = pressInteractionToStrings(this.interactionSystem.pressInteraction, this.keyboardLayoutMap);
             const keyString = keys.join(" / ");
             this.interactionText.style.display = "block";
             this.interactionText.innerText = `[${keyString}] ${currentInteractions[0].label}`;

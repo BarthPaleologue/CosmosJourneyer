@@ -278,7 +278,7 @@ export class StarSystemView implements View {
             return choice;
         });
 
-        this.interactionLayer = new InteractionLayer(this.interactionSystem);
+        this.interactionLayer = new InteractionLayer(this.interactionSystem, this.keyboardLayoutMap);
         document.body.appendChild(this.interactionLayer.root);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {

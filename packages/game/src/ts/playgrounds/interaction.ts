@@ -40,6 +40,8 @@ import { Button } from "@/frontend/ui/3d/button";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 
+import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+
 import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
@@ -119,7 +121,7 @@ export async function createInteractionDemo(
         },
     );
 
-    const interactionLayer = new InteractionLayer(interactionSystem);
+    const interactionLayer = new InteractionLayer(interactionSystem, await getGlobalKeyboardLayoutMap());
     document.body.appendChild(interactionLayer.root);
 
     //spawn a bunch of boxes
