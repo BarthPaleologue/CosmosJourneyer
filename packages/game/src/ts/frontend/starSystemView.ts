@@ -268,12 +268,18 @@ export class StarSystemView implements View {
             }
 
             const hasPointerLock = engine.isPointerLock;
+            const activeCamera = scene.activeCamera;
             if (hasPointerLock) {
-                document.exitPointerLock();
+                activeCamera?.detachControl();
             }
-            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            const choice = await radialChoiceModal(
+                interactions,
+                (interaction) => interaction.label,
+                soundPlayer,
+                hasPointerLock ? { useVirtualCursor: true } : undefined,
+            );
             if (hasPointerLock) {
-                await engine.getRenderingCanvas()?.requestPointerLock();
+                activeCamera?.attachControl(true);
             }
             return choice;
         });

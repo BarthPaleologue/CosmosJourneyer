@@ -1,0 +1,18 @@
+@use "variables";
+
+.virtualCursor {
+    position: absolute;
+    width: 2vh;
+    height: 2vh;
+    z-index: 31;
+    transform: translate(-50%, -50%);
+    outline: white 0.3vh solid;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    transform-origin: center;
+    scale: 1;
+    transition: scale variables.$transition-time variables.$bezier-overshoot;
+}

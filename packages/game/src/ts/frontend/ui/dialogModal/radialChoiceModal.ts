@@ -19,10 +19,15 @@ import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import { Settings } from "@/settings";
 
+export type RadialChoiceModalOptions = {
+    useVirtualCursor: boolean;
+};
+
 export function radialChoiceModal<T>(
     choices: ReadonlyArray<T>,
     toString: (value: T) => string,
     soundPlayer: ISoundPlayer,
+    options?: Partial<RadialChoiceModalOptions>,
 ): Promise<T | null> {
     const defaultChoice = choices[0];
     if (defaultChoice === undefined) {
@@ -44,6 +49,10 @@ export function radialChoiceModal<T>(
     overlay.style.zIndex = "1000";
     overlay.style.pointerEvents = "auto";
     overlay.tabIndex = -1;
+    const useVirtualCursor = options?.useVirtualCursor ?? document.pointerLockElement !== null;
+    overlay.style.cursor = useVirtualCursor ? "none" : "default";
+
+    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
     const circleSize = 500;
     const center = circleSize / 2;
@@ -99,6 +108,14 @@ export function radialChoiceModal<T>(
 
     const getChoice = (index: number): T => choices[index] ?? defaultChoice;
 
+    const getPointerOffsetFromCenter = (clientX: number, clientY: number) => {
+        const rect = circle.getBoundingClientRect();
+        return {
+            x: clientX - (rect.left + rect.width / 2),
+            y: clientY - (rect.top + rect.height / 2),
+        };
+    };
+
     const setSelectedIndex = (index: number) => {
         selectedIndex = (index + choices.length) % choices.length;
         segments.forEach(({ path, label }, idx) => {
@@ -110,10 +127,31 @@ export function radialChoiceModal<T>(
         currentLabel.textContent = toString(getChoice(selectedIndex));
     };
 
+    const setSelectedFromPointer = (clientX: number, clientY: number) => {
+        const { x: pointerX, y: pointerY } = getPointerOffsetFromCenter(clientX, clientY);
+        let closestIndex = selectedIndex;
+        let closestDistanceSq = Number.POSITIVE_INFINITY;
+        segments.forEach(({ center: relativeCenter }, idx) => {
+            const dx = pointerX - relativeCenter.x;
+            const dy = pointerY - relativeCenter.y;
+            const distanceSq = dx * dx + dy * dy;
+            if (distanceSq < closestDistanceSq) {
+                closestDistanceSq = distanceSq;
+                closestIndex = idx;
+            }
+        });
+        if (closestIndex !== selectedIndex) {
+            setSelectedIndex(closestIndex);
+        }
+    };
+
     const cleanup = () => {
         overlay.removeEventListener("keydown", handleKeydown);
         overlay.removeEventListener("click", handleOverlayClick);
         overlay.removeEventListener("mousemove", handleMouseMove);
+        if (useVirtualCursor) {
+            detachVirtualCursorListeners();
+        }
         if (overlay.isConnected) {
             overlay.remove();
         }
@@ -144,23 +182,7 @@ export function radialChoiceModal<T>(
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-        const rect = circle.getBoundingClientRect();
-        const pointerX = event.clientX - (rect.left + rect.width / 2);
-        const pointerY = event.clientY - (rect.top + rect.height / 2);
-        let closestIndex = selectedIndex;
-        let closestDistanceSq = Number.POSITIVE_INFINITY;
-        segments.forEach(({ center: relativeCenter }, idx) => {
-            const dx = pointerX - relativeCenter.x;
-            const dy = pointerY - relativeCenter.y;
-            const distanceSq = dx * dx + dy * dy;
-            if (distanceSq < closestDistanceSq) {
-                closestDistanceSq = distanceSq;
-                closestIndex = idx;
-            }
-        });
-        if (closestIndex !== selectedIndex) {
-            setSelectedIndex(closestIndex);
-        }
+        setSelectedFromPointer(event.clientX, event.clientY);
     };
 
     const polarToCartesian = (angle: number, radius: number) => ({
@@ -297,6 +319,56 @@ export function radialChoiceModal<T>(
     }
 
     svg.appendChild(strokeOverlay);
+
+    let detachVirtualCursorListeners = () => {};
+
+    if (useVirtualCursor) {
+        const virtualCursor = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+        const cursor = document.createElement("div");
+        cursor.classList.add("virtualCursor");
+        cursor.style.position = "fixed";
+        cursor.style.left = "0";
+        cursor.style.top = "0";
+        cursor.style.zIndex = "1001";
+        overlay.appendChild(cursor);
+
+        const updateCursorPosition = (nextX: number, nextY: number) => {
+            virtualCursor.x = clamp(nextX, 0, window.innerWidth);
+            virtualCursor.y = clamp(nextY, 0, window.innerHeight);
+            cursor.style.transform = `translate(calc(${virtualCursor.x}px - 50%), calc(${virtualCursor.y}px - 50%))`;
+            setSelectedFromPointer(virtualCursor.x, virtualCursor.y);
+        };
+
+        const handleVirtualMouseMove = (event: MouseEvent) => {
+            updateCursorPosition(virtualCursor.x + event.movementX, virtualCursor.y + event.movementY);
+        };
+
+        const handleVirtualClick = (event: MouseEvent) => {
+            if (event.button !== 0) {
+                return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            finish(getChoice(selectedIndex));
+        };
+
+        const handleResize = () => {
+            updateCursorPosition(virtualCursor.x, virtualCursor.y);
+        };
+
+        updateCursorPosition(virtualCursor.x, virtualCursor.y);
+        window.addEventListener("mousemove", handleVirtualMouseMove, true);
+        window.addEventListener("mousedown", handleVirtualClick, true);
+        window.addEventListener("resize", handleResize);
+
+        detachVirtualCursorListeners = () => {
+            window.removeEventListener("mousemove", handleVirtualMouseMove, true);
+            window.removeEventListener("mousedown", handleVirtualClick, true);
+            window.removeEventListener("resize", handleResize);
+            cursor.remove();
+        };
+    }
 
     document.body.appendChild(overlay);
     overlay.focus({ preventScroll: true });
