@@ -23,6 +23,8 @@ import { Settings } from "@/settings";
 import { pressInteractionToStrings } from "../helpers/inputControlsString";
 import type { InteractionSystem } from "../inputs/interaction/interactionSystem";
 
+import "@babylonjs/core/Rendering/edgesRenderer";
+
 export class InteractionLayer {
     readonly root: HTMLDivElement;
 
