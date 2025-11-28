@@ -21,7 +21,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { type DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
-import { Scene } from "@babylonjs/core/scene";
+import { Scene, type SceneOptions } from "@babylonjs/core/scene";
 
 import { type Controls } from "@/frontend/controls";
 
@@ -42,8 +42,8 @@ export class UberScene extends Scene {
      * Creates a new UberScene.
      * @param engine The BabylonJS engine.
      */
-    constructor(engine: AbstractEngine) {
-        super(engine);
+    constructor(engine: AbstractEngine, options?: SceneOptions) {
+        super(engine, options);
         this.clearColor = new Color4(0, 0, 0, 0);
 
         this.onNewCameraAddedObservable.add((camera) => {

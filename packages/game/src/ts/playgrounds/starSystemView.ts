@@ -54,7 +54,7 @@ export async function createStarSystemViewScene(
     const ttsMock = new TtsMock();
     const notificationManager: INotificationManager = new NotificationManagerMock();
 
-    const scene = new UberScene(engine);
+    const scene = new UberScene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
     const havokPlugin = await enablePhysics(scene);
