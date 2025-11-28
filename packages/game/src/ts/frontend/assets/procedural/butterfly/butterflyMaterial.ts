@@ -19,11 +19,9 @@ import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OffsetWorldToRef } from "@/frontend/helpers/floatingOrigin";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
@@ -53,9 +51,6 @@ const ButterflyMaterialSamplerNames = {
 export class ButterflyMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
     private stars: ReadonlyArray<PointLight> = [];
-    private playerPosition: Vector3 = Vector3.Zero();
-
-    private planet: TransformNode | null = null;
 
     private scene: Scene;
 
@@ -80,20 +75,12 @@ export class ButterflyMaterial extends ShaderMaterial {
         this.backFaceCulling = false;
         this.setTexture(ButterflyMaterialSamplerNames.BUTTERFLY_TEXTURE, butterflyTexture);
 
-        const tempPlayerPosition = Vector3.Zero();
-        const tempCameraPosition = Vector3.Zero();
-        const tempPlanetPosition = Vector3.Zero();
-        const tempPlanetWorld = new Matrix();
         this.onBindObservable.add(() => {
             const floatingOriginOffset = scene.floatingOriginOffset;
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
 
-            this.getEffect().setVector3(
-                ButterflyMaterialUniformNames.PLAYER_POSITION,
-                this.playerPosition.subtractToRef(floatingOriginOffset, tempPlayerPosition),
-            );
             this.getEffect().setFloat(ButterflyMaterialUniformNames.TIME, this.elapsedSeconds);
 
             const activeCamera = this.scene.activeCamera;
@@ -103,33 +90,15 @@ export class ButterflyMaterial extends ShaderMaterial {
             }
             this.getEffect().setVector3(
                 ButterflyMaterialUniformNames.CAMERA_POSITION,
-                floatingOriginEnabled
-                    ? Vector3.ZeroReadOnly
-                    : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
+                floatingOriginEnabled ? Vector3.ZeroReadOnly : activeCamera.globalPosition,
             );
-
-            if (this.planet !== null) {
-                this.getEffect().setVector3(
-                    ButterflyMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempPlanetPosition),
-                );
-                this.getEffect().setMatrix(
-                    ButterflyMaterialUniformNames.PLANET_WORLD,
-                    OffsetWorldToRef(floatingOriginOffset, this.planet.getWorldMatrix(), tempPlanetWorld),
-                );
-            }
         });
 
         this.scene = scene;
     }
 
-    setPlanet(planet: TransformNode) {
-        this.planet = planet;
-    }
-
-    update(stars: ReadonlyArray<PointLight>, playerPosition: Vector3, deltaSeconds: number) {
+    update(stars: ReadonlyArray<PointLight>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
-        this.playerPosition = playerPosition;
     }
 }

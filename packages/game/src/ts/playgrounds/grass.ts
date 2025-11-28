@@ -69,13 +69,11 @@ export async function createGrassScene(
         },
         scene,
     );
-    ground.setEnabled(false);
 
     const grassBladeMesh = createGrassBlade(scene, 5);
     grassBladeMesh.isVisible = false;
 
     const grassMaterial = new GrassMaterial(scene, textures.noises, false);
-    grassMaterial.setPlanet(ground);
     grassBladeMesh.material = grassMaterial;
 
     const rng = seededSquirrelNoise(0);
@@ -86,10 +84,11 @@ export async function createGrassScene(
 
     const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng));
     grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
+    grassPatch.getCurrentMesh().parent = ground;
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        grassMaterial.update([light], new Vector3(0, 10, 0), deltaSeconds);
+        grassMaterial.update([light], deltaSeconds);
     });
 
     return scene;

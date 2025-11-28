@@ -18,11 +18,9 @@
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { OffsetWorldToRef } from "@/frontend/helpers/floatingOrigin";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
@@ -54,11 +52,8 @@ const GrassMaterialSamplerNames = {
 export class GrassMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
     private stars: ReadonlyArray<PointLight> = [];
-    private playerPosition: Vector3 = Vector3.Zero();
 
     private scene: Scene;
-
-    private planet: TransformNode | null = null;
 
     constructor(scene: Scene, noiseTextures: NoiseTextures, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
@@ -81,20 +76,12 @@ export class GrassMaterial extends ShaderMaterial {
         this.backFaceCulling = false;
         this.setTexture("perlinNoise", noiseTextures.seamlessPerlin);
 
-        const tempPlayerPosition = Vector3.Zero();
-        const tempCameraPosition = Vector3.Zero();
-        const tempPlanetPosition = Vector3.Zero();
-        const tempPlanetWorld = new Matrix();
         this.onBindObservable.add(() => {
             const floatingOriginOffset = scene.floatingOriginOffset;
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
 
-            this.getEffect().setVector3(
-                GrassMaterialUniformNames.PLAYER_POSITION,
-                this.playerPosition.subtractToRef(floatingOriginOffset, tempPlayerPosition),
-            );
             this.getEffect().setFloat(GrassMaterialUniformNames.TIME, this.elapsedSeconds);
 
             const activeCamera = this.scene.activeCamera;
@@ -105,33 +92,15 @@ export class GrassMaterial extends ShaderMaterial {
 
             this.getEffect().setVector3(
                 GrassMaterialUniformNames.CAMERA_POSITION,
-                floatingOriginEnabled
-                    ? Vector3.ZeroReadOnly
-                    : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
+                floatingOriginEnabled ? Vector3.ZeroReadOnly : activeCamera.globalPosition,
             );
-
-            if (this.planet !== null) {
-                this.getEffect().setVector3(
-                    GrassMaterialUniformNames.PLANET_POSITION,
-                    this.planet.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempPlanetPosition),
-                );
-                this.getEffect().setMatrix(
-                    GrassMaterialUniformNames.PLANET_WORLD,
-                    OffsetWorldToRef(floatingOriginOffset, this.planet.getWorldMatrix(), tempPlanetWorld),
-                );
-            }
         });
 
         this.scene = scene;
     }
 
-    setPlanet(planet: TransformNode) {
-        this.planet = planet;
-    }
-
-    update(stars: ReadonlyArray<PointLight>, playerPosition: Vector3, deltaSeconds: number) {
+    update(stars: ReadonlyArray<PointLight>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.stars = stars;
-        this.playerPosition = playerPosition;
     }
 }

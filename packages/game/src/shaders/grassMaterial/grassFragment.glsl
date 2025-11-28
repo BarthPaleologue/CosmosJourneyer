@@ -27,8 +27,6 @@ varying vec3 vPositionW;
 
 varying vec3 vNormalW;
 
-varying float vPlanetNdl;
-
 // This is used to render the grass blade to the depth buffer properly
 // (see https://forum.babylonjs.com/t/how-to-write-shadermaterial-to-depthrenderer/47227/3 and https://playground.babylonjs.com/#6GFJNR#161)
 #ifdef FORDEPTH

@@ -23,14 +23,7 @@ attribute vec2 uv;
 
 uniform mat4 viewProjection;
 
-//uniform mat4 world;
-
-uniform vec3 playerPosition;
-
 uniform float time;
-
-uniform vec3 planetPosition;
-uniform mat4 planetWorld;
 
 varying vec3 vPositionW;
 varying vec2 vUV;
@@ -48,14 +41,6 @@ varying float vDepthMetric;
 
 #include "../utils/rotateAround.glsl";
 
-float easeOut(float t, float a) {
-    return 1.0 - pow(1.0 - t, a);
-}
-
-float easeIn(float t, float alpha) {
-    return pow(t, alpha);
-}
-
 #include "../utils/remap.glsl";
 
 #include<instancesDeclaration>
@@ -63,7 +48,7 @@ float easeIn(float t, float alpha) {
 void main() {
     #include<instancesVertex>
 
-    mat4 worldMatrix = planetWorld * finalWorld;
+    mat4 worldMatrix = finalWorld;
     
     vec3 objectWorld = worldMatrix[3].xyz;
     vOriginalWorldPosition = objectWorld;
@@ -83,14 +68,6 @@ void main() {
     flyPosition.y += 3.0;
 
     objectWorld += butterflyForward * 0.5 * sin(0.5 * time + vOriginalWorldPosition.x * 10.0 + vOriginalWorldPosition.z * 10.0);
-
-    // avoid the player
-    vec3 playerToButterfly = objectWorld - playerPosition;
-    playerToButterfly.y = 0.0;
-    float distanceToPlayer = length(playerToButterfly);
-    if (distanceToPlayer < 2.0) {
-        objectWorld += normalize(playerToButterfly) * (2.0 - distanceToPlayer);
-    }
 
     worldMatrix[3].xyz = objectWorld;
 
