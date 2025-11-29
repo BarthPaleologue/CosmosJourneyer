@@ -17,8 +17,6 @@
 
 precision highp float;
 
-uniform float time;
-
 uniform vec3 cameraPosition;
 
 uniform sampler2D butterflyTexture;

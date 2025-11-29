@@ -42,7 +42,9 @@ export async function createSpaceStationScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
-    const scene = new Scene(engine);
+    const scene = new Scene(engine, {
+        useFloatingOrigin: true,
+    });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 

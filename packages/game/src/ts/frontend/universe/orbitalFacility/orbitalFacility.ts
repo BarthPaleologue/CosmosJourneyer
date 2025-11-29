@@ -23,9 +23,6 @@ import { type Targetable } from "@/frontend/universe/architecture/targetable";
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
-    extends OrbitalObjectBase<T>,
-        ManagesLandingPads,
-        Cullable,
-        Targetable {
+    extends OrbitalObjectBase<T>, ManagesLandingPads, Cullable, Targetable {
     getSubTargets(): ReadonlyArray<Targetable>;
 }

@@ -186,6 +186,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
             const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
             butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
+            for (const butterflyMesh of butterflyPatch.getLodMeshes()) {
+                butterflyMesh.parent = this.parent;
+            }
             this.instancePatches.push(butterflyPatch);
 
             const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
@@ -193,13 +196,10 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
                 { mesh: assets.objects.grassBlades[0], distance: 0 },
                 { mesh: assets.objects.grassBlades[1], distance: 50 },
             ]);
+            for (const grassMesh of grassPatch.getLodMeshes()) {
+                grassMesh.parent = this.parent;
+            }
             this.instancePatches.push(grassPatch);
-
-            assets.materials.grass.setPlanet(this.parent);
-            assets.materials.grassDepth.setPlanet(this.parent);
-
-            assets.materials.butterfly.setPlanet(this.parent);
-            assets.materials.butterflyDepth.setPlanet(this.parent);
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
                 depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), assets.materials.butterflyDepth);

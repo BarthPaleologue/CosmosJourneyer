@@ -845,26 +845,10 @@ export class StarSystemView implements View {
         const stellarObjects = starSystem.getStellarObjects().map((object) => object.getLight());
 
         // update dynamic materials
-        this.assets.materials.butterfly.update(
-            stellarObjects,
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds,
-        );
-        this.assets.materials.butterflyDepth.update(
-            stellarObjects,
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds,
-        );
-        this.assets.materials.grass.update(
-            stellarObjects,
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds,
-        );
-        this.assets.materials.grassDepth.update(
-            stellarObjects,
-            this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            deltaSeconds,
-        );
+        this.assets.materials.butterfly.update(stellarObjects, deltaSeconds);
+        this.assets.materials.butterflyDepth.update(stellarObjects, deltaSeconds);
+        this.assets.materials.grass.update(stellarObjects, deltaSeconds);
+        this.assets.materials.grassDepth.update(stellarObjects, deltaSeconds);
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);

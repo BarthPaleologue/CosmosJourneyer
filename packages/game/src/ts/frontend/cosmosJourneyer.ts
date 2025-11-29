@@ -441,7 +441,7 @@ export class CosmosJourneyer {
 
         const player = Player.Default(backend.universe);
 
-        const starSystemViewScene = new UberScene(engine);
+        const starSystemViewScene = new UberScene(engine, { useFloatingOrigin: true });
         starSystemViewScene.useRightHandedSystem = true;
 
         const starMapScene = new Scene(engine, { useFloatingOrigin: true });
