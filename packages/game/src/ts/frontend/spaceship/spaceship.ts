@@ -121,6 +121,8 @@ export class Spaceship implements Transformable {
     private readonly lowFuelWarningThreshold = 0.2;
 
     readonly soundInstances: SoundInstances;
+    readonly warpDriveSoundMaxVolume = 0.3;
+    readonly thrusterSoundMaxVolume = 0.5;
 
     readonly onFuelScoopStart = new Observable<void>();
     readonly onFuelScoopEnd = new Observable<void>();
@@ -588,10 +590,10 @@ export class Spaceship implements Transformable {
             this.soundInstances.thruster.setVolume(0);
 
             if (currentForwardSpeed < warpDrive.getWarpSpeed()) {
-                this.soundInstances.acceleratingWarpDrive.setVolume(1);
+                this.soundInstances.acceleratingWarpDrive.setVolume(this.warpDriveSoundMaxVolume);
                 this.soundInstances.deceleratingWarpDrive.setVolume(0);
             } else {
-                this.soundInstances.deceleratingWarpDrive.setVolume(1);
+                this.soundInstances.deceleratingWarpDrive.setVolume(this.warpDriveSoundMaxVolume);
                 this.soundInstances.acceleratingWarpDrive.setVolume(0);
             }
         }
@@ -666,7 +668,7 @@ export class Spaceship implements Transformable {
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
             if (this.mainEngineThrottle !== 0) {
-                const throttleVolume = Math.abs(this.mainEngineThrottle); // Ensure volume is positive
+                const throttleVolume = Math.abs(this.mainEngineThrottle) * this.thrusterSoundMaxVolume;
                 this.soundInstances.thruster.setVolume(throttleVolume);
             } else {
                 this.soundInstances.thruster.setVolume(0);

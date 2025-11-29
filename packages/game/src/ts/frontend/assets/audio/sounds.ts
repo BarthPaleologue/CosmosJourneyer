@@ -107,7 +107,6 @@ export async function loadSounds(
         audioEngine,
         {
             playbackRate: 1.0,
-            volume: 0.3,
             loop: true,
         },
     );
@@ -118,20 +117,17 @@ export async function loadSounds(
         audioEngine,
         {
             playbackRate: 1.0,
-            volume: 0.3,
             loop: true,
         },
     );
 
     const hyperSpaceSoundPromise = loadSoundAsync("HyperSpaceSound", hyperSpaceSoundPath, audioEngine, {
         playbackRate: 1.5,
-        volume: 0.25,
         loop: true,
     });
 
     const thrusterSoundPromise = loadSoundAsync("ThrusterSound", thrusterSoundPath, audioEngine, {
         playbackRate: 1.0,
-        volume: 0.5,
         loop: true,
     });
 

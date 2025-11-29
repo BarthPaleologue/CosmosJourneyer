@@ -390,7 +390,7 @@ export class StarSystemView implements View {
             if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
             spaceship.warpTunnel.getTransform().setEnabled(false);
-            spaceship.soundInstances.hyperSpace.setVolume(1);
+            spaceship.soundInstances.hyperSpace.setVolume(0.5);
             soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
