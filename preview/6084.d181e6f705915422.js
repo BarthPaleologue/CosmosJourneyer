@@ -1,0 +1,5 @@
+"use strict";(globalThis.webpackChunk_cosmos_journeyer_game=globalThis.webpackChunk_cosmos_journeyer_game||[]).push([["6084"],{15983:function(e,r,t){t.r(r),t.d(r,{extractHighlightsPixelShaderWGSL:()=>l});var u=t(68415);t(29969);let a="extractHighlightsPixelShader",o=`#include<helperFunctions>
+varying vUV: vec2f;var textureSamplerSampler: sampler;var textureSampler: texture_2d<f32>;uniform threshold: f32;uniform exposure: f32;
+#define CUSTOM_FRAGMENT_DEFINITIONS
+@fragment
+fn main(input: FragmentInputs)->FragmentOutputs {fragmentOutputs.color=textureSample(textureSampler,textureSamplerSampler,input.vUV);var luma: f32=dot(LuminanceEncodeApprox,fragmentOutputs.color.rgb*uniforms.exposure);fragmentOutputs.color=vec4f(step(uniforms.threshold,luma)*fragmentOutputs.color.rgb,fragmentOutputs.color.a);}`;u.l.ShadersStoreWGSL[a]||(u.l.ShadersStoreWGSL[a]=o);let l={name:a,shader:o}}}]);
