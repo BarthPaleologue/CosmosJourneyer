@@ -39,7 +39,7 @@ jobs:
         timeout-minutes: 20
         strategy:
             matrix:
-                node-version: [22]
+                node-version: [24]
         steps:
             # ─────────── Setup Environment ───────────
 
