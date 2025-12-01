@@ -390,7 +390,7 @@ export class StarSystemView implements View {
             if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
             spaceship.warpTunnel.getTransform().setEnabled(false);
-            spaceship.hyperSpaceSound.setVolume(1);
+            spaceship.soundInstances.hyperSpace.setVolume(0.5);
             soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
@@ -410,7 +410,7 @@ export class StarSystemView implements View {
 
             spaceship.hyperSpaceTunnel.setEnabled(false);
             spaceship.warpTunnel.getTransform().setEnabled(true);
-            spaceship.hyperSpaceSound.setVolume(0);
+            spaceship.soundInstances.hyperSpace.setVolume(0);
 
             spaceship.idleThrottle();
 
@@ -450,8 +450,8 @@ export class StarSystemView implements View {
 
                 await this.scene.setActiveControls(characterControls);
 
-                spaceship.acceleratingWarpDriveSound.setVolume(0);
-                spaceship.deceleratingWarpDriveSound.setVolume(0);
+                spaceship.soundInstances.acceleratingWarpDrive.setVolume(0);
+                spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
             }
         });
 
@@ -537,13 +537,13 @@ export class StarSystemView implements View {
             this.targetCursorLayer.addObject(body);
         });
 
-        spaceStations.forEach((spaceStation) => {
+        for (const spaceStation of spaceStations) {
             this.targetCursorLayer.addObject(spaceStation);
 
             spaceStation.getSubTargets().forEach((landingPad) => {
                 this.targetCursorLayer.addObject(landingPad);
             });
-        });
+        }
 
         this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
         this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
@@ -648,7 +648,7 @@ export class StarSystemView implements View {
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
 
-        const spaceship = Spaceship.Deserialize(
+        const spaceship = await Spaceship.Deserialize(
             spaceshipSerialized,
             this.player.spareSpaceshipComponents,
             this.scene,
@@ -1049,9 +1049,9 @@ export class StarSystemView implements View {
      */
     public stopBackgroundSounds() {
         const spaceship = this.getSpaceshipControls().getSpaceship();
-        spaceship.acceleratingWarpDriveSound.setVolume(0);
-        spaceship.deceleratingWarpDriveSound.setVolume(0);
-        spaceship.thrusterSound.setVolume(0);
+        spaceship.soundInstances.acceleratingWarpDrive.setVolume(0);
+        spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
+        spaceship.soundInstances.thruster.setVolume(0);
     }
 
     /**

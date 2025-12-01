@@ -57,7 +57,11 @@ export class SaveLoadingPanelContent {
             event.stopPropagation();
             dropFileZone.classList.add("dragover");
             dropFileZone.classList.remove("invalid");
-            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
+            if (event.dataTransfer === null) {
+                console.warn("event.dataTransfer is null");
+                dropFileZone.classList.add("invalid");
+                return;
+            }
             event.dataTransfer.dropEffect = "copy";
         });
 
@@ -72,8 +76,11 @@ export class SaveLoadingPanelContent {
             event.stopPropagation();
             dropFileZone.classList.remove("dragover");
 
-            if (event.dataTransfer === null) throw new Error("event.dataTransfer is null");
-            if (event.dataTransfer.files.length === 0) throw new Error("event.dataTransfer.files is empty");
+            if (event.dataTransfer === null) {
+                console.warn("event.dataTransfer is null");
+                dropFileZone.classList.add("invalid");
+                return;
+            }
 
             const file = event.dataTransfer.files[0];
             if (file === undefined) {
@@ -90,10 +97,7 @@ export class SaveLoadingPanelContent {
             fileInput.type = "file";
             fileInput.accept = "application/json";
             fileInput.onchange = async () => {
-                if (fileInput.files === null) throw new Error("fileInput.files is null");
-                if (fileInput.files.length === 0) throw new Error("fileInput.files is empty");
-
-                const file = fileInput.files[0];
+                const file = fileInput.files?.[0];
                 if (file === undefined) {
                     await alertModal("No file selected", this.soundPlayer);
                     return;
@@ -117,7 +121,9 @@ export class SaveLoadingPanelContent {
         const flatSortedSaves: Map<string, Array<DeepReadonly<Save>>> = new Map();
         for (const uuid of cmdrUuids) {
             const cmdrSaves = await saveManager.getSavesForCmdr(uuid);
-            if (cmdrSaves === undefined) continue;
+            if (cmdrSaves === undefined) {
+                continue;
+            }
             flatSortedSaves.set(uuid, cmdrSaves.manual.concat(cmdrSaves.auto));
         }
         flatSortedSaves.forEach((saves) => {
@@ -128,8 +134,11 @@ export class SaveLoadingPanelContent {
         cmdrUuids.sort((a, b) => {
             const aLatestSave = flatSortedSaves.get(a)?.at(0);
             const bLatestSave = flatSortedSaves.get(b)?.at(0);
-            if (aLatestSave === undefined || bLatestSave === undefined)
-                throw new Error("aLatestSave or bLatestSave is undefined");
+            if (aLatestSave === undefined || bLatestSave === undefined) {
+                console.warn("aLatestSave or bLatestSave is undefined", a, b, aLatestSave, bLatestSave);
+                return 0;
+            }
+
             return bLatestSave.timestamp - aLatestSave.timestamp;
         });
 
@@ -278,10 +287,14 @@ export class SaveLoadingPanelContent {
                 ? save.shipLocations[save.playerLocation.shipId]
                 : save.playerLocation;
         if (locationToUse === undefined) {
-            throw new Error("locationToUse is undefined");
+            console.warn("locationToUse is undefined");
+            saveLocation.innerText = i18n.t("sidePanel:locationNotFound");
+            return saveDiv;
         }
         if (locationToUse.type === "inSpaceship") {
-            throw new Error("Spaceship inside a spaceship is not supported yet");
+            console.warn("Spaceship inside a spaceship is not supported yet");
+            saveLocation.innerText = i18n.t("sidePanel:locationNotFound");
+            return saveDiv;
         }
         const isLanded = locationToUse.type === "atStation";
         const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);

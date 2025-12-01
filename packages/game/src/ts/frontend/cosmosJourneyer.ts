@@ -19,6 +19,8 @@ import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
 
+import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudioEngine";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
@@ -142,6 +144,7 @@ export class CosmosJourneyer {
     private constructor(
         player: Player,
         engine: AbstractEngine,
+        audioEngine: AudioEngineV2,
         assets: Assets,
         starSystemView: StarSystemView,
         starMapView: StarMapView,
@@ -185,7 +188,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.musicConductor = new MusicConductor(this.assets.audio.musics, this.starSystemView);
+        this.musicConductor = new MusicConductor(this.assets.audio.musics, audioEngine, this.starSystemView);
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;
@@ -410,14 +413,12 @@ export class CosmosJourneyer {
                       wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
                       jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
                   },
-                  audioEngine: true,
               })
             : new Engine(canvas, true, {
                   // the preserveDrawingBuffer option is required for the screenshot feature to work
                   preserveDrawingBuffer: true,
                   useHighPrecisionMatrix: true,
                   doNotHandleContextLost: true,
-                  audioEngine: true,
               });
 
         engine.useReverseDepthBuffer = true;
@@ -428,6 +429,8 @@ export class CosmosJourneyer {
             canvas.height = window.innerHeight;
             engine.resize(true);
         });
+
+        const audioEngine = await CreateAudioEngineAsync();
 
         await initI18n();
 
@@ -457,7 +460,7 @@ export class CosmosJourneyer {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const starSystemViewAssetsPromise = loadAssets(starSystemViewScene, loadingProgressMonitor);
+        const starSystemViewAssetsPromise = loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
 
         const starMapViewAssetsPromise = loadStarMapTextures(starMapScene, loadingProgressMonitor);
 
@@ -503,6 +506,7 @@ export class CosmosJourneyer {
         return new CosmosJourneyer(
             player,
             engine,
+            audioEngine,
             starSystemViewAssets,
             starSystemView,
             starMapView,
@@ -896,8 +900,11 @@ export class CosmosJourneyer {
 
         await this.starSystemView.loadStarSystem(systemModel);
 
-        if (this.state === EngineState.UNINITIALIZED) await this.init(true);
-        else this.starSystemView.initStarSystem();
+        if (this.state === EngineState.UNINITIALIZED) {
+            await this.init(true);
+        } else {
+            this.starSystemView.initStarSystem();
+        }
 
         if (playerLocation.type === "inSpaceship") {
             await this.starSystemView.switchToSpaceshipControls();

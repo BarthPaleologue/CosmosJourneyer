@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Sound } from "@babylonjs/core/Audio/sound";
+import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
 
 import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
 
@@ -48,13 +48,13 @@ export class Tts implements ITts {
     private readonly voiceLines: SpeakerVoiceLines;
 
     private isPlaying = false;
-    private soundQueue: Set<Sound> = new Set();
+    private soundQueue: Set<AbstractSound> = new Set();
 
     constructor(voiceLines: SpeakerVoiceLines) {
         this.voiceLines = voiceLines;
     }
 
-    private getLineFromVoiceLines(voiceLines: VoiceLines, line: VoiceLine): Sound {
+    private getLineFromVoiceLines(voiceLines: VoiceLines, line: VoiceLine): AbstractSound {
         switch (line) {
             case VoiceLine.INITIATING_PLANETARY_LANDING:
                 return voiceLines.initiatingPlanetaryLanding;

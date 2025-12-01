@@ -115,6 +115,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
     readonly size: number;
     readonly quality: number;
 
+    private isAcceleratingFlag = false;
+
     constructor(serializedWarpDrive: SerializedWarpDrive, enabledByDefault = false) {
         this.type = serializedWarpDrive.type;
 
@@ -178,6 +180,10 @@ export class WarpDrive implements ReadonlyWarpDrive {
         return this.state === WarpDriveState.DISENGAGING;
     }
 
+    public isAccelerating(): boolean {
+        return this.isAcceleratingFlag;
+    }
+
     /**
      * Computes the target speed of the warp drive based on the distance to the closest body and the user throttle.
      * @param closestObjectDistance The distance to the closest body in m.
@@ -223,11 +229,15 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private updateWarpDriveSpeed(deltaSeconds: number): void {
         // use lerp smoothing to reach target speed, while making it a bit harder to decelerate
-        this.currentSpeed =
+        let newSpeed =
             this.currentSpeed < this.maxTargetSpeed
                 ? lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.1, deltaSeconds) // acceleration
                 : lerpSmooth(this.currentSpeed, this.throttle * this.maxTargetSpeed, 0.6, deltaSeconds); // deceleration
-        this.currentSpeed = clamp(this.currentSpeed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed);
+        newSpeed = clamp(newSpeed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed);
+
+        const hysteresis = -1e3; // Avoid flickering between accelerating and decelerating states
+        this.isAcceleratingFlag = newSpeed > this.currentSpeed + hysteresis;
+        this.currentSpeed = newSpeed;
     }
 
     /**
