@@ -53,9 +53,7 @@ export class AiSpaceshipControls implements Controls {
         return false;
     }
 
-    update(): Vector3 {
-        return Vector3.Zero();
-    }
+    update(): void {}
 
     dispose(soundPlayer: ISoundPlayer) {
         this.spaceship.dispose(soundPlayer);

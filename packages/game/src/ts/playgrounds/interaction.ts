@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractMesh,
     Color3,
     CreateAudioEngineAsync,
     DirectionalLight,
@@ -32,7 +31,7 @@ import {
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
@@ -65,7 +64,7 @@ export async function createInteractionDemo(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const characters = await loadCharacters(scene, progressMonitor);
+    const characters = await loadHumanoidPrefabs(scene, progressMonitor);
 
     const sounds = await loadSounds(audioEngine, progressMonitor);
 
@@ -89,12 +88,12 @@ export async function createInteractionDemo(
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
     groundAggregate.shape.material.friction = 2;
 
-    const characterObject = characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
+    const characterModel = characters.default.spawn();
+    if (!characterModel.success) {
+        throw new Error(`Failed to instantiate character: ${characterModel.error}`);
     }
 
-    const character = new CharacterControls(characterObject, scene);
+    const character = new CharacterControls(characterModel.value, scene);
     character.getActiveCamera().attachControl();
 
     CharacterInputs.setEnabled(true);

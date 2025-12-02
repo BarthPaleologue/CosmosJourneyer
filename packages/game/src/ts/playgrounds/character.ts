@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractMesh,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -30,7 +29,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 
@@ -49,7 +48,7 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const characters = await loadCharacters(scene, progressMonitor);
+    const characters = await loadHumanoidPrefabs(scene, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -59,14 +58,14 @@ export async function createCharacterDemoScene(
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const characterObject = characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
-    }
-
     const groundRadius = 40;
 
-    const character = new CharacterControls(characterObject, scene);
+    const characterModel = characters.default.spawn();
+    if (!characterModel.success) {
+        throw new Error(`Failed to instantiate character: ${characterModel.error}`);
+    }
+
+    const character = new CharacterControls(characterModel.value, scene);
     character.getTransform().position.y = groundRadius;
 
     enableShadows(light);

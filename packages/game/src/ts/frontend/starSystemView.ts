@@ -20,7 +20,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
@@ -712,14 +711,14 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const character = this.assets.objects.characters.default.instantiateHierarchy(null);
-            if (!(character instanceof Mesh)) {
-                await alertModal("Character model is not a mesh!", this.soundPlayer);
-            } else {
-                this.characterControls = new CharacterControls(character, this.scene);
+            const characterModel = this.assets.objects.humanoids.default.spawn();
+            if (characterModel.success) {
+                this.characterControls = new CharacterControls(characterModel.value, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
                 this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
+            } else {
+                await alertModal(characterModel.error, this.soundPlayer);
             }
         }
 

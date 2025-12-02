@@ -31,7 +31,7 @@ import { type Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
 import { loadAsteroids, type Asteroid } from "./asteroids";
-import { loadCharacters, type Characters } from "./characters";
+import { loadHumanoidPrefabs, type HumanoidPrefabs } from "./humanoids";
 import { loadAssetInContainerAsync } from "./utils";
 
 import bananaPath from "@assets/banana/banana.glb";
@@ -46,7 +46,7 @@ export type Objects = {
     wanderer: Mesh;
     butterfly: Mesh;
     banana: Mesh;
-    characters: Readonly<Characters>;
+    humanoids: Readonly<HumanoidPrefabs>;
     rock: Mesh;
     asteroids: ReadonlyArray<Asteroid>;
     tree: Mesh;
@@ -64,7 +64,7 @@ export async function loadObjects(
     // Start loading all mesh assets
     const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);
     const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
-    const characterPromise = loadCharacters(scene, progressMonitor);
+    const humanoidsPromise = loadHumanoidPrefabs(scene, progressMonitor);
     const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
     const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
@@ -165,7 +165,7 @@ export async function loadObjects(
         tree,
         asteroids: await asteroidPromises,
         rock,
-        characters: await characterPromise,
+        humanoids: await humanoidsPromise,
         banana,
         butterfly,
         grassBlades,

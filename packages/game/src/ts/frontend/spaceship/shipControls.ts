@@ -312,7 +312,7 @@ export class ShipControls implements Controls {
         return this.closestLandableFacility;
     }
 
-    public update(deltaSeconds: number): Vector3 {
+    public update(deltaSeconds: number): void {
         const spaceship = this.getSpaceship();
         spaceship.update(deltaSeconds);
 
@@ -405,8 +405,6 @@ export class ShipControls implements Controls {
         this.thirdPersonCamera.fov = lerpSmooth(this.thirdPersonCamera.fov, this.targetFov, 0.08, deltaSeconds);
 
         this.getActiveCamera().getViewMatrix(true);
-
-        return this.getTransform().getAbsolutePosition();
     }
 
     syncCameraTransform() {

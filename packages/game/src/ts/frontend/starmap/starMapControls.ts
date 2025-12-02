@@ -71,7 +71,7 @@ export class StarMapControls implements Controls {
         return false;
     }
 
-    public update(deltaSeconds: number): Vector3 {
+    public update(deltaSeconds: number) {
         const inertiaFactor = 0.15;
         const [xMove, zMove] = StarMapInputs.map.move.value;
         this.inertia.x = lerpSmooth(this.inertia.x, xMove, inertiaFactor, deltaSeconds);
@@ -92,8 +92,6 @@ export class StarMapControls implements Controls {
             .addInPlace(cameraUp.scaleInPlace(this.inertia.y * deltaSeconds * this.speed));
 
         this.transform.position.addInPlace(displacement);
-
-        return displacement;
     }
 
     public getSpeed(): number {
