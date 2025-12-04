@@ -25,14 +25,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { Settings } from "@/settings";
 
 import { type Controls } from "../";
 import { CharacterInputs } from "./characterControlsInputs";
-import { HumanoidAvatar } from "./humanoidAvatar";
+import type { HumanoidAvatar } from "./humanoidAvatar";
 
 export class CharacterControls implements Controls {
     readonly firstPersonCamera: FreeCamera;
@@ -45,8 +44,8 @@ export class CharacterControls implements Controls {
 
     private readonly avatar: HumanoidAvatar;
 
-    constructor(character: HumanoidInstance, scene: Scene) {
-        this.avatar = new HumanoidAvatar(character, scene);
+    constructor(avatar: HumanoidAvatar, scene: Scene) {
+        this.avatar = avatar;
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.speed = 0;

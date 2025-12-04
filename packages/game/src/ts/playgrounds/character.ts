@@ -68,8 +68,10 @@ export async function createCharacterDemoScene(
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const character = new CharacterControls(humanoidInstance.value, scene);
-    character.getTransform().position.y = groundRadius;
+    const character = new HumanoidAvatar(humanoidInstance.value, scene);
+
+    const characterControls = new CharacterControls(character, scene);
+    characterControls.getTransform().position.y = groundRadius;
 
     const humanoid2 = humanoids.default.spawn();
     if (!humanoid2.success) {
@@ -90,10 +92,10 @@ export async function createCharacterDemoScene(
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("thirdPerson") !== null) {
-        character.setThirdPersonCameraActive();
+        characterControls.setThirdPersonCameraActive();
     }
 
-    character.getActiveCamera().attachControl();
+    characterControls.getActiveCamera().attachControl();
 
     CharacterInputs.setEnabled(true);
 
@@ -109,19 +111,19 @@ export async function createCharacterDemoScene(
         getTransform: () => ground,
     };
 
-    character.setClosestWalkableObject(walkableObject);
+    characterControls.setClosestWalkableObject(walkableObject);
 
     scene.onBeforeRenderObservable.add(() => {
-        if (character.getActiveCamera() !== scene.activeCamera) {
+        if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
-            const camera = character.getActiveCamera();
+            const camera = characterControls.getActiveCamera();
             camera.attachControl();
             scene.activeCamera = camera;
         }
 
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        character.update(deltaSeconds);
+        characterControls.update(deltaSeconds);
         character2.update(deltaSeconds, walkableObject);
         character3.update(deltaSeconds, walkableObject);
     });

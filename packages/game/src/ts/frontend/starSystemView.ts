@@ -79,6 +79,7 @@ import { type DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
+import { HumanoidAvatar } from "./controls/characterControls/humanoidAvatar";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -711,14 +712,15 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const characterModel = this.assets.objects.humanoids.default.spawn();
-            if (characterModel.success) {
-                this.characterControls = new CharacterControls(characterModel.value, this.scene);
+            const humanoidInstance = this.assets.objects.humanoids.default.spawn();
+            if (humanoidInstance.success) {
+                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.scene);
+                this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
                 this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
             } else {
-                await alertModal(characterModel.error, this.soundPlayer);
+                await alertModal(humanoidInstance.error, this.soundPlayer);
             }
         }
 
