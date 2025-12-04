@@ -113,6 +113,8 @@ export async function createCharacterDemoScene(
 
     characterControls.setClosestWalkableObject(walkableObject);
 
+    character3.dance();
+
     scene.onBeforeRenderObservable.add(() => {
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
