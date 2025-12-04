@@ -77,6 +77,10 @@ export class CharacterControls implements Controls {
                 this.setThirdPersonCameraActive();
             }
         });
+
+        CharacterInputs.map.dance.on("complete", () => {
+            this.avatar.dance();
+        });
     }
 
     public setFirstPersonCameraActive() {
@@ -140,7 +144,6 @@ export class CharacterControls implements Controls {
             xMove,
             yMove,
             CharacterInputs.map.run.value,
-            CharacterInputs.map.samba.value,
             CharacterInputs.map.jump.state === "complete",
         );
 

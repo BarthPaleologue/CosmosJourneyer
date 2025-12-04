@@ -31,10 +31,12 @@ const jumpAction = new Action({
 
 const jumpInteraction = new PressInteraction(jumpAction);
 
-const sambaKey = keyboard.getControl("KeyX");
-const sambaAction = new Action({
-    bindings: [sambaKey],
-});
+const danceKey = keyboard.getControl("KeyX");
+const danceInteraction = new PressInteraction(
+    new Action({
+        bindings: [danceKey],
+    }),
+);
 
 const runKey = keyboard.getControl("ShiftLeft");
 const runAction = new Action({
@@ -50,13 +52,13 @@ const toggleCameraInteraction = new PressInteraction(
 export const CharacterInputs = new InputMap<{
     move: Action<[number, number]>;
     jump: PressInteraction;
-    samba: Action;
+    dance: PressInteraction;
     run: Action;
     toggleCamera: PressInteraction;
 }>("CharacterInputs", {
     move: moveAction,
     jump: jumpInteraction,
-    samba: sambaAction,
+    dance: danceInteraction,
     run: runAction,
     toggleCamera: toggleCameraInteraction,
 });

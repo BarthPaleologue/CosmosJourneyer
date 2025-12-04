@@ -73,7 +73,7 @@ export class HumanoidAvatar implements Transformable {
     private readonly idleAnim: AnimationGroupWrapper;
     private readonly walkAnim: AnimationGroupWrapper;
     private readonly walkBackAnim: AnimationGroupWrapper;
-    private readonly sambaAnim: AnimationGroupWrapper;
+    private readonly danceAnim: AnimationGroupWrapper;
     private readonly runningAnim: AnimationGroupWrapper;
 
     private readonly swimmingIdleAnim: AnimationGroupWrapper;
@@ -112,7 +112,7 @@ export class HumanoidAvatar implements Transformable {
         this.idleAnim = new AnimationGroupWrapper("idle", instance.animations.idle, 1, true);
         this.walkAnim = new AnimationGroupWrapper("walk", instance.animations.walk, 0, true);
         this.walkBackAnim = new AnimationGroupWrapper("walkBack", instance.animations.walkBackward, 0, true);
-        this.sambaAnim = new AnimationGroupWrapper("samba", instance.animations.dance, 0, true);
+        this.danceAnim = new AnimationGroupWrapper("dance", instance.animations.dance, 0, true);
         this.runningAnim = new AnimationGroupWrapper("running", instance.animations.run, 0, true);
         this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", instance.animations.fall, 0, true);
         this.skyDivingAnim = new AnimationGroupWrapper("skydiving", instance.animations.skyDive, 0, true);
@@ -127,7 +127,7 @@ export class HumanoidAvatar implements Transformable {
         this.nonIdleAnimations = [
             this.walkAnim,
             this.walkBackAnim,
-            this.sambaAnim,
+            this.danceAnim,
             this.runningAnim,
             this.fallingIdleAnim,
             this.jumpingAnim,
@@ -139,7 +139,7 @@ export class HumanoidAvatar implements Transformable {
         this.groundedState = new AnimationState(this.idleAnim, [
             this.walkAnim,
             this.walkBackAnim,
-            this.sambaAnim,
+            this.danceAnim,
             this.runningAnim,
         ]);
         this.fallingState = new AnimationState(this.fallingIdleAnim, [this.skyDivingAnim]);
@@ -238,16 +238,23 @@ export class HumanoidAvatar implements Transformable {
                 this.root.forward.scale(-this.runSpeed * deltaSeconds * this.runningAnim.weight),
             );
         }
+
+        this.targetAnim = this.currentAnimationState.currentAnimation;
+
+        let weightSum = 0;
+        for (const animation of this.nonIdleAnimations) {
+            if (animation === this.targetAnim) {
+                animation.moveTowardsWeight(1, deltaSeconds);
+            } else {
+                animation.moveTowardsWeight(0, deltaSeconds);
+            }
+            weightSum += animation.weight;
+        }
+
+        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
     }
 
-    public move(
-        deltaSeconds: number,
-        xMove: number,
-        yMove: number,
-        running: number,
-        sambaing: number,
-        jumping: boolean,
-    ): void {
+    public move(deltaSeconds: number, xMove: number, yMove: number, running: number, jumping: boolean): void {
         const displacement = Vector3.Zero();
 
         // Translation
@@ -258,18 +265,15 @@ export class HumanoidAvatar implements Transformable {
                 this.root.moveWithCollisions(this.root.forward.scale(-this.swimSpeed * deltaSeconds));
             }
         } else if (this.currentAnimationState === this.groundedState) {
-            this.groundedState.currentAnimation = this.idleAnim;
+            if (this.groundedState.currentAnimation !== this.danceAnim) {
+                this.groundedState.currentAnimation = this.idleAnim;
+            }
             if (yMove > 0) {
                 this.groundedState.currentAnimation = this.walkAnim;
             } else if (yMove < 0) {
                 this.groundedState.currentAnimation = this.walkBackAnim;
             } else if (running > 0) {
                 this.groundedState.currentAnimation = this.runningAnim;
-            }
-
-            // Samba!
-            if (sambaing > 0) {
-                this.groundedState.currentAnimation = this.sambaAnim;
             }
 
             if (jumping) {
@@ -288,23 +292,13 @@ export class HumanoidAvatar implements Transformable {
             }
         }
 
-        this.targetAnim = this.currentAnimationState.currentAnimation;
-
-        let weightSum = 0;
-        for (const animation of this.nonIdleAnimations) {
-            if (animation === this.targetAnim) {
-                animation.moveTowardsWeight(1, deltaSeconds);
-            } else {
-                animation.moveTowardsWeight(0, deltaSeconds);
-            }
-            weightSum += animation.weight;
-        }
-
-        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
-
         this.root.computeWorldMatrix(true);
 
         translate(this.getTransform(), displacement);
+    }
+
+    public dance() {
+        this.groundedState.currentAnimation = this.danceAnim;
     }
 
     public dispose() {
