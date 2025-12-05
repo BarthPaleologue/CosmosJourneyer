@@ -22,7 +22,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { TransformNode } from "@babylonjs/core/Meshes";
+import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -43,9 +43,12 @@ export class CharacterControls implements Controls {
     private readonly characterRotationSpeed = 6;
 
     private readonly avatar: HumanoidAvatar;
+    private readonly headTransform: TransformNode;
 
     constructor(avatar: HumanoidAvatar, scene: Scene) {
         this.avatar = avatar;
+        this.headTransform = new TransformNode("characterHeadTransform", scene);
+        this.headTransform.attachToBone(this.avatar.instance.head.bone, this.avatar.instance.head.attachmentMesh);
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.speed = 0;
@@ -127,8 +130,9 @@ export class CharacterControls implements Controls {
 
     public update(deltaSeconds: number): void {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
+        this.headTransform.computeWorldMatrix(true);
         this.firstPersonCamera.position = Vector3.TransformCoordinates(
-            this.avatar.instance.head.getAbsolutePosition(),
+            this.headTransform.getAbsolutePosition(),
             inverseTransform,
         );
 
@@ -167,6 +171,7 @@ export class CharacterControls implements Controls {
 
     dispose() {
         this.avatar.dispose();
+        this.headTransform.dispose();
         this.firstPersonCamera.dispose();
         this.thirdPersonCamera.dispose();
     }

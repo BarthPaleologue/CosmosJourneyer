@@ -16,7 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
+import type { Bone } from "@babylonjs/core/Bones/bone";
 import type { Skeleton } from "@babylonjs/core/Bones/skeleton";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -48,7 +50,10 @@ export type HumanoidAnimations = {
 
 export type HumanoidInstance = {
     root: TransformNode;
-    head: TransformNode;
+    head: {
+        bone: Bone;
+        attachmentMesh: AbstractMesh;
+    };
     skeleton: Skeleton;
     animations: HumanoidAnimations;
 };
@@ -113,24 +118,26 @@ export async function loadHumanoidPrefabs(
                 return err("DefaultHumanoid skeleton not found");
             }
 
-            const characterNode = root.getChildMeshes().find((mesh) => mesh.name.includes("Alpha_Joints"));
-            if (characterNode === undefined) {
-                return err("Could not find the Alpha_Joints node in the character mesh");
-            }
-
             const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:HeadTop_End");
             const headBone = skeleton.bones[headBoneIndex];
             if (headBone === undefined) {
                 return err("Could not find the head bone in the skeleton");
             }
 
-            const head = new TransformNode("headTransform", scene);
-            head.attachToBone(headBone, characterNode);
+            const headAttachmentMesh = root
+                .getChildMeshes()
+                .find((mesh): mesh is AbstractMesh => mesh.skeleton === skeleton);
+            if (headAttachmentMesh === undefined) {
+                return err("Could not find a mesh bound to the humanoid skeleton");
+            }
 
             return ok({
                 root,
                 skeleton,
-                head,
+                head: {
+                    bone: headBone,
+                    attachmentMesh: headAttachmentMesh,
+                },
                 animations: {
                     idle: idleAnim,
                     walk: walkAnim,
