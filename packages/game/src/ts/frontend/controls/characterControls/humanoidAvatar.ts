@@ -254,9 +254,7 @@ export class HumanoidAvatar implements Transformable {
         this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
     }
 
-    public move(deltaSeconds: number, xMove: number, yMove: number, running: number, jumping: boolean): void {
-        const displacement = Vector3.Zero();
-
+    public move(deltaSeconds: number, xMove: number, yMove: number, running: number): void {
         // Translation
         if (this.currentAnimationState === this.swimmingState) {
             this.swimmingState.currentAnimation = this.swimmingIdleAnim;
@@ -275,15 +273,6 @@ export class HumanoidAvatar implements Transformable {
             } else if (running > 0) {
                 this.groundedState.currentAnimation = this.runningAnim;
             }
-
-            if (jumping) {
-                this.targetAnim = this.jumpingAnim;
-                this.jumpingAnim.weight = 1;
-                this.jumpingAnim.group.stop();
-                this.jumpingAnim.group.play();
-                this.currentAnimationState = this.fallingState;
-                this.jumpVelocity = this.getTransform().up.scale(10.0).add(this.getTransform().forward.scale(-5.0));
-            }
         } else if (this.currentAnimationState === this.fallingState) {
             if (this.distanceToGround < 30) {
                 this.fallingState.currentAnimation = this.fallingIdleAnim;
@@ -293,12 +282,19 @@ export class HumanoidAvatar implements Transformable {
         }
 
         this.root.computeWorldMatrix(true);
-
-        translate(this.getTransform(), displacement);
     }
 
     public dance() {
         this.groundedState.currentAnimation = this.danceAnim;
+    }
+
+    public jump() {
+        this.targetAnim = this.jumpingAnim;
+        this.jumpingAnim.weight = 1;
+        this.jumpingAnim.group.stop();
+        this.jumpingAnim.group.play();
+        this.currentAnimationState = this.fallingState;
+        this.jumpVelocity = this.getTransform().up.scale(6.0).add(this.getTransform().forward.scale(-2.0));
     }
 
     public dispose() {

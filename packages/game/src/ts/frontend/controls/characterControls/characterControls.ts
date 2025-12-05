@@ -81,6 +81,10 @@ export class CharacterControls implements Controls {
         CharacterInputs.map.dance.on("complete", () => {
             this.avatar.dance();
         });
+
+        CharacterInputs.map.jump.on("complete", () => {
+            this.avatar.jump();
+        });
     }
 
     public setFirstPersonCameraActive() {
@@ -139,13 +143,7 @@ export class CharacterControls implements Controls {
 
         // https://playground.babylonjs.com/#AJA5J6#77
 
-        this.avatar.move(
-            deltaSeconds,
-            xMove,
-            yMove,
-            CharacterInputs.map.run.value,
-            CharacterInputs.map.jump.state === "complete",
-        );
+        this.avatar.move(deltaSeconds, xMove, yMove, CharacterInputs.map.run.value);
 
         const isMoving = xMove !== 0 || yMove !== 0;
 
