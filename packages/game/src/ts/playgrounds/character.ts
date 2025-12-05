@@ -115,6 +115,8 @@ export async function createCharacterDemoScene(
 
     character3.dance();
 
+    const headTrackingTarget = Vector3.Zero();
+
     scene.onBeforeRenderObservable.add(() => {
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
@@ -124,10 +126,16 @@ export async function createCharacterDemoScene(
             scene.activeCamera = camera;
         }
 
+        const targetHead = character.instance.head;
+        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, headTrackingTarget);
+
         const deltaSeconds = engine.getDeltaTime() / 1000;
         characterControls.update(deltaSeconds);
         character2.update(deltaSeconds, walkableObject);
         character3.update(deltaSeconds, walkableObject);
+
+        character2.lookAt(headTrackingTarget);
+        character3.lookAt(headTrackingTarget);
     });
 
     return scene;

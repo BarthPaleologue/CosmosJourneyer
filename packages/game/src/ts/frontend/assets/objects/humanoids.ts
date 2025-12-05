@@ -118,7 +118,7 @@ export async function loadHumanoidPrefabs(
                 return err("DefaultHumanoid skeleton not found");
             }
 
-            const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:HeadTop_End");
+            const headBoneIndex = skeleton.getBoneIndexByName("mixamorig:Head");
             const headBone = skeleton.bones[headBoneIndex];
             if (headBone === undefined) {
                 return err("Could not find the head bone in the skeleton");

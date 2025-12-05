@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
+import { BoneLookController } from "@babylonjs/core/Bones/boneLookController";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -64,6 +66,8 @@ class AnimationState {
 
 export class HumanoidAvatar implements Transformable {
     readonly instance: HumanoidInstance;
+
+    readonly headLookController: BoneLookController;
 
     readonly walkSpeed = 1.8;
     readonly walkSpeedBackwards = 1.2;
@@ -147,6 +151,17 @@ export class HumanoidAvatar implements Transformable {
         this.currentAnimationState = this.groundedState;
 
         this.targetAnim = this.idleAnim;
+
+        this.headLookController = new BoneLookController(
+            this.instance.head.attachmentMesh,
+            this.instance.head.bone,
+            Vector3.Zero(),
+            {
+                upAxis: Vector3.UpReadOnly,
+                upAxisSpace: Space.BONE,
+                slerpAmount: 0.2,
+            },
+        );
     }
 
     public getTransform(): TransformNode {
@@ -252,6 +267,8 @@ export class HumanoidAvatar implements Transformable {
         }
 
         this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
+
+        this.headLookController.update();
     }
 
     public move(deltaSeconds: number, xMove: number, yMove: number, running: number): void {
@@ -295,6 +312,22 @@ export class HumanoidAvatar implements Transformable {
         this.jumpingAnim.group.play();
         this.currentAnimationState = this.fallingState;
         this.jumpVelocity = this.getTransform().up.scale(6.0).add(this.getTransform().forward.scale(-2.0));
+    }
+
+    public lookAt(target: Vector3) {
+        this.headLookController.target.copyFrom(target);
+        this.headLookController.minYaw = -Math.PI / 4;
+        this.headLookController.maxYaw = Math.PI / 4;
+        this.headLookController.minPitch = -Math.PI / 6;
+        this.headLookController.maxPitch = Math.PI / 6;
+    }
+
+    public resetLookAt() {
+        this.headLookController.target.copyFrom(Vector3.Zero());
+        this.headLookController.minYaw = 0;
+        this.headLookController.maxYaw = 0;
+        this.headLookController.minPitch = 0;
+        this.headLookController.maxPitch = 0;
     }
 
     public dispose() {
