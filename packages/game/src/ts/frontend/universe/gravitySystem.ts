@@ -30,8 +30,16 @@ type CelestialBody = {
 
 export class GravitySystem {
     private readonly scene: Scene;
-    constructor(scene: Scene) {
+
+    private celestialBodies: ReadonlyArray<CelestialBody>;
+
+    constructor(celestialBodies: ReadonlyArray<CelestialBody>, scene: Scene) {
         this.scene = scene;
+        this.celestialBodies = [...celestialBodies];
+    }
+
+    setCelestialBodies(celestialBodies: ReadonlyArray<CelestialBody>) {
+        this.celestialBodies = [...celestialBodies];
     }
 
     private filterPhysicsBodies(nodes: ReadonlyArray<TransformNode>): Array<PhysicsBody> {
@@ -56,31 +64,34 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    public applyGravity(celestialBodies: ReadonlyArray<CelestialBody>) {
-        for (const physicsBody of this.getPhysicsBodies()) {
-            const objectMass = physicsBody.getMassProperties().mass;
-            if (objectMass === undefined || objectMass === 0) {
+    public computeGravity(body: PhysicsBody) {
+        const objectMass = body.getMassProperties().mass;
+        if (objectMass === undefined || objectMass === 0) {
+            return Vector3.Zero();
+        }
+
+        const totalForce = Vector3.Zero();
+        for (const celestialBody of this.celestialBodies) {
+            const scaledDirection = celestialBody.position.subtract(body.transformNode.getAbsolutePosition());
+            const distance = scaledDirection.length();
+            //TODO: when 2.0 comes along, use the correct formula
+            //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
+            const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
+            if (forceMagnitude <= 1e-6) {
                 continue;
             }
 
-            const totalForce = Vector3.Zero();
-            for (const celestialBody of celestialBodies) {
-                const scaledDirection = celestialBody.position.subtract(
-                    physicsBody.transformNode.getAbsolutePosition(),
-                );
-                const distance = scaledDirection.length();
-                //TODO: when 2.0 comes along, use the correct formula
-                //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
-                const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
-                if (forceMagnitude <= 1e-6) {
-                    continue;
-                }
+            const force = scaledDirection.scale(forceMagnitude / distance);
+            totalForce.addInPlace(force);
+        }
 
-                const force = scaledDirection.scale(forceMagnitude / distance);
-                totalForce.addInPlace(force);
-            }
+        return totalForce;
+    }
 
-            physicsBody.applyForce(totalForce, physicsBody.getObjectCenterWorld());
+    public update() {
+        for (const physicsBody of this.getPhysicsBodies()) {
+            const gravity = this.computeGravity(physicsBody);
+            physicsBody.applyForce(gravity, physicsBody.getObjectCenterWorld());
         }
     }
 }

@@ -108,21 +108,26 @@ export async function createCharacterDemoScene(
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
 
-    const gravitySystem = new GravitySystem(scene);
-
-    character3.dance();
-
-    const headTrackingTarget = Vector3.Zero();
-
-    scene.onBeforeRenderObservable.add(() => {
-        gravitySystem.applyGravity([
+    const gravitySystem = new GravitySystem(
+        [
             {
                 name: "Planet",
                 mass: 100000,
                 position: ground.position,
                 radius: groundRadius,
             },
-        ]);
+        ],
+        scene,
+    );
+
+    character3.dance();
+
+    const headTrackingTarget = Vector3.Zero();
+
+    const characters = [character, character2, character3];
+
+    scene.onBeforeRenderObservable.add(() => {
+        gravitySystem.update();
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
