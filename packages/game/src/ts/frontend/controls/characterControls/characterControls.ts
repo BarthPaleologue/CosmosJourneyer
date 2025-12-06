@@ -36,7 +36,7 @@ export class CharacterControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
     private activeCamera: Camera;
 
-    private readonly characterRotationSpeed = 6;
+    private readonly characterRotationSpeed = 4;
 
     private readonly avatar: HumanoidAvatar;
     private readonly headTransform: TransformNode;
