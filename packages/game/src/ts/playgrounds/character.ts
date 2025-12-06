@@ -35,6 +35,7 @@ import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { setUpVector } from "@/frontend/helpers/transform";
 import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
@@ -143,6 +144,11 @@ export async function createCharacterDemoScene(
         characterControls.update(deltaSeconds);
         character2.update(deltaSeconds);
         character3.update(deltaSeconds);
+
+        for (const character of characters) {
+            const upDirection = gravitySystem.computeGravity(character.aggregate.body).normalize().negateInPlace();
+            setUpVector(character.getTransform(), upDirection);
+        }
 
         character2.lookAt(headTrackingTarget);
         character3.lookAt(headTrackingTarget);
