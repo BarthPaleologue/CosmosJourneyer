@@ -20,7 +20,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
@@ -80,6 +79,7 @@ import { type DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
+import { HumanoidAvatar } from "./controls/characterControls/humanoidAvatar";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -712,14 +712,15 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const character = this.assets.objects.characters.default.instantiateHierarchy(null);
-            if (!(character instanceof Mesh)) {
-                await alertModal("Character model is not a mesh!", this.soundPlayer);
-            } else {
-                this.characterControls = new CharacterControls(character, this.scene);
+            const humanoidInstance = this.assets.objects.humanoids.default.spawn();
+            if (humanoidInstance.success) {
+                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.scene);
+                this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
                 this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
+            } else {
+                await alertModal(humanoidInstance.error, this.soundPlayer);
             }
         }
 

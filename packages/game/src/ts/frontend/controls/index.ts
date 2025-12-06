@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
@@ -31,8 +30,8 @@ export interface Controls extends Transformable {
     shouldLockPointer(): boolean;
 
     /**
-     * Makes the controller listen to all its inputs and returns the displacement to apply to the player
+     * Makes the controller listen to all its inputs and update its state.
      * @param deltaSeconds the time between 2 frames
      */
-    update(deltaSeconds: number): Vector3;
+    update(deltaSeconds: number): void;
 }

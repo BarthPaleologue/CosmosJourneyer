@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractMesh,
+    Axis,
     Color3,
     DirectionalLight,
     HemisphericLight,
@@ -24,15 +24,17 @@ import {
     PBRMetallicRoughnessMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
+    Space,
 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
 
@@ -49,7 +51,7 @@ export async function createCharacterDemoScene(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const characters = await loadCharacters(scene, progressMonitor);
+    const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
     light.position = new Vector3(5, 5, 5).scaleInPlace(10);
@@ -59,24 +61,41 @@ export async function createCharacterDemoScene(
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const characterObject = characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
-    }
-
     const groundRadius = 40;
 
-    const character = new CharacterControls(characterObject, scene);
-    character.getTransform().position.y = groundRadius;
+    const humanoidInstance = humanoids.default.spawn();
+    if (!humanoidInstance.success) {
+        throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
+    }
+
+    const character = new HumanoidAvatar(humanoidInstance.value, scene);
+
+    const characterControls = new CharacterControls(character, scene);
+    characterControls.getTransform().position.y = groundRadius;
+
+    const humanoid2 = humanoids.default.spawn();
+    if (!humanoid2.success) {
+        throw new Error(`Failed to instantiate character: ${humanoid2.error}`);
+    }
+    const character2 = new HumanoidAvatar(humanoid2.value, scene);
+    character2.getTransform().position = new Vector3(10, groundRadius, 6);
+
+    const humanoid3 = humanoids.default.spawn();
+    if (!humanoid3.success) {
+        throw new Error(`Failed to instantiate character: ${humanoid3.error}`);
+    }
+    const character3 = new HumanoidAvatar(humanoid3.value, scene);
+    character3.getTransform().position = new Vector3(10, groundRadius, 7.5);
+    character3.getTransform().rotate(Axis.Y, Math.PI, Space.WORLD);
 
     enableShadows(light);
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("thirdPerson") !== null) {
-        character.setThirdPersonCameraActive();
+        characterControls.setThirdPersonCameraActive();
     }
 
-    character.getActiveCamera().attachControl();
+    characterControls.getActiveCamera().attachControl();
 
     CharacterInputs.setEnabled(true);
 
@@ -88,21 +107,35 @@ export async function createCharacterDemoScene(
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
 
-    character.setClosestWalkableObject({
+    const walkableObject = {
         getTransform: () => ground,
-    });
+    };
+
+    characterControls.setClosestWalkableObject(walkableObject);
+
+    character3.dance();
+
+    const headTrackingTarget = Vector3.Zero();
 
     scene.onBeforeRenderObservable.add(() => {
-        if (character.getActiveCamera() !== scene.activeCamera) {
+        if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
-            const camera = character.getActiveCamera();
+            const camera = characterControls.getActiveCamera();
             camera.attachControl();
             scene.activeCamera = camera;
         }
 
+        const targetHead = character.instance.head;
+        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, headTrackingTarget);
+
         const deltaSeconds = engine.getDeltaTime() / 1000;
-        character.update(deltaSeconds);
+        characterControls.update(deltaSeconds);
+        character2.update(deltaSeconds, walkableObject);
+        character3.update(deltaSeconds, walkableObject);
+
+        character2.lookAt(headTrackingTarget);
+        character3.lookAt(headTrackingTarget);
     });
 
     return scene;

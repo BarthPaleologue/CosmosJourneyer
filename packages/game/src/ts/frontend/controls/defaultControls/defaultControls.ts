@@ -68,7 +68,7 @@ export class DefaultControls implements Controls {
         return false;
     }
 
-    public update(deltaSeconds: number): Vector3 {
+    public update(deltaSeconds: number): void {
         const inertiaHalfLifeSeconds = 0.07;
 
         this.rotationInertia.x = lerpSmooth(
@@ -142,8 +142,6 @@ export class DefaultControls implements Controls {
 
         translate(this.transform, displacement);
         this.getActiveCamera().getViewMatrix();
-
-        return displacement;
     }
 
     dispose() {

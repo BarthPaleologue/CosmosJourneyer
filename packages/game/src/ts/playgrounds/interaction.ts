@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import {
-    AbstractMesh,
     Color3,
     CreateAudioEngineAsync,
     DirectionalLight,
@@ -32,10 +31,11 @@ import {
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadCharacters } from "@/frontend/assets/objects/characters";
+import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
 import { Button } from "@/frontend/ui/3d/button";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
@@ -65,7 +65,7 @@ export async function createInteractionDemo(
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 
-    const characters = await loadCharacters(scene, progressMonitor);
+    const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
     const sounds = await loadSounds(audioEngine, progressMonitor);
 
@@ -89,13 +89,15 @@ export async function createInteractionDemo(
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
     groundAggregate.shape.material.friction = 2;
 
-    const characterObject = characters.default.instantiateHierarchy(null);
-    if (!(characterObject instanceof AbstractMesh)) {
-        throw new Error("Character object is null");
+    const humanoidInstance = humanoids.default.spawn();
+    if (!humanoidInstance.success) {
+        throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const character = new CharacterControls(characterObject, scene);
-    character.getActiveCamera().attachControl();
+    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, scene);
+
+    const characterControls = new CharacterControls(humanoidAvatar, scene);
+    characterControls.getActiveCamera().attachControl();
 
     CharacterInputs.setEnabled(true);
 
@@ -106,7 +108,7 @@ export async function createInteractionDemo(
     const interactionSystem = new InteractionSystem(
         CollisionMask.INTERACTIVE,
         scene,
-        [character.firstPersonCamera],
+        [characterControls.firstPersonCamera],
         async (interactions) => {
             if (interactions.length === 0) {
                 return null;
@@ -179,15 +181,15 @@ export async function createInteractionDemo(
         interactionSystem.update(deltaSeconds);
         interactionLayer.update(deltaSeconds);
 
-        if (character.getActiveCamera() !== scene.activeCamera) {
+        if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
-            const camera = character.getActiveCamera();
+            const camera = characterControls.getActiveCamera();
             camera.attachControl();
             scene.activeCamera = camera;
         }
 
-        character.update(deltaSeconds);
+        characterControls.update(deltaSeconds);
     });
 
     return scene;
