@@ -92,20 +92,24 @@ export class CharacterControls implements Controls {
 
     public setFirstPersonCameraActive() {
         this.activeCamera = this.firstPersonCamera;
-        this.getTransform()
-            .getChildMeshes()
-            .forEach((mesh) => {
-                mesh.setEnabled(false);
-            });
+        for (const mesh of this.getTransform().getChildMeshes()) {
+            const material = mesh.material;
+            if (material === null) {
+                continue;
+            }
+            material.disableColorWrite = true;
+        }
     }
 
     public setThirdPersonCameraActive() {
         this.activeCamera = this.thirdPersonCamera;
-        this.getTransform()
-            .getChildMeshes()
-            .forEach((mesh) => {
-                mesh.setEnabled(true);
-            });
+        for (const mesh of this.getTransform().getChildMeshes()) {
+            const material = mesh.material;
+            if (material === null) {
+                continue;
+            }
+            material.disableColorWrite = false;
+        }
     }
 
     public setClosestWalkableObject(object: Transformable | null) {

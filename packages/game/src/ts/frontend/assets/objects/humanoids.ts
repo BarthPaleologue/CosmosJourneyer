@@ -75,7 +75,7 @@ export async function loadHumanoidPrefabs(
 
     const defaultHumanoidPrefab: HumanoidPrefab = {
         spawn: () => {
-            const entries = defaultHumanoid.instantiateModelsToScene();
+            const entries = defaultHumanoid.instantiateModelsToScene(undefined, true);
             const root = entries.rootNodes[0];
             if (root === undefined || !(root instanceof TransformNode)) {
                 return err("DefaultHumanoid root node not found");
