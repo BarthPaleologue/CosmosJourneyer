@@ -502,7 +502,6 @@ export class StarSystemView implements View {
 
         if (this.starSystem !== null) {
             this.spaceshipControls?.setClosestLandableFacility(null);
-            this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
@@ -773,8 +772,6 @@ export class StarSystemView implements View {
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
         }
-
-        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
 
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (

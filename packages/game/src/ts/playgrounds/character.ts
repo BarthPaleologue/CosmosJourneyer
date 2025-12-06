@@ -35,6 +35,7 @@ import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
 
@@ -45,7 +46,7 @@ export async function createCharacterDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    await enablePhysics(scene, new Vector3(0, 0, 0));
 
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
@@ -101,23 +102,27 @@ export async function createCharacterDemoScene(
 
     const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
-    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
+    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
 
-    const walkableObject = {
-        getTransform: () => ground,
-    };
-
-    characterControls.setClosestWalkableObject(walkableObject);
+    const gravitySystem = new GravitySystem(scene);
 
     character3.dance();
 
     const headTrackingTarget = Vector3.Zero();
 
     scene.onBeforeRenderObservable.add(() => {
+        gravitySystem.applyGravity([
+            {
+                name: "Planet",
+                mass: 100000,
+                position: ground.position,
+                radius: groundRadius,
+            },
+        ]);
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
@@ -131,8 +136,8 @@ export async function createCharacterDemoScene(
 
         const deltaSeconds = engine.getDeltaTime() / 1000;
         characterControls.update(deltaSeconds);
-        character2.update(deltaSeconds, walkableObject);
-        character3.update(deltaSeconds, walkableObject);
+        character2.update(deltaSeconds);
+        character3.update(deltaSeconds);
 
         character2.lookAt(headTrackingTarget);
         character3.lookAt(headTrackingTarget);

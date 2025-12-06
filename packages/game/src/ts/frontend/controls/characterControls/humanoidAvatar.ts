@@ -22,13 +22,11 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsAggregate, PhysicsShapeCapsule, type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
-import { setUpVector, translate } from "@/frontend/helpers/transform";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 
 import { CollisionMask } from "@/settings";
 
@@ -103,14 +101,29 @@ export class HumanoidAvatar implements Transformable {
 
     private readonly root: AbstractMesh;
 
-    private jumpVelocity = Vector3.Zero();
-
     private readonly physicsEngine: PhysicsEngineV2;
+
+    private readonly mass = 80;
+    readonly aggregate: PhysicsAggregate;
 
     constructor(instance: HumanoidInstance, scene: Scene) {
         this.instance = instance;
         this.root = instance.root as AbstractMesh;
         this.getTransform().rotationQuaternion = Quaternion.Identity();
+
+        const capsuleRadius = 0.4;
+        const shape = new PhysicsShapeCapsule(
+            new Vector3(0, capsuleRadius, 0),
+            new Vector3(0, 1.8 - capsuleRadius, 0),
+            capsuleRadius,
+            scene,
+        );
+        shape.material.restitution = 0.0;
+        shape.material.friction = 0.0;
+
+        this.aggregate = new PhysicsAggregate(this.root, shape, { mass: this.mass });
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });
+        this.aggregate.body.disablePreStep = false;
 
         this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
         this.idleAnim = new AnimationGroupWrapper("idle", instance.animations.idle, 1, true);
@@ -162,96 +175,34 @@ export class HumanoidAvatar implements Transformable {
                 slerpAmount: 0.2,
             },
         );
+        this.resetLookAt();
     }
 
     public getTransform(): TransformNode {
         return this.root;
     }
 
-    public update(deltaSeconds: number, closestWalkableObject: Transformable | null): void {
+    public update(deltaSeconds: number): void {
         const character = this.getTransform();
+
         const start = character.getAbsolutePosition().add(character.up.scale(50e3));
         const end = character.position.add(character.up.scale(-50e3));
-
-        if (this.currentAnimationState === this.fallingState) {
-            // apply gravity
-            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaSeconds));
-            translate(character, this.jumpVelocity.scale(deltaSeconds));
-        }
-
-        if (closestWalkableObject !== null) {
-            const up = character
-                .getAbsolutePosition()
-                .subtract(closestWalkableObject.getTransform().getAbsolutePosition())
-                .normalize();
-            setUpVector(character, up);
-        }
-
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
             collideWith: CollisionMask.ENVIRONMENT,
         });
-        if (this.raycastResult.hasHit) {
-            const up = character.up;
-            let distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
-
-            // if closestWalkableObject is a telluric planet, the distance is the min between the distance to the ground and the distance to the water level
-            if (closestWalkableObject !== null && closestWalkableObject instanceof TelluricPlanet) {
-                const waterLevel = (closestWalkableObject.model.ocean?.depth ?? 0) + closestWalkableObject.getRadius();
-                const distanceToWater =
-                    Vector3.Distance(
-                        this.getTransform().getAbsolutePosition(),
-                        closestWalkableObject.getTransform().getAbsolutePosition(),
-                    ) - waterLevel;
-                distance = Math.min(distance, distanceToWater + 1.3);
-            }
-
-            if (distance <= 0.1) {
-                // push the character up if it's below the surface
-                translate(character, up.scale(-distance));
-
-                if (closestWalkableObject !== null && closestWalkableObject instanceof TelluricPlanet) {
-                    const waterLevel =
-                        (closestWalkableObject.model.ocean?.depth ?? 0) + closestWalkableObject.getRadius();
-                    const distanceToWater =
-                        Vector3.Distance(
-                            this.getTransform().getAbsolutePosition(),
-                            closestWalkableObject.getTransform().getAbsolutePosition(),
-                        ) - waterLevel;
-                    if (distanceToWater < 0) {
-                        this.currentAnimationState = this.swimmingState;
-                    } else {
-                        this.currentAnimationState = this.groundedState;
-                    }
-                } else {
-                    this.currentAnimationState = this.groundedState;
-                }
-                this.distanceToGround = 0;
-                this.jumpVelocity = Vector3.Zero();
-            } else {
-                this.currentAnimationState = this.fallingState;
-                this.distanceToGround = distance;
-            }
-        } else {
-            this.currentAnimationState = this.fallingState;
-            this.distanceToGround = 50e3;
-        }
 
         if (this.walkAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(-this.walkSpeed * deltaSeconds * this.walkAnim.weight),
-            );
+            this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.walkSpeed * this.walkAnim.weight));
         }
 
         if (this.walkBackAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(this.walkSpeedBackwards * deltaSeconds * this.walkBackAnim.weight),
+            this.aggregate.body.setLinearVelocity(
+                this.root.forward.scale(this.walkSpeedBackwards * this.walkBackAnim.weight),
             );
         }
 
         if (this.runningAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(-this.runSpeed * deltaSeconds * this.runningAnim.weight),
-            );
+            this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.runSpeed * this.runningAnim.weight));
         }
 
         this.targetAnim = this.currentAnimationState.currentAnimation;
@@ -271,13 +222,13 @@ export class HumanoidAvatar implements Transformable {
         this.headLookController.update();
     }
 
-    public move(deltaSeconds: number, xMove: number, yMove: number, running: number): void {
+    public move(xMove: number, yMove: number, running: number): void {
         // Translation
         if (this.currentAnimationState === this.swimmingState) {
             this.swimmingState.currentAnimation = this.swimmingIdleAnim;
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
-                this.root.moveWithCollisions(this.root.forward.scale(-this.swimSpeed * deltaSeconds));
+                this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.swimSpeed));
             }
         } else if (this.currentAnimationState === this.groundedState) {
             if (this.groundedState.currentAnimation !== this.danceAnim) {
@@ -310,8 +261,12 @@ export class HumanoidAvatar implements Transformable {
         this.jumpingAnim.weight = 1;
         this.jumpingAnim.group.stop();
         this.jumpingAnim.group.play();
-        this.currentAnimationState = this.fallingState;
-        this.jumpVelocity = this.getTransform().up.scale(6.0).add(this.getTransform().forward.scale(-2.0));
+        //this.currentAnimationState = this.fallingState;
+
+        this.aggregate.body.applyImpulse(
+            this.getTransform().up.scale(this.mass * 200),
+            this.getTransform().getAbsolutePosition(),
+        );
     }
 
     public lookAt(target: Vector3) {

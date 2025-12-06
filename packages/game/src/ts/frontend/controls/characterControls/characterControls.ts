@@ -25,8 +25,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
 import { Settings } from "@/settings";
 
 import { type Controls } from "../";
@@ -37,8 +35,6 @@ export class CharacterControls implements Controls {
     readonly firstPersonCamera: FreeCamera;
     readonly thirdPersonCamera: ArcRotateCamera;
     private activeCamera: Camera;
-
-    private closestWalkableObject: Transformable | null = null;
 
     private readonly characterRotationSpeed = 6;
 
@@ -112,10 +108,6 @@ export class CharacterControls implements Controls {
         }
     }
 
-    public setClosestWalkableObject(object: Transformable | null) {
-        this.closestWalkableObject = object;
-    }
-
     public getActiveCamera(): Camera {
         return this.activeCamera;
     }
@@ -145,13 +137,13 @@ export class CharacterControls implements Controls {
         this.firstPersonCamera.rotation.y = Math.PI;
         this.firstPersonCamera.getViewMatrix(true);
 
-        this.avatar.update(deltaSeconds, this.closestWalkableObject);
+        this.avatar.update(deltaSeconds);
 
         const [xMove, yMove] = CharacterInputs.map.move.value;
 
         // https://playground.babylonjs.com/#AJA5J6#77
 
-        this.avatar.move(deltaSeconds, xMove, yMove, CharacterInputs.map.run.value);
+        this.avatar.move(xMove, yMove, CharacterInputs.map.run.value);
 
         const isMoving = xMove !== 0 || yMove !== 0;
 
