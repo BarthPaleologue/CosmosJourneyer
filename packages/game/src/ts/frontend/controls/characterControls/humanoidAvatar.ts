@@ -183,26 +183,36 @@ export class HumanoidAvatar implements Transformable {
     }
 
     public update(deltaSeconds: number): void {
-        const character = this.getTransform();
+        const transform = this.getTransform();
 
-        const start = character.getAbsolutePosition().add(character.up.scale(50e3));
-        const end = character.position.add(character.up.scale(-50e3));
+        const linearVelocity = this.aggregate.body.getLinearVelocity();
+
+        const verticalVelocityBackup = linearVelocity.dot(transform.up);
+
+        const start = transform.getAbsolutePosition().add(transform.up.scale(50e3));
+        const end = transform.position.add(transform.up.scale(-50e3));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
             collideWith: CollisionMask.ENVIRONMENT,
         });
 
+        const horizontalVelocity = new Vector3();
+
         if (this.walkAnim.weight > 0.0) {
-            this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.walkSpeed * this.walkAnim.weight));
+            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.walkSpeed * this.walkAnim.weight));
         }
 
         if (this.walkBackAnim.weight > 0.0) {
-            this.aggregate.body.setLinearVelocity(
-                this.root.forward.scale(this.walkSpeedBackwards * this.walkBackAnim.weight),
+            horizontalVelocity.addInPlace(
+                transform.forward.scaleInPlace(this.walkSpeedBackwards * this.walkBackAnim.weight),
             );
         }
 
         if (this.runningAnim.weight > 0.0) {
-            this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.runSpeed * this.runningAnim.weight));
+            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
+        }
+
+        if (this.runningAnim.weight > 0.0) {
+            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
         }
 
         this.targetAnim = this.currentAnimationState.currentAnimation;
@@ -220,6 +230,10 @@ export class HumanoidAvatar implements Transformable {
         this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
 
         this.headLookController.update();
+
+        this.aggregate.body.setLinearVelocity(
+            horizontalVelocity.addInPlace(transform.up.scaleInPlace(verticalVelocityBackup)),
+        );
     }
 
     public move(xMove: number, yMove: number, running: number): void {
@@ -264,7 +278,7 @@ export class HumanoidAvatar implements Transformable {
         //this.currentAnimationState = this.fallingState;
 
         this.aggregate.body.applyImpulse(
-            this.getTransform().up.scale(this.mass * 200),
+            this.getTransform().up.scale(this.mass * 50),
             this.getTransform().getAbsolutePosition(),
         );
     }
