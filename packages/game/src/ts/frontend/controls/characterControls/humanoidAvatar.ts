@@ -284,7 +284,7 @@ export class HumanoidAvatar implements Transformable {
                 this.groundedState.currentAnimation = this.idleAnim;
             }
             if (yMove > 0) {
-                this.groundedState.currentAnimation = this.walkAnim;
+                this.groundedState.currentAnimation = running > 0 ? this.runningAnim : this.walkAnim;
             } else if (yMove < 0) {
                 this.groundedState.currentAnimation = this.walkBackAnim;
             } else if (running > 0) {
