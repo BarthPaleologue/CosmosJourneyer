@@ -28,36 +28,18 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
+import { moveTowards } from "@/utils/math";
+
 import { CollisionMask } from "@/settings";
 
-class AnimationGroupWrapper {
-    name: string;
-    group: AnimationGroup;
-    weight: number;
-
-    constructor(name: string, group: AnimationGroup, startingWeight: number, loop: boolean) {
-        this.name = name;
-        this.weight = startingWeight;
-
-        this.group = group;
-        this.group.play(loop);
-        this.group.setWeightForAllAnimatables(startingWeight);
-    }
-
-    moveTowardsWeight(targetWeight: number, deltaTime: number) {
-        this.weight = Math.min(Math.max(this.weight + deltaTime * Math.sign(targetWeight - this.weight), 0), 1);
-        this.group.setWeightForAllAnimatables(this.weight);
-    }
-}
-
 class AnimationState {
-    readonly idleAnimation: AnimationGroupWrapper;
-    readonly nonIdleAnimations: AnimationGroupWrapper[];
-    currentAnimation: AnimationGroupWrapper;
+    readonly idleAnimation: AnimationGroup;
+    readonly nonIdleAnimations: Array<AnimationGroup>;
+    currentAnimation: AnimationGroup;
 
-    constructor(idleAnimation: AnimationGroupWrapper, nonIdleAnimations: AnimationGroupWrapper[]) {
+    constructor(idleAnimation: AnimationGroup, nonIdleAnimations: ReadonlyArray<AnimationGroup>) {
         this.idleAnimation = idleAnimation;
-        this.nonIdleAnimations = nonIdleAnimations;
+        this.nonIdleAnimations = [...nonIdleAnimations];
         this.currentAnimation = idleAnimation;
     }
 }
@@ -72,23 +54,20 @@ export class HumanoidAvatar implements Transformable {
     readonly runSpeed = 3.6;
     readonly swimSpeed = 1.5;
 
-    private readonly idleAnim: AnimationGroupWrapper;
-    private readonly walkAnim: AnimationGroupWrapper;
-    private readonly walkBackAnim: AnimationGroupWrapper;
-    private readonly danceAnim: AnimationGroupWrapper;
-    private readonly runningAnim: AnimationGroupWrapper;
+    private readonly idleAnim: AnimationGroup;
+    private readonly walkAnim: AnimationGroup;
+    private readonly walkBackAnim: AnimationGroup;
+    private readonly danceAnim: AnimationGroup;
+    private readonly runningAnim: AnimationGroup;
+    private readonly swimmingIdleAnim: AnimationGroup;
+    private readonly swimmingForwardAnim: AnimationGroup;
 
-    private readonly swimmingIdleAnim: AnimationGroupWrapper;
-    private readonly swimmingForwardAnim: AnimationGroupWrapper;
+    private readonly jumpingAnim: AnimationGroup;
+    private readonly fallingIdleAnim: AnimationGroup;
+    private readonly skyDivingAnim: AnimationGroup;
 
-    private readonly jumpingAnim: AnimationGroupWrapper;
-
-    private readonly fallingIdleAnim: AnimationGroupWrapper;
-    private readonly skyDivingAnim: AnimationGroupWrapper;
-
-    private readonly nonIdleAnimations: AnimationGroupWrapper[];
-
-    private targetAnim: AnimationGroupWrapper | null = null;
+    private readonly nonIdleAnimations: Array<AnimationGroup>;
+    private targetAnim: AnimationGroup | null = null;
 
     private readonly groundedState: AnimationState;
     private readonly fallingState: AnimationState;
@@ -128,21 +107,47 @@ export class HumanoidAvatar implements Transformable {
         this.aggregate.body.disablePreStep = false;
 
         this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
-        this.idleAnim = new AnimationGroupWrapper("idle", instance.animations.idle, 1, true);
-        this.walkAnim = new AnimationGroupWrapper("walk", instance.animations.walk, 0, true);
-        this.walkBackAnim = new AnimationGroupWrapper("walkBack", instance.animations.walkBackward, 0, true);
-        this.danceAnim = new AnimationGroupWrapper("dance", instance.animations.dance, 0, true);
-        this.runningAnim = new AnimationGroupWrapper("running", instance.animations.run, 0, true);
-        this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", instance.animations.fall, 0, true);
-        this.skyDivingAnim = new AnimationGroupWrapper("skydiving", instance.animations.skyDive, 0, true);
-        this.swimmingIdleAnim = new AnimationGroupWrapper("swimming", instance.animations.swim.idle, 0, true);
-        this.swimmingForwardAnim = new AnimationGroupWrapper(
-            "swimmingForward",
-            instance.animations.swim.forward,
-            0,
-            true,
-        );
-        this.jumpingAnim = new AnimationGroupWrapper("jumping", instance.animations.jump, 0, false);
+
+        this.idleAnim = instance.animations.idle;
+        this.idleAnim.play(true);
+        this.idleAnim.weight = 1;
+
+        this.walkAnim = instance.animations.walk;
+        this.walkAnim.play(true);
+        this.walkAnim.weight = 0;
+
+        this.walkBackAnim = instance.animations.walkBackward;
+        this.walkBackAnim.play(true);
+        this.walkBackAnim.weight = 0;
+
+        this.danceAnim = instance.animations.dance;
+        this.danceAnim.play(true);
+        this.danceAnim.weight = 0;
+
+        this.runningAnim = instance.animations.run;
+        this.runningAnim.play(true);
+        this.runningAnim.weight = 0;
+
+        this.fallingIdleAnim = instance.animations.fall;
+        this.fallingIdleAnim.play(true);
+        this.fallingIdleAnim.weight = 0;
+
+        this.skyDivingAnim = instance.animations.skyDive;
+        this.skyDivingAnim.play(true);
+        this.skyDivingAnim.weight = 0;
+
+        this.swimmingIdleAnim = instance.animations.swim.idle;
+        this.swimmingIdleAnim.play(true);
+        this.swimmingIdleAnim.weight = 0;
+
+        this.swimmingForwardAnim = instance.animations.swim.forward;
+        this.swimmingForwardAnim.play(true);
+        this.swimmingForwardAnim.weight = 0;
+
+        this.jumpingAnim = instance.animations.jump;
+        this.jumpingAnim.play();
+        this.jumpingAnim.weight = 0;
+
         this.nonIdleAnimations = [
             this.walkAnim,
             this.walkBackAnim,
@@ -241,14 +246,18 @@ export class HumanoidAvatar implements Transformable {
         let weightSum = 0;
         for (const animation of this.nonIdleAnimations) {
             if (animation === this.targetAnim) {
-                animation.moveTowardsWeight(1, deltaSeconds);
+                animation.weight = moveTowards(animation.weight, 1, deltaSeconds);
             } else {
-                animation.moveTowardsWeight(0, deltaSeconds);
+                animation.weight = moveTowards(animation.weight, 0, deltaSeconds);
             }
             weightSum += animation.weight;
         }
 
-        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
+        this.idleAnim.weight = moveTowards(
+            this.idleAnim.weight,
+            Math.min(Math.max(1 - weightSum, 0.0), 1.0),
+            deltaSeconds,
+        );
 
         this.headLookController.update();
     }
@@ -294,8 +303,8 @@ export class HumanoidAvatar implements Transformable {
 
         this.targetAnim = this.jumpingAnim;
         this.jumpingAnim.weight = 1;
-        this.jumpingAnim.group.stop();
-        this.jumpingAnim.group.play();
+        this.jumpingAnim.stop();
+        this.jumpingAnim.play();
 
         this.aggregate.body.applyImpulse(
             this.getTransform().up.scale(this.mass * 50),
