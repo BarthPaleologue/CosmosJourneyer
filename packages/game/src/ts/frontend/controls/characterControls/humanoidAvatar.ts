@@ -74,7 +74,7 @@ export class HumanoidAvatar implements Transformable {
     private readonly swimmingState: AnimationState;
     private currentAnimationState: AnimationState;
 
-    private distanceToGround = 0;
+    private lastDistanceToGround: number | null = null;
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
@@ -189,56 +189,64 @@ export class HumanoidAvatar implements Transformable {
         return this.root;
     }
 
-    public update(deltaSeconds: number): void {
-        const transform = this.getTransform();
-
-        const linearVelocity = this.aggregate.body.getLinearVelocity();
-
-        const verticalVelocityBackup = linearVelocity.dot(transform.up);
-
+    private getCurrentAnimationState(): AnimationState {
+        const up = this.getTransform().up;
         const rayStartOffset = 1;
-        const start = transform.getAbsolutePosition().add(transform.up.scale(rayStartOffset));
-        const end = transform.getAbsolutePosition().add(transform.up.scale(-1));
+        const rayDepth = 50;
+        const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
+        const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
             collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
         });
 
-        if (this.raycastResult.hasHit) {
-            const distance = rayStartOffset - this.raycastResult.hitDistance;
-            this.distanceToGround = distance;
-            if (Math.abs(distance) < 0.1) {
-                this.currentAnimationState = this.groundedState;
-            } else {
-                this.currentAnimationState = this.fallingState;
-            }
-        } else {
-            this.currentAnimationState = this.fallingState;
+        if (!this.raycastResult.hasHit) {
+            this.lastDistanceToGround = null;
+            return this.fallingState;
         }
 
-        if (this.currentAnimationState !== this.fallingState) {
-            const horizontalVelocity = new Vector3();
+        const distance = rayStartOffset - this.raycastResult.hitDistance;
+        this.lastDistanceToGround = distance;
+        if (Math.abs(distance) < 0.1) {
+            return this.groundedState;
+        } else {
+            return this.fallingState;
+        }
+    }
 
-            if (this.walkAnim.weight > 0.0) {
-                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.walkSpeed * this.walkAnim.weight));
-            }
+    private handleGroundedState() {
+        const forward = this.getTransform().forward;
+        const up = this.getTransform().up;
 
-            if (this.walkBackAnim.weight > 0.0) {
-                horizontalVelocity.addInPlace(
-                    transform.forward.scaleInPlace(this.walkSpeedBackwards * this.walkBackAnim.weight),
-                );
-            }
+        const linearVelocity = this.aggregate.body.getLinearVelocity();
+        const verticalVelocityBackup = linearVelocity.dot(up);
 
-            if (this.runningAnim.weight > 0.0) {
-                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
-            }
+        const newLinearVelocity = new Vector3();
+        newLinearVelocity.addInPlace(forward.scale(-this.walkSpeed * this.walkAnim.weight));
+        newLinearVelocity.addInPlace(forward.scale(this.walkSpeedBackwards * this.walkBackAnim.weight));
+        newLinearVelocity.addInPlace(forward.scale(-this.runSpeed * this.runningAnim.weight));
+        newLinearVelocity.addInPlace(up.scale(verticalVelocityBackup));
 
-            if (this.runningAnim.weight > 0.0) {
-                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
-            }
+        this.aggregate.body.setLinearVelocity(newLinearVelocity);
+    }
 
-            this.aggregate.body.setLinearVelocity(
-                horizontalVelocity.addInPlace(transform.up.scaleInPlace(verticalVelocityBackup)),
-            );
+    private handleSwimmingState() {
+        this.aggregate.body.setLinearVelocity(
+            this.getTransform().forward.scale(-this.swimSpeed * this.swimmingForwardAnim.weight),
+        );
+    }
+
+    public update(deltaSeconds: number): void {
+        this.currentAnimationState = this.getCurrentAnimationState();
+
+        switch (this.currentAnimationState) {
+            case this.groundedState:
+                this.handleGroundedState();
+                break;
+            case this.fallingState:
+                break;
+            case this.swimmingState:
+                this.handleSwimmingState();
+                break;
         }
 
         this.targetAnim = this.currentAnimationState.currentAnimation;
@@ -268,7 +276,6 @@ export class HumanoidAvatar implements Transformable {
             this.swimmingState.currentAnimation = this.swimmingIdleAnim;
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
-                this.aggregate.body.setLinearVelocity(this.root.forward.scale(-this.swimSpeed));
             }
         } else if (this.currentAnimationState === this.groundedState) {
             if (this.groundedState.currentAnimation !== this.danceAnim) {
@@ -282,14 +289,12 @@ export class HumanoidAvatar implements Transformable {
                 this.groundedState.currentAnimation = this.runningAnim;
             }
         } else if (this.currentAnimationState === this.fallingState) {
-            if (this.distanceToGround < 30) {
+            if (this.lastDistanceToGround !== null && this.lastDistanceToGround < 30) {
                 this.fallingState.currentAnimation = this.fallingIdleAnim;
             } else {
                 this.fallingState.currentAnimation = this.skyDivingAnim;
             }
         }
-
-        this.root.computeWorldMatrix(true);
     }
 
     public dance() {
