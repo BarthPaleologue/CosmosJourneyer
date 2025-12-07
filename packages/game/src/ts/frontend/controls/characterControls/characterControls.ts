@@ -94,6 +94,7 @@ export class CharacterControls implements Controls {
                 continue;
             }
             material.disableColorWrite = true;
+            material.disableDepthWrite = true;
         }
     }
 
@@ -105,6 +106,7 @@ export class CharacterControls implements Controls {
                 continue;
             }
             material.disableColorWrite = false;
+            material.disableDepthWrite = false;
         }
     }
 
