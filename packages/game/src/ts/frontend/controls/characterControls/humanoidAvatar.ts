@@ -191,30 +191,49 @@ export class HumanoidAvatar implements Transformable {
 
         const verticalVelocityBackup = linearVelocity.dot(transform.up);
 
-        const start = transform.getAbsolutePosition().add(transform.up.scale(50e3));
-        const end = transform.position.add(transform.up.scale(-50e3));
+        const rayStartOffset = 1;
+        const start = transform.getAbsolutePosition().add(transform.up.scale(rayStartOffset));
+        const end = transform.getAbsolutePosition().add(transform.up.scale(-1));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-            collideWith: CollisionMask.ENVIRONMENT,
+            collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
         });
 
-        const horizontalVelocity = new Vector3();
-
-        if (this.walkAnim.weight > 0.0) {
-            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.walkSpeed * this.walkAnim.weight));
+        if (this.raycastResult.hasHit) {
+            const distance = rayStartOffset - this.raycastResult.hitDistance;
+            this.distanceToGround = distance;
+            if (Math.abs(distance) < 0.1) {
+                this.currentAnimationState = this.groundedState;
+            } else {
+                this.currentAnimationState = this.fallingState;
+            }
+        } else {
+            this.currentAnimationState = this.fallingState;
         }
 
-        if (this.walkBackAnim.weight > 0.0) {
-            horizontalVelocity.addInPlace(
-                transform.forward.scaleInPlace(this.walkSpeedBackwards * this.walkBackAnim.weight),
+        if (this.currentAnimationState !== this.fallingState) {
+            const horizontalVelocity = new Vector3();
+
+            if (this.walkAnim.weight > 0.0) {
+                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.walkSpeed * this.walkAnim.weight));
+            }
+
+            if (this.walkBackAnim.weight > 0.0) {
+                horizontalVelocity.addInPlace(
+                    transform.forward.scaleInPlace(this.walkSpeedBackwards * this.walkBackAnim.weight),
+                );
+            }
+
+            if (this.runningAnim.weight > 0.0) {
+                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
+            }
+
+            if (this.runningAnim.weight > 0.0) {
+                horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
+            }
+
+            this.aggregate.body.setLinearVelocity(
+                horizontalVelocity.addInPlace(transform.up.scaleInPlace(verticalVelocityBackup)),
             );
-        }
-
-        if (this.runningAnim.weight > 0.0) {
-            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
-        }
-
-        if (this.runningAnim.weight > 0.0) {
-            horizontalVelocity.addInPlace(transform.forward.scaleInPlace(-this.runSpeed * this.runningAnim.weight));
         }
 
         this.targetAnim = this.currentAnimationState.currentAnimation;
@@ -232,10 +251,6 @@ export class HumanoidAvatar implements Transformable {
         this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
 
         this.headLookController.update();
-
-        this.aggregate.body.setLinearVelocity(
-            horizontalVelocity.addInPlace(transform.up.scaleInPlace(verticalVelocityBackup)),
-        );
     }
 
     public move(xMove: number, yMove: number, running: number): void {
@@ -273,11 +288,14 @@ export class HumanoidAvatar implements Transformable {
     }
 
     public jump() {
+        if (this.currentAnimationState !== this.groundedState) {
+            return;
+        }
+
         this.targetAnim = this.jumpingAnim;
         this.jumpingAnim.weight = 1;
         this.jumpingAnim.group.stop();
         this.jumpingAnim.group.play();
-        //this.currentAnimationState = this.fallingState;
 
         this.aggregate.body.applyImpulse(
             this.getTransform().up.scale(this.mass * 50),
