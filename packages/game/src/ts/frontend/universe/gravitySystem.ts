@@ -33,6 +33,8 @@ export class GravitySystem {
 
     private celestialBodies: ReadonlyArray<CelestialBody>;
 
+    private forceCache: Map<PhysicsBody, Vector3> = new Map();
+
     constructor(celestialBodies: ReadonlyArray<CelestialBody>, scene: Scene) {
         this.scene = scene;
         this.celestialBodies = [...celestialBodies];
@@ -64,7 +66,7 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    public computeGravity(body: PhysicsBody) {
+    private computeGravity(body: PhysicsBody) {
         const objectMass = body.getMassProperties().mass;
         if (objectMass === undefined || objectMass === 0) {
             return Vector3.Zero();
@@ -92,6 +94,11 @@ export class GravitySystem {
         for (const physicsBody of this.getPhysicsBodies()) {
             const gravity = this.computeGravity(physicsBody);
             physicsBody.applyForce(gravity, physicsBody.getObjectCenterWorld());
+            this.forceCache.set(physicsBody, gravity);
         }
+    }
+
+    public getLastComputedForce(body: PhysicsBody): Vector3 | null {
+        return this.forceCache.get(body) ?? null;
     }
 }
