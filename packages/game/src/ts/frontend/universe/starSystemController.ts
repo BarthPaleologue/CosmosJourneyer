@@ -96,7 +96,7 @@ export class StarSystemController {
 
     private readonly assets: RenderingAssets;
 
-    private readonly gravitySystem: GravitySystem;
+    readonly gravitySystem: GravitySystem;
     private readonly floatingOriginSystem: FloatingOriginSystem;
 
     /**

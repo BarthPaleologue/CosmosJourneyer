@@ -146,7 +146,8 @@ export async function createCharacterDemoScene(
         character3.update(deltaSeconds);
 
         for (const character of characters) {
-            const upDirection = gravitySystem.computeGravity(character.aggregate.body).normalize().negateInPlace();
+            const gravity = gravitySystem.getLastComputedForce(character.aggregate.body) ?? Vector3.Up();
+            const upDirection = gravity.normalize().negateInPlace();
             setUpVector(character.getTransform(), upDirection);
         }
 

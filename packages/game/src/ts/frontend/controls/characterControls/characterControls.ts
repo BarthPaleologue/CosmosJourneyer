@@ -38,7 +38,7 @@ export class CharacterControls implements Controls {
 
     private readonly characterRotationSpeed = 4;
 
-    private readonly avatar: HumanoidAvatar;
+    readonly avatar: HumanoidAvatar;
     private readonly headTransform: TransformNode;
 
     constructor(avatar: HumanoidAvatar, scene: Scene) {

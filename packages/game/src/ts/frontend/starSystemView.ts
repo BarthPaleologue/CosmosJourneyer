@@ -46,7 +46,7 @@ import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotati
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
+import { getRotationQuaternion, lookAt, setRotationQuaternion, setUpVector } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
@@ -745,6 +745,10 @@ export class StarSystemView implements View {
             this.scene.activeCamera?.detachControl();
             this.scene.setActiveCamera(this.scene.getActiveControls().getActiveCamera());
         }
+
+        const lastCharacterGravity =
+            starSystem.gravitySystem.getLastComputedForce(this.characterControls.avatar.aggregate.body) ?? Vector3.Up();
+        setUpVector(this.characterControls.avatar.getTransform(), lastCharacterGravity.normalize().negateInPlace());
 
         const activeControls = this.scene.getActiveControls();
 
