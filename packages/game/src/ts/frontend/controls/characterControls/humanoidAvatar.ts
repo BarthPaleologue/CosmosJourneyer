@@ -120,6 +120,8 @@ export class HumanoidAvatar implements Transformable {
         );
         shape.material.restitution = 0.0;
         shape.material.friction = 0.0;
+        shape.filterMembershipMask = CollisionMask.AVATARS;
+        shape.filterCollideMask = CollisionMask.EVERYTHING;
 
         this.aggregate = new PhysicsAggregate(this.root, shape, { mass: this.mass });
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });

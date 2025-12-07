@@ -75,8 +75,9 @@ export const Settings = {
 };
 
 export const CollisionMask = {
-    ENVIRONMENT: 0b00000001,
-    DYNAMIC_OBJECTS: 0b00000010,
-    INTERACTIVE: 0b00001000,
-    EVERYTHING: 0b11111111,
+    ENVIRONMENT: 1 << 0,
+    DYNAMIC_OBJECTS: 1 << 1,
+    INTERACTIVE: 1 << 3,
+    AVATARS: 1 << 4,
+    EVERYTHING: 0xffffffff,
 } as const;
