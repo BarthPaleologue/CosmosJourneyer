@@ -137,9 +137,6 @@ export async function createCharacterDemoScene(
             scene.activeCamera = camera;
         }
 
-        const targetHead = character.instance.head;
-        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, headTrackingTarget);
-
         const deltaSeconds = engine.getDeltaTime() / 1000;
         characterControls.update(deltaSeconds);
         character2.update(deltaSeconds);
@@ -151,6 +148,7 @@ export async function createCharacterDemoScene(
             setUpVector(character.getTransform(), upDirection);
         }
 
+        character.getHeadPositionToRef(headTrackingTarget);
         character2.lookAt(headTrackingTarget);
         character3.lookAt(headTrackingTarget);
     });

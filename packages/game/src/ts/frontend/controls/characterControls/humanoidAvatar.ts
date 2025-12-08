@@ -333,6 +333,11 @@ export class HumanoidAvatar implements Transformable {
         this.headLookController.maxPitch = 0;
     }
 
+    public getHeadPositionToRef(result: Vector3) {
+        const targetHead = this.instance.head;
+        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, result);
+    }
+
     public dispose() {
         const { animations } = this.instance;
         for (const group of [
