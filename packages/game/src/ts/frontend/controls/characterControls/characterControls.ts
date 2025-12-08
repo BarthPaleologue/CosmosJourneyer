@@ -88,26 +88,10 @@ export class CharacterControls implements Controls {
 
     public setFirstPersonCameraActive() {
         this.activeCamera = this.firstPersonCamera;
-        for (const mesh of this.getTransform().getChildMeshes()) {
-            const material = mesh.material;
-            if (material === null) {
-                continue;
-            }
-            material.disableColorWrite = true;
-            material.disableDepthWrite = true;
-        }
     }
 
     public setThirdPersonCameraActive() {
         this.activeCamera = this.thirdPersonCamera;
-        for (const mesh of this.getTransform().getChildMeshes()) {
-            const material = mesh.material;
-            if (material === null) {
-                continue;
-            }
-            material.disableColorWrite = false;
-            material.disableDepthWrite = false;
-        }
     }
 
     public getActiveCamera(): Camera {
@@ -126,13 +110,17 @@ export class CharacterControls implements Controls {
         return true;
     }
 
+    public getEyesPosition(): Vector3 {
+        return this.headTransform
+            .getAbsolutePosition()
+            .add(this.headTransform.forward.scale(-0.12))
+            .add(this.headTransform.up.scale(0.05));
+    }
+
     public update(deltaSeconds: number): void {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
         this.headTransform.computeWorldMatrix(true);
-        this.firstPersonCamera.position = Vector3.TransformCoordinates(
-            this.headTransform.getAbsolutePosition(),
-            inverseTransform,
-        );
+        this.firstPersonCamera.position = Vector3.TransformCoordinates(this.getEyesPosition(), inverseTransform);
 
         this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y - Math.PI, Space.LOCAL);
         this.getTransform().computeWorldMatrix(true);
