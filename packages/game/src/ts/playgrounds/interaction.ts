@@ -99,6 +99,8 @@ export async function createInteractionDemo(
     const characterControls = new CharacterControls(humanoidAvatar, scene);
     characterControls.getActiveCamera().attachControl();
 
+    characterControls.getActiveCamera().minZ = 0.1;
+
     CharacterInputs.setEnabled(true);
 
     enableShadows(light);

@@ -98,6 +98,7 @@ export async function createCharacterDemoScene(
     }
 
     characterControls.getActiveCamera().attachControl();
+    characterControls.getActiveCamera().minZ = 0.1;
 
     CharacterInputs.setEnabled(true);
 
