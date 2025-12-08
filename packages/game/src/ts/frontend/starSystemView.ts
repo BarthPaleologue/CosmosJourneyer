@@ -711,7 +711,7 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const humanoidInstance = this.assets.objects.humanoids.default.spawn();
+            const humanoidInstance = this.assets.objects.humanoids.placeholder.spawn();
             if (humanoidInstance.success) {
                 const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.scene);
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);

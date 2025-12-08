@@ -30,7 +30,7 @@ import { loadAssetInContainerAsync } from "./utils";
 import defaultHumanoidPath from "@assets/character/character.glb";
 
 export type HumanoidPrefabs = {
-    default: HumanoidPrefab;
+    placeholder: HumanoidPrefab;
 };
 
 export type HumanoidAnimations = {
@@ -157,6 +157,6 @@ export async function loadHumanoidPrefabs(
     };
 
     return {
-        default: defaultHumanoidPrefab,
+        placeholder: defaultHumanoidPrefab,
     };
 }

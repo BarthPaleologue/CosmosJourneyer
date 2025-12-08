@@ -65,7 +65,7 @@ export async function createCharacterDemoScene(
 
     const groundRadius = 40;
 
-    const humanoidInstance = humanoids.default.spawn();
+    const humanoidInstance = humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
@@ -75,14 +75,14 @@ export async function createCharacterDemoScene(
     const characterControls = new CharacterControls(character, scene);
     characterControls.getTransform().position.y = groundRadius;
 
-    const humanoid2 = humanoids.default.spawn();
+    const humanoid2 = humanoids.placeholder.spawn();
     if (!humanoid2.success) {
         throw new Error(`Failed to instantiate character: ${humanoid2.error}`);
     }
     const character2 = new HumanoidAvatar(humanoid2.value, scene);
     character2.getTransform().position = new Vector3(10, groundRadius, 6);
 
-    const humanoid3 = humanoids.default.spawn();
+    const humanoid3 = humanoids.placeholder.spawn();
     if (!humanoid3.success) {
         throw new Error(`Failed to instantiate character: ${humanoid3.error}`);
     }

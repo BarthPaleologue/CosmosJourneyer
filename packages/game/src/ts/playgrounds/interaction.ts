@@ -89,7 +89,7 @@ export async function createInteractionDemo(
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
     groundAggregate.shape.material.friction = 2;
 
-    const humanoidInstance = humanoids.default.spawn();
+    const humanoidInstance = humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
