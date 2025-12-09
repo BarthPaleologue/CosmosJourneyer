@@ -19,8 +19,9 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
@@ -134,6 +135,8 @@ export class StarSystemView implements View {
      * The Havok physics plugin used inside the scene
      */
     readonly havokPlugin: HavokPlugin;
+
+    private readonly physicsEngine: PhysicsEngineV2;
 
     /**
      * The default controls are used for debug purposes. They allow to move freely between orbital objects without speed limitations.
@@ -256,6 +259,8 @@ export class StarSystemView implements View {
         this.scene.autoClear = false;
 
         this.havokPlugin = havokPlugin;
+
+        this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -441,9 +446,32 @@ export class StarSystemView implements View {
 
                 const left = Vector3.Cross(Vector3.Up(), up).normalize();
 
+                const desiredSpawnPosition = shipPosition.add(shipForward.scale(20)).add(left.scale(10));
+
+                // make sure character spawns above ground
+                const raycastResult = new PhysicsRaycastResult();
+                this.physicsEngine.raycastToRef(
+                    desiredSpawnPosition.add(up.scale(200)),
+                    desiredSpawnPosition.add(up.scale(-200)),
+                    raycastResult,
+                    {
+                        collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
+                    },
+                );
+
+                if (raycastResult.hasHit) {
+                    desiredSpawnPosition.copyFrom(
+                        raycastResult.hitPointWorld.add(raycastResult.hitNormalWorld.scale(1.0)),
+                    );
+                }
+
+                characterControls.getTransform().setAbsolutePosition(desiredSpawnPosition);
+
                 characterControls
                     .getTransform()
-                    .setAbsolutePosition(shipPosition.add(shipForward.scale(20)).add(left.scale(10)));
+                    .rotationQuaternion?.copyFrom(
+                        shipControls.getTransform().rotationQuaternion ?? Quaternion.Identity(),
+                    );
 
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
@@ -827,7 +855,7 @@ export class StarSystemView implements View {
             currentSystem: starSystem,
             currentItinerary: this.player.currentItinerary,
             playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2,
+            physicsEngine: this.physicsEngine,
         };
 
         const newlyCompletedMissions: Mission[] = [];
