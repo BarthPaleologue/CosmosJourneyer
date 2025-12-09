@@ -92,6 +92,11 @@ export class ObjectTargetCursor {
                 this.minSize = 1.5;
                 this.maxSize = 1.5;
                 break;
+            case ObjectTargetCursorType.SPACESHIP:
+                this.cursor.classList.add("rotated");
+                this.minSize = 1.5;
+                this.maxSize = 1.5;
+                break;
         }
 
         this.textBlock = document.createElement("div");

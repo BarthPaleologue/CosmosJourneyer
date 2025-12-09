@@ -23,7 +23,6 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
@@ -131,11 +130,6 @@ export class StarSystemView implements View {
      */
     readonly scene: UberScene;
 
-    /**
-     * The Havok physics plugin used inside the scene
-     */
-    readonly havokPlugin: HavokPlugin;
-
     private readonly physicsEngine: PhysicsEngineV2;
 
     /**
@@ -229,17 +223,24 @@ export class StarSystemView implements View {
     private readonly assets: RenderingAssets;
 
     /**
-     * Creates an empty star system view with a scene, a gui and a havok plugin
+     * Creates an empty star system view with a scene, a gui and a physics engine
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
+     * @param scene The UberScene instance
      * @param player The player object shared with the rest of the game
      * @param engine The BabylonJS engine
-     * @param havokPlugin The Havok physics plugin instance
+     * @param physicsEngine The physics engine V2 instance
+     * @param encyclopaedia The encyclopaedia manager
+     * @param universeBackend The universe backend
+     * @param soundPlayer The sound player
+     * @param tts The text-to-speech system
+     * @param notificationManager The notification manager
+     * @param assets The rendering assets
      */
     constructor(
         scene: UberScene,
         player: Player,
         engine: AbstractEngine,
-        havokPlugin: HavokPlugin,
+        physicsEngine: PhysicsEngineV2,
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
@@ -258,9 +259,7 @@ export class StarSystemView implements View {
         this.scene.skipPointerMovePicking = true;
         this.scene.autoClear = false;
 
-        this.havokPlugin = havokPlugin;
-
-        this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
+        this.physicsEngine = physicsEngine;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -621,6 +620,10 @@ export class StarSystemView implements View {
         const currentSpaceship = this.spaceshipControls?.getSpaceship();
         const currentJumpRange = currentSpaceship?.getInternals().getWarpDrive()?.rangeLY ?? 0;
 
+        if (currentSpaceship !== undefined) {
+            this.targetCursorLayer.addObject(currentSpaceship);
+        }
+
         for (const neighbor of getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
             Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
@@ -683,6 +686,8 @@ export class StarSystemView implements View {
             this.soundPlayer,
         );
         this.player.instancedSpaceships.push(spaceship);
+
+        this.targetCursorLayer.addObject(spaceship);
 
         this.interactionSystem.register({
             getPhysicsAggregate: () => spaceship.aggregate,
@@ -986,7 +991,6 @@ export class StarSystemView implements View {
 
         shipControls.syncCameraTransform();
 
-        shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
     }
 
@@ -1013,7 +1017,6 @@ export class StarSystemView implements View {
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
-        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
@@ -1035,7 +1038,6 @@ export class StarSystemView implements View {
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
-        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
 
         this.stopBackgroundSounds();

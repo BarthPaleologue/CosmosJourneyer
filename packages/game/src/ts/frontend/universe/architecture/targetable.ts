@@ -2,13 +2,16 @@ import { type HasBoundingSphere } from "./hasBoundingSphere";
 import { type Transformable } from "./transformable";
 import { type TypedObject } from "./typedObject";
 
-export const enum ObjectTargetCursorType {
-    CELESTIAL_BODY,
-    FACILITY,
-    ANOMALY,
-    LANDING_PAD,
-    STAR_SYSTEM,
-}
+export const ObjectTargetCursorType = {
+    CELESTIAL_BODY: "CELESTIAL_BODY",
+    FACILITY: "FACILITY",
+    ANOMALY: "ANOMALY",
+    LANDING_PAD: "LANDING_PAD",
+    STAR_SYSTEM: "STAR_SYSTEM",
+    SPACESHIP: "SPACESHIP",
+} as const;
+
+export type ObjectTargetCursorType = (typeof ObjectTargetCursorType)[keyof typeof ObjectTargetCursorType];
 
 export type TargetInfo = {
     type: ObjectTargetCursorType;
