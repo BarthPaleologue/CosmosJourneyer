@@ -34,3 +34,7 @@ export function createEnvironmentAggregate(
 
     return aggregate;
 }
+
+export function setCollisionsEnabled(aggregate: PhysicsAggregate, enabled: boolean): void {
+    aggregate.shape.filterCollideMask = enabled ? CollisionMask.EVERYTHING : CollisionMask.NONE;
+}

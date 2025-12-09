@@ -19,7 +19,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import { Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -80,6 +80,7 @@ import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
 import { HumanoidAvatar } from "./controls/characterControls/humanoidAvatar";
+import { setCollisionsEnabled } from "./helpers/havok";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -433,6 +434,7 @@ export class StarSystemView implements View {
             const spaceship = shipControls.getSpaceship();
 
             if (this.scene.getActiveControls() === shipControls) {
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
 
@@ -465,12 +467,10 @@ export class StarSystemView implements View {
                 }
 
                 characterControls.getTransform().setAbsolutePosition(desiredSpawnPosition);
+                characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
 
-                characterControls
-                    .getTransform()
-                    .rotationQuaternion?.copyFrom(
-                        shipControls.getTransform().rotationQuaternion ?? Quaternion.Identity(),
-                    );
+                lookAt(characterControls.getTransform(), shipPosition, scene.useRightHandedSystem);
+                characterControls.getTransform().rotate(Vector3.Up(), Math.PI, Space.LOCAL);
 
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
@@ -747,6 +747,7 @@ export class StarSystemView implements View {
             const humanoidInstance = this.assets.objects.humanoids.placeholder.spawn();
             if (humanoidInstance.success) {
                 const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.physicsEngine, this.scene);
+                setCollisionsEnabled(humanoidAvatar.aggregate, false);
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
