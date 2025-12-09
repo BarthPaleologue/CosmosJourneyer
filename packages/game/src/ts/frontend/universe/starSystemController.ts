@@ -129,15 +129,7 @@ export class StarSystemController {
         this.anomalies = orbitalObjects.anomalies;
         this.orbitalFacilities = orbitalObjects.orbitalFacilities;
 
-        this.gravitySystem = new GravitySystem(
-            this.getCelestialBodies().map((body) => ({
-                name: body.model.name,
-                radius: body.getBoundingRadius(),
-                position: body.getTransform().getAbsolutePosition(),
-                mass: body.model.mass,
-            })),
-            this.scene,
-        );
+        this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
 
         this.getOrbitalObjects().forEach((object) => {
@@ -440,7 +432,14 @@ export class StarSystemController {
             }
         }
 
-        this.gravitySystem.update();
+        this.gravitySystem.update(
+            this.getCelestialBodies().map((body) => ({
+                name: body.model.name,
+                radius: body.getBoundingRadius(),
+                position: body.getTransform().getAbsolutePosition(),
+                mass: body.model.mass,
+            })),
+        );
 
         this.floatingOriginSystem.update(controls.getTransform().getAbsolutePosition());
         this.floatingOriginSystem.getOffsetToRef(this.referencePosition);

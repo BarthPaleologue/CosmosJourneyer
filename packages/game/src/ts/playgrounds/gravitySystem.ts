@@ -109,23 +109,7 @@ export async function createGravitySystemScene(
 
     enableShadows(sun);
 
-    const gravitySystem = new GravitySystem(
-        [
-            {
-                name: "sphere1",
-                mass: 1,
-                radius: sphere1Radius,
-                position: sphere1.position,
-            },
-            {
-                name: "sphere2",
-                mass: 1,
-                radius: sphere2Radius,
-                position: sphere2.position,
-            },
-        ],
-        scene,
-    );
+    const gravitySystem = new GravitySystem(scene);
 
     let elapsedSeconds = 0.0;
     const orbitalPeriod = 10;
@@ -139,7 +123,20 @@ export async function createGravitySystemScene(
             0,
         );
 
-        gravitySystem.update();
+        gravitySystem.update([
+            {
+                name: "sphere1",
+                mass: 1,
+                radius: sphere1Radius,
+                position: sphere1.position,
+            },
+            {
+                name: "sphere2",
+                mass: 1,
+                radius: sphere2Radius,
+                position: sphere2.position,
+            },
+        ]);
     });
 
     return scene;

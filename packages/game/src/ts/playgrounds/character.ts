@@ -110,17 +110,7 @@ export async function createCharacterDemoScene(
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
 
-    const gravitySystem = new GravitySystem(
-        [
-            {
-                name: "Planet",
-                mass: 100000,
-                position: ground.position,
-                radius: groundRadius,
-            },
-        ],
-        scene,
-    );
+    const gravitySystem = new GravitySystem(scene);
 
     character3.dance();
 
@@ -129,7 +119,14 @@ export async function createCharacterDemoScene(
     const characters = [character, character2, character3];
 
     scene.onBeforeRenderObservable.add(() => {
-        gravitySystem.update();
+        gravitySystem.update([
+            {
+                name: "Planet",
+                mass: 100000,
+                position: ground.position,
+                radius: groundRadius,
+            },
+        ]);
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 

@@ -31,17 +31,10 @@ type CelestialBody = {
 export class GravitySystem {
     private readonly scene: Scene;
 
-    private celestialBodies: ReadonlyArray<CelestialBody>;
+    private forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
 
-    private forceCache: Map<PhysicsBody, Vector3> = new Map();
-
-    constructor(celestialBodies: ReadonlyArray<CelestialBody>, scene: Scene) {
+    constructor(scene: Scene) {
         this.scene = scene;
-        this.celestialBodies = [...celestialBodies];
-    }
-
-    setCelestialBodies(celestialBodies: ReadonlyArray<CelestialBody>) {
-        this.celestialBodies = [...celestialBodies];
     }
 
     private filterPhysicsBodies(nodes: ReadonlyArray<TransformNode>): Array<PhysicsBody> {
@@ -66,14 +59,14 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    private computeGravity(body: PhysicsBody) {
+    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>) {
         const objectMass = body.getMassProperties().mass;
         if (objectMass === undefined || objectMass === 0) {
             return Vector3.Zero();
         }
 
         const totalForce = Vector3.Zero();
-        for (const celestialBody of this.celestialBodies) {
+        for (const celestialBody of celestialBodies) {
             const scaledDirection = celestialBody.position.subtract(body.transformNode.getAbsolutePosition());
             const distance = scaledDirection.length();
             //TODO: when 2.0 comes along, use the correct formula
@@ -90,9 +83,9 @@ export class GravitySystem {
         return totalForce;
     }
 
-    public update() {
+    public update(celestialBodies: ReadonlyArray<CelestialBody>): void {
         for (const physicsBody of this.getPhysicsBodies()) {
-            const gravity = this.computeGravity(physicsBody);
+            const gravity = this.computeGravity(physicsBody, celestialBodies);
             physicsBody.applyForce(gravity, physicsBody.getObjectCenterWorld());
             this.forceCache.set(physicsBody, gravity);
         }
