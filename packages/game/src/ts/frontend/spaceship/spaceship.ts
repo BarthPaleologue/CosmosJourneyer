@@ -235,8 +235,6 @@ export class Spaceship implements Transformable, Targetable {
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
         this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
 
-        console.log(this.aggregate.body.getObjectCenterWorld(), this.aggregate.body.getMassProperties().centerOfMass);
-
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
 
