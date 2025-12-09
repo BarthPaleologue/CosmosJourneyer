@@ -189,9 +189,9 @@ export class HumanoidAvatar implements Transformable {
         return this.root;
     }
 
-    private getCurrentAnimationState(): AnimationState {
+    private updateDistanceToGround(): number | null {
         const up = this.getTransform().up;
-        const rayStartOffset = 1;
+        const rayStartOffset = 1.8;
         const rayDepth = 50;
         const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
         const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
@@ -200,13 +200,18 @@ export class HumanoidAvatar implements Transformable {
         });
 
         if (!this.raycastResult.hasHit) {
-            this.lastDistanceToGround = null;
+            return null;
+        }
+
+        return this.raycastResult.hitDistance - rayStartOffset;
+    }
+
+    private getCurrentAnimationState(): AnimationState {
+        if (this.lastDistanceToGround === null) {
             return this.fallingState;
         }
 
-        const distance = rayStartOffset - this.raycastResult.hitDistance;
-        this.lastDistanceToGround = distance;
-        if (Math.abs(distance) < 0.1) {
+        if (Math.abs(this.lastDistanceToGround) < 0.1) {
             return this.groundedState;
         } else {
             return this.fallingState;
@@ -236,6 +241,11 @@ export class HumanoidAvatar implements Transformable {
     }
 
     public update(deltaSeconds: number): void {
+        this.lastDistanceToGround = this.updateDistanceToGround();
+        if (this.lastDistanceToGround !== null && this.lastDistanceToGround < 0) {
+            this.getTransform().position.addInPlace(this.getTransform().up.scale(-this.lastDistanceToGround));
+        }
+
         this.currentAnimationState = this.getCurrentAnimationState();
 
         switch (this.currentAnimationState) {
