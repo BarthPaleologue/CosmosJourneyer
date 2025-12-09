@@ -47,7 +47,8 @@ class AnimationState {
 export class HumanoidAvatar implements Transformable {
     readonly instance: HumanoidInstance;
 
-    readonly headLookController: BoneLookController;
+    private readonly headLookController: BoneLookController;
+    private isLookingAtTarget = false;
 
     readonly walkSpeed = 1.8;
     readonly walkSpeedBackwards = 1.2;
@@ -180,9 +181,12 @@ export class HumanoidAvatar implements Transformable {
                 upAxis: Vector3.UpReadOnly,
                 upAxisSpace: Space.BONE,
                 slerpAmount: 0.2,
+                minYaw: -Math.PI / 4,
+                maxYaw: Math.PI / 4,
+                minPitch: -Math.PI / 6,
+                maxPitch: Math.PI / 6,
             },
         );
-        this.resetLookAt();
     }
 
     public getTransform(): TransformNode {
@@ -277,6 +281,11 @@ export class HumanoidAvatar implements Transformable {
             deltaSeconds,
         );
 
+        if (!this.isLookingAtTarget) {
+            this.headLookController.target.copyFrom(
+                this.getHeadPositionToRef(new Vector3()).addInPlace(this.getTransform().forward.negate()),
+            );
+        }
         this.headLookController.update();
     }
 
@@ -327,25 +336,20 @@ export class HumanoidAvatar implements Transformable {
         );
     }
 
-    public lookAt(target: Vector3) {
+    public lookAt(target: Vector3 | null) {
+        if (target === null) {
+            this.isLookingAtTarget = false;
+            return;
+        }
+
+        this.isLookingAtTarget = true;
         this.headLookController.target.copyFrom(target);
-        this.headLookController.minYaw = -Math.PI / 4;
-        this.headLookController.maxYaw = Math.PI / 4;
-        this.headLookController.minPitch = -Math.PI / 6;
-        this.headLookController.maxPitch = Math.PI / 6;
     }
 
-    public resetLookAt() {
-        this.headLookController.target.copyFrom(Vector3.Zero());
-        this.headLookController.minYaw = 0;
-        this.headLookController.maxYaw = 0;
-        this.headLookController.minPitch = 0;
-        this.headLookController.maxPitch = 0;
-    }
-
-    public getHeadPositionToRef(result: Vector3) {
+    public getHeadPositionToRef(result: Vector3): Vector3 {
         const targetHead = this.instance.head;
         targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, result);
+        return result;
     }
 
     public dispose() {
