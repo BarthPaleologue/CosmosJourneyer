@@ -86,7 +86,7 @@ export class HumanoidAvatar implements Transformable {
     private readonly mass = 80;
     readonly aggregate: PhysicsAggregate;
 
-    constructor(instance: HumanoidInstance, scene: Scene) {
+    constructor(instance: HumanoidInstance, physicsEngine: PhysicsEngineV2, scene: Scene) {
         this.instance = instance;
         this.root = instance.root as AbstractMesh;
         this.getTransform().rotationQuaternion = Quaternion.Identity();
@@ -107,7 +107,7 @@ export class HumanoidAvatar implements Transformable {
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });
         this.aggregate.body.disablePreStep = false;
 
-        this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
+        this.physicsEngine = physicsEngine;
 
         this.idleAnim = instance.animations.idle;
         this.idleAnim.play(true);

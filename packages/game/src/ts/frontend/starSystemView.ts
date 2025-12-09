@@ -746,7 +746,7 @@ export class StarSystemView implements View {
         if (this.characterControls === null) {
             const humanoidInstance = this.assets.objects.humanoids.placeholder.spawn();
             if (humanoidInstance.success) {
-                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.scene);
+                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.physicsEngine, this.scene);
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));

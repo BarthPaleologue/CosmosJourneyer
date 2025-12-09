@@ -27,17 +27,22 @@ import {
     type Camera,
     type DepthRenderer,
     type DirectionalLight,
+    type PhysicsEngineV2,
     type Scene,
 } from "@babylonjs/core";
 import HavokPhysics, { type HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { SkyMaterial } from "@babylonjs/materials";
 import * as QRCode from "qrcode";
 
-export async function enablePhysics(scene: Scene, gravity = Vector3.Zero(), havokInstance?: HavokPhysicsWithBindings) {
-    const havokPlugin = new HavokPlugin(false, havokInstance ?? (await HavokPhysics()));
+export async function enablePhysics(
+    scene: Scene,
+    gravity = Vector3.Zero(),
+    havokInstance?: HavokPhysicsWithBindings,
+): Promise<PhysicsEngineV2> {
+    const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));
     scene.enablePhysics(gravity, havokPlugin);
 
-    return havokPlugin;
+    return scene.getPhysicsEngine() as PhysicsEngineV2;
 }
 
 export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<{ size: number }>): void {

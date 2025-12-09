@@ -47,7 +47,7 @@ export async function createCharacterDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, 0, 0));
+    const physicsEngine = await enablePhysics(scene, new Vector3(0, 0, 0));
 
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
@@ -70,7 +70,7 @@ export async function createCharacterDemoScene(
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const character = new HumanoidAvatar(humanoidInstance.value, scene);
+    const character = new HumanoidAvatar(humanoidInstance.value, physicsEngine, scene);
 
     const characterControls = new CharacterControls(character, scene);
     characterControls.getTransform().position.y = groundRadius;
@@ -79,14 +79,14 @@ export async function createCharacterDemoScene(
     if (!humanoid2.success) {
         throw new Error(`Failed to instantiate character: ${humanoid2.error}`);
     }
-    const character2 = new HumanoidAvatar(humanoid2.value, scene);
+    const character2 = new HumanoidAvatar(humanoid2.value, physicsEngine, scene);
     character2.getTransform().position = new Vector3(10, groundRadius, 6);
 
     const humanoid3 = humanoids.placeholder.spawn();
     if (!humanoid3.success) {
         throw new Error(`Failed to instantiate character: ${humanoid3.error}`);
     }
-    const character3 = new HumanoidAvatar(humanoid3.value, scene);
+    const character3 = new HumanoidAvatar(humanoid3.value, physicsEngine, scene);
     character3.getTransform().position = new Vector3(10, groundRadius, 7.5);
     character3.getTransform().rotate(Axis.Y, Math.PI, Space.WORLD);
 
