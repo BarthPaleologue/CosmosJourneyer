@@ -80,14 +80,14 @@ export async function createCharacterDemoScene(
         throw new Error(`Failed to instantiate character: ${humanoid2.error}`);
     }
     const character2 = new HumanoidAvatar(humanoid2.value, physicsEngine, scene);
-    character2.getTransform().position = new Vector3(10, groundRadius, 6);
+    character2.getTransform().position = new Vector3(10, groundRadius, 7.5);
 
     const humanoid3 = humanoids.placeholder.spawn();
     if (!humanoid3.success) {
         throw new Error(`Failed to instantiate character: ${humanoid3.error}`);
     }
     const character3 = new HumanoidAvatar(humanoid3.value, physicsEngine, scene);
-    character3.getTransform().position = new Vector3(10, groundRadius, 7.5);
+    character3.getTransform().position = new Vector3(10, groundRadius, 6);
     character3.getTransform().rotate(Axis.Y, Math.PI, Space.WORLD);
 
     enableShadows(light);

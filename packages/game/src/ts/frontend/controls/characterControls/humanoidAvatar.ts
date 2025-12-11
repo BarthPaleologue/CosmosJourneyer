@@ -230,9 +230,13 @@ export class HumanoidAvatar implements Transformable {
         const verticalVelocityBackup = linearVelocity.dot(up);
 
         const newLinearVelocity = new Vector3();
-        newLinearVelocity.addInPlace(forward.scale(-this.walkSpeed * this.walkAnim.weight));
-        newLinearVelocity.addInPlace(forward.scale(this.walkSpeedBackwards * this.walkBackAnim.weight));
-        newLinearVelocity.addInPlace(forward.scale(-this.runSpeed * this.runningAnim.weight));
+        newLinearVelocity.addInPlace(
+            forward.scale(
+                this.runSpeed * this.runningAnim.weight +
+                    this.walkSpeed * this.walkAnim.weight -
+                    this.walkSpeedBackwards * this.walkBackAnim.weight,
+            ),
+        );
         newLinearVelocity.addInPlace(up.scale(verticalVelocityBackup));
 
         this.aggregate.body.setLinearVelocity(newLinearVelocity);
@@ -240,7 +244,7 @@ export class HumanoidAvatar implements Transformable {
 
     private handleSwimmingState() {
         this.aggregate.body.setLinearVelocity(
-            this.getTransform().forward.scale(-this.swimSpeed * this.swimmingForwardAnim.weight),
+            this.getTransform().forward.scale(this.swimSpeed * this.swimmingForwardAnim.weight),
         );
     }
 
@@ -283,7 +287,7 @@ export class HumanoidAvatar implements Transformable {
 
         if (!this.isLookingAtTarget) {
             this.headLookController.target.copyFrom(
-                this.getHeadPositionToRef(new Vector3()).addInPlace(this.getTransform().forward.negate()),
+                this.getHeadPositionToRef(new Vector3()).addInPlace(this.getTransform().forward),
             );
         }
         this.headLookController.update();

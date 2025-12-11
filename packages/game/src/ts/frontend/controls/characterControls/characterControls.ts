@@ -53,7 +53,7 @@ export class CharacterControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
-            -1.0,
+            Math.PI / 2,
             Math.PI / 3,
             10,
             new Vector3(0, 1.5, 0),
@@ -113,7 +113,7 @@ export class CharacterControls implements Controls {
     public getEyesPosition(): Vector3 {
         return this.headTransform
             .getAbsolutePosition()
-            .add(this.headTransform.forward.scale(-0.12))
+            .add(this.headTransform.forward.scale(-0.15))
             .add(this.headTransform.up.scale(0.05));
     }
 
@@ -122,9 +122,9 @@ export class CharacterControls implements Controls {
         this.headTransform.computeWorldMatrix(true);
         this.firstPersonCamera.position = Vector3.TransformCoordinates(this.getEyesPosition(), inverseTransform);
 
-        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y - Math.PI, Space.LOCAL);
+        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
         this.getTransform().computeWorldMatrix(true);
-        this.firstPersonCamera.rotation.y = Math.PI;
+        this.firstPersonCamera.rotation.y = 0;
         this.firstPersonCamera.getViewMatrix(true);
 
         this.avatar.update(deltaSeconds);
@@ -148,7 +148,7 @@ export class CharacterControls implements Controls {
             this.thirdPersonCamera.target = cameraPosition;
         } else if (this.activeCamera === this.firstPersonCamera) {
             this.getTransform().position.addInPlace(
-                this.getTransform().right.scale(xMove * this.avatar.walkSpeed * deltaSeconds),
+                this.getTransform().right.scale(-xMove * this.avatar.walkSpeed * deltaSeconds),
             );
         }
 
