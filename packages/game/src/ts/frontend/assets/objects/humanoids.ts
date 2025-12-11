@@ -48,6 +48,8 @@ export type HumanoidAnimations = {
     skyDive: AnimationGroup;
     sittingOnGroundIdle: AnimationGroup;
     sittingOnSeatIdle: AnimationGroup;
+    sittingOnSeatToStandingIdle: AnimationGroup;
+    standingIdleToSittingOnSeat: AnimationGroup;
 };
 
 export type HumanoidInstance = {
@@ -127,6 +129,12 @@ export async function loadHumanoidPrefabs(
             const sittingOnSeatIdleAnim = findAnimation("Sitting On Seat Idle");
             if (!sittingOnSeatIdleAnim.success) return sittingOnSeatIdleAnim;
 
+            const standingIdleToSittingOnSeatAnim = findAnimation("Stand To Sit");
+            if (!standingIdleToSittingOnSeatAnim.success) return standingIdleToSittingOnSeatAnim;
+
+            const sittingOnSeatToStandingIdleAnim = findAnimation("Sit To Stand");
+            if (!sittingOnSeatToStandingIdleAnim.success) return sittingOnSeatToStandingIdleAnim;
+
             const skeleton = entries.skeletons[0];
             if (skeleton === undefined) {
                 return err("DefaultHumanoid skeleton not found");
@@ -167,6 +175,8 @@ export async function loadHumanoidPrefabs(
                     skyDive: skyDivingAnim.value,
                     sittingOnGroundIdle: sittingOnGroundIdleAnim.value,
                     sittingOnSeatIdle: sittingOnSeatIdleAnim.value,
+                    sittingOnSeatToStandingIdle: sittingOnSeatToStandingIdleAnim.value,
+                    standingIdleToSittingOnSeat: standingIdleToSittingOnSeatAnim.value,
                 },
             });
         },
