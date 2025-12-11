@@ -63,6 +63,9 @@ export class HumanoidAvatar implements Transformable {
     private readonly swimmingIdleAnim: AnimationGroup;
     private readonly swimmingForwardAnim: AnimationGroup;
 
+    private readonly sittingOnGroundIdleAnim: AnimationGroup;
+    private readonly sittingOnSeatIdleAnim: AnimationGroup;
+
     private readonly jumpingAnim: AnimationGroup;
     private readonly fallingIdleAnim: AnimationGroup;
     private readonly skyDivingAnim: AnimationGroup;
@@ -71,6 +74,7 @@ export class HumanoidAvatar implements Transformable {
     private targetAnim: AnimationGroup | null = null;
 
     private readonly groundedState: AnimationState;
+    private readonly seatedState: AnimationState;
     private readonly fallingState: AnimationState;
     private readonly swimmingState: AnimationState;
     private currentAnimationState: AnimationState;
@@ -149,6 +153,14 @@ export class HumanoidAvatar implements Transformable {
         this.jumpingAnim.play();
         this.jumpingAnim.weight = 0;
 
+        this.sittingOnGroundIdleAnim = instance.animations.sittingOnGroundIdle;
+        this.sittingOnGroundIdleAnim.play(true);
+        this.sittingOnGroundIdleAnim.weight = 0;
+
+        this.sittingOnSeatIdleAnim = instance.animations.sittingOnSeatIdle;
+        this.sittingOnSeatIdleAnim.play(true);
+        this.sittingOnSeatIdleAnim.weight = 0;
+
         this.nonIdleAnimations = [
             this.walkAnim,
             this.walkBackAnim,
@@ -159,6 +171,8 @@ export class HumanoidAvatar implements Transformable {
             this.skyDivingAnim,
             this.swimmingIdleAnim,
             this.swimmingForwardAnim,
+            this.sittingOnGroundIdleAnim,
+            this.sittingOnSeatIdleAnim,
         ];
 
         this.groundedState = new AnimationState(this.idleAnim, [
@@ -166,7 +180,9 @@ export class HumanoidAvatar implements Transformable {
             this.walkBackAnim,
             this.danceAnim,
             this.runningAnim,
+            this.sittingOnGroundIdleAnim,
         ]);
+        this.seatedState = new AnimationState(this.sittingOnSeatIdleAnim, []);
         this.fallingState = new AnimationState(this.fallingIdleAnim, [this.skyDivingAnim]);
         this.swimmingState = new AnimationState(this.swimmingIdleAnim, [this.swimmingForwardAnim]);
         this.currentAnimationState = this.groundedState;
@@ -279,8 +295,8 @@ export class HumanoidAvatar implements Transformable {
             weightSum += animation.weight;
         }
 
-        this.idleAnim.weight = moveTowards(
-            this.idleAnim.weight,
+        this.currentAnimationState.idleAnimation.weight = moveTowards(
+            this.currentAnimationState.idleAnimation.weight,
             Math.min(Math.max(1 - weightSum, 0.0), 1.0),
             deltaSeconds,
         );
@@ -301,7 +317,10 @@ export class HumanoidAvatar implements Transformable {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
             }
         } else if (this.currentAnimationState === this.groundedState) {
-            if (this.groundedState.currentAnimation !== this.danceAnim) {
+            if (
+                this.groundedState.currentAnimation !== this.danceAnim &&
+                this.groundedState.currentAnimation !== this.sittingOnGroundIdleAnim
+            ) {
                 this.groundedState.currentAnimation = this.idleAnim;
             }
             if (yMove > 0) {
@@ -317,11 +336,24 @@ export class HumanoidAvatar implements Transformable {
             } else {
                 this.fallingState.currentAnimation = this.skyDivingAnim;
             }
+        } else if (this.currentAnimationState === this.seatedState) {
+            this.seatedState.currentAnimation = this.sittingOnSeatIdleAnim;
+            if (xMove !== 0 || yMove !== 0) {
+                this.currentAnimationState = this.groundedState;
+            }
         }
     }
 
     public dance() {
         this.groundedState.currentAnimation = this.danceAnim;
+    }
+
+    public sitOnGround() {
+        this.groundedState.currentAnimation = this.sittingOnGroundIdleAnim;
+    }
+
+    public sitOnSeat() {
+        this.currentAnimationState = this.seatedState;
     }
 
     public jump() {

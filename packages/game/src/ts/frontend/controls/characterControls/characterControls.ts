@@ -84,6 +84,10 @@ export class CharacterControls implements Controls {
         CharacterInputs.map.jump.on("complete", () => {
             this.avatar.jump();
         });
+
+        CharacterInputs.map.sitOnGround.on("complete", () => {
+            this.avatar.sitOnGround();
+        });
     }
 
     public setFirstPersonCameraActive() {

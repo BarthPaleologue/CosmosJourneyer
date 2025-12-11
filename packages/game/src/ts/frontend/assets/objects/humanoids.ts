@@ -46,6 +46,8 @@ export type HumanoidAnimations = {
     jump: AnimationGroup;
     fall: AnimationGroup;
     skyDive: AnimationGroup;
+    sittingOnGroundIdle: AnimationGroup;
+    sittingOnSeatIdle: AnimationGroup;
 };
 
 export type HumanoidInstance = {
@@ -119,6 +121,12 @@ export async function loadHumanoidPrefabs(
             const jumpingAnim = findAnimation("Jumping");
             if (!jumpingAnim.success) return jumpingAnim;
 
+            const sittingOnGroundIdleAnim = findAnimation("Sitting On Ground Idle");
+            if (!sittingOnGroundIdleAnim.success) return sittingOnGroundIdleAnim;
+
+            const sittingOnSeatIdleAnim = findAnimation("Sitting On Seat Idle");
+            if (!sittingOnSeatIdleAnim.success) return sittingOnSeatIdleAnim;
+
             const skeleton = entries.skeletons[0];
             if (skeleton === undefined) {
                 return err("DefaultHumanoid skeleton not found");
@@ -157,6 +165,8 @@ export async function loadHumanoidPrefabs(
                     jump: jumpingAnim.value,
                     fall: fallingIdleAnim.value,
                     skyDive: skyDivingAnim.value,
+                    sittingOnGroundIdle: sittingOnGroundIdleAnim.value,
+                    sittingOnSeatIdle: sittingOnSeatIdleAnim.value,
                 },
             });
         },

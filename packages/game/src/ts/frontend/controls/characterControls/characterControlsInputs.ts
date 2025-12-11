@@ -38,6 +38,12 @@ const danceInteraction = new PressInteraction(
     }),
 );
 
+const sitOnGroundInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("KeyZ")],
+    }),
+);
+
 const runKey = keyboard.getControl("ShiftLeft");
 const runAction = new Action({
     bindings: [runKey],
@@ -53,12 +59,14 @@ export const CharacterInputs = new InputMap<{
     move: Action<[number, number]>;
     jump: PressInteraction;
     dance: PressInteraction;
+    sitOnGround: PressInteraction;
     run: Action;
     toggleCamera: PressInteraction;
 }>("CharacterInputs", {
     move: moveAction,
     jump: jumpInteraction,
     dance: danceInteraction,
+    sitOnGround: sitOnGroundInteraction,
     run: runAction,
     toggleCamera: toggleCameraInteraction,
 });
