@@ -44,6 +44,20 @@ class AnimationState {
     }
 }
 
+type GroundSurfaceInfo = {
+    type: "ground";
+    distance: number;
+};
+
+type WaterSurfaceInfo = {
+    type: "water";
+    distance: number;
+};
+
+export type SurfaceInfo = GroundSurfaceInfo | WaterSurfaceInfo;
+
+export type HumanoidAvatarState = "standingOnGround" | "seated" | "falling" | "swimming";
+
 export class HumanoidAvatar implements Transformable {
     readonly instance: HumanoidInstance;
 
@@ -54,6 +68,7 @@ export class HumanoidAvatar implements Transformable {
     readonly walkSpeedBackwards = 1.2;
     readonly runSpeed = 3.6;
     readonly swimSpeed = 1.5;
+    readonly swimVerticalSpeed = 1.0;
 
     private readonly idleAnim: AnimationGroup;
     private readonly walkAnim: AnimationGroup;
@@ -79,7 +94,7 @@ export class HumanoidAvatar implements Transformable {
     private readonly swimmingState: AnimationState;
     private currentAnimationState: AnimationState;
 
-    private lastDistanceToGround: number | null = null;
+    private lastSurfaceInfo: SurfaceInfo | null = null;
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
@@ -209,33 +224,62 @@ export class HumanoidAvatar implements Transformable {
         return this.root;
     }
 
-    private updateDistanceToGround(): number | null {
+    public getState(): HumanoidAvatarState {
+        if (this.currentAnimationState === this.groundedState) {
+            return "standingOnGround";
+        } else if (this.currentAnimationState === this.seatedState) {
+            return "seated";
+        } else if (this.currentAnimationState === this.fallingState) {
+            return "falling";
+        } else {
+            return "swimming";
+        }
+    }
+
+    private querySurfaceBelow() {
         const up = this.getTransform().up;
-        const rayStartOffset = 1.8;
-        const rayDepth = 50;
+        const rayStartOffset = 150;
+        const rayDepth = 100;
         const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
         const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-            collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
+            collideWith: CollisionMask.EVERYTHING & ~CollisionMask.AVATARS,
         });
 
         if (!this.raycastResult.hasHit) {
             return null;
         }
 
-        return this.raycastResult.hitDistance - rayStartOffset;
+        const distance = this.raycastResult.hitDistance - rayStartOffset;
+        if ((this.raycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+            return {
+                type: "water" as const,
+                distance,
+            };
+        }
+
+        return {
+            type: "ground" as const,
+            distance,
+        };
     }
 
     private getCurrentAnimationState(): AnimationState {
-        if (this.lastDistanceToGround === null) {
+        if (this.lastSurfaceInfo === null) {
             return this.fallingState;
         }
 
-        if (Math.abs(this.lastDistanceToGround) < 0.1) {
-            return this.groundedState;
-        } else {
+        if (this.lastSurfaceInfo.distance > 0.1) {
             return this.fallingState;
         }
+
+        // start swimming when water is 1m above feet
+        const waterLevelThreshold = 1;
+        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance < -waterLevelThreshold) {
+            return this.swimmingState;
+        }
+
+        return this.groundedState;
     }
 
     private handleGroundedState() {
@@ -259,15 +303,22 @@ export class HumanoidAvatar implements Transformable {
     }
 
     private handleSwimmingState() {
-        this.aggregate.body.setLinearVelocity(
-            this.getTransform().forward.scale(this.swimSpeed * this.swimmingForwardAnim.weight),
-        );
+        const forward = this.getTransform().forward;
+        this.aggregate.body.setLinearVelocity(forward.scale(this.swimSpeed * this.swimmingForwardAnim.weight));
     }
 
     public update(deltaSeconds: number): void {
-        this.lastDistanceToGround = this.updateDistanceToGround();
-        if (this.lastDistanceToGround !== null && this.lastDistanceToGround < 0) {
-            this.getTransform().position.addInPlace(this.getTransform().up.scale(-this.lastDistanceToGround));
+        this.lastSurfaceInfo = this.querySurfaceBelow();
+
+        // Do not fall through the ground
+        if (
+            this.lastSurfaceInfo !== null &&
+            this.lastSurfaceInfo.type === "ground" &&
+            this.lastSurfaceInfo.distance < 0
+        ) {
+            this.getTransform().position.addInPlace(
+                this.getTransform().up.scale(Math.abs(this.lastSurfaceInfo.distance)),
+            );
         }
 
         this.currentAnimationState = this.getCurrentAnimationState();
@@ -331,7 +382,7 @@ export class HumanoidAvatar implements Transformable {
                 this.groundedState.currentAnimation = this.runningAnim;
             }
         } else if (this.currentAnimationState === this.fallingState) {
-            if (this.lastDistanceToGround !== null && this.lastDistanceToGround < 30) {
+            if (this.lastSurfaceInfo !== null && this.lastSurfaceInfo.distance < 30) {
                 this.fallingState.currentAnimation = this.fallingIdleAnim;
             } else {
                 this.fallingState.currentAnimation = this.skyDivingAnim;

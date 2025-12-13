@@ -80,5 +80,6 @@ export const CollisionMask = {
     DYNAMIC_OBJECTS: 1 << 1,
     INTERACTIVE: 1 << 3,
     AVATARS: 1 << 4,
+    WATER: 1 << 5,
     EVERYTHING: 0xffffffff,
 } as const;

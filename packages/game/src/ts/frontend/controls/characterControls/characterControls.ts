@@ -139,6 +139,17 @@ export class CharacterControls implements Controls {
 
         this.avatar.move(xMove, yMove, CharacterInputs.map.run.value);
 
+        const avatarState = this.avatar.getState();
+        if (avatarState === "swimming") {
+            this.avatar
+                .getTransform()
+                .translate(
+                    this.avatar.getTransform().up,
+                    CharacterInputs.map.swimVertical.value * this.avatar.swimVerticalSpeed * deltaSeconds,
+                    Space.WORLD,
+                );
+        }
+
         const isMoving = xMove !== 0 || yMove !== 0;
 
         // Rotation
