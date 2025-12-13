@@ -102,7 +102,7 @@ export async function CreateSwimmingScene(
 
     const waterPlaneAggregate = new PhysicsAggregate(waterPlane, PhysicsShapeType.BOX, { mass: 0 }, scene);
     waterPlaneAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT | CollisionMask.WATER;
-    waterPlaneAggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.AVATARS;
+    waterPlaneAggregate.shape.filterCollideMask = CollisionMask.SURFACE_QUERY;
 
     const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);

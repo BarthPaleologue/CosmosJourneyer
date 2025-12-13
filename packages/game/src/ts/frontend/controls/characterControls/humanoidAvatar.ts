@@ -120,7 +120,7 @@ export class HumanoidAvatar implements Transformable {
         shape.material.restitution = 0.0;
         shape.material.friction = 0.0;
         shape.filterMembershipMask = CollisionMask.AVATARS;
-        shape.filterCollideMask = CollisionMask.EVERYTHING;
+        shape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS | CollisionMask.AVATARS;
 
         this.aggregate = new PhysicsAggregate(this.root, shape, { mass: this.mass });
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });
@@ -243,6 +243,7 @@ export class HumanoidAvatar implements Transformable {
         const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
         const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
+            membership: CollisionMask.EVERYTHING,
             collideWith: CollisionMask.EVERYTHING & ~CollisionMask.AVATARS,
         });
 
