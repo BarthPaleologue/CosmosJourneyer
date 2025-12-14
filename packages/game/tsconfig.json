@@ -1,12 +1,11 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "baseUrl": "./",
         "paths": {
-            "@/*": ["src/ts/*"],
-            "@assets/*": ["src/asset/*"],
-            "@shaders/*": ["src/shaders/*"],
-            "@styles/*": ["src/styles/*"]
+            "@/*": ["./src/ts/*"],
+            "@assets/*": ["./src/asset/*"],
+            "@shaders/*": ["./src/shaders/*"],
+            "@styles/*": ["./src/styles/*"]
         },
         "typeRoots": ["./node_modules/@types"],
         "types": ["webpack-env"]
