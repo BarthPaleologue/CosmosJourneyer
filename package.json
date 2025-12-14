@@ -58,20 +58,20 @@
         "tauri": "pnpm --filter @cosmos-journeyer/game exec -- tauri"
     },
     "devDependencies": {
-        "@eslint/js": "^9.37.0",
+        "@eslint/js": "^9.39.2",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-        "@next/eslint-plugin-next": "^15.5.5",
-        "eslint": "^9.37.0",
+        "@next/eslint-plugin-next": "^16.0.10",
+        "eslint": "^9.39.2",
         "eslint-import-resolver-typescript": "^4.4.4",
         "eslint-plugin-import": "^2.32.0",
-        "globals": "^16.4.0",
+        "globals": "^16.5.0",
         "http-server": "^14.1.1",
         "husky": "^9.1.7",
-        "lint-staged": "^16.2.4",
-        "prettier": "^3.6.2",
-        "tsx": "^4.20.6",
+        "lint-staged": "^16.2.7",
+        "prettier": "^3.7.4",
+        "tsx": "^4.21.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.1"
+        "typescript-eslint": "^8.49.0"
     },
     "lint-staged": {
         "*": "prettier --write --ignore-unknown"

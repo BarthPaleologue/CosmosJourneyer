@@ -7,7 +7,6 @@ import tseslint from "typescript-eslint";
 const projectConfigs = ["./packages/game/tsconfig.json", "./packages/website/tsconfig.json"];
 const tsParserOptions = {
     projectService: true,
-    project: projectConfigs,
     tsconfigRootDir: import.meta.dirname,
 };
 
