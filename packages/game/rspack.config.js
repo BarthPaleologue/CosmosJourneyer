@@ -4,7 +4,6 @@ import { fileURLToPath } from "url";
 
 import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
-import HtmlWebpackPlugin from "html-webpack-plugin";
 import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 
 // __dirname replacement in ESM modules
