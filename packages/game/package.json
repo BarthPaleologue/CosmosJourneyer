@@ -29,8 +29,8 @@
         "webgpu"
     ],
     "scripts": {
-        "build": "rspack --mode=production --node-env=production",
-        "serve": "rspack serve",
+        "build": "rspack --mode=production --node-env=production --configLoader=native",
+        "serve": "rspack serve --configLoader=native",
         "serve:prod": "http-server dist -p 8080",
         "format:check": "prettier . --check",
         "format": "prettier . --write",

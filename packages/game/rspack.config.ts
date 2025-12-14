@@ -10,7 +10,7 @@ import { TsCheckerRspackPlugin } from "ts-checker-rspack-plugin";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env["NODE_ENV"] === "production";
 
 const getLocalNetworkAddress = () => {
     const networkInterfaces = os.networkInterfaces();
@@ -20,7 +20,7 @@ const getLocalNetworkAddress = () => {
         }
 
         for (const address of networkInterface) {
-            if (address.family === "IPv4" && address.internal === false) {
+            if (address.family === "IPv4" && !address.internal) {
                 return address.address;
             }
         }
