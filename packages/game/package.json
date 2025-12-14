@@ -84,7 +84,6 @@
         "http-server": "^14.1.1",
         "jsdom": "^27.2.0",
         "prettier": "^3.7.1",
-        "raw-loader": "^4.0.2",
         "sass": "^1.94.2",
         "sass-loader": "^16.0.6",
         "ts-checker-rspack-plugin": "^1.2.0",
