@@ -123,7 +123,7 @@ export async function createGravitySystemScene(
             0,
         );
 
-        gravitySystem.applyGravity([
+        gravitySystem.update([
             {
                 name: "sphere1",
                 mass: 1,

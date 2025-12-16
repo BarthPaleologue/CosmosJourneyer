@@ -18,25 +18,9 @@
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
-
-/**
- *
- * @param body
- * @param enabled
- * @param havokPlugin
- * @see https://forum.babylonjs.com/t/havok-setenabled-on-body-shape/40818
- */
-export function setEnabledBody(body: PhysicsBody, enabled: boolean, havokPlugin: HavokPlugin): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    if (enabled) havokPlugin._hknp.HP_World_AddBody(havokPlugin.world, body._pluginData.hpBodyId, body.startAsleep);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    else havokPlugin._hknp.HP_World_RemoveBody(havokPlugin.world, body._pluginData.hpBodyId);
-}
 
 export function createEnvironmentAggregate(
     mesh: AbstractMesh,
@@ -49,4 +33,8 @@ export function createEnvironmentAggregate(
     aggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
     return aggregate;
+}
+
+export function setCollisionsEnabled(aggregate: PhysicsAggregate, enabled: boolean): void {
+    aggregate.shape.filterCollideMask = enabled ? CollisionMask.EVERYTHING : CollisionMask.NONE;
 }

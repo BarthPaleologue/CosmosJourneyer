@@ -57,7 +57,7 @@ export async function createInteractionDemo(
 
     await initI18n();
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
     const audioEngine = await CreateAudioEngineAsync();
 
@@ -89,15 +89,17 @@ export async function createInteractionDemo(
     groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
     groundAggregate.shape.material.friction = 2;
 
-    const humanoidInstance = humanoids.default.spawn();
+    const humanoidInstance = humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, scene);
+    const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, physicsEngine, scene);
 
     const characterControls = new CharacterControls(humanoidAvatar, scene);
     characterControls.getActiveCamera().attachControl();
+
+    characterControls.getActiveCamera().minZ = 0.1;
 
     CharacterInputs.setEnabled(true);
 

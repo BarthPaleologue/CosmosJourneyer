@@ -25,8 +25,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
 import { Settings } from "@/settings";
 
 import { type Controls } from "../";
@@ -38,11 +36,9 @@ export class CharacterControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
     private activeCamera: Camera;
 
-    private closestWalkableObject: Transformable | null = null;
+    private readonly characterRotationSpeed = 4;
 
-    private readonly characterRotationSpeed = 6;
-
-    private readonly avatar: HumanoidAvatar;
+    readonly avatar: HumanoidAvatar;
     private readonly headTransform: TransformNode;
 
     constructor(avatar: HumanoidAvatar, scene: Scene) {
@@ -57,7 +53,7 @@ export class CharacterControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
-            -1.0,
+            Math.PI / 2,
             Math.PI / 3,
             10,
             new Vector3(0, 1.5, 0),
@@ -88,32 +84,18 @@ export class CharacterControls implements Controls {
         CharacterInputs.map.jump.on("complete", () => {
             this.avatar.jump();
         });
+
+        CharacterInputs.map.sitOnGround.on("complete", () => {
+            this.avatar.sitOnGround();
+        });
     }
 
     public setFirstPersonCameraActive() {
         this.activeCamera = this.firstPersonCamera;
-        for (const mesh of this.getTransform().getChildMeshes()) {
-            const material = mesh.material;
-            if (material === null) {
-                continue;
-            }
-            material.disableColorWrite = true;
-        }
     }
 
     public setThirdPersonCameraActive() {
         this.activeCamera = this.thirdPersonCamera;
-        for (const mesh of this.getTransform().getChildMeshes()) {
-            const material = mesh.material;
-            if (material === null) {
-                continue;
-            }
-            material.disableColorWrite = false;
-        }
-    }
-
-    public setClosestWalkableObject(object: Transformable | null) {
-        this.closestWalkableObject = object;
     }
 
     public getActiveCamera(): Camera {
@@ -132,26 +114,41 @@ export class CharacterControls implements Controls {
         return true;
     }
 
+    public getEyesPosition(): Vector3 {
+        return this.headTransform
+            .getAbsolutePosition()
+            .add(this.headTransform.forward.scale(-0.15))
+            .add(this.headTransform.up.scale(0.05));
+    }
+
     public update(deltaSeconds: number): void {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
         this.headTransform.computeWorldMatrix(true);
-        this.firstPersonCamera.position = Vector3.TransformCoordinates(
-            this.headTransform.getAbsolutePosition(),
-            inverseTransform,
-        );
+        this.firstPersonCamera.position = Vector3.TransformCoordinates(this.getEyesPosition(), inverseTransform);
 
-        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y - Math.PI, Space.LOCAL);
+        this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
         this.getTransform().computeWorldMatrix(true);
-        this.firstPersonCamera.rotation.y = Math.PI;
+        this.firstPersonCamera.rotation.y = 0;
         this.firstPersonCamera.getViewMatrix(true);
 
-        this.avatar.update(deltaSeconds, this.closestWalkableObject);
+        this.avatar.update(deltaSeconds);
 
         const [xMove, yMove] = CharacterInputs.map.move.value;
 
         // https://playground.babylonjs.com/#AJA5J6#77
 
-        this.avatar.move(deltaSeconds, xMove, yMove, CharacterInputs.map.run.value);
+        this.avatar.move(xMove, yMove, CharacterInputs.map.run.value);
+
+        const avatarState = this.avatar.getState();
+        if (avatarState === "swimming") {
+            this.avatar
+                .getTransform()
+                .translate(
+                    this.avatar.getTransform().up,
+                    CharacterInputs.map.swimVertical.value * this.avatar.swimVerticalSpeed * deltaSeconds,
+                    Space.WORLD,
+                );
+        }
 
         const isMoving = xMove !== 0 || yMove !== 0;
 
@@ -166,7 +163,7 @@ export class CharacterControls implements Controls {
             this.thirdPersonCamera.target = cameraPosition;
         } else if (this.activeCamera === this.firstPersonCamera) {
             this.getTransform().position.addInPlace(
-                this.getTransform().right.scale(xMove * this.avatar.walkSpeed * deltaSeconds),
+                this.getTransform().right.scale(-xMove * this.avatar.walkSpeed * deltaSeconds),
             );
         }
 

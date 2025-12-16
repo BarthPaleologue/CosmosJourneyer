@@ -29,6 +29,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
@@ -455,6 +456,8 @@ export class CosmosJourneyer {
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         starSystemViewScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
+        const starSystemViewPhysicsEngine = starSystemViewScene.getPhysicsEngine() as PhysicsEngineV2;
+
         const loadingProgressMonitor = new LoadingProgressMonitor();
         loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
             loadingScreen.setProgress(startedCount, completedCount);
@@ -476,7 +479,7 @@ export class CosmosJourneyer {
             starSystemViewScene,
             player,
             engine,
-            mainHavokPlugin,
+            starSystemViewPhysicsEngine,
             backend.encyclopaedia,
             backend.universe,
             soundPlayer,

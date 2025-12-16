@@ -22,112 +22,160 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsAggregate, PhysicsShapeCapsule, type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
-import { setUpVector, translate } from "@/frontend/helpers/transform";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
+
+import { moveTowards } from "@/utils/math";
 
 import { CollisionMask } from "@/settings";
 
-class AnimationGroupWrapper {
-    name: string;
-    group: AnimationGroup;
-    weight: number;
-
-    constructor(name: string, group: AnimationGroup, startingWeight: number, loop: boolean) {
-        this.name = name;
-        this.weight = startingWeight;
-
-        this.group = group;
-        this.group.play(loop);
-        this.group.setWeightForAllAnimatables(startingWeight);
-    }
-
-    moveTowardsWeight(targetWeight: number, deltaTime: number) {
-        this.weight = Math.min(Math.max(this.weight + deltaTime * Math.sign(targetWeight - this.weight), 0), 1);
-        this.group.setWeightForAllAnimatables(this.weight);
-    }
-}
-
 class AnimationState {
-    readonly idleAnimation: AnimationGroupWrapper;
-    readonly nonIdleAnimations: AnimationGroupWrapper[];
-    currentAnimation: AnimationGroupWrapper;
+    readonly idleAnimation: AnimationGroup;
+    readonly nonIdleAnimations: Array<AnimationGroup>;
+    currentAnimation: AnimationGroup;
 
-    constructor(idleAnimation: AnimationGroupWrapper, nonIdleAnimations: AnimationGroupWrapper[]) {
+    constructor(idleAnimation: AnimationGroup, nonIdleAnimations: ReadonlyArray<AnimationGroup>) {
         this.idleAnimation = idleAnimation;
-        this.nonIdleAnimations = nonIdleAnimations;
+        this.nonIdleAnimations = [...nonIdleAnimations];
         this.currentAnimation = idleAnimation;
     }
 }
 
+type GroundSurfaceInfo = {
+    type: "ground";
+    distance: number;
+};
+
+type WaterSurfaceInfo = {
+    type: "water";
+    distance: number;
+};
+
+export type SurfaceInfo = GroundSurfaceInfo | WaterSurfaceInfo;
+
+export type HumanoidAvatarState = "standingOnGround" | "seated" | "falling" | "swimming";
+
 export class HumanoidAvatar implements Transformable {
     readonly instance: HumanoidInstance;
 
-    readonly headLookController: BoneLookController;
+    private readonly headLookController: BoneLookController;
+    private isLookingAtTarget = false;
 
     readonly walkSpeed = 1.8;
     readonly walkSpeedBackwards = 1.2;
     readonly runSpeed = 3.6;
     readonly swimSpeed = 1.5;
+    readonly swimVerticalSpeed = 1.0;
 
-    private readonly idleAnim: AnimationGroupWrapper;
-    private readonly walkAnim: AnimationGroupWrapper;
-    private readonly walkBackAnim: AnimationGroupWrapper;
-    private readonly danceAnim: AnimationGroupWrapper;
-    private readonly runningAnim: AnimationGroupWrapper;
+    private readonly idleAnim: AnimationGroup;
+    private readonly walkAnim: AnimationGroup;
+    private readonly walkBackAnim: AnimationGroup;
+    private readonly danceAnim: AnimationGroup;
+    private readonly runningAnim: AnimationGroup;
+    private readonly swimmingIdleAnim: AnimationGroup;
+    private readonly swimmingForwardAnim: AnimationGroup;
 
-    private readonly swimmingIdleAnim: AnimationGroupWrapper;
-    private readonly swimmingForwardAnim: AnimationGroupWrapper;
+    private readonly sittingOnGroundIdleAnim: AnimationGroup;
+    private readonly sittingOnSeatIdleAnim: AnimationGroup;
 
-    private readonly jumpingAnim: AnimationGroupWrapper;
+    private readonly jumpingAnim: AnimationGroup;
+    private readonly fallingIdleAnim: AnimationGroup;
+    private readonly skyDivingAnim: AnimationGroup;
 
-    private readonly fallingIdleAnim: AnimationGroupWrapper;
-    private readonly skyDivingAnim: AnimationGroupWrapper;
-
-    private readonly nonIdleAnimations: AnimationGroupWrapper[];
-
-    private targetAnim: AnimationGroupWrapper | null = null;
+    private readonly nonIdleAnimations: Array<AnimationGroup>;
+    private targetAnim: AnimationGroup | null = null;
 
     private readonly groundedState: AnimationState;
+    private readonly seatedState: AnimationState;
     private readonly fallingState: AnimationState;
     private readonly swimmingState: AnimationState;
     private currentAnimationState: AnimationState;
 
-    private distanceToGround = 0;
+    private lastSurfaceInfo: SurfaceInfo | null = null;
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
     private readonly root: AbstractMesh;
 
-    private jumpVelocity = Vector3.Zero();
-
     private readonly physicsEngine: PhysicsEngineV2;
 
-    constructor(instance: HumanoidInstance, scene: Scene) {
+    private readonly mass = 80;
+    readonly aggregate: PhysicsAggregate;
+
+    constructor(instance: HumanoidInstance, physicsEngine: PhysicsEngineV2, scene: Scene) {
         this.instance = instance;
         this.root = instance.root as AbstractMesh;
         this.getTransform().rotationQuaternion = Quaternion.Identity();
 
-        this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
-        this.idleAnim = new AnimationGroupWrapper("idle", instance.animations.idle, 1, true);
-        this.walkAnim = new AnimationGroupWrapper("walk", instance.animations.walk, 0, true);
-        this.walkBackAnim = new AnimationGroupWrapper("walkBack", instance.animations.walkBackward, 0, true);
-        this.danceAnim = new AnimationGroupWrapper("dance", instance.animations.dance, 0, true);
-        this.runningAnim = new AnimationGroupWrapper("running", instance.animations.run, 0, true);
-        this.fallingIdleAnim = new AnimationGroupWrapper("fallingIdle", instance.animations.fall, 0, true);
-        this.skyDivingAnim = new AnimationGroupWrapper("skydiving", instance.animations.skyDive, 0, true);
-        this.swimmingIdleAnim = new AnimationGroupWrapper("swimming", instance.animations.swim.idle, 0, true);
-        this.swimmingForwardAnim = new AnimationGroupWrapper(
-            "swimmingForward",
-            instance.animations.swim.forward,
-            0,
-            true,
+        const capsuleRadius = 0.4;
+        const shape = new PhysicsShapeCapsule(
+            new Vector3(0, capsuleRadius, 0),
+            new Vector3(0, 1.8 - capsuleRadius, 0),
+            capsuleRadius,
+            scene,
         );
-        this.jumpingAnim = new AnimationGroupWrapper("jumping", instance.animations.jump, 0, false);
+        shape.material.restitution = 0.0;
+        shape.material.friction = 0.0;
+        shape.filterMembershipMask = CollisionMask.AVATARS;
+        shape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS | CollisionMask.AVATARS;
+
+        this.aggregate = new PhysicsAggregate(this.root, shape, { mass: this.mass });
+        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero() });
+        this.aggregate.body.disablePreStep = false;
+
+        this.physicsEngine = physicsEngine;
+
+        this.idleAnim = instance.animations.idle;
+        this.idleAnim.play(true);
+        this.idleAnim.weight = 1;
+
+        this.walkAnim = instance.animations.walk;
+        this.walkAnim.play(true);
+        this.walkAnim.weight = 0;
+
+        this.walkBackAnim = instance.animations.walkBackward;
+        this.walkBackAnim.play(true);
+        this.walkBackAnim.weight = 0;
+
+        this.danceAnim = instance.animations.dance;
+        this.danceAnim.play(true);
+        this.danceAnim.weight = 0;
+
+        this.runningAnim = instance.animations.run;
+        this.runningAnim.play(true);
+        this.runningAnim.weight = 0;
+
+        this.fallingIdleAnim = instance.animations.fall;
+        this.fallingIdleAnim.play(true);
+        this.fallingIdleAnim.weight = 0;
+
+        this.skyDivingAnim = instance.animations.skyDive;
+        this.skyDivingAnim.play(true);
+        this.skyDivingAnim.weight = 0;
+
+        this.swimmingIdleAnim = instance.animations.swim.idle;
+        this.swimmingIdleAnim.play(true);
+        this.swimmingIdleAnim.weight = 0;
+
+        this.swimmingForwardAnim = instance.animations.swim.forward;
+        this.swimmingForwardAnim.play(true);
+        this.swimmingForwardAnim.weight = 0;
+
+        this.jumpingAnim = instance.animations.jump;
+        this.jumpingAnim.play();
+        this.jumpingAnim.weight = 0;
+
+        this.sittingOnGroundIdleAnim = instance.animations.sittingOnGroundIdle;
+        this.sittingOnGroundIdleAnim.play(true);
+        this.sittingOnGroundIdleAnim.weight = 0;
+
+        this.sittingOnSeatIdleAnim = instance.animations.sittingOnSeatIdle;
+        this.sittingOnSeatIdleAnim.play(true);
+        this.sittingOnSeatIdleAnim.weight = 0;
+
         this.nonIdleAnimations = [
             this.walkAnim,
             this.walkBackAnim,
@@ -138,6 +186,8 @@ export class HumanoidAvatar implements Transformable {
             this.skyDivingAnim,
             this.swimmingIdleAnim,
             this.swimmingForwardAnim,
+            this.sittingOnGroundIdleAnim,
+            this.sittingOnSeatIdleAnim,
         ];
 
         this.groundedState = new AnimationState(this.idleAnim, [
@@ -145,7 +195,9 @@ export class HumanoidAvatar implements Transformable {
             this.walkBackAnim,
             this.danceAnim,
             this.runningAnim,
+            this.sittingOnGroundIdleAnim,
         ]);
+        this.seatedState = new AnimationState(this.sittingOnSeatIdleAnim, []);
         this.fallingState = new AnimationState(this.fallingIdleAnim, [this.skyDivingAnim]);
         this.swimmingState = new AnimationState(this.swimmingIdleAnim, [this.swimmingForwardAnim]);
         this.currentAnimationState = this.groundedState;
@@ -160,6 +212,10 @@ export class HumanoidAvatar implements Transformable {
                 upAxis: Vector3.UpReadOnly,
                 upAxisSpace: Space.BONE,
                 slerpAmount: 0.2,
+                minYaw: -Math.PI / 4,
+                maxYaw: Math.PI / 4,
+                minPitch: -Math.PI / 6,
+                maxPitch: Math.PI / 6,
             },
         );
     }
@@ -168,90 +224,115 @@ export class HumanoidAvatar implements Transformable {
         return this.root;
     }
 
-    public update(deltaSeconds: number, closestWalkableObject: Transformable | null): void {
-        const character = this.getTransform();
-        const start = character.getAbsolutePosition().add(character.up.scale(50e3));
-        const end = character.position.add(character.up.scale(-50e3));
-
-        if (this.currentAnimationState === this.fallingState) {
-            // apply gravity
-            this.jumpVelocity.addInPlace(character.up.scale(-9.8 * deltaSeconds));
-            translate(character, this.jumpVelocity.scale(deltaSeconds));
-        }
-
-        if (closestWalkableObject !== null) {
-            const up = character
-                .getAbsolutePosition()
-                .subtract(closestWalkableObject.getTransform().getAbsolutePosition())
-                .normalize();
-            setUpVector(character, up);
-        }
-
-        this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-            collideWith: CollisionMask.ENVIRONMENT,
-        });
-        if (this.raycastResult.hasHit) {
-            const up = character.up;
-            let distance = Vector3.Dot(character.getAbsolutePosition().subtract(this.raycastResult.hitPointWorld), up);
-
-            // if closestWalkableObject is a telluric planet, the distance is the min between the distance to the ground and the distance to the water level
-            if (closestWalkableObject !== null && closestWalkableObject instanceof TelluricPlanet) {
-                const waterLevel = (closestWalkableObject.model.ocean?.depth ?? 0) + closestWalkableObject.getRadius();
-                const distanceToWater =
-                    Vector3.Distance(
-                        this.getTransform().getAbsolutePosition(),
-                        closestWalkableObject.getTransform().getAbsolutePosition(),
-                    ) - waterLevel;
-                distance = Math.min(distance, distanceToWater + 1.3);
-            }
-
-            if (distance <= 0.1) {
-                // push the character up if it's below the surface
-                translate(character, up.scale(-distance));
-
-                if (closestWalkableObject !== null && closestWalkableObject instanceof TelluricPlanet) {
-                    const waterLevel =
-                        (closestWalkableObject.model.ocean?.depth ?? 0) + closestWalkableObject.getRadius();
-                    const distanceToWater =
-                        Vector3.Distance(
-                            this.getTransform().getAbsolutePosition(),
-                            closestWalkableObject.getTransform().getAbsolutePosition(),
-                        ) - waterLevel;
-                    if (distanceToWater < 0) {
-                        this.currentAnimationState = this.swimmingState;
-                    } else {
-                        this.currentAnimationState = this.groundedState;
-                    }
-                } else {
-                    this.currentAnimationState = this.groundedState;
-                }
-                this.distanceToGround = 0;
-                this.jumpVelocity = Vector3.Zero();
-            } else {
-                this.currentAnimationState = this.fallingState;
-                this.distanceToGround = distance;
-            }
+    public getState(): HumanoidAvatarState {
+        if (this.currentAnimationState === this.groundedState) {
+            return "standingOnGround";
+        } else if (this.currentAnimationState === this.seatedState) {
+            return "seated";
+        } else if (this.currentAnimationState === this.fallingState) {
+            return "falling";
         } else {
-            this.currentAnimationState = this.fallingState;
-            this.distanceToGround = 50e3;
+            return "swimming";
+        }
+    }
+
+    private querySurfaceBelow() {
+        const up = this.getTransform().up;
+        const rayStartOffset = 150;
+        const rayDepth = 100;
+        const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
+        const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
+        this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
+            membership: CollisionMask.EVERYTHING,
+            collideWith: CollisionMask.EVERYTHING & ~CollisionMask.AVATARS,
+        });
+
+        if (!this.raycastResult.hasHit) {
+            return null;
         }
 
-        if (this.walkAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(-this.walkSpeed * deltaSeconds * this.walkAnim.weight),
+        const distance = this.raycastResult.hitDistance - rayStartOffset;
+        if ((this.raycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+            return {
+                type: "water" as const,
+                distance,
+            };
+        }
+
+        return {
+            type: "ground" as const,
+            distance,
+        };
+    }
+
+    private getCurrentAnimationState(): AnimationState {
+        if (this.lastSurfaceInfo === null) {
+            return this.fallingState;
+        }
+
+        if (this.lastSurfaceInfo.distance > 0.1) {
+            return this.fallingState;
+        }
+
+        // start swimming when water is 1m above feet
+        const waterLevelThreshold = 1;
+        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance < -waterLevelThreshold) {
+            return this.swimmingState;
+        }
+
+        return this.groundedState;
+    }
+
+    private handleGroundedState() {
+        const forward = this.getTransform().forward;
+        const up = this.getTransform().up;
+
+        const linearVelocity = this.aggregate.body.getLinearVelocity();
+        const verticalVelocityBackup = linearVelocity.dot(up);
+
+        const newLinearVelocity = new Vector3();
+        newLinearVelocity.addInPlace(
+            forward.scale(
+                this.runSpeed * this.runningAnim.weight +
+                    this.walkSpeed * this.walkAnim.weight -
+                    this.walkSpeedBackwards * this.walkBackAnim.weight,
+            ),
+        );
+        newLinearVelocity.addInPlace(up.scale(verticalVelocityBackup));
+
+        this.aggregate.body.setLinearVelocity(newLinearVelocity);
+    }
+
+    private handleSwimmingState() {
+        const forward = this.getTransform().forward;
+        this.aggregate.body.setLinearVelocity(forward.scale(this.swimSpeed * this.swimmingForwardAnim.weight));
+    }
+
+    public update(deltaSeconds: number): void {
+        this.lastSurfaceInfo = this.querySurfaceBelow();
+
+        // Do not fall through the ground
+        if (
+            this.lastSurfaceInfo !== null &&
+            this.lastSurfaceInfo.type === "ground" &&
+            this.lastSurfaceInfo.distance < 0
+        ) {
+            this.getTransform().position.addInPlace(
+                this.getTransform().up.scale(Math.abs(this.lastSurfaceInfo.distance)),
             );
         }
 
-        if (this.walkBackAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(this.walkSpeedBackwards * deltaSeconds * this.walkBackAnim.weight),
-            );
-        }
+        this.currentAnimationState = this.getCurrentAnimationState();
 
-        if (this.runningAnim.weight > 0.0) {
-            this.root.moveWithCollisions(
-                this.root.forward.scale(-this.runSpeed * deltaSeconds * this.runningAnim.weight),
-            );
+        switch (this.currentAnimationState) {
+            case this.groundedState:
+                this.handleGroundedState();
+                break;
+            case this.fallingState:
+                break;
+            case this.swimmingState:
+                this.handleSwimmingState();
+                break;
         }
 
         this.targetAnim = this.currentAnimationState.currentAnimation;
@@ -259,28 +340,39 @@ export class HumanoidAvatar implements Transformable {
         let weightSum = 0;
         for (const animation of this.nonIdleAnimations) {
             if (animation === this.targetAnim) {
-                animation.moveTowardsWeight(1, deltaSeconds);
+                animation.weight = moveTowards(animation.weight, 1, deltaSeconds);
             } else {
-                animation.moveTowardsWeight(0, deltaSeconds);
+                animation.weight = moveTowards(animation.weight, 0, deltaSeconds);
             }
             weightSum += animation.weight;
         }
 
-        this.idleAnim.moveTowardsWeight(Math.min(Math.max(1 - weightSum, 0.0), 1.0), deltaSeconds);
+        this.currentAnimationState.idleAnimation.weight = moveTowards(
+            this.currentAnimationState.idleAnimation.weight,
+            Math.min(Math.max(1 - weightSum, 0.0), 1.0),
+            deltaSeconds,
+        );
 
+        if (!this.isLookingAtTarget) {
+            this.headLookController.target.copyFrom(
+                this.getHeadPositionToRef(new Vector3()).addInPlace(this.getTransform().forward),
+            );
+        }
         this.headLookController.update();
     }
 
-    public move(deltaSeconds: number, xMove: number, yMove: number, running: number): void {
+    public move(xMove: number, yMove: number, running: number): void {
         // Translation
         if (this.currentAnimationState === this.swimmingState) {
             this.swimmingState.currentAnimation = this.swimmingIdleAnim;
             if (yMove > 0) {
                 this.swimmingState.currentAnimation = this.swimmingForwardAnim;
-                this.root.moveWithCollisions(this.root.forward.scale(-this.swimSpeed * deltaSeconds));
             }
         } else if (this.currentAnimationState === this.groundedState) {
-            if (this.groundedState.currentAnimation !== this.danceAnim) {
+            if (
+                this.groundedState.currentAnimation !== this.danceAnim &&
+                this.groundedState.currentAnimation !== this.sittingOnGroundIdleAnim
+            ) {
                 this.groundedState.currentAnimation = this.idleAnim;
             }
             if (yMove > 0) {
@@ -291,43 +383,61 @@ export class HumanoidAvatar implements Transformable {
                 this.groundedState.currentAnimation = this.runningAnim;
             }
         } else if (this.currentAnimationState === this.fallingState) {
-            if (this.distanceToGround < 30) {
+            if (this.lastSurfaceInfo !== null && this.lastSurfaceInfo.distance < 30) {
                 this.fallingState.currentAnimation = this.fallingIdleAnim;
             } else {
                 this.fallingState.currentAnimation = this.skyDivingAnim;
             }
+        } else if (this.currentAnimationState === this.seatedState) {
+            this.seatedState.currentAnimation = this.sittingOnSeatIdleAnim;
+            if (xMove !== 0 || yMove !== 0) {
+                this.currentAnimationState = this.groundedState;
+            }
         }
-
-        this.root.computeWorldMatrix(true);
     }
 
     public dance() {
         this.groundedState.currentAnimation = this.danceAnim;
     }
 
+    public sitOnGround() {
+        this.groundedState.currentAnimation = this.sittingOnGroundIdleAnim;
+    }
+
+    public sitOnSeat() {
+        this.currentAnimationState = this.seatedState;
+    }
+
     public jump() {
+        if (this.currentAnimationState !== this.groundedState) {
+            return;
+        }
+
         this.targetAnim = this.jumpingAnim;
         this.jumpingAnim.weight = 1;
-        this.jumpingAnim.group.stop();
-        this.jumpingAnim.group.play();
-        this.currentAnimationState = this.fallingState;
-        this.jumpVelocity = this.getTransform().up.scale(6.0).add(this.getTransform().forward.scale(-2.0));
+        this.jumpingAnim.stop();
+        this.jumpingAnim.play();
+
+        this.aggregate.body.applyImpulse(
+            this.getTransform().up.scale(this.mass * 50),
+            this.getTransform().getAbsolutePosition(),
+        );
     }
 
-    public lookAt(target: Vector3) {
+    public lookAt(target: Vector3 | null) {
+        if (target === null) {
+            this.isLookingAtTarget = false;
+            return;
+        }
+
+        this.isLookingAtTarget = true;
         this.headLookController.target.copyFrom(target);
-        this.headLookController.minYaw = -Math.PI / 4;
-        this.headLookController.maxYaw = Math.PI / 4;
-        this.headLookController.minPitch = -Math.PI / 6;
-        this.headLookController.maxPitch = Math.PI / 6;
     }
 
-    public resetLookAt() {
-        this.headLookController.target.copyFrom(Vector3.Zero());
-        this.headLookController.minYaw = 0;
-        this.headLookController.maxYaw = 0;
-        this.headLookController.minPitch = 0;
-        this.headLookController.maxPitch = 0;
+    public getHeadPositionToRef(result: Vector3): Vector3 {
+        const targetHead = this.instance.head;
+        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, result);
+        return result;
     }
 
     public dispose() {

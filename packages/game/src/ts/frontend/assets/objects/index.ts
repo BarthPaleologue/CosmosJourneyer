@@ -116,7 +116,6 @@ export async function loadObjects(
     rock.position.y = 0.1;
     rock.scaling.scaleInPlace(0.2);
     rock.bakeCurrentTransformIntoVertices();
-    rock.checkCollisions = true;
     rock.isVisible = false;
 
     rockContainer.addAllToScene();
@@ -130,7 +129,6 @@ export async function loadObjects(
     tree.position.y = -1;
     tree.scaling.scaleInPlace(3);
     tree.bakeCurrentTransformIntoVertices();
-    tree.checkCollisions = true;
     tree.isVisible = false;
     tree.material = materials.tree;
 

@@ -19,10 +19,10 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 
@@ -46,7 +46,7 @@ import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotati
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
+import { getRotationQuaternion, lookAt, setRotationQuaternion, setUpVector } from "@/frontend/helpers/transform";
 import { type UberScene } from "@/frontend/helpers/uberScene";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
@@ -80,6 +80,7 @@ import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
 import { HumanoidAvatar } from "./controls/characterControls/humanoidAvatar";
+import { setCollisionsEnabled } from "./helpers/havok";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -130,10 +131,7 @@ export class StarSystemView implements View {
      */
     readonly scene: UberScene;
 
-    /**
-     * The Havok physics plugin used inside the scene
-     */
-    readonly havokPlugin: HavokPlugin;
+    private readonly physicsEngine: PhysicsEngineV2;
 
     /**
      * The default controls are used for debug purposes. They allow to move freely between orbital objects without speed limitations.
@@ -226,17 +224,24 @@ export class StarSystemView implements View {
     private readonly assets: RenderingAssets;
 
     /**
-     * Creates an empty star system view with a scene, a gui and a havok plugin
+     * Creates an empty star system view with a scene, a gui and a physics engine
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
+     * @param scene The UberScene instance
      * @param player The player object shared with the rest of the game
      * @param engine The BabylonJS engine
-     * @param havokPlugin The Havok physics plugin instance
+     * @param physicsEngine The physics engine V2 instance
+     * @param encyclopaedia The encyclopaedia manager
+     * @param universeBackend The universe backend
+     * @param soundPlayer The sound player
+     * @param tts The text-to-speech system
+     * @param notificationManager The notification manager
+     * @param assets The rendering assets
      */
     constructor(
         scene: UberScene,
         player: Player,
         engine: AbstractEngine,
-        havokPlugin: HavokPlugin,
+        physicsEngine: PhysicsEngineV2,
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
@@ -255,7 +260,7 @@ export class StarSystemView implements View {
         this.scene.skipPointerMovePicking = true;
         this.scene.autoClear = false;
 
-        this.havokPlugin = havokPlugin;
+        this.physicsEngine = physicsEngine;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -429,6 +434,7 @@ export class StarSystemView implements View {
             const spaceship = shipControls.getSpaceship();
 
             if (this.scene.getActiveControls() === shipControls) {
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
 
@@ -441,9 +447,30 @@ export class StarSystemView implements View {
 
                 const left = Vector3.Cross(Vector3.Up(), up).normalize();
 
-                characterControls
-                    .getTransform()
-                    .setAbsolutePosition(shipPosition.add(shipForward.scale(20)).add(left.scale(10)));
+                const desiredSpawnPosition = shipPosition.add(shipForward.scale(20)).add(left.scale(10));
+
+                // make sure character spawns above ground
+                const raycastResult = new PhysicsRaycastResult();
+                this.physicsEngine.raycastToRef(
+                    desiredSpawnPosition.add(up.scale(200)),
+                    desiredSpawnPosition.add(up.scale(-200)),
+                    raycastResult,
+                    {
+                        collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
+                    },
+                );
+
+                if (raycastResult.hasHit) {
+                    desiredSpawnPosition.copyFrom(
+                        raycastResult.hitPointWorld.add(raycastResult.hitNormalWorld.scale(1.0)),
+                    );
+                }
+
+                characterControls.getTransform().setAbsolutePosition(desiredSpawnPosition);
+                characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
+
+                lookAt(characterControls.getTransform(), shipPosition, scene.useRightHandedSystem);
+                characterControls.getTransform().rotate(Vector3.Up(), Math.PI, Space.LOCAL);
 
                 SpaceShipControlsInputs.setEnabled(false);
                 this.spaceShipLayer.setVisibility(false);
@@ -502,7 +529,6 @@ export class StarSystemView implements View {
 
         if (this.starSystem !== null) {
             this.spaceshipControls?.setClosestLandableFacility(null);
-            this.characterControls?.setClosestWalkableObject(null);
             this.chunkForge.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
@@ -594,6 +620,10 @@ export class StarSystemView implements View {
         const currentSpaceship = this.spaceshipControls?.getSpaceship();
         const currentJumpRange = currentSpaceship?.getInternals().getWarpDrive()?.rangeLY ?? 0;
 
+        if (currentSpaceship !== undefined) {
+            this.targetCursorLayer.addObject(currentSpaceship);
+        }
+
         for (const neighbor of getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
             Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
@@ -657,6 +687,8 @@ export class StarSystemView implements View {
         );
         this.player.instancedSpaceships.push(spaceship);
 
+        this.targetCursorLayer.addObject(spaceship);
+
         this.interactionSystem.register({
             getPhysicsAggregate: () => spaceship.aggregate,
             getInteractions: () => {
@@ -712,9 +744,10 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const humanoidInstance = this.assets.objects.humanoids.default.spawn();
+            const humanoidInstance = this.assets.objects.humanoids.placeholder.spawn();
             if (humanoidInstance.success) {
-                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.scene);
+                const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.physicsEngine, this.scene);
+                setCollisionsEnabled(humanoidAvatar.aggregate, false);
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
@@ -747,6 +780,10 @@ export class StarSystemView implements View {
             this.scene.setActiveCamera(this.scene.getActiveControls().getActiveCamera());
         }
 
+        const lastCharacterGravity =
+            starSystem.gravitySystem.getLastComputedForce(this.characterControls.avatar.aggregate.body) ?? Vector3.Up();
+        setUpVector(this.characterControls.avatar.getTransform(), lastCharacterGravity.normalize().negateInPlace());
+
         const activeControls = this.scene.getActiveControls();
 
         this.chunkForge.update(this.assets);
@@ -773,8 +810,6 @@ export class StarSystemView implements View {
         } else {
             this.spaceshipControls.setClosestLandableFacility(null);
         }
-
-        this.characterControls.setClosestWalkableObject(nearestOrbitalObject);
 
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (
@@ -826,7 +861,7 @@ export class StarSystemView implements View {
             currentSystem: starSystem,
             currentItinerary: this.player.currentItinerary,
             playerPosition: this.scene.getActiveControls().getTransform().getAbsolutePosition(),
-            physicsEngine: this.scene.getPhysicsEngine() as PhysicsEngineV2,
+            physicsEngine: this.physicsEngine,
         };
 
         const newlyCompletedMissions: Mission[] = [];
@@ -957,7 +992,6 @@ export class StarSystemView implements View {
 
         shipControls.syncCameraTransform();
 
-        shipControls.getSpaceship().setEnabled(true, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(true);
     }
 
@@ -984,7 +1018,6 @@ export class StarSystemView implements View {
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
-        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
@@ -1006,7 +1039,6 @@ export class StarSystemView implements View {
 
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
-        spaceship.setEnabled(false, this.havokPlugin);
         SpaceShipControlsInputs.setEnabled(false);
 
         this.stopBackgroundSounds();

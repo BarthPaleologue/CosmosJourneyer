@@ -35,6 +35,8 @@ import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { setUpVector } from "@/frontend/helpers/transform";
+import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
 
@@ -45,7 +47,7 @@ export async function createCharacterDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene, new Vector3(0, 0, 0));
 
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
@@ -62,31 +64,53 @@ export async function createCharacterDemoScene(
     hemi.intensity = 0.5;
 
     const groundRadius = 40;
+    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
-    const humanoidInstance = humanoids.default.spawn();
+    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
+
+    const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
+    groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
+    ground.material = groundMaterial;
+
+    const humanoidInstance = humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
 
-    const character = new HumanoidAvatar(humanoidInstance.value, scene);
+    const character = new HumanoidAvatar(humanoidInstance.value, physicsEngine, scene);
 
     const characterControls = new CharacterControls(character, scene);
     characterControls.getTransform().position.y = groundRadius;
 
-    const humanoid2 = humanoids.default.spawn();
+    const humanoid2 = humanoids.placeholder.spawn();
     if (!humanoid2.success) {
         throw new Error(`Failed to instantiate character: ${humanoid2.error}`);
     }
-    const character2 = new HumanoidAvatar(humanoid2.value, scene);
-    character2.getTransform().position = new Vector3(10, groundRadius, 6);
+    const character2 = new HumanoidAvatar(humanoid2.value, physicsEngine, scene);
+    character2.getTransform().position = new Vector3(10, groundRadius, 7.5);
+    const dirToCenter = character2.getTransform().position.negate().normalize();
+    const rayCastResult2 = physicsEngine.raycast(
+        character2.getTransform().position,
+        character2.getTransform().position.add(dirToCenter.scale(30)),
+    );
+    if (rayCastResult2.hasHit) {
+        character2.getTransform().position = rayCastResult2.hitPointWorld;
+    }
 
-    const humanoid3 = humanoids.default.spawn();
+    const humanoid3 = humanoids.placeholder.spawn();
     if (!humanoid3.success) {
         throw new Error(`Failed to instantiate character: ${humanoid3.error}`);
     }
-    const character3 = new HumanoidAvatar(humanoid3.value, scene);
-    character3.getTransform().position = new Vector3(10, groundRadius, 7.5);
+    const character3 = new HumanoidAvatar(humanoid3.value, physicsEngine, scene);
+    character3.getTransform().position = new Vector3(10, groundRadius, 6);
     character3.getTransform().rotate(Axis.Y, Math.PI, Space.WORLD);
+    const rayCastResult3 = physicsEngine.raycast(
+        character3.getTransform().position,
+        character3.getTransform().position.add(dirToCenter.scale(30)),
+    );
+    if (rayCastResult3.hasHit) {
+        character3.getTransform().position = rayCastResult3.hitPointWorld;
+    }
 
     enableShadows(light);
 
@@ -96,28 +120,27 @@ export async function createCharacterDemoScene(
     }
 
     characterControls.getActiveCamera().attachControl();
+    characterControls.getActiveCamera().minZ = 0.1;
 
     CharacterInputs.setEnabled(true);
 
-    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
-
-    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0 }, scene);
-
-    const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
-    groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
-    ground.material = groundMaterial;
-
-    const walkableObject = {
-        getTransform: () => ground,
-    };
-
-    characterControls.setClosestWalkableObject(walkableObject);
+    const gravitySystem = new GravitySystem(scene);
 
     character3.dance();
 
     const headTrackingTarget = Vector3.Zero();
 
+    const characters = [character, character2, character3];
+
     scene.onBeforeRenderObservable.add(() => {
+        gravitySystem.update([
+            {
+                name: "Planet",
+                mass: 100000,
+                position: ground.position,
+                radius: groundRadius,
+            },
+        ]);
         if (characterControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
@@ -126,14 +149,18 @@ export async function createCharacterDemoScene(
             scene.activeCamera = camera;
         }
 
-        const targetHead = character.instance.head;
-        targetHead.bone.getAbsolutePositionToRef(targetHead.attachmentMesh, headTrackingTarget);
-
         const deltaSeconds = engine.getDeltaTime() / 1000;
         characterControls.update(deltaSeconds);
-        character2.update(deltaSeconds, walkableObject);
-        character3.update(deltaSeconds, walkableObject);
+        character2.update(deltaSeconds);
+        character3.update(deltaSeconds);
 
+        for (const character of characters) {
+            const gravity = gravitySystem.getLastComputedForce(character.aggregate.body) ?? Vector3.Up();
+            const upDirection = gravity.normalize().negateInPlace();
+            setUpVector(character.getTransform(), upDirection);
+        }
+
+        character.getHeadPositionToRef(headTrackingTarget);
         character2.lookAt(headTrackingTarget);
         character3.lookAt(headTrackingTarget);
     });

@@ -19,7 +19,6 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
@@ -43,7 +42,7 @@ import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField"
 import { type ItemPool } from "@/utils/itemPool";
 import { type DeepReadonly } from "@/utils/types";
 
-import { Settings } from "@/settings";
+import { CollisionMask, Settings } from "@/settings";
 
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
@@ -90,19 +89,16 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2,
-            },
-            scene,
-        );
+        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.getBoundingRadius(), scene);
+        physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+        physicsShape.filterCollideMask = CollisionMask.SURFACE_QUERY | CollisionMask.SUN_OCCLUSION_QUERY;
+        if (model.ocean !== null) {
+            physicsShape.filterMembershipMask |= CollisionMask.WATER;
+        }
+
+        this.aggregate = new PhysicsAggregate(this.getTransform(), physicsShape, undefined, scene);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.getTransform());
 
         if (this.model.atmosphere !== null) {
             const atmosphereThickness =

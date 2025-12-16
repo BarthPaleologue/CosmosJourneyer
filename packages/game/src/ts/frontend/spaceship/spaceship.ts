@@ -26,7 +26,6 @@ import {
     type IPhysicsCollisionEvent,
 } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
@@ -42,7 +41,6 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { setEnabledBody } from "@/frontend/helpers/havok";
 import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
@@ -52,8 +50,10 @@ import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPad
 
 import type { DeepReadonly } from "@/utils/types";
 
+import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
+import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
@@ -74,7 +74,7 @@ type SoundInstances = {
     thruster: ISoundInstance;
 };
 
-export class Spaceship implements Transformable {
+export class Spaceship implements Transformable, Targetable {
     readonly shipType: ShipType;
 
     readonly id: string;
@@ -82,6 +82,8 @@ export class Spaceship implements Transformable {
     readonly name: string;
 
     readonly frame: AbstractMesh;
+
+    readonly targetInfo: TargetInfo;
 
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
@@ -233,8 +235,6 @@ export class Spaceship implements Transformable {
         this.aggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
         this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
 
-        console.log(this.aggregate.body.getObjectCenterWorld(), this.aggregate.body.getMassProperties().centerOfMass);
-
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
 
@@ -260,6 +260,13 @@ export class Spaceship implements Transformable {
 
         this.boundingExtent = boundingMax.subtract(boundingMin);
 
+        this.getTransform().name = this.name;
+        this.targetInfo = {
+            type: ObjectTargetCursorType.SPACESHIP,
+            minDistance: this.getBoundingRadius() * 15,
+            maxDistance: 0,
+        };
+
         this.soundInstances = soundInstances;
 
         this.soundInstances.thruster.play();
@@ -282,9 +289,12 @@ export class Spaceship implements Transformable {
         return this.aggregate.transformNode;
     }
 
-    public setEnabled(enabled: boolean, havokPlugin: HavokPlugin) {
-        this.getTransform().setEnabled(enabled);
-        setEnabledBody(this.aggregate.body, enabled, havokPlugin);
+    public getBoundingRadius(): number {
+        return this.boundingExtent.length() / 2;
+    }
+
+    public getTypeName(): string {
+        return i18n.t("objectTypes:spaceship");
     }
 
     public setNearestOrbitalObject(orbitalObject: OrbitalObject) {

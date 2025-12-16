@@ -96,7 +96,7 @@ export class StarSystemController {
 
     private readonly assets: RenderingAssets;
 
-    private readonly gravitySystem: GravitySystem;
+    readonly gravitySystem: GravitySystem;
     private readonly floatingOriginSystem: FloatingOriginSystem;
 
     /**
@@ -432,7 +432,7 @@ export class StarSystemController {
             }
         }
 
-        this.gravitySystem.applyGravity(
+        this.gravitySystem.update(
             this.getCelestialBodies().map((body) => ({
                 name: body.model.name,
                 radius: body.getBoundingRadius(),

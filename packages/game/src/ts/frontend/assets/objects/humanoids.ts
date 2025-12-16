@@ -30,7 +30,7 @@ import { loadAssetInContainerAsync } from "./utils";
 import defaultHumanoidPath from "@assets/character/character.glb";
 
 export type HumanoidPrefabs = {
-    default: HumanoidPrefab;
+    placeholder: HumanoidPrefab;
 };
 
 export type HumanoidAnimations = {
@@ -46,6 +46,10 @@ export type HumanoidAnimations = {
     jump: AnimationGroup;
     fall: AnimationGroup;
     skyDive: AnimationGroup;
+    sittingOnGroundIdle: AnimationGroup;
+    sittingOnSeatIdle: AnimationGroup;
+    sittingOnSeatToStandingIdle: AnimationGroup;
+    standingIdleToSittingOnSeat: AnimationGroup;
 };
 
 export type HumanoidInstance = {
@@ -83,35 +87,53 @@ export async function loadHumanoidPrefabs(
 
             const animations = entries.animationGroups;
 
-            const walkAnim = animations.find((a) => a.name.includes("WalkingForward"));
-            if (walkAnim === undefined) return err("'WalkingForward' animation not found");
+            const findAnimation = (namePart: string): Result<AnimationGroup, string> => {
+                const anim = animations.find((a) => a.name.includes(namePart));
+                if (anim === undefined) {
+                    return err(`'${namePart}' animation not found`);
+                }
+                return ok(anim);
+            };
 
-            const walkBackAnim = animations.find((a) => a.name.includes("WalkingBackwards"));
-            if (walkBackAnim === undefined) return err("'WalkingBackwards' animation not found");
+            const walkAnim = findAnimation("Walking Forward");
+            if (!walkAnim.success) return walkAnim;
 
-            const idleAnim = animations.find((a) => a.name.includes("WalkingIdle"));
-            if (idleAnim === undefined) return err("'WalkingIdle' animation not found");
+            const walkBackAnim = findAnimation("Walking Backward");
+            if (!walkBackAnim.success) return walkBackAnim;
+            const idleAnim = findAnimation("Standing Idle");
+            if (!idleAnim.success) return idleAnim;
 
-            const sambaAnim = animations.find((a) => a.name.includes("Samba"));
-            if (sambaAnim === undefined) return err("'Samba' animation not found");
+            const sambaAnim = findAnimation("Samba Dancing");
+            if (!sambaAnim.success) return sambaAnim;
 
-            const runningAnim = animations.find((a) => a.name.includes("Running"));
-            if (runningAnim === undefined) return err("'Running' animation not found");
+            const runningAnim = findAnimation("Running");
+            if (!runningAnim.success) return runningAnim;
+            const fallingIdleAnim = findAnimation("Falling Idle");
+            if (!fallingIdleAnim.success) return fallingIdleAnim;
 
-            const fallingIdleAnim = animations.find((a) => a.name.includes("FallingIdle"));
-            if (fallingIdleAnim === undefined) return err("'FallingIdle' animation not found");
+            const skyDivingAnim = findAnimation("Sky Diving");
+            if (!skyDivingAnim.success) return skyDivingAnim;
 
-            const skyDivingAnim = animations.find((a) => a.name.includes("SkyDiving"));
-            if (skyDivingAnim === undefined) return err("'SkyDiving' animation not found");
+            const swimmingIdleAnim = findAnimation("Swimming Idle");
+            if (!swimmingIdleAnim.success) return swimmingIdleAnim;
 
-            const swimmingIdleAnim = animations.find((a) => a.name.includes("SwimmingIdle"));
-            if (swimmingIdleAnim === undefined) return err("'SwimmingIdle' animation not found");
+            const swimmingForwardAnim = findAnimation("Swimming Forward");
+            if (!swimmingForwardAnim.success) return swimmingForwardAnim;
 
-            const swimmingForwardAnim = animations.find((a) => a.name.includes("SwimmingForward"));
-            if (swimmingForwardAnim === undefined) return err("'SwimmingForward' animation not found");
+            const jumpingAnim = findAnimation("Jumping");
+            if (!jumpingAnim.success) return jumpingAnim;
 
-            const jumpingAnim = animations.find((a) => a.name.includes("Jumping"));
-            if (jumpingAnim === undefined) return err("'Jumping' animation not found");
+            const sittingOnGroundIdleAnim = findAnimation("Sitting On Ground Idle");
+            if (!sittingOnGroundIdleAnim.success) return sittingOnGroundIdleAnim;
+
+            const sittingOnSeatIdleAnim = findAnimation("Sitting On Seat Idle");
+            if (!sittingOnSeatIdleAnim.success) return sittingOnSeatIdleAnim;
+
+            const standingIdleToSittingOnSeatAnim = findAnimation("Stand To Sit");
+            if (!standingIdleToSittingOnSeatAnim.success) return standingIdleToSittingOnSeatAnim;
+
+            const sittingOnSeatToStandingIdleAnim = findAnimation("Sit To Stand");
+            if (!sittingOnSeatToStandingIdleAnim.success) return sittingOnSeatToStandingIdleAnim;
 
             const skeleton = entries.skeletons[0];
             if (skeleton === undefined) {
@@ -139,24 +161,28 @@ export async function loadHumanoidPrefabs(
                     attachmentMesh: headAttachmentMesh,
                 },
                 animations: {
-                    idle: idleAnim,
-                    walk: walkAnim,
-                    walkBackward: walkBackAnim,
-                    dance: sambaAnim,
-                    run: runningAnim,
+                    idle: idleAnim.value,
+                    walk: walkAnim.value,
+                    walkBackward: walkBackAnim.value,
+                    dance: sambaAnim.value,
+                    run: runningAnim.value,
                     swim: {
-                        idle: swimmingIdleAnim,
-                        forward: swimmingForwardAnim,
+                        idle: swimmingIdleAnim.value,
+                        forward: swimmingForwardAnim.value,
                     },
-                    jump: jumpingAnim,
-                    fall: fallingIdleAnim,
-                    skyDive: skyDivingAnim,
+                    jump: jumpingAnim.value,
+                    fall: fallingIdleAnim.value,
+                    skyDive: skyDivingAnim.value,
+                    sittingOnGroundIdle: sittingOnGroundIdleAnim.value,
+                    sittingOnSeatIdle: sittingOnSeatIdleAnim.value,
+                    sittingOnSeatToStandingIdle: sittingOnSeatToStandingIdleAnim.value,
+                    standingIdleToSittingOnSeat: standingIdleToSittingOnSeatAnim.value,
                 },
             });
         },
     };
 
     return {
-        default: defaultHumanoidPrefab,
+        placeholder: defaultHumanoidPrefab,
     };
 }

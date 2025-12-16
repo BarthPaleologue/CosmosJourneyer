@@ -11,5 +11,6 @@
     "custom": "Custom Object",
     "spaceElevatorClimber": "Space Elevator Climber",
     "anomaly": "Anomaly",
-    "landingPad": "Landing Pad"
+    "landingPad": "Landing Pad",
+    "spaceship": "Spaceship"
 }

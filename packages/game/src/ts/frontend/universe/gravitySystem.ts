@@ -30,6 +30,9 @@ type CelestialBody = {
 
 export class GravitySystem {
     private readonly scene: Scene;
+
+    private forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
+
     constructor(scene: Scene) {
         this.scene = scene;
     }
@@ -56,31 +59,39 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    public applyGravity(celestialBodies: ReadonlyArray<CelestialBody>) {
-        for (const physicsBody of this.getPhysicsBodies()) {
-            const objectMass = physicsBody.getMassProperties().mass;
-            if (objectMass === undefined || objectMass === 0) {
+    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>) {
+        const objectMass = body.getMassProperties().mass;
+        if (objectMass === undefined || objectMass === 0) {
+            return Vector3.Zero();
+        }
+
+        const totalForce = Vector3.Zero();
+        for (const celestialBody of celestialBodies) {
+            const scaledDirection = celestialBody.position.subtract(body.transformNode.getAbsolutePosition());
+            const distance = scaledDirection.length();
+            //TODO: when 2.0 comes along, use the correct formula
+            //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
+            const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
+            if (forceMagnitude <= 1e-6) {
                 continue;
             }
 
-            const totalForce = Vector3.Zero();
-            for (const celestialBody of celestialBodies) {
-                const scaledDirection = celestialBody.position.subtract(
-                    physicsBody.transformNode.getAbsolutePosition(),
-                );
-                const distance = scaledDirection.length();
-                //TODO: when 2.0 comes along, use the correct formula
-                //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
-                const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
-                if (forceMagnitude <= 1e-6) {
-                    continue;
-                }
-
-                const force = scaledDirection.scale(forceMagnitude / distance);
-                totalForce.addInPlace(force);
-            }
-
-            physicsBody.applyForce(totalForce, physicsBody.getObjectCenterWorld());
+            const force = scaledDirection.scale(forceMagnitude / distance);
+            totalForce.addInPlace(force);
         }
+
+        return totalForce;
+    }
+
+    public update(celestialBodies: ReadonlyArray<CelestialBody>): void {
+        for (const physicsBody of this.getPhysicsBodies()) {
+            const gravity = this.computeGravity(physicsBody, celestialBodies);
+            physicsBody.applyForce(gravity, physicsBody.getObjectCenterWorld());
+            this.forceCache.set(physicsBody, gravity);
+        }
+    }
+
+    public getLastComputedForce(body: PhysicsBody): Vector3 | null {
+        return this.forceCache.get(body) ?? null;
     }
 }
