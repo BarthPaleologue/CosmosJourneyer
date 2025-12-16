@@ -41,6 +41,7 @@ import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/ima
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
+import { AnimatedInputBlockTypes } from "@babylonjs/core/Materials/Node/Blocks/Input/animatedInputBlockTypes";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
 import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
@@ -127,6 +128,14 @@ export function uniformWorld(options?: Partial<TargetOptions>): NodeMaterialConn
     world.setAsSystemValue(NodeMaterialSystemValues.World);
 
     return world.output;
+}
+
+export function uniformElapsedSeconds(): NodeMaterialConnectionPoint {
+    const elapsedSecondsBlock = new InputBlock("Time");
+    elapsedSecondsBlock.target = NodeMaterialBlockTargets.Vertex;
+    elapsedSecondsBlock.value = 0;
+    elapsedSecondsBlock.animationType = AnimatedInputBlockTypes.Time;
+    return elapsedSecondsBlock.output;
 }
 
 export type VertexAttributeName =
