@@ -60,6 +60,7 @@ import {
 import { TriPlanarBlock } from "@babylonjs/core/Materials/Node/Blocks/triPlanarBlock";
 import { VectorMergerBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorMergerBlock";
 import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vectorSplitterBlock";
+import { InstancesBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/instancesBlock";
 import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/vertexOutputBlock";
 import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDirectionBlock";
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
@@ -148,6 +149,16 @@ export function vertexAttribute(
     name: VertexAttributeName,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
+    const attribute = new InputBlock(name);
+    attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
+    attribute.setAsAttribute(name);
+
+    return attribute.output;
+}
+
+export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3";
+
+export function instanceAttribute(name: InstanceAttributeName, options?: Partial<TargetOptions>) {
     const attribute = new InputBlock(name);
     attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
     attribute.setAsAttribute(name);
@@ -319,6 +330,31 @@ export function triPlanarMapping(
     options?.sharpness?.connectTo(triPlanarBlock.sharpness);
 
     return triPlanarBlock;
+}
+
+export type InstanceData = {
+    output: NodeMaterialConnectionPoint;
+    instanceID: NodeMaterialConnectionPoint;
+};
+
+export function getInstanceData(
+    world0: NodeMaterialConnectionPoint,
+    world1: NodeMaterialConnectionPoint,
+    world2: NodeMaterialConnectionPoint,
+    world3: NodeMaterialConnectionPoint,
+    world: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): InstanceData {
+    const instancesBlock = new InstancesBlock("Instances");
+    instancesBlock.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
+
+    world0.connectTo(instancesBlock.world0);
+    world1.connectTo(instancesBlock.world1);
+    world2.connectTo(instancesBlock.world2);
+    world3.connectTo(instancesBlock.world3);
+    world.connectTo(instancesBlock.world);
+
+    return instancesBlock;
 }
 
 /**
