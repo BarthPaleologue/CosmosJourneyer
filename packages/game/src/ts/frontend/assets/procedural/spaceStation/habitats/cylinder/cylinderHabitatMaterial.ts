@@ -35,7 +35,7 @@ import {
     perturbNormal,
     remap,
     smoothstep,
-    split,
+    splitVec,
     step,
     sub,
     Target,
@@ -66,7 +66,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const uv = vertexAttribute("uv");
 
         const positionXZ = xz(position);
-        const splitPositionXZ = split(positionXZ);
+        const splitPositionXZ = splitVec(positionXZ);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -74,8 +74,8 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
-        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height / sectorSize), mask));
+        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitVec(uv).y, mix(f(1.0), f(height / sectorSize), mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);

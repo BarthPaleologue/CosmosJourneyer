@@ -41,14 +41,17 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
     const curvyNormal1 = rotateAround(normal, new Vector3(0, 1, 0), Math.PI * 0.3);
     const curvyNormal2 = rotateAround(normal, new Vector3(0, 1, 0), -Math.PI * 0.3);
 
+    const width = 0.07;
+    const height = 0.8;
+
     // The vertices are aranged in rows of 2 vertices, we stack the rows on top of each other until we reach the top of the blade
     let vertexIndex = 0;
     let normalIndex = 0;
     let indexIndex = 0;
-    const step = 1 / nbStacks;
+    const step = height / nbStacks;
     for (let i = 0; i < nbStacks; i++) {
         // the square root makes the blade rounder
-        const x = 0.05 * Math.sqrt((nbStacks - i) * step);
+        const x = width * Math.sqrt((nbStacks - i) * step);
 
         positions[vertexIndex++] = -x;
         positions[vertexIndex++] = i * step;

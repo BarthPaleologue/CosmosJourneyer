@@ -34,7 +34,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
-    split,
+    splitVec,
     step,
     sub,
     textureSample,
@@ -64,9 +64,9 @@ export class LandingPadMaterial extends NodeMaterial {
         const position = vertexAttribute("position");
         const normal = vertexAttribute("normal");
         const uv = vertexAttribute("uv");
-        const uvSplit = split(uv);
+        const uvSplit = splitVec(uv);
 
-        const centeredUV = split(sub(uv, f(0.5)));
+        const centeredUV = splitVec(sub(uv, f(0.5)));
         const centeredUVScaled = vec2(mul(centeredUV.x, f(Settings.LANDING_PAD_ASPECT_RATIO)), centeredUV.y);
 
         const proceduralUV = mul(xz(position), f(0.1));

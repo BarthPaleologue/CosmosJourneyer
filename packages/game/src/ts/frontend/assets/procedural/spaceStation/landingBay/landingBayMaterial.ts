@@ -36,7 +36,7 @@ import {
     pbr,
     perturbNormal,
     remap,
-    split,
+    splitVec,
     step,
     sub,
     Target,
@@ -106,7 +106,7 @@ export class LandingBayMaterial extends NodeMaterial {
         const uv = vertexAttribute("uv");
 
         const positionXZ = xz(position);
-        const splitPositionXZ = split(positionXZ);
+        const splitPositionXZ = splitVec(positionXZ);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -114,8 +114,8 @@ export class LandingBayMaterial extends NodeMaterial {
 
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
-        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height), mask));
+        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitVec(uv).y, mix(f(1.0), f(height), mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -151,7 +151,7 @@ export class LandingBayMaterial extends NodeMaterial {
         /* if (vNormal.y < 1.0) {
             namePlateUV *= 0.0;
         } */
-        const namePlateUvMask = step(f(1.0), split(normal).y);
+        const namePlateUvMask = step(f(1.0), splitVec(normal).y);
         const namePlateUV = mix(vec2(f(0.0), f(0.0)), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
 
         const namePlateColor = textureSample(namePlateTexture, fract(namePlateUV));

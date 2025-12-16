@@ -45,6 +45,7 @@ import { AnimatedInputBlockTypes } from "@babylonjs/core/Materials/Node/Blocks/I
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
 import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
+import { MatrixSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/matrixSplitterBlock";
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
@@ -598,7 +599,7 @@ export function withX(
     x: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ) {
-    const splitInput = split(input, options);
+    const splitInput = splitVec(input, options);
     return merge(x, splitInput.y, splitInput.z, splitInput.w, options);
 }
 
@@ -613,7 +614,7 @@ export function withY(
     y: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ) {
-    const splitInput = split(input, options);
+    const splitInput = splitVec(input, options);
     return merge(splitInput.x, y, splitInput.z, splitInput.w, options);
 }
 
@@ -628,7 +629,7 @@ export function withZ(
     z: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ) {
-    const splitInput = split(input, options);
+    const splitInput = splitVec(input, options);
     return merge(splitInput.x, splitInput.y, z, splitInput.w, options);
 }
 
@@ -643,7 +644,7 @@ export function withW(
     w: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ) {
-    const splitInput = split(input, options);
+    const splitInput = splitVec(input, options);
     return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
 }
 
@@ -714,7 +715,7 @@ export function vec4(
  * @param inputVec - The input vec.
  * @param options - Optional target options.
  */
-export function split(inputVec: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): VectorSplitterBlock {
+export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): VectorSplitterBlock {
     const splitBlock = new VectorSplitterBlock("split");
     splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -743,6 +744,28 @@ export function split(inputVec: NodeMaterialConnectionPoint, options?: Partial<T
     return splitBlock;
 }
 
+export type MatrixSplitterOutput = {
+    row0: NodeMaterialConnectionPoint;
+    row1: NodeMaterialConnectionPoint;
+    row2: NodeMaterialConnectionPoint;
+    row3: NodeMaterialConnectionPoint;
+    col0: NodeMaterialConnectionPoint;
+    col1: NodeMaterialConnectionPoint;
+    col2: NodeMaterialConnectionPoint;
+    col3: NodeMaterialConnectionPoint;
+};
+
+export function splitMatrix(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): MatrixSplitterOutput {
+    const splitBlock = new MatrixSplitterBlock("splitMatrix");
+    splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+    input.connectTo(splitBlock.input);
+
+    return splitBlock;
+}
+
 /**
  * Creates a vec2 using the input vector's X and Z components.
  * Useful for projecting 3D positions onto a 2D plane.
@@ -754,7 +777,7 @@ export function xz(
     inputVec: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const inputSplitted = split(inputVec, options);
+    const inputSplitted = splitVec(inputVec, options);
 
     const outputXZ = new VectorMergerBlock("OutputXZ");
     outputXZ.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
