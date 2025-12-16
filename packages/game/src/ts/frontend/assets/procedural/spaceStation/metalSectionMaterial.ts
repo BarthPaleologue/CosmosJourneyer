@@ -33,11 +33,11 @@ export class MetalSectionMaterial extends NodeMaterial {
         const normal = BSL.vertexAttribute("normal");
         const uv = BSL.vertexAttribute("uv");
 
-        const positionY = BSL.split(position).y;
+        const positionY = BSL.splitVec(position).y;
         const uvY = BSL.mul(positionY, BSL.float(1 / 50));
 
         const scaledUV = BSL.mul(uv, BSL.float(6.0));
-        const proceduralUV = BSL.vec2(BSL.split(scaledUV).x, uvY);
+        const proceduralUV = BSL.vec2(BSL.splitVec(scaledUV).x, uvY);
 
         const world = BSL.uniformWorld();
         const positionW = BSL.transformPosition(world, position);

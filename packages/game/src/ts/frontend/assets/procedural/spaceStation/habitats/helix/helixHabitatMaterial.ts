@@ -32,7 +32,7 @@ import {
     pbr,
     perturbNormal,
     smoothstep,
-    split,
+    splitVec,
     step,
     sub,
     textureSample,
@@ -66,11 +66,11 @@ export class HelixHabitatMaterial extends NodeMaterial {
         const positionW = transformPosition(world, position);
         const normalW = transformDirection(world, normal);
 
-        const splitUV = split(uv);
+        const splitUV = splitVec(uv);
         const scaledUvX = mul(splitUV.x, f((2.0 * Math.PI * meanRadius) / deltaRadius));
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
+        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
         const scaledUvY = mul(splitUV.y, mix(f(1.0), f(thicknessMultiplier), mask));
         const proceduralUV = vec2(scaledUvX, scaledUvY);
 
