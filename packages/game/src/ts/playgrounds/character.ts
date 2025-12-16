@@ -64,6 +64,13 @@ export async function createCharacterDemoScene(
     hemi.intensity = 0.5;
 
     const groundRadius = 40;
+    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
+
+    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
+
+    const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
+    groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
+    ground.material = groundMaterial;
 
     const humanoidInstance = humanoids.placeholder.spawn();
     if (!humanoidInstance.success) {
@@ -81,6 +88,14 @@ export async function createCharacterDemoScene(
     }
     const character2 = new HumanoidAvatar(humanoid2.value, physicsEngine, scene);
     character2.getTransform().position = new Vector3(10, groundRadius, 7.5);
+    const dirToCenter = character2.getTransform().position.negate().normalize();
+    const rayCastResult2 = physicsEngine.raycast(
+        character2.getTransform().position,
+        character2.getTransform().position.add(dirToCenter.scale(30)),
+    );
+    if (rayCastResult2.hasHit) {
+        character2.getTransform().position = rayCastResult2.hitPointWorld;
+    }
 
     const humanoid3 = humanoids.placeholder.spawn();
     if (!humanoid3.success) {
@@ -89,6 +104,13 @@ export async function createCharacterDemoScene(
     const character3 = new HumanoidAvatar(humanoid3.value, physicsEngine, scene);
     character3.getTransform().position = new Vector3(10, groundRadius, 6);
     character3.getTransform().rotate(Axis.Y, Math.PI, Space.WORLD);
+    const rayCastResult3 = physicsEngine.raycast(
+        character3.getTransform().position,
+        character3.getTransform().position.add(dirToCenter.scale(30)),
+    );
+    if (rayCastResult3.hasHit) {
+        character3.getTransform().position = rayCastResult3.hitPointWorld;
+    }
 
     enableShadows(light);
 
@@ -101,14 +123,6 @@ export async function createCharacterDemoScene(
     characterControls.getActiveCamera().minZ = 0.1;
 
     CharacterInputs.setEnabled(true);
-
-    const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
-
-    new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
-
-    const groundMaterial = new PBRMetallicRoughnessMaterial("groundMaterial", scene);
-    groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
-    ground.material = groundMaterial;
 
     const gravitySystem = new GravitySystem(scene);
 
