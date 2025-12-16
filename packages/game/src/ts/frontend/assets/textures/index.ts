@@ -26,6 +26,7 @@ import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadEnvironmentTextures } from "./environment";
 import { loadGasPlanetTextures, type GasPlanetTextures } from "./gasPlanet";
 import { loadMaterialTextures, type AllMaterialTextures } from "./materials";
+import { loadNoiseTextures, type NoiseTextures } from "./noises";
 import { loadParticleTextures, type ParticleTextures } from "./particles";
 import { loadRingsTextures, type RingsTextures } from "./rings";
 import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
@@ -33,7 +34,6 @@ import { createTexturePools, type TexturePools } from "./texturePools";
 import { loadTextureAsync } from "./utils";
 
 import empty from "@assets/oneBlackPixel.webp";
-import seamlessPerlin from "@assets/perlin.webp";
 import cursorImage from "@assets/textures/hoveredCircle.png";
 import waterNormal1 from "@assets/textures/waterNormalMap3.jpg";
 import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
@@ -43,10 +43,6 @@ import waterNormal2 from "@assets/textures/waterNormalMap4.jpg";
 export type WaterTextures = {
     normalMap1: Texture;
     normalMap2: Texture;
-};
-
-export type NoiseTextures = {
-    seamlessPerlin: Texture;
 };
 
 export type Textures = {
@@ -80,8 +76,6 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
 
     const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
 
-    const seamlessPerlinPromise = loadTextureAsync("SeamlessPerlin", seamlessPerlin, scene, progressMonitor);
-
     const environmentPromise = loadEnvironmentTextures(scene, progressMonitor);
 
     const terrainTexturesPromise = loadTerrainTextures(scene, progressMonitor);
@@ -89,6 +83,8 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
     const materialTexturesPromise = loadMaterialTextures(scene, progressMonitor);
     const gasPlanetTexturesPromise = loadGasPlanetTextures(scene, progressMonitor);
     const ringsTexturesPromise = loadRingsTextures(scene, progressMonitor);
+
+    const noiseTexturesPromise = loadNoiseTextures(scene, progressMonitor);
 
     // Assemble and return the textures structure
     return {
@@ -102,9 +98,7 @@ export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgre
         gasPlanet: await gasPlanetTexturesPromise,
         rings: await ringsTexturesPromise,
         environment: await environmentPromise,
-        noises: {
-            seamlessPerlin: await seamlessPerlinPromise,
-        },
+        noises: await noiseTexturesPromise,
         ui: {
             cursorImageUrl: cursorImage,
         },

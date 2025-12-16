@@ -23,7 +23,7 @@ import { seededSquirrelNoise } from "squirrel-noise";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
 import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
@@ -35,7 +35,7 @@ export async function createGrassScene(
 ): Promise<Scene> {
     const scene = new Scene(engine);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const noiseTextures = await loadNoiseTextures(scene, progressMonitor);
 
     // This creates and positions a free camera (non-mesh)
     const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
@@ -73,7 +73,7 @@ export async function createGrassScene(
     const grassBladeMesh = createGrassBlade(scene, 5);
     grassBladeMesh.isVisible = false;
 
-    const grassMaterial = new GrassMaterial(scene, textures.noises, false);
+    const grassMaterial = new GrassMaterial(scene, noiseTextures.seamlessPerlin, false);
     grassBladeMesh.material = grassMaterial;
 
     const rng = seededSquirrelNoise(0);

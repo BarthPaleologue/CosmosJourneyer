@@ -55,8 +55,8 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
         butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
-        grass: new GrassMaterial(scene, textures.noises, false),
-        grassDepth: new GrassMaterial(scene, textures.noises, true),
+        grass: new GrassMaterial(scene, textures.noises.seamlessPerlin, false),
+        grassDepth: new GrassMaterial(scene, textures.noises.seamlessPerlin, true),
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,

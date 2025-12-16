@@ -18,6 +18,7 @@
 import { type PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
@@ -25,8 +26,6 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-
-import { type NoiseTextures } from "../../textures";
 
 import grassFragment from "@shaders/grassMaterial/grassFragment.glsl";
 import grassVertex from "@shaders/grassMaterial/grassVertex.glsl";
@@ -55,7 +54,7 @@ export class GrassMaterial extends ShaderMaterial {
 
     private scene: Scene;
 
-    constructor(scene: Scene, noiseTextures: NoiseTextures, isDepthMaterial: boolean) {
+    constructor(scene: Scene, noiseTexture: Texture, isDepthMaterial: boolean) {
         const shaderName = "grassMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] = grassVertex;
@@ -74,7 +73,7 @@ export class GrassMaterial extends ShaderMaterial {
         });
 
         this.backFaceCulling = false;
-        this.setTexture("perlinNoise", noiseTextures.seamlessPerlin);
+        this.setTexture("perlinNoise", noiseTexture);
 
         this.onBindObservable.add(() => {
             const floatingOriginOffset = scene.floatingOriginOffset;
