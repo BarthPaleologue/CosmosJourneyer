@@ -75,6 +75,7 @@ import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/n
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
 import { type NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Target = {
@@ -692,6 +693,15 @@ export function withW(
 ) {
     const splitInput = splitVec(input, options);
     return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
+}
+
+export function color(color: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    const colorBlock = new InputBlock("color");
+    colorBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+    colorBlock.isConstant = true;
+    colorBlock.value = color;
+
+    return colorBlock.output;
 }
 
 /**
