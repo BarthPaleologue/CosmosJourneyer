@@ -37,6 +37,7 @@ import { createGrassScene } from "./grass";
 import { createGravitySystemScene } from "./gravitySystem";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createInteractionDemo } from "./interaction";
+import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
@@ -96,6 +97,7 @@ export class PlaygroundRegistry {
         ["gravitySystem", createGravitySystemScene],
         ["interaction", createInteractionDemo],
         ["swimming", CreateSwimmingScene],
+        ["onFoot", createOnFootScene],
     ]);
 
     register(
