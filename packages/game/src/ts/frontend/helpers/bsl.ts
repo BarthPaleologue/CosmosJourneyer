@@ -36,7 +36,9 @@
 
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
+import { CrossBlock } from "@babylonjs/core/Materials/Node/Blocks/crossBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
+import { DotBlock } from "@babylonjs/core/Materials/Node/Blocks/dotBlock";
 import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/imageSourceBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
@@ -934,6 +936,34 @@ export function sub(
     right.connectTo(subBlock.right);
 
     return subBlock.output;
+}
+
+export function cross(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const crossBlock = new CrossBlock("cross");
+    crossBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(crossBlock.left);
+    right.connectTo(crossBlock.right);
+
+    return crossBlock.output;
+}
+
+export function dot(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const dotBlock = new DotBlock("dot");
+    dotBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(dotBlock.left);
+    right.connectTo(dotBlock.right);
+
+    return dotBlock.output;
 }
 
 /**
