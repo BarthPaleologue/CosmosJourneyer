@@ -26,8 +26,6 @@ varying vec3 vPositionW;
 varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 
-#include "../utils/applyQuaternion.glsl";
-
 void main() {
     gl_Position = worldViewProjection * vec4(position, 1.0);
 
