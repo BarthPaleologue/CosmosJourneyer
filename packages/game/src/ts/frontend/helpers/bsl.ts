@@ -1065,6 +1065,21 @@ export function max(
     return maxBlock.output;
 }
 
+/**
+ *
+ * @param input
+ * @param options
+ * @returns
+ * @see https://www.shadertoy.com/view/4djSRW
+ */
+export function hash11(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const a = mul(input, f(0.1031, options), options);
+    const b = fract(a, options);
+    const c = add(mul(b, b, options), f(33.33, options), options);
+    const d = mul(c, add(b, b, options), options);
+    return fract(d, options);
+}
+
 export type PerturbNormalOptions = TargetOptions & {
     parallax: {
         viewDirection: NodeMaterialConnectionPoint;
