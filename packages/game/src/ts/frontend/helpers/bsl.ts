@@ -451,6 +451,14 @@ export function atan2(
     return atan2Block.output;
 }
 
+export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.Sin, options);
+}
+
+export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.Cos, options);
+}
+
 /**
  * Returns the length (magnitude) of a vector.
  * @param input - The input vector.
