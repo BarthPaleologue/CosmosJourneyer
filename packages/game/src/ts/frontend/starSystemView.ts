@@ -883,8 +883,6 @@ export class StarSystemView implements View {
         // update dynamic materials
         this.assets.materials.butterfly.update(stellarObjects, deltaSeconds);
         this.assets.materials.butterflyDepth.update(stellarObjects, deltaSeconds);
-        this.assets.materials.grass.update(stellarObjects, deltaSeconds);
-        this.assets.materials.grassDepth.update(stellarObjects, deltaSeconds);
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);

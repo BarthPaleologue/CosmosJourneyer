@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Material } from "@babylonjs/core/Materials/material";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -28,8 +29,7 @@ import { type Textures } from "./textures";
 export type Materials = {
     readonly butterfly: ButterflyMaterial;
     readonly butterflyDepth: ButterflyMaterial;
-    readonly grass: GrassMaterial;
-    readonly grassDepth: GrassMaterial;
+    readonly grass: Material;
     readonly crate: PBRMetallicRoughnessMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
@@ -55,8 +55,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
         butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
-        grass: new GrassMaterial(scene, textures.noises.seamlessPerlin, false),
-        grassDepth: new GrassMaterial(scene, textures.noises.seamlessPerlin, true),
+        grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,

@@ -15,7 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
+import {
+    ArcRotateCamera,
+    Color3,
+    DirectionalLight,
+    HemisphericLight,
+    MeshBuilder,
+    PBRMaterial,
+    Vector3,
+} from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
@@ -34,31 +42,21 @@ export async function createGrassScene(
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
+    scene.useRightHandedSystem = true;
 
-    const noiseTextures = await loadNoiseTextures(scene, progressMonitor);
-
-    // This creates and positions a free camera (non-mesh)
-    const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
-
-    // This targets the camera to scene origin
-    camera.setTarget(Vector3.Zero());
-
-    // This attaches the camera to the canvas
+    const camera = new ArcRotateCamera("camera1", 0, (0.9 * Math.PI) / 2, 10, new Vector3(0, 0.5, 0), scene);
+    camera.upperBetaLimit = Math.PI / 2;
+    camera.lowerRadiusLimit = 5;
+    camera.upperRadiusLimit = 100;
     camera.attachControl();
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new PointLight("light1", new Vector3(200, 800, 100), scene);
-    const lightSphere = MeshBuilder.CreateSphere(
-        "lightSphere",
-        {
-            diameter: 0.1,
-            segments: 8,
-        },
-        scene,
-    );
-    lightSphere.position = light.position;
+    const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
+    light.position = new Vector3(5, 5, 5).scaleInPlace(10);
 
-    createSky(light.position, scene);
+    createSky(light.direction.scale(-1), scene);
+
+    const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
+    hemi.intensity = 0.5;
 
     const ground = MeshBuilder.CreateGround(
         "ground",
@@ -70,11 +68,18 @@ export async function createGrassScene(
         scene,
     );
 
+    const groundMaterial = new PBRMaterial("groundMaterial", scene);
+    groundMaterial.albedoColor = new Color3(0.1, 0.6, 0.08).scale(0.5);
+    groundMaterial.metallic = 0.0;
+    groundMaterial.roughness = 0.8;
+    ground.material = groundMaterial;
+
     const grassBladeMesh = createGrassBlade(scene, 5);
     grassBladeMesh.isVisible = false;
 
-    const grassMaterial = new GrassMaterial(scene, noiseTextures.seamlessPerlin, false);
-    grassBladeMesh.material = grassMaterial;
+    const noiseTextures = await loadNoiseTextures(scene, progressMonitor);
+    const grassMaterial = new GrassMaterial(noiseTextures.seamlessPerlin, scene);
+    grassBladeMesh.material = grassMaterial.get();
 
     const rng = seededSquirrelNoise(0);
     let rngState = 0;
@@ -85,11 +90,6 @@ export async function createGrassScene(
     const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng));
     grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
     grassPatch.getCurrentMesh().parent = ground;
-
-    scene.onBeforeRenderObservable.add(() => {
-        const deltaSeconds = engine.getDeltaTime() / 1000;
-        grassMaterial.update([light], deltaSeconds);
-    });
 
     return scene;
 }

@@ -15,91 +15,140 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
-import { Effect } from "@babylonjs/core/Materials/effect";
-import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Scene } from "@babylonjs/core/scene";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Scene } from "@babylonjs/core/scene";
 
 import {
-    setStellarObjectUniforms,
-    StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+    add,
+    color,
+    cos,
+    distance,
+    f,
+    getInstanceData,
+    hash11,
+    instanceAttribute,
+    mix,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbr,
+    pow,
+    remap,
+    rotateAround,
+    sin,
+    smoothstep,
+    splitMatrix,
+    splitVec,
+    sub,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformElapsedSeconds,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec3,
+    vertexAttribute,
+    xz,
+} from "@/frontend/helpers/bsl";
 
-import grassFragment from "@shaders/grassMaterial/grassFragment.glsl";
-import grassVertex from "@shaders/grassMaterial/grassVertex.glsl";
+export class GrassMaterial {
+    private readonly material: NodeMaterial;
 
-const GrassMaterialUniformNames = {
-    WORLD: "world",
-    WORLD_VIEW: "worldView",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
-    VIEW: "view",
-    PROJECTION: "projection",
-    VIEW_PROJECTION: "viewProjection",
-    TIME: "time",
-    CAMERA_POSITION: "cameraPosition",
-    PLAYER_POSITION: "playerPosition",
-    PLANET_POSITION: "planetPosition",
-    PLANET_WORLD: "planetWorld",
-};
+    constructor(noise: Texture, scene: Scene, options?: Partial<{ fadeDistance: number }>) {
+        this.material = new NodeMaterial("GrassMaterial", scene);
+        this.material.backFaceCulling = false;
 
-const GrassMaterialSamplerNames = {
-    PERLIN_NOISE: "perlinNoise",
-};
+        const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
 
-export class GrassMaterial extends ShaderMaterial {
-    private elapsedSeconds = 0;
-    private stars: ReadonlyArray<PointLight> = [];
+        const world0 = instanceAttribute("world0");
+        const world1 = instanceAttribute("world1");
+        const world2 = instanceAttribute("world2");
+        const world3 = instanceAttribute("world3");
 
-    private scene: Scene;
+        const elapsedSeconds = uniformElapsedSeconds();
 
-    constructor(scene: Scene, noiseTexture: Texture, isDepthMaterial: boolean) {
-        const shaderName = "grassMaterial";
-        Effect.ShadersStore[`${shaderName}FragmentShader`] = grassFragment;
-        Effect.ShadersStore[`${shaderName}VertexShader`] = grassVertex;
+        const globalWorld = uniformWorld();
+        const { instanceID, output: instanceWorld } = getInstanceData(world0, world1, world2, world3, globalWorld);
 
-        const defines = ["#define INSTANCES"];
-        if (isDepthMaterial) defines.push("#define FORDEPTH");
+        const hash = hash11(instanceID);
 
-        const uniforms = [...Object.values(GrassMaterialUniformNames), ...Object.values(StellarObjectUniformNames)];
-        if (isDepthMaterial) uniforms.push("depthValues");
+        const height01 = splitVec(position).y;
 
-        super(shaderName, scene, shaderName, {
-            attributes: ["position", "normal"],
-            uniforms: uniforms,
-            defines: defines,
-            samplers: [...Object.values(GrassMaterialSamplerNames)],
+        const instancePosition = splitMatrix(instanceWorld).row3;
+
+        const windStrength = textureSample(
+            noise,
+            add(mul(f(0.007), xz(instancePosition)), mul(f(0.1), elapsedSeconds)),
+        ).r;
+        const windDir = mul(
+            f(2.0 * Math.PI),
+            textureSample(noise, add(mul(f(0.005), xz(instancePosition)), mul(f(0.05), elapsedSeconds))).r,
+        );
+
+        const windCurveAmount = remap(windStrength, f(0), f(1), f(0.25), f(1.0));
+
+        const leanAxis = vec3(cos(windDir), f(0.0), sin(windDir));
+
+        const maxCurveAngle = f(0.6);
+
+        const curveAmount = mul(mul(height01, maxCurveAngle), windCurveAmount);
+
+        const curvedNormal = rotateAround(normal, leanAxis, curveAmount);
+        const curvedPosition = rotateAround(position, leanAxis, curveAmount);
+
+        const scalingTextureValue = textureSample(noise, mul(f(0.1), xz(instancePosition))).r;
+        const scalingFactor = remap(scalingTextureValue, f(0), f(1), f(0.4), f(0.7));
+
+        const cameraPosition = uniformCameraPosition();
+
+        const bladeCameraDistance = distance(splitVec(instancePosition).xyzOut, cameraPosition);
+        const fadeDistance = add(f(options?.fadeDistance ?? 60.0), mul(hash, f(10.0)));
+        const fadeStartDistance = sub(fadeDistance, f(10.0));
+        const fadeInFactor = sub(f(1.0), smoothstep(fadeStartDistance, fadeDistance, bladeCameraDistance));
+
+        const finalScalingFactor = mul(scalingFactor, fadeInFactor);
+
+        const scaledCurvedPosition = mul(curvedPosition, finalScalingFactor);
+
+        const positionW = transformPosition(instanceWorld, scaledCurvedPosition);
+        const normalW = transformDirection(instanceWorld, curvedNormal);
+
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
+
+        const vertexOutput = outputVertexPosition(positionClipSpace);
+
+        const view = uniformView();
+
+        const baseColor = color(new Color3(0.1, 0.6, 0.08));
+        const tipColor = color(new Color3(0.2, 0.4, 0.1));
+
+        const albedoRgb = mix(baseColor, tipColor, pow(height01, f(2.0)));
+
+        const ambientOcclusion = mix(f(0.7), f(1.0), pow(height01, f(2.0)));
+
+        const pbrShading = pbr(f(0.0), f(0.4), normalW, normalW, view, cameraPosition, positionW, {
+            albedoRgb,
+            ambientOcclusion,
         });
 
-        this.backFaceCulling = false;
-        this.setTexture("perlinNoise", noiseTexture);
+        const fragOutput = outputFragColor(pbrShading.lighting);
 
-        this.onBindObservable.add(() => {
-            const floatingOriginOffset = scene.floatingOriginOffset;
-            const floatingOriginEnabled = scene.floatingOriginMode;
-
-            setStellarObjectUniforms(this.getEffect(), this.stars, floatingOriginOffset);
-
-            this.getEffect().setFloat(GrassMaterialUniformNames.TIME, this.elapsedSeconds);
-
-            const activeCamera = this.scene.activeCamera;
-            if (activeCamera === null) {
-                console.warn("No active camera in the scene");
-                return;
-            }
-
-            this.getEffect().setVector3(
-                GrassMaterialUniformNames.CAMERA_POSITION,
-                floatingOriginEnabled ? Vector3.ZeroReadOnly : activeCamera.globalPosition,
-            );
-        });
-
-        this.scene = scene;
+        this.material.addOutputNode(vertexOutput);
+        this.material.addOutputNode(fragOutput);
+        this.material.build();
     }
 
-    update(stars: ReadonlyArray<PointLight>, deltaSeconds: number) {
-        this.elapsedSeconds += deltaSeconds;
-        this.stars = stars;
+    get() {
+        return this.material;
+    }
+
+    dispose() {
+        this.material.dispose();
     }
 }

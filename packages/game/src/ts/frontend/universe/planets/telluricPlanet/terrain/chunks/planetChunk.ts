@@ -203,7 +203,6 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
             for (const depthRenderer of Object.values(this.getTransform().getScene()._depthRenderer)) {
                 depthRenderer.setMaterialForRendering(butterflyPatch.getLodMeshes(), assets.materials.butterflyDepth);
-                depthRenderer.setMaterialForRendering(grassPatch.getLodMeshes(), assets.materials.grassDepth);
             }
         }
     }
