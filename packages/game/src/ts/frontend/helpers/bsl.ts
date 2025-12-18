@@ -998,6 +998,32 @@ export function dot(
 }
 
 /**
+ * Rotates a vector around an axis by a given angle using Rodrigues' rotation formula.
+ * @param vector - The vector to rotate.
+ * @param axis - The axis of rotation (must be a unit vector).
+ * @param theta - The rotation angle in radians.
+ * @param options - Optional target options.
+ * @returns The rotated vector.
+ * @see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+ */
+export function rotateAround(
+    vector: NodeMaterialConnectionPoint,
+    axis: NodeMaterialConnectionPoint,
+    theta: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const cosTheta = cos(theta, options);
+    const sinTheta = sin(theta, options);
+    const oneMinusCosTheta = sub(float(1, options), cosTheta, options);
+
+    const term1 = mul(cosTheta, vector, options);
+    const term2 = mul(sinTheta, cross(axis, vector, options), options);
+    const term3 = mul(oneMinusCosTheta, mul(axis, dot(axis, vector, options), options), options);
+
+    return add(add(term1, term2, options), term3, options);
+}
+
+/**
  * Returns the minimum of two values.
  * @param left - The first value to compare.
  * @param right - The second value to compare.
