@@ -55,8 +55,6 @@ uniform float time;
 
 #include "./utils/saturate.glsl";
 
-#include "./utils/applyQuaternion.glsl";
-
 #include "./utils/computeSpecularHighlight.glsl";
 
 #include "./utils/refraction.glsl";
