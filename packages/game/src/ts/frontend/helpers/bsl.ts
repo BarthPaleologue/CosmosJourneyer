@@ -1109,7 +1109,7 @@ export function perturbNormal(
     return perturbedNormal;
 }
 
-export type PBROptions = TargetOptions & {
+export type PBROptions = {
     useEnergyConservation: boolean;
     useRadianceOcclusion: boolean;
     useHorizonOcclusion: boolean;
@@ -1146,7 +1146,7 @@ export function pbr(
     options?: Partial<PBROptions>,
 ): PBROutput {
     const PBRMetallicRoughness = new PBRMetallicRoughnessBlock("PBRMetallicRoughness");
-    PBRMetallicRoughness.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
+    PBRMetallicRoughness.target = NodeMaterialBlockTargets.VertexAndFragment;
     PBRMetallicRoughness.useEnergyConservation = options?.useEnergyConservation ?? true;
     PBRMetallicRoughness.useRadianceOcclusion = options?.useRadianceOcclusion ?? true;
     PBRMetallicRoughness.useHorizonOcclusion = options?.useHorizonOcclusion ?? true;
