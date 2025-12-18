@@ -50,6 +50,7 @@ import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
+import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
 import { SmoothStepBlock } from "@babylonjs/core/Materials/Node/Blocks/smoothStepBlock";
 import { StepBlock } from "@babylonjs/core/Materials/Node/Blocks/stepBlock";
@@ -562,6 +563,20 @@ export function div(
     right.connectTo(mulBlock.right);
 
     return mulBlock.output;
+}
+
+export function pow(
+    value: NodeMaterialConnectionPoint,
+    power: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const powBlock = new PowBlock("pow");
+    powBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    value.connectTo(powBlock.value);
+    power.connectTo(powBlock.power);
+
+    return powBlock.output;
 }
 
 /**
