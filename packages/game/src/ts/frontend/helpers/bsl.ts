@@ -43,6 +43,7 @@ import { DotBlock } from "@babylonjs/core/Materials/Node/Blocks/dotBlock";
 import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/imageSourceBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
+import { FrontFacingBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/frontFacingBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
 import { AnimatedInputBlockTypes } from "@babylonjs/core/Materials/Node/Blocks/Input/animatedInputBlockTypes";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
@@ -593,6 +594,12 @@ export function pow(
     power.connectTo(powBlock.power);
 
     return powBlock.output;
+}
+
+export function getFrontFacing() {
+    const frontFacingBlock = new FrontFacingBlock("frontFacing");
+    frontFacingBlock.target = NodeMaterialBlockTargets.Fragment;
+    return frontFacingBlock.output;
 }
 
 /**
