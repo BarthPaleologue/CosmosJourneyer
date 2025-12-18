@@ -37,6 +37,7 @@
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { CrossBlock } from "@babylonjs/core/Materials/Node/Blocks/crossBlock";
+import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
 import { DotBlock } from "@babylonjs/core/Materials/Node/Blocks/dotBlock";
 import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/imageSourceBlock";
@@ -477,6 +478,19 @@ export function length(
     input.connectTo(lengthBlock.value);
 
     return lengthBlock.output;
+}
+
+export function distance(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const distanceBlock = new DistanceBlock("distance");
+    distanceBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(distanceBlock.left);
+    right.connectTo(distanceBlock.right);
+    return distanceBlock.output;
 }
 
 /**
