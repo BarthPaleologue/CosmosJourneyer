@@ -262,7 +262,7 @@ export type TextureBlockOptions = TargetOptions & {
  * @param options - Optional properties for the texture block.
  */
 export function textureSample(
-    texture: Texture,
+    texture: NodeMaterialConnectionPoint,
     uv: NodeMaterialConnectionPoint,
     options?: Partial<TextureBlockOptions>,
 ) {
@@ -271,8 +271,8 @@ export function textureSample(
     textureBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
     textureBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
     textureBlock.disableLevelMultiplication = options?.disableLevelMultiplication ?? false;
-    textureBlock.texture = texture;
 
+    texture.connectTo(textureBlock.source);
     uv.connectTo(textureBlock.uv);
 
     return textureBlock;

@@ -41,6 +41,7 @@ import {
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
@@ -82,10 +83,11 @@ export class LandingPadMaterial extends NodeMaterial {
 
         // Fragment Shader
 
+        const numberUniformTexture = uniformTexture2d(numberTexture).source;
+
         //float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x + 0.01)).a;
         const paintMaskUV = vec2(uvSplit.y, add(uvSplit.x, f(0.01)));
-        const paintWeight = textureSample(numberTexture, paintMaskUV).a;
-
+        const paintWeight = textureSample(numberUniformTexture, paintMaskUV).a;
         const paintAlbedo = vec(Vector3.One());
 
         const borderThickness = f(0.03);
@@ -113,14 +115,19 @@ export class LandingPadMaterial extends NodeMaterial {
 
         const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
 
-        const albedoTexture = textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
+        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+
+        const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
-        const normalMapValue = textureSample(textures.normal, proceduralUV);
-        const ambientOcclusion = textureSample(textures.ambientOcclusion, proceduralUV);
+        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+        const normalMapValue = textureSample(normalTexture, proceduralUV);
+        const ambientOcclusion = textureSample(occlusionTexture, proceduralUV);
 
-        const finalAlbedo = mix(albedoTexture.rgb, paintAlbedo, fullPaintWeight);
+        const finalAlbedo = mix(albedo.rgb, paintAlbedo, fullPaintWeight);
         const finalMetallic = mix(metallicRoughness.r, f(0), fullPaintWeight);
         const finalRoughness = mix(metallicRoughness.g, f(0.7), fullPaintWeight);
         const finalAmbientOcclusion = mix(ambientOcclusion.r, f(1), fullPaintWeight);

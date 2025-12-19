@@ -50,31 +50,34 @@ export class MetalSectionMaterial extends NodeMaterial {
 
         // Fragment
 
-        const albedoTexture = BSL.textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = BSL.uniformTexture2d(textures.albedo).source;
+        const metallicRoughnessTexture = BSL.uniformTexture2d(textures.metallicRoughness).source;
+        const aoTexture = BSL.uniformTexture2d(textures.ambientOcclusion).source;
+        const normalTexture = BSL.uniformTexture2d(textures.normal).source;
+
+        const albedo = BSL.textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const metallicRoughnesstexture = BSL.textureSample(textures.metallicRoughness, proceduralUV);
-        const aoTexture = BSL.textureSample(textures.ambientOcclusion, proceduralUV);
-        const normalTexture = BSL.textureSample(textures.normal, proceduralUV);
+        const metallicRoughness = BSL.textureSample(metallicRoughnessTexture, proceduralUV);
+        const ao = BSL.textureSample(aoTexture, proceduralUV);
+        const normalTextureValue = BSL.textureSample(normalTexture, proceduralUV);
 
-        const perturbedNormal = BSL.perturbNormal(proceduralUV, positionW, normalW, normalTexture.rgb, BSL.float(1));
+        const perturbedNormal = BSL.perturbNormal(
+            proceduralUV,
+            positionW,
+            normalW,
+            normalTextureValue.rgb,
+            BSL.float(1),
+        );
 
         const view = BSL.uniformView();
         const cameraPosition = BSL.uniformCameraPosition();
 
-        const pbrColor = BSL.pbr(
-            metallicRoughnesstexture.r,
-            metallicRoughnesstexture.g,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: albedoTexture.rgb,
-                ambientOcclusion: aoTexture.r,
-                perturbedNormal: perturbedNormal.output,
-            },
-        );
+        const pbrColor = BSL.pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            ambientOcclusion: ao.r,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const fragmentOutput = BSL.outputFragColor(pbrColor.lighting);
 
