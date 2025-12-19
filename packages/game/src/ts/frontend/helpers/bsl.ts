@@ -467,6 +467,10 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
     return trig(x, TrigonometryBlockOperations.Cos, options);
 }
 
+export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.Sign, options);
+}
+
 /**
  * Returns the length (magnitude) of a vector.
  * @param input - The input vector.
