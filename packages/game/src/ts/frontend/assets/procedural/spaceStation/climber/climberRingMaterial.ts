@@ -61,7 +61,6 @@ export class ClimberRingMaterial extends NodeMaterial {
         const pbrColor = BSL.pbr(
             metallicRoughnesstexture.r,
             metallicRoughnesstexture.g,
-            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
@@ -69,6 +68,7 @@ export class ClimberRingMaterial extends NodeMaterial {
             {
                 albedoRgb: albedoTexture.rgb,
                 ambientOcclusion: aoTexture.r,
+                perturbedNormal: perturbedNormal.output,
             },
         );
 

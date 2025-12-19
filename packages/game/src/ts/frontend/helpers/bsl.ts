@@ -1146,6 +1146,7 @@ export type PBROptions = {
     albedoRgb: NodeMaterialConnectionPoint;
     ambientOcclusion: NodeMaterialConnectionPoint;
     opacity: NodeMaterialConnectionPoint;
+    perturbedNormal: NodeMaterialConnectionPoint;
 };
 
 export type PBROutput = {
@@ -1158,7 +1159,6 @@ export type PBROutput = {
  * Creates a PBR metallic roughness material using the given parameters.
  * @param metallicFloat - The metallic value.
  * @param roughnessFloat - The roughness value.
- * @param perturbedNormalVec3 - The perturbed normal vector.
  * @param normalWorldVec3 - The world normal vector.
  * @param viewMat4 - The view matrix.
  * @param cameraPositionVec3 - The camera position vector.
@@ -1168,7 +1168,6 @@ export type PBROutput = {
 export function pbr(
     metallicFloat: NodeMaterialConnectionPoint,
     roughnessFloat: NodeMaterialConnectionPoint,
-    perturbedNormalVec3: NodeMaterialConnectionPoint,
     normalWorldVec3: NodeMaterialConnectionPoint,
     viewMat4: NodeMaterialConnectionPoint,
     cameraPositionVec3: NodeMaterialConnectionPoint,
@@ -1183,7 +1182,6 @@ export function pbr(
 
     metallicFloat.connectTo(PBRMetallicRoughness.metallic);
     roughnessFloat.connectTo(PBRMetallicRoughness.roughness);
-    perturbedNormalVec3.connectTo(PBRMetallicRoughness.perturbedNormal);
     normalWorldVec3.connectTo(PBRMetallicRoughness.worldNormal);
     viewMat4.connectTo(PBRMetallicRoughness.view);
     cameraPositionVec3.connectTo(PBRMetallicRoughness.cameraPosition);
@@ -1192,6 +1190,7 @@ export function pbr(
     options?.albedoRgb?.connectTo(PBRMetallicRoughness.baseColor);
     options?.ambientOcclusion?.connectTo(PBRMetallicRoughness.ambientOcc);
     options?.opacity?.connectTo(PBRMetallicRoughness.opacity);
+    options?.perturbedNormal?.connectTo(PBRMetallicRoughness.perturbedNormal);
 
     return PBRMetallicRoughness;
 }

@@ -60,12 +60,11 @@ export class SolarPanelMaterial extends NodeMaterial {
         const pbrLighting = BSL.pbr(
             metallicRoughness.r,
             metallicRoughness.g,
-            perturbedNormal.output,
             normalW,
             view,
             cameraPosition,
             positionW,
-            { albedoRgb: albedoTexture.rgb },
+            { albedoRgb: albedoTexture.rgb, perturbedNormal: perturbedNormal.output },
         );
 
         const fragOutput = BSL.outputFragColor(pbrLighting.lighting);

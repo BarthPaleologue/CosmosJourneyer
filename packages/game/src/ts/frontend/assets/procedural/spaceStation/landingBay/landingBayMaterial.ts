@@ -173,19 +173,11 @@ export class LandingBayMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(
-            finalMetallic,
-            finalRoughness,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: finalAlbedo,
-                ambientOcclusion: finalAo,
-            },
-        );
+        const pbrColor = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+            albedoRgb: finalAlbedo,
+            ambientOcclusion: finalAo,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const fragOutput = outputFragColor(pbrColor.lighting);
 
