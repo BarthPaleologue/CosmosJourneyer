@@ -39,6 +39,7 @@ import {
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
@@ -81,12 +82,17 @@ export class HelixHabitatMaterial extends NodeMaterial {
 
         this.addOutputNode(vertexOutput);
 
-        const albedo = textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+
+        const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const normalMap = textureSample(textures.normal, proceduralUV);
-        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
-        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalMap = textureSample(normalTexture, proceduralUV);
+        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+        const occlusion = textureSample(occlusionTexture, proceduralUV);
 
         const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 

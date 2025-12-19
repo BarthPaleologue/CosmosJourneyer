@@ -44,6 +44,7 @@ import {
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
@@ -138,12 +139,18 @@ export class LandingBayMaterial extends NodeMaterial {
         const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
         const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
-        const albedo = textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+        const namePlate = uniformTexture2d(namePlateTexture).source;
+
+        const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const normalMap = textureSample(textures.normal, proceduralUV);
-        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
-        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalMap = textureSample(normalTexture, proceduralUV);
+        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+        const occlusion = textureSample(occlusionTexture, proceduralUV);
 
         const namePlateUvX = mul(theta, f(1.0 / Math.PI));
         const namePlateUvY = distanceToCenter01;
@@ -154,7 +161,7 @@ export class LandingBayMaterial extends NodeMaterial {
         const namePlateUvMask = step(f(1.0), splitVec(normal).y);
         const namePlateUV = mix(vec2(f(0.0), f(0.0)), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
 
-        const namePlateColor = textureSample(namePlateTexture, fract(namePlateUV));
+        const namePlateColor = textureSample(namePlate, fract(namePlateUV));
         const paintWeight = namePlateColor.a;
 
         const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
