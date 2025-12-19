@@ -42,6 +42,7 @@ import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
 import { DotBlock } from "@babylonjs/core/Materials/Node/Blocks/dotBlock";
 import { ImageSourceBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/imageSourceBlock";
 import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/textureBlock";
+import { DiscardBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/discardBlock";
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { FrontFacingBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/frontFacingBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
@@ -1198,6 +1199,16 @@ export function pbr(
     options?.perturbedNormal?.connectTo(PBRMetallicRoughness.perturbedNormal);
 
     return PBRMetallicRoughness;
+}
+
+export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint) {
+    const discardBlock = new DiscardBlock("discard");
+    discardBlock.target = NodeMaterialBlockTargets.Fragment;
+
+    value.connectTo(discardBlock.value);
+    cutoff.connectTo(discardBlock.cutoff);
+
+    return discardBlock;
 }
 
 export type OutputFragColorOptions = {
