@@ -305,16 +305,17 @@ export type TriPlanarSampleOptions = TargetOptions & {
  * @param options - Optional properties for the triplanar sampling.
  */
 export function textureTriPlanarSample(
-    texture: Texture,
+    texture: NodeMaterialConnectionPoint,
     position: NodeMaterialConnectionPoint,
     normal: NodeMaterialConnectionPoint,
     options?: Partial<TriPlanarSampleOptions>,
 ) {
     const triPlanarBlock = new TriPlanarBlock("TriPlanar");
-    triPlanarBlock.texture = texture;
 
     triPlanarBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
     triPlanarBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
+
+    texture.connectTo(triPlanarBlock.source);
 
     position.connectTo(triPlanarBlock.position);
     normal.connectTo(triPlanarBlock.normal);
