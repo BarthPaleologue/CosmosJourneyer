@@ -37,7 +37,6 @@ export async function createButterflyScene(
     scene.useRightHandedSystem = true;
 
     const camera = new ArcRotateCamera("camera1", 0, (0.9 * Math.PI) / 2, 10, new Vector3(0, 2, 0), scene);
-    camera.upperBetaLimit = Math.PI / 2;
     camera.lowerRadiusLimit = 5;
     camera.upperRadiusLimit = 100;
     camera.attachControl();
@@ -54,8 +53,8 @@ export async function createButterflyScene(
     butterflyMesh.isVisible = false;
 
     const particleTextures = await loadParticleTextures(scene, progressMonitor);
-    const butterflyMaterial = new ButterflyMaterial(particleTextures.butterfly, scene, false);
-    butterflyMesh.material = butterflyMaterial;
+    const butterflyMaterial = new ButterflyMaterial(particleTextures.butterfly, scene);
+    butterflyMesh.material = butterflyMaterial.get();
 
     const rng = seededSquirrelNoise(0);
     let rngState = 0;
@@ -63,7 +62,7 @@ export async function createButterflyScene(
         return rng(rngState++);
     };
 
-    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 32, wrappedRng));
+    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 128, wrappedRng));
     butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
     return scene;
