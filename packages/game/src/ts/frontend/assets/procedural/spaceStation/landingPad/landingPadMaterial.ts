@@ -136,19 +136,11 @@ export class LandingPadMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrLighting = pbr(
-            finalMetallic,
-            finalRoughness,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: finalAlbedo,
-                ambientOcclusion: finalAmbientOcclusion,
-            },
-        );
+        const pbrLighting = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+            albedoRgb: finalAlbedo,
+            ambientOcclusion: finalAmbientOcclusion,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const additionalLight = mul(finalAlbedo, div(f(0.05), add(f(0.05), mul(distToCenter, distToCenter))));
 

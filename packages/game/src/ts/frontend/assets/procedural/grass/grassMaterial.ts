@@ -140,7 +140,7 @@ export class GrassMaterial {
 
         const ambientOcclusion = mix(f(0.7), f(1.0), pow(height01, f(2.0)));
 
-        const pbrShading = pbr(f(0.0), f(0.4), normalW, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(f(0.0), f(0.4), normalW, view, cameraPosition, positionW, {
             albedoRgb,
             ambientOcclusion,
         });

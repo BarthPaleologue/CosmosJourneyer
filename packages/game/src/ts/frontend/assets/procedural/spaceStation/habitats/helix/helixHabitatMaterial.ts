@@ -93,19 +93,11 @@ export class HelixHabitatMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(
-            metallicRoughness.r,
-            metallicRoughness.g,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: albedo.rgb,
-                ambientOcclusion: occlusion.r,
-            },
-        );
+        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            ambientOcclusion: occlusion.r,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const lightEmission = mul(
             mul(
