@@ -22,7 +22,6 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import {
     add,
-    color,
     cos,
     distance,
     f,
@@ -37,6 +36,7 @@ import {
     pow,
     remap,
     rotateAround,
+    sampleGradient,
     sin,
     smoothstep,
     splitMatrix,
@@ -83,7 +83,7 @@ export class GrassMaterial {
 
         const windStrength = textureSample(
             noise,
-            add(mul(f(0.007), xz(instancePosition)), mul(f(0.1), elapsedSeconds)),
+            add(mul(f(0.03), xz(instancePosition)), mul(f(0.2), elapsedSeconds)),
         ).r;
         const windDir = mul(
             f(2.0 * Math.PI),
@@ -125,10 +125,16 @@ export class GrassMaterial {
 
         const view = uniformView();
 
-        const baseColor = color(new Color3(0.1, 0.6, 0.08));
-        const tipColor = color(new Color3(0.2, 0.4, 0.1));
+        const baseColor = Color3.FromHexString("#0C4909");
+        const tipColor = Color3.FromHexString("#347215");
 
-        const albedoRgb = mix(baseColor, tipColor, pow(height01, f(2.0)));
+        const albedoRgb = sampleGradient(
+            [
+                [0, baseColor],
+                [0.5, tipColor],
+            ],
+            height01,
+        );
 
         const ambientOcclusion = mix(f(0.7), f(1.0), pow(height01, f(2.0)));
 
