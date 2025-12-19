@@ -27,6 +27,7 @@ import { createSierpinskiScene } from "./anomalies/sierpinski";
 import { createAsteroidFieldScene } from "./asteroidField";
 import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createAutomaticLandingScene } from "./automaticLanding";
+import { createButterflyScene } from "./butterfly";
 import { createCharacterDemoScene } from "./character";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
@@ -98,6 +99,7 @@ export class PlaygroundRegistry {
         ["interaction", createInteractionDemo],
         ["swimming", CreateSwimmingScene],
         ["onFoot", createOnFootScene],
+        ["butterfly", createButterflyScene],
     ]);
 
     register(
