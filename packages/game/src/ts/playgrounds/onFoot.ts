@@ -31,6 +31,8 @@ import { seededSquirrelNoise } from "squirrel-noise";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
+import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
+import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";
 import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -105,6 +107,15 @@ export async function createOnFootScene(
     const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 512, wrappedRng));
     grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
     grassPatch.getCurrentMesh().parent = ground;
+
+    const butterflyMesh = createButterfly(scene);
+    butterflyMesh.isVisible = false;
+
+    const butterflyMaterial = new ButterflyMaterial(assets.textures.particles.butterfly, scene);
+    butterflyMesh.material = butterflyMaterial.get();
+
+    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 32, wrappedRng));
+    butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0.2 }, scene);
 

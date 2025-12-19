@@ -27,8 +27,7 @@ import { SolarPanelMaterial } from "./procedural/solarPanel/solarPanelMaterial";
 import { type Textures } from "./textures";
 
 export type Materials = {
-    readonly butterfly: ButterflyMaterial;
-    readonly butterflyDepth: ButterflyMaterial;
+    readonly butterfly: Material;
     readonly grass: Material;
     readonly crate: PBRMetallicRoughnessMaterial;
     readonly solarPanel: SolarPanelMaterial;
@@ -53,8 +52,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     tankMaterial.roughness = 0.4;
 
     return {
-        butterfly: new ButterflyMaterial(textures.particles.butterfly, scene, false),
-        butterflyDepth: new ButterflyMaterial(textures.particles.butterfly, scene, true),
+        butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
