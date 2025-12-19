@@ -45,6 +45,7 @@ import { TextureBlock } from "@babylonjs/core/Materials/Node/Blocks/Dual/texture
 import { FragmentOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/fragmentOutputBlock";
 import { FrontFacingBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/frontFacingBlock";
 import { PerturbNormalBlock } from "@babylonjs/core/Materials/Node/Blocks/Fragment/perturbNormalBlock";
+import { GradientBlock, GradientBlockColorStep } from "@babylonjs/core/Materials/Node/Blocks/gradientBlock";
 import { AnimatedInputBlockTypes } from "@babylonjs/core/Materials/Node/Blocks/Input/animatedInputBlockTypes";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { LengthBlock } from "@babylonjs/core/Materials/Node/Blocks/lengthBlock";
@@ -702,6 +703,20 @@ export function color(color: Color3 | Color4, options?: Partial<TargetOptions>):
     colorBlock.value = color;
 
     return colorBlock.output;
+}
+
+export function sampleGradient(
+    gradientSteps: ReadonlyArray<[number, Color3]>,
+    t: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const gradientBlock = new GradientBlock("Gradient");
+    gradientBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    gradientBlock.colorSteps = gradientSteps.map(([value, color]) => new GradientBlockColorStep(value, color));
+    t.connectTo(gradientBlock.gradient);
+
+    return gradientBlock.output;
 }
 
 /**
