@@ -69,7 +69,7 @@ export async function createGrassScene(
     );
 
     const groundMaterial = new PBRMaterial("groundMaterial", scene);
-    groundMaterial.albedoColor = new Color3(0.1, 0.6, 0.08).scale(0.5);
+    groundMaterial.albedoColor = Color3.FromHexString("#0C4909").scale(0.5);
     groundMaterial.metallic = 0.0;
     groundMaterial.roughness = 0.8;
     ground.material = groundMaterial;
