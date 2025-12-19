@@ -36,6 +36,7 @@
 
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
+import { ColorConverterBlock } from "@babylonjs/core/Materials/Node/Blocks/colorConverterBlock";
 import { CrossBlock } from "@babylonjs/core/Materials/Node/Blocks/crossBlock";
 import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
@@ -723,6 +724,30 @@ export function sampleGradient(
     t.connectTo(gradientBlock.gradient);
 
     return gradientBlock.output;
+}
+
+export function rgbToHsl(
+    rgb: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const colorConverter = new ColorConverterBlock("RGBtoHSL");
+    colorConverter.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    rgb.connectTo(colorConverter.rgbIn);
+
+    return colorConverter.hslOut;
+}
+
+export function hslToRgb(
+    hsl: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const colorConverter = new ColorConverterBlock("HSLtoRGB");
+    colorConverter.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    hsl.connectTo(colorConverter.hslIn);
+
+    return colorConverter.rgbOut;
 }
 
 /**
