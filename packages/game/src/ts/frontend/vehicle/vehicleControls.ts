@@ -36,9 +36,9 @@ export class VehicleControls implements Controls {
 
     private readonly thirdPersonCameraYOffset = 2;
 
-    private readonly thirdPersonCamera: ArcRotateCamera;
+    readonly thirdPersonCamera: ArcRotateCamera;
 
-    private readonly firstPersonCamera: FreeCamera;
+    readonly firstPersonCamera: FreeCamera;
 
     private activeCamera: Camera;
 

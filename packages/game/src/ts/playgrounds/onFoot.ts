@@ -37,15 +37,22 @@ import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade"
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { TtsMock } from "@/frontend/audio/tts";
+import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
+import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal/radialChoiceModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
+import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
+import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
+import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -62,10 +69,6 @@ export async function createOnFootScene(
     scene.useRightHandedSystem = true;
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
-
-    engine.getRenderingCanvas()?.addEventListener("click", async () => {
-        await engine.getRenderingCanvas()?.requestPointerLock();
-    });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -119,7 +122,7 @@ export async function createOnFootScene(
     const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 64, wrappedRng));
     butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
-    new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0.2 }, scene);
+    new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0.2, friction: 2 }, scene);
 
     const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
@@ -138,10 +141,42 @@ export async function createOnFootScene(
     const spaceship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
     spaceship.getTransform().position.copyFromFloats(16, 5, 16);
 
-    const rover = createWolfMk2(assets, scene, new Vector3(-16, 5, 16), { axis: Vector3.Up(), angle: 0.5 });
-    if (!rover.success) {
-        throw new Error(`Failed to create rover: ${rover.error}`);
+    const tts = new TtsMock();
+    const notificationManager = new NotificationManagerMock();
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);
+
+    const roverResult = createWolfMk2(assets, scene, new Vector3(-16, 3, 16), { axis: Vector3.Up(), angle: 0.5 });
+    if (!roverResult.success) {
+        throw new Error(`Failed to create rover: ${roverResult.error}`);
     }
+
+    const rover = roverResult.value;
+
+    const roverControls = new VehicleControls(scene);
+    roverControls.firstPersonCamera.minZ = 0.1;
+    roverControls.setVehicle(rover);
+
+    let activeControls: Controls = characterControls;
+
+    const setActiveControls = async (controls: Controls) => {
+        scene.activeCamera?.detachControl();
+
+        activeControls = controls;
+        activeControls.getActiveCamera().attachControl();
+        scene.activeCamera = activeControls.getActiveCamera();
+
+        if (engine.isPointerLock && !activeControls.shouldLockPointer()) {
+            document.exitPointerLock();
+        } else if (!engine.isPointerLock && activeControls.shouldLockPointer()) {
+            await engine.getRenderingCanvas()?.requestPointerLock();
+        }
+    };
+
+    engine.getRenderingCanvas()?.addEventListener("click", async () => {
+        if (activeControls.shouldLockPointer()) {
+            await engine.getRenderingCanvas()?.requestPointerLock();
+        }
+    });
 
     const interactionSystem = new InteractionSystem(
         CollisionMask.INTERACTIVE,
@@ -163,18 +198,60 @@ export async function createOnFootScene(
 
     const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
     const interactionLayer = new InteractionLayer(interactionSystem, keyboardLayoutMap);
+    document.body.appendChild(interactionLayer.root);
+
+    interactionSystem.register({
+        getPhysicsAggregate: () => spaceship.aggregate,
+        getInteractions: () => [
+            {
+                label: "Pilot",
+                perform: async () => {
+                    await setActiveControls(shipControls);
+                    CharacterInputs.setEnabled(false);
+                    SpaceShipControlsInputs.setEnabled(true);
+                },
+            },
+        ],
+    });
+
+    interactionSystem.register({
+        getPhysicsAggregate: () => roverResult.value.frame,
+        getInteractions: () => [
+            {
+                label: "Drive",
+                perform: async () => {
+                    await setActiveControls(roverControls);
+                    CharacterInputs.setEnabled(false);
+                    VehicleInputs.setEnabled(true);
+                },
+            },
+        ],
+    });
+
+    for (const door of rover.doors) {
+        interactionSystem.register(door);
+    }
+
+    document.addEventListener("keydown", async (e) => {
+        if (e.key === "e") {
+            await setActiveControls(characterControls);
+            CharacterInputs.setEnabled(true);
+            VehicleInputs.setEnabled(false);
+            SpaceShipControlsInputs.setEnabled(false);
+        }
+    });
 
     scene.onBeforeRenderObservable.add(() => {
-        if (characterControls.getActiveCamera() !== scene.activeCamera) {
+        if (activeControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
 
-            const camera = characterControls.getActiveCamera();
+            const camera = activeControls.getActiveCamera();
             camera.attachControl();
             scene.activeCamera = camera;
         }
 
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
-        characterControls.update(deltaSeconds);
+        activeControls.update(deltaSeconds);
         interactionSystem.update(deltaSeconds);
         interactionLayer.update(deltaSeconds);
     });
