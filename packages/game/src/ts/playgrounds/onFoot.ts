@@ -68,7 +68,7 @@ export async function createOnFootScene(
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
-    const light = new DirectionalLight("sun", new Vector3(1, -2, -1), scene);
+    const light = new DirectionalLight("sun", new Vector3(1, -1, -1), scene);
 
     createSky(light.direction.negate(), scene);
 
@@ -90,6 +90,7 @@ export async function createOnFootScene(
     groundMaterial.albedoColor = Color3.FromHexString("#0C4909").scale(0.5);
     groundMaterial.metallic = 0.0;
     groundMaterial.roughness = 0.8;
+    groundMaterial.backFaceCulling = false;
     ground.material = groundMaterial;
 
     const grassBladeMesh = createGrassBlade(scene, 5);
@@ -114,7 +115,7 @@ export async function createOnFootScene(
     const butterflyMaterial = new ButterflyMaterial(assets.textures.particles.butterfly, scene);
     butterflyMesh.material = butterflyMaterial.get();
 
-    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 32, wrappedRng));
+    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 64, wrappedRng));
     butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0.2 }, scene);
