@@ -21,9 +21,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 
 import {
+    abs,
     add,
     cos,
     discardTest,
+    div,
     f,
     fract,
     getInstanceData,
@@ -33,16 +35,21 @@ import {
     mul,
     outputFragColor,
     outputVertexPosition,
+    pbr,
     remap,
     rgbToHsl,
     rotateAround,
     sign,
     sin,
     splitVec,
+    sub,
     textureSample,
+    transformDirection,
     transformPosition,
+    uniformCameraPosition,
     uniformElapsedSeconds,
     uniformTexture2d,
+    uniformView,
     uniformViewProjection,
     uniformWorld,
     vec,
@@ -58,6 +65,7 @@ export class ButterflyMaterial {
         this.material.backFaceCulling = false;
 
         const position = vertexAttribute("position");
+        const normal = vertexAttribute("normal");
         const uv = vertexAttribute("uv");
 
         const world0 = instanceAttribute("world0");
@@ -70,19 +78,21 @@ export class ButterflyMaterial {
         const globalWorld = uniformWorld();
         const { instanceID, output: instanceWorld } = getInstanceData(world0, world1, world2, world3, globalWorld);
 
-        const hash = mul(hash11(instanceID), f(10000));
+        const hash = hash11(instanceID);
 
-        const scaling = remap(hash11(instanceID), f(0), f(1), f(0.02), f(0.1));
+        const scaling = remap(hash, f(0), f(1), f(0.02), f(0.1));
 
         const scaledPosition = mul(position, scaling);
 
+        const flappingPeriod = remap(hash, f(0), f(1), f(0.25), f(0.75));
+        const flappingOmega = div(f(2 * Math.PI), flappingPeriod);
         const phase = mul(hash, f(2 * Math.PI));
-        const wingFlapJitter = sin(add(mul(f(5), elapsedSeconds), phase));
+        const wingFlapJitter = sin(add(mul(flappingOmega, elapsedSeconds), phase));
 
         const movementY = add(sin(add(mul(f(0.2), elapsedSeconds), phase)), f(3));
 
-        const flappingPeriod = 0.5;
-        const wingAngle = cos(add(mul(f((2 * Math.PI) / flappingPeriod), elapsedSeconds), phase));
+        const wingAngleShape = abs(cos(add(mul(flappingOmega, elapsedSeconds), phase)));
+        const wingAngle = remap(sub(f(1), wingAngleShape), f(0), f(1), f(-0.7), f(1));
 
         const splitPosition = splitVec(position);
         const butterflyForward = vec(new Vector3(1, 0, 0));
@@ -90,7 +100,9 @@ export class ButterflyMaterial {
         const signedWingAngle = mul(sign(splitPosition.z), wingAngle);
         const flappingPosition = rotateAround(scaledPosition, butterflyForward, signedWingAngle);
 
-        const totalMovementY = add(mul(f(0.3), movementY), mul(f(0.02), wingFlapJitter));
+        const flappingNormal = rotateAround(normal, butterflyForward, signedWingAngle);
+
+        const totalMovementY = add(mul(f(0.3), movementY), mul(mul(scaling, f(0.2)), wingFlapJitter));
 
         const splitFlappingPosition = splitVec(flappingPosition);
 
@@ -100,7 +112,14 @@ export class ButterflyMaterial {
             splitFlappingPosition.z,
         );
 
-        const positionW = transformPosition(instanceWorld, position2);
+        const rotationAngle = cos(elapsedSeconds);
+
+        const position3 = rotateAround(position2, vec(Vector3.Up()), rotationAngle);
+
+        const finalNormal = rotateAround(flappingNormal, vec(Vector3.Up()), rotationAngle);
+
+        const positionW = transformPosition(instanceWorld, position3);
+        const normalW = transformDirection(instanceWorld, finalNormal);
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -119,7 +138,13 @@ export class ButterflyMaterial {
         const shiftedAlbedoHsl = vec3(shiftedHue, splitAlbedoHsl.y, splitAlbedoHsl.z);
         const shiftedAlbedo = hslToRgb(shiftedAlbedoHsl);
 
-        const fragOutput = outputFragColor(shiftedAlbedo, { alpha: albedo.a });
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
+        const shading = pbr(f(0), f(1), normalW, view, cameraPosition, positionW, { albedoRgb: shiftedAlbedo });
+
+        const ambient = mul(f(0.8), shiftedAlbedo);
+
+        const fragOutput = outputFragColor(add(ambient, shading.lighting), { alpha: albedo.a });
 
         this.material.addOutputNode(vertexOutput);
         this.material.addOutputNode(fragOutput);
