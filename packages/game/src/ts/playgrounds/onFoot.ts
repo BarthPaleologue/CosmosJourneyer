@@ -46,6 +46,7 @@ import { radialChoiceModal } from "@/frontend/ui/dialogModal/radialChoiceModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
+import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
@@ -136,6 +137,11 @@ export async function createOnFootScene(
     const soundPlayer = new SoundPlayerMock();
     const spaceship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
     spaceship.getTransform().position.copyFromFloats(16, 5, 16);
+
+    const rover = createWolfMk2(assets, scene, new Vector3(-16, 5, 16), { axis: Vector3.Up(), angle: 0.5 });
+    if (!rover.success) {
+        throw new Error(`Failed to create rover: ${rover.error}`);
+    }
 
     const interactionSystem = new InteractionSystem(
         CollisionMask.INTERACTIVE,
