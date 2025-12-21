@@ -78,15 +78,10 @@ export class SolarPanelMaterial extends NodeMaterial {
 
         const view = uniformView();
 
-        const pbrLighting = pbr(
-            metallic.r,
-            roughness.r,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            { albedoRgb: albedo.rgb, perturbedNormal },
-        );
+        const pbrLighting = pbr(metallic.r, roughness.r, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            perturbedNormal,
+        });
 
         const fragOutput = outputFragColor(pbrLighting.lighting);
 
