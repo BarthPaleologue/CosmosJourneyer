@@ -37,8 +37,9 @@ export async function createButterflyScene(
     scene.useRightHandedSystem = true;
 
     const camera = new ArcRotateCamera("camera1", 0, (0.9 * Math.PI) / 2, 10, new Vector3(0, 2, 0), scene);
-    camera.lowerRadiusLimit = 5;
+    camera.lowerRadiusLimit = 0.5;
     camera.upperRadiusLimit = 100;
+    camera.minZ = 0.1;
     camera.attachControl();
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
