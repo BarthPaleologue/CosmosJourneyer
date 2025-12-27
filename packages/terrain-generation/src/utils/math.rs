@@ -38,7 +38,7 @@ pub fn s_max(a: f32, b: f32, k: f32) -> f32 {
  * @param grad_v the gradient of v
  * @returns the smooth minimum between u and v
  */
-pub fn s_min_gradient(u: f32, v: f32, k: f32, mut grad_u: Vector3, grad_v: Vector3) -> f32 {
+pub fn s_min_gradient(u: f32, v: f32, k: f32, grad_u: &mut Vector3, grad_v: &Vector3) -> f32 {
     let eku = f32::exp(k * u);
     let ekv = f32::exp(k * v);
     let ekuv = eku + ekv;
