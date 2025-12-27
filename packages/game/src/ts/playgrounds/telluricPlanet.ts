@@ -168,7 +168,7 @@ export async function createTelluricPlanetScene(
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            planet.updateLOD(camera.globalPosition, chunkForge);
+            planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge);
             chunkForge.update(assets);
 
             if (chunkForge.applyTaskQueue.length === 0 && chunkForge.workerPool.busyWorkers.length === 0) {
