@@ -140,6 +140,9 @@ export function uniformWorld(options?: Partial<TargetOptions>): NodeMaterialConn
     return world.output;
 }
 
+/**
+ * Returns an animated time uniform in seconds.
+ */
 export function uniformElapsedSeconds(): NodeMaterialConnectionPoint {
     const elapsedSecondsBlock = new InputBlock("Time");
     elapsedSecondsBlock.target = NodeMaterialBlockTargets.Vertex;
@@ -177,6 +180,11 @@ export function vertexAttribute(
 
 export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3";
 
+/**
+ * Returns an instance attribute input block for the given name.
+ * @param name - The instance attribute name.
+ * @param options - Optional target options.
+ */
 export function instanceAttribute(name: InstanceAttributeName, options?: Partial<TargetOptions>) {
     const attribute = new InputBlock(name);
     attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
@@ -199,6 +207,9 @@ export function float(value: number, options?: Partial<TargetOptions>): NodeMate
     return inputBlock.output;
 }
 
+/**
+ * Shorthand alias for {@link float}.
+ */
 export function f(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return float(value, options);
 }
@@ -237,6 +248,12 @@ export function uniformFloat(
     return inputBlock.output;
 }
 
+/**
+ * Returns the view direction from world position to camera position.
+ * @param worldPosition - The world position.
+ * @param cameraPosition - The camera position.
+ * @param options - Optional target options.
+ */
 export function getViewDirection(
     worldPosition: NodeMaterialConnectionPoint,
     cameraPosition: NodeMaterialConnectionPoint,
@@ -285,6 +302,11 @@ export type UniformTexture2d = {
     dimensions: ImageSourceBlock["dimensions"];
 };
 
+/**
+ * Returns a texture uniform with an ImageSourceBlock.
+ * @param texture - The texture to expose.
+ * @param options - Optional target options.
+ */
 export function uniformTexture2d(texture: Texture, options?: Partial<TargetOptions>): UniformTexture2d {
     const imageSourceBlock = new ImageSourceBlock(`${texture.name}SourceBlock`);
     imageSourceBlock.target = options?.target ?? Target.VERT_AND_FRAG;
@@ -327,6 +349,13 @@ export function textureTriPlanarSample(
     return triPlanarBlock;
 }
 
+/**
+ * Samples up to three textures using triplanar mapping.
+ * @param textures - The X, Y, and Z textures (optional per axis).
+ * @param position - The world position.
+ * @param normal - The world normal.
+ * @param options - Optional triplanar sampling options.
+ */
 export function triPlanarMapping(
     textures: [NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?],
     position: NodeMaterialConnectionPoint,
@@ -357,6 +386,15 @@ export type InstanceData = {
     instanceID: NodeMaterialConnectionPoint;
 };
 
+/**
+ * Builds an InstancesBlock using world matrix rows and base world matrix.
+ * @param world0 - The first world matrix row.
+ * @param world1 - The second world matrix row.
+ * @param world2 - The third world matrix row.
+ * @param world3 - The fourth world matrix row.
+ * @param world - The base world matrix.
+ * @param options - Optional target options.
+ */
 export function getInstanceData(
     world0: NodeMaterialConnectionPoint,
     world1: NodeMaterialConnectionPoint,
@@ -461,14 +499,29 @@ export function atan2(
     return atan2Block.output;
 }
 
+/**
+ * Returns the sine of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
 export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     return trig(x, TrigonometryBlockOperations.Sin, options);
 }
 
+/**
+ * Returns the cosine of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
 export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     return trig(x, TrigonometryBlockOperations.Cos, options);
 }
 
+/**
+ * Returns the sign of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
 export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     return trig(x, TrigonometryBlockOperations.Sign, options);
 }
@@ -490,6 +543,12 @@ export function length(
     return lengthBlock.output;
 }
 
+/**
+ * Returns the distance between two points.
+ * @param left - The first point.
+ * @param right - The second point.
+ * @param options - Optional target options.
+ */
 export function distance(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -591,6 +650,12 @@ export function div(
     return mulBlock.output;
 }
 
+/**
+ * Raises a value to the given power.
+ * @param value - The base value.
+ * @param power - The exponent.
+ * @param options - Optional target options.
+ */
 export function pow(
     value: NodeMaterialConnectionPoint,
     power: NodeMaterialConnectionPoint,
@@ -605,6 +670,9 @@ export function pow(
     return powBlock.output;
 }
 
+/**
+ * Returns whether the current fragment is front-facing.
+ */
 export function getFrontFacing() {
     const frontFacingBlock = new FrontFacingBlock("frontFacing");
     frontFacingBlock.target = NodeMaterialBlockTargets.Fragment;
@@ -703,6 +771,11 @@ export function withW(
     return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
 }
 
+/**
+ * Returns a constant color input block.
+ * @param color - The color value.
+ * @param options - Optional target options.
+ */
 export function color(color: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const colorBlock = new InputBlock("color");
     colorBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -712,6 +785,12 @@ export function color(color: Color3 | Color4, options?: Partial<TargetOptions>):
     return colorBlock.output;
 }
 
+/**
+ * Samples a gradient based on the given steps and t value.
+ * @param gradientSteps - Pairs of position and color.
+ * @param t - The gradient input.
+ * @param options - Optional target options.
+ */
 export function sampleGradient(
     gradientSteps: ReadonlyArray<[number, Color3]>,
     t: NodeMaterialConnectionPoint,
@@ -726,6 +805,11 @@ export function sampleGradient(
     return gradientBlock.output;
 }
 
+/**
+ * Converts RGB to HSL.
+ * @param rgb - The RGB input.
+ * @param options - Optional target options.
+ */
 export function rgbToHsl(
     rgb: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
@@ -738,6 +822,11 @@ export function rgbToHsl(
     return colorConverter.hslOut;
 }
 
+/**
+ * Converts HSL to RGB.
+ * @param hsl - The HSL input.
+ * @param options - Optional target options.
+ */
 export function hslToRgb(
     hsl: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
@@ -857,6 +946,11 @@ export type MatrixSplitterOutput = {
     col3: NodeMaterialConnectionPoint;
 };
 
+/**
+ * Splits a matrix into its row and column vectors.
+ * @param input - The input matrix.
+ * @param options - Optional target options.
+ */
 export function splitMatrix(
     input: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
@@ -1015,6 +1109,12 @@ export function sub(
     return subBlock.output;
 }
 
+/**
+ * Returns the cross product of two vectors.
+ * @param left - The left vector.
+ * @param right - The right vector.
+ * @param options - Optional target options.
+ */
 export function cross(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -1029,6 +1129,12 @@ export function cross(
     return crossBlock.output;
 }
 
+/**
+ * Returns the dot product of two vectors.
+ * @param left - The left vector.
+ * @param right - The right vector.
+ * @param options - Optional target options.
+ */
 export function dot(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
@@ -1112,10 +1218,10 @@ export function max(
 }
 
 /**
- *
- * @param input
- * @param options
- * @returns
+ * Hashes a float into a pseudo-random value in [0, 1).
+ * @param input - The input value.
+ * @param options - Optional target options.
+ * @returns The hashed value.
  * @see https://www.shadertoy.com/view/4djSRW
  */
 export function hash11(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
@@ -1226,6 +1332,11 @@ export function pbr(
     return PBRMetallicRoughness;
 }
 
+/**
+ * Discards fragments where value is below cutoff.
+ * @param value - The test value.
+ * @param cutoff - The cutoff threshold.
+ */
 export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint) {
     const discardBlock = new DiscardBlock("discard");
     discardBlock.target = NodeMaterialBlockTargets.Fragment;
