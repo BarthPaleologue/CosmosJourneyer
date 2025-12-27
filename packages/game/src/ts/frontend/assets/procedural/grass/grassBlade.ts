@@ -44,7 +44,7 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
     const width = 0.08;
     const height = 1;
 
-    // The vertices are aranged in rows of 2 vertices, we stack the rows on top of each other until we reach the top of the blade
+    // The vertices are arranged in rows of 2 vertices, we stack the rows on top of each other until we reach the top of the blade
     let vertexIndex = 0;
     let normalIndex = 0;
     let indexIndex = 0;
