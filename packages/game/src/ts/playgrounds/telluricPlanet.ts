@@ -117,6 +117,12 @@ export async function createTelluricPlanetScene(
             scene,
         );
         camera.attachPostProcess(clouds);
+
+        await new Promise<void>((resolve) => {
+            planet.cloudsUniforms?.lut.getTexture().executeWhenReady(() => {
+                resolve();
+            });
+        });
     }
 
     if (planet.atmosphereUniforms !== null) {
