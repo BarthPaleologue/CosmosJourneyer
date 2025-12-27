@@ -1,0 +1,4 @@
+"use strict";(globalThis.webpackChunk_cosmos_journeyer_game=globalThis.webpackChunk_cosmos_journeyer_game||[]).push([["2"],{15641(e,o,r){r.r(o),r.d(o,{volumetricLightingRenderVolumeVertexShader:()=>t});var i=r(17984);r(13214),r(64274),r(10423),r(59645);let l="volumetricLightingRenderVolumeVertexShader",s=`#include<__decl__sceneVertex>
+#include<__decl__meshVertex>
+attribute vec3 position;varying vec4 vWorldPos;void main(void) {vec4 worldPos=world*vec4(position,1.0);vWorldPos=worldPos;gl_Position=viewProjection*worldPos;}
+`;i.l.ShadersStore[l]||(i.l.ShadersStore[l]=s);let t={name:l,shader:s}}}]);
