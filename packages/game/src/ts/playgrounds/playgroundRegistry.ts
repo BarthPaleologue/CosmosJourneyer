@@ -27,6 +27,7 @@ import { createSierpinskiScene } from "./anomalies/sierpinski";
 import { createAsteroidFieldScene } from "./asteroidField";
 import { createAtmosphericScatteringScene } from "./atmosphericScattering";
 import { createAutomaticLandingScene } from "./automaticLanding";
+import { createButterflyScene } from "./butterfly";
 import { createCharacterDemoScene } from "./character";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
@@ -37,6 +38,7 @@ import { createGrassScene } from "./grass";
 import { createGravitySystemScene } from "./gravitySystem";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createInteractionDemo } from "./interaction";
+import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
@@ -52,6 +54,7 @@ import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
+import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
@@ -96,6 +99,9 @@ export class PlaygroundRegistry {
         ["gravitySystem", createGravitySystemScene],
         ["interaction", createInteractionDemo],
         ["swimming", CreateSwimmingScene],
+        ["onFoot", createOnFootScene],
+        ["butterfly", createButterflyScene],
+        ["telluricPlanet", createTelluricPlanetScene],
     ]);
 
     register(

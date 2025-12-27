@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundState } from "@babylonjs/core";
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import { SoundState } from "@babylonjs/core/AudioV2/soundState";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { type Musics } from "@/frontend/assets/audio/musics";

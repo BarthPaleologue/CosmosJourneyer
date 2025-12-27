@@ -99,7 +99,7 @@ export function createButterfly(scene: Scene) {
     vertexData.applyToMesh(mesh);
     mesh.createNormals(false);
 
-    mesh.scaling.scaleInPlace(0.2);
+    mesh.scaling.scaleInPlace(0.5);
     mesh.bakeCurrentTransformIntoVertices();
 
     return mesh;

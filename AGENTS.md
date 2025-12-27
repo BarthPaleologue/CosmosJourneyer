@@ -4,7 +4,7 @@
 
 - Objective: contribute maintainable, testable code aligned with Cosmos Journeyer’s open-source vision of a cathedral-quality codebase capable of supporting the space-exploration experience for decades.
 - Repo type: pnpm workspace with two primary products – the Babylon.js game and a Next.js website.
-- Toolchain baseline: Node.js ≥ 20, pnpm ≥ 10, strict TypeScript across packages, strict linting via ESLint, formatting with Prettier.
+- Toolchain baseline: see root `package.json` engines for the current Node.js/pnpm versions; strict TypeScript across packages, strict linting via ESLint, formatting with Prettier.
 
 ## Repo Structure
 

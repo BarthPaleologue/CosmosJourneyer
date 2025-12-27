@@ -15,6 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-vec3 lerp(vec3 v1, vec3 v2, float s) {
-    return s * v1 + (1.0 - s) * v2;
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
+
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadTextureAsync } from "./utils";
+
+import seamlessPerlinPath from "@assets/perlin.webp";
+
+export type NoiseTextures = {
+    seamlessPerlin: Texture;
+};
+
+export async function loadNoiseTextures(
+    scene: Scene,
+    progressMonitor: ILoadingProgressMonitor | null,
+): Promise<NoiseTextures> {
+    const seamlessPerlin = loadTextureAsync("SeamlessPerlinNoise", seamlessPerlinPath, scene, progressMonitor);
+
+    return {
+        seamlessPerlin: await seamlessPerlin,
+    };
 }

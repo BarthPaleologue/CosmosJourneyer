@@ -15,39 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    ArcRotateCamera,
-    Color3,
-    DirectionalLight,
-    HemisphericLight,
-    MeshBuilder,
-    PBRMaterial,
-    Vector3,
-} from "@babylonjs/core";
+import { ArcRotateCamera, DirectionalLight, HemisphericLight, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
-import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
-import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
+import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
+import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";
+import { loadParticleTextures } from "@/frontend/assets/textures/particles";
 import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 
 import { createSky } from "./utils";
 
-export async function createGrassScene(
+export async function createButterflyScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const camera = new ArcRotateCamera("camera1", 0, (0.9 * Math.PI) / 2, 10, new Vector3(0, 0.5, 0), scene);
-    camera.upperBetaLimit = Math.PI / 2;
-    camera.lowerRadiusLimit = 5;
+    const camera = new ArcRotateCamera("camera1", 0, (0.9 * Math.PI) / 2, 10, new Vector3(0, 2, 0), scene);
+    camera.lowerRadiusLimit = 0.5;
     camera.upperRadiusLimit = 100;
+    camera.minZ = 0.1;
     camera.attachControl();
 
     const light = new DirectionalLight("dir01", new Vector3(1, -2, -1), scene);
@@ -58,28 +50,12 @@ export async function createGrassScene(
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const ground = MeshBuilder.CreateGround(
-        "ground",
-        {
-            width: 32,
-            height: 32,
-            subdivisions: 4,
-        },
-        scene,
-    );
+    const butterflyMesh = createButterfly(scene);
+    butterflyMesh.isVisible = false;
 
-    const groundMaterial = new PBRMaterial("groundMaterial", scene);
-    groundMaterial.albedoColor = Color3.FromHexString("#0C4909").scale(0.5);
-    groundMaterial.metallic = 0.0;
-    groundMaterial.roughness = 0.8;
-    ground.material = groundMaterial;
-
-    const grassBladeMesh = createGrassBlade(scene, 5);
-    grassBladeMesh.isVisible = false;
-
-    const noiseTextures = await loadNoiseTextures(scene, progressMonitor);
-    const grassMaterial = new GrassMaterial(noiseTextures.seamlessPerlin, scene);
-    grassBladeMesh.material = grassMaterial.get();
+    const particleTextures = await loadParticleTextures(scene, progressMonitor);
+    const butterflyMaterial = new ButterflyMaterial(particleTextures.butterfly, scene);
+    butterflyMesh.material = butterflyMaterial.get();
 
     const rng = seededSquirrelNoise(0);
     let rngState = 0;
@@ -87,9 +63,8 @@ export async function createGrassScene(
         return rng(rngState++);
     };
 
-    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng));
-    grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
-    grassPatch.getCurrentMesh().parent = ground;
+    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 128, wrappedRng));
+    butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
     return scene;
 }

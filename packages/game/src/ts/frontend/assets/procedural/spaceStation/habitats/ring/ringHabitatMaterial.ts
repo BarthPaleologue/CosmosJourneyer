@@ -32,13 +32,14 @@ import {
     pbr,
     perturbNormal,
     smoothstep,
-    split,
+    splitVec,
     step,
     sub,
     textureSample,
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
@@ -60,11 +61,11 @@ export class RingHabitatMaterial extends NodeMaterial {
         const positionW = transformPosition(world, position);
         const normalW = transformDirection(world, normal);
 
-        const splitUV = split(uv);
+        const splitUV = splitVec(uv);
         const scaledUvX = mul(splitUV.x, f((2.0 * Math.PI * meanRadius) / deltaRadius));
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
+        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
         const scaledUvY = mul(splitUV.y, mix(f(1.0), f(height), mask));
         const proceduralUV = vec2(scaledUvX, scaledUvY);
 
@@ -75,31 +76,28 @@ export class RingHabitatMaterial extends NodeMaterial {
 
         this.addOutputNode(vertexOutput);
 
-        const albedo = textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+
+        const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const normalMap = textureSample(textures.normal, proceduralUV);
-        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
-        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalMap = textureSample(normalTexture, proceduralUV);
+        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+        const occlusion = textureSample(occlusionTexture, proceduralUV);
 
         const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrLighting = pbr(
-            metallicRoughness.r,
-            metallicRoughness.g,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: albedo.rgb,
-                ambientOcclusion: occlusion.r,
-            },
-        );
+        const pbrLighting = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            ambientOcclusion: occlusion.r,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const lightEmission = mul(
             mul(

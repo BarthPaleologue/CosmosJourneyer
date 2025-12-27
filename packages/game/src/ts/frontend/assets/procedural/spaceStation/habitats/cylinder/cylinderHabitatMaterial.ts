@@ -35,7 +35,7 @@ import {
     perturbNormal,
     remap,
     smoothstep,
-    split,
+    splitVec,
     step,
     sub,
     Target,
@@ -43,6 +43,7 @@ import {
     transformDirection,
     transformPosition,
     uniformCameraPosition,
+    uniformTexture2d,
     uniformView,
     uniformViewProjection,
     uniformWorld,
@@ -66,7 +67,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const uv = vertexAttribute("uv");
 
         const positionXZ = xz(position);
-        const splitPositionXZ = split(positionXZ);
+        const splitPositionXZ = splitVec(positionXZ);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -74,8 +75,8 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(split(normal).y)));
-        const scaledUvY = mul(split(uv).y, mix(f(1.0), f(height / sectorSize), mask));
+        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitVec(uv).y, mix(f(1.0), f(height / sectorSize), mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -92,31 +93,28 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
         const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
-        const albedo = textureSample(textures.albedo, proceduralUV, {
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+
+        const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
         });
-        const normalMap = textureSample(textures.normal, proceduralUV);
-        const metallicRoughness = textureSample(textures.metallicRoughness, proceduralUV);
-        const occlusion = textureSample(textures.ambientOcclusion, proceduralUV);
+        const normalMap = textureSample(normalTexture, proceduralUV);
+        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+        const occlusion = textureSample(occlusionTexture, proceduralUV);
 
         const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(
-            metallicRoughness.r,
-            metallicRoughness.g,
-            perturbedNormal.output,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                albedoRgb: albedo.rgb,
-                ambientOcclusion: occlusion.r,
-            },
-        );
+        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            albedoRgb: albedo.rgb,
+            ambientOcclusion: occlusion.r,
+            perturbedNormal: perturbedNormal.output,
+        });
 
         const lightEmission = mul(
             mask,
