@@ -117,6 +117,12 @@ export async function createTelluricPlanetScene(
             scene,
         );
         camera.attachPostProcess(clouds);
+
+        await new Promise<void>((resolve) => {
+            planet.cloudsUniforms?.lut.getTexture().executeWhenReady(() => {
+                resolve();
+            });
+        });
     }
 
     if (planet.atmosphereUniforms !== null) {
@@ -153,11 +159,23 @@ export async function createTelluricPlanetScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
+        planet.updateLOD(camera.globalPosition, chunkForge);
         chunkForge.update(assets);
 
         planet.computeCulling(camera);
-        planet.updateLOD(camera.globalPosition, chunkForge);
         planet.updateMaterial([light]);
+    });
+
+    await new Promise<void>((resolve) => {
+        const observer = engine.onBeginFrameObservable.add(() => {
+            planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge);
+            chunkForge.update(assets);
+
+            if (chunkForge.applyTaskQueue.length === 0 && chunkForge.workerPool.busyWorkers.length === 0) {
+                engine.onBeginFrameObservable.remove(observer);
+                resolve();
+            }
+        });
     });
 
     return scene;
