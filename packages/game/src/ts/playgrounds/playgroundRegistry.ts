@@ -54,6 +54,7 @@ import { createStarSystemViewScene } from "./starSystemView";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
+import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
@@ -100,6 +101,7 @@ export class PlaygroundRegistry {
         ["swimming", CreateSwimmingScene],
         ["onFoot", createOnFootScene],
         ["butterfly", createButterflyScene],
+        ["telluricPlanet", createTelluricPlanetScene],
     ]);
 
     register(
