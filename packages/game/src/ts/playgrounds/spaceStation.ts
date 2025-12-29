@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ClusteredLightContainer, DirectionalLight, GlowLayer } from "@babylonjs/core";
+import { DirectionalLight, GlowLayer } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -97,15 +97,6 @@ export async function createSpaceStationScene(
     landingBay.getTransform().position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
 
     lookAt(defaultControls.getTransform(), spaceStation.getTransform().position, scene.useRightHandedSystem);
-
-    const clustered = new ClusteredLightContainer(
-        "clustered",
-        landingBay.landingPads.flatMap((pad) => pad.getLights()),
-        scene,
-    );
-    for (const light of landingBay.lights) {
-        clustered.addLight(light);
-    }
 
     new DirectionalLight("sun", new Vector3(-1, -1, 1).normalize(), scene);
 

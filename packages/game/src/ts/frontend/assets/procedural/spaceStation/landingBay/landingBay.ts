@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -226,6 +227,15 @@ export class LandingBay {
             .forEach((mesh) => {
                 mesh.position.subtractInPlace(center);
             });
+
+        const clustered = new ClusteredLightContainer(
+            "landingBayLightContainer",
+            this.landingPads.flatMap((pad) => pad.getLights()),
+            scene,
+        );
+        for (const light of this.lights) {
+            clustered.addLight(light);
+        }
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
