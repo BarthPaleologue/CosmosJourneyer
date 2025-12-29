@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh, type TransformNode } from "@babylonjs/core/Meshes";
@@ -144,6 +145,8 @@ export class Spaceship implements Transformable, Targetable {
 
     readonly boundingExtent: Vector3;
 
+    readonly lightContainer: ClusteredLightContainer;
+
     public static async New(
         serializedSpaceShip: DeepReadonly<SerializedSpaceship>,
         unfitComponents: Set<SerializedComponent>,
@@ -238,9 +241,12 @@ export class Spaceship implements Transformable, Targetable {
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
 
+        this.lightContainer = new ClusteredLightContainer("spaceshipLightContainer", [], scene);
+
         for (const child of this.frame.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
                 const mainThruster = new Thruster(child, this.frame.forward.negate(), this.aggregate);
+                this.lightContainer.addLight(mainThruster.light);
                 this.mainThrusters.push(mainThruster);
                 continue;
             }
@@ -836,6 +842,7 @@ export class Spaceship implements Transformable, Targetable {
             thruster.dispose();
         });
         this.mainThrusters.length = 0;
+        this.lightContainer.dispose();
 
         this.warpTunnel.dispose();
         this.hyperSpaceTunnel.dispose();

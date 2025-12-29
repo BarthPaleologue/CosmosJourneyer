@@ -46,6 +46,7 @@ export class Thruster {
         this.parentAggregate = parentAggregate;
 
         this.light = new PointLight("thrusterLight", Vector3.Zero(), mesh.getScene());
+        this.light.range = 20;
         this.light.parent = mesh;
         this.light.position.addInPlace(direction.scale(1.0));
     }
