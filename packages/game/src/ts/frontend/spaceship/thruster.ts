@@ -15,10 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 import { SolidPlume } from "./solidPlume";
 
@@ -33,9 +35,8 @@ export class Thruster {
 
     readonly parentAggregate: PhysicsAggregate;
 
-    readonly light: PointLight;
-    readonly lightMinIntensity = 10.0;
-    readonly lightMaxIntensity = 100.0;
+    readonly light: SpotLight;
+    readonly lightMaxIntensity = 5_000;
 
     constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
@@ -45,18 +46,29 @@ export class Thruster {
 
         this.parentAggregate = parentAggregate;
 
-        this.light = new PointLight("thrusterLight", Vector3.Zero(), mesh.getScene());
-        this.light.range = 20;
+        this.light = new SpotLight(
+            "thrusterLight",
+            Vector3.Zero(),
+            direction.negate(),
+            degreesToRadians(120),
+            2,
+            mesh.getScene(),
+        );
+        this.light.range = 200;
         this.light.parent = mesh;
         this.light.position.addInPlace(direction.scale(1.0));
     }
 
+    /**
+     * @param throttle Throttle value in the [0, 1] range
+     */
     public setThrottle(throttle: number): void {
         this.throttle = throttle;
+        this.light.intensity = Math.abs(this.throttle) * this.lightMaxIntensity;
     }
 
     public updateThrottle(delta: number): void {
-        this.throttle = Math.max(Math.min(1, this.throttle + delta), 0);
+        this.setThrottle(Math.max(Math.min(1, this.throttle + delta), 0));
     }
 
     public getThrottle(): number {
@@ -66,9 +78,6 @@ export class Thruster {
     public update(deltaSeconds: number): void {
         this.plume.update(deltaSeconds);
         this.plume.setThrottle(this.throttle);
-
-        this.light.intensity =
-            this.lightMinIntensity + (this.lightMaxIntensity - this.lightMinIntensity) * Math.max(0, this.throttle);
     }
 
     public dispose() {
