@@ -17,6 +17,7 @@
 
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
@@ -24,6 +25,7 @@ import {
     abs,
     add,
     atan2,
+    color,
     f,
     fract,
     length,
@@ -48,10 +50,11 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec2,
-    vec3,
     vertexAttribute,
     xz,
 } from "@/frontend/helpers/bsl";
+
+import { Settings } from "@/settings";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
     constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
@@ -130,7 +133,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             ),
         );
 
-        const lightColor = vec3(f(1), f(1), f(0.7));
+        const lightColor = color(Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR));
         const glow = mul(lightEmission, lightColor);
 
         const fragOutput = outputFragColor(add(pbrColor.lighting, glow), { glow });
