@@ -17,17 +17,13 @@
 
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     abs,
-    add,
     atan2,
-    color,
     f,
-    fract,
     length,
     mix,
     mul,
@@ -36,7 +32,6 @@ import {
     pbr,
     perturbNormal,
     remap,
-    smoothstep,
     splitVec,
     step,
     sub,
@@ -53,8 +48,6 @@ import {
     vertexAttribute,
     xz,
 } from "@/frontend/helpers/bsl";
-
-import { Settings } from "@/settings";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
     constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
@@ -119,24 +112,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             perturbedNormal: perturbedNormal.output,
         });
 
-        const lightEmission = mul(
-            mask,
-            mul(
-                mul(
-                    smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
-                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX))),
-                ),
-                mul(
-                    smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
-                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY))),
-                ),
-            ),
-        );
-
-        const lightColor = color(Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR));
-        const glow = mul(lightEmission, lightColor);
-
-        const fragOutput = outputFragColor(add(pbrColor.lighting, glow), { glow });
+        const fragOutput = outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(fragOutput);
 
