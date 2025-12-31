@@ -15,8 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { type Material } from "@babylonjs/core/Materials/material";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -49,6 +52,8 @@ export class UtilitySection implements Transformable {
     private tankBodies: Array<PhysicsBody> = [];
     private readonly tankShape: PhysicsShape;
 
+    private readonly lights: Array<PointLight> = [];
+
     constructor(seed: number, assets: RenderingAssets, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "UtilitySectionMetalMaterial",
@@ -59,14 +64,15 @@ export class UtilitySection implements Transformable {
         this.rng = getRngFromSeed(seed);
 
         const attachmentRadius = 50;
-        const tesselation = 6;
+        const tessellation = 6;
+        const attachmentSize = 700;
 
         this.attachment = MeshBuilder.CreateCylinder(
             "UtilitySectionRoot",
             {
-                height: 700,
+                height: attachmentSize,
                 diameter: attachmentRadius * 2,
-                tessellation: 6,
+                tessellation,
             },
             scene,
         );
@@ -80,16 +86,54 @@ export class UtilitySection implements Transformable {
 
         this.tankShape = new PhysicsShapeSphere(Vector3.Zero(), tankRadius, scene);
 
-        if (this.rng(0) < 0.3) {
+        const hasTanks = this.rng(0) < 0.3;
+        if (hasTanks) {
             for (let ring = -3; ring <= 3; ring++) {
-                for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
-                    const radius = attachmentRadius * Math.cos(Math.PI / tesselation) + tankRadius;
-                    const theta = Math.PI / tesselation + ((2 * Math.PI) / tesselation) * sideIndex;
+                for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+                    const radius = attachmentRadius * Math.cos(Math.PI / tessellation) + tankRadius;
+                    const theta = Math.PI / tessellation + ((2 * Math.PI) / tessellation) * sideIndex;
 
                     const tank = tankBase.createInstance(`tankInstance${ring}_${sideIndex}`);
                     tank.position.set(radius * Math.cos(theta), ring * tankRadius * 2, radius * Math.sin(theta));
 
                     this.tanks.push(tank);
+                }
+            }
+        }
+
+        if (!hasTanks) {
+            const lampHeight = 30;
+            const lightRadius = 5;
+            const lightInstances = MeshBuilder.CreateCylinder(
+                "utilitySectionLightMesh",
+                { height: lampHeight, diameter: lightRadius * 2, tessellation: 6 },
+                scene,
+            );
+            lightInstances.parent = this.getTransform();
+            const lightMaterial = new StandardMaterial("utilitySectionLightMaterial", scene);
+            lightMaterial.disableLighting = true;
+            lightMaterial.emissiveColor = Color3.White();
+            lightInstances.material = lightMaterial;
+            for (let ring = -1; ring <= 1; ring++) {
+                for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+                    const radius = (attachmentRadius + lightRadius) * Math.cos(Math.PI / tessellation);
+                    const theta = Math.PI / tessellation + ((2 * Math.PI) / tessellation) * sideIndex;
+
+                    const lightPosition = new Vector3(
+                        radius * Math.cos(theta),
+                        ring * attachmentSize * 0.5 * 0.66,
+                        radius * Math.sin(theta),
+                    );
+
+                    lightInstances.thinInstanceAdd(
+                        Matrix.Translation(lightPosition.x, lightPosition.y, lightPosition.z),
+                    );
+
+                    const light = new PointLight(`utilitySectionLight${ring}_${sideIndex}`, lightPosition, scene);
+                    light.parent = this.getTransform();
+                    light.range = 200;
+
+                    this.lights.push(light);
                 }
             }
         }
@@ -125,6 +169,10 @@ export class UtilitySection implements Transformable {
 
     getTransform(): TransformNode {
         return this.attachment;
+    }
+
+    getLights(): Array<PointLight> {
+        return this.lights;
     }
 
     dispose() {

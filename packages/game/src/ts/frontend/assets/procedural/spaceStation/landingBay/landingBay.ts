@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
@@ -64,9 +63,7 @@ export class LandingBay {
 
     readonly landingPads: LandingPad[] = [];
 
-    readonly lights: Array<Light> = [];
-
-    readonly lightContainer: ClusteredLightContainer;
+    private readonly lights: Array<Light> = [];
 
     constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
@@ -251,15 +248,6 @@ export class LandingBay {
             .forEach((mesh) => {
                 mesh.position.subtractInPlace(center);
             });
-
-        this.lightContainer = new ClusteredLightContainer(
-            "landingBayLightContainer",
-            this.landingPads.flatMap((pad) => pad.getLights()),
-            scene,
-        );
-        for (const light of this.lights) {
-            this.lightContainer.addLight(light);
-        }
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -310,6 +298,10 @@ export class LandingBay {
         }
     }
 
+    getLights(): Array<Light> {
+        return this.lights.concat(this.landingPads.flatMap((pad) => pad.getLights()));
+    }
+
     getTransform(): TransformNode {
         return this.root;
     }
@@ -335,7 +327,5 @@ export class LandingBay {
         this.landingPads.forEach((landingPad) => {
             landingPad.dispose();
         });
-
-        this.lightContainer.dispose();
     }
 }
