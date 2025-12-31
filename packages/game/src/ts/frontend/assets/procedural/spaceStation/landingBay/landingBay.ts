@@ -18,6 +18,7 @@
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -114,6 +115,27 @@ export class LandingBay {
 
         const lightMatrixBuffer = createCircleInstanceBuffer(this.radius + (deltaRadius - lampThickness) / 2, nbSteps);
         lightMeshInstances.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
+
+        const lampPostInstances = MeshBuilder.CreateCylinder(
+            `LandingBayLightPosts`,
+            {
+                height: lampPostHeight,
+                diameter: lampThickness * 0.618,
+                tessellation: 6,
+                updatable: false,
+            },
+            scene,
+        );
+        lampPostInstances.convertToFlatShadedMesh();
+        const lampPostMaterial = new PBRMaterial("lampPostMaterial", scene);
+        lampPostMaterial.metallic = 1;
+        lampPostMaterial.roughness = 0.4;
+        lampPostMaterial.useGLTFLightFalloff = true;
+        lampPostInstances.material = lampPostMaterial;
+        lampPostInstances.parent = this.getTransform();
+        lampPostInstances.position.y = (heightFactor * deltaRadius) / 2 + lampPostHeight / 2;
+
+        lampPostInstances.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
 
         for (let i = 0; i < nbSteps; i++) {
             const bufferOffset = i * 16;
