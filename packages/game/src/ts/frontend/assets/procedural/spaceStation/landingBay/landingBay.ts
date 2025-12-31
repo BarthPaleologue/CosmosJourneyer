@@ -66,6 +66,8 @@ export class LandingBay {
 
     readonly lights: Array<Light> = [];
 
+    readonly lightContainer: ClusteredLightContainer;
+
     constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
@@ -250,13 +252,13 @@ export class LandingBay {
                 mesh.position.subtractInPlace(center);
             });
 
-        const clustered = new ClusteredLightContainer(
+        this.lightContainer = new ClusteredLightContainer(
             "landingBayLightContainer",
             this.landingPads.flatMap((pad) => pad.getLights()),
             scene,
         );
         for (const light of this.lights) {
-            clustered.addLight(light);
+            this.lightContainer.addLight(light);
         }
     }
 
@@ -333,5 +335,7 @@ export class LandingBay {
         this.landingPads.forEach((landingPad) => {
             landingPad.dispose();
         });
+
+        this.lightContainer.dispose();
     }
 }
