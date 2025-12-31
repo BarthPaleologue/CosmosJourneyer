@@ -15,8 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -31,6 +34,8 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
+
+import { Settings } from "@/settings";
 
 import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
@@ -48,6 +53,8 @@ export class CylinderHabitat implements Transformable {
 
     readonly habitableSurface: number;
 
+    private readonly lights: Array<PointLight> = [];
+
     constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
@@ -55,18 +62,23 @@ export class CylinderHabitat implements Transformable {
 
         this.radius = 2e3 + this.rng(0) * 2e3;
 
-        const height = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
+        const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 
+        const tessellation = 32;
+
+        const circumference = 2 * Math.PI * this.radius;
+        const nbSectors = tessellation;
+        const sectorSize = circumference / nbSectors;
+        const sectorYCount = Math.ceil(requiredHeight / sectorSize);
+        const height = sectorYCount * sectorSize;
         this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
-
-        const tesselation = 32;
 
         this.cylinder = MeshBuilder.CreateCylinder(
             "CylinderHabitat",
             {
                 diameter: this.radius * 2,
-                height: height,
-                tessellation: tesselation,
+                height,
+                tessellation,
             },
             scene,
         );
@@ -75,7 +87,7 @@ export class CylinderHabitat implements Transformable {
         this.cylinderMaterial = new CylinderHabitatMaterial(
             this.radius,
             height,
-            tesselation,
+            tessellation,
             textures.materials.spaceStation,
             scene,
         );
@@ -83,6 +95,44 @@ export class CylinderHabitat implements Transformable {
         this.cylinder.material = this.cylinderMaterial;
 
         this.cylinder.parent = this.getTransform();
+
+        const lightRadius = 5;
+        const lightInstances = MeshBuilder.CreateCylinder(
+            "CylinderHabitatLightTemplate",
+            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
+            scene,
+        );
+        lightInstances.parent = this.getTransform();
+
+        const lightMaterial = new StandardMaterial("cylinderHabitatLightMaterial", scene);
+        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+        lightMaterial.disableLighting = true;
+        lightInstances.material = lightMaterial;
+
+        for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+            for (let ring = 0; ring < sectorYCount; ring++) {
+                const lightHeight = ring * sectorSize + sectorSize / 2 - height / 2;
+                const theta = ((2 * Math.PI) / tessellation) * sideIndex + Math.PI / tessellation;
+                const lightRadius = (this.radius + 5) * Math.cos(Math.PI / tessellation);
+
+                const lightPosition = new Vector3(
+                    lightRadius * Math.cos(theta),
+                    lightHeight,
+                    lightRadius * Math.sin(theta),
+                );
+
+                lightInstances.thinInstanceAdd(Matrix.Translation(lightPosition.x, lightPosition.y, lightPosition.z));
+
+                const light = new PointLight("CylinderHabitatLight", lightPosition, scene);
+                light.range = 200;
+                light.parent = this.getTransform();
+                this.lights.push(light);
+            }
+        }
+    }
+
+    getLights(): Array<PointLight> {
+        return this.lights;
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
