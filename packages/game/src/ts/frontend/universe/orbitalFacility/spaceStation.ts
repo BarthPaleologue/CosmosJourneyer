@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
@@ -74,6 +75,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     private readonly landingPadManager: LandingPadManager;
 
+    private readonly lightContainer: ClusteredLightContainer;
+
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
@@ -116,6 +119,18 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
+
+        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, [], scene);
+        for (const landingBay of this.landingBays) {
+            for (const light of landingBay.getLights()) {
+                this.lightContainer.addLight(light);
+            }
+        }
+        for (const utilitySection of this.utilitySections) {
+            for (const light of utilitySection.getLights()) {
+                this.lightContainer.addLight(light);
+            }
+        }
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -330,6 +345,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.engineBays.forEach((engineBay) => {
             engineBay.dispose();
         });
+
+        this.lightContainer.dispose();
 
         this.root.dispose();
     }
