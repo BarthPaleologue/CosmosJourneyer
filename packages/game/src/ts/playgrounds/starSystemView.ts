@@ -57,6 +57,7 @@ export async function createStarSystemViewScene(
     scene.useRightHandedSystem = true;
 
     const havokPlugin = await enablePhysics(scene);
+    havokPlugin.setVelocityLimits(10_000, 10_000);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
