@@ -136,6 +136,11 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
                 this.lightContainer.addLight(light);
             }
         }
+        for (const ringHabitat of this.ringHabitats) {
+            for (const light of ringHabitat.getLights()) {
+                this.lightContainer.addLight(light);
+            }
+        }
     }
 
     getLandingPadManager(): LandingPadManager {

@@ -15,8 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -32,6 +35,8 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
+
+import { Settings } from "@/settings";
 
 import { MetalSectionMaterial } from "../../metalSectionMaterial";
 import { RingHabitatMaterial } from "./ringHabitatMaterial";
@@ -56,6 +61,8 @@ export class RingHabitat implements Transformable {
     private readonly armAggregates: PhysicsAggregate[] = [];
 
     readonly habitableSurface: number;
+
+    private readonly lights: Array<PointLight> = [];
 
     constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
@@ -100,8 +107,8 @@ export class RingHabitat implements Transformable {
 
         const circumference = 2 * Math.PI * this.radius;
 
-        const nbSteps = Math.ceil(circumference / deltaRadius);
-        this.ring = createRing(this.radius, deltaRadius, height, nbSteps, scene);
+        const tesselation = Math.ceil(circumference / deltaRadius);
+        this.ring = createRing(this.radius, deltaRadius, height, tesselation, scene);
 
         this.ringMaterial = new RingHabitatMaterial(
             this.radius,
@@ -114,6 +121,96 @@ export class RingHabitat implements Transformable {
         this.ring.material = this.ringMaterial;
 
         this.ring.parent = this.getTransform();
+
+        const lightRadius = 5;
+        const lightInstances = MeshBuilder.CreateCylinder(
+            "RingHabitatLightTemplate",
+            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
+            scene,
+        );
+        lightInstances.parent = this.getTransform();
+
+        const lightMaterial = new StandardMaterial("ringHabitatLightMaterial", scene);
+        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+        lightMaterial.disableLighting = true;
+        lightInstances.material = lightMaterial;
+
+        for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
+            for (let ring = 0; ring < yScaling; ring++) {
+                const lightHeight = ring * deltaRadius + deltaRadius / 2 - height / 2;
+                const theta = ((2 * Math.PI) / tesselation) * sideIndex + Math.PI / tesselation;
+                const radius1 = this.radius + deltaRadius / 2 + lightRadius;
+                const radius2 = this.radius - deltaRadius / 2 - lightRadius;
+                const lightPosition1 = new Vector3(radius1 * Math.cos(theta), lightHeight, radius1 * Math.sin(theta));
+                const lightPosition2 = new Vector3(radius2 * Math.cos(theta), lightHeight, radius2 * Math.sin(theta));
+
+                lightInstances.thinInstanceAdd(
+                    Matrix.Translation(lightPosition1.x, lightPosition1.y, lightPosition1.z),
+                );
+                lightInstances.thinInstanceAdd(
+                    Matrix.Translation(lightPosition2.x, lightPosition2.y, lightPosition2.z),
+                );
+
+                const light1 = new PointLight(`ringHabitatLight${ring}_${sideIndex}_1`, lightPosition1, scene);
+                light1.range = 200;
+                light1.parent = this.getTransform();
+                this.lights.push(light1);
+
+                const light2 = new PointLight(`ringHabitatLight${ring}_${sideIndex}_2`, lightPosition2, scene);
+                light2.range = 200;
+                light2.parent = this.getTransform();
+                this.lights.push(light2);
+            }
+        }
+
+        for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
+            const radius = this.radius;
+            const theta = ((2 * Math.PI) / tesselation) * sideIndex + Math.PI / tesselation;
+
+            const lightPosition1 = new Vector3(
+                radius * Math.cos(theta),
+                -height / 2 - lightRadius,
+                radius * Math.sin(theta),
+            );
+            const lightPosition2 = new Vector3(
+                radius * Math.cos(theta),
+                height / 2 + lightRadius,
+                radius * Math.sin(theta),
+            );
+
+            lightInstances.thinInstanceAdd(
+                Matrix.Compose(
+                    Vector3.OneReadOnly,
+                    Quaternion.FromUnitVectorsToRef(
+                        Vector3.UpReadOnly,
+                        new Vector3(-lightPosition1.x, 0, -lightPosition1.z).normalize(),
+                        Quaternion.Identity(),
+                    ),
+                    lightPosition1,
+                ),
+            );
+            lightInstances.thinInstanceAdd(
+                Matrix.Compose(
+                    Vector3.OneReadOnly,
+                    Quaternion.FromUnitVectorsToRef(
+                        Vector3.UpReadOnly,
+                        new Vector3(-lightPosition2.x, 0, -lightPosition2.z).normalize(),
+                        Quaternion.Identity(),
+                    ),
+                    lightPosition2,
+                ),
+            );
+
+            const light1 = new PointLight(`ringHabitatLightBottom${sideIndex}_1`, lightPosition1, scene);
+            light1.range = 200;
+            light1.parent = this.getTransform();
+            this.lights.push(light1);
+
+            const light2 = new PointLight(`ringHabitatLightTop${sideIndex}_2`, lightPosition2, scene);
+            light2.range = 200;
+            light2.parent = this.getTransform();
+            this.lights.push(light2);
+        }
 
         const nbArms = attachmentNbSides / 2;
         for (let i = 0; i <= nbArms; i++) {
@@ -138,6 +235,10 @@ export class RingHabitat implements Transformable {
 
             this.arms.push(arm);
         }
+    }
+
+    getLights(): Array<PointLight> {
+        return this.lights;
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
