@@ -80,7 +80,7 @@ export class LandingBay {
             scene,
         );
 
-        const heightFactor = 2 + Math.floor(this.rng(0) * 3);
+        const heightFactor = 1 + Math.floor(this.rng(0) * 3);
 
         const circumference = 2 * Math.PI * this.radius;
 
