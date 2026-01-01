@@ -218,9 +218,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 0.4],
-                [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3],
+                [SpaceStationNodeType.RING_HABITAT, 1 / 3],
+                [SpaceStationNodeType.HELIX_HABITAT, 1 / 3],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 1 / 3],
             ],
             rng(17),
         );
