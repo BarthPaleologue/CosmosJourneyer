@@ -28,6 +28,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
+import { randRangeInt } from "extended-random";
 
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import { type Textures } from "@/frontend/assets/textures";
@@ -49,6 +50,7 @@ export class HelixHabitat implements Transformable {
     private readonly rng: (index: number) => number;
 
     private readonly radius: number;
+    private readonly deltaRadius: number;
 
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
@@ -59,8 +61,8 @@ export class HelixHabitat implements Transformable {
     private readonly helixMaterial: HelixHabitatMaterial;
     private readonly metalSectionMaterial: Material;
 
-    private readonly arms: Mesh[] = [];
-    private readonly armAggregates: PhysicsAggregate[] = [];
+    private readonly arms: Array<Mesh> = [];
+    private readonly armAggregates: Array<PhysicsAggregate> = [];
 
     private readonly lights: Array<PointLight> = [];
 
@@ -70,25 +72,23 @@ export class HelixHabitat implements Transformable {
         this.rng = getRngFromSeed(seed);
 
         this.radius = 5e3 + this.rng(0) * 10e3;
-        const deltaRadius = 400 + this.rng(1) * 100;
+        this.deltaRadius = 400 + this.rng(1) * 100;
 
-        const thicknessFactor = 2.0 + Math.floor(this.rng(3) * 2);
+        const helixCount = randRangeInt(2, 4, this.rng, 654);
+        const thicknessFactor = randRangeInt(1, 5 - helixCount, this.rng, 150);
 
-        const helixThickness = deltaRadius * thicknessFactor;
-
-        const perSpirePerimeter = 2 * Math.PI * this.radius;
-        const perSpireSurface = perSpirePerimeter * helixThickness;
-
-        const helixCount = 2;
+        const helixThickness = this.deltaRadius * thicknessFactor;
+        const perTurnPerimeter = 2 * Math.PI * this.radius;
+        const perTurnHabitableSurface = perTurnPerimeter * helixThickness;
 
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / helixCount;
-        const nbSpires = Math.ceil(requiredHabitableSurfacePerHelix / perSpireSurface);
+        const turnCount = Math.ceil(requiredHabitableSurfacePerHelix / perTurnHabitableSurface);
 
-        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * nbSpires * helixThickness);
+        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * turnCount * helixThickness);
 
-        const pitch = 2 * this.radius * (1 + 0.3 * (this.rng(2) * 2 - 1));
+        const helixPitch = 2 * this.radius * (1 + 0.3 * (this.rng(2) * 2 - 1));
 
-        const totalLength = pitch * nbSpires;
+        const helixLength = helixPitch * turnCount;
 
         const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
 
@@ -103,7 +103,7 @@ export class HelixHabitat implements Transformable {
             {
                 diameterTop: 100,
                 diameterBottom: 100,
-                height: totalLength + deltaRadius * 4,
+                height: helixLength + this.deltaRadius * 4,
                 tessellation: attachmentNbSides,
             },
             scene,
@@ -115,7 +115,7 @@ export class HelixHabitat implements Transformable {
 
         this.helixMaterial = new HelixHabitatMaterial(
             this.radius,
-            deltaRadius,
+            this.deltaRadius,
             thicknessFactor,
             textures.materials.spaceStation,
             scene,
@@ -125,11 +125,11 @@ export class HelixHabitat implements Transformable {
         const helix1 = createHelix(
             "HabitatHelix1",
             this.radius,
-            deltaRadius,
+            this.deltaRadius,
             helixThickness,
             tessellation,
-            nbSpires,
-            pitch,
+            turnCount,
+            helixPitch,
             scene,
         );
         helix1.material = this.helixMaterial;
@@ -154,25 +154,82 @@ export class HelixHabitat implements Transformable {
         lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
         lightMaterial.disableLighting = true;
         lightInstances.material = lightMaterial;
+        const lightPoints = this.getLightPoints(helixCount, turnCount, helixThickness, helixPitch);
+        for (const [i, [lightPosition, lightRotation]] of lightPoints.entries()) {
+            lightInstances.thinInstanceAdd(Matrix.Compose(Vector3.OneReadOnly, lightRotation, lightPosition));
 
-        const sectionCount = Math.floor((2 * Math.PI * this.radius) / deltaRadius);
+            const light = new PointLight(`HelixHabitatLight${i}`, lightPosition, scene);
+            light.range = 200;
+            light.parent = this.getTransform();
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            this.lights.push(light);
+        }
 
-        const maxRadius = this.radius + deltaRadius / 2;
-        const minRadius = this.radius - deltaRadius / 2;
-
+        const armCount = (attachmentNbSides * turnCount) / 2;
         for (let helixIndex = 0; helixIndex < this.helices.length; helixIndex++) {
-            for (let spireIndex = 0; spireIndex < nbSpires; spireIndex++) {
-                for (let sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
+            for (let armIndex = 0; armIndex <= armCount; armIndex++) {
+                const arm = MeshBuilder.CreateCylinder(
+                    `HelixHabitatArm${armIndex}`,
+                    {
+                        height: this.radius,
+                        diameter: this.deltaRadius / 3,
+                        tessellation: 6,
+                    },
+                    scene,
+                );
+                arm.position.y = this.radius / 2;
+                arm.bakeCurrentTransformIntoVertices();
+                arm.convertToFlatShadedMesh();
+                arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
+                arm.material = this.metalSectionMaterial;
+
+                const angle =
+                    -(2.0 * Math.PI * turnCount * armIndex) / armCount -
+                    (helixIndex * (Math.PI * 2)) / helixCount +
+                    Math.PI;
+
+                arm.position.y = (armIndex / armCount) * helixLength - helixLength / 2;
+                arm.rotate(Axis.Y, angle, Space.WORLD);
+
+                arm.parent = this.getTransform();
+
+                this.arms.push(arm);
+            }
+        }
+    }
+
+    getLights(): Array<PointLight> {
+        return this.lights;
+    }
+
+    private getLightPoints(
+        helixCount: number,
+        turnCount: number,
+        helixThickness: number,
+        helixPitch: number,
+    ): Array<[Vector3, Quaternion]> {
+        const sectionCount = Math.floor((2 * Math.PI * this.radius) / this.deltaRadius);
+
+        const maxRadius = this.radius + this.deltaRadius / 2;
+        const minRadius = this.radius - this.deltaRadius / 2;
+
+        const thicknessFactor = Math.floor(helixThickness / this.deltaRadius);
+
+        const results: Array<[Vector3, Quaternion]> = [];
+
+        for (let helixIndex = 0; helixIndex < helixCount; helixIndex++) {
+            for (let turnIndex = 0; turnIndex < turnCount; turnIndex++) {
+                for (let sectionIndex = 0; sectionIndex <= sectionCount; sectionIndex++) {
                     const angle =
                         (sectionIndex * Math.PI * 2.0) / sectionCount + (helixIndex * (Math.PI * 2)) / helixCount;
                     for (const radius of [maxRadius, minRadius]) {
                         for (let ring = 0; ring < thicknessFactor; ring++) {
                             const yOffset =
-                                (spireIndex + sectionIndex / sectionCount) * pitch -
-                                (nbSpires * pitch) / 2 +
-                                ring * deltaRadius -
+                                (turnIndex + sectionIndex / sectionCount) * helixPitch -
+                                (turnCount * helixPitch) / 2 +
+                                ring * this.deltaRadius -
                                 helixThickness / 2 +
-                                deltaRadius / 2;
+                                this.deltaRadius / 2;
 
                             const lightPosition = new Vector3(
                                 radius * Math.cos(angle),
@@ -180,22 +237,11 @@ export class HelixHabitat implements Transformable {
                                 radius * Math.sin(angle),
                             );
 
-                            lightInstances.thinInstanceAdd(
-                                Matrix.Translation(lightPosition.x, lightPosition.y, lightPosition.z),
-                            );
-
-                            const light = new PointLight(
-                                `Helix${helixIndex}_Habitat_Light_Spire${spireIndex}_Point${sectionIndex}`,
-                                lightPosition,
-                                this.getTransform().getScene(),
-                            );
-                            light.parent = this.getTransform();
-                            light.range = 200;
-                            this.lights.push(light);
+                            results.push([lightPosition, Quaternion.Identity()]);
                         }
                     }
 
-                    const yBase = (spireIndex + sectionIndex / sectionCount) * pitch - (nbSpires * pitch) / 2;
+                    const yBase = (turnIndex + sectionIndex / sectionCount) * helixPitch - (turnCount * helixPitch) / 2;
                     for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
                         const lightPosition = new Vector3(
                             this.radius * Math.cos(angle),
@@ -203,61 +249,20 @@ export class HelixHabitat implements Transformable {
                             this.radius * Math.sin(angle),
                         );
 
-                        lightInstances.thinInstanceAdd(
-                            Matrix.Compose(
-                                Vector3.OneReadOnly,
-                                Quaternion.FromUnitVectorsToRef(
-                                    Vector3.UpReadOnly,
-                                    new Vector3(-lightPosition.x, 0, -lightPosition.z).normalize(),
-                                    Quaternion.Identity(),
-                                ),
-                                lightPosition,
-                            ),
-                        );
-
-                        const light = new PointLight(
-                            `HelixHabitatLight_Center1_Spire${spireIndex}_Point${sectionIndex}`,
+                        results.push([
                             lightPosition,
-                            this.getTransform().getScene(),
-                        );
-                        light.parent = this.getTransform();
-                        light.range = 200;
-                        this.lights.push(light);
+                            Quaternion.FromUnitVectorsToRef(
+                                Vector3.UpReadOnly,
+                                new Vector3(-lightPosition.x, 0, -lightPosition.z).normalize(),
+                                Quaternion.Identity(),
+                            ),
+                        ]);
                     }
                 }
             }
         }
 
-        const nbArms = (attachmentNbSides * nbSpires) / 2;
-        for (let i = 0; i <= nbArms; i++) {
-            const arm = MeshBuilder.CreateCylinder(
-                `HelixHabitatArm${i}`,
-                {
-                    height: 2 * this.radius,
-                    diameter: deltaRadius / 3,
-                    tessellation: 6,
-                },
-                scene,
-            );
-            arm.convertToFlatShadedMesh();
-            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
-            arm.material = this.metalSectionMaterial;
-
-            const y = (i / nbArms) * totalLength - totalLength / 2;
-
-            const theta = -(2.0 * Math.PI * nbSpires * i) / nbArms;
-
-            arm.position.y = y;
-            arm.rotate(Axis.Y, theta, Space.WORLD);
-
-            arm.parent = this.getTransform();
-
-            this.arms.push(arm);
-        }
-    }
-
-    getLights(): Array<PointLight> {
-        return this.lights;
+        return results;
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
