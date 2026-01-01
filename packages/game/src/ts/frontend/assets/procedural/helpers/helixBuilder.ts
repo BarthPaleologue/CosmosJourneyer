@@ -8,7 +8,7 @@ import { type Scene } from "@babylonjs/core/scene";
  * @param radius The radius of the spiral between the two walls.
  * @param thickness The separation between the two walls.
  * @param height The height of the spiral.
- * @param nbSpires The number of spires of the spiral.
+ * @param turnCount The number of spires of the spiral.
  * @param pitch The distance between two spires.
  * @param tessellation The number of sides of the spiral.
  */
@@ -16,7 +16,7 @@ export function createHelixVertexData(
     radius: number,
     thickness: number,
     height: number,
-    nbSpires: number,
+    turnCount: number,
     pitch: number,
     tessellation: number,
 ) {
@@ -28,13 +28,13 @@ export function createHelixVertexData(
     const innerRadius = radius - thickness / 2;
     const outerRadius = radius + thickness / 2;
 
-    for (let spire = 0; spire < nbSpires; spire++) {
+    for (let turnIndex = 0; turnIndex < turnCount; turnIndex++) {
         for (let i = 0; i <= tessellation; i++) {
             const angle = (i * Math.PI * 2.0) / tessellation;
             const dx = Math.cos(angle);
             const dz = Math.sin(angle);
 
-            const yOffset = (spire + i / tessellation) * pitch - (nbSpires * pitch) / 2;
+            const yOffset = (turnIndex + i / tessellation) * pitch - (turnCount * pitch) / 2;
 
             const bottomY = yOffset - height / 2;
             const topY = yOffset + height / 2;
@@ -79,10 +79,10 @@ export function createHelixVertexData(
             uvs.push(i / tessellation, 1);
             uvs.push(i / tessellation, 0);
 
-            if (spire === 0 && i === 0) continue;
+            if (turnIndex === 0 && i === 0) continue;
 
             const stride = 8;
-            const spiralIndexOffset = spire * stride * tessellation;
+            const spiralIndexOffset = turnIndex * stride * tessellation;
 
             const previousBottomIndex = spiralIndexOffset + stride * (i - 1) + 0;
             const currentBottomIndex = spiralIndexOffset + stride * i + 0;
@@ -134,11 +134,11 @@ export function createHelix(
     thickness: number,
     height: number,
     tessellation: number,
-    nbSpires: number,
+    turnCount: number,
     pitch: number,
     scene: Scene,
 ) {
-    const vertexData = createHelixVertexData(radius, thickness, height, nbSpires, pitch, tessellation);
+    const vertexData = createHelixVertexData(radius, thickness, height, turnCount, pitch, tessellation);
     const ring = new Mesh(name, scene);
     vertexData.applyToMesh(ring);
     ring.convertToFlatShadedMesh();
