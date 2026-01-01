@@ -17,79 +17,20 @@
 
 import { uniformRandBool } from "extended-random";
 
-export const SpaceStationNames: string[] = [
-    "Aldrin",
-    "Apollo",
-    "Archimedes",
-    "Armstrong",
-    "Asimov",
-    "Babbage",
-    "Blinn",
-    "Bohr",
-    "Boole",
-    "Bradbury",
-    "Catmull",
-    "Clark",
-    "Clarke",
-    "Copernicus",
-    "Curie",
-    "Darwin",
-    "Egan",
-    "Einstein",
-    "Fermat",
-    "Feynman",
-    "Fibonacci",
-    "Franklin",
-    "Gagarin",
-    "Galileo",
-    "Gauss",
-    "Gemini",
-    "Glenn",
-    "Goodal",
-    "Gouraud",
-    "Hawking",
-    "Heinlein",
-    "Heisenberg",
-    "Herbert",
-    "Huygens",
-    "Kepler",
-    "Kubrick",
-    "Laika",
-    "LeCun",
-    "Lovelace",
-    "Mercury",
-    "Musk",
-    "Newton",
-    "Pascal",
-    "Pasteur",
-    "Pesquet",
-    "Phong",
-    "Picard",
-    "Pratchett",
-    "Pythagoras",
-    "Rayleigh",
-    "Shotwell",
-    "Stanford",
-    "Sutherland",
-    "Suzanne",
-    "Tesla",
-    "Tolkien",
-    "Tolstoy",
-    "Torvalds",
-    "Turing",
-    "Verne",
-    "Von Braun",
-    "Von Neumann",
-];
+import { IllustriousFigures } from "./illustriousFigures";
 
-export const SpaceStationAdjectives: string[] = [
+export const SpaceStationDesignators = [
     "Abode",
     "Apex",
+    "Arcadia",
     "Bar",
     "Bastion",
+    "Beacon",
     "Citadel",
     "Colony",
     "Constellation",
+    "Crown",
+    "Dawn",
     "Discovery",
     "Domain",
     "Elysium",
@@ -98,8 +39,10 @@ export const SpaceStationAdjectives: string[] = [
     "Epiphany",
     "Eternity",
     "Expanse",
+    "Firmament",
     "Foundation",
     "Frontier",
+    "Gateway",
     "Habitat",
     "Haven",
     "Horizon",
@@ -109,14 +52,19 @@ export const SpaceStationAdjectives: string[] = [
     "Laboratory",
     "Nexus",
     "Oasis",
+    "Olympus",
+    "Oracle",
     "Orbital",
     "Outpost",
     "Paradise",
     "Pinnacle",
+    "Port",
     "Prospect",
     "Prosperity",
+    "Radiance",
     "Refuge",
     "Resort",
+    "Reverie",
     "Sanctuary",
     "Settlement",
     "Station",
@@ -128,25 +76,31 @@ export const SpaceStationAdjectives: string[] = [
     "Vanguard",
     "Vision",
     "Zenith",
-];
+] as const;
 
-export const SpaceElevatorAdjectives: string[] = [
+export const SpaceElevatorDesignators = [
+    "Anchor",
+    "Ascent",
     "Ascension",
     "Ascending",
     "Bridge",
     "Climb",
     "Climbing",
-    "Elevated",
+    "Conduit",
     "Elevation",
     "Elevator",
+    "Gateway",
     "Ladder",
     "Lift",
     "Lifting",
     "Rising",
     "Skyward",
     "Soaring",
+    "Stairway",
+    "Tether",
+    "Updraft",
     "Upward",
-];
+] as const;
 
 /**
  * Generate a space station name using a noise based rng and a given sample index
@@ -154,13 +108,13 @@ export const SpaceElevatorAdjectives: string[] = [
  * @param sampleIndex The index of the sample to generate
  */
 export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number) {
-    const adjective = SpaceStationAdjectives[Math.floor(rng(sampleIndex) * SpaceStationAdjectives.length)];
-    const name = SpaceStationNames[Math.floor(rng(sampleIndex + 1) * SpaceStationNames.length)];
-    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${adjective}`;
+    const designator = SpaceStationDesignators[Math.floor(rng(sampleIndex) * SpaceStationDesignators.length)];
+    const name = IllustriousFigures[Math.floor(rng(sampleIndex + 1) * IllustriousFigures.length)]?.lastName;
+    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${designator}`;
 }
 
 export function generateSpaceElevatorName(rng: (index: number) => number, sampleIndex: number) {
-    const adjective = SpaceElevatorAdjectives[Math.floor(rng(sampleIndex) * SpaceElevatorAdjectives.length)];
-    const name = SpaceStationNames[Math.floor(rng(sampleIndex + 1) * SpaceStationNames.length)];
-    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${adjective}`;
+    const designator = SpaceElevatorDesignators[Math.floor(rng(sampleIndex) * SpaceElevatorDesignators.length)];
+    const name = IllustriousFigures[Math.floor(rng(sampleIndex + 1) * IllustriousFigures.length)]?.lastName;
+    return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${designator}`;
 }
