@@ -62,18 +62,23 @@ export class CylinderHabitat implements Transformable {
 
         this.radius = 2e3 + this.rng(0) * 2e3;
 
-        const height = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
+        const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 
+        const tessellation = 32;
+
+        const circumference = 2 * Math.PI * this.radius;
+        const nbSectors = tessellation;
+        const sectorSize = circumference / nbSectors;
+        const sectorYCount = Math.ceil(requiredHeight / sectorSize);
+        const height = sectorYCount * sectorSize;
         this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
-
-        const tesselation = 32;
 
         this.cylinder = MeshBuilder.CreateCylinder(
             "CylinderHabitat",
             {
                 diameter: this.radius * 2,
-                height: height,
-                tessellation: tesselation,
+                height,
+                tessellation,
             },
             scene,
         );
@@ -82,7 +87,7 @@ export class CylinderHabitat implements Transformable {
         this.cylinderMaterial = new CylinderHabitatMaterial(
             this.radius,
             height,
-            tesselation,
+            tessellation,
             textures.materials.spaceStation,
             scene,
         );
@@ -90,11 +95,6 @@ export class CylinderHabitat implements Transformable {
         this.cylinder.material = this.cylinderMaterial;
 
         this.cylinder.parent = this.getTransform();
-
-        const circumference = 2 * Math.PI * this.radius;
-        const nbSectors = tesselation;
-        const sectorSize = circumference / nbSectors;
-        const sectorYCount = Math.floor(height / sectorSize);
 
         const lightRadius = 5;
         const lightInstances = MeshBuilder.CreateCylinder(
@@ -109,11 +109,11 @@ export class CylinderHabitat implements Transformable {
         lightMaterial.disableLighting = true;
         lightInstances.material = lightMaterial;
 
-        for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
-            for (let ring = 0; ring <= sectorYCount; ring++) {
+        for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+            for (let ring = 0; ring < sectorYCount; ring++) {
                 const lightHeight = ring * sectorSize + sectorSize / 2 - height / 2;
-                const theta = ((2 * Math.PI) / tesselation) * sideIndex + Math.PI / tesselation;
-                const lightRadius = (this.radius + 5) * Math.cos(Math.PI / tesselation);
+                const theta = ((2 * Math.PI) / tessellation) * sideIndex + Math.PI / tessellation;
+                const lightRadius = (this.radius + 5) * Math.cos(Math.PI / tessellation);
 
                 const lightPosition = new Vector3(
                     lightRadius * Math.cos(theta),
