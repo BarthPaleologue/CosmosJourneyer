@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -85,6 +87,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly targetInfo: TargetInfo;
 
     private readonly landingPadManager: LandingPadManager;
+
+    private readonly lightContainer: ClusteredLightContainer;
 
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
@@ -156,6 +160,18 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
+
+        this.lightContainer = new ClusteredLightContainer("SpaceElevatorLightContainer", this.getLights(), scene);
+    }
+
+    getLights(): Array<Light> {
+        const result: Array<Light> = [];
+        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
+        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
+        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
+        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
+        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        return result;
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -382,5 +398,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.climber.dispose();
 
         this.root.dispose();
+
+        this.lightContainer.dispose();
     }
 }
