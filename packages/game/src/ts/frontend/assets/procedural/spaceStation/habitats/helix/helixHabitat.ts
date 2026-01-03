@@ -90,7 +90,7 @@ export class HelixHabitat implements Transformable {
 
         const helixLength = helixPitch * turnCount;
 
-        const attachmentNbSides = 6 + 2 * Math.floor(this.rng(4) * 2);
+        const attachmentTessellation = 6 + 2 * Math.floor(this.rng(4) * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "HelixHabitatMetalSectionMaterial",
@@ -98,20 +98,50 @@ export class HelixHabitat implements Transformable {
             scene,
         );
 
+        const attachmentLength = helixLength + this.deltaRadius * 4;
+        const attachmentRadius = 50;
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",
             {
-                diameterTop: 100,
-                diameterBottom: 100,
-                height: helixLength + this.deltaRadius * 4,
-                tessellation: attachmentNbSides,
+                diameter: attachmentRadius * 2,
+                height: attachmentLength,
+                tessellation: attachmentTessellation,
             },
             scene,
         );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
-        this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
+        this.attachment.rotate(Axis.Y, Math.PI / attachmentTessellation, Space.WORLD);
         this.attachment.parent = this.getTransform();
+
+        const lightRadius = 5;
+        const lightInstances = MeshBuilder.CreateCylinder(
+            "RingHabitatLightTemplate",
+            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
+            scene,
+        );
+        lightInstances.parent = this.getTransform();
+
+        const lightMaterial = new StandardMaterial("ringHabitatLightMaterial", scene);
+        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+        lightMaterial.disableLighting = true;
+        lightInstances.material = lightMaterial;
+
+        // point lights along attachment
+        const lightYStep = 350;
+        const attachmentLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+        for (let y = -attachmentLength / 2 + 50; y <= attachmentLength / 2 - 50; y += lightYStep) {
+            for (let sideIndex = 0; sideIndex < attachmentTessellation; sideIndex += 2) {
+                const theta = ((2 * Math.PI) / attachmentTessellation) * sideIndex;
+                const position = new Vector3(
+                    (attachmentRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / attachmentTessellation),
+                    y,
+                    (attachmentRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / attachmentTessellation),
+                );
+
+                attachmentLightPoints.push({ position, rotation: Quaternion.Identity() });
+            }
+        }
 
         this.helixMaterial = new HelixHabitatMaterial(
             this.radius,
@@ -142,45 +172,26 @@ export class HelixHabitat implements Transformable {
             this.helices.push(helix);
         }
 
-        const lightRadius = 5;
-        const lightInstances = MeshBuilder.CreateCylinder(
-            "RingHabitatLightTemplate",
-            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
-            scene,
-        );
-        lightInstances.parent = this.getTransform();
+        const helixLightPoints = this.getLightPoints(helixCount, turnCount, helixThickness, helixPitch);
 
-        const lightMaterial = new StandardMaterial("ringHabitatLightMaterial", scene);
-        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
-        lightMaterial.disableLighting = true;
-        lightInstances.material = lightMaterial;
-        const lightPoints = this.getLightPoints(helixCount, turnCount, helixThickness, helixPitch);
-        for (const [i, [lightPosition, lightRotation]] of lightPoints.entries()) {
-            lightInstances.thinInstanceAdd(Matrix.Compose(Vector3.OneReadOnly, lightRotation, lightPosition));
-
-            const light = new PointLight(`HelixHabitatLight${i}`, lightPosition, scene);
-            light.range = 200;
-            light.parent = this.getTransform();
-            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
-            this.lights.push(light);
-        }
-
-        const armCount = (attachmentNbSides * turnCount) / 2;
+        const armCount = (attachmentTessellation * turnCount) / 2;
+        const armTessellation = 6;
+        const armRadius = this.deltaRadius / 6;
+        const armLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
         for (let helixIndex = 0; helixIndex < this.helices.length; helixIndex++) {
             for (let armIndex = 0; armIndex <= armCount; armIndex++) {
                 const arm = MeshBuilder.CreateCylinder(
                     `HelixHabitatArm${armIndex}`,
                     {
                         height: this.radius,
-                        diameter: this.deltaRadius / 3,
-                        tessellation: 6,
+                        diameter: armRadius * 2,
+                        tessellation: armTessellation,
                     },
                     scene,
                 );
                 arm.position.y = this.radius / 2;
                 arm.bakeCurrentTransformIntoVertices();
                 arm.convertToFlatShadedMesh();
-                arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
                 arm.material = this.metalSectionMaterial;
 
                 const angle =
@@ -188,14 +199,46 @@ export class HelixHabitat implements Transformable {
                     (helixIndex * (Math.PI * 2)) / helixCount +
                     Math.PI;
 
-                arm.position.y = (armIndex / armCount) * helixLength - helixLength / 2;
-                arm.rotate(Axis.Y, angle, Space.WORLD);
+                const rotation = Quaternion.RotationAxis(Axis.Y, angle).multiply(
+                    Quaternion.RotationAxis(Axis.Z, Math.PI / 2),
+                );
+                arm.rotationQuaternion = rotation;
 
+                arm.position.y = (armIndex / armCount) * helixLength - helixLength / 2;
                 arm.parent = this.getTransform();
+
+                const lightYStep = 350;
+                for (let lightY = lightYStep; lightY <= this.radius; lightY += lightYStep) {
+                    for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
+                        const theta = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
+                        const position = new Vector3(
+                            (armRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / armTessellation),
+                            lightY,
+                            (armRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / armTessellation),
+                        );
+
+                        position.rotateByQuaternionToRef(rotation, position);
+                        position.y += arm.position.y;
+
+                        armLightPoints.push({ position, rotation });
+                    }
+                }
 
                 this.arms.push(arm);
             }
         }
+
+        const lightPoints = attachmentLightPoints.concat(helixLightPoints).concat(armLightPoints);
+        const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
+        for (const [i, { position, rotation }] of lightPoints.entries()) {
+            lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
+            const light = new PointLight(`HelixHabitatLight${i}`, position, scene);
+            light.range = 200;
+            light.parent = this.getTransform();
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            this.lights.push(light);
+        }
+        lightInstances.thinInstanceSetBuffer("matrix", lightInstanceBuffer, 16, true);
     }
 
     getLights(): Array<PointLight> {
@@ -207,7 +250,7 @@ export class HelixHabitat implements Transformable {
         turnCount: number,
         helixThickness: number,
         helixPitch: number,
-    ): Array<[Vector3, Quaternion]> {
+    ): Array<{ position: Vector3; rotation: Quaternion }> {
         const sectionCount = Math.floor((2 * Math.PI * this.radius) / this.deltaRadius);
 
         const maxRadius = this.radius + this.deltaRadius / 2;
@@ -215,7 +258,7 @@ export class HelixHabitat implements Transformable {
 
         const thicknessFactor = Math.floor(helixThickness / this.deltaRadius);
 
-        const results: Array<[Vector3, Quaternion]> = [];
+        const results: Array<{ position: Vector3; rotation: Quaternion }> = [];
 
         for (let helixIndex = 0; helixIndex < helixCount; helixIndex++) {
             for (let turnIndex = 0; turnIndex < turnCount; turnIndex++) {
@@ -231,32 +274,28 @@ export class HelixHabitat implements Transformable {
                                 helixThickness / 2 +
                                 this.deltaRadius / 2;
 
-                            const lightPosition = new Vector3(
-                                radius * Math.cos(angle),
-                                yOffset,
-                                radius * Math.sin(angle),
-                            );
+                            const position = new Vector3(radius * Math.cos(angle), yOffset, radius * Math.sin(angle));
 
-                            results.push([lightPosition, Quaternion.Identity()]);
+                            results.push({ position, rotation: Quaternion.Identity() });
                         }
                     }
 
                     const yBase = (turnIndex + sectionIndex / sectionCount) * helixPitch - (turnCount * helixPitch) / 2;
                     for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
-                        const lightPosition = new Vector3(
+                        const position = new Vector3(
                             this.radius * Math.cos(angle),
                             yBase + yOffset,
                             this.radius * Math.sin(angle),
                         );
 
-                        results.push([
-                            lightPosition,
-                            Quaternion.FromUnitVectorsToRef(
+                        results.push({
+                            position,
+                            rotation: Quaternion.FromUnitVectorsToRef(
                                 Vector3.UpReadOnly,
-                                new Vector3(-lightPosition.x, 0, -lightPosition.z).normalize(),
+                                new Vector3(-position.x, 0, -position.z).normalize(),
                                 Quaternion.Identity(),
                             ),
-                        ]);
+                        });
                     }
                 }
             }
