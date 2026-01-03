@@ -131,6 +131,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
         result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
         result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
         return result;
     }
 
