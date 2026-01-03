@@ -115,7 +115,7 @@ export class UtilitySection implements Transformable {
             lightMaterial.emissiveColor = Color3.White();
             lightInstances.material = lightMaterial;
             for (let ring = -1; ring <= 1; ring++) {
-                for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+                for (let sideIndex = 0; sideIndex < tessellation; sideIndex += 2) {
                     const radius = (attachmentRadius + lightRadius) * Math.cos(Math.PI / tessellation);
                     const theta = Math.PI / tessellation + ((2 * Math.PI) / tessellation) * sideIndex;
 
