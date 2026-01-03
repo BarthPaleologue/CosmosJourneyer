@@ -19,7 +19,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -109,26 +109,52 @@ export class CylinderHabitat implements Transformable {
         lightMaterial.disableLighting = true;
         lightInstances.material = lightMaterial;
 
+        const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
         for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {
+            const theta = ((2 * Math.PI) / tessellation) * sideIndex + Math.PI / tessellation;
             for (let ring = 0; ring < sectorYCount; ring++) {
                 const lightHeight = ring * sectorSize + sectorSize / 2 - height / 2;
-                const theta = ((2 * Math.PI) / tessellation) * sideIndex + Math.PI / tessellation;
-                const lightRadius = (this.radius + 5) * Math.cos(Math.PI / tessellation);
 
-                const lightPosition = new Vector3(
-                    lightRadius * Math.cos(theta),
+                const position = new Vector3(
+                    (this.radius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / tessellation),
                     lightHeight,
-                    lightRadius * Math.sin(theta),
+                    (this.radius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / tessellation),
                 );
 
-                lightInstances.thinInstanceAdd(Matrix.Translation(lightPosition.x, lightPosition.y, lightPosition.z));
+                lightPoints.push({ position, rotation: Quaternion.Identity() });
+            }
 
-                const light = new PointLight("CylinderHabitatLight", lightPosition, scene);
-                light.range = 200;
-                light.parent = this.getTransform();
-                this.lights.push(light);
+            const nbSectorsInRadius = Math.floor(this.radius / sectorSize);
+            const baseX = Math.cos(theta) * Math.cos(Math.PI / tessellation);
+            const baseZ = Math.sin(theta) * Math.cos(Math.PI / tessellation);
+            const rotation = Quaternion.FromUnitVectorsToRef(
+                Vector3.UpReadOnly,
+                new Vector3(-baseX, 0, -baseZ).normalize(),
+                Quaternion.Identity(),
+            );
+            for (let ring = 0; ring < nbSectorsInRadius; ring++) {
+                const radius = ring * sectorSize + sectorSize / 2;
+                const position = new Vector3(radius * baseX, -height / 2, radius * baseZ);
+
+                lightPoints.push({ position, rotation });
+
+                const position2 = position.clone();
+                position2.y = height / 2;
+
+                lightPoints.push({ position: position2, rotation });
             }
         }
+
+        const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
+        for (const [i, { position, rotation }] of lightPoints.entries()) {
+            lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
+            const light = new PointLight(`CylinderHabitatLight${i}`, position, scene);
+            light.range = 200;
+            light.parent = this.getTransform();
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            this.lights.push(light);
+        }
+        lightInstances.thinInstanceSetBuffer("matrix", lightInstanceBuffer, 16, true);
     }
 
     getLights(): Array<PointLight> {
