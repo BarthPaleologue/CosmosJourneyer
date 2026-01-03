@@ -35,7 +35,7 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
-import { CollisionMask } from "@/settings";
+import { CollisionMask, Settings } from "@/settings";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
@@ -112,7 +112,7 @@ export class UtilitySection implements Transformable {
             lightInstances.parent = this.getTransform();
             const lightMaterial = new StandardMaterial("utilitySectionLightMaterial", scene);
             lightMaterial.disableLighting = true;
-            lightMaterial.emissiveColor = Color3.White();
+            lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             lightInstances.material = lightMaterial;
             for (let ring = -1; ring <= 1; ring++) {
                 for (let sideIndex = 0; sideIndex < tessellation; sideIndex += 2) {
@@ -132,6 +132,7 @@ export class UtilitySection implements Transformable {
                     const light = new PointLight(`utilitySectionLight${ring}_${sideIndex}`, lightPosition, scene);
                     light.parent = this.getTransform();
                     light.range = 200;
+                    light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
 
                     this.lights.push(light);
                 }
