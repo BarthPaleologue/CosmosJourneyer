@@ -110,7 +110,7 @@ export class CylinderHabitat implements Transformable {
         lightInstances.material = lightMaterial;
 
         for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
-            for (let ring = 0; ring < sectorYCount; ring++) {
+            for (let ring = 0; ring <= sectorYCount; ring++) {
                 const lightHeight = ring * sectorSize + sectorSize / 2 - height / 2;
                 const theta = ((2 * Math.PI) / tesselation) * sideIndex + Math.PI / tesselation;
                 const lightRadius = (this.radius + 5) * Math.cos(Math.PI / tesselation);
