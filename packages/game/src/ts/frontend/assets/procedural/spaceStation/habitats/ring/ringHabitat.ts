@@ -80,7 +80,7 @@ export class RingHabitat implements Transformable {
         // adjust the radius to fit the required habitable surface
         this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
 
-        const attachmentNbSides = 4 + 2 * Math.floor(this.rng(1) * 2);
+        const attachmentTessellation = 4 + 2 * Math.floor(this.rng(1) * 2);
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "RingHabitatMetalSectionMaterial",
@@ -90,20 +90,50 @@ export class RingHabitat implements Transformable {
 
         this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
 
+        const attachmentLength = height * 1.5;
+        const attachmentRadius = 50;
         this.attachment = MeshBuilder.CreateCylinder(
             "RingHabitatAttachment",
             {
-                diameterTop: 100,
-                diameterBottom: 100,
-                height: height * 1.5,
-                tessellation: attachmentNbSides,
+                diameter: attachmentRadius * 2,
+                height: attachmentLength,
+                tessellation: attachmentTessellation,
             },
             scene,
         );
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = this.metalSectionMaterial;
-        this.attachment.rotate(Axis.Y, Math.PI / attachmentNbSides, Space.WORLD);
+        this.attachment.rotate(Axis.Y, Math.PI / attachmentTessellation, Space.WORLD);
         this.attachment.parent = this.getTransform();
+
+        const lightRadius = 5;
+        const lightInstances = MeshBuilder.CreateCylinder(
+            "RingHabitatLightTemplate",
+            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
+            scene,
+        );
+        lightInstances.parent = this.getTransform();
+
+        const lightMaterial = new StandardMaterial("ringHabitatLightMaterial", scene);
+        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+        lightMaterial.disableLighting = true;
+        lightInstances.material = lightMaterial;
+
+        // point lights along attachment
+        const lightYStep = 350;
+        const attachmentLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+        for (let y = -attachmentLength / 2 + 50; y <= attachmentLength / 2 - 50; y += lightYStep) {
+            for (let sideIndex = 0; sideIndex < attachmentTessellation; sideIndex += 2) {
+                const theta = ((2 * Math.PI) / attachmentTessellation) * sideIndex;
+                const position = new Vector3(
+                    (attachmentRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / attachmentTessellation),
+                    y,
+                    (attachmentRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / attachmentTessellation),
+                );
+
+                attachmentLightPoints.push({ position, rotation: Quaternion.Identity() });
+            }
+        }
 
         const circumference = 2 * Math.PI * this.radius;
 
@@ -122,19 +152,7 @@ export class RingHabitat implements Transformable {
 
         this.ring.parent = this.getTransform();
 
-        const lightRadius = 5;
-        const lightInstances = MeshBuilder.CreateCylinder(
-            "RingHabitatLightTemplate",
-            { height: 60, diameter: lightRadius * 2, tessellation: 6 },
-            scene,
-        );
-        lightInstances.parent = this.getTransform();
-
-        const lightMaterial = new StandardMaterial("ringHabitatLightMaterial", scene);
-        lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
-        lightMaterial.disableLighting = true;
-        lightInstances.material = lightMaterial;
-
+        const ringLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
         for (let sideIndex = 0; sideIndex < tesselation; sideIndex++) {
             for (let ring = 0; ring < yScaling; ring++) {
                 const lightHeight = ring * deltaRadius + deltaRadius / 2 - height / 2;
@@ -144,22 +162,8 @@ export class RingHabitat implements Transformable {
                 const lightPosition1 = new Vector3(radius1 * Math.cos(theta), lightHeight, radius1 * Math.sin(theta));
                 const lightPosition2 = new Vector3(radius2 * Math.cos(theta), lightHeight, radius2 * Math.sin(theta));
 
-                lightInstances.thinInstanceAdd(
-                    Matrix.Translation(lightPosition1.x, lightPosition1.y, lightPosition1.z),
-                );
-                lightInstances.thinInstanceAdd(
-                    Matrix.Translation(lightPosition2.x, lightPosition2.y, lightPosition2.z),
-                );
-
-                const light1 = new PointLight(`ringHabitatLight${ring}_${sideIndex}_1`, lightPosition1, scene);
-                light1.range = 200;
-                light1.parent = this.getTransform();
-                this.lights.push(light1);
-
-                const light2 = new PointLight(`ringHabitatLight${ring}_${sideIndex}_2`, lightPosition2, scene);
-                light2.range = 200;
-                light2.parent = this.getTransform();
-                this.lights.push(light2);
+                ringLightPoints.push({ position: lightPosition1, rotation: Quaternion.Identity() });
+                ringLightPoints.push({ position: lightPosition2, rotation: Quaternion.Identity() });
             }
         }
 
@@ -178,63 +182,81 @@ export class RingHabitat implements Transformable {
                 radius * Math.sin(theta),
             );
 
-            lightInstances.thinInstanceAdd(
-                Matrix.Compose(
-                    Vector3.OneReadOnly,
-                    Quaternion.FromUnitVectorsToRef(
-                        Vector3.UpReadOnly,
-                        new Vector3(-lightPosition1.x, 0, -lightPosition1.z).normalize(),
-                        Quaternion.Identity(),
-                    ),
-                    lightPosition1,
+            ringLightPoints.push({
+                position: lightPosition1,
+                rotation: Quaternion.FromUnitVectorsToRef(
+                    Vector3.UpReadOnly,
+                    new Vector3(-lightPosition1.x, 0, -lightPosition1.z).normalize(),
+                    Quaternion.Identity(),
                 ),
-            );
-            lightInstances.thinInstanceAdd(
-                Matrix.Compose(
-                    Vector3.OneReadOnly,
-                    Quaternion.FromUnitVectorsToRef(
-                        Vector3.UpReadOnly,
-                        new Vector3(-lightPosition2.x, 0, -lightPosition2.z).normalize(),
-                        Quaternion.Identity(),
-                    ),
-                    lightPosition2,
+            });
+            ringLightPoints.push({
+                position: lightPosition2,
+                rotation: Quaternion.FromUnitVectorsToRef(
+                    Vector3.UpReadOnly,
+                    new Vector3(-lightPosition2.x, 0, -lightPosition2.z).normalize(),
+                    Quaternion.Identity(),
                 ),
-            );
-
-            const light1 = new PointLight(`ringHabitatLightBottom${sideIndex}_1`, lightPosition1, scene);
-            light1.range = 200;
-            light1.parent = this.getTransform();
-            this.lights.push(light1);
-
-            const light2 = new PointLight(`ringHabitatLightTop${sideIndex}_2`, lightPosition2, scene);
-            light2.range = 200;
-            light2.parent = this.getTransform();
-            this.lights.push(light2);
+            });
         }
 
-        const nbArms = attachmentNbSides / 2;
+        const nbArms = attachmentTessellation / 2;
+        const armRadius = deltaRadius / 6;
+        const armTessellation = 6;
+        const armLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
                 `RingHabitatArm${i}`,
                 {
-                    height: 2 * this.radius,
-                    diameter: deltaRadius / 3,
-                    tessellation: 6,
+                    height: this.radius,
+                    diameter: armRadius * 2,
+                    tessellation: armTessellation,
                 },
                 scene,
             );
+            arm.position.y = this.radius / 2;
+            arm.bakeCurrentTransformIntoVertices();
             arm.convertToFlatShadedMesh();
-            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             arm.material = this.metalSectionMaterial;
 
             const theta = (i / nbArms) * Math.PI * 2;
-
-            arm.rotate(Axis.Y, theta, Space.WORLD);
-
+            const rotation = Quaternion.RotationAxis(Axis.Y, theta).multiply(
+                Quaternion.RotationAxis(Axis.Z, Math.PI / 2),
+            );
+            arm.rotationQuaternion = rotation;
             arm.parent = this.getTransform();
+
+            const lightYStep = 350;
+            for (let lightY = lightYStep; lightY <= this.radius - lightYStep; lightY += lightYStep) {
+                for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
+                    const phi = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
+                    const position = new Vector3(
+                        (armRadius + lightRadius) * Math.cos(phi) * Math.cos(Math.PI / armTessellation),
+                        lightY,
+                        (armRadius + lightRadius) * Math.sin(phi) * Math.cos(Math.PI / armTessellation),
+                    );
+
+                    position.rotateByQuaternionToRef(rotation, position);
+
+                    armLightPoints.push({ position, rotation });
+                }
+            }
 
             this.arms.push(arm);
         }
+
+        const lightPoints = attachmentLightPoints.concat(ringLightPoints).concat(armLightPoints);
+        const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
+        for (const [i, { position, rotation }] of lightPoints.entries()) {
+            lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
+
+            const light = new PointLight("RingHabitatLight", position, scene);
+            light.range = 200;
+            light.parent = this.getTransform();
+            this.lights.push(light);
+        }
+
+        lightInstances.thinInstanceSetBuffer("matrix", lightInstanceBuffer, 16, true);
     }
 
     getLights(): Array<PointLight> {
