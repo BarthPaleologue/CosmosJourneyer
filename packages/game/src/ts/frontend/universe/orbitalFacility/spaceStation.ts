@@ -17,6 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
@@ -120,32 +121,17 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             maxDistance: 0.0,
         };
 
-        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, [], scene);
-        for (const landingBay of this.landingBays) {
-            for (const light of landingBay.getLights()) {
-                this.lightContainer.addLight(light);
-            }
-        }
-        for (const utilitySection of this.utilitySections) {
-            for (const light of utilitySection.getLights()) {
-                this.lightContainer.addLight(light);
-            }
-        }
-        for (const cylinderHabitat of this.cylinderHabitats) {
-            for (const light of cylinderHabitat.getLights()) {
-                this.lightContainer.addLight(light);
-            }
-        }
-        for (const ringHabitat of this.ringHabitats) {
-            for (const light of ringHabitat.getLights()) {
-                this.lightContainer.addLight(light);
-            }
-        }
-        for (const helixHabitat of this.helixHabitats) {
-            for (const light of helixHabitat.getLights()) {
-                this.lightContainer.addLight(light);
-            }
-        }
+        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, this.getLights(), scene);
+    }
+
+    getLights(): Array<Light> {
+        const result: Array<Light> = [];
+        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
+        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
+        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
+        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
+        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        return result;
     }
 
     getLandingPadManager(): LandingPadManager {
