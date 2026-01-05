@@ -256,24 +256,10 @@ export class SolarSection implements Transformable {
             panel1.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
             panel1.translate(Axis.Z, panelDimensionX / 2 + armRadius * Math.cos(Math.PI / armTessellation));
             panel1.rotate(Axis.Z, Math.PI / 2);
-
             this.solarPanels.push(panel1);
 
-            const panel2 = MeshBuilder.CreateBox(
-                "SolarPanel2",
-                {
-                    height: 0.3,
-                    width: panelDimensionY,
-                    depth: panelDimensionX,
-                },
-                scene,
-            );
-            panel2.parent = arm;
-            panel2.material = solarPanelMaterial;
-            panel2.translate(Axis.Y, (panelDimensionY + gap) * (i - (nbPanelsPerSide - 1) / 2));
-            panel2.translate(Axis.Z, -panelDimensionX / 2 - armRadius * Math.cos(Math.PI / armTessellation));
-            panel2.rotate(Axis.Z, Math.PI / 2);
-
+            const panel2 = panel1.clone("SolarPanel2");
+            panel2.rotateAround(Vector3.Zero(), Axis.X, Math.PI);
             this.solarPanels.push(panel2);
         }
     }
