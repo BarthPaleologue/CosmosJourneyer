@@ -203,7 +203,7 @@ export class SolarSection implements Transformable {
                     secondaryArmLength,
                     attachmentRadius / 2,
                     attachmentTessellation,
-                    requiredSurface / 2,
+                    requiredSurface / secondaryArmCount,
                     assets.materials.solarPanel,
                 );
             }
