@@ -208,7 +208,12 @@ export class SolarSection implements Transformable {
                 );
             }
         } else if (axisCount >= 3) {
-            this.generateStarPattern(axisCount, requiredSurface, assets.materials.solarPanel);
+            const starPatternLightPoints = this.generateStarPattern(
+                axisCount,
+                requiredSurface,
+                assets.materials.solarPanel,
+            );
+            lightPoints.push(...starPatternLightPoints);
         }
 
         const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
@@ -264,35 +269,58 @@ export class SolarSection implements Transformable {
         }
     }
 
-    private generateStarPattern(nbArms: number, requiredSurface: number, solarPanelMaterial: SolarPanelMaterial) {
+    private generateStarPattern(armCount: number, requiredSurface: number, solarPanelMaterial: SolarPanelMaterial) {
         const scene = this.getTransform().getScene();
 
+        const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+
         // there will be two solar array per arm, so the surface is distributed over 2*nbArms
-        const surfacePerArm = requiredSurface / (2 * nbArms);
+        const surfacePerArm = requiredSurface / (2 * armCount);
         const squareSideSize = Math.sqrt(surfacePerArm);
         const armLength = squareSideSize * 2.618;
-        for (let i = 0; i <= nbArms; i++) {
+        for (let i = 0; i <= armCount; i++) {
             const armThickness = 100;
+            const armTessellation = 6;
             const arm = MeshBuilder.CreateCylinder(
                 `RingHabitatArm${i}`,
                 {
                     height: armLength,
                     diameter: armThickness,
-                    tessellation: 6,
+                    tessellation: armTessellation,
                 },
                 scene,
             );
+            arm.position.y = armLength / 2;
+            arm.bakeCurrentTransformIntoVertices();
             arm.convertToFlatShadedMesh();
-            arm.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
 
-            const theta = (i / nbArms) * Math.PI * 2;
-            arm.rotate(Axis.Y, theta, Space.WORLD);
-            arm.translate(Axis.Y, armLength / 2, Space.LOCAL);
+            const theta = (i / armCount) * Math.PI * 2;
+            const rotation = Quaternion.RotationAxis(Axis.Y, theta).multiply(
+                Quaternion.RotationAxis(Axis.Z, Math.PI / 2),
+            );
+            arm.rotationQuaternion = rotation;
+
             arm.parent = this.getTransform();
             arm.material = this.metalSectionMaterial;
             this.arms.push(arm);
 
-            const armOffset = (nbArms * 0.3 * surfacePerArm) / armLength;
+            const lightYStepArm = 200;
+            const lightRadius = 5;
+            for (let lightY = lightYStepArm; lightY <= armLength - lightYStepArm; lightY += lightYStepArm) {
+                for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
+                    const thetaLight = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
+                    const position = new Vector3(
+                        (armThickness / 2 + lightRadius) * Math.cos(thetaLight) * Math.cos(Math.PI / armTessellation),
+                        lightY,
+                        (armThickness / 2 + lightRadius) * Math.sin(thetaLight) * Math.cos(Math.PI / armTessellation),
+                    );
+                    position.rotateByQuaternionToRef(rotation, position);
+
+                    lightPoints.push({ position, rotation });
+                }
+            }
+
+            const armOffset = (armCount * 0.3 * surfacePerArm) / armLength;
             const hexagonOffset = armThickness * (1 - Math.sqrt(3) / 2);
 
             const solarPanel1 = MeshBuilder.CreateBox(
@@ -306,29 +334,17 @@ export class SolarSection implements Transformable {
             );
             solarPanel1.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
             solarPanel1.parent = arm;
-            solarPanel1.translate(Axis.X, armOffset);
+            solarPanel1.translate(Axis.X, armOffset + armLength / 2);
             solarPanel1.translate(Axis.Z, 0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
             solarPanel1.material = solarPanelMaterial;
-
             this.solarPanels.push(solarPanel1);
 
-            const solarPanel2 = MeshBuilder.CreateBox(
-                "SolarPanel2",
-                {
-                    height: 0.3,
-                    width: armLength,
-                    depth: surfacePerArm / armLength,
-                },
-                scene,
-            );
-            solarPanel2.rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
-            solarPanel2.parent = arm;
-            solarPanel2.translate(Axis.X, armOffset);
-            solarPanel2.translate(Axis.Z, -0.5 * (surfacePerArm / armLength + armThickness - hexagonOffset));
-            solarPanel2.material = solarPanelMaterial;
-
+            const solarPanel2 = solarPanel1.clone("SolarPanel2");
+            solarPanel2.rotateAround(Vector3.Zero(), Axis.Y, Math.PI);
             this.solarPanels.push(solarPanel2);
         }
+
+        return lightPoints;
     }
 
     getLights(): Array<PointLight> {
