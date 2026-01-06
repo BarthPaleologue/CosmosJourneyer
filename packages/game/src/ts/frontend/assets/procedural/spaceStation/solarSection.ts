@@ -117,7 +117,7 @@ export class SolarSection implements Transformable {
         lightMaterial.emissiveColor = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
         lightInstances.material = lightMaterial;
 
-        const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+        const lightPoints: Array<{ position: Vector3; rotation?: Quaternion; scale?: Vector3 }> = [];
         const lightYStep = 200;
         for (
             let lightY = -attachmentLength / 2 + lightYStep;
@@ -131,7 +131,7 @@ export class SolarSection implements Transformable {
                     lightY,
                     (attachmentRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / attachmentTessellation),
                 );
-                lightPoints.push({ position: lightPosition, rotation: Quaternion.Identity() });
+                lightPoints.push({ position: lightPosition });
             }
         }
 
@@ -216,9 +216,14 @@ export class SolarSection implements Transformable {
             lightPoints.push(...starPatternLightPoints);
         }
 
+        this.addSolarPanelLightPoints(lightPoints);
+
         const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
-        for (const [i, { position, rotation }] of lightPoints.entries()) {
-            lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
+        for (const [i, { position, rotation, scale }] of lightPoints.entries()) {
+            lightInstanceBuffer.set(
+                Matrix.Compose(scale ?? Vector3.OneReadOnly, rotation ?? Quaternion.Identity(), position).asArray(),
+                i * 16,
+            );
             const light = new PointLight(`SolarSectionLight${i}`, position, scene);
             light.range = 200;
             light.parent = this.getTransform();
@@ -345,6 +350,60 @@ export class SolarSection implements Transformable {
         }
 
         return lightPoints;
+    }
+
+    private addSolarPanelLightPoints(
+        lightPoints: Array<{ position: Vector3; rotation?: Quaternion; scale?: Vector3 }>,
+    ) {
+        if (this.solarPanels.length === 0) {
+            return;
+        }
+
+        const attachment = this.getTransform();
+        attachment.computeWorldMatrix(true);
+        const attachmentWorldInverse = attachment.getWorldMatrix().clone().invert();
+        const attachmentRotation = attachment.absoluteRotationQuaternion;
+        const panelLightScale = new Vector3(1, 0.35, 1);
+
+        this.solarPanels.forEach((panel) => {
+            panel.computeWorldMatrix(true);
+            const panelWorldMatrix = panel.getWorldMatrix();
+            const panelWorldRotation = panel.absoluteRotationQuaternion;
+            const panelRotation = attachmentRotation.clone().conjugate().multiply(panelWorldRotation);
+            const { extendSize } = panel.getBoundingInfo().boundingBox;
+
+            const panelHalfWidth = extendSize.x;
+            const panelHalfDepth = extendSize.z;
+            const outlineLightStep = 200;
+            const lightsAlongWidth = Math.max(2, Math.floor((panelHalfWidth * 2) / outlineLightStep));
+            const lightsAlongDepth = Math.max(2, Math.floor((panelHalfDepth * 2) / outlineLightStep));
+
+            const localOffsets: Vector3[] = [];
+
+            for (let i = 0; i <= lightsAlongWidth; i += 2) {
+                const t = i / lightsAlongWidth;
+                const x = -panelHalfWidth + t * panelHalfWidth * 2;
+                localOffsets.push(new Vector3(x, 0, panelHalfDepth));
+                localOffsets.push(new Vector3(x, 0, -panelHalfDepth));
+            }
+
+            for (let i = 0; i <= lightsAlongDepth; i += 2) {
+                const t = i / lightsAlongDepth;
+                const z = -panelHalfDepth + t * panelHalfDepth * 2;
+                localOffsets.push(new Vector3(panelHalfWidth, 0, z));
+                localOffsets.push(new Vector3(-panelHalfWidth, 0, z));
+            }
+
+            localOffsets.forEach((localOffset) => {
+                const worldPosition = Vector3.TransformCoordinates(localOffset, panelWorldMatrix);
+                const attachmentLocalPosition = Vector3.TransformCoordinates(worldPosition, attachmentWorldInverse);
+                lightPoints.push({
+                    position: attachmentLocalPosition,
+                    rotation: panelRotation,
+                    scale: panelLightScale,
+                });
+            });
+        });
     }
 
     getLights(): Array<PointLight> {
