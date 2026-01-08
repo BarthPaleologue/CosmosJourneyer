@@ -59,11 +59,11 @@
         "d3": "^7.9.0",
         "extended-random": "^1.2.2",
         "fast-simplex-noise": "^4.0.0",
-        "i18next": "^25.7.3",
+        "i18next": "^25.7.4",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
         "terrain-generation": "workspace:^",
-        "zod": "^4.2.1"
+        "zod": "^4.3.5"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
@@ -83,7 +83,7 @@
         "http-server": "^14.1.1",
         "jsdom": "^27.4.0",
         "prettier": "^3.7.4",
-        "sass": "^1.97.1",
+        "sass": "^1.97.2",
         "sass-loader": "^16.0.6",
         "ts-checker-rspack-plugin": "^1.2.3",
         "ts-shader-loader": "^2.1.0",
@@ -91,7 +91,7 @@
         "typedoc-github-theme": "^0.3.1",
         "typedoc-plugin-missing-exports": "^4.1.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.50.1",
+        "typescript-eslint": "^8.52.0",
         "vite-tsconfig-paths": "^6.0.3",
         "vitest": "^4.0.16"
     }
