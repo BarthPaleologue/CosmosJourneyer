@@ -19,16 +19,13 @@ import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadConcreteTextures } from "./concrete";
 import { loadTextureAsync } from "./utils";
 
 import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
 import crateAmbientOcclusion from "@assets/crateMaterial/space-crate1-ao.webp";
 import crateMetallicRoughness from "@assets/crateMaterial/space-crate1-metallic-roughness.webp";
 import crateNormal from "@assets/crateMaterial/space-crate1-normal-dx.webp";
-import concreteAlbedo from "@assets/degraded-concrete-ue/degraded-concrete_albedo.webp";
-import concreteAmbientOcclusion from "@assets/degraded-concrete-ue/degraded-concrete_ao.webp";
-import concreteMetallicRoughness from "@assets/degraded-concrete-ue/degraded-concrete_metallic_roughness.webp";
-import concreteNormal from "@assets/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
 import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRoughness.webp";
 import metalPanelsAlbedo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsAmbientOcclusion from "@assets/metalPanelMaterial/sci-fi-panel1-ao.webp";
@@ -117,21 +114,7 @@ export async function loadMaterialTextures(
 
     const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath, scene, progressMonitor);
 
-    // Concrete
-    const concreteAlbedoPromise = loadTextureAsync("ConcreteAlbedo", concreteAlbedo, scene, progressMonitor);
-    const concreteNormalPromise = loadTextureAsync("ConcreteNormal", concreteNormal, scene, progressMonitor);
-    const concreteMetallicRoughnessPromise = loadTextureAsync(
-        "ConcreteMetallicRoughness",
-        concreteMetallicRoughness,
-        scene,
-        progressMonitor,
-    );
-    const concreteAmbientOcclusionPromise = loadTextureAsync(
-        "ConcreteAmbientOcclusion",
-        concreteAmbientOcclusion,
-        scene,
-        progressMonitor,
-    );
+    const concretePromise = loadConcreteTextures(scene, progressMonitor);
 
     // Crate
     const crateAlbedoPromise = loadTextureAsync("CrateAlbedo", crateAlbedo, scene, progressMonitor);
@@ -170,12 +153,7 @@ export async function loadMaterialTextures(
             metallicRoughness: await metalPanelsMetallicRoughnessPromise,
             ambientOcclusion: await metalPanelsAmbientOcclusionPromise,
         },
-        concrete: {
-            albedo: await concreteAlbedoPromise,
-            normal: await concreteNormalPromise,
-            metallicRoughness: await concreteMetallicRoughnessPromise,
-            ambientOcclusion: await concreteAmbientOcclusionPromise,
-        },
+        concrete: await concretePromise,
         crate: {
             albedo: await crateAlbedoPromise,
             normal: await crateNormalPromise,
