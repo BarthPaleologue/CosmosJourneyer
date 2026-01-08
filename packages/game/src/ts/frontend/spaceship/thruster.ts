@@ -50,7 +50,7 @@ export class Thruster {
             "thrusterLight",
             Vector3.Zero(),
             direction.negate(),
-            degreesToRadians(120),
+            degreesToRadians(160),
             2,
             mesh.getScene(),
         );
