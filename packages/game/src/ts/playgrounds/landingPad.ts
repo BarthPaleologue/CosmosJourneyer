@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { GlowLayer, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { ClusteredLightContainer, GlowLayer, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
@@ -47,7 +47,9 @@ export async function createLandingPadScene(
 
     const textures = await loadTextures(scene, progressMonitor);
 
-    new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
+    const landingPad = new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
+
+    new ClusteredLightContainer("lightContainer", landingPad.getLights(), scene);
 
     new GlowLayer("glow", scene);
 

@@ -115,6 +115,7 @@ export class LandingPad implements ILandingPad {
                 degreesToRadians(120),
                 6,
                 scene,
+                true,
             );
             light.diffuse.copyFromFloats(1, 1, 0.8);
             light.intensity = 10;

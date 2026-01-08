@@ -224,7 +224,7 @@ export class SolarSection implements Transformable {
                 Matrix.Compose(scale ?? Vector3.OneReadOnly, rotation ?? Quaternion.Identity(), position).asArray(),
                 i * 16,
             );
-            const light = new PointLight(`SolarSectionLight${i}`, position, scene);
+            const light = new PointLight(`SolarSectionLight${i}`, position, scene, true);
             light.range = 200;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);

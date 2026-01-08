@@ -148,7 +148,7 @@ export class CylinderHabitat implements Transformable {
         const lightInstanceBuffer = new Float32Array(lightPoints.length * 16);
         for (const [i, { position, rotation }] of lightPoints.entries()) {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
-            const light = new PointLight(`CylinderHabitatLight${i}`, position, scene);
+            const light = new PointLight(`CylinderHabitatLight${i}`, position, scene, true);
             light.range = 200;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);

@@ -250,7 +250,7 @@ export class RingHabitat implements Transformable {
         for (const [i, { position, rotation }] of lightPoints.entries()) {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
 
-            const light = new PointLight("RingHabitatLight", position, scene);
+            const light = new PointLight("RingHabitatLight", position, scene, true);
             light.range = 200;
             light.parent = this.getTransform();
             this.lights.push(light);

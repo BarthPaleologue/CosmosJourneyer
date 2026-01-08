@@ -142,7 +142,7 @@ export class LandingBay {
             const y = lightMatrixBuffer[bufferOffset + 13];
             const z = lightMatrixBuffer[bufferOffset + 14];
 
-            const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene);
+            const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene, true);
             light.range = deltaRadius * 2;
             light.parent = lightMeshInstances;
 

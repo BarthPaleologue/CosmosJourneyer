@@ -129,7 +129,7 @@ export class UtilitySection implements Transformable {
                         Matrix.Translation(lightPosition.x, lightPosition.y, lightPosition.z),
                     );
 
-                    const light = new PointLight(`utilitySectionLight${ring}_${sideIndex}`, lightPosition, scene);
+                    const light = new PointLight(`utilitySectionLight${ring}_${sideIndex}`, lightPosition, scene, true);
                     light.parent = this.getTransform();
                     light.range = 200;
                     light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
