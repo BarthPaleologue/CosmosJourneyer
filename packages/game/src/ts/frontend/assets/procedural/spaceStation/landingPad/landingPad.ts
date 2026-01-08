@@ -1,15 +1,36 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import type { Light } from "@babylonjs/core/Lights/light";
+import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
-import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { Textures } from "@/frontend/assets/textures";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+
+import type { RGBColor } from "@/utils/colors";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
@@ -20,9 +41,9 @@ export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
     private deckAggregate: PhysicsAggregate | null = null;
 
-    private readonly deckMaterial: LandingPadMaterial;
+    private lights: Array<Light> = [];
 
-    private readonly crates: InstancedMesh[] = [];
+    private readonly deckMaterial: LandingPadMaterial;
 
     readonly padNumber: number;
     private readonly padSize: LandingPadSize;
@@ -36,7 +57,7 @@ export class LandingPad implements ILandingPad {
     private readonly width: number;
     private readonly depth: number;
 
-    constructor(padNumber: number, padSize: LandingPadSize, assets: RenderingAssets, scene: Scene) {
+    constructor(padNumber: number, padSize: LandingPadSize, textures: Textures, scene: Scene) {
         this.padSize = padSize;
 
         this.width = 40 * padSize;
@@ -48,8 +69,8 @@ export class LandingPad implements ILandingPad {
 
         this.deckMaterial = new LandingPadMaterial(
             padNumber,
-            assets.textures.materials.concrete,
-            assets.textures.pools.landingPad,
+            textures.materials.concrete,
+            textures.pools.landingPad,
             scene,
         );
 
@@ -66,44 +87,76 @@ export class LandingPad implements ILandingPad {
 
         this.enablePhysics(scene);
 
-        const nbBoxes = Math.floor(Math.random() * 5);
-        this.scatterAssets(assets.objects.crate, nbBoxes);
-
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
             minDistance: this.getBoundingRadius() * 4.0,
             maxDistance: this.getBoundingRadius() * 6.0,
         };
-    }
 
-    scatterAssets(asset: Mesh, nbScatter: number) {
-        for (let i = 0; i < nbScatter; i++) {
-            const corner1 = Math.random() < 0.5 ? -1 : 1;
-            const corner2 = Math.random() < 0.5 ? -1 : 1;
+        const lightHeight = 20;
+        const lightInset = Math.min(2, Math.min(this.width, this.depth) * 0.05);
+        const halfWidth = this.width / 2 - lightInset;
+        const halfDepth = this.depth / 2 - lightInset;
+        const corners: ReadonlyArray<{ x: number; z: number }> = [
+            { x: halfWidth, z: halfDepth },
+            { x: -halfWidth, z: halfDepth },
+            { x: -halfWidth, z: -halfDepth },
+            { x: halfWidth, z: -halfDepth },
+        ];
 
-            const crateSize = Math.random() < 0.2 ? 0.5 : 1;
-            const crate = asset.createInstance(`crate${i}`);
-            crate.scaling.scaleInPlace(crateSize);
-            crate.parent = this.deck;
-            crate.position.y += 0.25 + crateSize / 2;
-
-            let nbTries = 0;
-            const maxTries = 10;
-            do {
-                crate.position.x = (corner1 * (this.width - 10 * Math.random() - 3)) / 2;
-                crate.position.z = (corner2 * (this.depth - 10 * Math.random() - 3)) / 2;
-                crate.rotation.y = Math.random() * Math.PI * 2;
-                nbTries++;
-                if (nbTries > maxTries) {
-                    crate.dispose();
-                    break;
-                }
-            } while (!this.crates.every((otherCrate) => Vector3.Distance(crate.position, otherCrate.position) > 1.5));
-
-            if (nbTries <= maxTries) {
-                this.crates.push(crate);
-            }
+        for (const corner of corners) {
+            const position = new Vector3(corner.x, lightHeight, corner.z);
+            const target = new Vector3(corner.x / 2, 0, corner.z / 2);
+            const direction = target.subtract(position).normalize();
+            const light = new SpotLight(
+                `LandingPadLight${this.padNumber}`,
+                position,
+                direction,
+                degreesToRadians(120),
+                6,
+                scene,
+                true,
+            );
+            light.diffuse.copyFromFloats(1, 1, 0.8);
+            light.intensity = 10;
+            light.parent = this.getTransform();
+            light.range = this.depth;
+            this.lights.push(light);
         }
+
+        /*this.spotLights = corners.map((corner) => {
+            const proceduralSpotLight = new ProceduralSpotLight(
+                degreesToRadians(120),
+                this.padSize * 0.6,
+                this.depth,
+                scene,
+            );
+            proceduralSpotLight.getTransform().position.set(corner.x, lightHeight, corner.z);
+            proceduralSpotLight.getTransform().parent = this.getTransform();
+            lookAt(
+                proceduralSpotLight.getTransform(),
+                new Vector3(corner.x / 2, 0, corner.z / 2),
+                sceneUsesRightHanded,
+            );
+
+            const lampPost = MeshBuilder.CreateCylinder(
+                "Lamp Post",
+                {
+                    diameter: 0.3,
+                    height: lightHeight,
+                },
+                scene,
+            );
+            lampPost.position.set(corner.x, lightHeight / 2, corner.z);
+            lampPost.parent = this.getTransform();
+
+            const lampPostMaterial = new PBRMetallicRoughnessMaterial("LampPostMaterial", scene);
+            lampPostMaterial.metallic = 1;
+            lampPostMaterial.roughness = 0.4;
+            lampPost.material = lampPostMaterial;
+
+            return proceduralSpotLight;
+        });*/
     }
 
     disablePhysics() {
@@ -146,13 +199,20 @@ export class LandingPad implements ILandingPad {
         return this.boundingRadius;
     }
 
+    getLights(): Array<Light> {
+        return this.lights;
+    }
+
+    setLightsColor({ r, g, b }: RGBColor): void {
+        for (const light of this.lights) {
+            light.diffuse.copyFromFloats(r, g, b);
+        }
+    }
+
     dispose() {
         this.deck.dispose();
         this.deckAggregate?.dispose();
         this.deckMaterial.dispose();
-        this.crates.forEach((crate) => {
-            crate.dispose();
-        });
     }
 
     getTypeName(): string {

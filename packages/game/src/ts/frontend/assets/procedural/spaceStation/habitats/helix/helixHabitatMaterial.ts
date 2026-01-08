@@ -15,23 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     abs,
-    add,
     f,
-    fract,
     mix,
     mul,
     outputFragColor,
     outputVertexPosition,
     pbr,
     perturbNormal,
-    smoothstep,
     splitVec,
     step,
     sub,
@@ -44,7 +40,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec2,
-    vec3,
     vertexAttribute,
 } from "@/frontend/helpers/bsl";
 
@@ -57,7 +52,6 @@ export class HelixHabitatMaterial extends NodeMaterial {
         scene: Scene,
     ) {
         super("HelixHabitatMaterial", scene);
-        this.mode = NodeMaterialModes.Material;
 
         const position = vertexAttribute("position");
         const normal = vertexAttribute("normal");
@@ -105,21 +99,7 @@ export class HelixHabitatMaterial extends NodeMaterial {
             perturbedNormal: perturbedNormal.output,
         });
 
-        const lightEmission = mul(
-            mul(
-                smoothstep(f(0.48), f(0.5), fract(scaledUvX)),
-                sub(f(1), smoothstep(f(0.5), f(0.52), fract(scaledUvX))),
-            ),
-            mul(
-                smoothstep(f(0.4), f(0.45), fract(scaledUvY)),
-                sub(f(1), smoothstep(f(0.55), f(0.6), fract(scaledUvY))),
-            ),
-        );
-
-        const lightColor = vec3(f(1), f(1), f(0.7));
-
-        const finalColor = add(pbrColor.lighting, mul(lightEmission, lightColor));
-        const fragOutput = outputFragColor(finalColor);
+        const fragOutput = outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(fragOutput);
 

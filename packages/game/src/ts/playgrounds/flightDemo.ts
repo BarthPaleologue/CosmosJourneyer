@@ -19,7 +19,7 @@ import {
     Color3,
     DirectionalLight,
     MeshBuilder,
-    PBRMetallicRoughnessMaterial,
+    PBRMaterial,
     SolidParticleSystem,
     type SolidParticle,
 } from "@babylonjs/core";
@@ -88,10 +88,11 @@ export async function createFlightDemoScene(
 
     const mesh = boxesSPS.buildMesh();
 
-    const material = new PBRMetallicRoughnessMaterial("material", scene);
-    material.baseColor = new Color3(0.5, 0.5, 0.5);
-    material.metallic = 0.0;
+    const material = new PBRMaterial("material", scene);
+    material.albedoColor = new Color3(0.5, 0.5, 0.5);
+    material.metallic = 1.0;
     material.roughness = 0.5;
+    material.useGLTFLightFalloff = true;
 
     mesh.material = material;
 

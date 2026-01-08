@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
@@ -74,6 +76,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     private readonly landingPadManager: LandingPadManager;
 
+    private readonly lightContainer: ClusteredLightContainer;
+
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
@@ -116,6 +120,19 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
+
+        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, this.getLights(), scene);
+    }
+
+    getLights(): Array<Light> {
+        const result: Array<Light> = [];
+        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
+        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
+        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
+        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
+        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
+        return result;
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -188,9 +205,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 0.4],
-                [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3],
+                [SpaceStationNodeType.RING_HABITAT, 1 / 3],
+                [SpaceStationNodeType.HELIX_HABITAT, 1 / 3],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 1 / 3],
             ],
             rng(17),
         );
@@ -330,6 +347,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.engineBays.forEach((engineBay) => {
             engineBay.dispose();
         });
+
+        this.lightContainer.dispose();
 
         this.root.dispose();
     }

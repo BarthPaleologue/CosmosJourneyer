@@ -22,10 +22,8 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     abs,
-    add,
     atan2,
     f,
-    fract,
     length,
     mix,
     mul,
@@ -34,7 +32,6 @@ import {
     pbr,
     perturbNormal,
     remap,
-    smoothstep,
     splitVec,
     step,
     sub,
@@ -48,7 +45,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec2,
-    vec3,
     vertexAttribute,
     xz,
 } from "@/frontend/helpers/bsl";
@@ -116,24 +112,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
             perturbedNormal: perturbedNormal.output,
         });
 
-        const lightEmission = mul(
-            mask,
-            mul(
-                mul(
-                    smoothstep(f(0.48), f(0.5), fract(proceduralUvX)),
-                    sub(f(1), smoothstep(f(0.5), f(0.52), fract(proceduralUvX))),
-                ),
-                mul(
-                    smoothstep(f(0.4), f(0.45), fract(proceduralUvY)),
-                    sub(f(1), smoothstep(f(0.55), f(0.6), fract(proceduralUvY))),
-                ),
-            ),
-        );
-
-        const lightColor = vec3(f(1), f(1), f(0.7));
-
-        const finalColor = add(pbrColor.lighting, mul(lightEmission, lightColor));
-        const fragOutput = outputFragColor(finalColor);
+        const fragOutput = outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(fragOutput);
 
