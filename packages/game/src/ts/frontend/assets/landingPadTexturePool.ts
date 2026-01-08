@@ -41,7 +41,7 @@ export class LandingPadTexturePool {
         );
 
         //Add text to dynamic texture
-        const font = `bold 256px ${Settings.MAIN_FONT}`;
+        const font = `bold 512px ${Settings.MAIN_FONT}`;
         numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
 
         this.landingPadTextures.set(padNumber, numberTexture);

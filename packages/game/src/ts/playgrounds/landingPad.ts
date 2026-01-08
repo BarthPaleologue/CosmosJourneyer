@@ -25,13 +25,15 @@ import {
     type AbstractEngine,
 } from "@babylonjs/core";
 
+import { LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import { LandingPadMaterial } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadMaterial";
 import {
     ProceduralSpotLightInstances,
     type ProceduralSpotLightInstanceData,
 } from "@/frontend/assets/procedural/spotLight";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadConcreteTextures } from "@/frontend/assets/textures/concrete";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -57,9 +59,13 @@ export async function createLandingPadScene(
     controls.getTransform().position.copyFromFloats(0, 30, -100);
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadConcreteTextures(scene, progressMonitor);
+    const numberTexturePool = new LandingPadTexturePool();
+    const landingPadMaterial = new LandingPadMaterial(textures, scene);
 
-    const landingPad = new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
+    const landingPad = new LandingPad("LandingPad", LandingPadSize.MEDIUM, landingPadMaterial, scene, {
+        centerDecalTexture: numberTexturePool.get(42, scene),
+    });
 
     const spotLights = new ProceduralSpotLightInstances(Math.PI / 2, scene);
 

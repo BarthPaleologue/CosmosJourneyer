@@ -209,11 +209,15 @@ export class LandingBay {
         const lightInstanceData: Array<ProceduralSpotLightInstanceData> = [];
         for (let row = 0; row < heightFactor; row++) {
             for (let i = 0; i < nbPads; i++) {
+                const landingPadIndex = padNumber++;
                 const landingPad = new LandingPad(
-                    padNumber++,
+                    `Landing Pad ${landingPadIndex}`,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
-                    assets.textures,
+                    assets.materials.landingPad,
                     scene,
+                    {
+                        centerDecalTexture: assets.textures.pools.landingPad.get(landingPadIndex, scene),
+                    },
                 );
                 landingPad.getTransform().parent = this.getTransform();
 
