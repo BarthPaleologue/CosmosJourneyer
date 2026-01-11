@@ -38,6 +38,7 @@ import { Light } from "@babylonjs/core/Lights/light";
 import { AddBlock } from "@babylonjs/core/Materials/Node/Blocks/addBlock";
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import { ColorConverterBlock } from "@babylonjs/core/Materials/Node/Blocks/colorConverterBlock";
+import { ColorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/colorSplitterBlock";
 import { CrossBlock } from "@babylonjs/core/Materials/Node/Blocks/crossBlock";
 import { DistanceBlock } from "@babylonjs/core/Materials/Node/Blocks/distanceBlock";
 import { DivideBlock } from "@babylonjs/core/Materials/Node/Blocks/divideBlock";
@@ -179,7 +180,7 @@ export function vertexAttribute(
     return attribute.output;
 }
 
-export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3";
+export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3" | "instanceColor";
 
 /**
  * Returns an instance attribute input block for the given name.
@@ -932,6 +933,15 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
             inputVec.connectTo(splitBlock.xyzw);
             break;
     }
+
+    return splitBlock;
+}
+
+export function splitRgba(inputColor: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const splitBlock = new ColorSplitterBlock("splitColor");
+    splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    inputColor.connectTo(splitBlock.rgba);
 
     return splitBlock;
 }
