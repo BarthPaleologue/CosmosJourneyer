@@ -38,7 +38,7 @@ export function createSpotLightsScene(
 
     MeshBuilder.CreateGround("ground", { width: groundSize, height: groundSize }, scene);
 
-    const spotLightInstances = new ProceduralSpotLightInstances(Math.PI / 2, 0.3, 10, 3, scene);
+    const spotLightInstances = new ProceduralSpotLightInstances(Math.PI / 2, 0.3, 3, scene);
 
     const instanceData: Array<{ rootPosition: Vector3; lookAtTarget: Vector3; upDirection: Vector3; color: Color3 }> =
         [];
@@ -49,11 +49,11 @@ export function createSpotLightsScene(
         const position = new Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
         const target = new Vector3(
             (Math.random() - 0.5) * groundSize,
-            (Math.random() - 0.5) * 2,
+            -Math.random() * 50,
             (Math.random() - 0.5) * groundSize,
         );
 
-        const color = Color3.Random();
+        const color = Color3.FromHSV(Math.random() * 360, 0.7, 1);
 
         instanceData.push({ rootPosition: position, lookAtTarget: target, color, upDirection: Vector3.UpReadOnly });
     }

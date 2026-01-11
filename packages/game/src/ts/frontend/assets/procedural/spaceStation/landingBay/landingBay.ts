@@ -20,6 +20,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -39,8 +40,10 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
+import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
@@ -201,6 +204,7 @@ export class LandingBay {
 
         const nbPads = nbSteps;
         let padNumber = 0;
+        const lightInstanceData: Array<ProceduralSpotLightInstanceData> = [];
         for (let row = 0; row < heightFactor; row++) {
             for (let i = 0; i < nbPads; i++) {
                 const landingPad = new LandingPad(
@@ -212,9 +216,7 @@ export class LandingBay {
                 landingPad.getTransform().parent = this.getTransform();
 
                 landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
-
                 landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
-
                 landingPad.getTransform().rotate(Axis.Y, -Math.PI / 2, Space.LOCAL);
 
                 landingPad
@@ -234,20 +236,25 @@ export class LandingBay {
                     );
 
                 this.landingPads.push(landingPad);
+
+                const landingPadCenter = landingPad.getTransform().position;
+                const landingPadUp = landingPad.getTransform().up;
+                for (const corner of landingPad.getCorners()) {
+                    lightInstanceData.push({
+                        rootPosition: corner,
+                        lookAtTarget: landingPadCenter,
+                        color: Color3.White(),
+                        upDirection: landingPadUp,
+                        range: 50 * landingPad.getPadSize(),
+                    });
+                }
             }
         }
 
-        this.getTransform().computeWorldMatrix(true);
-
-        const bb = this.getTransform().getHierarchyBoundingVectors();
-        const extend = bb.max.subtract(bb.min);
-        const center = bb.min.add(extend.scale(0.5));
-
-        this.getTransform()
-            .getChildMeshes(true)
-            .forEach((mesh) => {
-                mesh.position.subtractInPlace(center);
-            });
+        const proceduralSpotLights = new ProceduralSpotLightInstances(degreesToRadians(120), 2, 20, scene);
+        proceduralSpotLights.getTransform().parent = this.getTransform();
+        proceduralSpotLights.setInstances(lightInstanceData);
+        this.lights.push(...proceduralSpotLights.lights);
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -299,7 +306,7 @@ export class LandingBay {
     }
 
     getLights(): Array<Light> {
-        return this.lights.concat(this.landingPads.flatMap((pad) => pad.getLights()));
+        return this.lights;
     }
 
     getTransform(): TransformNode {

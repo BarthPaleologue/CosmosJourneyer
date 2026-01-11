@@ -15,10 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ClusteredLightContainer, GlowLayer, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import {
+    ClusteredLightContainer,
+    Color3,
+    GlowLayer,
+    HemisphericLight,
+    Scene,
+    Vector3,
+    type AbstractEngine,
+} from "@babylonjs/core";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import {
+    ProceduralSpotLightInstances,
+    type ProceduralSpotLightInstanceData,
+} from "@/frontend/assets/procedural/spotLight";
 import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
@@ -49,7 +61,24 @@ export async function createLandingPadScene(
 
     const landingPad = new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
 
-    new ClusteredLightContainer("lightContainer", landingPad.getLights(), scene);
+    const spotLights = new ProceduralSpotLightInstances(Math.PI / 2, 2, 20, scene);
+
+    const instanceData: Array<ProceduralSpotLightInstanceData> = [];
+    for (const corner of landingPad.getCorners()) {
+        instanceData.push({
+            rootPosition: corner,
+            lookAtTarget: landingPad.getTransform().position,
+            color: Color3.White(),
+            upDirection: landingPad.getTransform().up,
+            range: 50 * landingPad.getPadSize(),
+        });
+    }
+    spotLights.setInstances(instanceData);
+
+    new ClusteredLightContainer("lightContainer", spotLights.lights, scene);
+
+    const ambient = new HemisphericLight("ambientLight", Vector3.Up(), scene);
+    ambient.intensity = 0.3;
 
     new GlowLayer("glow", scene);
 

@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Light } from "@babylonjs/core/Lights/light";
-import { SpotLight } from "@babylonjs/core/Lights/spotLight";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -28,9 +27,6 @@ import { type Scene } from "@babylonjs/core/scene";
 import type { Textures } from "@/frontend/assets/textures";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import type { RGBColor } from "@/utils/colors";
-import { degreesToRadians } from "@/utils/physics/unitConversions";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
@@ -92,71 +88,6 @@ export class LandingPad implements ILandingPad {
             minDistance: this.getBoundingRadius() * 4.0,
             maxDistance: this.getBoundingRadius() * 6.0,
         };
-
-        const lightHeight = 20;
-        const lightInset = Math.min(2, Math.min(this.width, this.depth) * 0.05);
-        const halfWidth = this.width / 2 - lightInset;
-        const halfDepth = this.depth / 2 - lightInset;
-        const corners: ReadonlyArray<{ x: number; z: number }> = [
-            { x: halfWidth, z: halfDepth },
-            { x: -halfWidth, z: halfDepth },
-            { x: -halfWidth, z: -halfDepth },
-            { x: halfWidth, z: -halfDepth },
-        ];
-
-        for (const corner of corners) {
-            const position = new Vector3(corner.x, lightHeight, corner.z);
-            const target = new Vector3(corner.x / 2, 0, corner.z / 2);
-            const direction = target.subtract(position).normalize();
-            const light = new SpotLight(
-                `LandingPadLight${this.padNumber}`,
-                position,
-                direction,
-                degreesToRadians(120),
-                6,
-                scene,
-                true,
-            );
-            light.diffuse.copyFromFloats(1, 1, 0.8);
-            light.intensity = 10;
-            light.parent = this.getTransform();
-            light.range = this.depth;
-            this.lights.push(light);
-        }
-
-        /*this.spotLights = corners.map((corner) => {
-            const proceduralSpotLight = new ProceduralSpotLight(
-                degreesToRadians(120),
-                this.padSize * 0.6,
-                this.depth,
-                scene,
-            );
-            proceduralSpotLight.getTransform().position.set(corner.x, lightHeight, corner.z);
-            proceduralSpotLight.getTransform().parent = this.getTransform();
-            lookAt(
-                proceduralSpotLight.getTransform(),
-                new Vector3(corner.x / 2, 0, corner.z / 2),
-                sceneUsesRightHanded,
-            );
-
-            const lampPost = MeshBuilder.CreateCylinder(
-                "Lamp Post",
-                {
-                    diameter: 0.3,
-                    height: lightHeight,
-                },
-                scene,
-            );
-            lampPost.position.set(corner.x, lightHeight / 2, corner.z);
-            lampPost.parent = this.getTransform();
-
-            const lampPostMaterial = new PBRMetallicRoughnessMaterial("LampPostMaterial", scene);
-            lampPostMaterial.metallic = 1;
-            lampPostMaterial.roughness = 0.4;
-            lampPost.material = lampPostMaterial;
-
-            return proceduralSpotLight;
-        });*/
     }
 
     disablePhysics() {
@@ -199,14 +130,19 @@ export class LandingPad implements ILandingPad {
         return this.boundingRadius;
     }
 
-    getLights(): Array<Light> {
-        return this.lights;
-    }
+    getCorners(): [Vector3, Vector3, Vector3, Vector3] {
+        const halfWidth = this.width / 2;
+        const halfDepth = this.depth / 2;
 
-    setLightsColor({ r, g, b }: RGBColor): void {
-        for (const light of this.lights) {
-            light.diffuse.copyFromFloats(r, g, b);
-        }
+        const forward = this.getTransform().forward;
+        const right = this.getTransform().right;
+
+        return [
+            this.getTransform().position.add(forward.scale(halfDepth)).add(right.scale(-halfWidth)),
+            this.getTransform().position.add(forward.scale(halfDepth)).add(right.scale(halfWidth)),
+            this.getTransform().position.add(forward.scale(-halfDepth)).add(right.scale(halfWidth)),
+            this.getTransform().position.add(forward.scale(-halfDepth)).add(right.scale(-halfWidth)),
+        ];
     }
 
     dispose() {

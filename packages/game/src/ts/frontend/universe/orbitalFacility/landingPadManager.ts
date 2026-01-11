@@ -17,13 +17,12 @@
 
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 
-import type { RGBColor } from "@/utils/colors";
-
-export const enum LandingPadSize {
-    SMALL = 1,
-    MEDIUM = 2,
-    LARGE = 3,
-}
+export const LandingPadSize = {
+    SMALL: 1,
+    MEDIUM: 2,
+    LARGE: 3,
+} as const;
+export type LandingPadSize = (typeof LandingPadSize)[keyof typeof LandingPadSize];
 
 export type LandingRequest = {
     minimumPadSize: LandingPadSize;
@@ -33,7 +32,6 @@ export interface ILandingPad extends Targetable {
     getPadNumber(): number;
     getPadSize(): LandingPadSize;
     getPadHeight(): number;
-    setLightsColor(color: RGBColor): void;
 }
 
 /**
@@ -98,12 +96,10 @@ export class LandingPadManager {
     }
 
     private markPadAsUnavailable(landingPad: ILandingPad): void {
-        landingPad.setLightsColor({ r: 1, g: 0, b: 0 });
         this.unavailableLandingPads.add(landingPad);
     }
 
     private markPadAsAvailable(landingPad: ILandingPad): void {
-        landingPad.setLightsColor({ r: 1, g: 1, b: 1 });
         this.unavailableLandingPads.delete(landingPad);
     }
 }
