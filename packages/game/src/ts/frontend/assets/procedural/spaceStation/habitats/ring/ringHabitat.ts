@@ -252,6 +252,7 @@ export class RingHabitat implements Transformable {
 
             const light = new PointLight("RingHabitatLight", position, scene, true);
             light.range = 200;
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             light.parent = this.getTransform();
             this.lights.push(light);
         }
