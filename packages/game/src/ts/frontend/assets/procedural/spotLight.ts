@@ -49,18 +49,18 @@ export class ProceduralSpotLightInstances implements Transformable {
 
     private readonly scene: Scene;
 
-    constructor(aperture: number, size: number, height: number, scene: Scene) {
+    constructor(lightAperture: number, capSize: number, postHeight: number, scene: Scene) {
         this.root = new TransformNode("ProceduralSpotLightInstancesRoot", scene);
 
         this.lampPost = MeshBuilder.CreateCylinder(
             "Lamp Post",
             {
-                diameter: 0.3,
-                height: height,
+                diameter: capSize * 0.3,
+                height: postHeight,
             },
             scene,
         );
-        this.lampPost.translate(Vector3.UpReadOnly, height / 2);
+        this.lampPost.translate(Vector3.UpReadOnly, postHeight / 2);
         this.lampPost.bakeCurrentTransformIntoVertices();
         this.lampPost.parent = this.root;
 
@@ -69,20 +69,22 @@ export class ProceduralSpotLightInstances implements Transformable {
         lampPostMaterial.roughness = 0.4;
         this.lampPost.material = lampPostMaterial;
 
-        this.height = height;
-        this.aperture = aperture;
+        this.height = postHeight;
+        this.aperture = lightAperture;
         this.scene = scene;
 
-        const lightCapHeight = size;
+        const lightCapHeight = capSize;
         this.lightCap = MeshBuilder.CreateCylinder(
             "Light Cap",
             {
-                diameterBottom: Math.tan(aperture / 2) * lightCapHeight,
-                diameterTop: Math.tan(aperture / 2) * lightCapHeight * 2,
+                diameterBottom: Math.tan(lightAperture / 2) * lightCapHeight,
+                diameterTop: Math.tan(lightAperture / 2) * lightCapHeight * 2,
                 height: lightCapHeight,
             },
             scene,
         );
+        this.lightCap.translate(Vector3.UpReadOnly, lightCapHeight / 2);
+        this.lightCap.bakeCurrentTransformIntoVertices();
         this.lightCap.parent = this.root;
 
         const lightCapMaterial = new PBRMaterial("LightCapMaterial", scene);
@@ -93,12 +95,12 @@ export class ProceduralSpotLightInstances implements Transformable {
         this.lightDisk = MeshBuilder.CreateDisc(
             "Light Disk",
             {
-                radius: Math.tan(aperture / 2) * lightCapHeight * 0.8,
+                radius: Math.tan(lightAperture / 2) * lightCapHeight * 0.8,
             },
             scene,
         );
         this.lightDisk.rotate(Vector3.RightReadOnly, Math.PI / 2);
-        this.lightDisk.translate(Vector3.RightHandedForwardReadOnly, lightCapHeight / 2);
+        this.lightDisk.translate(Vector3.RightHandedForwardReadOnly, lightCapHeight);
         this.lightDisk.bakeCurrentTransformIntoVertices();
         this.lightDisk.parent = this.root;
 
