@@ -177,6 +177,9 @@ export class UtilitySection implements Transformable {
     }
 
     dispose() {
+        for (const light of this.lights) {
+            light.dispose();
+        }
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();
         this.metalSectionMaterial.dispose();
