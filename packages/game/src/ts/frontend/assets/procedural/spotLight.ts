@@ -18,7 +18,7 @@
 import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -26,14 +26,46 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
-export class ProceduralSpotLight implements Transformable {
-    readonly lightCap: Mesh;
+export type ProceduralSpotLightInstanceData = {
+    rootPosition: Vector3;
+    upDirection?: Vector3;
+    lookAtTarget: Vector3;
+    color: Color3;
+    range?: number;
+};
 
-    readonly light: SpotLight;
+export class ProceduralSpotLightInstances implements Transformable {
+    private readonly lampPost: Mesh;
 
-    readonly color = Color3.White();
+    private readonly lightCap: Mesh;
 
-    constructor(aperture: number, size: number, range: number, scene: Scene) {
+    private readonly lightDisk: Mesh;
+    private readonly lightDiskMaterial: StandardMaterial;
+
+    readonly lights: Array<SpotLight> = [];
+
+    private readonly height: number;
+
+    private readonly aperture: number;
+
+    private readonly scene: Scene;
+
+    constructor(aperture: number, size: number, range: number, height: number, scene: Scene) {
+        this.lampPost = MeshBuilder.CreateCylinder(
+            "Lamp Post",
+            {
+                diameter: 0.1,
+                height: height,
+            },
+            scene,
+        );
+        this.lampPost.translate(Vector3.UpReadOnly, height / 2);
+        this.lampPost.bakeCurrentTransformIntoVertices();
+
+        this.height = height;
+        this.aperture = aperture;
+        this.scene = scene;
+
         const lightCapHeight = size;
         this.lightCap = MeshBuilder.CreateCylinder(
             "Light Cap",
@@ -44,42 +76,87 @@ export class ProceduralSpotLight implements Transformable {
             },
             scene,
         );
-        this.lightCap.rotation.x = -Math.PI / 2;
-        this.lightCap.bakeCurrentTransformIntoVertices();
-        this.lightCap.position.addInPlace(Vector3.Forward(scene.useRightHandedSystem).scale(lightCapHeight / 2));
         this.lightCap.bakeCurrentTransformIntoVertices();
 
-        const lightDisk = MeshBuilder.CreateDisc(
+        this.lightDisk = MeshBuilder.CreateDisc(
             "Light Disk",
             {
                 radius: Math.tan(aperture / 2) * lightCapHeight * 0.8,
             },
             scene,
         );
-        lightDisk.parent = this.lightCap;
-        lightDisk.position.addInPlace(Vector3.Forward(scene.useRightHandedSystem).scale(lightCapHeight + 0.01));
+        this.lightDisk.rotate(Vector3.RightReadOnly, Math.PI / 2);
+        this.lightDisk.translate(Vector3.RightHandedForwardReadOnly, lightCapHeight / 2);
+        this.lightDisk.bakeCurrentTransformIntoVertices();
 
-        const lightCapDiskMaterial = new StandardMaterial("LightCapDiskMaterial", scene);
-        lightCapDiskMaterial.emissiveColor = this.color;
-        lightCapDiskMaterial.disableLighting = true;
-        lightDisk.material = lightCapDiskMaterial;
+        this.lightDisk.thinInstanceRegisterAttribute("color", 4);
 
-        this.light = new SpotLight(
-            "SpotLight",
-            Vector3.Zero(),
-            Vector3.Forward(scene.useRightHandedSystem),
-            aperture,
-            2,
-            scene,
-        );
-        this.light.range = range;
-        this.light.diffuse = this.color;
-        this.light.specular = this.color;
+        this.lightDiskMaterial = new StandardMaterial("LightCapDiskMaterial", scene);
+        this.lightDiskMaterial.emissiveColor = Color3.White();
+        this.lightDiskMaterial.disableLighting = true;
+        this.lightDiskMaterial.zOffset = -2;
 
-        this.light.parent = this.lightCap;
+        this.lightDisk.material = this.lightDiskMaterial;
+    }
+
+    setInstances(instanceData: ReadonlyArray<ProceduralSpotLightInstanceData>): void {
+        const instanceCount = instanceData.length;
+        const postTransforms = new Float32Array(instanceCount * 16);
+        const lampTransforms = new Float32Array(instanceCount * 16);
+        const lightColors = new Float32Array(instanceCount * 4);
+        for (const [i, { rootPosition, upDirection, lookAtTarget, color, range }] of instanceData.entries()) {
+            const upDirectionFinal = upDirection ?? Vector3.UpReadOnly;
+            const postTransform = Matrix.Compose(
+                Vector3.OneReadOnly,
+                Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, upDirectionFinal, Quaternion.Identity()),
+                rootPosition,
+            );
+            postTransform.copyToArray(postTransforms, i * 16);
+
+            const lampPosition = rootPosition.add(upDirectionFinal.scale(this.height));
+            const lampTransform = Matrix.Compose(
+                Vector3.OneReadOnly,
+                Quaternion.FromUnitVectorsToRef(
+                    Vector3.UpReadOnly,
+                    lookAtTarget.subtract(lampPosition).normalize(),
+                    Quaternion.Identity(),
+                ),
+                lampPosition,
+            );
+            lampTransform.copyToArray(lampTransforms, i * 16);
+
+            lightColors[i * 4 + 0] = color.r;
+            lightColors[i * 4 + 1] = color.g;
+            lightColors[i * 4 + 2] = color.b;
+            lightColors[i * 4 + 3] = 1;
+
+            const light = new SpotLight(
+                "ProceduralSpotLight",
+                lampPosition,
+                lookAtTarget.subtract(lampPosition).normalize(),
+                this.aperture,
+                6,
+                this.scene,
+                true,
+            );
+            light.diffuse = color;
+            light.range = range ?? 10;
+            this.lights.push(light);
+        }
+
+        this.lampPost.thinInstanceSetBuffer("matrix", postTransforms, 16, true);
+        this.lightCap.thinInstanceSetBuffer("matrix", lampTransforms, 16, true);
+        this.lightDisk.thinInstanceSetBuffer("matrix", lampTransforms, 16, true);
+        this.lightDisk.thinInstanceSetBuffer("color", lightColors, 4, true);
     }
 
     getTransform(): TransformNode {
         return this.lightCap;
+    }
+
+    dispose() {
+        this.lightDiskMaterial.dispose();
+        this.lampPost.dispose();
+        this.lightCap.dispose();
     }
 }

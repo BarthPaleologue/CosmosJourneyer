@@ -49,6 +49,7 @@ import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSpotLightsScene } from "./spotLights";
 import { createStarMapScene } from "./starMap";
 import { createStarMapViewScene } from "./starMapView";
 import { createStarSystemViewScene } from "./starSystemView";
@@ -104,6 +105,7 @@ export class PlaygroundRegistry {
         ["butterfly", createButterflyScene],
         ["telluricPlanet", createTelluricPlanetScene],
         ["landingPad", createLandingPadScene],
+        ["spotLights", createSpotLightsScene],
     ]);
 
     register(
