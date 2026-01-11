@@ -33,7 +33,7 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { createCircle as createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
+import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";

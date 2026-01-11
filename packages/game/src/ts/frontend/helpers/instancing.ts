@@ -17,7 +17,7 @@
 
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export function createCircle(radius: number, nbPoints: number) {
+export function createCircleInstanceBuffer(radius: number, nbPoints: number) {
     const buffer = new Float32Array(16 * nbPoints);
 
     for (let i = 0; i < nbPoints; i++) {
