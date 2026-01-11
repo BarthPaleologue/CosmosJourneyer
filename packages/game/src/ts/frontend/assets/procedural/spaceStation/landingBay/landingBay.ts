@@ -172,7 +172,7 @@ export class LandingBay {
         const armOffset = Math.sqrt(armHeight * armHeight - this.radius * this.radius);
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
-                `RingHabitatArm${i}`,
+                `LandingBayArm${i}`,
                 {
                     height: armHeight,
                     diameter: armDiameter,

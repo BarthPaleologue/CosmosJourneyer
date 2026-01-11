@@ -18,6 +18,7 @@
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
@@ -285,16 +286,16 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {
-        const previousBoundingVectors = parent.getHierarchyBoundingVectors();
-        const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+        // Make sure bounds are current
+        parent.computeWorldMatrix(true);
+        node.computeWorldMatrix(true);
 
-        const newBoundingVectors = node.getHierarchyBoundingVectors();
-        const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+        const parentBV = parent.getHierarchyBoundingVectors();
+        const nodeBV = node.getHierarchyBoundingVectors();
 
-        const previousSectionSizeY = previousBoundingExtendSize.y;
-        const newSectionY = newBoundingExtendSize.y;
+        const deltaY = parentBV.max.y - nodeBV.min.y; // bring node bottom to parent top
 
-        node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
+        node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
