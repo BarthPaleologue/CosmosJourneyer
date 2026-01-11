@@ -53,6 +53,7 @@ export class Thruster {
             degreesToRadians(160),
             2,
             mesh.getScene(),
+            true,
         );
         this.light.range = 200;
         this.light.parent = mesh;
