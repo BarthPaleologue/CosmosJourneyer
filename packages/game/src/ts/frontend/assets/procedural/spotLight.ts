@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SpotLight } from "@babylonjs/core/Lights/spotLight";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Material } from "@babylonjs/core/Materials/material";
+import { type Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -25,6 +25,8 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
+
+import { InstanceGlowMaterial } from "../materials/instanceGlow";
 
 export type ProceduralSpotLightInstanceData = {
     rootPosition: Vector3;
@@ -40,7 +42,7 @@ export class ProceduralSpotLightInstances implements Transformable {
     private readonly lightCap: Mesh;
 
     private readonly lightDisk: Mesh;
-    private readonly lightDiskMaterial: StandardMaterial;
+    private readonly lightDiskMaterial: Material;
 
     readonly lights: Array<SpotLight> = [];
 
@@ -91,9 +93,7 @@ export class ProceduralSpotLightInstances implements Transformable {
 
         this.lightDisk.thinInstanceRegisterAttribute("color", 4);
 
-        this.lightDiskMaterial = new StandardMaterial("LightCapDiskMaterial", scene);
-        this.lightDiskMaterial.emissiveColor = Color3.White();
-        this.lightDiskMaterial.disableLighting = true;
+        this.lightDiskMaterial = new InstanceGlowMaterial(scene).get();
         this.lightDiskMaterial.zOffset = -2;
 
         this.lightDisk.material = this.lightDiskMaterial;
