@@ -210,9 +210,12 @@ export class LandingPad implements ILandingPad {
     }
 
     dispose() {
-        this.deck.dispose();
+        for (const light of this.lights) {
+            light.dispose();
+        }
         this.deckAggregate?.dispose();
         this.deckMaterial.dispose();
+        this.deck.dispose();
     }
 
     getTypeName(): string {
