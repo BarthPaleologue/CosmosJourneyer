@@ -35,7 +35,7 @@ import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
@@ -65,6 +65,8 @@ export class LandingBay {
     private readonly armAggregates: PhysicsAggregate[] = [];
 
     readonly landingPads: LandingPad[] = [];
+
+    private readonly landingPadLights: ProceduralSpotLightInstances;
 
     private readonly lights: Array<Light> = [];
 
@@ -254,10 +256,26 @@ export class LandingBay {
             }
         }
 
-        const proceduralSpotLights = new ProceduralSpotLightInstances(degreesToRadians(120), scene);
-        proceduralSpotLights.getTransform().parent = this.getTransform();
-        proceduralSpotLights.setInstances(lightInstanceData);
-        this.lights.push(...proceduralSpotLights.lights);
+        this.landingPadLights = new ProceduralSpotLightInstances(degreesToRadians(120), scene);
+        this.landingPadLights.getTransform().parent = this.getTransform();
+        this.landingPadLights.setInstances(lightInstanceData);
+        this.lights.push(...this.landingPadLights.lights);
+    }
+
+    setLandingPadStatus(landingPadIndex: number, status: LandingPadStatus) {
+        const statusColor = new Color3();
+        switch (status) {
+            case LandingPadStatus.AVAILABLE:
+                statusColor.copyFromFloats(1, 1, 0.8);
+                break;
+            case LandingPadStatus.OCCUPIED:
+                statusColor.copyFromFloats(1, 0, 0);
+                break;
+        }
+        this.landingPadLights.setColorAt(landingPadIndex * 4, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 1, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 2, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 3, statusColor);
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {

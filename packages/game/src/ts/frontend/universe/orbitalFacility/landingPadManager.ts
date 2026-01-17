@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Observable } from "@babylonjs/core/Misc/observable";
+
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 
 export const LandingPadSize = {
@@ -40,20 +42,23 @@ export const LandingPadStatus = {
 } as const;
 export type LandingPadStatus = (typeof LandingPadStatus)[keyof typeof LandingPadStatus];
 
+export type StatusChangedHandler = (status: LandingPadStatus) => void;
+
 /**
  * Manages landing pads for orbital facilities such as space stations and space elevators
  */
 export class LandingPadManager {
     private readonly landingPads: ReadonlyArray<ILandingPad>;
     private readonly landingPadStatus: Map<ILandingPad, LandingPadStatus> = new Map();
+    readonly onStatusChanged: Observable<{ pad: ILandingPad; status: LandingPadStatus }> = new Observable();
 
     /**
      * @param landingPads Array of landing pads to be managed
      */
     constructor(landingPads: ReadonlyArray<ILandingPad>) {
-        this.landingPads = [...landingPads]; // Create immutable copy
-        for (const landingPad of this.landingPads) {
-            this.landingPadStatus.set(landingPad, LandingPadStatus.AVAILABLE);
+        this.landingPads = [...landingPads];
+        for (const pad of this.landingPads) {
+            this.setPadState(pad, LandingPadStatus.AVAILABLE);
         }
     }
 
@@ -76,7 +81,7 @@ export class LandingPadManager {
             return null;
         }
 
-        this.markPadAsUnavailable(availablePad);
+        this.setPadState(availablePad, LandingPadStatus.OCCUPIED);
         return availablePad;
     }
 
@@ -85,7 +90,7 @@ export class LandingPadManager {
      * @param pad The landing pad to make available
      */
     public cancelLandingRequest(pad: ILandingPad): void {
-        this.markPadAsAvailable(pad);
+        this.setPadState(pad, LandingPadStatus.AVAILABLE);
     }
 
     /**
@@ -104,11 +109,8 @@ export class LandingPadManager {
         });
     }
 
-    private markPadAsUnavailable(landingPad: ILandingPad): void {
-        this.landingPadStatus.set(landingPad, LandingPadStatus.OCCUPIED);
-    }
-
-    private markPadAsAvailable(landingPad: ILandingPad): void {
-        this.landingPadStatus.set(landingPad, LandingPadStatus.AVAILABLE);
+    private setPadState(landingPad: ILandingPad, status: LandingPadStatus): void {
+        this.landingPadStatus.set(landingPad, status);
+        this.onStatusChanged.notifyObservers({ pad: landingPad, status });
     }
 }

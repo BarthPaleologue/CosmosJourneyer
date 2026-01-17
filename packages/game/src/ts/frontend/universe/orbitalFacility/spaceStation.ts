@@ -39,7 +39,7 @@ import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -98,11 +98,24 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.generate(stellarObjects, assets);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
-        this.landingPadManager = new LandingPadManager(
-            this.landingBays.flatMap((landingBay) => {
-                return landingBay.landingPads;
-            }),
-        );
+        const allLandingPads: Array<ILandingPad> = [];
+        const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();
+        for (const bay of this.landingBays) {
+            for (const [landingPadIndex, landingPad] of bay.landingPads.entries()) {
+                allLandingPads.push(landingPad);
+                landingPadToLandingBay.set(landingPad, { bay, index: landingPadIndex });
+            }
+        }
+        this.landingPadManager = new LandingPadManager(allLandingPads);
+        this.landingPadManager.onStatusChanged.add(({ pad, status }) => {
+            const padInfo = landingPadToLandingBay.get(pad);
+            if (padInfo === undefined) {
+                console.warn("Landing pad not found in landing bay map");
+                return;
+            }
+
+            padInfo.bay.setLandingPadStatus(padInfo.index, status);
+        });
 
         // center the space station on its center of mass
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
