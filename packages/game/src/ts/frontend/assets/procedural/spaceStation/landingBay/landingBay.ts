@@ -338,6 +338,11 @@ export class LandingBay {
         this.root.dispose();
         this.ring.dispose();
 
+        this.landingPadLights.dispose();
+        for (const light of this.lights) {
+            light.dispose();
+        }
+
         this.ringAggregate?.dispose();
         this.ringAggregate = null;
 

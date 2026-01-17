@@ -186,6 +186,10 @@ export class ProceduralSpotLightInstances implements Transformable {
     }
 
     dispose() {
+        for (const light of this.lights) {
+            light.dispose();
+        }
+
         this.lampPost.dispose(false, true);
         this.lightCap.dispose(false, true);
         this.lightDisk.dispose(false, true);

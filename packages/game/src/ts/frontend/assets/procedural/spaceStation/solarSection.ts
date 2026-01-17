@@ -460,6 +460,10 @@ export class SolarSection implements Transformable {
         this.attachmentAggregate?.dispose();
         this.attachmentAggregate = null;
 
+        for (const light of this.lights) {
+            light.dispose();
+        }
+
         this.arms.forEach((arm) => {
             arm.dispose();
         });
