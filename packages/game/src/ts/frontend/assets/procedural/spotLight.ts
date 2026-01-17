@@ -34,6 +34,9 @@ export type ProceduralSpotLightInstanceData = {
     lookAtTarget: Vector3;
     color: Color3;
     range?: number;
+    lampSize?: number;
+    postHeight?: number;
+    postDiameter?: number;
 };
 
 export class ProceduralSpotLightInstances implements Transformable {
@@ -44,23 +47,22 @@ export class ProceduralSpotLightInstances implements Transformable {
 
     readonly lights: Array<SpotLight> = [];
 
-    private readonly height: number;
     private readonly aperture: number;
 
     private readonly scene: Scene;
 
-    constructor(lightAperture: number, capSize: number, postHeight: number, scene: Scene) {
+    constructor(lightAperture: number, scene: Scene) {
         this.root = new TransformNode("ProceduralSpotLightInstancesRoot", scene);
 
         this.lampPost = MeshBuilder.CreateCylinder(
             "Lamp Post",
             {
-                diameter: capSize * 0.3,
-                height: postHeight,
+                diameter: 1,
+                height: 1,
             },
             scene,
         );
-        this.lampPost.translate(Vector3.UpReadOnly, postHeight / 2);
+        this.lampPost.translate(Vector3.UpReadOnly, 0.5);
         this.lampPost.bakeCurrentTransformIntoVertices();
         this.lampPost.parent = this.root;
 
@@ -69,21 +71,19 @@ export class ProceduralSpotLightInstances implements Transformable {
         lampPostMaterial.roughness = 0.4;
         this.lampPost.material = lampPostMaterial;
 
-        this.height = postHeight;
         this.aperture = lightAperture;
         this.scene = scene;
 
-        const lightCapHeight = capSize;
         this.lightCap = MeshBuilder.CreateCylinder(
             "Light Cap",
             {
-                diameterBottom: Math.tan(lightAperture / 2) * lightCapHeight,
-                diameterTop: Math.tan(lightAperture / 2) * lightCapHeight * 2,
-                height: lightCapHeight,
+                diameterBottom: Math.tan(lightAperture / 2),
+                diameterTop: Math.tan(lightAperture / 2) * 2,
+                height: 1,
             },
             scene,
         );
-        this.lightCap.translate(Vector3.UpReadOnly, lightCapHeight / 2);
+        this.lightCap.translate(Vector3.UpReadOnly, 0.5);
         this.lightCap.bakeCurrentTransformIntoVertices();
         this.lightCap.parent = this.root;
 
@@ -95,12 +95,12 @@ export class ProceduralSpotLightInstances implements Transformable {
         this.lightDisk = MeshBuilder.CreateDisc(
             "Light Disk",
             {
-                radius: Math.tan(lightAperture / 2) * lightCapHeight * 0.8,
+                radius: Math.tan(lightAperture / 2) * 0.8,
             },
             scene,
         );
         this.lightDisk.rotate(Vector3.RightReadOnly, Math.PI / 2);
-        this.lightDisk.translate(Vector3.RightHandedForwardReadOnly, lightCapHeight);
+        this.lightDisk.translate(Vector3.RightHandedForwardReadOnly, 1);
         this.lightDisk.bakeCurrentTransformIntoVertices();
         this.lightDisk.parent = this.root;
 
@@ -117,18 +117,23 @@ export class ProceduralSpotLightInstances implements Transformable {
         const postTransforms = new Float32Array(instanceCount * 16);
         const lampTransforms = new Float32Array(instanceCount * 16);
         const lightColors = new Float32Array(instanceCount * 4);
-        for (const [i, { rootPosition, upDirection, lookAtTarget, color, range }] of instanceData.entries()) {
+        for (const [
+            i,
+            { rootPosition, upDirection, lookAtTarget, color, range, lampSize, postHeight, postDiameter },
+        ] of instanceData.entries()) {
             const upDirectionFinal = upDirection ?? Vector3.UpReadOnly;
+            const postScaling = new Vector3(postDiameter ?? 0.4, postHeight ?? 1, postDiameter ?? 0.4);
             const postTransform = Matrix.Compose(
-                Vector3.OneReadOnly,
+                postScaling,
                 Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, upDirectionFinal, Quaternion.Identity()),
                 rootPosition,
             );
             postTransform.copyToArray(postTransforms, i * 16);
 
-            const lampPosition = rootPosition.add(upDirectionFinal.scale(this.height));
+            const lampScaling = Vector3.One().scaleInPlace(lampSize ?? 0.5);
+            const lampPosition = rootPosition.add(upDirectionFinal.scale(postHeight ?? 1));
             const lampTransform = Matrix.Compose(
-                Vector3.OneReadOnly,
+                lampScaling,
                 Quaternion.FromUnitVectorsToRef(
                     Vector3.UpReadOnly,
                     lookAtTarget.subtract(lampPosition).normalize(),

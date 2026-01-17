@@ -243,15 +243,18 @@ export class LandingBay {
                     lightInstanceData.push({
                         rootPosition: corner,
                         lookAtTarget: landingPadCenter,
-                        color: Color3.White(),
+                        color: new Color3(1, 1, 0.8),
                         upDirection: landingPadUp,
                         range: 50 * landingPad.getPadSize(),
+                        lampSize: 1 * landingPad.getPadSize(),
+                        postHeight: 10 * landingPad.getPadSize(),
+                        postDiameter: 0.4 * landingPad.getPadSize(),
                     });
                 }
             }
         }
 
-        const proceduralSpotLights = new ProceduralSpotLightInstances(degreesToRadians(120), 2, 20, scene);
+        const proceduralSpotLights = new ProceduralSpotLightInstances(degreesToRadians(120), scene);
         proceduralSpotLights.getTransform().parent = this.getTransform();
         proceduralSpotLights.setInstances(lightInstanceData);
         this.lights.push(...proceduralSpotLights.lights);

@@ -20,7 +20,10 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
+import {
+    ProceduralSpotLightInstances,
+    type ProceduralSpotLightInstanceData,
+} from "@/frontend/assets/procedural/spotLight";
 
 export function createSpotLightsScene(
     engine: AbstractEngine,
@@ -38,10 +41,9 @@ export function createSpotLightsScene(
 
     MeshBuilder.CreateGround("ground", { width: groundSize, height: groundSize }, scene);
 
-    const spotLightInstances = new ProceduralSpotLightInstances(Math.PI / 2, 0.3, 3, scene);
+    const spotLightInstances = new ProceduralSpotLightInstances(Math.PI / 2, scene);
 
-    const instanceData: Array<{ rootPosition: Vector3; lookAtTarget: Vector3; upDirection: Vector3; color: Color3 }> =
-        [];
+    const instanceData: Array<ProceduralSpotLightInstanceData> = [];
     for (let i = 0; i < 1000; i++) {
         const angle = Math.random() * Math.PI * 2;
         const radius = Math.sqrt(Math.random()) * (groundSize / 2);
@@ -55,7 +57,16 @@ export function createSpotLightsScene(
 
         const color = Color3.FromHSV(Math.random() * 360, 0.7, 1);
 
-        instanceData.push({ rootPosition: position, lookAtTarget: target, color, upDirection: Vector3.UpReadOnly });
+        const postHeight = 1.5 + Math.random() * 2;
+
+        instanceData.push({
+            rootPosition: position,
+            lookAtTarget: target,
+            color,
+            upDirection: Vector3.UpReadOnly,
+            postHeight,
+            postDiameter: 0.2,
+        });
     }
 
     spotLightInstances.setInstances(instanceData);

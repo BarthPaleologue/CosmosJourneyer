@@ -61,7 +61,7 @@ export async function createLandingPadScene(
 
     const landingPad = new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
 
-    const spotLights = new ProceduralSpotLightInstances(Math.PI / 2, 2, 20, scene);
+    const spotLights = new ProceduralSpotLightInstances(Math.PI / 2, scene);
 
     const instanceData: Array<ProceduralSpotLightInstanceData> = [];
     for (const corner of landingPad.getCorners()) {
@@ -71,6 +71,8 @@ export async function createLandingPadScene(
             color: Color3.White(),
             upDirection: landingPad.getTransform().up,
             range: 50 * landingPad.getPadSize(),
+            postHeight: 10 * landingPad.getPadSize(),
+            lampSize: 2,
         });
     }
     spotLights.setInstances(instanceData);
