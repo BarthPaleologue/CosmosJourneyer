@@ -34,18 +34,27 @@ export interface ILandingPad extends Targetable {
     getPadHeight(): number;
 }
 
+export const LandingPadStatus = {
+    AVAILABLE: "available",
+    OCCUPIED: "occupied",
+} as const;
+export type LandingPadStatus = (typeof LandingPadStatus)[keyof typeof LandingPadStatus];
+
 /**
  * Manages landing pads for orbital facilities such as space stations and space elevators
  */
 export class LandingPadManager {
-    private readonly unavailableLandingPads: Set<ILandingPad> = new Set();
     private readonly landingPads: ReadonlyArray<ILandingPad>;
+    private readonly landingPadStatus: Map<ILandingPad, LandingPadStatus> = new Map();
 
     /**
      * @param landingPads Array of landing pads to be managed
      */
     constructor(landingPads: ReadonlyArray<ILandingPad>) {
         this.landingPads = [...landingPads]; // Create immutable copy
+        for (const landingPad of this.landingPads) {
+            this.landingPadStatus.set(landingPad, LandingPadStatus.AVAILABLE);
+        }
     }
 
     /**
@@ -91,15 +100,15 @@ export class LandingPadManager {
      */
     public getAvailableLandingPads(): ReadonlyArray<ILandingPad> {
         return this.getLandingPads().filter((landingPad) => {
-            return !this.unavailableLandingPads.has(landingPad);
+            return this.landingPadStatus.get(landingPad) === LandingPadStatus.AVAILABLE;
         });
     }
 
     private markPadAsUnavailable(landingPad: ILandingPad): void {
-        this.unavailableLandingPads.add(landingPad);
+        this.landingPadStatus.set(landingPad, LandingPadStatus.OCCUPIED);
     }
 
     private markPadAsAvailable(landingPad: ILandingPad): void {
-        this.unavailableLandingPads.delete(landingPad);
+        this.landingPadStatus.set(landingPad, LandingPadStatus.AVAILABLE);
     }
 }
