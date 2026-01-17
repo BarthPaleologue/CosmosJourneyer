@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Light } from "@babylonjs/core/Lights/light";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -36,8 +35,6 @@ import { LandingPadMaterial } from "./landingPadMaterial";
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
     private deckAggregate: PhysicsAggregate | null = null;
-
-    private lights: Array<Light> = [];
 
     private readonly deckMaterial: LandingPadMaterial;
 
@@ -146,9 +143,6 @@ export class LandingPad implements ILandingPad {
     }
 
     dispose() {
-        for (const light of this.lights) {
-            light.dispose();
-        }
         this.deckAggregate?.dispose();
         this.deckMaterial.dispose();
         this.deck.dispose();
