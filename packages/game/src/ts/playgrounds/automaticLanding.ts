@@ -39,7 +39,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 
 import { CollisionMask } from "@/settings";
 
-import { enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enableShadows } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
@@ -87,6 +87,8 @@ export async function createAutomaticLandingScene(
     groundAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
 
     const sun = new DirectionalLight("sun", new Vector3(1, -2, -1), scene);
+
+    createSky(sun.direction.negate(), scene);
 
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 0.1;
