@@ -21,7 +21,6 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
-import { getAngleFromQuaternion, getAxisFromQuaternion, getDeltaQuaternion } from "@/frontend/helpers/algebra";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
@@ -302,12 +301,9 @@ export class LandingComputer {
         const distance = Vector3.Distance(targetPosition, currentPosition);
         const directionToTarget = targetPosition.subtract(currentPosition).normalize();
 
-        const deltaQuaternion = getDeltaQuaternion(currentRotation, targetRotation);
-        const deltaAngle = getAngleFromQuaternion(deltaQuaternion);
-
         if (
             distance <= positionTolerance &&
-            Math.abs(deltaAngle) <= rotationTolerance &&
+            Quaternion.AreClose(currentRotation, targetRotation, rotationTolerance) &&
             currentLinearVelocity.length() < maxSpeedAtTarget &&
             currentAngularVelocity.length() < maxRotationSpeedAtTarget
         ) {
@@ -320,7 +316,8 @@ export class LandingComputer {
             return LandingComputerStatusBit.PROGRESS;
         }
 
-        const mass = this.aggregate.body.getMassProperties().mass ?? 1;
+        const massProps = this.aggregate.body.getMassProperties();
+        const mass = massProps.mass ?? 1;
 
         // Decompose the direction to target along the ship's axes
         const shipXAxis = this.transform.right;
@@ -346,22 +343,55 @@ export class LandingComputer {
         // damp speed along other directions
         this.aggregate.body.applyForce(otherSpeed.scale(-5 * mass), currentPosition);
 
-        const deltaRotation = getDeltaQuaternion(currentRotation, targetRotation);
-        const rotationAngle = getAngleFromQuaternion(deltaRotation);
-        const rotationAxis = getAxisFromQuaternion(deltaRotation);
+        // --- Rotation control (quaternion-error PD) ---
+        //
+        // Goal: drive angular velocity toward a desired angular velocity derived from quaternion error.
+        // We avoid axis/angle extraction; quaternion vector part ~ axis * sin(theta/2).
+
+        const qErr = targetRotation.multiply(currentRotation.conjugate()); // target * inverse(current)
+        if (qErr.w < 0) qErr.scaleInPlace(-1); // choose shortest-arc representation
+
+        const rotErr = new Vector3(qErr.x, qErr.y, qErr.z); // rotation error direction/magnitude proxy
+
+        // Controller gains:
+        // - kp maps orientation error -> desired angular velocity ("how aggressively to turn toward target").
+        // - kd maps angular-velocity error -> angular impulse per step ("how quickly to match the desired spin").
+        // Despite the name, kd is a gain; it produces a damping/stabilizing effect because it acts on velocity error.
+        const kp = 8.0;
+        const kd = 2.0;
 
         const angularVelocity = this.aggregate.body.getAngularVelocity();
 
-        const currentRotationSpeed = angularVelocity.dot(rotationAxis);
-        const targetRotationSpeed =
-            Math.sign(rotationAngle) * Math.min(maxRotationSpeed, 0.4 * Math.sqrt(Math.abs(rotationAngle)));
+        // Convert orientation error into a desired angular velocity (world space).
+        // For small angles, 2*rotErr ≈ axis * angle, so kp sets the response speed.
+        // Clamp so we don't demand faster spin than the action allows.
+        let desiredAngularVelocity = rotErr.scale(2 * kp);
+        if (desiredAngularVelocity.length() > maxRotationSpeed) {
+            desiredAngularVelocity = desiredAngularVelocity.normalize().scale(maxRotationSpeed);
+        }
 
-        const rotationImpulseStrength = 10 * mass * (targetRotationSpeed - currentRotationSpeed);
+        // Velocity error: how far the body is from the desired spin (world space).
+        const angVelErr = desiredAngularVelocity.subtract(angularVelocity);
 
-        this.aggregate.body.applyAngularImpulse(rotationAxis.scale(rotationImpulseStrength));
+        // Havok/BJS mass properties: inertia is documented as "for a unit mass".
+        // We build an angular impulse J such that Δω ≈ kd * angVelErr * dt, independent of mass/inertia.
+        const inertia = massProps.inertia ?? new Vector3(1, 1, 1);
+        const inertiaOrientation = massProps.inertiaOrientation ?? Quaternion.Identity();
 
-        const otherRotationSpeed = angularVelocity.subtract(rotationAxis.scale(currentRotationSpeed));
-        this.aggregate.body.applyAngularImpulse(otherRotationSpeed.scale(-0.2 * mass));
+        // Transform between world space and inertia principal-axes space.
+        const worldFromInertia = inertiaOrientation.multiply(currentRotation);
+        const inertiaFromWorld = worldFromInertia.conjugate();
+
+        // Move velocity error into inertia space, scale by (mass * inertia) to get angular momentum impulse,
+        // then rotate back to world space and apply per-step gain scaled by dt.
+        const errInInertia = angVelErr.applyRotationQuaternion(inertiaFromWorld);
+        const impulseInInertia = errInInertia.multiply(inertia).scale(mass);
+
+        const rotationImpulseWorld = impulseInInertia
+            .applyRotationQuaternion(worldFromInertia)
+            .scale(kd * deltaSeconds);
+
+        this.aggregate.body.applyAngularImpulse(rotationImpulseWorld);
 
         if (this.elapsedSeconds > this.maxSecondsPerPlan) {
             this.setTarget(null);
