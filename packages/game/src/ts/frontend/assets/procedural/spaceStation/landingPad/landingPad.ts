@@ -15,30 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Mesh } from "@babylonjs/core/Meshes";
+import { Material } from "@babylonjs/core/Materials/material";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateDecal, type Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
-import type { Textures } from "@/frontend/assets/textures";
 import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
-import { LandingPadMaterial } from "./landingPadMaterial";
-
 export class LandingPad implements ILandingPad {
     private readonly deck: Mesh;
     private deckAggregate: PhysicsAggregate | null = null;
 
-    private readonly deckMaterial: LandingPadMaterial;
+    private readonly deckMaterial: Material;
 
-    readonly padNumber: number;
     private readonly padSize: LandingPadSize;
 
     private readonly boundingRadius: number;
@@ -50,7 +49,18 @@ export class LandingPad implements ILandingPad {
     private readonly width: number;
     private readonly depth: number;
 
-    constructor(padNumber: number, padSize: LandingPadSize, textures: Textures, scene: Scene) {
+    private readonly decal: {
+        mesh: Mesh;
+        material: Material;
+    } | null;
+
+    constructor(
+        name: string,
+        padSize: LandingPadSize,
+        material: Material,
+        scene: Scene,
+        options?: Partial<{ centerDecalTexture: Texture }>,
+    ) {
         this.padSize = padSize;
 
         this.width = 40 * padSize;
@@ -58,17 +68,10 @@ export class LandingPad implements ILandingPad {
 
         this.boundingRadius = this.depth / 2;
 
-        this.padNumber = padNumber;
-
-        this.deckMaterial = new LandingPadMaterial(
-            padNumber,
-            textures.materials.concrete,
-            textures.pools.landingPad,
-            scene,
-        );
+        this.deckMaterial = material;
 
         this.deck = MeshBuilder.CreateBox(
-            `Landing Pad ${padNumber}`,
+            name,
             {
                 width: this.width,
                 depth: this.depth,
@@ -77,6 +80,31 @@ export class LandingPad implements ILandingPad {
             scene,
         );
         this.deck.material = this.deckMaterial;
+
+        if (options?.centerDecalTexture !== undefined) {
+            const decalMesh = CreateDecal(`${name} Center Decal`, this.deck, {
+                position: new Vector3(0, 0, -0.5 * this.getPadSize()),
+                normal: Vector3.Down(),
+                size: Vector3.One().scaleInPlace(this.width / 2),
+                angle: -Math.PI / 2,
+                localMode: true,
+            });
+            decalMesh.parent = this.deck;
+
+            const decalMaterial = new PBRMaterial(`${name} Center Decal Material`, scene);
+            decalMaterial.albedoTexture = options.centerDecalTexture;
+            decalMaterial.metallic = 0;
+            decalMaterial.roughness = 0.2;
+            decalMaterial.usePhysicalLightFalloff = false;
+            decalMaterial.zOffset = -2;
+            decalMaterial.transparencyMode = Material.MATERIAL_ALPHATEST;
+
+            decalMesh.material = decalMaterial;
+
+            this.decal = { mesh: decalMesh, material: decalMaterial };
+        } else {
+            this.decal = null;
+        }
 
         this.enablePhysics(scene);
 
@@ -105,10 +133,6 @@ export class LandingPad implements ILandingPad {
         this.deckAggregate.body.disablePreStep = false;
         this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
-    }
-
-    getPadNumber(): number {
-        return this.padNumber;
     }
 
     getPadSize(): LandingPadSize {
@@ -143,8 +167,9 @@ export class LandingPad implements ILandingPad {
     }
 
     dispose() {
+        this.decal?.material.dispose();
+        this.decal?.mesh.dispose();
         this.deckAggregate?.dispose();
-        this.deckMaterial.dispose();
         this.deck.dispose();
     }
 

@@ -15,35 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { Settings } from "@/settings";
+import { createSquareTextDecalTexture } from "./textures/squareTextDecalTexture";
 
 export class LandingPadTexturePool {
-    private readonly landingPadTextures: Map<number, DynamicTexture> = new Map();
+    private readonly landingPadTextures: Map<number, Texture> = new Map();
 
-    get(padNumber: number, scene: Scene): DynamicTexture {
+    get(padNumber: number, scene: Scene): Texture {
         const texture = this.landingPadTextures.get(padNumber);
         if (texture !== undefined) {
             return texture;
         }
 
-        const padNumberTextureResolution = 1024;
-        const numberTexture = new DynamicTexture(
-            `PadNumberTexture${padNumber}`,
-            {
-                width: padNumberTextureResolution,
-                height: padNumberTextureResolution * Settings.LANDING_PAD_ASPECT_RATIO,
-            },
-            scene,
-            true,
-        );
-
-        //Add text to dynamic texture
-        const font = `bold 256px ${Settings.MAIN_FONT}`;
-        numberTexture.drawText(`${padNumber}`, null, null, font, "white", null, true, true);
-
+        const numberTexture = createSquareTextDecalTexture(`PadNumberTexture${padNumber}`, `${padNumber}`, scene);
         this.landingPadTextures.set(padNumber, numberTexture);
 
         return numberTexture;

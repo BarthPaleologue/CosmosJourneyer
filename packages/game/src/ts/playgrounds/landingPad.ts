@@ -27,11 +27,13 @@ import {
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import { LandingPadMaterial } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadMaterial";
 import {
     ProceduralSpotLightInstances,
     type ProceduralSpotLightInstanceData,
 } from "@/frontend/assets/procedural/spotLight";
-import { loadTextures } from "@/frontend/assets/textures";
+import { loadConcreteTextures } from "@/frontend/assets/textures/concrete";
+import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareTextDecalTexture";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -57,9 +59,14 @@ export async function createLandingPadScene(
     controls.getTransform().position.copyFromFloats(0, 30, -100);
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadConcreteTextures(scene, progressMonitor);
+    const landingPadMaterial = new LandingPadMaterial(textures, scene);
 
-    const landingPad = new LandingPad(42, LandingPadSize.MEDIUM, textures, scene);
+    const decalTexture = createSquareTextDecalTexture("LandingPadCenterDecal", "A1", scene);
+
+    const landingPad = new LandingPad("LandingPad", LandingPadSize.MEDIUM, landingPadMaterial, scene, {
+        centerDecalTexture: decalTexture,
+    });
 
     const spotLights = new ProceduralSpotLightInstances(Math.PI / 2, scene);
 

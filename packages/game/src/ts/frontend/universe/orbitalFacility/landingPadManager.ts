@@ -31,7 +31,6 @@ export type LandingRequest = {
 };
 
 export interface ILandingPad extends Targetable {
-    getPadNumber(): number;
     getPadSize(): LandingPadSize;
     getPadHeight(): number;
 }

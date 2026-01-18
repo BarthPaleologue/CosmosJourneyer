@@ -238,7 +238,7 @@ export class ShipControls implements Controls {
             this.notificationManager.create(
                 NotificationOrigin.SPACE_STATION,
                 NotificationIntent.SUCCESS,
-                `Landing request granted. Proceed to pad ${landingPad.getPadNumber()}`,
+                `Landing request granted. Proceed to ${landingPad.getTransform().name}`,
                 30000,
             );
             spaceship.engageLandingOnPad(landingPad);

@@ -20,7 +20,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type LandingPadTexturePool } from "@/frontend/assets/landingPadTexturePool";
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     add,
@@ -54,11 +53,9 @@ import {
 import { Settings } from "@/settings";
 
 export class LandingPadMaterial extends NodeMaterial {
-    constructor(padNumber: number, textures: PBRTextures, texturePool: LandingPadTexturePool, scene: Scene) {
-        super(`LandingPadMaterial${padNumber}`, scene);
+    constructor(textures: PBRTextures, scene: Scene) {
+        super(`LandingPadMaterial`, scene);
         this.mode = NodeMaterialModes.Material;
-
-        const numberTexture = texturePool.get(padNumber, scene);
 
         // Vertex Shader
 
@@ -83,11 +80,6 @@ export class LandingPadMaterial extends NodeMaterial {
 
         // Fragment Shader
 
-        const numberUniformTexture = uniformTexture2d(numberTexture).source;
-
-        //float paintWeight = texture(numberTexture, vec2(vUV.y, vUV.x + 0.01)).a;
-        const paintMaskUV = vec2(uvSplit.y, add(uvSplit.x, f(0.01)));
-        const paintWeight = textureSample(numberUniformTexture, paintMaskUV).a;
         const paintAlbedo = vec(Vector3.One());
         const paintMetallic = f(0);
         const paintRoughness = f(0.2);
@@ -120,7 +112,7 @@ export class LandingPadMaterial extends NodeMaterial {
             sub(f(1), smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
         );
 
-        const fullPaintWeight = add(add(paintWeight, borderWeight), circleMask);
+        const fullPaintWeight = add(borderWeight, circleMask);
 
         const albedoTexture = uniformTexture2d(textures.albedo).source;
         const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;

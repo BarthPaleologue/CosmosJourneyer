@@ -24,6 +24,7 @@ import { type Scene } from "@babylonjs/core/scene";
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
+import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
 import { type Textures } from "../textures";
 
 export type Materials = {
@@ -33,6 +34,7 @@ export type Materials = {
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: PBRMetallicRoughnessMaterial;
+    readonly landingPad: Material;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -58,6 +60,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,
         tank: tankMaterial,
+        landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
     };
 }
 
