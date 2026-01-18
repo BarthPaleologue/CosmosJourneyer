@@ -16,7 +16,7 @@ const landingInteraction = new PressInteraction(landingAction);
 
 const emitLandingRequest = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("keyY")],
+        bindings: [keyboard.getControl("KeyY")],
     }),
 );
 

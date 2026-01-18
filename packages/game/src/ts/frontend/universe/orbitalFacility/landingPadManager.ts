@@ -15,13 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Observable } from "@babylonjs/core/Misc/observable";
+
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 
-export const enum LandingPadSize {
-    SMALL = 1,
-    MEDIUM = 2,
-    LARGE = 3,
-}
+export const LandingPadSize = {
+    SMALL: 1,
+    MEDIUM: 2,
+    LARGE: 3,
+} as const;
+export type LandingPadSize = (typeof LandingPadSize)[keyof typeof LandingPadSize];
 
 export type LandingRequest = {
     minimumPadSize: LandingPadSize;
@@ -33,18 +36,30 @@ export interface ILandingPad extends Targetable {
     getPadHeight(): number;
 }
 
+export const LandingPadStatus = {
+    AVAILABLE: "available",
+    OCCUPIED: "occupied",
+} as const;
+export type LandingPadStatus = (typeof LandingPadStatus)[keyof typeof LandingPadStatus];
+
+export type StatusChangedHandler = (status: LandingPadStatus) => void;
+
 /**
  * Manages landing pads for orbital facilities such as space stations and space elevators
  */
 export class LandingPadManager {
-    private readonly unavailableLandingPads: Set<ILandingPad> = new Set();
     private readonly landingPads: ReadonlyArray<ILandingPad>;
+    private readonly landingPadStatus: Map<ILandingPad, LandingPadStatus> = new Map();
+    readonly onStatusChanged: Observable<{ pad: ILandingPad; status: LandingPadStatus }> = new Observable();
 
     /**
      * @param landingPads Array of landing pads to be managed
      */
     constructor(landingPads: ReadonlyArray<ILandingPad>) {
-        this.landingPads = [...landingPads]; // Create immutable copy
+        this.landingPads = [...landingPads];
+        for (const pad of this.landingPads) {
+            this.setPadState(pad, LandingPadStatus.AVAILABLE);
+        }
     }
 
     /**
@@ -66,7 +81,7 @@ export class LandingPadManager {
             return null;
         }
 
-        this.markPadAsUnavailable(availablePad);
+        this.setPadState(availablePad, LandingPadStatus.OCCUPIED);
         return availablePad;
     }
 
@@ -75,7 +90,7 @@ export class LandingPadManager {
      * @param pad The landing pad to make available
      */
     public cancelLandingRequest(pad: ILandingPad): void {
-        this.markPadAsAvailable(pad);
+        this.setPadState(pad, LandingPadStatus.AVAILABLE);
     }
 
     /**
@@ -90,15 +105,12 @@ export class LandingPadManager {
      */
     public getAvailableLandingPads(): ReadonlyArray<ILandingPad> {
         return this.getLandingPads().filter((landingPad) => {
-            return !this.unavailableLandingPads.has(landingPad);
+            return this.landingPadStatus.get(landingPad) === LandingPadStatus.AVAILABLE;
         });
     }
 
-    private markPadAsUnavailable(landingPad: ILandingPad): void {
-        this.unavailableLandingPads.add(landingPad);
-    }
-
-    private markPadAsAvailable(landingPad: ILandingPad): void {
-        this.unavailableLandingPads.delete(landingPad);
+    private setPadState(landingPad: ILandingPad, status: LandingPadStatus): void {
+        this.landingPadStatus.set(landingPad, status);
+        this.onStatusChanged.notifyObservers({ pad: landingPad, status });
     }
 }

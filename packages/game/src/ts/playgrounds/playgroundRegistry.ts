@@ -38,6 +38,7 @@ import { createGrassScene } from "./grass";
 import { createGravitySystemScene } from "./gravitySystem";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createInteractionDemo } from "./interaction";
+import { createLandingPadScene } from "./landingPad";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
@@ -48,6 +49,7 @@ import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSpotLightsScene } from "./spotLights";
 import { createStarMapScene } from "./starMap";
 import { createStarMapViewScene } from "./starMapView";
 import { createStarSystemViewScene } from "./starSystemView";
@@ -102,6 +104,8 @@ export class PlaygroundRegistry {
         ["onFoot", createOnFootScene],
         ["butterfly", createButterflyScene],
         ["telluricPlanet", createTelluricPlanetScene],
+        ["landingPad", createLandingPadScene],
+        ["spotLights", createSpotLightsScene],
     ]);
 
     register(

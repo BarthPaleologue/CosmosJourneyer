@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { DirectionalLight, GlowLayer } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -30,7 +31,6 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { AU } from "@/utils/physics/constants";
 
@@ -75,9 +75,6 @@ export async function createSpaceStationScene(
 
     const sunModel: StarModel = getSunModel();
 
-    const sun = new Star(sunModel, assets.textures, scene);
-    sun.getTransform().position = new Vector3(7, 2, 5).normalize().scaleInPlace(distanceToStar);
-
     const urlParams = new URLSearchParams(window.location.search);
     const seedParam = urlParams.get("seed");
 
@@ -92,20 +89,27 @@ export async function createSpaceStationScene(
 
     const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), assets, scene);
 
-    spaceStation.landingBays[0]
-        ?.getTransform()
-        .position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
+    const landingBay = spaceStation.landingBays[0];
+    if (landingBay === undefined) {
+        throw new Error("Space station has no landing bay");
+    }
+
+    landingBay.getTransform().position.addToRef(new Vector3(0, 3e3, 0), defaultControls.getTransform().position);
 
     lookAt(defaultControls.getTransform(), spaceStation.getTransform().position, scene.useRightHandedSystem);
 
-    scene.onBeforeRenderObservable.add(() => {
+    new DirectionalLight("sun", new Vector3(-1, -1, 1).normalize(), scene);
+
+    new GlowLayer("glow", scene);
+
+    scene.onBeforePhysicsObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
         defaultControls.update(deltaSeconds);
 
         const cameraWorldPosition = camera.globalPosition;
 
-        spaceStation.update([sun], cameraWorldPosition, deltaSeconds);
+        spaceStation.update([], cameraWorldPosition, deltaSeconds);
     });
 
     return scene;

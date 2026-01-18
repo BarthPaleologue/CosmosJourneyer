@@ -72,6 +72,8 @@ export const Settings = {
     TUTORIAL_SAVE_UUID: "00000000-0000-0000-0000-000000000000",
 
     QUALITY_CHARS: "FEDCBA",
+
+    FACILITY_LIGHT_COLOR: "#FFFFFF",
 };
 
 export const CollisionMask = {

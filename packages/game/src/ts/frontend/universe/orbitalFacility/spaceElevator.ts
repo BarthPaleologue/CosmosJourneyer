@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -40,7 +42,7 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 import { setUpVector } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -85,6 +87,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly targetInfo: TargetInfo;
 
     private readonly landingPadManager: LandingPadManager;
+
+    private readonly lightContainer: ClusteredLightContainer;
 
     constructor(
         model: DeepReadonly<SpaceElevatorModel>,
@@ -131,11 +135,24 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.generate(stellarObjects, assets);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
-        this.landingPadManager = new LandingPadManager(
-            this.landingBays.flatMap((landingBay) => {
-                return landingBay.landingPads;
-            }),
-        );
+        const allLandingPads: Array<ILandingPad> = [];
+        const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();
+        for (const bay of this.landingBays) {
+            for (const [landingPadIndex, landingPad] of bay.landingPads.entries()) {
+                allLandingPads.push(landingPad);
+                landingPadToLandingBay.set(landingPad, { bay, index: landingPadIndex });
+            }
+        }
+        this.landingPadManager = new LandingPadManager(allLandingPads);
+        this.landingPadManager.onStatusChanged.add(({ pad, status }) => {
+            const padInfo = landingPadToLandingBay.get(pad);
+            if (padInfo === undefined) {
+                console.warn("Landing pad not found in landing bay map");
+                return;
+            }
+
+            padInfo.bay.setLandingPadStatus(padInfo.index, status);
+        });
 
         // center the space station on its center of mass
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
@@ -156,6 +173,19 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
+
+        this.lightContainer = new ClusteredLightContainer("SpaceElevatorLightContainer", this.getLights(), scene);
+    }
+
+    getLights(): Array<Light> {
+        const result: Array<Light> = [];
+        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
+        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
+        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
+        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
+        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
+        return result;
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -382,5 +412,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.climber.dispose();
 
         this.root.dispose();
+
+        this.lightContainer.dispose();
     }
 }

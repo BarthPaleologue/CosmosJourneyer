@@ -16,6 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
+import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
@@ -36,7 +39,7 @@ import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
@@ -74,6 +77,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     private readonly landingPadManager: LandingPadManager;
 
+    private readonly lightContainer: ClusteredLightContainer;
+
     constructor(
         model: DeepReadonly<SpaceStationModel>,
         stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>,
@@ -93,11 +98,24 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.generate(stellarObjects, assets);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
-        this.landingPadManager = new LandingPadManager(
-            this.landingBays.flatMap((landingBay) => {
-                return landingBay.landingPads;
-            }),
-        );
+        const allLandingPads: Array<ILandingPad> = [];
+        const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();
+        for (const bay of this.landingBays) {
+            for (const [landingPadIndex, landingPad] of bay.landingPads.entries()) {
+                allLandingPads.push(landingPad);
+                landingPadToLandingBay.set(landingPad, { bay, index: landingPadIndex });
+            }
+        }
+        this.landingPadManager = new LandingPadManager(allLandingPads);
+        this.landingPadManager.onStatusChanged.add(({ pad, status }) => {
+            const padInfo = landingPadToLandingBay.get(pad);
+            if (padInfo === undefined) {
+                console.warn("Landing pad not found in landing bay map");
+                return;
+            }
+
+            padInfo.bay.setLandingPadStatus(padInfo.index, status);
+        });
 
         // center the space station on its center of mass
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
@@ -116,6 +134,19 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
+
+        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, this.getLights(), scene);
+    }
+
+    getLights(): Array<Light> {
+        const result: Array<Light> = [];
+        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
+        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
+        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
+        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
+        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
+        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
+        return result;
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -188,9 +219,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 0.4],
-                [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.3],
+                [SpaceStationNodeType.RING_HABITAT, 1 / 3],
+                [SpaceStationNodeType.HELIX_HABITAT, 1 / 3],
+                [SpaceStationNodeType.CYLINDER_HABITAT, 1 / 3],
             ],
             rng(17),
         );
@@ -268,16 +299,16 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {
-        const previousBoundingVectors = parent.getHierarchyBoundingVectors();
-        const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+        // Make sure bounds are current
+        parent.computeWorldMatrix(true);
+        node.computeWorldMatrix(true);
 
-        const newBoundingVectors = node.getHierarchyBoundingVectors();
-        const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+        const parentBV = parent.getHierarchyBoundingVectors();
+        const nodeBV = node.getHierarchyBoundingVectors();
 
-        const previousSectionSizeY = previousBoundingExtendSize.y;
-        const newSectionY = newBoundingExtendSize.y;
+        const deltaY = parentBV.max.y - nodeBV.min.y; // bring node bottom to parent top
 
-        node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
+        node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -330,6 +361,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.engineBays.forEach((engineBay) => {
             engineBay.dispose();
         });
+
+        this.lightContainer.dispose();
 
         this.root.dispose();
     }

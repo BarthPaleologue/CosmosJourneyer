@@ -15,8 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -30,13 +34,16 @@ import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/ind
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
+import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
+import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
@@ -57,16 +64,14 @@ export class LandingBay {
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
 
-    private readonly centralLight: PointLight;
-
     readonly landingPads: LandingPad[] = [];
+
+    private readonly landingPadLights: ProceduralSpotLightInstances;
+
+    private readonly lights: Array<Light> = [];
 
     constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
-
-        this.centralLight = new PointLight("LandingBayCentralLight", Vector3.Zero(), scene);
-        this.centralLight.parent = this.root;
-        this.centralLight.intensity = 1000;
 
         this.rng = getRngFromSeed(seed);
 
@@ -80,7 +85,7 @@ export class LandingBay {
             scene,
         );
 
-        const heightFactor = 2 + Math.floor(this.rng(0) * 3);
+        const heightFactor = 1 + Math.floor(this.rng(0) * 3);
 
         const circumference = 2 * Math.PI * this.radius;
 
@@ -90,6 +95,64 @@ export class LandingBay {
         }
 
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
+
+        const lightMeshMaterial = new StandardMaterial("LandingBayLightMeshMaterial", scene);
+        lightMeshMaterial.emissiveColor.set(1, 1, 1);
+        lightMeshMaterial.disableLighting = true;
+
+        const lampHeight = deltaRadius / 16;
+        const lampThickness = lampHeight;
+        const lightMeshInstances = MeshBuilder.CreateBox(
+            `LandingBayLightCaps`,
+            {
+                width: deltaRadius / 8,
+                depth: lampThickness,
+                height: lampHeight,
+            },
+            scene,
+        );
+        lightMeshInstances.material = lightMeshMaterial;
+        lightMeshInstances.parent = this.getTransform();
+
+        const lampPostHeight = 10;
+        lightMeshInstances.position.y = (heightFactor * deltaRadius) / 2 + lampPostHeight + lampHeight / 2;
+
+        const lightMatrixBuffer = createCircleInstanceBuffer(this.radius + (deltaRadius - lampThickness) / 2, nbSteps);
+        lightMeshInstances.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
+
+        const lampPostInstances = MeshBuilder.CreateCylinder(
+            `LandingBayLightPosts`,
+            {
+                height: lampPostHeight,
+                diameter: lampThickness * 0.618,
+                tessellation: 6,
+                updatable: false,
+            },
+            scene,
+        );
+        lampPostInstances.convertToFlatShadedMesh();
+        const lampPostMaterial = new PBRMaterial("lampPostMaterial", scene);
+        lampPostMaterial.metallic = 1;
+        lampPostMaterial.roughness = 0.4;
+        lampPostMaterial.useGLTFLightFalloff = true;
+        lampPostInstances.material = lampPostMaterial;
+        lampPostInstances.parent = this.getTransform();
+        lampPostInstances.position.y = (heightFactor * deltaRadius) / 2 + lampPostHeight / 2;
+
+        lampPostInstances.thinInstanceSetBuffer("matrix", lightMatrixBuffer, 16);
+
+        for (let i = 0; i < nbSteps; i++) {
+            const bufferOffset = i * 16;
+            const x = lightMatrixBuffer[bufferOffset + 12];
+            const y = lightMatrixBuffer[bufferOffset + 13];
+            const z = lightMatrixBuffer[bufferOffset + 14];
+
+            const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene, true);
+            light.range = deltaRadius * 2;
+            light.parent = lightMeshInstances;
+
+            this.lights.push(light);
+        }
 
         this.landingBayMaterial = new LandingBayMaterial(
             stationModel,
@@ -114,7 +177,7 @@ export class LandingBay {
         const armOffset = Math.sqrt(armHeight * armHeight - this.radius * this.radius);
         for (let i = 0; i <= nbArms; i++) {
             const arm = MeshBuilder.CreateCylinder(
-                `RingHabitatArm${i}`,
+                `LandingBayArm${i}`,
                 {
                     height: armHeight,
                     diameter: armDiameter,
@@ -143,20 +206,19 @@ export class LandingBay {
 
         const nbPads = nbSteps;
         let padNumber = 0;
+        const lightInstanceData: Array<ProceduralSpotLightInstanceData> = [];
         for (let row = 0; row < heightFactor; row++) {
             for (let i = 0; i < nbPads; i++) {
                 const landingPad = new LandingPad(
                     padNumber++,
                     (i + row) % 2 === 0 ? LandingPadSize.SMALL : LandingPadSize.MEDIUM,
-                    assets,
+                    assets.textures,
                     scene,
                 );
                 landingPad.getTransform().parent = this.getTransform();
 
                 landingPad.getTransform().rotate(Axis.Z, Math.PI / 2, Space.LOCAL);
-
                 landingPad.getTransform().rotate(Axis.X, ((i + 0.5) * 2.0 * Math.PI) / nbPads, Space.LOCAL);
-
                 landingPad.getTransform().rotate(Axis.Y, -Math.PI / 2, Space.LOCAL);
 
                 landingPad
@@ -176,22 +238,44 @@ export class LandingBay {
                     );
 
                 this.landingPads.push(landingPad);
+
+                const landingPadCenter = landingPad.getTransform().position;
+                const landingPadUp = landingPad.getTransform().up;
+                for (const corner of landingPad.getCorners()) {
+                    lightInstanceData.push({
+                        rootPosition: corner,
+                        lookAtTarget: landingPadCenter,
+                        color: new Color3(1, 1, 0.8),
+                        upDirection: landingPadUp,
+                        range: 50 * landingPad.getPadSize(),
+                        lampSize: 1 * landingPad.getPadSize(),
+                        postHeight: 10 * landingPad.getPadSize(),
+                        postDiameter: 0.4 * landingPad.getPadSize(),
+                    });
+                }
             }
         }
 
-        this.getTransform().computeWorldMatrix(true);
+        this.landingPadLights = new ProceduralSpotLightInstances(degreesToRadians(120), scene);
+        this.landingPadLights.getTransform().parent = this.getTransform();
+        this.landingPadLights.setInstances(lightInstanceData);
+        this.lights.push(...this.landingPadLights.lights);
+    }
 
-        const bb = this.getTransform().getHierarchyBoundingVectors();
-        const extend = bb.max.subtract(bb.min);
-        const center = bb.min.add(extend.scale(0.5));
-
-        this.getTransform()
-            .getChildMeshes(true)
-            .forEach((mesh) => {
-                mesh.position.subtractInPlace(center);
-            });
-
-        this.centralLight.includedOnlyMeshes = this.getTransform().getChildMeshes();
+    setLandingPadStatus(landingPadIndex: number, status: LandingPadStatus) {
+        const statusColor = new Color3();
+        switch (status) {
+            case LandingPadStatus.AVAILABLE:
+                statusColor.copyFromFloats(1, 1, 0.8);
+                break;
+            case LandingPadStatus.OCCUPIED:
+                statusColor.copyFromFloats(1, 0, 0);
+                break;
+        }
+        this.landingPadLights.setColorAt(landingPadIndex * 4, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 1, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 2, statusColor);
+        this.landingPadLights.setColorAt(landingPadIndex * 4 + 3, statusColor);
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -242,6 +326,10 @@ export class LandingBay {
         }
     }
 
+    getLights(): Array<Light> {
+        return this.lights;
+    }
+
     getTransform(): TransformNode {
         return this.root;
     }
@@ -249,6 +337,11 @@ export class LandingBay {
     dispose() {
         this.root.dispose();
         this.ring.dispose();
+
+        this.landingPadLights.dispose();
+        for (const light of this.lights) {
+            light.dispose();
+        }
 
         this.ringAggregate?.dispose();
         this.ringAggregate = null;
@@ -267,7 +360,5 @@ export class LandingBay {
         this.landingPads.forEach((landingPad) => {
             landingPad.dispose();
         });
-
-        this.centralLight.dispose();
     }
 }
