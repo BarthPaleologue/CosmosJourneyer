@@ -55,12 +55,16 @@ export async function createAutomaticLandingScene(
     const soundPlayer = new SoundPlayerMock();
 
     const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
-    ship.getTransform().position.copyFromFloats(
-        randRange(-50, 50, Math.random, 0),
-        randRange(30, 50, Math.random, 0),
-        randRange(-50, 50, Math.random, 0),
-    );
-    ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
+
+    const initShipTransform = () => {
+        ship.getTransform().position.copyFromFloats(
+            randRange(-50, 50, Math.random, 0),
+            randRange(30, 50, Math.random, 0),
+            randRange(-50, 50, Math.random, 0),
+        );
+        ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
+    };
+    initShipTransform();
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.getTransform().position.copyFromFloats(0, 10, 75);
@@ -95,8 +99,12 @@ export async function createAutomaticLandingScene(
 
     enableShadows(sun);
 
-    ship.engageLandingOnPad(landingPad);
-    //ship.engageSurfaceLanding(ground);
+    const engageLanding = () => {
+        ship.engageLandingOnPad(landingPad);
+        //ship.engageSurfaceLanding(ground);
+    };
+
+    engageLanding();
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -104,6 +112,14 @@ export async function createAutomaticLandingScene(
         ship.update(deltaSeconds);
 
         defaultControls.update(deltaSeconds);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "r") {
+            ship.takeOff();
+            initShipTransform();
+            engageLanding();
+        }
     });
 
     return scene;
