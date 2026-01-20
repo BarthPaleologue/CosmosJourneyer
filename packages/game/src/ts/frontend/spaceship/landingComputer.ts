@@ -25,6 +25,8 @@ import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPad
 
 import { CollisionMask } from "@/settings";
 
+import { AttitudePDController } from "./attitudePdController";
+
 export const enum LandingTargetKind {
     LANDING_PAD,
     CELESTIAL_BODY,
@@ -120,6 +122,8 @@ export class LandingComputer {
 
     private elapsedSeconds = 0;
     private readonly maxSecondsPerPlan = 90;
+
+    private readonly attitudeController = new AttitudePDController(8, 4);
 
     constructor(aggregate: PhysicsAggregate, physicsEngine: PhysicsEngineV2) {
         this.aggregate = aggregate;
@@ -290,7 +294,7 @@ export class LandingComputer {
         const { position: targetPosition, rotation: targetRotation } = targetTransform;
         const { position: positionTolerance, rotation: rotationTolerance } = currentAction.tolerance;
         const { linear: maxSpeedAtTarget, rotation: maxRotationSpeedAtTarget } = currentAction.maxVelocityAtTarget;
-        const { linearY: maxLinearSpeedY, rotation: maxRotationSpeed } = currentAction.maxVelocity;
+        const { linearY: maxLinearSpeedY } = currentAction.maxVelocity;
 
         const currentPosition = this.transform.getAbsolutePosition();
         const currentRotation = this.transform.absoluteRotationQuaternion;
@@ -343,55 +347,21 @@ export class LandingComputer {
         // damp speed along other directions
         this.aggregate.body.applyForce(otherSpeed.scale(-5 * mass), currentPosition);
 
-        // --- Rotation control (quaternion-error PD) ---
-        //
-        // Goal: drive angular velocity toward a desired angular velocity derived from quaternion error.
-        // We avoid axis/angle extraction; quaternion vector part ~ axis * sin(theta/2).
-
-        const qErr = targetRotation.multiply(currentRotation.conjugate()); // target * inverse(current)
-        if (qErr.w < 0) qErr.scaleInPlace(-1); // choose shortest-arc representation
-
-        const rotErr = new Vector3(qErr.x, qErr.y, qErr.z); // rotation error direction/magnitude proxy
-
-        // Controller gains:
-        // - kp maps orientation error -> desired angular velocity ("how aggressively to turn toward target").
-        // - kd maps angular-velocity error -> angular impulse per step ("how quickly to match the desired spin").
-        // Despite the name, kd is a gain; it produces a damping/stabilizing effect because it acts on velocity error.
-        const kp = 8.0;
-        const kd = 2.0;
-
-        const angularVelocity = this.aggregate.body.getAngularVelocity();
-
-        // Convert orientation error into a desired angular velocity (world space).
-        // For small angles, 2*rotErr ≈ axis * angle, so kp sets the response speed.
-        // Clamp so we don't demand faster spin than the action allows.
-        let desiredAngularVelocity = rotErr.scale(2 * kp);
-        if (desiredAngularVelocity.length() > maxRotationSpeed) {
-            desiredAngularVelocity = desiredAngularVelocity.normalize().scale(maxRotationSpeed);
-        }
-
-        // Velocity error: how far the body is from the desired spin (world space).
-        const angVelErr = desiredAngularVelocity.subtract(angularVelocity);
-
-        // Havok/BJS mass properties: inertia is documented as "for a unit mass".
-        // We build an angular impulse J such that Δω ≈ kd * angVelErr * dt, independent of mass/inertia.
         const inertia = massProps.inertia ?? new Vector3(1, 1, 1);
         const inertiaOrientation = massProps.inertiaOrientation ?? Quaternion.Identity();
+        const attitudeTorque = this.attitudeController.computeTorque(
+            {
+                orientation: currentRotation,
+                angularVelocity: currentAngularVelocity,
+            },
+            {
+                orientation: targetRotation,
+                angularVelocity: Vector3.ZeroReadOnly,
+            },
+            { mass, inertia, inertiaOrientation },
+        );
 
-        // Transform between world space and inertia principal-axes space.
-        const worldFromInertia = inertiaOrientation.multiply(currentRotation);
-        const inertiaFromWorld = worldFromInertia.conjugate();
-
-        // Move velocity error into inertia space, scale by (mass * inertia) to get angular momentum impulse,
-        // then rotate back to world space and apply per-step gain scaled by dt.
-        const errInInertia = angVelErr.applyRotationQuaternion(inertiaFromWorld);
-        const impulseInInertia = errInInertia.multiply(inertia).scale(mass);
-
-        const rotationImpulseWorld = impulseInInertia
-            .applyRotationQuaternion(worldFromInertia)
-            .scale(kd * deltaSeconds);
-
-        this.aggregate.body.applyAngularImpulse(rotationImpulseWorld);
+        this.aggregate.body.applyAngularImpulse(attitudeTorque.scale(deltaSeconds));
 
         if (this.elapsedSeconds > this.maxSecondsPerPlan) {
             this.setTarget(null);
