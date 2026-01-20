@@ -26,6 +26,7 @@ import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPad
 import { CollisionMask } from "@/settings";
 
 import { AttitudePDController } from "./attitudePdController";
+import { PositionPDController } from "./positionPdController";
 
 export const enum LandingTargetKind {
     LANDING_PAD,
@@ -123,7 +124,8 @@ export class LandingComputer {
     private elapsedSeconds = 0;
     private readonly maxSecondsPerPlan = 90;
 
-    private readonly attitudeController = new AttitudePDController(8, 4);
+    private readonly positionController: PositionPDController;
+    private readonly attitudeController: AttitudePDController;
 
     constructor(aggregate: PhysicsAggregate, physicsEngine: PhysicsEngineV2) {
         this.aggregate = aggregate;
@@ -133,6 +135,9 @@ export class LandingComputer {
 
         const boundingVectors = this.transform.getHierarchyBoundingVectors();
         this.boundingExtent = boundingVectors.max.subtract(boundingVectors.min);
+
+        this.positionController = new PositionPDController(4, 4);
+        this.attitudeController = new AttitudePDController(8, 4);
     }
 
     getTarget() {
@@ -294,7 +299,6 @@ export class LandingComputer {
         const { position: targetPosition, rotation: targetRotation } = targetTransform;
         const { position: positionTolerance, rotation: rotationTolerance } = currentAction.tolerance;
         const { linear: maxSpeedAtTarget, rotation: maxRotationSpeedAtTarget } = currentAction.maxVelocityAtTarget;
-        const { linearY: maxLinearSpeedY } = currentAction.maxVelocity;
 
         const currentPosition = this.transform.getAbsolutePosition();
         const currentRotation = this.transform.absoluteRotationQuaternion;
@@ -303,8 +307,6 @@ export class LandingComputer {
         const currentAngularVelocity = this.aggregate.body.getAngularVelocity();
 
         const distance = Vector3.Distance(targetPosition, currentPosition);
-        const directionToTarget = targetPosition.subtract(currentPosition).normalize();
-
         if (
             distance <= positionTolerance &&
             Quaternion.AreClose(currentRotation, targetRotation, rotationTolerance) &&
@@ -323,33 +325,24 @@ export class LandingComputer {
         const massProps = this.aggregate.body.getMassProperties();
         const mass = massProps.mass ?? 1;
 
-        // Decompose the direction to target along the ship's axes
-        const shipXAxis = this.transform.right;
-        const shipYAxis = this.transform.up;
-        const shipZAxis = this.transform.forward;
+        const force = this.positionController.computeForceToRef(
+            {
+                position: currentPosition,
+                velocity: currentLinearVelocity,
+            },
+            {
+                position: targetPosition,
+                velocity: Vector3.ZeroReadOnly,
+            },
+            mass,
+            Vector3.Zero(),
+        );
 
-        const targetSpeedX = directionToTarget.dot(shipXAxis) * maxLinearSpeedY * 2;
-        const targetSpeedY = directionToTarget.dot(shipYAxis) * maxLinearSpeedY;
-        const targetSpeedZ = directionToTarget.dot(shipZAxis) * maxLinearSpeedY * 2;
-
-        const currentSpeedX = currentLinearVelocity.dot(shipXAxis);
-        const currentSpeedY = currentLinearVelocity.dot(shipYAxis);
-        const currentSpeedZ = currentLinearVelocity.dot(shipZAxis);
-
-        // Apply forces along each axis
-        this.aggregate.body.applyForce(shipXAxis.scale(mass * (targetSpeedX - currentSpeedX)), currentPosition);
-        this.aggregate.body.applyForce(shipYAxis.scale(mass * (targetSpeedY - currentSpeedY)), currentPosition);
-        this.aggregate.body.applyForce(shipZAxis.scale(mass * (targetSpeedZ - currentSpeedZ)), currentPosition);
-
-        const currentSpeedTowardTarget = currentLinearVelocity.dot(directionToTarget);
-        const otherSpeed = currentLinearVelocity.subtract(directionToTarget.scale(currentSpeedTowardTarget));
-
-        // damp speed along other directions
-        this.aggregate.body.applyForce(otherSpeed.scale(-5 * mass), currentPosition);
+        this.aggregate.body.applyForce(force, currentPosition);
 
         const inertia = massProps.inertia ?? new Vector3(1, 1, 1);
         const inertiaOrientation = massProps.inertiaOrientation ?? Quaternion.Identity();
-        const attitudeTorque = this.attitudeController.computeTorque(
+        const attitudeTorque = this.attitudeController.computeTorqueToRef(
             {
                 orientation: currentRotation,
                 angularVelocity: currentAngularVelocity,
@@ -359,6 +352,7 @@ export class LandingComputer {
                 angularVelocity: Vector3.ZeroReadOnly,
             },
             { mass, inertia, inertiaOrientation },
+            Vector3.Zero(),
         );
 
         this.aggregate.body.applyAngularImpulse(attitudeTorque.scale(deltaSeconds));

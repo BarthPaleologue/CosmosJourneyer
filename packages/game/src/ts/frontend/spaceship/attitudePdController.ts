@@ -39,10 +39,11 @@ export class AttitudePDController {
     /**
      * Returns world-space torque to apply this step.
      */
-    computeTorque(
+    computeTorqueToRef(
         current: { orientation: Quaternion; angularVelocity: Vector3 },
         target: { orientation: Quaternion; angularVelocity: Vector3 },
         massProps: AngularMassProperties,
+        ref: Vector3,
     ): Vector3 {
         const quaternionError = target.orientation.multiply(current.orientation.conjugate());
         if (quaternionError.w < 0) {
@@ -77,7 +78,7 @@ export class AttitudePDController {
             .scale(this.kp)
             .add(angularVelocityErrorLocal.multiply(inertia).scale(-this.kd));
 
-        const torque = torqueLocal.applyRotationQuaternion(worldFromInertia);
+        const torque = torqueLocal.applyRotationQuaternionToRef(worldFromInertia, ref);
 
         return torque;
     }

@@ -18,7 +18,7 @@ describe("AttitudePDController", () => {
 
     it("returns zero torque when current matches target", () => {
         const controller = new AttitudePDController(2, 3);
-        const torque = controller.computeTorque(
+        const torque = controller.computeTorqueToRef(
             {
                 orientation: Quaternion.Identity(),
                 angularVelocity: Vector3.Zero(),
@@ -28,6 +28,7 @@ describe("AttitudePDController", () => {
                 angularVelocity: Vector3.Zero(),
             },
             massProps,
+            Vector3.Zero(),
         );
 
         expectVectorClose(torque, Vector3.Zero());
@@ -37,7 +38,7 @@ describe("AttitudePDController", () => {
         const controller = new AttitudePDController(2, 0);
         const targetOrientation = Quaternion.RotationAxis(Vector3.Right(), Math.PI / 2);
 
-        const torque = controller.computeTorque(
+        const torque = controller.computeTorqueToRef(
             {
                 orientation: Quaternion.Identity(),
                 angularVelocity: Vector3.Zero(),
@@ -47,16 +48,17 @@ describe("AttitudePDController", () => {
                 angularVelocity: Vector3.Zero(),
             },
             massProps,
+            Vector3.Zero(),
         );
 
-        const expected = new Vector3(-2 * Math.PI, 0, 0);
+        const expected = new Vector3(2 * Math.PI, 0, 0);
         expectVectorClose(torque, expected);
     });
 
     it("computes derivative torque from angular velocity error", () => {
         const controller = new AttitudePDController(0, 1.5);
 
-        const torque = controller.computeTorque(
+        const torque = controller.computeTorqueToRef(
             {
                 orientation: Quaternion.Identity(),
                 angularVelocity: new Vector3(1, -2, 0.5),
@@ -66,6 +68,7 @@ describe("AttitudePDController", () => {
                 angularVelocity: Vector3.Zero(),
             },
             massProps,
+            Vector3.Zero(),
         );
 
         const expected = new Vector3(-3, 12, -4.5);
@@ -82,7 +85,7 @@ describe("AttitudePDController", () => {
             -targetOrientation.w,
         );
 
-        const torqueFromPositive = controller.computeTorque(
+        const torqueFromPositive = controller.computeTorqueToRef(
             {
                 orientation: Quaternion.Identity(),
                 angularVelocity: Vector3.Zero(),
@@ -92,9 +95,10 @@ describe("AttitudePDController", () => {
                 angularVelocity: Vector3.Zero(),
             },
             massProps,
+            Vector3.Zero(),
         );
 
-        const torqueFromNegative = controller.computeTorque(
+        const torqueFromNegative = controller.computeTorqueToRef(
             {
                 orientation: Quaternion.Identity(),
                 angularVelocity: Vector3.Zero(),
@@ -104,6 +108,7 @@ describe("AttitudePDController", () => {
                 angularVelocity: Vector3.Zero(),
             },
             massProps,
+            Vector3.Zero(),
         );
 
         expectVectorClose(torqueFromNegative, torqueFromPositive);
