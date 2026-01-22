@@ -23,6 +23,7 @@ import {
     MeshBuilder,
     ReflectionProbe,
     Vector3,
+    type AbstractEngine,
     type AbstractMesh,
     type Camera,
     type DepthRenderer,
@@ -43,6 +44,12 @@ export async function enablePhysics(
     scene.enablePhysics(gravity, havokPlugin);
 
     return scene.getPhysicsEngine() as PhysicsEngineV2;
+}
+
+export function enablePointerLock(engine: AbstractEngine) {
+    engine.getRenderingCanvas()?.addEventListener("click", async () => {
+        await engine.getRenderingCanvas()?.requestPointerLock();
+    });
 }
 
 export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<{ size: number }>): void {

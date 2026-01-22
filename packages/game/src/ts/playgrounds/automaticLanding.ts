@@ -39,7 +39,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 
 import { CollisionMask } from "@/settings";
 
-import { createSky, enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
@@ -49,6 +49,8 @@ export async function createAutomaticLandingScene(
     scene.useRightHandedSystem = true;
 
     await enablePhysics(scene);
+
+    enablePointerLock(engine);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

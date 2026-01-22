@@ -46,7 +46,7 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
-import { createSky, enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
 export async function createInteractionDemo(
     engine: AbstractEngine,
@@ -61,9 +61,7 @@ export async function createInteractionDemo(
 
     const audioEngine = await CreateAudioEngineAsync();
 
-    engine.getRenderingCanvas()?.addEventListener("click", async () => {
-        await engine.getRenderingCanvas()?.requestPointerLock();
-    });
+    enablePointerLock(engine);
 
     const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
