@@ -70,4 +70,52 @@ describe("PositionPDController", () => {
         const expected = new Vector3(3, -2, 1).add(new Vector3(-2, 4, 4));
         expectVectorClose(force, expected);
     });
+
+    it("skips position correction when within the max distance threshold", () => {
+        const controller = new PositionPDController(10, 2);
+        const ref = new Vector3(1, 1, 1);
+
+        const force = controller.computeForceToRef(
+            { position: new Vector3(0, 0, 0), velocity: new Vector3(2, 0, -1) },
+            { position: new Vector3(0.005, 0, 0), velocity: new Vector3(-1, 2, 3) },
+            2,
+            ref,
+            { max: { closingSpeed: 10, acceleration: 5 } },
+        );
+
+        const expected = new Vector3(-3, 2, 4).scaleInPlace(4);
+        expectVectorClose(force, expected);
+    });
+
+    it("adds desired closing speed from max acceleration when below closing speed cap", () => {
+        const controller = new PositionPDController(0, 1);
+        const ref = Vector3.Zero();
+
+        const force = controller.computeForceToRef(
+            { position: Vector3.Zero(), velocity: Vector3.Zero() },
+            { position: new Vector3(8, 0, 0), velocity: Vector3.Zero() },
+            1,
+            ref,
+            { max: { closingSpeed: 100, acceleration: 2 } },
+        );
+
+        const expected = new Vector3(Math.sqrt(32), 0, 0);
+        expectVectorClose(force, expected);
+    });
+
+    it("clamps desired closing speed to the configured maximum", () => {
+        const controller = new PositionPDController(0, 1);
+        const ref = Vector3.Zero();
+
+        const force = controller.computeForceToRef(
+            { position: Vector3.Zero(), velocity: Vector3.Zero() },
+            { position: new Vector3(100, 0, 0), velocity: Vector3.Zero() },
+            1,
+            ref,
+            { max: { closingSpeed: 5, acceleration: 2 } },
+        );
+
+        const expected = new Vector3(5, 0, 0);
+        expectVectorClose(force, expected);
+    });
 });

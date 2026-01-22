@@ -23,6 +23,8 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { EarthG } from "@/utils/physics/constants";
+
 import { CollisionMask } from "@/settings";
 
 import { AttitudePDController } from "./attitudePdController";
@@ -136,8 +138,8 @@ export class LandingComputer {
         const boundingVectors = this.transform.getHierarchyBoundingVectors();
         this.boundingExtent = boundingVectors.max.subtract(boundingVectors.min);
 
-        this.positionController = new PositionPDController(4, 4);
-        this.attitudeController = new AttitudePDController(8, 4);
+        this.positionController = new PositionPDController(1, 4);
+        this.attitudeController = new AttitudePDController(4, 4);
     }
 
     getTarget() {
@@ -336,6 +338,12 @@ export class LandingComputer {
             },
             mass,
             Vector3.Zero(),
+            {
+                max: {
+                    closingSpeed: currentAction.maxVelocity.linearY,
+                    acceleration: 2 * EarthG,
+                },
+            },
         );
 
         this.aggregate.body.applyForce(force, currentPosition);

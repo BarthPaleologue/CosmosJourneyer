@@ -30,6 +30,7 @@ export class PositionPDController {
 
     private readonly tmpPositionError = Vector3.Zero();
     private readonly tmpVelocityError = Vector3.Zero();
+    private readonly tmpDirToTarget = Vector3.Zero();
 
     /**
      * Creates a new PositionPDController.
@@ -52,9 +53,26 @@ export class PositionPDController {
         target: { position: Vector3; velocity: Vector3 },
         mass: number,
         ref: Vector3,
+        options?: Partial<{ max?: { closingSpeed: number; acceleration: number } }>,
     ): Vector3 {
         const positionError = target.position.subtractToRef(current.position, this.tmpPositionError);
         const velocityError = target.velocity.subtractToRef(current.velocity, this.tmpVelocityError);
+
+        if (options?.max !== undefined) {
+            const distanceToTarget = positionError.length();
+            if (distanceToTarget < 0.01) {
+                // Close enough to target position: no position correction.
+                return velocityError.scaleInPlace(this.kd * mass);
+            }
+            const dirToTarget = positionError.scaleToRef(1 / distanceToTarget, this.tmpDirToTarget);
+
+            const desiredClosingSpeed = Math.min(
+                options.max.closingSpeed,
+                Math.sqrt(2 * options.max.acceleration * distanceToTarget),
+            );
+
+            velocityError.addInPlace(dirToTarget.scaleInPlace(desiredClosingSpeed));
+        }
 
         return positionError.scaleToRef(this.kp * mass, ref).addInPlace(velocityError.scaleInPlace(this.kd * mass));
     }
