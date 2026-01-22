@@ -363,7 +363,7 @@ export class LandingComputer {
             Vector3.Zero(),
         );
 
-        this.aggregate.body.applyAngularImpulse(attitudeTorque.scale(deltaSeconds));
+        this.aggregate.body.applyTorque(attitudeTorque);
 
         if (this.elapsedSeconds > this.maxSecondsPerPlan) {
             this.setTarget(null);
