@@ -77,7 +77,8 @@ export class StarMapView implements View {
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private currentSystemCoordinates: StarSystemCoordinates | null = null;
 
-    private readonly travelLine: ThickLines;
+    private readonly currentItineraryLine: ThickLines;
+    private readonly visitedSystemsLines: ThickLines;
 
     private readonly stellarPathfinder: StellarPathfinder;
 
@@ -190,12 +191,22 @@ export class StarMapView implements View {
         pipeline.imageProcessing.exposure = 1.0;
         pipeline.imageProcessing.contrast = 1.0;
 
-        this.travelLine = new ThickLines(
+        this.currentItineraryLine = new ThickLines(
             "travelLine",
             {
                 points: [],
                 thickness: 0.05,
                 color: Color3.Red(),
+            },
+            this.scene,
+        );
+
+        this.visitedSystemsLines = new ThickLines(
+            "visitedSystemsLine",
+            {
+                points: [],
+                thickness: 0.05,
+                color: Color3.Gray(),
             },
             this.scene,
         );
@@ -231,7 +242,7 @@ export class StarMapView implements View {
 
                     const parsedItinerary = ItinerarySchema.safeParse(path.value);
                     if (parsedItinerary.success) {
-                        this.drawPath(parsedItinerary.data);
+                        this.drawCurrentItinerary(parsedItinerary.data);
                         this.player.currentItinerary = parsedItinerary.data;
                     } else {
                         this.notificationManager.create(
@@ -274,11 +285,18 @@ export class StarMapView implements View {
         window.StarMap = this;
     }
 
-    private drawPath(path: DeepReadonly<Itinerary>) {
+    private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
         const points = path.map((coordinates) => {
             return wrapVector3(this.universeBackend.getSystemGalacticPosition(coordinates));
         });
-        this.travelLine.setPoints(points);
+        this.currentItineraryLine.setPoints(points);
+    }
+
+    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
+        const points = path.map((coordinates) => {
+            return wrapVector3(this.universeBackend.getSystemGalacticPosition(coordinates));
+        });
+        this.visitedSystemsLines.setPoints(points);
     }
 
     public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean) {
@@ -371,7 +389,10 @@ export class StarMapView implements View {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
         if (this.player.currentItinerary !== null) {
-            this.drawPath(this.player.currentItinerary);
+            this.drawCurrentItinerary(this.player.currentItinerary);
+        }
+        if (this.player.visitedSystemHistory.length > 1) {
+            this.drawVisitedSystems(this.player.visitedSystemHistory);
         }
     }
 

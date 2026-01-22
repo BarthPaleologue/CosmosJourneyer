@@ -80,5 +80,7 @@ export async function createStarMapViewScene(
         starMap.focusOnSystem(StarSystemCoordinatesSchema.parse(systemCoordinates), true);
     }
 
+    starMap.attachControl();
+
     return scene;
 }
