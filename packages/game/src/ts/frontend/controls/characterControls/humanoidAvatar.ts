@@ -26,11 +26,12 @@ import { PhysicsAggregate, PhysicsShapeCapsule, type PhysicsEngineV2 } from "@ba
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { moveTowards } from "@/utils/math";
 
 import { CollisionMask } from "@/settings";
+
+import type { CharacterAvatar, CharacterAvatarState, SurfaceInfo } from "./characterAvatar";
 
 class AnimationState {
     readonly idleAnimation: AnimationGroup;
@@ -44,21 +45,7 @@ class AnimationState {
     }
 }
 
-type GroundSurfaceInfo = {
-    type: "ground";
-    distance: number;
-};
-
-type WaterSurfaceInfo = {
-    type: "water";
-    distance: number;
-};
-
-export type SurfaceInfo = GroundSurfaceInfo | WaterSurfaceInfo;
-
-export type HumanoidAvatarState = "standingOnGround" | "seated" | "falling" | "swimming";
-
-export class HumanoidAvatar implements Transformable {
+export class HumanoidAvatar implements CharacterAvatar {
     readonly instance: HumanoidInstance;
 
     private readonly headLookController: BoneLookController;
@@ -229,7 +216,7 @@ export class HumanoidAvatar implements Transformable {
         return this.root;
     }
 
-    public getState(): HumanoidAvatarState {
+    public getState(): CharacterAvatarState {
         if (this.currentAnimationState === this.groundedState) {
             return "standingOnGround";
         } else if (this.currentAnimationState === this.seatedState) {

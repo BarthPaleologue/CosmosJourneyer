@@ -28,8 +28,8 @@ import { type Scene } from "@babylonjs/core/scene";
 import { Settings } from "@/settings";
 
 import { type Controls } from "../";
+import type { CharacterAvatar } from "./characterAvatar";
 import { CharacterInputs } from "./characterControlsInputs";
-import type { HumanoidAvatar } from "./humanoidAvatar";
 
 export class CharacterControls implements Controls {
     readonly firstPersonCamera: FreeCamera;
@@ -38,9 +38,9 @@ export class CharacterControls implements Controls {
 
     private readonly characterRotationSpeed = 4;
 
-    readonly avatar: HumanoidAvatar;
+    readonly avatar: CharacterAvatar;
 
-    constructor(avatar: HumanoidAvatar, scene: Scene) {
+    constructor(avatar: CharacterAvatar, scene: Scene) {
         this.avatar = avatar;
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
