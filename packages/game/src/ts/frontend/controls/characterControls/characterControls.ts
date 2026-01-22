@@ -22,7 +22,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { Settings } from "@/settings";
@@ -39,12 +39,9 @@ export class CharacterControls implements Controls {
     private readonly characterRotationSpeed = 4;
 
     readonly avatar: HumanoidAvatar;
-    private readonly headTransform: TransformNode;
 
     constructor(avatar: HumanoidAvatar, scene: Scene) {
         this.avatar = avatar;
-        this.headTransform = new TransformNode("characterHeadTransform", scene);
-        this.headTransform.attachToBone(this.avatar.instance.head.bone, this.avatar.instance.head.attachmentMesh);
 
         this.firstPersonCamera = new FreeCamera("characterFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.speed = 0;
@@ -115,15 +112,15 @@ export class CharacterControls implements Controls {
     }
 
     public getEyesPosition(): Vector3 {
-        return this.headTransform
+        return this.avatar.headTransform
             .getAbsolutePosition()
-            .add(this.headTransform.forward.scale(-0.15))
-            .add(this.headTransform.up.scale(0.05));
+            .add(this.avatar.headTransform.forward.scale(-0.15))
+            .add(this.avatar.headTransform.up.scale(0.05));
     }
 
     public update(deltaSeconds: number): void {
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
-        this.headTransform.computeWorldMatrix(true);
+        this.avatar.headTransform.computeWorldMatrix(true);
         this.firstPersonCamera.position = Vector3.TransformCoordinates(this.getEyesPosition(), inverseTransform);
 
         this.getTransform().rotate(Axis.Y, this.firstPersonCamera.rotation.y, Space.LOCAL);
@@ -172,7 +169,6 @@ export class CharacterControls implements Controls {
 
     dispose() {
         this.avatar.dispose();
-        this.headTransform.dispose();
         this.firstPersonCamera.dispose();
         this.thirdPersonCamera.dispose();
     }

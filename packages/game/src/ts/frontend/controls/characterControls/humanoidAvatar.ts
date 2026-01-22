@@ -20,7 +20,7 @@ import { BoneLookController } from "@babylonjs/core/Bones/boneLookController";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate, PhysicsShapeCapsule, type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
@@ -105,6 +105,8 @@ export class HumanoidAvatar implements Transformable {
     private readonly mass = 80;
     readonly aggregate: PhysicsAggregate;
 
+    readonly headTransform: TransformNode;
+
     constructor(instance: HumanoidInstance, physicsEngine: PhysicsEngineV2, scene: Scene) {
         this.instance = instance;
         this.root = instance.root as AbstractMesh;
@@ -127,6 +129,9 @@ export class HumanoidAvatar implements Transformable {
         this.aggregate.body.disablePreStep = false;
 
         this.physicsEngine = physicsEngine;
+
+        this.headTransform = new TransformNode("characterHeadTransform", scene);
+        this.headTransform.attachToBone(this.instance.head.bone, this.instance.head.attachmentMesh);
 
         this.idleAnim = instance.animations.idle;
         this.idleAnim.play(true);
@@ -457,6 +462,7 @@ export class HumanoidAvatar implements Transformable {
             group.dispose();
         }
 
+        this.headTransform.dispose();
         this.root.dispose();
     }
 }
