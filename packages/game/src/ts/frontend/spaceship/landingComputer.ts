@@ -129,6 +129,9 @@ export class LandingComputer {
     private readonly positionController: PositionPDController;
     private readonly attitudeController: AttitudePDController;
 
+    private readonly tmpForce = new Vector3();
+    private readonly tmpTorque = new Vector3();
+
     constructor(aggregate: PhysicsAggregate, physicsEngine: PhysicsEngineV2) {
         this.aggregate = aggregate;
         this.transform = aggregate.transformNode;
@@ -337,7 +340,7 @@ export class LandingComputer {
                 velocity: Vector3.ZeroReadOnly,
             },
             mass,
-            Vector3.Zero(),
+            this.tmpForce,
             {
                 max: {
                     closingSpeed: currentAction.maxVelocity.linear,
@@ -360,7 +363,7 @@ export class LandingComputer {
                 angularVelocity: Vector3.ZeroReadOnly,
             },
             { mass, inertia, inertiaOrientation },
-            Vector3.Zero(),
+            this.tmpTorque,
         );
 
         this.aggregate.body.applyTorque(attitudeTorque);

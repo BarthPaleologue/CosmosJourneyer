@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { PhysicsMassProperties } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
 export type AngularMassProperties = Required<Omit<PhysicsMassProperties, "centerOfMass">>;
@@ -31,6 +31,18 @@ export class AttitudePDController {
      */
     readonly kd: number;
 
+    private readonly tmpQuaternionError = new Quaternion();
+    private readonly tmpRotationError = new Vector3();
+    private readonly tmpErrorVectorPart = new Vector3();
+    private readonly tmpAngularVelocityError = new Vector3();
+    private readonly tmpInertia = new Vector3();
+    private readonly tmpWorldFromInertia = new Quaternion();
+    private readonly tmpInertiaFromWorld = new Quaternion();
+    private readonly tmpRotationErrorLocal = new Vector3();
+    private readonly tmpAngularVelocityErrorLocal = new Vector3();
+    private readonly tmpProportionalTerm = new Vector3();
+    private readonly tmpDerivativeTerm = new Vector3();
+
     constructor(kp: number, kd: number) {
         this.kp = kp;
         this.kd = kd;
@@ -45,38 +57,48 @@ export class AttitudePDController {
         massProps: AngularMassProperties,
         ref: Vector3,
     ): Vector3 {
-        const quaternionError = target.orientation.multiply(current.orientation.conjugate());
+        const quaternionError = target.orientation.multiplyToRef(
+            current.orientation.conjugateToRef(this.tmpQuaternionError),
+            this.tmpQuaternionError,
+        );
         if (quaternionError.w < 0) {
             quaternionError.scaleInPlace(-1); // shortest arc
         }
 
         // convert the quaternion error to a scale-axis representation
-        let rotationError = Vector3.Zero();
-        const v = new Vector3(quaternionError.x, quaternionError.y, quaternionError.z);
-        const vLen = v.length();
-        if (vLen > 1e-8) {
-            const angle = 2 * Math.atan2(vLen, quaternionError.w);
-            const axis = v.scale(1 / vLen);
-            rotationError = axis.scale(angle);
+        const rotationError = this.tmpRotationError.setAll(0);
+        const errorVectorPart = this.tmpErrorVectorPart.set(quaternionError.x, quaternionError.y, quaternionError.z);
+        const errorVectorPartLength = errorVectorPart.length();
+        if (errorVectorPartLength > 1e-8) {
+            const angle = 2 * Math.atan2(errorVectorPartLength, quaternionError.w);
+            errorVectorPart.scaleToRef(angle / errorVectorPartLength, rotationError);
         }
 
-        const angularVelocityError = current.angularVelocity.subtract(target.angularVelocity);
+        const angularVelocityError = current.angularVelocity.subtractToRef(
+            target.angularVelocity,
+            this.tmpAngularVelocityError,
+        );
 
         const mass = massProps.mass;
         const inertiaPerMassUnit = massProps.inertia;
         const inertiaOrientation = massProps.inertiaOrientation;
-        const inertia = inertiaPerMassUnit.scale(mass);
+        const inertia = inertiaPerMassUnit.scaleToRef(mass, this.tmpInertia);
 
-        const worldFromInertia = inertiaOrientation.multiply(current.orientation);
-        const inertiaFromWorld = worldFromInertia.conjugate();
+        const worldFromInertia = inertiaOrientation.multiplyToRef(current.orientation, this.tmpWorldFromInertia);
+        const inertiaFromWorld = worldFromInertia.conjugateToRef(this.tmpInertiaFromWorld);
 
-        const rotationErrorLocal = rotationError.applyRotationQuaternion(inertiaFromWorld);
-        const angularVelocityErrorLocal = angularVelocityError.applyRotationQuaternion(inertiaFromWorld);
+        const rotationErrorLocal = rotationError.rotateByQuaternionToRef(inertiaFromWorld, this.tmpRotationErrorLocal);
+        const angularVelocityErrorLocal = angularVelocityError.rotateByQuaternionToRef(
+            inertiaFromWorld,
+            this.tmpAngularVelocityErrorLocal,
+        );
 
         const torqueLocal = rotationErrorLocal
-            .multiply(inertia)
-            .scale(this.kp)
-            .add(angularVelocityErrorLocal.multiply(inertia).scale(-this.kd));
+            .multiplyToRef(inertia, this.tmpProportionalTerm)
+            .scaleInPlace(this.kp)
+            .addInPlace(
+                angularVelocityErrorLocal.multiplyToRef(inertia, this.tmpDerivativeTerm).scaleInPlace(-this.kd),
+            );
 
         const torque = torqueLocal.applyRotationQuaternionToRef(worldFromInertia, ref);
 
