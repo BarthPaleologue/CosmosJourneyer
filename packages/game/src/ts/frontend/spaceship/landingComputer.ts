@@ -70,7 +70,7 @@ type LandingPlanStep = {
      * The maximum velocity at any point during the step
      */
     maxVelocity: {
-        linearY: number;
+        linear: number;
         rotation: number;
     };
 
@@ -183,7 +183,7 @@ export class LandingComputer {
                     rotation: 0.1,
                 },
                 maxVelocity: {
-                    linearY: 20,
+                    linear: 20,
                     rotation: 0.5,
                 },
                 tolerance: {
@@ -210,7 +210,7 @@ export class LandingComputer {
                     rotation: 0.1,
                 },
                 maxVelocity: {
-                    linearY: 5,
+                    linear: 5,
                     rotation: 0.5,
                 },
                 tolerance: {
@@ -270,7 +270,7 @@ export class LandingComputer {
                     rotation: 0.1,
                 },
                 maxVelocity: {
-                    linearY: 5,
+                    linear: 5,
                     rotation: 0.5,
                 },
                 tolerance: {
@@ -340,7 +340,7 @@ export class LandingComputer {
             Vector3.Zero(),
             {
                 max: {
-                    closingSpeed: currentAction.maxVelocity.linearY,
+                    closingSpeed: currentAction.maxVelocity.linear,
                     acceleration: 2 * EarthG,
                 },
             },
