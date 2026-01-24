@@ -287,7 +287,7 @@ export class StarMapView implements View {
             "CurrentItineraryLine",
             { points },
             {
-                color: Color3.FromHexString("#ff0000"),
+                color: Color3.FromHexString("#003f9f"),
                 width: 0.07,
                 colorMode: 0,
             },
