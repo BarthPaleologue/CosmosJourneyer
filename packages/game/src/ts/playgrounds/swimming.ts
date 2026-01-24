@@ -37,7 +37,7 @@ import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAv
 
 import { CollisionMask } from "@/settings";
 
-import { createSky, enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
 export async function CreateSwimmingScene(
     engine: AbstractEngine,
@@ -48,9 +48,7 @@ export async function CreateSwimmingScene(
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
-    engine.getRenderingCanvas()?.addEventListener("click", async () => {
-        await engine.getRenderingCanvas()?.requestPointerLock();
-    });
+    enablePointerLock(engine);
 
     const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 

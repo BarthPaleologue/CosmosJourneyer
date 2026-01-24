@@ -22,7 +22,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { getTransformationQuaternion } from "@/frontend/helpers/algebra";
 import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
 import { pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
 
@@ -100,7 +99,7 @@ export class DefaultControls implements Controls {
         const transformForward = this.getTransform().forward;
 
         if (!cameraForward.equalsWithEpsilon(transformForward)) {
-            const rotation = getTransformationQuaternion(transformForward, cameraForward);
+            const rotation = Quaternion.FromUnitVectorsToRef(transformForward, cameraForward, Quaternion.Identity());
             this.transform.rotationQuaternion = rotation.multiply(
                 this.transform.rotationQuaternion ?? Quaternion.Identity(),
             );

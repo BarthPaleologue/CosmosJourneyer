@@ -29,6 +29,8 @@ import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
 
+import { enablePointerLock } from "../utils";
+
 export async function createBlackHoleScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor | null,
@@ -66,11 +68,7 @@ export async function createBlackHoleScene(
         blackHolePostProcess.update(deltaSeconds);
     });
 
-    document.addEventListener("click", async () => {
-        if (document.pointerLockElement === null) {
-            await defaultControls.getActiveCamera().getEngine().getRenderingCanvas()?.requestPointerLock();
-        }
-    });
+    enablePointerLock(engine);
 
     return scene;
 }

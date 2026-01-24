@@ -39,7 +39,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 
 import { CollisionMask } from "@/settings";
 
-import { enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
@@ -50,17 +50,23 @@ export async function createAutomaticLandingScene(
 
     await enablePhysics(scene);
 
+    enablePointerLock(engine);
+
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
     const soundPlayer = new SoundPlayerMock();
 
     const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
-    ship.getTransform().position.copyFromFloats(
-        randRange(-50, 50, Math.random, 0),
-        randRange(30, 50, Math.random, 0),
-        randRange(-50, 50, Math.random, 0),
-    );
-    ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
+
+    const initShipTransform = () => {
+        ship.getTransform().position.copyFromFloats(
+            randRange(-50, 50, Math.random, 0),
+            randRange(30, 50, Math.random, 0),
+            randRange(-50, 50, Math.random, 0),
+        );
+        ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
+    };
+    initShipTransform();
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.getTransform().position.copyFromFloats(0, 10, 75);
@@ -88,13 +94,19 @@ export async function createAutomaticLandingScene(
 
     const sun = new DirectionalLight("sun", new Vector3(1, -2, -1), scene);
 
+    createSky(sun.direction.negate(), scene);
+
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 0.1;
 
     enableShadows(sun);
 
-    ship.engageLandingOnPad(landingPad);
-    //ship.engageSurfaceLanding(ground);
+    const engageLanding = () => {
+        ship.engageLandingOnPad(landingPad);
+        //ship.engageSurfaceLanding(ground);
+    };
+
+    engageLanding();
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
@@ -102,6 +114,14 @@ export async function createAutomaticLandingScene(
         ship.update(deltaSeconds);
 
         defaultControls.update(deltaSeconds);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "r") {
+            ship.takeOff();
+            initShipTransform();
+            engageLanding();
+        }
     });
 
     return scene;

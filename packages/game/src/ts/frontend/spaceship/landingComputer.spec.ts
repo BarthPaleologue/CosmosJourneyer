@@ -46,7 +46,7 @@ describe("LandingComputer", () => {
             getAngularVelocity: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
             getMassProperties: vi.fn().mockReturnValue({ mass: 1 }),
             applyForce: vi.fn(),
-            applyAngularImpulse: vi.fn(),
+            applyTorque: vi.fn(),
         } as unknown as PhysicsBody;
 
         mockAggregate = {

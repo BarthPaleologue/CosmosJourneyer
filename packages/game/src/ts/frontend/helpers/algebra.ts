@@ -16,48 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Color3 } from "@babylonjs/core/Maths/math.color";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { clamp } from "@/utils/math";
 import type { Vector3Like } from "@/utils/types";
 
 export function wrapVector3(vector: Vector3Like, target = new Vector3()): Vector3 {
     return target.copyFromFloats(vector.x, vector.y, vector.z);
-}
-
-export function getTransformationQuaternion(from: Vector3, to: Vector3): Quaternion {
-    if (from.equalsWithEpsilon(to)) {
-        return Quaternion.Identity();
-    }
-
-    const crossProduct = Vector3.Cross(from, to);
-    if (crossProduct.lengthSquared() < 1e-8) {
-        let axis: Vector3;
-        if (Math.abs(from.x) < Math.abs(from.y)) {
-            axis = Math.abs(from.x) < Math.abs(from.z) ? new Vector3(1, 0, 0) : new Vector3(0, 0, 1);
-        } else {
-            axis = Math.abs(from.y) < Math.abs(from.z) ? new Vector3(0, 1, 0) : new Vector3(0, 0, 1);
-        }
-        axis = Vector3.Cross(from, axis).normalize();
-        return Quaternion.RotationAxis(axis, Math.PI);
-    }
-
-    const cosTheta = clamp(Vector3.Dot(from, to), -1, 1);
-    const theta = Math.acos(cosTheta);
-
-    return Quaternion.RotationAxis(crossProduct.normalize(), theta);
-}
-
-export function getDeltaQuaternion(from: Quaternion, to: Quaternion): Quaternion {
-    return to.multiply(from.conjugate());
-}
-
-export function getAngleFromQuaternion(quaternion: Quaternion): number {
-    return 2 * Math.acos(quaternion.w);
-}
-
-export function getAxisFromQuaternion(quaternion: Quaternion): Vector3 {
-    return new Vector3(quaternion.x, quaternion.y, quaternion.z).normalize();
 }
 
 export function flattenVector3Array(vector3Array: ReadonlyArray<Vector3Like>): number[] {

@@ -38,7 +38,7 @@ import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAv
 import { setUpVector } from "@/frontend/helpers/transform";
 import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
-import { createSky, enablePhysics, enableShadows } from "./utils";
+import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
@@ -49,9 +49,7 @@ export async function createCharacterDemoScene(
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, 0, 0));
 
-    engine.getRenderingCanvas()?.addEventListener("click", async () => {
-        await engine.getRenderingCanvas()?.requestPointerLock();
-    });
+    enablePointerLock(engine);
 
     const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
