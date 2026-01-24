@@ -20,6 +20,9 @@ import "@babylonjs/core/Culling/ray";
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
+import type { GreasedLineBaseMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineBaseMesh";
+import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { type Scene } from "@babylonjs/core/scene";
@@ -49,7 +52,6 @@ import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { StarMapUI } from "./starMapUI";
 import { StellarPathfinder } from "./stellarPathfinder";
-import { ThickLines } from "./thickLines";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -77,8 +79,8 @@ export class StarMapView implements View {
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private currentSystemCoordinates: StarSystemCoordinates | null = null;
 
-    private readonly currentItineraryLine: ThickLines;
-    private readonly visitedSystemsLines: ThickLines;
+    private currentItineraryLine: GreasedLineBaseMesh | null = null;
+    private visitedSystemsLines: GreasedLineBaseMesh | null = null;
 
     private readonly stellarPathfinder: StellarPathfinder;
 
@@ -191,26 +193,6 @@ export class StarMapView implements View {
         pipeline.imageProcessing.exposure = 1.0;
         pipeline.imageProcessing.contrast = 1.0;
 
-        this.currentItineraryLine = new ThickLines(
-            "travelLine",
-            {
-                points: [],
-                thickness: 0.05,
-                color: Color3.Red(),
-            },
-            this.scene,
-        );
-
-        this.visitedSystemsLines = new ThickLines(
-            "visitedSystemsLine",
-            {
-                points: [],
-                thickness: 0.05,
-                color: Color3.Gray(),
-            },
-            this.scene,
-        );
-
         this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
@@ -285,18 +267,53 @@ export class StarMapView implements View {
         window.StarMap = this;
     }
 
-    private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
-        const points = path.map((coordinates) => {
+    private getGreasedLinePointsFromSystems(systems: DeepReadonly<Array<StarSystemCoordinates>>): Vector3[] {
+        if (systems.length < 2) {
+            return [];
+        }
+        const points = systems.map((coordinates) => {
             return wrapVector3(this.universeBackend.getSystemGalacticPosition(coordinates));
         });
-        this.currentItineraryLine.setPoints(points);
+
+        return GreasedLineTools.SegmentizeLineBySegmentCount(points, points.length - 1);
+    }
+
+    private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
+        if (this.currentItineraryLine !== null) {
+            this.currentItineraryLine.dispose();
+        }
+        const points = this.getGreasedLinePointsFromSystems(path);
+        this.currentItineraryLine = CreateGreasedLine(
+            "CurrentItineraryLine",
+            { points },
+            {
+                color: Color3.FromHexString("#ff0000"),
+                width: 0.07,
+                colorMode: 0,
+            },
+            this.scene,
+        );
     }
 
     private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
-        const points = path.map((coordinates) => {
-            return wrapVector3(this.universeBackend.getSystemGalacticPosition(coordinates));
-        });
-        this.visitedSystemsLines.setPoints(points);
+        if (this.visitedSystemsLines !== null) {
+            this.visitedSystemsLines.dispose();
+        }
+        const points = this.getGreasedLinePointsFromSystems(path);
+        const totalLength = GreasedLineTools.GetLineLength(points);
+        this.visitedSystemsLines = CreateGreasedLine(
+            "VisitedSystemsLines",
+            { points },
+            {
+                useDash: true,
+                dashCount: 2 * totalLength,
+                dashRatio: 0.3,
+                color: Color3.FromHexString("#9a9a9a"),
+                width: 0.05,
+                colorMode: 0,
+            },
+            this.scene,
+        );
     }
 
     public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean) {
@@ -390,9 +407,15 @@ export class StarMapView implements View {
         this.starMapUI.htmlRoot.classList.remove("hidden");
         if (this.player.currentItinerary !== null) {
             this.drawCurrentItinerary(this.player.currentItinerary);
+        } else if (this.currentItineraryLine !== null) {
+            this.currentItineraryLine.dispose();
+            this.currentItineraryLine = null;
         }
         if (this.player.visitedSystemHistory.length > 1) {
             this.drawVisitedSystems(this.player.visitedSystemHistory);
+        } else if (this.visitedSystemsLines !== null) {
+            this.visitedSystemsLines.dispose();
+            this.visitedSystemsLines = null;
         }
     }
 
