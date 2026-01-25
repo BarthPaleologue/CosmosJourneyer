@@ -51,6 +51,7 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
     const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, { x: 0, y: 0, z: 0 }, [
         hecate,
     ]);
+    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
 
     const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
     manaleth.orbit.inclination = degreesToRadians(45);
