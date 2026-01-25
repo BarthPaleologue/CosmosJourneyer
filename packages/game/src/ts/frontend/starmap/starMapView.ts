@@ -280,7 +280,7 @@ export class StarMapView implements View {
 
     private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
         if (this.currentItineraryLine !== null) {
-            this.currentItineraryLine.dispose();
+            this.currentItineraryLine.dispose(undefined, true);
         }
         const points = this.getGreasedLinePointsFromSystems(path);
         this.currentItineraryLine = CreateGreasedLine(
@@ -297,7 +297,7 @@ export class StarMapView implements View {
 
     private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
         if (this.visitedSystemsLines !== null) {
-            this.visitedSystemsLines.dispose();
+            this.visitedSystemsLines.dispose(undefined, true);
         }
         const points = this.getGreasedLinePointsFromSystems(path);
         const totalLength = GreasedLineTools.GetLineLength(points);
@@ -408,13 +408,13 @@ export class StarMapView implements View {
         if (this.player.currentItinerary !== null) {
             this.drawCurrentItinerary(this.player.currentItinerary);
         } else if (this.currentItineraryLine !== null) {
-            this.currentItineraryLine.dispose();
+            this.currentItineraryLine.dispose(undefined, true);
             this.currentItineraryLine = null;
         }
         if (this.player.visitedSystemHistory.length > 1) {
             this.drawVisitedSystems(this.player.visitedSystemHistory);
         } else if (this.visitedSystemsLines !== null) {
-            this.visitedSystemsLines.dispose();
+            this.visitedSystemsLines.dispose(undefined, true);
             this.visitedSystemsLines = null;
         }
     }
