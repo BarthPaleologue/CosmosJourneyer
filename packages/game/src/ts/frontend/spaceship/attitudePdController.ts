@@ -69,8 +69,8 @@ export class AttitudePDController {
         const angle = quaternionError.toAxisAngleToRef(scaledAxisError);
         scaledAxisError.scaleInPlace(angle);
 
-        const angularVelocityError = current.angularVelocity.subtractToRef(
-            target.angularVelocity,
+        const angularVelocityError = target.angularVelocity.subtractToRef(
+            current.angularVelocity,
             this.tmpAngularVelocityError,
         );
 
@@ -94,9 +94,7 @@ export class AttitudePDController {
         const torqueLocal = rotationErrorLocal
             .multiplyToRef(inertia, this.tmpProportionalTerm)
             .scaleInPlace(this.kp)
-            .addInPlace(
-                angularVelocityErrorLocal.multiplyToRef(inertia, this.tmpDerivativeTerm).scaleInPlace(-this.kd),
-            );
+            .addInPlace(angularVelocityErrorLocal.multiplyToRef(inertia, this.tmpDerivativeTerm).scaleInPlace(this.kd));
 
         const torque = torqueLocal.applyRotationQuaternionToRef(worldFromInertia, ref);
 
