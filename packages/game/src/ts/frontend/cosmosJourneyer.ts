@@ -1030,5 +1030,6 @@ export class CosmosJourneyer {
         }
 
         this.starSystemView.getSpaceshipControls().getSpaceship().spawnOnPad(landingPad);
+        this.starSystemView.getSpaceshipControls().syncCameraTransform();
     }
 }
