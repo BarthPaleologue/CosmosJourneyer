@@ -18,6 +18,7 @@
 import "@styles/index.scss";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
+import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CosmosJourneyer } from "@/frontend/cosmosJourneyer";
@@ -65,6 +66,15 @@ async function startCosmosJourneyer() {
     if (saveString !== null) {
         await initWithSaveString(engine, saveString);
         return;
+    }
+
+    if (urlParams.has("continue")) {
+        const latestSave = await getLatestSaveFromBackend(engine.backend.save);
+        if (latestSave !== null) {
+            await engine.loadSave(latestSave);
+            engine.starSystemView.setUIEnabled(true);
+            return;
+        }
     }
 
     await simpleInit(engine);
