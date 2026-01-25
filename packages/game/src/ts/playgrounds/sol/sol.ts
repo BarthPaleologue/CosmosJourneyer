@@ -70,7 +70,7 @@ export async function createSolScene(
         assets,
         scene,
     );
-    starSystemController.initPositions(2, chunkForge);
+    starSystemController.initPositions(2, chunkForge, Date.now() / 1000);
 
     const sun = starSystemController.getStellarObjects()[0];
 

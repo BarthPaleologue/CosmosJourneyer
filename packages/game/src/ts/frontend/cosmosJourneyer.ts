@@ -562,7 +562,7 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) await this.mainMenu.init();
-        this.starSystemView.initStarSystem();
+        this.starSystemView.initStarSystem(Date.now() / 1000);
 
         this.engine.runRenderLoop(() => {
             const deltaSeconds = this.engine.getDeltaTime() / 1000;
@@ -910,7 +910,7 @@ export class CosmosJourneyer {
         if (this.state === EngineState.UNINITIALIZED) {
             await this.init(true);
         } else {
-            this.starSystemView.initStarSystem();
+            this.starSystemView.initStarSystem(Date.now() / 1000);
         }
 
         if (playerLocation.type === "inSpaceship") {
