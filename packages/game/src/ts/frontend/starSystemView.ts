@@ -424,8 +424,6 @@ export class StarSystemView implements View {
             observer.remove();
             this.jumpLock = false;
 
-            this.player.visitedSystemHistory.push(this.getStarSystem().model.coordinates);
-
             this.onAfterJump.notifyObservers();
         });
 
@@ -535,8 +533,6 @@ export class StarSystemView implements View {
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
             this.spaceStationLayer.reset();
-
-            this.player.visitedSystemHistory.push(this.starSystem.model.coordinates);
         }
 
         this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
@@ -655,6 +651,7 @@ export class StarSystemView implements View {
             }
         }
 
+        this.ensureCurrentSystemInHistory();
         this.onInitStarSystem.notifyObservers();
         this.scene.getEngine().loadingScreen.hideLoadingUI();
 
@@ -759,6 +756,18 @@ export class StarSystemView implements View {
         }
 
         await this.scene.setActiveControls(this.spaceshipControls);
+    }
+
+    private ensureCurrentSystemInHistory(): void {
+        const currentCoordinates = this.getStarSystem().model.coordinates;
+        const lastVisited = this.player.visitedSystemHistory.at(-1);
+        if (lastVisited === undefined) {
+            this.player.visitedSystemHistory.push(currentCoordinates);
+            return;
+        }
+        if (!starSystemCoordinatesEquals(lastVisited, currentCoordinates)) {
+            this.player.visitedSystemHistory.push(currentCoordinates);
+        }
     }
 
     public isJumpingBetweenSystems() {
