@@ -32,8 +32,7 @@ export class AttitudePDController {
     readonly kd: number;
 
     private readonly tmpQuaternionError = new Quaternion();
-    private readonly tmpRotationError = new Vector3();
-    private readonly tmpErrorVectorPart = new Vector3();
+    private readonly tmpScaledAxisError = new Vector3();
     private readonly tmpAngularVelocityError = new Vector3();
     private readonly tmpInertia = new Vector3();
     private readonly tmpWorldFromInertia = new Quaternion();
@@ -66,13 +65,9 @@ export class AttitudePDController {
         }
 
         // convert the quaternion error to a scale-axis representation
-        const rotationError = this.tmpRotationError.setAll(0);
-        const errorVectorPart = this.tmpErrorVectorPart.set(quaternionError.x, quaternionError.y, quaternionError.z);
-        const errorVectorPartLength = errorVectorPart.length();
-        if (errorVectorPartLength > 1e-8) {
-            const angle = 2 * Math.atan2(errorVectorPartLength, quaternionError.w);
-            errorVectorPart.scaleToRef(angle / errorVectorPartLength, rotationError);
-        }
+        const scaledAxisError = this.tmpScaledAxisError;
+        const angle = quaternionError.toAxisAngleToRef(scaledAxisError);
+        scaledAxisError.scaleInPlace(angle);
 
         const angularVelocityError = current.angularVelocity.subtractToRef(
             target.angularVelocity,
@@ -87,7 +82,10 @@ export class AttitudePDController {
         const worldFromInertia = inertiaOrientation.multiplyToRef(current.orientation, this.tmpWorldFromInertia);
         const inertiaFromWorld = worldFromInertia.conjugateToRef(this.tmpInertiaFromWorld);
 
-        const rotationErrorLocal = rotationError.rotateByQuaternionToRef(inertiaFromWorld, this.tmpRotationErrorLocal);
+        const rotationErrorLocal = scaledAxisError.rotateByQuaternionToRef(
+            inertiaFromWorld,
+            this.tmpRotationErrorLocal,
+        );
         const angularVelocityErrorLocal = angularVelocityError.rotateByQuaternionToRef(
             inertiaFromWorld,
             this.tmpAngularVelocityErrorLocal,
