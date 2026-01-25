@@ -64,7 +64,11 @@ export async function createAutomaticLandingScene(
             randRange(30, 50, Math.random, 0),
             randRange(-50, 50, Math.random, 0),
         );
-        ship.getTransform().rotationQuaternion = Quaternion.Random().normalize();
+        ship.getTransform().rotationQuaternion = Quaternion.FromEulerAngles(
+            Math.random() * 2 * Math.PI,
+            Math.random() * 2 * Math.PI,
+            Math.random() * 2 * Math.PI,
+        );
     };
     initShipTransform();
 
