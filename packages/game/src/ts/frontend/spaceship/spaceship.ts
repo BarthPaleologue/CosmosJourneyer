@@ -459,9 +459,10 @@ export class Spaceship implements Transformable, Targetable {
         this.getTransform().setParent(null);
         this.engageLandingOnPad(landingPad);
         this.getTransform().rotationQuaternion = Quaternion.Identity();
-        this.getTransform().position.copyFromFloats(0, this.boundingExtent.y / 2, 0);
+        this.getTransform().position.copyFromFloats(0, (landingPad.getPadHeight() + this.boundingExtent.y) / 2, 0);
         this.getTransform().parent = landingPad.getTransform();
         this.completeLanding();
+        this.updatePhysicsState();
     }
 
     public isLanded(): boolean {
@@ -619,6 +620,31 @@ export class Spaceship implements Transformable, Targetable {
         else this.warpTunnel.setThrottle(0);
     }
 
+    private updatePhysicsState() {
+        const currentMotionType = this.aggregate.body.getMotionType();
+        const warpDrive = this.getInternals().getWarpDrive();
+        switch (this.state) {
+            case ShipState.LANDED:
+                if (currentMotionType !== PhysicsMotionType.STATIC) {
+                    this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
+                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+                }
+                break;
+            case ShipState.FLYING:
+            case ShipState.LANDING:
+                if (warpDrive !== null && warpDrive.isEnabled()) {
+                    if (currentMotionType !== PhysicsMotionType.ANIMATED) {
+                        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
+                        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
+                    }
+                } else if (currentMotionType !== PhysicsMotionType.DYNAMIC) {
+                    this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
+                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
+                }
+                break;
+        }
+    }
+
     public update(deltaSeconds: number) {
         this.getTransform().computeWorldMatrix(true);
         const thrusters = this.getInternals().getThrusters();
@@ -643,27 +669,7 @@ export class Spaceship implements Transformable, Targetable {
 
         this.handleFuelScoop(deltaSeconds);
 
-        const currentMotionType = this.aggregate.body.getMotionType();
-        switch (this.state) {
-            case ShipState.LANDED:
-                if (currentMotionType !== PhysicsMotionType.STATIC) {
-                    this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
-                }
-                break;
-            case ShipState.FLYING:
-            case ShipState.LANDING:
-                if (warpDrive !== null && warpDrive.isEnabled()) {
-                    if (currentMotionType !== PhysicsMotionType.ANIMATED) {
-                        this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
-                        this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
-                    }
-                } else if (currentMotionType !== PhysicsMotionType.DYNAMIC) {
-                    this.aggregate.body.setMotionType(PhysicsMotionType.DYNAMIC);
-                    this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
-                }
-                break;
-        }
+        this.updatePhysicsState();
 
         // Low fuel warning check
         const fuelPercentage = this.getRemainingFuel() / this.getTotalFuelCapacity();
