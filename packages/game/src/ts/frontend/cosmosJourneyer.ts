@@ -160,9 +160,6 @@ export class CosmosJourneyer {
         this.assets = assets;
 
         this.player = player;
-        this.player.onNameChangedObservable.add(async () => {
-            await this.createManualSave();
-        });
 
         this.backend = backend;
 
