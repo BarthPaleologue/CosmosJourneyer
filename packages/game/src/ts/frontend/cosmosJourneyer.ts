@@ -160,9 +160,6 @@ export class CosmosJourneyer {
         this.assets = assets;
 
         this.player = player;
-        this.player.onNameChangedObservable.add(async () => {
-            await this.createManualSave();
-        });
 
         this.backend = backend;
 
@@ -227,7 +224,13 @@ export class CosmosJourneyer {
             });
         });
 
-        this.mainMenu = new MainMenu(this.sidePanels, this.starSystemView, this.backend.universe, this.soundPlayer);
+        this.mainMenu = new MainMenu(
+            this.sidePanels,
+            this.starSystemView,
+            this.backend.save,
+            this.backend.universe,
+            this.soundPlayer,
+        );
         this.mainMenu.onStartObservable.add(async () => {
             await this.tutorialLayer.setTutorial(new FlightTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {

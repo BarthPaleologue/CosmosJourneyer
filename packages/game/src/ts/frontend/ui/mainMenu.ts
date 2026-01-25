@@ -18,6 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
+import { type ISaveBackend } from "@/backend/save/saveBackend";
+import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -58,6 +60,7 @@ export class MainMenu {
     private readonly version: HTMLElement;
 
     private readonly startButton: HTMLElement;
+    private readonly continueButton: HTMLElement;
     private readonly loadSaveButton: HTMLElement;
     private readonly settingsButton: HTMLElement;
     private readonly tutorialsButton: HTMLElement;
@@ -67,6 +70,7 @@ export class MainMenu {
     private readonly menuItems: HTMLElement;
 
     private readonly sidePanels: SidePanels;
+    private readonly saveBackend: ISaveBackend;
 
     private readonly universeObjectId: UniverseObjectId;
 
@@ -77,6 +81,7 @@ export class MainMenu {
         title: HTMLElement;
         version: HTMLElement;
         startButton: HTMLElement;
+        continueButton: HTMLElement;
         loadSaveButton: HTMLElement;
         settingsButton: HTMLElement;
         tutorialsButton: HTMLElement;
@@ -106,7 +111,11 @@ export class MainMenu {
         const menuItemsUl = document.createElement("ul");
         menuItemsUl.className = "leftSideMenu";
 
-        // Create individual button elements with translated text
+        const continueButton = document.createElement("li");
+        continueButton.textContent = i18n.t("mainMenu:continue");
+        continueButton.style.display = "none";
+        menuItemsUl.appendChild(continueButton);
+
         const startButton = document.createElement("li");
         startButton.textContent = i18n.t("mainMenu:newJourney");
         menuItemsUl.appendChild(startButton);
@@ -142,6 +151,7 @@ export class MainMenu {
             title: title,
             version: versionP,
             startButton: startButton,
+            continueButton: continueButton,
             loadSaveButton: loadSaveButton,
             settingsButton: settingsButton,
             tutorialsButton: tutorialsButton,
@@ -155,10 +165,12 @@ export class MainMenu {
     constructor(
         sidePanels: SidePanels,
         starSystemView: StarSystemView,
+        saveBackend: ISaveBackend,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
     ) {
         this.sidePanels = sidePanels;
+        this.saveBackend = saveBackend;
         this.starSystemView = starSystemView;
 
         this.scene = this.starSystemView.scene;
@@ -195,6 +207,7 @@ export class MainMenu {
         this.title = elements.title;
         this.version = elements.version;
         this.startButton = elements.startButton;
+        this.continueButton = elements.continueButton;
         this.loadSaveButton = elements.loadSaveButton;
         this.settingsButton = elements.settingsButton;
         this.tutorialsButton = elements.tutorialsButton;
@@ -214,6 +227,7 @@ export class MainMenu {
         // Add sound events to all menu items
         const allMenuItems = [
             this.startButton,
+            this.continueButton,
             this.loadSaveButton,
             this.settingsButton,
             this.tutorialsButton,
@@ -236,6 +250,15 @@ export class MainMenu {
 
         this.startButton.addEventListener("click", () => {
             this.startAnimation(() => this.onStartObservable.notifyObservers());
+        });
+
+        this.continueButton.addEventListener("click", async () => {
+            const latestSave = await getLatestSaveFromBackend(this.saveBackend);
+            if (latestSave === null) {
+                return;
+            }
+            this.hide();
+            this.sidePanels.loadSavePanel.content.onLoadSaveObservable.notifyObservers(latestSave);
         });
 
         this.loadSaveButton.addEventListener("click", async () => {
@@ -272,6 +295,7 @@ export class MainMenu {
 
     async init() {
         await this.starSystemView.loadStarSystem(this.starSystemModel);
+        await this.syncContinueButton();
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
@@ -293,6 +317,11 @@ export class MainMenu {
         this.starSystemView.targetCursorLayer.setEnabled(false);
 
         this.htmlRoot.style.display = "block";
+    }
+
+    private async syncContinueButton(): Promise<void> {
+        const latestSave = await getLatestSaveFromBackend(this.saveBackend);
+        this.continueButton.style.display = latestSave === null ? "none" : "";
     }
 
     private startAnimation(onAnimationFinished: () => void) {
