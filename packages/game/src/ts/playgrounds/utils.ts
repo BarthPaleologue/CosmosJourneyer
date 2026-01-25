@@ -41,8 +41,8 @@ export async function enablePhysics(
     havokInstance?: HavokPhysicsWithBindings,
 ): Promise<PhysicsEngineV2> {
     const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));
+    havokPlugin.setVelocityLimits(10_000, 10_000);
     scene.enablePhysics(gravity, havokPlugin);
-
     return scene.getPhysicsEngine() as PhysicsEngineV2;
 }
 
