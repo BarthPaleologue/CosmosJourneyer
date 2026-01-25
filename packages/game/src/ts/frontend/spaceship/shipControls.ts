@@ -101,6 +101,7 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.position = new Vector3(0, 1.5, 8);
 
         this.thirdPersonCameraTransform = new TransformNode("thirdPersonCameraTransform", scene);
+        this.thirdPersonCameraTransform.rotationQuaternion = Quaternion.Identity();
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "shipThirdPersonCamera",
