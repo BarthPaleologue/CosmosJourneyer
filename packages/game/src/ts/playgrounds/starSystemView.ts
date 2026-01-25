@@ -95,6 +95,7 @@ export async function createStarSystemViewScene(
                 .getLandingPads()[0];
             if (landingPad !== undefined) {
                 shipControls.getSpaceship().spawnOnPad(landingPad);
+                shipControls.syncCameraTransform();
             }
             break;
         }
