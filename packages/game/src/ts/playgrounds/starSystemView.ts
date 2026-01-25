@@ -82,11 +82,32 @@ export async function createStarSystemViewScene(
 
     starSystemView.initStarSystem(0);
 
-    positionNearObjectBrightSide(
-        starSystemView.getSpaceshipControls(),
-        starSystemView.getStarSystem().getStellarObjects()[0],
-        starSystemView.getStarSystem(),
-    );
+    const shipControls = starSystemView.getSpaceshipControls();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const spawnLocationParam = urlParams.get("spawnLocation");
+    switch (spawnLocationParam) {
+        case "atStation": {
+            const landingPad = starSystemView
+                .getStarSystem()
+                .getOrbitalFacilities()[0]
+                ?.getLandingPadManager()
+                .getLandingPads()[0];
+            if (landingPad !== undefined) {
+                shipControls.getSpaceship().spawnOnPad(landingPad);
+            }
+            break;
+        }
+        case "aroundStar":
+        case null:
+        default:
+            positionNearObjectBrightSide(
+                starSystemView.getSpaceshipControls(),
+                starSystemView.getStarSystem().getStellarObjects()[0],
+                starSystemView.getStarSystem(),
+            );
+            break;
+    }
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
