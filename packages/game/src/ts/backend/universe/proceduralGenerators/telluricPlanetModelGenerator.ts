@@ -19,7 +19,7 @@ import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
-import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index";
+import { type StellarObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type OceanModel } from "@/backend/universe/orbitalObjects/oceanModel";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { newSeededRingsModel, type RingsModel } from "@/backend/universe/orbitalObjects/ringsModel";
@@ -31,14 +31,17 @@ import { clamp } from "@/utils/math";
 import { EarthMass, EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { hasLiquidWater } from "@/utils/physics/physics";
 import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
+import type { DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
+
+import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
 
 export function newSeededTelluricPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: CelestialBodyModel[],
+    parentBodies: DeepReadonly<Array<StellarObjectModel>>,
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -84,9 +87,15 @@ export function newSeededTelluricPlanetModel(
             ? newCloudsModel(radius + ocean.depth, Settings.CLOUD_LAYER_HEIGHT, waterAmount, pressure)
             : null;
 
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
-    // Todo: do not hardcode
-    const orbitRadius = 2e9 + rng(GenerationSteps.ORBIT) * 15e9 + parentMaxRadius * 1.5;
+    const orbitRadiuses: Array<number> = [];
+    for (const parent of parentBodies) {
+        const radius = getTelluricPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, () =>
+            rng(GenerationSteps.ORBIT + orbitRadiuses.length),
+        );
+        orbitRadiuses.push(radius);
+    }
+
+    const orbitRadius = Math.max(...orbitRadiuses);
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
