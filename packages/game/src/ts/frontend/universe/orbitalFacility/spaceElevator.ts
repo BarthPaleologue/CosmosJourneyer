@@ -47,7 +47,7 @@ import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbital
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp, remap, triangleWave } from "@/utils/math";
-import { getSphereRadiatedEnergyFlux } from "@/utils/physics/thermodynamics";
+import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { type DeepReadonly } from "@/utils/types";
@@ -211,7 +211,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     private generate(stellarObjects: ReadonlyMap<DeepReadonly<StellarObjectModel>, number>, assets: RenderingAssets) {
         let totalStellarFlux = 0;
         stellarObjects.forEach((distance, model) => {
-            totalStellarFlux += getSphereRadiatedEnergyFlux(model.blackBodyTemperature, model.radius, distance);
+            totalStellarFlux += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
         });
 
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(

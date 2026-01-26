@@ -16,57 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The number of meters in a light year.
- */
-export const LightYearInMeters = 3e8 * 60 * 60 * 24 * 365.25;
-
-/**
  * Speed of light in meters per second.
  * @see https://en.wikipedia.org/wiki/Speed_of_light
  */
 export const C = 299_792_458;
 
-/**
- * The gravitational constant in m^3 kg^-1 s^-2.
- */
+/** The gravitational constant in m^3 kg^-1 s^-2. */
 export const G = 6.6743e-11;
 
-/**
- * The astronomical unit in meters.
- */
-export const AU = 150e9;
+/** Pi constant. */
+export const Pi = Math.PI;
 
-/**
- * The mass of the Earth in kilograms.
- */
-export const EarthMass = 5.972e24;
+/** Planck constant in J·s. */
+export const PlanckConstant = 6.626_070_15e-34;
 
-/**
- * The mass of the Moon in kilograms.
- */
-export const MoonMass = 7.348e22;
-
-/**
- * The mass of Jupiter in kilograms.
- */
-export const JupiterMass = 1.898e27;
-
-/**
- * The mass of the sun in kilograms.
- */
-export const SolarMass = 1.989e30;
-
-/**
- * The radius of the sun in meters.
- */
-export const SolarRadius = 696340e3;
-
-/**
- * The gravitational acceleration in m/s^2.
- */
-export const EarthG = 9.81;
-
-/**
- * The sea level pressure on Earth in Pascals.
- */
-export const EarthSeaLevelPressure = 101_325;
+/** Boltzmann constant in J/K. */
+export const BoltzmannConstant = 1.380_649e-23;
