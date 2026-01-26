@@ -53,6 +53,7 @@ import { createSpotLightsScene } from "./spotLights";
 import { createStarMapScene } from "./starMap";
 import { createStarMapViewScene } from "./starMapView";
 import { createStarSystemViewScene } from "./starSystemView";
+import { createStationLandingScene } from "./stationLanding";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
@@ -106,6 +107,7 @@ export class PlaygroundRegistry {
         ["telluricPlanet", createTelluricPlanetScene],
         ["landingPad", createLandingPadScene],
         ["spotLights", createSpotLightsScene],
+        ["stationLanding", createStationLandingScene],
     ]);
 
     register(

@@ -275,10 +275,11 @@ export class StarSystemController {
      * Uses updateOrbitalSimulation to avoid feeding large deltaSeconds to ship systems.
      * @param nbWarmUpUpdates Number of additional small updates to stabilize the simulation
      * @param chunkForge The chunk forge used for terrain generation
+     * @param timestampSeconds The timestamp to which we want to advance the simulation (in seconds)
      */
-    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge): void {
+    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge, timestampSeconds: number): void {
         // Use updateOrbitalSimulation
-        this.updateOrbitalSimulation(Date.now() / 1000);
+        this.updateOrbitalSimulation(timestampSeconds);
 
         // Perform warm-up updates with small time steps
         for (let i = 0; i < nbWarmUpUpdates; i++) this.update(1 / 60, chunkForge);

@@ -57,7 +57,6 @@ export async function createStarSystemViewScene(
     scene.useRightHandedSystem = true;
 
     const havokPlugin = await enablePhysics(scene);
-    havokPlugin.setVelocityLimits(10_000, 10_000);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -80,13 +79,35 @@ export async function createStarSystemViewScene(
 
     await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
 
-    starSystemView.initStarSystem();
+    starSystemView.initStarSystem(0);
 
-    positionNearObjectBrightSide(
-        starSystemView.getSpaceshipControls(),
-        starSystemView.getStarSystem().getStellarObjects()[0],
-        starSystemView.getStarSystem(),
-    );
+    const shipControls = starSystemView.getSpaceshipControls();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const spawnLocationParam = urlParams.get("spawnLocation");
+    switch (spawnLocationParam) {
+        case "atStation": {
+            const landingPad = starSystemView
+                .getStarSystem()
+                .getOrbitalFacilities()[0]
+                ?.getLandingPadManager()
+                .getLandingPads()[0];
+            if (landingPad !== undefined) {
+                shipControls.getSpaceship().spawnOnPad(landingPad);
+                shipControls.syncCameraTransform();
+            }
+            break;
+        }
+        case "aroundStar":
+        case null:
+        default:
+            positionNearObjectBrightSide(
+                starSystemView.getSpaceshipControls(),
+                starSystemView.getStarSystem().getStellarObjects()[0],
+                starSystemView.getStarSystem(),
+            );
+            break;
+    }
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
