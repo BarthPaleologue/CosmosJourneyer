@@ -20,7 +20,7 @@ import { getBlackBodyLuminosity } from "@/utils/physics/thermodynamics";
 import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 
 /**
- * Uses stellar luminosity to determine a plausible semi-major axis range then samples it
+ * Uses stellar luminosity to determine a plausible semi-major axis range for a Telluric planet then samples it
  * @param stellarTemperature Temperature of the parent star in K
  * @param stellarRadius Radius of the parent star in meters
  * @param rng A random number generator function returning a uniform float in [0, 1)
