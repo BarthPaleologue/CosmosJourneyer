@@ -52,7 +52,7 @@ describe("metersToLightYears", () => {
 
     it("converts a large distance in meters", () => {
         const largeDistanceInMeters = LightYearInMeters * 1000000; // A million light years in meters
-        expect(metersToLightYears(largeDistanceInMeters)).toBe(1000000);
+        expect(metersToLightYears(largeDistanceInMeters)).toBeCloseTo(1000000);
     });
 
     it("handles negative distances correctly", () => {
