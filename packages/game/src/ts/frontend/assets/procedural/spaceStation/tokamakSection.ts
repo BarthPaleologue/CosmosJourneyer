@@ -15,10 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
+import { CreateBox, CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -27,6 +29,9 @@ import { type Scene } from "@babylonjs/core/scene";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
+
+import { getRadiatorAreaForHeat } from "@/utils/physics/thermodynamics";
+import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { createRing } from "../helpers/ringBuilder";
 import { RingHabitatMaterial } from "./habitats/ring/ringHabitatMaterial";
@@ -40,6 +45,11 @@ export class TokamakSection implements Transformable {
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
+
+    private readonly radiators: Mesh[] = [];
+    private readonly radiatorAggregates: PhysicsAggregate[] = [];
+
+    private readonly radiatorMaterial: PBRMaterial;
 
     private readonly lights: Array<PointLight> = [];
 
@@ -117,6 +127,49 @@ export class TokamakSection implements Transformable {
 
             this.arms.push(arm);
         }
+
+        const heatOutput = requiredEnergyOutput - requiredNetEnergyOutput;
+        // see DOI 10.1140/epja/i2008-10666-6 "Emissivity measurements of opaque gray bodies up to 2000 ◦C by a dual-frequency pyrometer"
+        const radiatorTargetTemperature = 2000;
+        const emissivity = 0.8;
+        const radiatorArea = getRadiatorAreaForHeat(heatOutput, radiatorTargetTemperature, emissivity, true);
+        const radiatorEmissiveColor = getRgbFromTemperature(radiatorTargetTemperature);
+
+        this.radiatorMaterial = new PBRMaterial("RadiatorMaterial", scene);
+        this.radiatorMaterial.metallic = 0.0;
+        this.radiatorMaterial.roughness = 0.2;
+        this.radiatorMaterial.albedoColor = Color3.FromHexString("#888888");
+        this.radiatorMaterial.emissiveColor = new Color3(
+            radiatorEmissiveColor.r,
+            radiatorEmissiveColor.g,
+            radiatorEmissiveColor.b,
+        );
+
+        const radiatorWidth = 30;
+        const radiatorCount = armCount * 3;
+        for (let i = 0; i < radiatorCount; i++) {
+            const radiatorDepth = radiatorArea / (radiatorWidth * radiatorCount);
+            const radiator = CreateBox(
+                `Radiator${i}`,
+                {
+                    height: 0.1,
+                    width: radiatorWidth,
+                    depth: radiatorDepth,
+                },
+                scene,
+            );
+            radiator.position.z = radiatorDepth / 2 + majorRadius + minorRadius;
+            radiator.rotateAround(Vector3.Zero(), Vector3.Up(), 2 * Math.PI * (i / radiatorCount));
+            radiator.parent = this.attachment;
+            radiator.material = this.radiatorMaterial;
+            this.radiators.push(radiator);
+
+            const light = new PointLight(`RadiatorLight${i}`, radiator.position, scene, true);
+            light.parent = this.attachment;
+            light.diffuse = this.radiatorMaterial.emissiveColor;
+            light.range = radiatorDepth * 5;
+            this.lights.push(light);
+        }
     }
 
     getLights(): Array<PointLight> {
@@ -140,6 +193,14 @@ export class TokamakSection implements Transformable {
                 PhysicsShapeType.MESH,
                 this.getTransform().getScene(),
             );
+            for (const radiator of this.radiators) {
+                const radiatorAggregate = createEnvironmentAggregate(
+                    radiator,
+                    PhysicsShapeType.BOX,
+                    this.getTransform().getScene(),
+                );
+                this.radiatorAggregates.push(radiatorAggregate);
+            }
             this.arms.forEach((arm) => {
                 const armAggregate = createEnvironmentAggregate(
                     arm,
@@ -155,6 +216,11 @@ export class TokamakSection implements Transformable {
             this.tokamakAggregate?.dispose();
             this.tokamakAggregate = null;
 
+            for (const radiatorAggregate of this.radiatorAggregates) {
+                radiatorAggregate.dispose();
+            }
+            this.radiatorAggregates.length = 0;
+
             this.armAggregates.forEach((armAggregate) => {
                 armAggregate.dispose();
             });
@@ -167,6 +233,8 @@ export class TokamakSection implements Transformable {
     }
 
     public dispose() {
+        this.radiatorMaterial.dispose();
+
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();
         this.attachmentAggregate = null;
@@ -178,6 +246,16 @@ export class TokamakSection implements Transformable {
         for (const light of this.lights) {
             light.dispose();
         }
+
+        for (const radiator of this.radiators) {
+            radiator.dispose();
+        }
+        this.radiators.length = 0;
+
+        for (const radiatorAggregate of this.radiatorAggregates) {
+            radiatorAggregate.dispose();
+        }
+        this.radiatorAggregates.length = 0;
 
         this.arms.forEach((arm) => {
             arm.dispose();
