@@ -143,7 +143,7 @@ export class RingHabitat implements Transformable {
         this.ringMaterial = new RingHabitatMaterial(
             this.radius,
             deltaRadius,
-            yScaling,
+            yScaling * deltaRadius,
             textures.materials.spaceStation,
             scene,
         );

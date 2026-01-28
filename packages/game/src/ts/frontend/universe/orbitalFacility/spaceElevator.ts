@@ -35,6 +35,7 @@ import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay
 import { MetalSectionMaterial } from "@/frontend/assets/procedural/spaceStation/metalSectionMaterial";
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
+import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
@@ -48,6 +49,7 @@ import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp, remap, triangleWave } from "@/utils/math";
 import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
+import { km2ToM2 } from "@/utils/physics/unitConversions";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { type DeepReadonly } from "@/utils/types";
@@ -214,9 +216,10 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             totalStellarFlux += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
         });
 
+        const totalEnergyRequirementKWh = this.model.population * this.model.energyConsumptionPerCapitaKWh;
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
-            this.model.population * this.model.energyConsumptionPerCapitaKWh,
+            totalEnergyRequirementKWh,
             totalStellarFlux,
         );
 
@@ -289,16 +292,25 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
-        const solarSection = new SolarSection(
-            solarPanelSurfaceM2,
-            Settings.SEED_HALF_RANGE * rng(31),
-            assets,
-            this.scene,
-        );
-        solarSection.getTransform().parent = this.getTransform();
-        this.placeNode(solarSection.getTransform(), lastNode);
-        lastNode = solarSection.getTransform();
-        this.solarSections.push(solarSection);
+        const maxSolarPanelSurfaceM2 = km2ToM2(10);
+        if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
+            const solarSection = new SolarSection(
+                solarPanelSurfaceM2 / 36, //TODO: remove 1/36 factor when going 1:1 scale
+                Settings.SEED_HALF_RANGE * rng(31),
+                assets,
+                this.scene,
+            );
+            solarSection.getTransform().parent = this.getTransform();
+            this.placeNode(solarSection.getTransform(), lastNode);
+            lastNode = solarSection.getTransform();
+            this.solarSections.push(solarSection);
+        } else {
+            // using solar panels is unfeasible, fall back on nuclear fusion
+            const tokamakSection = new TokamakSection(totalEnergyRequirementKWh, assets, this.scene);
+            this.placeNode(tokamakSection.getTransform(), lastNode);
+            tokamakSection.getTransform().parent = this.getTransform();
+            lastNode = tokamakSection.getTransform();
+        }
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 

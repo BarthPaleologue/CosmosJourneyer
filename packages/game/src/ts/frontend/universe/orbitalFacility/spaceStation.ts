@@ -33,6 +33,7 @@ import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/
 import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
 import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
+import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
@@ -44,6 +45,7 @@ import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbital
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
+import { km2ToM2 } from "@/utils/physics/unitConversions";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { type DeepReadonly } from "@/utils/types";
@@ -60,6 +62,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     readonly type = "spaceStation";
 
     readonly solarSections: SolarSection[] = [];
+    readonly tokamakSections: TokamakSection[] = [];
     readonly utilitySections: UtilitySection[] = [];
     readonly helixHabitats: HelixHabitat[] = [];
     readonly ringHabitats: RingHabitat[] = [];
@@ -146,6 +149,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
         result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
         result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
+        result.push(...this.tokamakSections.flatMap((tokamakSection) => tokamakSection.getLights()));
         return result;
     }
 
@@ -175,11 +179,13 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             totalStellarFlux += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
         });
 
-        const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
-            this.model.solarPanelEfficiency,
-            this.model.population * this.model.energyConsumptionPerCapitaKWh,
-            totalStellarFlux,
-        );
+        const totalEnergyRequirementKWh = this.model.population * this.model.energyConsumptionPerCapitaKWh;
+        const solarPanelSurfaceM2 =
+            getSolarPanelSurfaceFromEnergyRequirement(
+                this.model.solarPanelEfficiency,
+                totalEnergyRequirementKWh,
+                totalStellarFlux,
+            ) / 36;
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
         let agricultureSurfaceHa = 0;
@@ -204,16 +210,26 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(564) * 5), rng, assets);
 
-        const solarSection = new SolarSection(
-            solarPanelSurfaceM2,
-            Settings.SEED_HALF_RANGE * rng(31),
-            assets,
-            this.scene,
-        );
-        solarSection.getTransform().parent = this.getTransform();
-        this.placeNode(solarSection.getTransform(), lastNode);
-        lastNode = solarSection.getTransform();
-        this.solarSections.push(solarSection);
+        const maxSolarPanelSurfaceM2 = km2ToM2(150);
+        if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
+            const solarSection = new SolarSection(
+                solarPanelSurfaceM2,
+                Settings.SEED_HALF_RANGE * rng(31),
+                assets,
+                this.scene,
+            );
+            solarSection.getTransform().parent = this.getTransform();
+            this.placeNode(solarSection.getTransform(), lastNode);
+            lastNode = solarSection.getTransform();
+            this.solarSections.push(solarSection);
+        } else {
+            // using solar panels is unfeasible, fall back on nuclear fusion
+            const tokamakSection = new TokamakSection(totalEnergyRequirementKWh, assets, this.scene);
+            this.placeNode(tokamakSection.getTransform(), lastNode);
+            tokamakSection.getTransform().parent = this.getTransform();
+            lastNode = tokamakSection.getTransform();
+            this.tokamakSections.push(tokamakSection);
+        }
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
@@ -312,21 +328,24 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
-        this.solarSections.forEach((solarSection) => {
+        for (const solarSection of this.solarSections) {
             solarSection.update(cameraWorldPosition);
-        });
-        this.utilitySections.forEach((utilitySection) => {
+        }
+        for (const tokamakSection of this.tokamakSections) {
+            tokamakSection.update(cameraWorldPosition);
+        }
+        for (const utilitySection of this.utilitySections) {
             utilitySection.update(cameraWorldPosition);
-        });
-        this.helixHabitats.forEach((helixHabitat) => {
+        }
+        for (const helixHabitat of this.helixHabitats) {
             helixHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.ringHabitats.forEach((ringHabitat) => {
+        }
+        for (const ringHabitat of this.ringHabitats) {
             ringHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.cylinderHabitats.forEach((cylinderHabitat) => {
+        }
+        for (const cylinderHabitat of this.cylinderHabitats) {
             cylinderHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
+        }
         this.landingBays.forEach((landingBay) => {
             landingBay.update(cameraWorldPosition, deltaSeconds);
         });
@@ -340,27 +359,30 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     dispose() {
-        this.solarSections.forEach((solarSection) => {
+        for (const solarSection of this.solarSections) {
             solarSection.dispose();
-        });
-        this.utilitySections.forEach((utilitySection) => {
+        }
+        for (const tokamakSection of this.tokamakSections) {
+            tokamakSection.dispose();
+        }
+        for (const utilitySection of this.utilitySections) {
             utilitySection.dispose();
-        });
-        this.helixHabitats.forEach((helixHabitat) => {
+        }
+        for (const helixHabitat of this.helixHabitats) {
             helixHabitat.dispose();
-        });
-        this.ringHabitats.forEach((ringHabitat) => {
+        }
+        for (const ringHabitat of this.ringHabitats) {
             ringHabitat.dispose();
-        });
-        this.cylinderHabitats.forEach((cylinderHabitat) => {
+        }
+        for (const cylinderHabitat of this.cylinderHabitats) {
             cylinderHabitat.dispose();
-        });
-        this.landingBays.forEach((landingBay) => {
+        }
+        for (const landingBay of this.landingBays) {
             landingBay.dispose();
-        });
-        this.engineBays.forEach((engineBay) => {
+        }
+        for (const engineBay of this.engineBays) {
             engineBay.dispose();
-        });
+        }
 
         this.lightContainer.dispose();
 

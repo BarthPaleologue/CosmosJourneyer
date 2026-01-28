@@ -72,3 +72,12 @@ export function barToPascal(bar: number): number {
 export function degreesToRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
 }
+
+/**
+ * Converts an area from square kilometers to square meters
+ * @param km2 The area in square kilometers
+ * @returns The area in square meters
+ */
+export function km2ToM2(km2: number): number {
+    return km2 * 1_000_000;
+}

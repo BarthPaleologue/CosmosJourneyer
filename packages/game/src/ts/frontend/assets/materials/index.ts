@@ -25,6 +25,7 @@ import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
+import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
 import { type Textures } from "../textures";
 
 export type Materials = {
@@ -35,6 +36,7 @@ export type Materials = {
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: PBRMetallicRoughnessMaterial;
     readonly landingPad: Material;
+    readonly metalSection: Material;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -53,6 +55,12 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     tankMaterial.metallic = 1;
     tankMaterial.roughness = 0.4;
 
+    const metalSectionMaterial = new MetalSectionMaterial(
+        "metalSectionMaterial",
+        textures.materials.metalPanels,
+        scene,
+    );
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
@@ -61,6 +69,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         tree: treeMaterial,
         tank: tankMaterial,
         landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
+        metalSection: metalSectionMaterial,
     };
 }
 
