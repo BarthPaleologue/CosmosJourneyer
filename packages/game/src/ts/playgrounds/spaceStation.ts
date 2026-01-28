@@ -59,7 +59,7 @@ export async function createSpaceStationScene(
     camera.maxZ = Settings.EARTH_RADIUS * 1e5;
     camera.attachControl();
 
-    const distanceToStar = AU;
+    const distanceToStar = 200 * AU;
 
     const coordinates = {
         starSectorX: 0,
