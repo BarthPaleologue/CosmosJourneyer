@@ -32,7 +32,6 @@ import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats
 import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
 import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
-import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -53,6 +52,7 @@ import { type DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
+import type { StationSection } from "./stationSection";
 
 export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     readonly name: string;
@@ -61,14 +61,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     readonly type = "spaceStation";
 
-    readonly solarSections: SolarSection[] = [];
-    readonly tokamakSections: TokamakSection[] = [];
-    readonly utilitySections: UtilitySection[] = [];
-    readonly helixHabitats: HelixHabitat[] = [];
-    readonly ringHabitats: RingHabitat[] = [];
-    readonly cylinderHabitats: CylinderHabitat[] = [];
-    readonly landingBays: LandingBay[] = [];
-    readonly engineBays: EngineBay[] = [];
+    readonly sections: Array<StationSection> = [];
+    readonly landingBays: Array<LandingBay> = [];
 
     private readonly root: TransformNode;
 
@@ -142,15 +136,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     getLights(): Array<Light> {
-        const result: Array<Light> = [];
-        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
-        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
-        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
-        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
-        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
-        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
-        result.push(...this.tokamakSections.flatMap((tokamakSection) => tokamakSection.getLights()));
-        return result;
+        return this.sections.flatMap((section) => section.getLights());
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -204,7 +190,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         const engineBay = new EngineBay(assets, this.scene);
         engineBay.getTransform().parent = this.getTransform();
         let lastNode = engineBay.getTransform();
-        this.engineBays.push(engineBay);
+        this.sections.push(engineBay);
 
         const rng = getRngFromSeed(this.model.seed);
 
@@ -221,60 +207,57 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             solarSection.getTransform().parent = this.getTransform();
             this.placeNode(solarSection.getTransform(), lastNode);
             lastNode = solarSection.getTransform();
-            this.solarSections.push(solarSection);
+            this.sections.push(solarSection);
         } else {
             // using solar panels is unfeasible, fall back on nuclear fusion
             const tokamakSection = new TokamakSection(totalEnergyRequirementKWh, assets, this.scene);
             this.placeNode(tokamakSection.getTransform(), lastNode);
             tokamakSection.getTransform().parent = this.getTransform();
             lastNode = tokamakSection.getTransform();
-            this.tokamakSections.push(tokamakSection);
+            this.sections.push(tokamakSection);
         }
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 1 / 3],
-                [SpaceStationNodeType.HELIX_HABITAT, 1 / 3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 1 / 3],
-            ],
+                ["ring", 1 / 3],
+                ["helix", 1 / 3],
+                ["cylinder", 1 / 3],
+            ] as const,
             rng(17),
         );
 
-        let newNode: TransformNode | null = null;
-        if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(19),
-                assets.textures,
-                this.scene,
-            );
-            this.helixHabitats.push(helixHabitat);
-            newNode = helixHabitat.getTransform();
-        } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(27),
-                assets.textures,
-                this.scene,
-            );
-            this.ringHabitats.push(ringHabitat);
-            newNode = ringHabitat.getTransform();
-        } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(13),
-                assets.textures,
-                this.scene,
-            );
-            this.cylinderHabitats.push(cylinderHabitat);
-            newNode = cylinderHabitat.getTransform();
+        let newSection: StationSection;
+        switch (habitatType) {
+            case "helix":
+                newSection = new HelixHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(19),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
+            case "ring":
+                newSection = new RingHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(27),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
+            case "cylinder":
+                newSection = new CylinderHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(13),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
         }
 
-        if (newNode === null) {
-            throw new Error("Node creation failed");
-        }
+        this.sections.push(newSection);
+        const newNode = newSection.getTransform();
 
         this.placeNode(newNode, lastNode);
         newNode.parent = this.root;
@@ -285,6 +268,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
 
         this.landingBays.push(landingBay);
+        this.sections.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
         landingBay.getTransform().parent = this.getTransform();
     }
@@ -298,12 +282,11 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
-                rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
+                rng(132 + 10 * this.sections.length) * Settings.SEED_HALF_RANGE,
                 assets,
                 this.scene,
             );
-            this.utilitySections.push(utilitySection);
-
+            this.sections.push(utilitySection);
             this.placeNode(utilitySection.getTransform(), newLastNode);
 
             utilitySection.getTransform().parent = this.getTransform();
@@ -328,30 +311,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
-        for (const solarSection of this.solarSections) {
-            solarSection.update(cameraWorldPosition);
+        for (const section of this.sections) {
+            section.update(cameraWorldPosition, deltaSeconds);
         }
-        for (const tokamakSection of this.tokamakSections) {
-            tokamakSection.update(cameraWorldPosition);
-        }
-        for (const utilitySection of this.utilitySections) {
-            utilitySection.update(cameraWorldPosition);
-        }
-        for (const helixHabitat of this.helixHabitats) {
-            helixHabitat.update(cameraWorldPosition, deltaSeconds);
-        }
-        for (const ringHabitat of this.ringHabitats) {
-            ringHabitat.update(cameraWorldPosition, deltaSeconds);
-        }
-        for (const cylinderHabitat of this.cylinderHabitats) {
-            cylinderHabitat.update(cameraWorldPosition, deltaSeconds);
-        }
-        this.landingBays.forEach((landingBay) => {
-            landingBay.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.engineBays.forEach((engineBay) => {
-            engineBay.update(cameraWorldPosition);
-        });
     }
 
     getTransform(): TransformNode {
@@ -359,33 +321,10 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     dispose() {
-        for (const solarSection of this.solarSections) {
-            solarSection.dispose();
-        }
-        for (const tokamakSection of this.tokamakSections) {
-            tokamakSection.dispose();
-        }
-        for (const utilitySection of this.utilitySections) {
-            utilitySection.dispose();
-        }
-        for (const helixHabitat of this.helixHabitats) {
-            helixHabitat.dispose();
-        }
-        for (const ringHabitat of this.ringHabitats) {
-            ringHabitat.dispose();
-        }
-        for (const cylinderHabitat of this.cylinderHabitats) {
-            cylinderHabitat.dispose();
-        }
-        for (const landingBay of this.landingBays) {
-            landingBay.dispose();
-        }
-        for (const engineBay of this.engineBays) {
-            engineBay.dispose();
-        }
-
         this.lightContainer.dispose();
-
+        for (const section of this.sections) {
+            section.dispose();
+        }
         this.root.dispose();
     }
 }

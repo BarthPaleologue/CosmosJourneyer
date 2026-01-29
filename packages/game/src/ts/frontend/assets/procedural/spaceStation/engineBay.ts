@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Light } from "@babylonjs/core";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -29,11 +30,11 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
-export class EngineBay implements Transformable {
+export class EngineBay implements StationSection {
     private readonly root: TransformNode;
 
     private readonly skirt: Mesh;
@@ -123,6 +124,10 @@ export class EngineBay implements Transformable {
 
     getTransform(): TransformNode {
         return this.root;
+    }
+
+    getLights(): Array<Light> {
+        return [];
     }
 
     dispose() {

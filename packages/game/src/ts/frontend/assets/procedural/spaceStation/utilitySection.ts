@@ -31,7 +31,7 @@ import { PhysicsShapeSphere, type PhysicsShape } from "@babylonjs/core/Physics/v
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
@@ -39,7 +39,7 @@ import { CollisionMask, Settings } from "@/settings";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
-export class UtilitySection implements Transformable {
+export class UtilitySection implements StationSection {
     private readonly attachment: Mesh;
 
     readonly rng: (step: number) => number;

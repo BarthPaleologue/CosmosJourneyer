@@ -31,7 +31,7 @@ import { randRangeInt } from "extended-random";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { wheelOfFortune } from "@/utils/random";
@@ -41,7 +41,7 @@ import { Settings } from "@/settings";
 import { type SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
-export class SolarSection implements Transformable {
+export class SolarSection implements StationSection {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
 

@@ -34,7 +34,6 @@ import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/
 import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
 import { MetalSectionMaterial } from "@/frontend/assets/procedural/spaceStation/metalSectionMaterial";
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
-import { SpaceStationNodeType } from "@/frontend/assets/procedural/spaceStation/spaceStationNode";
 import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -57,6 +56,7 @@ import { type DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
+import type { StationSection } from "./stationSection";
 
 export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly name: string;
@@ -65,12 +65,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
     readonly type = "spaceElevator";
 
-    private readonly solarSections: SolarSection[] = [];
-    private readonly utilitySections: UtilitySection[] = [];
-    private readonly helixHabitats: HelixHabitat[] = [];
-    private readonly ringHabitats: RingHabitat[] = [];
-    private readonly cylinderHabitats: CylinderHabitat[] = [];
-    private readonly landingBays: LandingBay[] = [];
+    private readonly sections: Array<StationSection> = [];
+    private readonly landingBays: Array<LandingBay> = [];
 
     private readonly tether: Mesh;
     private readonly tetherLength: number;
@@ -180,14 +176,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     }
 
     getLights(): Array<Light> {
-        const result: Array<Light> = [];
-        result.push(...this.landingBays.flatMap((landingBay) => landingBay.getLights()));
-        result.push(...this.utilitySections.flatMap((utilitySection) => utilitySection.getLights()));
-        result.push(...this.cylinderHabitats.flatMap((cylinderHabitat) => cylinderHabitat.getLights()));
-        result.push(...this.ringHabitats.flatMap((ringHabitat) => ringHabitat.getLights()));
-        result.push(...this.helixHabitats.flatMap((helixHabitat) => helixHabitat.getLights()));
-        result.push(...this.solarSections.flatMap((solarSection) => solarSection.getLights()));
-        return result;
+        return this.sections.flatMap((section) => section.getLights());
     }
 
     getLandingPadManager(): LandingPadManager {
@@ -245,46 +234,43 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         const habitatType = wheelOfFortune(
             [
-                [SpaceStationNodeType.RING_HABITAT, 0.5],
-                [SpaceStationNodeType.HELIX_HABITAT, 0.3],
-                [SpaceStationNodeType.CYLINDER_HABITAT, 0.2],
-            ],
+                ["ring", 0.5],
+                ["helix", 0.3],
+                ["cylinder", 0.2],
+            ] as const,
             rng(17),
         );
 
-        let newNode: TransformNode | null = null;
-        if (habitatType === SpaceStationNodeType.HELIX_HABITAT) {
-            const helixHabitat = new HelixHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(19),
-                assets.textures,
-                this.scene,
-            );
-            this.helixHabitats.push(helixHabitat);
-            newNode = helixHabitat.getTransform();
-        } else if (habitatType === SpaceStationNodeType.RING_HABITAT) {
-            const ringHabitat = new RingHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(27),
-                assets.textures,
-                this.scene,
-            );
-            this.ringHabitats.push(ringHabitat);
-            newNode = ringHabitat.getTransform();
-        } else if (habitatType === SpaceStationNodeType.CYLINDER_HABITAT) {
-            const cylinderHabitat = new CylinderHabitat(
-                totalHabitatSurfaceM2,
-                Settings.SEED_HALF_RANGE * rng(13),
-                assets.textures,
-                this.scene,
-            );
-            this.cylinderHabitats.push(cylinderHabitat);
-            newNode = cylinderHabitat.getTransform();
+        let newSection: StationSection;
+        switch (habitatType) {
+            case "helix":
+                newSection = new HelixHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(19),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
+            case "ring":
+                newSection = new RingHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(27),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
+            case "cylinder":
+                newSection = new CylinderHabitat(
+                    totalHabitatSurfaceM2,
+                    Settings.SEED_HALF_RANGE * rng(13),
+                    assets.textures,
+                    this.scene,
+                );
+                break;
         }
 
-        if (newNode === null) {
-            throw new Error("Node creation failed");
-        }
+        this.sections.push(newSection);
+        const newNode = newSection.getTransform();
 
         this.placeNode(newNode, lastNode);
         newNode.parent = this.root;
@@ -303,13 +289,14 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             solarSection.getTransform().parent = this.getTransform();
             this.placeNode(solarSection.getTransform(), lastNode);
             lastNode = solarSection.getTransform();
-            this.solarSections.push(solarSection);
+            this.sections.push(solarSection);
         } else {
             // using solar panels is unfeasible, fall back on nuclear fusion
             const tokamakSection = new TokamakSection(totalEnergyRequirementKWh, assets, this.scene);
             this.placeNode(tokamakSection.getTransform(), lastNode);
             tokamakSection.getTransform().parent = this.getTransform();
             lastNode = tokamakSection.getTransform();
+            this.sections.push(tokamakSection);
         }
 
         lastNode = this.addUtilitySections(lastNode, 5 + Math.floor(rng(23) * 5), rng, assets);
@@ -317,6 +304,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
 
         this.landingBays.push(landingBay);
+        this.sections.push(landingBay);
         this.placeNode(landingBay.getTransform(), lastNode);
         landingBay.getTransform().parent = this.getTransform();
     }
@@ -330,11 +318,11 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         let newLastNode = lastNode;
         for (let i = 0; i < nbSections; i++) {
             const utilitySection = new UtilitySection(
-                rng(132 + 10 * this.utilitySections.length) * Settings.SEED_HALF_RANGE,
+                rng(132 + 10 * this.sections.length) * Settings.SEED_HALF_RANGE,
                 assets,
                 this.scene,
             );
-            this.utilitySections.push(utilitySection);
+            this.sections.push(utilitySection);
 
             this.placeNode(utilitySection.getTransform(), newLastNode);
 
@@ -370,18 +358,9 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         this.elapsedSeconds += deltaSeconds;
 
-        this.helixHabitats.forEach((helixHabitat) => {
-            helixHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.ringHabitats.forEach((ringHabitat) => {
-            ringHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.cylinderHabitats.forEach((cylinderHabitat) => {
-            cylinderHabitat.update(cameraWorldPosition, deltaSeconds);
-        });
-        this.landingBays.forEach((landingBay) => {
-            landingBay.update(cameraWorldPosition, deltaSeconds);
-        });
+        for (const section of this.sections) {
+            section.update(cameraWorldPosition, deltaSeconds);
+        }
 
         const climberSpeed = 300 / 3.6; // 300 km/h in m/s
         const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
@@ -400,24 +379,10 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     }
 
     dispose() {
-        this.solarSections.forEach((solarSection) => {
-            solarSection.dispose();
-        });
-        this.utilitySections.forEach((utilitySection) => {
-            utilitySection.dispose();
-        });
-        this.helixHabitats.forEach((helixHabitat) => {
-            helixHabitat.dispose();
-        });
-        this.ringHabitats.forEach((ringHabitat) => {
-            ringHabitat.dispose();
-        });
-        this.cylinderHabitats.forEach((cylinderHabitat) => {
-            cylinderHabitat.dispose();
-        });
-        this.landingBays.forEach((landingBay) => {
-            landingBay.dispose();
-        });
+        for (const section of this.sections) {
+            section.dispose();
+        }
+
         this.tether.dispose();
         this.tetherMaterial.dispose();
 

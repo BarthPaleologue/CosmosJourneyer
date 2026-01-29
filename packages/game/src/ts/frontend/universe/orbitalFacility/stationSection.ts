@@ -15,10 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum SpaceStationNodeType {
-    UTILITY_SECTION,
-    SOLAR_SECTION,
-    RING_HABITAT,
-    HELIX_HABITAT,
-    CYLINDER_HABITAT,
+import type { Light } from "@babylonjs/core/Lights/light";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+import type { Transformable } from "../architecture/transformable";
+
+export interface StationSection extends Transformable {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void;
+
+    getLights(): Array<Light>;
+
+    dispose(): void;
 }

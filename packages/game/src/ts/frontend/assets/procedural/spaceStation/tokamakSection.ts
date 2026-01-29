@@ -28,7 +28,7 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { getRadiatorAreaForHeat } from "@/utils/physics/thermodynamics";
 import { getRgbFromTemperature } from "@/utils/specrend";
@@ -36,7 +36,7 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { createRing } from "../helpers/ringBuilder";
 import { RingHabitatMaterial } from "./habitats/ring/ringHabitatMaterial";
 
-export class TokamakSection implements Transformable {
+export class TokamakSection implements StationSection {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
 
