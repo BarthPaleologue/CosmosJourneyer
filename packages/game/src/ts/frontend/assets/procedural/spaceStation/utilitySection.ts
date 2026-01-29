@@ -143,7 +143,10 @@ export class UtilitySection implements Transformable {
     update(cameraWorldPosition: Vector3) {
         const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
 
-        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+        const toggleDistance = 20e3;
+        const hysteresisDistance = 5e3;
+
+        if (distanceToCamera < toggleDistance && this.attachmentAggregate === null) {
             this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
             this.attachmentAggregate.body.disablePreStep = false;
             this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
@@ -157,7 +160,7 @@ export class UtilitySection implements Transformable {
 
                 this.tankBodies.push(tankBody);
             });
-        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+        } else if (distanceToCamera > toggleDistance + hysteresisDistance && this.attachmentAggregate !== null) {
             this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 
