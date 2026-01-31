@@ -27,29 +27,34 @@ import { type DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { type GasPlanetModel } from "../orbitalObjects/gasPlanetModel";
-import { type CelestialBodyModel } from "../orbitalObjects/index";
+import { type StellarObjectModel } from "../orbitalObjects/index";
 import { type Orbit } from "../orbitalObjects/orbit";
 import { newSeededRingsModel } from "../orbitalObjects/ringsModel";
+import { getGasPlanetOrbitRadius } from "./gasPlanetOrbitGenerator";
 
 export function newSeededGasPlanetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: DeepReadonly<Array<CelestialBodyModel>>,
+    parentBodies: DeepReadonly<Array<StellarObjectModel>>,
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const radius = randRangeInt(Settings.EARTH_RADIUS * 4, Settings.EARTH_RADIUS * 20, rng, GenerationSteps.RADIUS);
 
-    // Todo: do not hardcode
-    let orbitRadius = rng(GenerationSteps.ORBIT) * 15e9;
+    const orbitRadiuses: Array<number> = [];
+    for (const parent of parentBodies) {
+        const radius = getGasPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, () =>
+            rng(GenerationSteps.ORBIT + orbitRadiuses.length),
+        );
+        orbitRadiuses.push(radius);
+    }
+
+    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
     if (parentBodies.length > 0) {
-        const maxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
-        orbitRadius += maxRadius * 1.5;
-
         for (const parent of parentBodies) {
             parentAverageInclination += parent.orbit.inclination;
             parentAverageAxialTilt += parent.axialTilt;

@@ -15,10 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum SpaceStationNodeType {
-    UTILITY_SECTION,
-    SOLAR_SECTION,
-    RING_HABITAT,
-    HELIX_HABITAT,
-    CYLINDER_HABITAT,
-}
+export * from "./fundamental";
+export * from "./derived";
+export * from "./astrophysics";

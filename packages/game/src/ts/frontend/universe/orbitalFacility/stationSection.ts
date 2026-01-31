@@ -15,21 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import type { Light } from "@babylonjs/core/Lights/light";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { C } from "@/utils/physics/constants";
+import type { Transformable } from "../architecture/transformable";
 
-export const SerializedWarpDriveSchema = z.object({
-    type: z.literal("warpDrive"),
-    size: z.number(),
-    quality: z.number(),
-});
+export interface StationSection extends Transformable {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void;
 
-export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
+    getLights(): Array<Light>;
 
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
-    return {
-        maxSpeed: 10 * C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),
-    };
+    dispose(): void;
 }

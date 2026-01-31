@@ -17,7 +17,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { getSphereRadiatedEnergyFlux } from "./physics/thermodynamics";
+import { getSphereIrradianceAtDistance } from "./physics/thermodynamics";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "./solarPanels";
 
 describe("solarPanelSurfaceCalculation", () => {
@@ -30,7 +30,7 @@ describe("solarPanelSurfaceCalculation", () => {
         const sunRadius = 6.9634e8;
         const energyRequirement = 120000;
 
-        const solarFlux = getSphereRadiatedEnergyFlux(sunTemperature, sunRadius, distanceToSun) * sunExposure;
+        const solarFlux = getSphereIrradianceAtDistance(sunTemperature, sunRadius, distanceToSun) * sunExposure;
 
         const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
         expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);

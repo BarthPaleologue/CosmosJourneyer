@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Material } from "@babylonjs/core/Materials/material";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -25,6 +26,7 @@ import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
+import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
 import { type Textures } from "../textures";
 
 export type Materials = {
@@ -33,8 +35,9 @@ export type Materials = {
     readonly crate: PBRMetallicRoughnessMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
-    readonly tank: PBRMetallicRoughnessMaterial;
+    readonly tank: Material;
     readonly landingPad: Material;
+    readonly metalSection: Material;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
@@ -48,10 +51,17 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     treeMaterial.baseTexture = textures.materials.tree.albedo;
     treeMaterial.transparencyMode = 1;
 
-    const tankMaterial = new PBRMetallicRoughnessMaterial("tankMaterial", scene);
-    tankMaterial.baseColor.copyFromFloats(0.2, 0.2, 0.2);
+    const tankMaterial = new PBRMaterial("tankMaterial", scene);
+    tankMaterial.albedoColor.copyFromFloats(0.2, 0.2, 0.2);
     tankMaterial.metallic = 1;
     tankMaterial.roughness = 0.4;
+    tankMaterial.usePhysicalLightFalloff = false;
+
+    const metalSectionMaterial = new MetalSectionMaterial(
+        "metalSectionMaterial",
+        textures.materials.metalPanels,
+        scene,
+    );
 
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
@@ -61,6 +71,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         tree: treeMaterial,
         tank: tankMaterial,
         landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
+        metalSection: metalSectionMaterial,
     };
 }
 

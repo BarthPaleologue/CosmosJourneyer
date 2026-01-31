@@ -126,7 +126,7 @@ describe("distanceToStellarObject", () => {
                 },
                 nbHydroponicLayers: 15,
                 faction: Faction.SATORI_CONCORD,
-                energyConsumptionPerCapitaKWh: 4000,
+                annualEnergyPerCapitaKWh: 4000,
                 mass: 1e6,
                 axialTilt: 0,
             },

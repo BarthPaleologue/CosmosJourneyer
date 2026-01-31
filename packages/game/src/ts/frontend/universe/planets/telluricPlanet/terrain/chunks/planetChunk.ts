@@ -266,11 +266,11 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             .normalizeToNew();
         const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
 
-        const isVisible =
+        const isEnabled =
             Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
             isSizeOnScreenEnough(this, camera, 0.002 / 5);
 
-        this.mesh.setEnabled(isVisible);
+        this.mesh.setEnabled(isEnabled);
 
         this.instancePatches.forEach((patch) => {
             let minDistance = Number.MAX_VALUE;

@@ -62,7 +62,7 @@ export class RingHabitatMaterial extends NodeMaterial {
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
         const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitUV.y, mix(f(1.0), f(height), mask));
+        const scaledUvY = mul(splitUV.y, mix(f(1.0), f(height / deltaRadius), mask));
         const proceduralUV = vec2(scaledUvX, scaledUvY);
 
         const viewProjection = uniformViewProjection();

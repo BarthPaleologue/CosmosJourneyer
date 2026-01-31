@@ -160,8 +160,7 @@ export class GasPlanet implements PlanetaryMassObjectBase<"gasPlanet">, Cullable
     }
 
     public computeCulling(camera: Camera): void {
-        // the mesh is hidden if it is not visible from any camera
-        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
+        this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {

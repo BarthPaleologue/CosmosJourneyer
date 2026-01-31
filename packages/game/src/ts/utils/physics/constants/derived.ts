@@ -15,21 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+import { BoltzmannConstant, C, Pi, PlanckConstant } from "./fundamental";
 
-import { C } from "@/utils/physics/constants";
+/** Reduced Planck constant in J·s. */
+export const ReducedPlanckConstant = PlanckConstant / (2 * Pi);
 
-export const SerializedWarpDriveSchema = z.object({
-    type: z.literal("warpDrive"),
-    size: z.number(),
-    quality: z.number(),
-});
+/** Stefan-Boltzmann constant in W·m⁻²·K⁻⁴. */
+export const StefanBoltzmannConstant = (2 * Pi ** 5 * BoltzmannConstant ** 4) / (15 * PlanckConstant ** 3 * C ** 2);
 
-export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
-
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
-    return {
-        maxSpeed: 10 * C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),
-    };
-}
+/** The number of meters in a light year. */
+export const LightYearInMeters = C * 60 * 60 * 24 * 365.25;

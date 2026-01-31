@@ -151,7 +151,7 @@ export class HelixHabitat implements Transformable {
             scene,
         );
 
-        const tessellation = 360;
+        const tessellation = Math.floor((turnCount * perTurnPerimeter) / this.deltaRadius);
         const helix1 = createHelix(
             "HabitatHelix1",
             this.radius,

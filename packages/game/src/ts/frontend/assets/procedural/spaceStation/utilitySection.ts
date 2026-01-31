@@ -31,7 +31,7 @@ import { PhysicsShapeSphere, type PhysicsShape } from "@babylonjs/core/Physics/v
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
@@ -39,7 +39,7 @@ import { CollisionMask, Settings } from "@/settings";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
-export class UtilitySection implements Transformable {
+export class UtilitySection implements StationSection {
     private readonly attachment: Mesh;
 
     readonly rng: (step: number) => number;
@@ -143,7 +143,10 @@ export class UtilitySection implements Transformable {
     update(cameraWorldPosition: Vector3) {
         const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
 
-        if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
+        const toggleDistance = 20e3;
+        const hysteresisDistance = 5e3;
+
+        if (distanceToCamera < toggleDistance && this.attachmentAggregate === null) {
             this.attachmentAggregate = new PhysicsAggregate(this.attachment, PhysicsShapeType.MESH, { mass: 0 });
             this.attachmentAggregate.body.disablePreStep = false;
             this.attachmentAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
@@ -157,7 +160,7 @@ export class UtilitySection implements Transformable {
 
                 this.tankBodies.push(tankBody);
             });
-        } else if (distanceToCamera > 360e3 && this.attachmentAggregate !== null) {
+        } else if (distanceToCamera > toggleDistance + hysteresisDistance && this.attachmentAggregate !== null) {
             this.attachmentAggregate.dispose();
             this.attachmentAggregate = null;
 

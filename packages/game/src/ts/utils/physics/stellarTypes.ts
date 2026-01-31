@@ -15,21 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { z } from "zod";
+export type StellarType = "O" | "B" | "A" | "F" | "G" | "K" | "M";
 
-import { C } from "@/utils/physics/constants";
-
-export const SerializedWarpDriveSchema = z.object({
-    type: z.literal("warpDrive"),
-    size: z.number(),
-    quality: z.number(),
-});
-
-export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
-
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
-    return {
-        maxSpeed: 10 * C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),
-    };
+export function getStellarTypeFromTemperature(temperature: number): StellarType {
+    if (temperature < 3500) return "M";
+    else if (temperature < 5000) return "K";
+    else if (temperature < 6000) return "G";
+    else if (temperature < 7500) return "F";
+    else if (temperature < 10000) return "A";
+    else if (temperature < 30000) return "B";
+    else return "O";
 }

@@ -24,15 +24,16 @@ import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects
 
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { SolarRadius } from "@/utils/physics/constants";
+import type { StellarType } from "@/utils/physics/stellarTypes";
 import { wheelOfFortune } from "@/utils/random";
-
-import { Settings } from "@/settings";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 export function newSeededStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: OrbitalObjectModel[],
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): StarModel {
     const rng = getRngFromSeed(seed);
 
@@ -82,85 +83,59 @@ export function newSeededStarModel(
     };
 }
 
-export const enum StellarType {
-    /** 30,000 - 50,000 K */
-    O = "O",
-    /** 10,000 - 30,000 K */
-    B = "B",
-    /** 7,500 - 10,000 K */
-    A = "A",
-    /** 6,000 - 7,500 K */
-    F = "F",
-    /** 5,000 - 6,000 K */
-    G = "G",
-    /** 3,500 - 5,000 K */
-    K = "K",
-    /** 2,700 - 3,500 K */
-    M = "M",
-}
-
-export function getStellarTypeFromTemperature(temperature: number) {
-    if (temperature < 3500) return StellarType.M;
-    else if (temperature < 5000) return StellarType.K;
-    else if (temperature < 6000) return StellarType.G;
-    else if (temperature < 7500) return StellarType.F;
-    else if (temperature < 10000) return StellarType.A;
-    else if (temperature < 30000) return StellarType.B;
-    else return StellarType.O;
-}
-
-export function getRandomStellarType(rng: (step: number) => number) {
-    // use wheel of fortune
-    const wheel: [StellarType, number][] = [
-        [StellarType.M, 0.765],
-        [StellarType.K, 0.121],
-        [StellarType.G, 0.076],
-        [StellarType.F, 0.03],
-        [StellarType.A, 0.006],
-        [StellarType.B, 0.0013],
-        [StellarType.O, 0.0000003],
-    ];
-
-    const r = rng(GenerationSteps.STELLAR_TYPE);
-
-    return wheelOfFortune<StellarType>(wheel, r);
+export function getRandomStellarType(rng: (step: number) => number): StellarType {
+    return wheelOfFortune(
+        [
+            ["M", 0.765],
+            ["K", 0.121],
+            ["G", 0.076],
+            ["F", 0.03],
+            ["A", 0.006],
+            ["B", 0.0013],
+            ["O", 0.0000003],
+        ] as const,
+        rng(GenerationSteps.STELLAR_TYPE),
+    );
 }
 
 export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
     switch (stellarType) {
-        case StellarType.M:
+        case "M":
             return randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.K:
+        case "K":
             return randRangeInt(3400, 4900, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.G:
+        case "G":
             return randRangeInt(4900, 5700, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.F:
+        case "F":
             return randRangeInt(5700, 7200, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.A:
+        case "A":
             return randRangeInt(7200, 9700, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.B:
+        case "B":
             return randRangeInt(9700, 30000, rng, GenerationSteps.TEMPERATURE);
-        case StellarType.O:
+        case "O":
             return randRangeInt(30000, 52000, rng, GenerationSteps.TEMPERATURE);
+        default:
+            return assertUnreachable(stellarType);
     }
 }
 
-export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
-    const solarSize = 109 * Settings.EARTH_RADIUS;
+export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
     switch (stellarType) {
-        case StellarType.M:
-            return randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.K:
-            return randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.G:
-            return randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.F:
-            return randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.A:
-            return randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.B:
-            return randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * solarSize;
-        case StellarType.O:
-            return randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * solarSize;
+        case "M":
+            return randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "K":
+            return randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "G":
+            return randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "F":
+            return randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "A":
+            return randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "B":
+            return randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * SolarRadius;
+        case "O":
+            return randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * SolarRadius;
+        default:
+            return assertUnreachable(stellarType);
     }
 }

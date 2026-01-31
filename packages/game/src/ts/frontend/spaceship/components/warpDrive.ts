@@ -21,24 +21,7 @@ import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
 
 import { clamp, remap } from "@/utils/math";
 
-const enum WarpDriveState {
-    /**
-     * The warp drive is disabled. It can be enabled by the user.
-     */
-    DISABLED,
-
-    /**
-     * The warp drive is enabled. It can be disengaged by the user.
-     * This means that the drive cannot be disabled right away. It needs to be disengaged first for the deceleration to be effective.
-     */
-    ENABLED,
-
-    /**
-     * The warp drive is disengaging. The warp speed is decreasing until it reaches 0.
-     * When the warp speed reaches 0, the warp drive is disabled.
-     */
-    DISENGAGING,
-}
+type WarpDriveState = "disabled" | "enabled" | "disengaging";
 
 /**
  * Interface of the warp drive of a spaceship that can only be read.
@@ -110,7 +93,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Current state of the warp drive.
      */
-    private state = WarpDriveState.DISABLED;
+    private state: WarpDriveState = "disabled";
 
     readonly size: number;
     readonly quality: number;
@@ -128,7 +111,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         this.maxWarpSpeed = spec.maxSpeed;
         this.rangeLY = spec.rangeLy;
 
-        this.state = enabledByDefault ? WarpDriveState.ENABLED : WarpDriveState.DISABLED;
+        this.state = enabledByDefault ? "enabled" : "disabled";
     }
 
     public serialize(): SerializedWarpDrive {
@@ -143,7 +126,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * Enables the warp drive: the ship will start to accelerate towards the target speed.
      */
     public enable(): void {
-        this.state = WarpDriveState.ENABLED;
+        this.state = "enabled";
         this.throttle = this.defaultThrottle;
     }
 
@@ -151,7 +134,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * Disengages the warp drive: the ship will start to decelerate towards 0. The warp drive will be disabled when the ship reaches 0 speed.
      */
     public disengage(): void {
-        this.state = WarpDriveState.DISENGAGING;
+        this.state = "disengaging";
     }
 
     public emergencyStop(): void {
@@ -162,22 +145,22 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * Disables the warp drive: the target speed, the current speed and the internal throttle are set to 0.
      */
     private disable(): void {
-        this.state = WarpDriveState.DISABLED;
+        this.state = "disabled";
         this.maxTargetSpeed = 0;
         this.throttle = 0;
         this.currentSpeed = 0;
     }
 
     public isEnabled(): boolean {
-        return this.state === WarpDriveState.ENABLED;
+        return this.state === "enabled";
     }
 
     public isDisabled(): boolean {
-        return this.state === WarpDriveState.DISABLED;
+        return this.state === "disabled";
     }
 
     public isDisengaging(): boolean {
-        return this.state === WarpDriveState.DISENGAGING;
+        return this.state === "disengaging";
     }
 
     public isAccelerating(): boolean {
@@ -248,17 +231,17 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     public update(closestObjectDistance: number, closestObjectRadius: number, deltaSeconds: number): void {
         switch (this.state) {
-            case WarpDriveState.DISENGAGING:
+            case "disengaging":
                 this.maxTargetSpeed *= 0.9;
                 this.currentSpeed *= 0.9;
                 if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED)
                     this.disable();
                 break;
-            case WarpDriveState.ENABLED:
+            case "enabled":
                 this.updateMaxTargetSpeed(closestObjectDistance, closestObjectRadius);
                 this.updateWarpDriveSpeed(deltaSeconds);
                 break;
-            case WarpDriveState.DISABLED:
+            case "disabled":
                 this.maxTargetSpeed = 0;
                 this.currentSpeed = 0;
                 this.throttle = 0;

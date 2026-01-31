@@ -29,9 +29,9 @@ export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjec
     readonly population: number;
 
     /**
-     * The average energy consumption of a citizen of the habitat in KWh
+     * The average yearly energy consumption of a citizen of the habitat in kWh.
      */
-    readonly energyConsumptionPerCapitaKWh: number;
+    readonly annualEnergyPerCapitaKWh: number;
 
     /**
      * The number of inhabitants per square kilometer in the habitat

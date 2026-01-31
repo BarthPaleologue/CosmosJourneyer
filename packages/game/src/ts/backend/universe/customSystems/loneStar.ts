@@ -75,7 +75,7 @@ export function getLoneStarSystem(): StarSystemModel {
                 }),
                 seed: 0,
                 faction: Faction.SATORI_CONCORD,
-                energyConsumptionPerCapitaKWh: 1e3,
+                annualEnergyPerCapitaKWh: 1e3,
                 solarPanelEfficiency: 0.4,
                 siderealDaySeconds: 0,
                 starSystemCoordinates: {
