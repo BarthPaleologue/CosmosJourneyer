@@ -213,12 +213,7 @@ export class UniverseBackend {
         const systemRng = getRngFromSeed(hash);
 
         return this.applyPlugins(
-            newSeededStarSystemModel(
-                systemRng,
-                coordinates,
-                this.getSystemGalacticPosition(coordinates),
-                this.isSystemInHumanBubble(coordinates),
-            ),
+            newSeededStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates)),
         );
     }
 

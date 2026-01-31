@@ -24,25 +24,25 @@ import { type OrbitalObjectType } from "..";
 import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
 export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
-    readonly starSystemCoordinates: StarSystemCoordinates;
+    starSystemCoordinates: StarSystemCoordinates;
 
-    readonly population: number;
+    population: number;
 
     /**
      * The average yearly energy consumption of a citizen of the habitat in kWh.
      */
-    readonly annualEnergyPerCapitaKWh: number;
+    annualEnergyPerCapitaKWh: number;
 
     /**
      * The number of inhabitants per square kilometer in the habitat
      */
-    readonly populationDensity: number;
+    populationDensity: number;
 
-    readonly agricultureMix: [number, CropType][];
+    agricultureMix: [number, CropType][];
 
-    readonly nbHydroponicLayers: number;
+    nbHydroponicLayers: number;
 
-    readonly faction: Faction;
+    faction: Faction;
 
-    readonly solarPanelEfficiency: number;
+    solarPanelEfficiency: number;
 };

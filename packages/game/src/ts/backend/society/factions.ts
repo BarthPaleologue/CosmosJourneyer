@@ -1,7 +1,6 @@
 import { uniformRandBool } from "extended-random";
 
-import type { Vector3Like } from "@/utils/types";
-
+import type { StarSystemCoordinates } from "../universe/starSystemCoordinates";
 import { getPowerPlayData } from "./powerplay";
 
 export const enum Faction {
@@ -24,11 +23,12 @@ export function factionToString(faction: Faction): string {
     }
 }
 
-export function getFactionFromGalacticPosition(
-    starSystemPosition: Vector3Like,
-    rng: (index: number) => number,
-): Faction {
-    const powerplayData = getPowerPlayData(starSystemPosition);
+export function getFactionFromCoordinates(coordinates: StarSystemCoordinates, rng: (index: number) => number): Faction {
+    const powerplayData = getPowerPlayData({
+        x: coordinates.starSectorX,
+        y: coordinates.starSectorY,
+        z: coordinates.starSectorZ,
+    });
 
     const isMaterialist = uniformRandBool(powerplayData.materialistSpiritualist, rng, 249);
     const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);

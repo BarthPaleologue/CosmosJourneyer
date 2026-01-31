@@ -15,6 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { haToM2 } from "./physics/unitConversions";
+import { assertUnreachable } from "./types";
+
 export const CropType = {
     POTATO: "potato",
     YAM: "yam",
@@ -30,28 +33,28 @@ export type CropType = (typeof CropType)[keyof typeof CropType];
 export const CropTypes = Object.values(CropType);
 
 /**
- * Edible energy in kcal/ha/day for different plant species
+ * Edible energy in kcal/m²/day for different plant species
  * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
  */
-export function getEdibleEnergyPerHaPerDay(cropType: CropType): number {
+export function getEdibleEnergyPerAreaPerDay(cropType: CropType): number {
     switch (cropType) {
         case CropType.POTATO:
-            return 54_000;
+            return 54_000 / haToM2(1);
         case CropType.YAM:
-            return 47_000;
+            return 47_000 / haToM2(1);
         case CropType.SWEET_POTATO:
-            return 70_000;
+            return 70_000 / haToM2(1);
         case CropType.RICE:
-            return 49_000;
+            return 49_000 / haToM2(1);
         case CropType.PEANUT:
-            return 36_000;
+            return 36_000 / haToM2(1);
         case CropType.WHEAT:
-            return 40_000;
+            return 40_000 / haToM2(1);
         case CropType.LENTIL:
-            return 23_000;
+            return 23_000 / haToM2(1);
         case CropType.CASSAVA:
-            return 27_000;
+            return 27_000 / haToM2(1);
         default:
-            throw new Error("Unknown crop type");
+            return assertUnreachable(cropType);
     }
 }

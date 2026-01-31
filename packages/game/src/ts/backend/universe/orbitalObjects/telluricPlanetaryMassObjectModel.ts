@@ -24,15 +24,15 @@ import { type OceanModel } from "./oceanModel";
 import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
-    readonly waterAmount: number;
-    readonly terrainSettings: TerrainSettings;
+    waterAmount: number;
+    terrainSettings: TerrainSettings;
 
     /**
      * The temperature range of the object in Kelvin
      * TODO: remove when the temperature gets calculated dynamically
      * @deprecated
      */
-    readonly temperature: {
+    temperature: {
         /**
          * Minimum temperature of the object in Kelvin
          */
@@ -43,7 +43,7 @@ export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = 
         max: number;
     };
 
-    readonly atmosphere: AtmosphereModel | null;
-    readonly clouds: CloudsModel | null;
-    readonly ocean: OceanModel | null;
+    atmosphere: AtmosphereModel | null;
+    clouds: CloudsModel | null;
+    ocean: OceanModel | null;
 };

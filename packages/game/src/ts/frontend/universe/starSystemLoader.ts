@@ -23,7 +23,6 @@ import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/t
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { getDistancesToStellarObjects } from "@/frontend/helpers/distanceToStellarObject";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -168,15 +167,13 @@ export class StarSystemLoader {
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
         for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
-            const distancesToStellarObjects = getDistancesToStellarObjects(orbitalFacilityModel, systemModel);
-
             let orbitalFacility: OrbitalFacility;
             switch (orbitalFacilityModel.type) {
                 case "spaceStation":
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
+                    orbitalFacility = new SpaceStation(orbitalFacilityModel, assets, scene);
                     break;
                 case "spaceElevator":
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, distancesToStellarObjects, assets, scene);
+                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, assets, scene);
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));

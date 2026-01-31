@@ -24,7 +24,7 @@ import { LandingBayModelSchema } from "./landingBay";
 import { SolarSectionModelSchema } from "./solar";
 import { UtilitySectionModelSchema } from "./utility";
 
-export const SectionModelSchema = z.discriminatedUnion("type", [
+export const StationSectionModelSchema = z.discriminatedUnion("type", [
     EngineBayModelSchema,
     UtilitySectionModelSchema,
     SolarSectionModelSchema,
@@ -33,4 +33,14 @@ export const SectionModelSchema = z.discriminatedUnion("type", [
     LandingBayModelSchema,
 ]);
 
-export type SectionModel = z.infer<typeof SectionModelSchema>;
+export type StationSectionModel = z.infer<typeof StationSectionModelSchema>;
+
+export const ElevatorSectionModelSchema = z.discriminatedUnion("type", [
+    UtilitySectionModelSchema,
+    SolarSectionModelSchema,
+    FusionSectionModelSchema,
+    HabitatModelSchema,
+    LandingBayModelSchema,
+]);
+
+export type ElevatorSectionModel = z.infer<typeof ElevatorSectionModelSchema>;

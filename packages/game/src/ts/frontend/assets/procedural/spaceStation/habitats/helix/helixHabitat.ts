@@ -71,8 +71,8 @@ export class HelixHabitat implements Transformable {
 
         this.rng = getRngFromSeed(seed);
 
-        this.radius = 5e3 + this.rng(0) * 10e3;
-        this.deltaRadius = 400 + this.rng(1) * 100;
+        this.radius = 10e3 + this.rng(0) * 10e3;
+        this.deltaRadius = 700 + this.rng(1) * 200;
 
         const helixCount = randRangeInt(2, 4, this.rng, 654);
         const thicknessFactor = randRangeInt(1, 5 - helixCount, this.rng, 150);

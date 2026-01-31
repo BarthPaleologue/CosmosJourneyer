@@ -21,5 +21,5 @@ import { type TelluricPlanetaryMassObjectModelBase } from "./telluricPlanetaryMa
 
 export type TelluricPlanetModel = TelluricPlanetaryMassObjectModelBase<"telluricPlanet"> &
     HasSeed & {
-        readonly rings: RingsModel | null;
+        rings: RingsModel | null;
     };

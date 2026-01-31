@@ -71,7 +71,7 @@ export class RingHabitat implements Transformable {
 
         this.radius = 5e3 + this.rng(0) * 10e3;
 
-        const deltaRadius = 500;
+        const deltaRadius = 1e3;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius + deltaRadius / 2));
         const yScaling = Math.ceil(requiredHeight / deltaRadius);
@@ -251,7 +251,7 @@ export class RingHabitat implements Transformable {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
 
             const light = new PointLight("RingHabitatLight", position, scene, true);
-            light.range = 200;
+            light.range = deltaRadius * 0.8;
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             light.parent = this.getTransform();
             this.lights.push(light);
