@@ -39,14 +39,16 @@ import lensFlareFragment from "@shaders/lensflare.glsl";
 
 export type LensFlareSettings = {
     visibility: number;
-    behindCamera: boolean;
-    clipPosition: Vector3;
 };
 
 export class LensFlarePostProcess extends PostProcess {
     readonly settings: LensFlareSettings;
 
     private activeCamera: Camera | null = null;
+
+    private clipPosition = Vector3.Zero();
+
+    private cameraToStellarObject = Vector3.Zero();
 
     constructor(stellarTransform: TransformNode, boundingRadius: number, color: RGBColor, scene: Scene) {
         const shaderName = "lensflare";
@@ -56,8 +58,6 @@ export class LensFlarePostProcess extends PostProcess {
 
         const settings: LensFlareSettings = {
             visibility: 1,
-            behindCamera: false,
-            clipPosition: new Vector3(),
         };
 
         const LensFlareUniformNames = {
@@ -113,7 +113,7 @@ export class LensFlarePostProcess extends PostProcess {
 
             effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
 
-            const clipPosition = Vector3.Project(
+            Vector3.ProjectToRef(
                 stellarTransform.getAbsolutePosition().subtractToRef(floatingOriginOffset, tempStellarObjectPosition),
                 Matrix.IdentityReadOnly,
                 OffsetViewProjectionToRef(
@@ -122,9 +122,18 @@ export class LensFlarePostProcess extends PostProcess {
                     tempViewProjection,
                 ),
                 this.activeCamera.viewport,
+                this.clipPosition,
             );
-            settings.behindCamera = clipPosition.z < 0;
-            effect.setVector3(LensFlareUniformNames.CLIP_POSITION, clipPosition);
+            effect.setVector3(LensFlareUniformNames.CLIP_POSITION, this.clipPosition);
+
+            const localForward = Vector3.Forward(scene.useRightHandedSystem);
+            const cameraForward = this.activeCamera.getDirection(localForward);
+            const cameraPosition = this.activeCamera.globalPosition;
+            const cameraToStellar = stellarTransform
+                .getAbsolutePosition()
+                .subtractToRef(cameraPosition, this.cameraToStellarObject);
+
+            const isBehindCamera = Vector3.Dot(cameraForward, cameraToStellar) < 0;
 
             const raycastResult = new PhysicsRaycastResult();
             const start = this.activeCamera.globalPosition;
@@ -132,7 +141,7 @@ export class LensFlarePostProcess extends PostProcess {
             (scene.getPhysicsEngine() as PhysicsEngineV2).raycastToRef(start, end, raycastResult);
             const occulted = raycastResult.hasHit && raycastResult.body?.transformNode !== stellarTransform;
 
-            const isNotVisible = occulted || settings.behindCamera;
+            const isNotVisible = occulted || isBehindCamera;
 
             if (isNotVisible && settings.visibility > 0) {
                 settings.visibility = moveTowards(settings.visibility, 0, 0.5);
