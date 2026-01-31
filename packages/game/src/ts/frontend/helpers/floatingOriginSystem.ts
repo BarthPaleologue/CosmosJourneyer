@@ -20,23 +20,25 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
 export class FloatingOriginSystem {
-    private readonly originOffset: Vector3 = Vector3.Zero();
+    private readonly originOffset = Vector3.Zero();
 
-    private readonly rebasingThreshold: number;
+    private readonly tmpOffset = Vector3.Zero();
+
+    private readonly rebasingThresholdSquared: number;
 
     private readonly scene: Scene;
 
     public constructor(scene: Scene, rebasingThreshold: number) {
-        this.rebasingThreshold = rebasingThreshold;
+        this.rebasingThresholdSquared = rebasingThreshold ** 2;
         this.scene = scene;
     }
 
     public update(observerPosition: Vector3) {
-        if (observerPosition.lengthSquared() < this.rebasingThreshold * this.rebasingThreshold) {
+        if (observerPosition.lengthSquared() < this.rebasingThresholdSquared) {
             return;
         }
 
-        const offset = observerPosition.clone().negateInPlace();
+        const offset = observerPosition.negateToRef(this.tmpOffset);
         this.originOffset.addInPlace(offset);
 
         // find all physics bodies that have disablePreStep=true and temporarily disable it to avoid issues during rebasing
