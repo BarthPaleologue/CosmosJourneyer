@@ -95,7 +95,7 @@ export function newSeededTelluricPlanetModel(
         orbitRadiuses.push(radius);
     }
 
-    const orbitRadius = Math.max(...orbitRadiuses);
+    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
