@@ -155,17 +155,17 @@ export class StarSystemController {
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
         const orbitalObjects = this.getOrbitalObjects();
 
-        let bestRelativeDistance = Number.POSITIVE_INFINITY;
+        let greatestInfluence = Number.NEGATIVE_INFINITY;
         let bestObject = orbitalObjects[0];
         if (bestObject === undefined) {
             throw new Error("There are no orbital objects in the solar system");
         }
         for (const object of orbitalObjects) {
-            const distance = Vector3.Distance(object.getTransform().position, position);
-            const relativeDistance = distance / object.getBoundingRadius();
+            const distanceSquared = Vector3.DistanceSquared(object.getTransform().position, position);
+            const influence = object.getBoundingRadius() / distanceSquared;
 
-            if (relativeDistance < bestRelativeDistance) {
-                bestRelativeDistance = relativeDistance;
+            if (influence > greatestInfluence) {
+                greatestInfluence = influence;
                 bestObject = object;
             }
         }
