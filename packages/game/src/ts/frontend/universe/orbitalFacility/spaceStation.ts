@@ -44,7 +44,7 @@ import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbital
 import { getEdibleEnergyPerHaPerDay } from "@/utils/agriculture";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
-import { km2ToM2 } from "@/utils/physics/unitConversions";
+import { km2ToM2, kwhPerYearToWatts } from "@/utils/physics/unitConversions";
 import { wheelOfFortune } from "@/utils/random";
 import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { type DeepReadonly } from "@/utils/types";
@@ -165,10 +165,11 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             totalStellarFlux += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
         });
 
-        const totalEnergyRequirementKWh = this.model.population * this.model.energyConsumptionPerCapitaKWh;
+        const totalEnergyRequirementKWhPerYear = this.model.population * this.model.annualEnergyPerCapitaKWh;
+        const totalPowerRequirementW = kwhPerYearToWatts(totalEnergyRequirementKWhPerYear);
         const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
             this.model.solarPanelEfficiency,
-            totalEnergyRequirementKWh,
+            totalPowerRequirementW,
             totalStellarFlux,
         );
 
@@ -209,7 +210,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             this.sections.push(solarSection);
         } else {
             // using solar panels is unfeasible, fall back on nuclear fusion
-            const tokamakSection = new TokamakSection(totalEnergyRequirementKWh, assets, this.scene);
+            const tokamakSection = new TokamakSection(totalPowerRequirementW, assets, this.scene);
             this.placeNode(tokamakSection.getTransform(), lastNode);
             tokamakSection.getTransform().parent = this.getTransform();
             lastNode = tokamakSection.getTransform();

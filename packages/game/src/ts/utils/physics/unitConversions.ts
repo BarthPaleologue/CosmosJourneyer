@@ -81,3 +81,13 @@ export function degreesToRadians(degrees: number): number {
 export function km2ToM2(km2: number): number {
     return km2 * 1_000_000;
 }
+
+/**
+ * Converts an annual energy consumption in kilowatt-hours to an average power in watts.
+ * @param kwhPerYear The energy consumption in kWh per year.
+ * @returns The average power in watts.
+ */
+export function kwhPerYearToWatts(kwhPerYear: number): number {
+    const hoursPerYear = 365 * 24;
+    return (kwhPerYear * 1000) / hoursPerYear;
+}

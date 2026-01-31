@@ -18,7 +18,13 @@
 import { describe, expect, it, test } from "vitest";
 
 import { LightYearInMeters } from "./constants";
-import { celsiusToKelvin, degreesToRadians, kelvinToCelsius, metersToLightYears } from "./unitConversions";
+import {
+    celsiusToKelvin,
+    degreesToRadians,
+    kelvinToCelsius,
+    kwhPerYearToWatts,
+    metersToLightYears,
+} from "./unitConversions";
 
 test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);
@@ -90,5 +96,15 @@ describe("degreesToRadians", () => {
         expect(degreesToRadians(45)).toBeCloseTo(Math.PI / 4);
         expect(degreesToRadians(30)).toBeCloseTo(Math.PI / 6);
         expect(degreesToRadians(60)).toBeCloseTo(Math.PI / 3);
+    });
+});
+
+describe("kwhPerYearToWatts", () => {
+    it("converts 8760 kWh/year to 1 kW", () => {
+        expect(kwhPerYearToWatts(8760)).toBeCloseTo(1000);
+    });
+
+    it("handles zero input", () => {
+        expect(kwhPerYearToWatts(0)).toBe(0);
     });
 });

@@ -83,7 +83,7 @@ export function newSeededSpaceStationModel(
 
     //TODO: make this dependent on economic model
     const population = 2_000_000;
-    const energyConsumptionPerCapitaKWh = 40_000;
+    const annualEnergyPerCapitaKWh = 40_000;
 
     const populationDensity = 4_000;
 
@@ -111,7 +111,7 @@ export function newSeededSpaceStationModel(
         siderealDaySeconds,
         axialTilt,
         population,
-        energyConsumptionPerCapitaKWh,
+        annualEnergyPerCapitaKWh,
         populationDensity,
         agricultureMix,
         nbHydroponicLayers,
