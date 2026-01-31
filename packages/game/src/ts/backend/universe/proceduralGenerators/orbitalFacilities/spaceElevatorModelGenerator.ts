@@ -64,7 +64,7 @@ export function newSeededSpaceElevatorModel(
 
     //TODO: make this dependent on economic model
     const population = 2_000_000;
-    const annualEnergyPerCapitaKWh = 40_000;
+    const annualEnergyPerCapitaKWh = 200_000; // US average is at 80k KWh https://www.eia.gov/tools/faqs/faq.php?id=85&t=1
 
     const populationDensity = 4_000;
 
