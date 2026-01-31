@@ -129,6 +129,7 @@ describe("distanceToStellarObject", () => {
                 annualEnergyPerCapitaKWh: 4000,
                 mass: 1e6,
                 axialTilt: 0,
+                sections: [],
             },
         ],
     };

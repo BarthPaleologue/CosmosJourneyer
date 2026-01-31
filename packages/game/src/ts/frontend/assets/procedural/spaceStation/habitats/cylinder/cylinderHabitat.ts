@@ -60,7 +60,7 @@ export class CylinderHabitat implements Transformable {
 
         this.rng = getRngFromSeed(seed);
 
-        this.radius = 2e3 + this.rng(0) * 2e3;
+        this.radius = 4e3 + this.rng(0) * 2e3;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 
@@ -149,7 +149,7 @@ export class CylinderHabitat implements Transformable {
         for (const [i, { position, rotation }] of lightPoints.entries()) {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
             const light = new PointLight(`CylinderHabitatLight${i}`, position, scene, true);
-            light.range = 200;
+            light.range = sectorSize * 0.8;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             this.lights.push(light);

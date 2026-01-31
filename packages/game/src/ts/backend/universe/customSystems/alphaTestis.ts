@@ -48,16 +48,12 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
 
     hecate.orbit.semiMajorAxis = 21000 * hecate.radius;
 
-    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, { x: 0, y: 0, z: 0 }, [
-        hecate,
-    ]);
-    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
-
     const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
     manaleth.orbit.inclination = degreesToRadians(45);
     manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.siderealDaySeconds, hecate.mass);
 
     const ares = newSeededTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
+    ares.ocean = null;
     if (ares.clouds !== null) ares.clouds.coverage = 1;
     if (ares.atmosphere !== null) ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
 
@@ -67,13 +63,20 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
     andromaque.orbit.semiMajorAxis = 25300 * hecate.radius;
     andromaque.orbit.eccentricity = 0.8;
 
-    return {
+    const model: StarSystemModel = {
         name: systemName,
         coordinates: systemCoordinates,
         stellarObjects: [weierstrass],
         planets: [hecate, ares, andromaque],
         satellites: [manaleth],
         anomalies: [],
-        orbitalFacilities: [spaceStation],
+        orbitalFacilities: [],
     };
+
+    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, hecate, model);
+    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
+
+    model.orbitalFacilities.push(spaceStation);
+
+    return model;
 }

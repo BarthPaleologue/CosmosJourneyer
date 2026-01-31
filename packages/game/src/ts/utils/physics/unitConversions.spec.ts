@@ -21,6 +21,7 @@ import { LightYearInMeters } from "./constants";
 import {
     celsiusToKelvin,
     degreesToRadians,
+    haToM2,
     kelvinToCelsius,
     kwhPerYearToWatts,
     metersToLightYears,
@@ -106,5 +107,15 @@ describe("kwhPerYearToWatts", () => {
 
     it("handles zero input", () => {
         expect(kwhPerYearToWatts(0)).toBe(0);
+    });
+});
+
+describe("haToM2", () => {
+    it("converts 1 hectare to 10,000 square meters", () => {
+        expect(haToM2(1)).toBe(10_000);
+    });
+
+    it("handles zero input", () => {
+        expect(haToM2(0)).toBe(0);
     });
 });

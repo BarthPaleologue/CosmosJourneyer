@@ -19,6 +19,10 @@ import { z } from "zod";
 
 export const RingHabitatModelSchema = z.object({
     type: z.literal("ringHabitat"),
+    surface: z.object({
+        housing: z.number().positive(),
+        agriculture: z.number().positive(),
+    }),
 });
 
 export type RingHabitatModel = z.infer<typeof RingHabitatModelSchema>;

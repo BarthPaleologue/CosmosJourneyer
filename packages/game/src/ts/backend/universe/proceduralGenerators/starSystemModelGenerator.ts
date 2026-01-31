@@ -77,7 +77,6 @@ const enum GenerationSteps {
 export function newSeededStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: StarSystemCoordinates,
-    position: Vector3Like,
     isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
@@ -243,6 +242,20 @@ export function newSeededStarSystemModel(
 
     const orbitalFacilities: Array<OrbitalFacilityModel> = [];
 
+    if (!isNonEmptyArray(stellarObjects)) {
+        throw new Error("No stellar objects were generated for the star system");
+    }
+
+    const systemModel: StarSystemModel = {
+        name: systemName,
+        coordinates,
+        stellarObjects: stellarObjects,
+        planets: planets,
+        satellites: satellites,
+        anomalies: anomalies,
+        orbitalFacilities: orbitalFacilities,
+    };
+
     if (isCivilized) {
         // finally, space station are placed
         const planetToScore = new Map<PlanetModel, number>();
@@ -280,37 +293,23 @@ export function newSeededStarSystemModel(
                 const spaceElevatorModel = newSeededSpaceElevatorModel(
                     createOrbitalObjectId([planet.id], "spaceElevator", 0),
                     spaceStationSeed,
-                    coordinates,
-                    position,
                     planet,
+                    systemModel,
                 );
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
                 const spaceStationModel = newSeededSpaceStationModel(
                     createOrbitalObjectId([planet.id], "spaceStation", 0),
                     spaceStationSeed,
-                    coordinates,
-                    position,
-                    [planet],
+                    planet,
+                    systemModel,
                 );
                 orbitalFacilities.push(spaceStationModel);
             }
         });
     }
 
-    if (!isNonEmptyArray(stellarObjects)) {
-        throw new Error("No stellar objects were generated for the star system");
-    }
-
-    return {
-        name: systemName,
-        coordinates,
-        stellarObjects: stellarObjects,
-        planets: planets,
-        satellites: satellites,
-        anomalies: anomalies,
-        orbitalFacilities: orbitalFacilities,
-    };
+    return systemModel;
 }
 
 /**
