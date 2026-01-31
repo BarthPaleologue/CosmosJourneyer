@@ -120,12 +120,6 @@ export async function createGasPlanetScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
         planet.updateMaterial([light], deltaSeconds);
-
-        /*const cameraPosition = controls.getTransform().position.clone();
-
-        controls.getTransform().position = Vector3.Zero();
-        planet.getTransform().position.subtractInPlace(cameraPosition);
-        light.position.subtractInPlace(cameraPosition);*/
     });
 
     return scene;
