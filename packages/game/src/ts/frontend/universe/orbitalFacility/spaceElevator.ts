@@ -281,7 +281,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         const maxSolarPanelSurfaceM2 = km2ToM2(10);
         if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
             const solarSection = new SolarSection(
-                solarPanelSurfaceM2 / 36, //TODO: remove 1/36 factor when going 1:1 scale
+                solarPanelSurfaceM2,
                 Settings.SEED_HALF_RANGE * rng(31),
                 assets,
                 this.scene,

@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
-import { getStellarTypeFromTemperature } from "@/backend/universe/proceduralGenerators/stellarObjects/starModelGenerator";
 
+import { getStellarTypeFromTemperature } from "@/utils/physics/stellarTypes";
 import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";

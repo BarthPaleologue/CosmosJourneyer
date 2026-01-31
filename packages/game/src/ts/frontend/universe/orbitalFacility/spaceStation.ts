@@ -166,12 +166,11 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         });
 
         const totalEnergyRequirementKWh = this.model.population * this.model.energyConsumptionPerCapitaKWh;
-        const solarPanelSurfaceM2 =
-            getSolarPanelSurfaceFromEnergyRequirement(
-                this.model.solarPanelEfficiency,
-                totalEnergyRequirementKWh,
-                totalStellarFlux,
-            ) / 36;
+        const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+            this.model.solarPanelEfficiency,
+            totalEnergyRequirementKWh,
+            totalStellarFlux,
+        );
 
         const housingSurfaceHa = (100 * this.model.population) / this.model.populationDensity; // convert km² to ha
         let agricultureSurfaceHa = 0;
