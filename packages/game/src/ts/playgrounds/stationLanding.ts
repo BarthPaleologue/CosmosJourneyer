@@ -34,7 +34,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
-import { AU } from "@/utils/physics/constants";
+import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 
@@ -66,7 +66,7 @@ export async function createStationLandingScene(
     scene.activeCamera = camera;
     camera.attachControl();
 
-    const distanceToStar = AU;
+    const distanceToStar = astronomicalUnitToMeters(1);
 
     const coordinates = {
         starSectorX: 0,
