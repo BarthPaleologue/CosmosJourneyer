@@ -18,6 +18,7 @@
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
+import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -38,7 +39,6 @@ import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilit
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { setUpVector } from "@/frontend/helpers/transform";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -261,16 +261,16 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     }
 
     private placeNode(node: TransformNode, parent: TransformNode) {
-        const previousBoundingVectors = parent.getHierarchyBoundingVectors();
-        const previousBoundingExtendSize = previousBoundingVectors.max.subtract(previousBoundingVectors.min).scale(0.5);
+        // Make sure bounds are current
+        parent.computeWorldMatrix(true);
+        node.computeWorldMatrix(true);
 
-        const newBoundingVectors = node.getHierarchyBoundingVectors();
-        const newBoundingExtendSize = newBoundingVectors.max.subtract(newBoundingVectors.min).scale(0.5);
+        const parentBV = parent.getHierarchyBoundingVectors();
+        const nodeBV = node.getHierarchyBoundingVectors();
 
-        const previousSectionSizeY = previousBoundingExtendSize.y;
-        const newSectionY = newBoundingExtendSize.y;
+        const deltaY = parentBV.max.y - nodeBV.min.y; // bring node bottom to parent top
 
-        node.position = parent.position.add(parent.up.scale(previousSectionSizeY + newSectionY));
+        node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
@@ -279,8 +279,16 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             throw new Error("Space Elevator should have exactly one parent");
         }
 
-        const upDirection = this.getTransform().position.subtract(parent.getTransform().position).normalize();
-        setUpVector(this.getTransform(), upDirection);
+        const newUp = this.getTransform().position.subtract(parent.getTransform().position).normalize();
+        if (newUp.lengthSquared() < 1e-6) {
+            newUp.set(0, 1, 0);
+        }
+        const currentUp = this.getTransform().up;
+        const rotation = Quaternion.FromUnitVectorsToRef(currentUp, newUp, Quaternion.Identity());
+
+        const currentRotation = this.getTransform().rotationQuaternion ?? Quaternion.Identity();
+        rotation.multiplyToRef(currentRotation, currentRotation);
+        this.getTransform().rotationQuaternion = currentRotation;
 
         this.elapsedSeconds += deltaSeconds;
 
