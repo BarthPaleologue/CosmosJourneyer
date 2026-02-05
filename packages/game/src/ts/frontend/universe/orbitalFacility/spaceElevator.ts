@@ -60,7 +60,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly type = "spaceElevator";
 
     private readonly sections: Array<StationSection> = [];
-    private readonly landingBays: Array<LandingBay> = [];
+    readonly landingBays: Array<LandingBay> = [];
 
     private readonly tether: Mesh;
     private readonly tetherLength: number;
