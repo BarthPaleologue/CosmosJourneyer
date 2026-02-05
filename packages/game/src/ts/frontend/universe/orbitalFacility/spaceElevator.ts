@@ -303,8 +303,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             clamp(1.05 * triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1),
             0,
             1,
-            -this.tetherLength / 2,
             this.tetherLength / 2,
+            -this.tetherLength / 2,
         );
     }
 

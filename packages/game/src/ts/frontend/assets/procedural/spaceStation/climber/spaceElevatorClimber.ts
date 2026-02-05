@@ -62,7 +62,7 @@ export class SpaceElevatorClimber implements Targetable {
         const nbPoints = 64;
 
         const globalRadius = 100;
-        const innerRadius = 10;
+        const innerRadius = 15;
 
         const yThickness = 0.5;
 
@@ -111,11 +111,11 @@ export class SpaceElevatorClimber implements Targetable {
             arm.parent = this.transform;
         });
 
-        const solarPanelWidth = 100;
-        const solarPanelDepth = 20;
+        const solarPanelWidth = 200;
+        const solarPanelDepth = 30;
         const solarPanelThickness = 0.1;
 
-        const solarPanelAngleSpacing = Math.PI / 6;
+        const solarPanelAngleSpacing = Math.PI / 4;
 
         const solarPanel1 = CreateBox(
             "ClimberSolarPanel1",
