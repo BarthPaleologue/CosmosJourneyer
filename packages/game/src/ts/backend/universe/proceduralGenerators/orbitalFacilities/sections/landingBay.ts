@@ -17,8 +17,12 @@
 
 import type { LandingBayModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/landingBay";
 
-export function generateLandingBayModel(): LandingBayModel {
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+export function generateLandingBayModel(seed: number): LandingBayModel {
+    const rng = getRngFromSeed(seed);
     return {
         type: "landingBay",
+        heightFactor: 1 + Math.floor(rng(0) * 3),
     };
 }

@@ -19,6 +19,7 @@ import { z } from "zod";
 
 export const LandingBayModelSchema = z.object({
     type: z.literal("landingBay"),
+    heightFactor: z.number().int().positive(),
 });
 
 export type LandingBayModel = z.infer<typeof LandingBayModelSchema>;

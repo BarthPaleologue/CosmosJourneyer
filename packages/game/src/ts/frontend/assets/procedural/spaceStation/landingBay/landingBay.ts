@@ -30,6 +30,7 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { type Scene } from "@babylonjs/core/scene";
 
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
+import type { LandingBayModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/landingBay";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -37,7 +38,6 @@ import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
@@ -50,8 +50,6 @@ import { LandingBayMaterial } from "./landingBayMaterial";
 
 export class LandingBay {
     private readonly root: TransformNode;
-
-    readonly rng: (step: number) => number;
 
     private readonly radius: number;
 
@@ -70,10 +68,13 @@ export class LandingBay {
 
     private readonly lights: Array<Light> = [];
 
-    constructor(stationModel: DeepReadonly<OrbitalFacilityModel>, seed: number, assets: RenderingAssets, scene: Scene) {
+    constructor(
+        model: LandingBayModel,
+        stationModel: DeepReadonly<OrbitalFacilityModel>,
+        assets: RenderingAssets,
+        scene: Scene,
+    ) {
         this.root = new TransformNode("LandingBayRoot", scene);
-
-        this.rng = getRngFromSeed(seed);
 
         this.radius = 500;
 
@@ -85,7 +86,7 @@ export class LandingBay {
             scene,
         );
 
-        const heightFactor = 1 + Math.floor(this.rng(0) * 3);
+        const heightFactor = model.heightFactor;
 
         const circumference = 2 * Math.PI * this.radius;
 

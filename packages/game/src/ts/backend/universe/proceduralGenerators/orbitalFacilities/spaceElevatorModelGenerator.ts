@@ -39,6 +39,7 @@ import type { StarSystemModel } from "../../starSystemModel";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
 import { generateRingHabitatModel } from "./sections/habitats/ring";
+import { generateLandingBayModel } from "./sections/landingBay";
 import { generateUtilitySectionModel } from "./sections/utility";
 
 export function generateSpaceElevatorModel(
@@ -183,7 +184,7 @@ export function generateSpaceElevatorModel(
         sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
     }
 
-    sections.push({ type: "landingBay" });
+    sections.push(generateLandingBayModel(Settings.SEED_HALF_RANGE * rng(37)));
 
     return {
         type: "spaceElevator",

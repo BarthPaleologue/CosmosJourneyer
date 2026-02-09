@@ -208,7 +208,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             case "helixHabitat":
                 return new HelixHabitat(model, assets.textures, this.scene);
             case "landingBay": {
-                const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
+                const landingBay = new LandingBay(model, this.model, assets, this.scene);
                 this.landingBays.push(landingBay);
                 return landingBay;
             }
