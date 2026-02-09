@@ -36,6 +36,7 @@ import { Settings } from "@/settings";
 
 import type { ElevatorSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
+import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 
 export function generateSpaceElevatorModel(
     id: string,
@@ -138,13 +139,12 @@ export function generateSpaceElevatorModel(
             });
             break;
         case "cylinder":
-            sections.push({
-                type: "cylinderHabitat",
-                surface: {
+            sections.push(
+                generateCylinderHabitatModel(Settings.SEED_HALF_RANGE * rng(13), {
                     housing: housingSurface,
                     agriculture: agricultureSurface,
-                },
-            });
+                }),
+            );
             break;
         default:
             return assertUnreachable(habitatType);

@@ -39,6 +39,7 @@ import { Settings } from "@/settings";
 
 import type { StationSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
+import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 
 export function generateSpaceStationModel(
     id: string,
@@ -188,13 +189,12 @@ export function generateSpaceStationModel(
             });
             break;
         case "cylinder":
-            sections.push({
-                type: "cylinderHabitat",
-                surface: {
+            sections.push(
+                generateCylinderHabitatModel(Settings.SEED_HALF_RANGE * rng(13), {
                     housing: housingSurface,
                     agriculture: agricultureSurface,
-                },
-            });
+                }),
+            );
             break;
         default:
             return assertUnreachable(habitatType);

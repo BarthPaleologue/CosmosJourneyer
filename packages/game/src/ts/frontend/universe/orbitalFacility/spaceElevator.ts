@@ -206,7 +206,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
             case "fusion":
                 return new TokamakSection(model, assets, this.scene);
             case "cylinderHabitat":
-                return new CylinderHabitat(model, Settings.SEED_HALF_RANGE * rng(13), assets.textures, this.scene);
+                return new CylinderHabitat(model, assets.textures, this.scene);
             case "ringHabitat":
                 return new RingHabitat(model, Settings.SEED_HALF_RANGE * rng(27), assets.textures, this.scene);
             case "helixHabitat":

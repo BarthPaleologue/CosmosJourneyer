@@ -33,7 +33,6 @@ import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
@@ -43,8 +42,6 @@ import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
-
-    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -57,12 +54,9 @@ export class CylinderHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(model: CylinderHabitatModel, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: CylinderHabitatModel, textures: Textures, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
-
-        this.rng = getRngFromSeed(seed);
-
-        this.radius = 4e3 + this.rng(0) * 2e3;
+        this.radius = model.radius;
 
         const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 

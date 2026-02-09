@@ -19,6 +19,7 @@ import { z } from "zod";
 
 export const CylinderHabitatModelSchema = z.object({
     type: z.literal("cylinderHabitat"),
+    radius: z.number().positive(),
     surface: z.object({
         housing: z.number().positive(),
         agriculture: z.number().positive(),

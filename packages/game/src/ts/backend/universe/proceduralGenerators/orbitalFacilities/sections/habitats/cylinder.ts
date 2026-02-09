@@ -17,12 +17,17 @@
 
 import type { CylinderHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/cylinder";
 
-export function generateCylinderHabitatModel(seed: number): CylinderHabitatModel {
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+export function generateCylinderHabitatModel(
+    seed: number,
+    surface: CylinderHabitatModel["surface"],
+): CylinderHabitatModel {
+    const rng = getRngFromSeed(seed);
+    const radius = 4e3 + rng(0) * 2e3;
     return {
         type: "cylinderHabitat",
-        surface: {
-            agriculture: 0,
-            housing: 0,
-        },
+        surface,
+        radius,
     };
 }
