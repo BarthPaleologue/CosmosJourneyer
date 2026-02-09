@@ -20,6 +20,8 @@ import { z } from "zod";
 export const SolarSectionModelSchema = z.object({
     type: z.literal("solar"),
     surface: z.number().positive(),
+    axisCount: z.number().int().positive(),
+    secondaryArmCount: z.number().int().positive().optional(),
 });
 
 export type SolarSectionModel = z.infer<typeof SolarSectionModelSchema>;

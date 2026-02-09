@@ -15,11 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { randRangeInt } from "extended-random";
+
 import type { SolarSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/solar";
 
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { wheelOfFortune } from "@/utils/random";
+
 export function generateSolarSectionModel(seed: number, surface: number): SolarSectionModel {
+    const rng = getRngFromSeed(seed);
+    const axisCount = wheelOfFortune(
+        [
+            [1, 0.1],
+            [2, 0.3],
+            [3, 0.3],
+            [4, 0.2],
+            [5, 0.1],
+        ],
+        rng(0),
+    );
+    const secondaryArmCount = axisCount === 2 ? randRangeInt(2, 4, rng, 777) : undefined;
     return {
         type: "solar",
         surface,
+        axisCount,
+        secondaryArmCount,
     };
 }

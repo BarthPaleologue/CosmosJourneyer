@@ -39,10 +39,13 @@ import { Settings } from "@/settings";
 
 import type { StationSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
+import { generateEngineBayModel } from "./sections/engineBay";
+import { generateFusionSectionModel } from "./sections/fusion";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
 import { generateRingHabitatModel } from "./sections/habitats/ring";
 import { generateLandingBayModel } from "./sections/landingBay";
+import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
 
 export function generateSpaceStationModel(
@@ -110,7 +113,7 @@ export function generateSpaceStationModel(
 
     const sections: Array<StationSectionModel> = [];
 
-    sections.push({ type: "engineBay" });
+    sections.push(generateEngineBayModel());
 
     const utilitySectionCount1 = 5 + Math.floor(rng(564) * 5);
     for (let i = 0; i < utilitySectionCount1; i++) {
@@ -142,9 +145,9 @@ export function generateSpaceStationModel(
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);
     if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
-        sections.push({ type: "solar", surface: solarPanelSurfaceM2 });
+        sections.push(generateSolarSectionModel(Settings.SEED_HALF_RANGE * rng(31), solarPanelSurfaceM2));
     } else {
-        sections.push({ type: "fusion", netPowerOutput: totalPowerRequirementW });
+        sections.push(generateFusionSectionModel(totalPowerRequirementW));
     }
 
     const utilitySectionCount2 = 5 + Math.floor(rng(23) * 5);

@@ -44,11 +44,8 @@ import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/fron
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp, remap, triangleWave } from "@/utils/math";
 import { assertUnreachable, type DeepReadonly } from "@/utils/types";
-
-import { Settings } from "@/settings";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";
@@ -189,16 +186,12 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    private getSectionFromModel(
-        model: ElevatorSectionModel,
-        assets: RenderingAssets,
-        rng: (step: number) => number,
-    ): StationSection {
+    private getSectionFromModel(model: ElevatorSectionModel, assets: RenderingAssets): StationSection {
         switch (model.type) {
             case "utility":
                 return new UtilitySection(model, assets, this.scene);
             case "solar":
-                return new SolarSection(model, Settings.SEED_HALF_RANGE * rng(31), assets, this.scene);
+                return new SolarSection(model, assets, this.scene);
             case "fusion":
                 return new TokamakSection(model, assets, this.scene);
             case "cylinderHabitat":
@@ -218,9 +211,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     }
 
     private generate(assets: RenderingAssets) {
-        const rng = getRngFromSeed(this.model.seed);
         for (const section of this.model.sections) {
-            const newSection = this.getSectionFromModel(section, assets, rng);
+            const newSection = this.getSectionFromModel(section, assets);
             const lastNode = this.sections.at(-1)?.getTransform() ?? this.tether;
             this.placeNode(newSection.getTransform(), lastNode);
 

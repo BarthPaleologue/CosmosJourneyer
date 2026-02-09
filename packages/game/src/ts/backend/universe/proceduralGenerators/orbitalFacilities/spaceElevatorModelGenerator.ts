@@ -36,10 +36,12 @@ import { Settings } from "@/settings";
 
 import type { ElevatorSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
+import { generateFusionSectionModel } from "./sections/fusion";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
 import { generateRingHabitatModel } from "./sections/habitats/ring";
 import { generateLandingBayModel } from "./sections/landingBay";
+import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
 
 export function generateSpaceElevatorModel(
@@ -174,9 +176,9 @@ export function generateSpaceElevatorModel(
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);
     if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
-        sections.push({ type: "solar", surface: solarPanelSurfaceM2 });
+        sections.push(generateSolarSectionModel(Settings.SEED_HALF_RANGE * rng(31), solarPanelSurfaceM2));
     } else {
-        sections.push({ type: "fusion", netPowerOutput: totalPowerRequirementW });
+        sections.push(generateFusionSectionModel(totalPowerRequirementW));
     }
 
     const utilitySectionCount3 = 5 + Math.floor(rng(23) * 5);

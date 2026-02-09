@@ -17,7 +17,7 @@
 
 import type { FusionSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/fusion";
 
-export function generateFusionSectionModel(seed: number, netPowerOutput: number): FusionSectionModel {
+export function generateFusionSectionModel(netPowerOutput: number): FusionSectionModel {
     return {
         type: "fusion",
         netPowerOutput,
