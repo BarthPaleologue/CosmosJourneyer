@@ -23,6 +23,7 @@ import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { StationSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections";
 import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
@@ -147,74 +148,51 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
+    private getSectionFromModel(
+        model: StationSectionModel,
+        assets: RenderingAssets,
+        rng: (step: number) => number,
+    ): StationSection {
+        switch (model.type) {
+            case "engineBay":
+                return new EngineBay(assets, this.scene);
+            case "utility":
+                return new UtilitySection(
+                    rng(132 + 10 * this.sections.length) * Settings.SEED_HALF_RANGE,
+                    assets,
+                    this.scene,
+                );
+            case "solar":
+                return new SolarSection(model, Settings.SEED_HALF_RANGE * rng(31), assets, this.scene);
+            case "fusion":
+                return new TokamakSection(model, assets, this.scene);
+            case "cylinderHabitat":
+                return new CylinderHabitat(model, Settings.SEED_HALF_RANGE * rng(13), assets.textures, this.scene);
+            case "ringHabitat":
+                return new RingHabitat(model, Settings.SEED_HALF_RANGE * rng(27), assets.textures, this.scene);
+            case "helixHabitat":
+                return new HelixHabitat(model, Settings.SEED_HALF_RANGE * rng(19), assets.textures, this.scene);
+            case "landingBay": {
+                const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
+                this.landingBays.push(landingBay);
+                return landingBay;
+            }
+            default:
+                return assertUnreachable(model);
+        }
+    }
+
     private generate(assets: RenderingAssets) {
         const rng = getRngFromSeed(this.model.seed);
         for (const section of this.model.sections) {
-            let newSection: StationSection;
-            switch (section.type) {
-                case "engineBay":
-                    newSection = new EngineBay(assets, this.scene);
-                    break;
-                case "utility":
-                    newSection = new UtilitySection(
-                        rng(132 + 10 * this.sections.length) * Settings.SEED_HALF_RANGE,
-                        assets,
-                        this.scene,
-                    );
-                    break;
-                case "solar":
-                    newSection = new SolarSection(section, Settings.SEED_HALF_RANGE * rng(31), assets, this.scene);
-                    break;
-                case "fusion":
-                    newSection = new TokamakSection(section, assets, this.scene);
-                    break;
-                case "cylinderHabitat":
-                    newSection = new CylinderHabitat(
-                        section,
-                        Settings.SEED_HALF_RANGE * rng(13),
-                        assets.textures,
-                        this.scene,
-                    );
-                    break;
-                case "ringHabitat":
-                    newSection = new RingHabitat(
-                        section,
-                        Settings.SEED_HALF_RANGE * rng(27),
-                        assets.textures,
-                        this.scene,
-                    );
-                    break;
-                case "helixHabitat":
-                    newSection = new HelixHabitat(
-                        section,
-                        Settings.SEED_HALF_RANGE * rng(19),
-                        assets.textures,
-                        this.scene,
-                    );
-                    break;
-                case "landingBay": {
-                    const landingBay = new LandingBay(
-                        this.model,
-                        rng(37) * Settings.SEED_HALF_RANGE,
-                        assets,
-                        this.scene,
-                    );
-                    this.landingBays.push(landingBay);
-                    newSection = landingBay;
-                    break;
-                }
-                default:
-                    return assertUnreachable(section);
-            }
-
-            const newNode = newSection.getTransform();
+            const newSection = this.getSectionFromModel(section, assets, rng);
             const lastNode = this.sections.at(-1);
             if (lastNode !== undefined) {
-                this.placeNode(newNode, lastNode.getTransform());
+                this.placeNode(newSection.getTransform(), lastNode.getTransform());
             }
 
             this.sections.push(newSection);
-            newNode.parent = this.root;
+            newSection.getTransform().parent = this.root;
         }
     }
 
