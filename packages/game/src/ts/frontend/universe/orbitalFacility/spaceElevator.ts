@@ -196,11 +196,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     ): StationSection {
         switch (model.type) {
             case "utility":
-                return new UtilitySection(
-                    rng(132 + 10 * this.sections.length) * Settings.SEED_HALF_RANGE,
-                    assets,
-                    this.scene,
-                );
+                return new UtilitySection(model, assets, this.scene);
             case "solar":
                 return new SolarSection(model, Settings.SEED_HALF_RANGE * rng(31), assets, this.scene);
             case "fusion":

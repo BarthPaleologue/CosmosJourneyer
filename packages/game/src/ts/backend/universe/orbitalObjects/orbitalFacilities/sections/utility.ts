@@ -19,6 +19,7 @@ import { z } from "zod";
 
 export const UtilitySectionModelSchema = z.object({
     type: z.literal("utility"),
+    hasTanks: z.boolean(),
 });
 
 export type UtilitySectionModel = z.infer<typeof UtilitySectionModelSchema>;

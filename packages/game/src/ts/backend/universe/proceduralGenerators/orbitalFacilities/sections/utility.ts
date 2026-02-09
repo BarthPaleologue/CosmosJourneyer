@@ -17,8 +17,12 @@
 
 import type { UtilitySectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/utility";
 
-export function generateUtilitySectionModel(): UtilitySectionModel {
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+export function generateUtilitySectionModel(seed: number): UtilitySectionModel {
+    const rng = getRngFromSeed(seed);
     return {
         type: "utility",
+        hasTanks: rng(0) < 0.3,
     };
 }

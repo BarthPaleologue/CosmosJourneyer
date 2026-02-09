@@ -39,6 +39,7 @@ import type { StarSystemModel } from "../../starSystemModel";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
 import { generateRingHabitatModel } from "./sections/habitats/ring";
+import { generateUtilitySectionModel } from "./sections/utility";
 
 export function generateSpaceElevatorModel(
     id: string,
@@ -96,7 +97,7 @@ export function generateSpaceElevatorModel(
 
     const utilitySectionCount1 = 5 + Math.floor(rng(564) * 5);
     for (let i = 0; i < utilitySectionCount1; i++) {
-        sections.push({ type: "utility" });
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
     }
 
     const housingSurface = km2ToM2(population / targetPopulationDensity);
@@ -152,7 +153,7 @@ export function generateSpaceElevatorModel(
 
     const utilitySectionCount2 = 5 + Math.floor(rng(23) * 5);
     for (let i = 0; i < utilitySectionCount2; i++) {
-        sections.push({ type: "utility" });
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
     }
 
     const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
@@ -179,7 +180,7 @@ export function generateSpaceElevatorModel(
 
     const utilitySectionCount3 = 5 + Math.floor(rng(23) * 5);
     for (let i = 0; i < utilitySectionCount3; i++) {
-        sections.push({ type: "utility" });
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
     }
 
     sections.push({ type: "landingBay" });
