@@ -17,12 +17,16 @@
 
 import type { RingHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/ring";
 
-export function generateRingHabitatModel(seed: number): RingHabitatModel {
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+export function generateRingHabitatModel(seed: number, surface: RingHabitatModel["surface"]): RingHabitatModel {
+    const rng = getRngFromSeed(seed);
+    const baseRadius = 5e3 + rng(0) * 10e3;
+    const attachmentTessellation = 4 + 2 * Math.floor(rng(1) * 2);
     return {
         type: "ringHabitat",
-        surface: {
-            agriculture: 0,
-            housing: 0,
-        },
+        surface,
+        baseRadius,
+        attachmentTessellation,
     };
 }

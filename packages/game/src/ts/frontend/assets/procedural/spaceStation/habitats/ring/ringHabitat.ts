@@ -34,7 +34,6 @@ import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
@@ -45,8 +44,6 @@ import { RingHabitatMaterial } from "./ringHabitatMaterial";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
-
-    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -66,12 +63,10 @@ export class RingHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(model: RingHabitatModel, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: RingHabitatModel, textures: Textures, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
-        this.rng = getRngFromSeed(seed);
-
-        this.radius = 5e3 + this.rng(0) * 10e3;
+        this.radius = model.baseRadius;
 
         const deltaRadius = 1e3;
 
@@ -84,7 +79,7 @@ export class RingHabitat implements Transformable {
         // adjust the radius to fit the required habitable surface
         this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
 
-        const attachmentTessellation = 4 + 2 * Math.floor(this.rng(1) * 2);
+        const attachmentTessellation = model.attachmentTessellation;
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "RingHabitatMetalSectionMaterial",

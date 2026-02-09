@@ -40,6 +40,8 @@ import { Settings } from "@/settings";
 import type { StationSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
+import { generateHelixHabitatModel } from "./sections/habitats/helix";
+import { generateRingHabitatModel } from "./sections/habitats/ring";
 
 export function generateSpaceStationModel(
     id: string,
@@ -171,22 +173,20 @@ export function generateSpaceStationModel(
     );
     switch (habitatType) {
         case "ring":
-            sections.push({
-                type: "ringHabitat",
-                surface: {
+            sections.push(
+                generateRingHabitatModel(Settings.SEED_HALF_RANGE * rng(27), {
                     housing: housingSurface,
                     agriculture: agricultureSurface,
-                },
-            });
+                }),
+            );
             break;
         case "helix":
-            sections.push({
-                type: "helixHabitat",
-                surface: {
+            sections.push(
+                generateHelixHabitatModel(Settings.SEED_HALF_RANGE * rng(19), {
                     housing: housingSurface,
                     agriculture: agricultureSurface,
-                },
-            });
+                }),
+            );
             break;
         case "cylinder":
             sections.push(

@@ -15,14 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { randRangeInt } from "extended-random";
+
 import type { HelixHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/helix";
 
-export function generateHelixHabitatModel(seed: number): HelixHabitatModel {
+import { getRngFromSeed } from "@/utils/getRngFromSeed";
+
+export function generateHelixHabitatModel(seed: number, surface: HelixHabitatModel["surface"]): HelixHabitatModel {
+    const rng = getRngFromSeed(seed);
+    const baseRadius = 10e3 + rng(0) * 10e3;
+    const deltaRadius = 700 + rng(1) * 200;
+    const helixCount = randRangeInt(2, 4, rng, 654);
+    const thicknessFactor = randRangeInt(1, 5 - helixCount, rng, 150);
+    const helixPitchMultiplier = 1 + 0.3 * (rng(2) * 2 - 1);
+    const attachmentTessellation = 6 + 2 * Math.floor(rng(4) * 2);
     return {
         type: "helixHabitat",
-        surface: {
-            housing: 0,
-            agriculture: 0,
-        },
+        surface,
+        baseRadius,
+        deltaRadius,
+        helixCount,
+        thicknessFactor,
+        helixPitchMultiplier,
+        attachmentTessellation,
     };
 }

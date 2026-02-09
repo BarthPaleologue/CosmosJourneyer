@@ -19,6 +19,8 @@ import { z } from "zod";
 
 export const RingHabitatModelSchema = z.object({
     type: z.literal("ringHabitat"),
+    baseRadius: z.number().positive(),
+    attachmentTessellation: z.number().int().positive(),
     surface: z.object({
         housing: z.number().positive(),
         agriculture: z.number().positive(),

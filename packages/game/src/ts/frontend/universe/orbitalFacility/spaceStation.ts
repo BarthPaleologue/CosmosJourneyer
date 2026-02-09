@@ -169,9 +169,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             case "cylinderHabitat":
                 return new CylinderHabitat(model, assets.textures, this.scene);
             case "ringHabitat":
-                return new RingHabitat(model, Settings.SEED_HALF_RANGE * rng(27), assets.textures, this.scene);
+                return new RingHabitat(model, assets.textures, this.scene);
             case "helixHabitat":
-                return new HelixHabitat(model, Settings.SEED_HALF_RANGE * rng(19), assets.textures, this.scene);
+                return new HelixHabitat(model, assets.textures, this.scene);
             case "landingBay": {
                 const landingBay = new LandingBay(this.model, rng(37) * Settings.SEED_HALF_RANGE, assets, this.scene);
                 this.landingBays.push(landingBay);
