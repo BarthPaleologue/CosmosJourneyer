@@ -17,7 +17,7 @@
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
+import { generateSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
@@ -40,7 +40,7 @@ export function createSierpinskiScene(
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-    const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(
+    const sierpinskiPyramidModel = generateSierpinskiPyramidModel(
         "sierpinski",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Sierpinski Pyramid",

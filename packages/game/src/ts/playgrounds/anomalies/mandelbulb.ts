@@ -17,7 +17,7 @@
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
+import { generateMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { MandelbulbPostProcess } from "@/frontend/postProcesses/anomalies/mandelbulbPostProcess";
@@ -40,7 +40,7 @@ export function createMandelbulbScene(
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-    const model = newSeededMandelbulbModel(
+    const model = generateMandelbulbModel(
         "mandelbulb",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Mandelbulb",

@@ -19,7 +19,7 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { SolarMass, SolarRadius } from "@/utils/physics/constants";
 
-import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import { generateSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 
 export function getLoneStarSystem(): StarSystemModel {
     const systemModel: StarSystemModel = {
@@ -62,7 +62,7 @@ export function getLoneStarSystem(): StarSystemModel {
         orbitalFacilities: [],
     };
 
-    const stationModel = newSeededSpaceStationModel("loneStarStation", 0, systemModel.stellarObjects[0], systemModel, {
+    const stationModel = generateSpaceStationModel("loneStarStation", 0, systemModel.stellarObjects[0], systemModel, {
         name: "Lone Star Outpost",
     });
 

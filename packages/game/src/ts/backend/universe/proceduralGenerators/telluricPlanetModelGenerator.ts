@@ -37,7 +37,7 @@ import { Settings } from "@/settings";
 
 import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
 
-export function newSeededTelluricPlanetModel(
+export function generateTelluricPlanetModel(
     id: string,
     seed: number,
     name: string,

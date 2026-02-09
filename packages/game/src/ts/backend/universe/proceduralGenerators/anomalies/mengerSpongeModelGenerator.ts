@@ -27,7 +27,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 
-export function newSeededMengerSpongeModel(
+export function generateMengerSpongeModel(
     id: string,
     seed: number,
     name: string,

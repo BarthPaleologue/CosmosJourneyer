@@ -21,7 +21,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import { generateSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 import type { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -83,7 +83,7 @@ export async function createSpaceStationScene(
     const urlParams = new URLSearchParams(window.location.search);
     const seedParam = urlParams.get("seed");
 
-    const spaceStationModel = newSeededSpaceStationModel(
+    const spaceStationModel = generateSpaceStationModel(
         "station",
         seedParam !== null ? Number(seedParam) : Math.random() * Settings.SEED_HALF_RANGE,
         sunModel,

@@ -17,7 +17,7 @@
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
+import { generateMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { MandelboxPostProcess } from "@/frontend/postProcesses/anomalies/mandelboxPostProcess";
@@ -40,7 +40,7 @@ export function createMandelboxScene(
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-    const model = newSeededMandelboxModel(
+    const model = generateMandelboxModel(
         "mandelbox",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Mandelbox",

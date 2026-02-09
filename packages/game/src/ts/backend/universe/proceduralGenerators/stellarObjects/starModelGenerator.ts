@@ -29,7 +29,7 @@ import type { StellarType } from "@/utils/physics/stellarTypes";
 import { wheelOfFortune } from "@/utils/random";
 import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
-export function newSeededStarModel(
+export function generateStarModel(
     id: string,
     seed: number,
     name: string,

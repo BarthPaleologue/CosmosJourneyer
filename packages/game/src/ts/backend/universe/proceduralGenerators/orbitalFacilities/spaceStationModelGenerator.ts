@@ -40,7 +40,7 @@ import { Settings } from "@/settings";
 import type { StationSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
 
-export function newSeededSpaceStationModel(
+export function generateSpaceStationModel(
     id: string,
     seed: number,
     parentBody: DeepReadonly<CelestialBodyModel>,

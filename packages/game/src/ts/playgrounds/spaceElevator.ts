@@ -21,8 +21,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { newSeededSpaceElevatorModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceElevatorModelGenerator";
-import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
+import { generateSpaceElevatorModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceElevatorModelGenerator";
+import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 import type { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -70,7 +70,7 @@ export async function createSpaceElevatorScene(
     };
 
     const sun = getSunModel();
-    const planet = newSeededTelluricPlanetModel("dummy", 0, "Dummy", [sun], {
+    const planet = generateTelluricPlanetModel("dummy", 0, "Dummy", [sun], {
         orbit: { semiMajorAxis: astronomicalUnitToMeters(1) },
     });
 
@@ -87,7 +87,7 @@ export async function createSpaceElevatorScene(
     const urlParams = new URLSearchParams(window.location.search);
     const seedParam = urlParams.get("seed");
 
-    const spaceElevatorModel = newSeededSpaceElevatorModel(
+    const spaceElevatorModel = generateSpaceElevatorModel(
         "station",
         seedParam !== null ? Number(seedParam) : Math.random() * Settings.SEED_HALF_RANGE,
         planet,

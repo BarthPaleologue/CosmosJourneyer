@@ -20,11 +20,11 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
-import { newSeededMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
-import { newSeededMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
-import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
+import { generateJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
+import { generateMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
+import { generateMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
+import { generateMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
+import { generateSierpinskiPyramidModel } from "@/backend/universe/proceduralGenerators/anomalies/sierpinskiPyramidModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
@@ -54,7 +54,7 @@ export async function createXrScene(
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
     function createMandelbulb(): TransformNode {
-        const mandelBulbModel = newSeededMandelbulbModel("mandelbulb", Math.random() * 100_000, "XR Anomaly", []);
+        const mandelBulbModel = generateMandelbulbModel("mandelbulb", Math.random() * 100_000, "XR Anomaly", []);
         const mandelbulb = new EmptyCelestialBody(mandelBulbModel, scene);
         mandelbulb.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -72,7 +72,7 @@ export async function createXrScene(
     }
 
     function createJulia(): TransformNode {
-        const juliaModel = newSeededJuliaSetModel("julia", Math.random() * 100_000, "XR Anomaly", []);
+        const juliaModel = generateJuliaSetModel("julia", Math.random() * 100_000, "XR Anomaly", []);
         const julia = new EmptyCelestialBody(juliaModel, scene);
         julia.getTransform().scalingDeterminant = 1 / 400e3;
 
@@ -90,7 +90,7 @@ export async function createXrScene(
     }
 
     function createMandelbox(): TransformNode {
-        const mandelboxModel = newSeededMandelboxModel("mandelbox", Math.random() * 100_000, "XR Anomaly", []);
+        const mandelboxModel = generateMandelboxModel("mandelbox", Math.random() * 100_000, "XR Anomaly", []);
         const mandelbox = new EmptyCelestialBody(mandelboxModel, scene);
         mandelbox.getTransform().scalingDeterminant = 1 / 100e3;
 
@@ -108,7 +108,7 @@ export async function createXrScene(
     }
 
     function createSierpinskiPyramid(): TransformNode {
-        const sierpinskiPyramidModel = newSeededSierpinskiPyramidModel(
+        const sierpinskiPyramidModel = generateSierpinskiPyramidModel(
             "sierpinski",
             Math.random() * 100_000,
             "XR Anomaly",
@@ -131,7 +131,7 @@ export async function createXrScene(
     }
 
     function createMengerSponge(): TransformNode {
-        const mengerSpongeModel = newSeededMengerSpongeModel("menger", Math.random() * 100_000, "XR Anomaly", []);
+        const mengerSpongeModel = generateMengerSpongeModel("menger", Math.random() * 100_000, "XR Anomaly", []);
         const mengerSponge = new EmptyCelestialBody(mengerSpongeModel, scene);
         mengerSponge.getTransform().scalingDeterminant = 1 / 100e3;
 

@@ -26,7 +26,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getMassFromSchwarzschildRadius } from "@/utils/physics/blackHole";
 import { type DeepReadonly } from "@/utils/types";
 
-export function newSeededBlackHoleModel(
+export function generateBlackHoleModel(
     id: string,
     seed: number,
     name: string,

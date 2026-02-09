@@ -32,7 +32,7 @@ import { type Orbit } from "../orbitalObjects/orbit";
 import { newSeededRingsModel } from "../orbitalObjects/ringsModel";
 import { getGasPlanetOrbitRadius } from "./gasPlanetOrbitGenerator";
 
-export function newSeededGasPlanetModel(
+export function generateGasPlanetModel(
     id: string,
     seed: number,
     name: string,

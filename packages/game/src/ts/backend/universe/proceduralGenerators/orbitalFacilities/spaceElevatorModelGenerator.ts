@@ -37,7 +37,7 @@ import { Settings } from "@/settings";
 import type { ElevatorSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
 import type { StarSystemModel } from "../../starSystemModel";
 
-export function newSeededSpaceElevatorModel(
+export function generateSpaceElevatorModel(
     id: string,
     seed: number,
     parentBody: DeepReadonly<PlanetModel>,
