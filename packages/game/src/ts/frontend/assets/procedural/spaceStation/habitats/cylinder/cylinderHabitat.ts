@@ -27,6 +27,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { CylinderHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/cylinder";
+
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
@@ -55,12 +57,14 @@ export class CylinderHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: CylinderHabitatModel, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
 
         this.radius = 4e3 + this.rng(0) * 2e3;
+
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 

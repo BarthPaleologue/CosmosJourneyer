@@ -29,6 +29,8 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { type Scene } from "@babylonjs/core/scene";
 import { randRangeInt } from "extended-random";
 
+import type { SolarSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/solar";
+
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
@@ -57,7 +59,7 @@ export class SolarSection implements StationSection {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredSurface: number, seed: number, assets: RenderingAssets, scene: Scene) {
+    constructor(model: SolarSectionModel, seed: number, assets: RenderingAssets, scene: Scene) {
         this.rng = getRngFromSeed(seed);
 
         const axisCount = wheelOfFortune(
@@ -72,6 +74,8 @@ export class SolarSection implements StationSection {
         );
 
         let attachmentLength = 200;
+
+        const requiredSurface = model.surface;
 
         if (axisCount === 1) {
             // in this case we will need a larger body to fit all the panels on the main attachment

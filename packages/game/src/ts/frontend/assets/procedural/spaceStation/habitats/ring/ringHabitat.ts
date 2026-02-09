@@ -27,6 +27,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { RingHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/ring";
+
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
@@ -64,7 +66,7 @@ export class RingHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: RingHabitatModel, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
@@ -72,6 +74,8 @@ export class RingHabitat implements Transformable {
         this.radius = 5e3 + this.rng(0) * 10e3;
 
         const deltaRadius = 1e3;
+
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius + deltaRadius / 2));
         const yScaling = Math.ceil(requiredHeight / deltaRadius);

@@ -30,6 +30,8 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { type Scene } from "@babylonjs/core/scene";
 import { randRangeInt } from "extended-random";
 
+import type { HelixHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/helix";
+
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
@@ -66,7 +68,7 @@ export class HelixHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: HelixHabitatModel, seed: number, textures: Textures, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
         this.rng = getRngFromSeed(seed);
@@ -80,6 +82,8 @@ export class HelixHabitat implements Transformable {
         const helixThickness = this.deltaRadius * thicknessFactor;
         const perTurnPerimeter = 2 * Math.PI * this.radius;
         const perTurnHabitableSurface = perTurnPerimeter * helixThickness;
+
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / helixCount;
         const turnCount = Math.ceil(requiredHabitableSurfacePerHelix / perTurnHabitableSurface);

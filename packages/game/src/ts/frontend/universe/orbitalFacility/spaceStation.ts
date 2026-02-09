@@ -163,19 +163,14 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
                     );
                     break;
                 case "solar":
-                    newSection = new SolarSection(
-                        section.surface,
-                        Settings.SEED_HALF_RANGE * rng(31),
-                        assets,
-                        this.scene,
-                    );
+                    newSection = new SolarSection(section, Settings.SEED_HALF_RANGE * rng(31), assets, this.scene);
                     break;
                 case "fusion":
-                    newSection = new TokamakSection(section.netPowerOutput, assets, this.scene);
+                    newSection = new TokamakSection(section, assets, this.scene);
                     break;
                 case "cylinderHabitat":
                     newSection = new CylinderHabitat(
-                        section.surface.agriculture + section.surface.housing,
+                        section,
                         Settings.SEED_HALF_RANGE * rng(13),
                         assets.textures,
                         this.scene,
@@ -183,7 +178,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
                     break;
                 case "ringHabitat":
                     newSection = new RingHabitat(
-                        section.surface.agriculture + section.surface.housing,
+                        section,
                         Settings.SEED_HALF_RANGE * rng(27),
                         assets.textures,
                         this.scene,
@@ -191,7 +186,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
                     break;
                 case "helixHabitat":
                     newSection = new HelixHabitat(
-                        section.surface.agriculture + section.surface.housing,
+                        section,
                         Settings.SEED_HALF_RANGE * rng(19),
                         assets.textures,
                         this.scene,
