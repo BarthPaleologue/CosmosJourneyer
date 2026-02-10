@@ -19,7 +19,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
@@ -244,12 +244,12 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         if (newUp.lengthSquared() < 1e-6) {
             newUp.set(0, 1, 0);
         }
-        const currentUp = this.getTransform().up;
-        const rotation = Quaternion.FromUnitVectorsToRef(currentUp, newUp, Quaternion.Identity());
-
         const currentRotation = this.getTransform().rotationQuaternion ?? Quaternion.Identity();
-        rotation.multiplyToRef(currentRotation, currentRotation);
-        this.getTransform().rotationQuaternion = currentRotation;
+        this.getTransform().rotationQuaternion = Quaternion.FromUnitVectorsToRef(
+            Vector3.UpReadOnly,
+            newUp,
+            currentRotation,
+        );
 
         this.elapsedSeconds += deltaSeconds;
 
