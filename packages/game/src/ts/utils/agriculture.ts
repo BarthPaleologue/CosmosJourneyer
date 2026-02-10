@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { haToM2 } from "./physics/unitConversions";
+import { perHaToPerM2 } from "./physics/unitConversions";
 import { assertUnreachable } from "./types";
 
 export const CropType = {
@@ -62,21 +62,21 @@ export function cropTypeToString(cropType: CropType): string {
 export function getEdibleEnergyPerAreaPerDay(cropType: CropType): number {
     switch (cropType) {
         case CropType.POTATO:
-            return 54_000 / haToM2(1);
+            return perHaToPerM2(54_000);
         case CropType.YAM:
-            return 47_000 / haToM2(1);
+            return perHaToPerM2(47_000);
         case CropType.SWEET_POTATO:
-            return 70_000 / haToM2(1);
+            return perHaToPerM2(70_000);
         case CropType.RICE:
-            return 49_000 / haToM2(1);
+            return perHaToPerM2(49_000);
         case CropType.PEANUT:
-            return 36_000 / haToM2(1);
+            return perHaToPerM2(36_000);
         case CropType.WHEAT:
-            return 40_000 / haToM2(1);
+            return perHaToPerM2(40_000);
         case CropType.LENTIL:
-            return 23_000 / haToM2(1);
+            return perHaToPerM2(23_000);
         case CropType.CASSAVA:
-            return 27_000 / haToM2(1);
+            return perHaToPerM2(27_000);
         default:
             return assertUnreachable(cropType);
     }

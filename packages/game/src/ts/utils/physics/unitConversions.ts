@@ -92,6 +92,15 @@ export function haToM2(hectares: number): number {
 }
 
 /**
+ * Converts a quantity expressed per hectare to the equivalent quantity per square meter.
+ * @param valuePerHa The quantity per hectare.
+ * @returns The quantity per square meter.
+ */
+export function perHaToPerM2(valuePerHa: number): number {
+    return valuePerHa / haToM2(1);
+}
+
+/**
  * Converts an annual energy consumption in kilowatt-hours to an average power in watts.
  * @param kwhPerYear The energy consumption in kWh per year.
  * @returns The average power in watts.

@@ -25,6 +25,7 @@ import {
     kelvinToCelsius,
     kwhPerYearToWatts,
     metersToLightYears,
+    perHaToPerM2,
 } from "./unitConversions";
 
 test("celsiusToKelvin", () => {
@@ -117,5 +118,15 @@ describe("haToM2", () => {
 
     it("handles zero input", () => {
         expect(haToM2(0)).toBe(0);
+    });
+});
+
+describe("perHaToPerM2", () => {
+    it("converts values from per hectare to per square meter", () => {
+        expect(perHaToPerM2(54_000)).toBe(5.4);
+    });
+
+    it("handles zero input", () => {
+        expect(perHaToPerM2(0)).toBe(0);
     });
 });
