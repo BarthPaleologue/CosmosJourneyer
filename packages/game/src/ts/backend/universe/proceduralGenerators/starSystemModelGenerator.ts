@@ -92,12 +92,12 @@ export function generateStarSystemModel(
             break;
         case "blackHole":
             stellarObjects.push(
-                generateBlackHoleModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
+                generateBlackHoleModel(createOrbitalObjectId([], "blackHole", 0), seed, stellarObjectName, []),
             );
             break;
         case "neutronStar":
             stellarObjects.push(
-                generateNeutronStarModel(createOrbitalObjectId([], "blackHole", 0), seed, stellarObjectName, []),
+                generateNeutronStarModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
             );
             break;
     }
