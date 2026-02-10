@@ -20,7 +20,7 @@ import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/un
 
 import { makeD3PieChart } from "@/frontend/helpers/d3PieChart";
 
-import { type CropType } from "@/utils/agriculture";
+import { cropTypeToString, type CropType } from "@/utils/agriculture";
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -51,7 +51,7 @@ export function generateInfoHTML(
         ${makeD3PieChart<[number, CropType]>(
             agricultureMix,
             ([proportion]) => proportion,
-            ([, cropType]) => cropType,
+            ([, cropType]) => cropTypeToString(cropType),
         )}
     `;
 }

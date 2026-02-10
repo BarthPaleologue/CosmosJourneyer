@@ -32,6 +32,29 @@ export type CropType = (typeof CropType)[keyof typeof CropType];
 
 export const CropTypes = Object.values(CropType);
 
+export function cropTypeToString(cropType: CropType): string {
+    switch (cropType) {
+        case CropType.POTATO:
+            return "Potato";
+        case CropType.YAM:
+            return "Yam";
+        case CropType.SWEET_POTATO:
+            return "Sweet potato";
+        case CropType.RICE:
+            return "Rice";
+        case CropType.PEANUT:
+            return "Peanut";
+        case CropType.WHEAT:
+            return "Wheat";
+        case CropType.LENTIL:
+            return "Lentil";
+        case CropType.CASSAVA:
+            return "Cassava";
+        default:
+            return assertUnreachable(cropType);
+    }
+}
+
 /**
  * Edible energy in kcal/m²/day for different plant species
  * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
