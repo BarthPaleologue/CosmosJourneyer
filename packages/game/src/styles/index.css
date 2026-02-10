@@ -1,25 +1,37 @@
-@use "sass:meta";
-@use "sass:color";
+@import "./variables.css";
+@import "./virtualCursor.css";
+@import "./helmetOverlay/helmetOverlay.css";
+@import "./spaceStationUI/spaceStationUI.css";
+@import "./pauseMenu/index.css";
+@import "./mainMenu.css";
+@import "./inputs.css";
+@import "./loadingScreen.css";
+@import "./targetCursors.css";
+@import "./starMapUI.css";
+@import "./tutorialLayer.css";
+@import "./tutorialsMenuPanel.css";
+@import "./inspectorLayer.css";
+@import "./saveLoadingPanelContent.css";
+@import "./select.css";
+@import "./button.css";
+@import "./dialog.css";
 
-//  This file is part of Cosmos Journeyer
-//
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU Affero General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Affero General Public License for more details.
-//
-//  You should have received a copy of the GNU Affero General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-@use "variables";
-@use "virtualCursor";
+/*  This file is part of Cosmos Journeyer */
+/* */
+/*  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com> */
+/* */
+/*  This program is free software: you can redistribute it and/or modify */
+/*  it under the terms of the GNU Affero General Public License as published by */
+/*  the Free Software Foundation, either version 3 of the License, or */
+/*  (at your option) any later version. */
+/* */
+/*  This program is distributed in the hope that it will be useful, */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the */
+/*  GNU Affero General Public License for more details. */
+/* */
+/*  You should have received a copy of the GNU Affero General Public License */
+/*  along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 @font-face {
     font-family: "Nasalization";
@@ -30,7 +42,7 @@
     display: none !important;
 }
 
-// scroll bar
+/* scroll bar */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -41,7 +53,7 @@
 
 ::-webkit-scrollbar-thumb {
     background: #888;
-    //border-radius: 5px;
+    /*border-radius: 5px; */
     transition: 0.2s;
 }
 
@@ -78,18 +90,18 @@ body {
         top: 65vh;
         left: 2.5vw;
         transform: translateY(-50%);
-        transition: variables.$transition-time ease-in-out;
+        transition: var(--transition-time) ease-in-out;
 
         z-index: 10;
 
         li {
             color: white;
-            font-family: variables.$main-font;
+            font-family: var(--main-font);
             font-size: var(--menu-items-size);
             line-height: 1.5em;
             cursor: pointer;
             padding: 5px 20px;
-            transition: variables.$transition-time;
+            transition: var(--transition-time);
 
             &:hover {
                 background: var(--accent-color);
@@ -109,36 +121,6 @@ body {
             }
         }
     }
-
-    @include meta.load-css("helmetOverlay/helmetOverlay");
-
-    @include meta.load-css("spaceStationUI/spaceStationUI");
-
-    @include meta.load-css("pauseMenu/index.scss");
-
-    @include meta.load-css("mainMenu.scss");
-
-    @include meta.load-css("inputs.scss");
-
-    @include meta.load-css("loadingScreen.scss");
-
-    @include meta.load-css("targetCursors.scss");
-
-    @include meta.load-css("starMapUI.scss");
-
-    @include meta.load-css("tutorialLayer.scss");
-
-    @include meta.load-css("tutorialsMenuPanel.scss");
-
-    @include meta.load-css("inspectorLayer.scss");
-
-    @include meta.load-css("saveLoadingPanelContent.scss");
-
-    @include meta.load-css("select.scss");
-
-    @include meta.load-css("button.scss");
-
-    @include meta.load-css("dialog.scss");
 
     canvas {
         z-index: 1;

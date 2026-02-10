@@ -1,5 +1,3 @@
-@use "variables";
-
 select {
     background: var(--accent-color-dark);
     outline: none;

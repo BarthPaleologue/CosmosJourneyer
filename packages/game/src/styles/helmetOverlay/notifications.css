@@ -1,6 +1,6 @@
 .notification-container {
-    // positioned at top-center of the screen
-    // children are notifications that have a text and a progress bar
+    /* positioned at top-center of the screen */
+    /* children are notifications that have a text and a progress bar */
     position: absolute;
     top: 0;
     left: 50%;
@@ -17,7 +17,7 @@
     padding: 10px 0;
 
     .notification {
-        // notification container
+        /* notification container */
         position: relative;
         width: 50%;
         min-width: 500px;
@@ -52,7 +52,7 @@
             }
 
             p {
-                // notification text
+                /* notification text */
                 position: relative;
                 padding: 5px 10px;
                 text-align: center;
@@ -63,13 +63,13 @@
         }
 
         .notification-progress {
-            // progress bar
+            /* progress bar */
             width: 100%;
             height: 5px;
             background-color: rgba(255, 255, 255, 0.5);
 
             .notification-progress-bar {
-                // progress bar fill
+                /* progress bar fill */
                 height: 100%;
                 width: 100%;
                 background-color: white;

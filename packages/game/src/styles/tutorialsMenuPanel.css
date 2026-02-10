@@ -10,10 +10,10 @@
         column-gap: 20px;
         row-gap: 20px;
 
-        $tileWidth: 300px;
+        --tile-width: 300px;
 
         & > * {
-            width: $tileWidth;
+            width: var(--tile-width);
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
 

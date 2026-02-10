@@ -1,5 +1,3 @@
-@use "variables";
-
 @keyframes loadingAnimation {
     0% {
         background-position: 100% 0;
@@ -16,7 +14,7 @@ button {
     --size: var(--text-size);
     background-color: var(--button-bg-color);
     color: white;
-    font-family: variables.$main-font;
+    font-family: var(--main-font);
     padding: 1vmin;
     font-size: var(--size);
     line-height: var(--size);

@@ -129,12 +129,6 @@ export default defineConfig({
                 exclude: /node_modules/,
             },
             {
-                test: /\.s[ac]ss$/i,
-                use: [{ loader: "sass-loader", options: { sourceMap: !isProduction } }],
-                type: "css/auto",
-                exclude: /node_modules/,
-            },
-            {
                 test: /\.(eot|svg|ttf|woff2?|otf|png|jpe?g|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
                 exclude: /node_modules/,

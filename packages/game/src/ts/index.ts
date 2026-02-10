@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "@styles/index.scss";
+import "@styles/index.css";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";

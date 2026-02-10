@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "@styles/index.scss";
+import "@styles/index.css";
 
 import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
