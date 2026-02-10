@@ -1,5 +1,3 @@
-@use "variables";
-
 .virtualCursor {
     position: absolute;
     width: 2vh;
@@ -14,5 +12,5 @@
     pointer-events: none;
     transform-origin: center;
     scale: 1;
-    transition: scale variables.$transition-time variables.$bezier-overshoot;
+    transition: scale var(--transition-time) var(--bezier-overshoot);
 }

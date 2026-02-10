@@ -186,7 +186,7 @@ export class StarMapUI {
         this.humanPresence.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
-        this.cursor.classList.add("cursor");
+        this.cursor.classList.add("virtualCursor");
         this.htmlRoot.appendChild(this.cursor);
 
         this.shortHandUI = document.createElement("div");

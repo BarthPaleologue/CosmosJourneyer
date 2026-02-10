@@ -1,6 +1,7 @@
-@use "../variables";
-
-$gaps: 10px;
+:root {
+    --space-station-ui-gap: 10px;
+    --space-station-ui-icon-size: 75px;
+}
 
 #spaceStationUI {
     position: absolute;
@@ -10,9 +11,9 @@ $gaps: 10px;
     right: 0;
     z-index: 2;
 
-    font-family: variables.$main-font;
+    font-family: var(--main-font);
 
-    padding: $gaps;
+    padding: var(--space-station-ui-gap);
 
     visibility: hidden;
 
@@ -20,8 +21,8 @@ $gaps: 10px;
     grid-template-columns: 7fr 3fr;
     grid-template-rows: 15vh auto;
 
-    row-gap: $gaps;
-    column-gap: $gaps;
+    row-gap: var(--space-station-ui-gap);
+    column-gap: var(--space-station-ui-gap);
 
     & > * {
         box-shadow: 0 0 20px black;
@@ -35,7 +36,7 @@ $gaps: 10px;
         flex-direction: column;
         justify-content: space-evenly;
 
-        row-gap: $gaps;
+        row-gap: var(--space-station-ui-gap);
         padding: 20px;
 
         p {
@@ -55,7 +56,7 @@ $gaps: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        row-gap: $gaps;
+        row-gap: var(--space-station-ui-gap);
         padding: 20px;
 
         h2,
@@ -142,11 +143,11 @@ $gaps: 10px;
                         outline: none;
                         border: none;
                         color: white;
-                        font-family: variables.$main-font;
+                        font-family: var(--main-font);
                         padding: 1vmin;
                         font-size: var(--text-size);
 
-                        transition: variables.$transition-time;
+                        transition: var(--transition-time);
 
                         &:hover {
                             background: var(--accent-color-light);
@@ -166,7 +167,7 @@ $gaps: 10px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            row-gap: $gaps;
+            row-gap: var(--space-station-ui-gap);
 
             h3 {
                 margin-block: 0;
@@ -175,7 +176,7 @@ $gaps: 10px;
             .fuelManagementContainer {
                 display: flex;
                 align-items: center;
-                column-gap: $gaps;
+                column-gap: var(--space-station-ui-gap);
 
                 p {
                     flex-grow: 1;
@@ -192,7 +193,7 @@ $gaps: 10px;
         align-items: center;
 
         padding: 10px;
-        row-gap: $gaps;
+        row-gap: var(--space-station-ui-gap);
 
         .flexGrow {
             flex-grow: 1;
@@ -205,10 +206,8 @@ $gaps: 10px;
 
             transition: 0.2s;
 
-            $icon-size: 75px;
-
             display: grid;
-            grid-template-columns: $icon-size auto;
+            grid-template-columns: var(--space-station-ui-icon-size) auto;
             align-items: center;
 
             column-gap: 10px;
@@ -228,8 +227,8 @@ $gaps: 10px;
 
             img {
                 grid-row: span 2;
-                width: $icon-size;
-                height: $icon-size;
+                width: var(--space-station-ui-icon-size);
+                height: var(--space-station-ui-icon-size);
             }
 
             h2 {
@@ -331,7 +330,7 @@ $gaps: 10px;
     grid-template-columns: 1fr 2fr 1fr;
     background: rgba(0, 0, 0, 0.4);
     padding: 10px;
-    column-gap: $gaps;
+    column-gap: var(--space-station-ui-gap);
 
     & > div,
     .componentSpec {
@@ -382,7 +381,7 @@ $gaps: 10px;
     background: var(--accent-color-dark);
     padding: 10px;
     cursor: pointer;
-    transition: variables.$transition-time;
+    transition: var(--transition-time);
 
     &:hover {
         background: var(--accent-color);

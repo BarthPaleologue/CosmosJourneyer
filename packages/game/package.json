@@ -83,8 +83,6 @@
         "http-server": "^14.1.1",
         "jsdom": "^27.4.0",
         "prettier": "^3.8.1",
-        "sass": "^1.97.3",
-        "sass-loader": "^16.0.6",
         "ts-checker-rspack-plugin": "^1.2.6",
         "ts-shader-loader": "^2.1.0",
         "typedoc": "^0.28.16",

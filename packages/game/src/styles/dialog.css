@@ -1,5 +1,3 @@
-@use "variables";
-
 ::backdrop {
     background-color: rgba(0, 0, 0, 0.8);
 }
@@ -9,7 +7,7 @@ dialog {
     z-index: 1000;
 
     color: white;
-    font-family: variables.$main-font;
+    font-family: var(--main-font);
     font-size: var(--text-size);
 
     max-width: 40%;
