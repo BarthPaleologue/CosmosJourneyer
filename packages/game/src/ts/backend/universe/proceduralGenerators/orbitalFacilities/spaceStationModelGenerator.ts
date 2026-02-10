@@ -22,9 +22,8 @@ import { type CelestialBodyModel } from "@/backend/universe/orbitalObjects/index
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { type SpaceStationModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spacestationModel";
 
-import { getDistancesToStellarObjects } from "@/frontend/helpers/distanceToStellarObject";
-
 import { CropTypes, getEdibleEnergyPerAreaPerDay, type CropType } from "@/utils/agriculture";
+import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";

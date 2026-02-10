@@ -20,9 +20,8 @@ import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
 
-import { getDistancesToStellarObjects } from "@/frontend/helpers/distanceToStellarObject";
-
 import { CropTypes, getEdibleEnergyPerAreaPerDay, type CropType } from "@/utils/agriculture";
+import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
