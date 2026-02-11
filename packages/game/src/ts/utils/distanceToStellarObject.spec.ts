@@ -20,7 +20,8 @@ import { describe, expect, it } from "vitest";
 import { Faction } from "@/backend/society/factions";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { AU, EarthMass, SolarMass, SolarRadius } from "@/utils/physics/constants";
+import { EarthMass, SolarMass, SolarRadius } from "@/utils/physics/constants";
+import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -69,7 +70,7 @@ describe("distanceToStellarObject", () => {
                 name: "Planet",
                 orbit: {
                     p: 2,
-                    semiMajorAxis: AU,
+                    semiMajorAxis: astronomicalUnitToMeters(1),
                     parentIds: ["star"],
                     argumentOfPeriapsis: 0,
                     inclination: 0,
@@ -129,6 +130,7 @@ describe("distanceToStellarObject", () => {
                 annualEnergyPerCapitaKWh: 4000,
                 mass: 1e6,
                 axialTilt: 0,
+                sections: [],
             },
         ],
     };

@@ -17,7 +17,7 @@
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
+import { generateMengerSpongeModel } from "@/backend/universe/proceduralGenerators/anomalies/mengerSpongeModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { MengerSpongePostProcess } from "@/frontend/postProcesses/anomalies/mengerSpongePostProcess";
@@ -40,7 +40,7 @@ export function createMengerSpongeScene(
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-    const model = newSeededMengerSpongeModel(
+    const model = generateMengerSpongeModel(
         "mengerSponge",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Menger Sponge",

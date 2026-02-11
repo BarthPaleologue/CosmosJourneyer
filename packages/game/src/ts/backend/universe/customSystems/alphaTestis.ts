@@ -21,11 +21,11 @@ import { EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
 import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
 
-import { newSeededGasPlanetModel } from "../proceduralGenerators/gasPlanetModelGenerator";
-import { newSeededSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { newSeededStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
-import { newSeededTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
+import { generateGasPlanetModel } from "../proceduralGenerators/gasPlanetModelGenerator";
+import { generateSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import { generateStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
+import { generateTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
+import { generateTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
 import { type StarSystemModel } from "../starSystemModel";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {
@@ -39,41 +39,44 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         localZ: 0,
     };
 
-    const weierstrass = newSeededStarModel("star0", 420, "Weierstrass", []);
+    const weierstrass = generateStarModel("star0", 420, "Weierstrass", []);
     weierstrass.blackBodyTemperature = 5778;
 
-    const hecate = newSeededTelluricPlanetModel("hecate", 253, "Hécate", [weierstrass]);
+    const hecate = generateTelluricPlanetModel("hecate", 253, "Hécate", [weierstrass]);
     hecate.temperature.min = celsiusToKelvin(-40);
     hecate.temperature.max = celsiusToKelvin(30);
 
     hecate.orbit.semiMajorAxis = 21000 * hecate.radius;
 
-    const spaceStation = newSeededSpaceStationModel("hecate->station", 0, systemCoordinates, { x: 0, y: 0, z: 0 }, [
-        hecate,
-    ]);
-    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
-
-    const manaleth = newSeededTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
+    const manaleth = generateTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate]);
     manaleth.orbit.inclination = degreesToRadians(45);
     manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.siderealDaySeconds, hecate.mass);
 
-    const ares = newSeededTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
+    const ares = generateTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
+    ares.ocean = null;
     if (ares.clouds !== null) ares.clouds.coverage = 1;
     if (ares.atmosphere !== null) ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
 
     ares.orbit.semiMajorAxis = 25100 * hecate.radius;
 
-    const andromaque = newSeededGasPlanetModel("andromaque", 0.28711440474126226, "Andromaque", [weierstrass]);
+    const andromaque = generateGasPlanetModel("andromaque", 0.28711440474126226, "Andromaque", [weierstrass]);
     andromaque.orbit.semiMajorAxis = 25300 * hecate.radius;
     andromaque.orbit.eccentricity = 0.8;
 
-    return {
+    const model: StarSystemModel = {
         name: systemName,
         coordinates: systemCoordinates,
         stellarObjects: [weierstrass],
         planets: [hecate, ares, andromaque],
         satellites: [manaleth],
         anomalies: [],
-        orbitalFacilities: [spaceStation],
+        orbitalFacilities: [],
     };
+
+    const spaceStation = generateSpaceStationModel("hecate->station", 0, hecate, model);
+    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
+
+    model.orbitalFacilities.push(spaceStation);
+
+    return model;
 }

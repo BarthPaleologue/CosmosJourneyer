@@ -17,8 +17,8 @@
 
 import "@styles/index.css";
 
-import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
-import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
+import { generateBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
+import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
@@ -32,9 +32,9 @@ const starSystemView = engine.starSystemView;
 
 const scene = starSystemView.scene;
 
-const blackHoleModel = newSeededBlackHoleModel("blackHole", 42, "Gargantua", []);
+const blackHoleModel = generateBlackHoleModel("blackHole", 42, "Gargantua", []);
 
-const millerPlanetModel = newSeededTelluricPlanetModel("miller", 47, "Miller", [blackHoleModel]);
+const millerPlanetModel = generateTelluricPlanetModel("miller", 47, "Miller", [blackHoleModel]);
 millerPlanetModel.orbit.semiMajorAxis = blackHoleModel.accretionDiskRadius * 10;
 millerPlanetModel.orbit.inclination = 0.2;
 

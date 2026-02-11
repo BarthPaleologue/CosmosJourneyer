@@ -20,11 +20,9 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { type StarModel } from "@/backend/universe/orbitalObjects/stellarObjects/starModel";
-import { newSeededSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { UniverseBackend } from "@/backend/universe/universeBackend";
+import { generateSpaceStationModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+import type { StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -36,7 +34,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
-import { AU } from "@/utils/physics/constants";
+import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
 
 import { Settings } from "@/settings";
 
@@ -68,7 +66,7 @@ export async function createStationLandingScene(
     scene.activeCamera = camera;
     camera.attachControl();
 
-    const distanceToStar = AU;
+    const distanceToStar = astronomicalUnitToMeters(1);
 
     const coordinates = {
         starSectorX: 0,
@@ -79,24 +77,28 @@ export async function createStationLandingScene(
         localZ: 0,
     };
 
-    const systemDatabase = new UniverseBackend(getLoneStarSystem());
-    const systemPosition = systemDatabase.getSystemGalacticPosition(coordinates);
-
-    const sunModel: StarModel = getSunModel();
+    const systemModel: StarSystemModel = {
+        name: "Station Landing PG",
+        coordinates: coordinates,
+        stellarObjects: [getSunModel()],
+        planets: [],
+        satellites: [],
+        anomalies: [],
+        orbitalFacilities: [],
+    };
 
     const urlParams = new URLSearchParams(window.location.search);
     const seedParam = urlParams.get("seed");
 
-    const spaceStationModel = newSeededSpaceStationModel(
+    const spaceStationModel = generateSpaceStationModel(
         "station",
         seedParam !== null ? Number(seedParam) : Math.random() * Settings.SEED_HALF_RANGE,
-        coordinates,
-        systemPosition,
-        [sunModel],
+        systemModel.stellarObjects[0],
+        systemModel,
+        { orbit: { semiMajorAxis: distanceToStar } },
     );
-    spaceStationModel.orbit.semiMajorAxis = distanceToStar;
 
-    const spaceStation = new SpaceStation(spaceStationModel, new Map([[sunModel, distanceToStar]]), assets, scene);
+    const spaceStation = new SpaceStation(spaceStationModel, assets, scene);
 
     const landingBay = spaceStation.landingBays[0];
     if (landingBay === undefined) {

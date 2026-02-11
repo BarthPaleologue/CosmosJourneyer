@@ -17,8 +17,10 @@
 
 import { type HasSeed } from "../hasSeed";
 import { type OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
+import type { ElevatorSectionModel } from "./sections";
 
 export type SpaceElevatorModel = OrbitalFacilityModelBase<"spaceElevator"> &
     HasSeed & {
-        readonly tetherLength: number;
+        tetherLength: number;
+        sections: Array<ElevatorSectionModel>;
     };

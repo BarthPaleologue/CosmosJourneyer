@@ -1,51 +1,36 @@
-export const enum CropType {
-    POTATO,
-    YAM,
-    SWEET_POTATO,
-    RICE,
-    PEANUT,
-    WHEAT,
-    LENTIL,
-    CASSAVA,
-}
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const CropTypes: CropType[] = [
-    CropType.POTATO,
-    CropType.YAM,
-    CropType.SWEET_POTATO,
-    CropType.RICE,
-    CropType.PEANUT,
-    CropType.WHEAT,
-    CropType.LENTIL,
-    CropType.CASSAVA,
-];
+import { perHaToPerM2 } from "./physics/unitConversions";
+import { assertUnreachable } from "./types";
 
-/**
- * Edible energy in kcal/ha/day for different plant species
- * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
- */
-export function getEdibleEnergyPerHaPerDay(cropType: CropType): number {
-    switch (cropType) {
-        case CropType.POTATO:
-            return 54_000;
-        case CropType.YAM:
-            return 47_000;
-        case CropType.SWEET_POTATO:
-            return 70_000;
-        case CropType.RICE:
-            return 49_000;
-        case CropType.PEANUT:
-            return 36_000;
-        case CropType.WHEAT:
-            return 40_000;
-        case CropType.LENTIL:
-            return 23_000;
-        case CropType.CASSAVA:
-            return 27_000;
-        default:
-            throw new Error("Unknown crop type");
-    }
-}
+export const CropType = {
+    POTATO: "potato",
+    YAM: "yam",
+    SWEET_POTATO: "sweet_potato",
+    RICE: "rice",
+    PEANUT: "peanut",
+    WHEAT: "wheat",
+    LENTIL: "lentil",
+    CASSAVA: "cassava",
+} as const;
+export type CropType = (typeof CropType)[keyof typeof CropType];
+
+export const CropTypes = Object.values(CropType);
 
 export function cropTypeToString(cropType: CropType): string {
     switch (cropType) {
@@ -66,6 +51,33 @@ export function cropTypeToString(cropType: CropType): string {
         case CropType.CASSAVA:
             return "Cassava";
         default:
-            throw new Error("Unknown crop type");
+            return assertUnreachable(cropType);
+    }
+}
+
+/**
+ * Edible energy in kcal/m²/day for different plant species
+ * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
+ */
+export function getEdibleEnergyPerAreaPerDay(cropType: CropType): number {
+    switch (cropType) {
+        case CropType.POTATO:
+            return perHaToPerM2(54_000);
+        case CropType.YAM:
+            return perHaToPerM2(47_000);
+        case CropType.SWEET_POTATO:
+            return perHaToPerM2(70_000);
+        case CropType.RICE:
+            return perHaToPerM2(49_000);
+        case CropType.PEANUT:
+            return perHaToPerM2(36_000);
+        case CropType.WHEAT:
+            return perHaToPerM2(40_000);
+        case CropType.LENTIL:
+            return perHaToPerM2(23_000);
+        case CropType.CASSAVA:
+            return perHaToPerM2(27_000);
+        default:
+            return assertUnreachable(cropType);
     }
 }

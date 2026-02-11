@@ -19,7 +19,7 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
+import { generateBlackHoleModel } from "@/backend/universe/proceduralGenerators/stellarObjects/blackHoleModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
@@ -52,7 +52,7 @@ export async function createBlackHoleScene(
 
     new StarFieldBox(textures.milkyWay, 1000e3, scene);
 
-    const blackHoleModel = newSeededBlackHoleModel("blackHole", 42, "Black Hole Demo", []);
+    const blackHoleModel = generateBlackHoleModel("blackHole", 42, "Black Hole Demo", []);
     const blackHole = new BlackHole(blackHoleModel, textures.milkyWay, scene);
     blackHole.getTransform().position = new Vector3(0, -0.2, 1).scaleInPlace(blackHole.getRadius() * 20);
 

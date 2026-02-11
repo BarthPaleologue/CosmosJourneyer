@@ -24,7 +24,6 @@ import { wheelOfFortune } from "@/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";
 import { romanNumeral } from "@/utils/strings/romanNumerals";
 import { generateStarName } from "@/utils/strings/starNameGenerator";
-import type { Vector3Like } from "@/utils/types";
 import { isNonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
@@ -39,19 +38,19 @@ import {
 import { createOrbitalObjectId } from "../orbitalObjects/orbitalObjectId";
 import { type TelluricSatelliteModel } from "../orbitalObjects/telluricSatelliteModel";
 import { type StarSystemModel } from "../starSystemModel";
-import { newSeededJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
-import { newSeededMandelboxModel } from "./anomalies/mandelboxModelGenerator";
-import { newSeededMandelbulbModel } from "./anomalies/mandelbulbModelGenerator";
-import { newSeededMengerSpongeModel } from "./anomalies/mengerSpongeModelGenerator";
-import { newSeededSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModelGenerator";
-import { newSeededGasPlanetModel } from "./gasPlanetModelGenerator";
-import { newSeededSpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModelGenerator";
-import { newSeededSpaceStationModel } from "./orbitalFacilities/spaceStationModelGenerator";
-import { newSeededBlackHoleModel } from "./stellarObjects/blackHoleModelGenerator";
-import { newSeededNeutronStarModel } from "./stellarObjects/neutronStarModelGenerator";
-import { newSeededStarModel } from "./stellarObjects/starModelGenerator";
-import { newSeededTelluricPlanetModel } from "./telluricPlanetModelGenerator";
-import { newSeededTelluricSatelliteModel } from "./telluricSatelliteModelGenerator";
+import { generateJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
+import { generateMandelboxModel } from "./anomalies/mandelboxModelGenerator";
+import { generateMandelbulbModel } from "./anomalies/mandelbulbModelGenerator";
+import { generateMengerSpongeModel } from "./anomalies/mengerSpongeModelGenerator";
+import { generateSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModelGenerator";
+import { generateGasPlanetModel } from "./gasPlanetModelGenerator";
+import { generateSpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModelGenerator";
+import { generateSpaceStationModel } from "./orbitalFacilities/spaceStationModelGenerator";
+import { generateBlackHoleModel } from "./stellarObjects/blackHoleModelGenerator";
+import { generateNeutronStarModel } from "./stellarObjects/neutronStarModelGenerator";
+import { generateStarModel } from "./stellarObjects/starModelGenerator";
+import { generateTelluricPlanetModel } from "./telluricPlanetModelGenerator";
+import { generateTelluricSatelliteModel } from "./telluricSatelliteModelGenerator";
 
 const enum GenerationSteps {
     NAME,
@@ -70,14 +69,12 @@ const enum GenerationSteps {
  * Generates a new star system data model given a seed using a pseudo-random number generator.
  * @param systemRng The pseudo-random generator for the star system.
  * @param coordinates The coordinates of the star system within the galaxy.
- * @param position The position of the star system within its sector.
  * @param isCivilized Whether the generated system should be considered civilized.
  * @returns The data model of the generated star system.
  */
-export function newSeededStarSystemModel(
+export function generateStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: StarSystemCoordinates,
-    position: Vector3Like,
     isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
@@ -90,16 +87,16 @@ export function newSeededStarSystemModel(
     const stellarObjectName = `${systemName} ${Alphabet.charAt(0).toUpperCase()}`;
     switch (stellarObjectType) {
         case "star":
-            stellarObjects.push(newSeededStarModel(createOrbitalObjectId([], "star", 0), seed, stellarObjectName, []));
+            stellarObjects.push(generateStarModel(createOrbitalObjectId([], "star", 0), seed, stellarObjectName, []));
             break;
         case "blackHole":
             stellarObjects.push(
-                newSeededBlackHoleModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
+                generateBlackHoleModel(createOrbitalObjectId([], "blackHole", 0), seed, stellarObjectName, []),
             );
             break;
         case "neutronStar":
             stellarObjects.push(
-                newSeededNeutronStarModel(createOrbitalObjectId([], "blackHole", 0), seed, stellarObjectName, []),
+                generateNeutronStarModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
             );
             break;
     }
@@ -128,7 +125,7 @@ export function newSeededStarSystemModel(
         switch (bodyType) {
             case "telluricPlanet":
                 planets.push(
-                    newSeededTelluricPlanetModel(
+                    generateTelluricPlanetModel(
                         createOrbitalObjectId(parentIds, "telluricPlanet", i),
                         seed,
                         planetName,
@@ -138,7 +135,7 @@ export function newSeededStarSystemModel(
                 break;
             case "gasPlanet":
                 planets.push(
-                    newSeededGasPlanetModel(
+                    generateGasPlanetModel(
                         createOrbitalObjectId(parentIds, "gasPlanet", i),
                         seed,
                         planetName,
@@ -161,7 +158,7 @@ export function newSeededStarSystemModel(
             const satelliteName = `${planet.name}${Alphabet[j]}`;
             const satelliteSeed = centeredRand(planetRng, GenerationSteps.MOONS + j) * Settings.SEED_HALF_RANGE;
             const satelliteId = createOrbitalObjectId([planet.id], "telluricSatellite", j);
-            const satelliteModel = newSeededTelluricSatelliteModel(satelliteId, satelliteSeed, satelliteName, [planet]);
+            const satelliteModel = generateTelluricSatelliteModel(satelliteId, satelliteSeed, satelliteName, [planet]);
             satellites.push(satelliteModel);
         }
     });
@@ -193,7 +190,7 @@ export function newSeededStarSystemModel(
         switch (anomalyType) {
             case "mandelbulb":
                 anomalies.push(
-                    newSeededMandelbulbModel(
+                    generateMandelbulbModel(
                         createOrbitalObjectId(parentIds, "mandelbulb", i),
                         anomalySeed,
                         anomalyName,
@@ -203,24 +200,21 @@ export function newSeededStarSystemModel(
                 break;
             case "juliaSet":
                 anomalies.push(
-                    newSeededJuliaSetModel(createOrbitalObjectId(parentIds, "juliaSet", i), anomalySeed, anomalyName, [
+                    generateJuliaSetModel(createOrbitalObjectId(parentIds, "juliaSet", i), anomalySeed, anomalyName, [
                         firstStellarObject,
                     ]),
                 );
                 break;
             case "mandelbox":
                 anomalies.push(
-                    newSeededMandelboxModel(
-                        createOrbitalObjectId(parentIds, "mandelbox", i),
-                        anomalySeed,
-                        anomalyName,
-                        [firstStellarObject],
-                    ),
+                    generateMandelboxModel(createOrbitalObjectId(parentIds, "mandelbox", i), anomalySeed, anomalyName, [
+                        firstStellarObject,
+                    ]),
                 );
                 break;
             case "sierpinskiPyramid":
                 anomalies.push(
-                    newSeededSierpinskiPyramidModel(
+                    generateSierpinskiPyramidModel(
                         createOrbitalObjectId(parentIds, "sierpinskiPyramid", i),
                         anomalySeed,
                         anomalyName,
@@ -230,7 +224,7 @@ export function newSeededStarSystemModel(
                 break;
             case "mengerSponge":
                 anomalies.push(
-                    newSeededMengerSpongeModel(
+                    generateMengerSpongeModel(
                         createOrbitalObjectId(parentIds, "mengerSponge", i),
                         anomalySeed,
                         anomalyName,
@@ -242,6 +236,20 @@ export function newSeededStarSystemModel(
     }
 
     const orbitalFacilities: Array<OrbitalFacilityModel> = [];
+
+    if (!isNonEmptyArray(stellarObjects)) {
+        throw new Error("No stellar objects were generated for the star system");
+    }
+
+    const systemModel: StarSystemModel = {
+        name: systemName,
+        coordinates,
+        stellarObjects: stellarObjects,
+        planets: planets,
+        satellites: satellites,
+        anomalies: anomalies,
+        orbitalFacilities: orbitalFacilities,
+    };
 
     if (isCivilized) {
         // finally, space station are placed
@@ -277,40 +285,26 @@ export function newSeededStarSystemModel(
                 planet.type === "telluricPlanet" && // space elevators can't be built on gas giants yet
                 planet.rings === null // can't have rings because the tether would be at risk
             ) {
-                const spaceElevatorModel = newSeededSpaceElevatorModel(
+                const spaceElevatorModel = generateSpaceElevatorModel(
                     createOrbitalObjectId([planet.id], "spaceElevator", 0),
                     spaceStationSeed,
-                    coordinates,
-                    position,
                     planet,
+                    systemModel,
                 );
                 orbitalFacilities.push(spaceElevatorModel);
             } else {
-                const spaceStationModel = newSeededSpaceStationModel(
+                const spaceStationModel = generateSpaceStationModel(
                     createOrbitalObjectId([planet.id], "spaceStation", 0),
                     spaceStationSeed,
-                    coordinates,
-                    position,
-                    [planet],
+                    planet,
+                    systemModel,
                 );
                 orbitalFacilities.push(spaceStationModel);
             }
         });
     }
 
-    if (!isNonEmptyArray(stellarObjects)) {
-        throw new Error("No stellar objects were generated for the star system");
-    }
-
-    return {
-        name: systemName,
-        coordinates,
-        stellarObjects: stellarObjects,
-        planets: planets,
-        satellites: satellites,
-        anomalies: anomalies,
-        orbitalFacilities: orbitalFacilities,
-    };
+    return systemModel;
 }
 
 /**

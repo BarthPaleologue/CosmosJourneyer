@@ -31,17 +31,18 @@ import { clamp } from "@/utils/math";
 import { EarthMass, EarthSeaLevelPressure } from "@/utils/physics/constants";
 import { hasLiquidWater } from "@/utils/physics/physics";
 import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
-import type { DeepReadonly } from "@/utils/types";
+import type { DeepPartial, DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
 
-export function newSeededTelluricPlanetModel(
+export function generateTelluricPlanetModel(
     id: string,
     seed: number,
     name: string,
     parentBodies: DeepReadonly<Array<StellarObjectModel>>,
+    overrides?: DeepPartial<TelluricPlanetModel>,
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -95,7 +96,7 @@ export function newSeededTelluricPlanetModel(
         orbitRadiuses.push(radius);
     }
 
-    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
+    const orbitRadius = overrides?.orbit?.semiMajorAxis ?? (parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0);
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;

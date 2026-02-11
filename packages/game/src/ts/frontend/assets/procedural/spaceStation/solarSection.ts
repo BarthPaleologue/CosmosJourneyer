@@ -27,14 +27,12 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-import { randRangeInt } from "extended-random";
+
+import type { SolarSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/solar";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { wheelOfFortune } from "@/utils/random";
 
 import { Settings } from "@/settings";
 
@@ -44,8 +42,6 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 export class SolarSection implements StationSection {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
-
-    private readonly rng: (index: number) => number;
 
     private readonly arms: Mesh[] = [];
     private readonly armAggregates: PhysicsAggregate[] = [];
@@ -57,21 +53,12 @@ export class SolarSection implements StationSection {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredSurface: number, seed: number, assets: RenderingAssets, scene: Scene) {
-        this.rng = getRngFromSeed(seed);
-
-        const axisCount = wheelOfFortune(
-            [
-                [1, 0.1],
-                [2, 0.3],
-                [3, 0.3],
-                [4, 0.2],
-                [5, 0.1],
-            ],
-            this.rng(0),
-        );
+    constructor(model: SolarSectionModel, assets: RenderingAssets, scene: Scene) {
+        const axisCount = model.axisCount;
 
         let attachmentLength = 200;
+
+        const requiredSurface = model.surface;
 
         if (axisCount === 1) {
             // in this case we will need a larger body to fit all the panels on the main attachment
@@ -149,7 +136,7 @@ export class SolarSection implements StationSection {
             const secondaryArmTessellation = 6;
             const secondaryArmRadius = attachmentRadius;
 
-            const secondaryArmCount = randRangeInt(2, 4, this.rng, 777);
+            const secondaryArmCount = model.secondaryArmCount ?? 2;
 
             for (let secondaryArmIndex = 0; secondaryArmIndex < secondaryArmCount; secondaryArmIndex++) {
                 const secondaryArm = MeshBuilder.CreateCylinder(

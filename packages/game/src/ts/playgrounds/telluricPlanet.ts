@@ -17,7 +17,7 @@
 
 import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
+import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -71,7 +71,7 @@ export async function createTelluricPlanetScene(
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");
 
-    const telluricPlanetModel = newSeededTelluricPlanetModel(
+    const telluricPlanetModel = generateTelluricPlanetModel(
         "telluricPlanet",
         seed !== null ? Number(seed) : Math.random() * 1000,
         "Telluric Planet",

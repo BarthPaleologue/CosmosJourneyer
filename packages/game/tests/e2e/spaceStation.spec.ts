@@ -16,6 +16,6 @@ test("The space station playground has correct physics", async ({ page }) => {
         scene: "spaceStation",
         shotName: "baseline-physics",
         flagToWait: "frozen",
-        urlParams: { physicsViewer: "", freeze: 3, seed: 5 },
+        urlParams: { physicsViewer: "", freeze: 2, seed: 5 },
     });
 });

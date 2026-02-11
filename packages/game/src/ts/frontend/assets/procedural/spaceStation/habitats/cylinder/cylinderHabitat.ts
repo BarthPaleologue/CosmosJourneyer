@@ -27,11 +27,12 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { CylinderHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/cylinder";
+
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
@@ -41,8 +42,6 @@ import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
-
-    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -55,12 +54,11 @@ export class CylinderHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: CylinderHabitatModel, textures: Textures, scene: Scene) {
         this.root = new TransformNode("CylinderHabitatRoot", scene);
+        this.radius = model.radius;
 
-        this.rng = getRngFromSeed(seed);
-
-        this.radius = 2e3 + this.rng(0) * 2e3;
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius / 2));
 
@@ -149,7 +147,7 @@ export class CylinderHabitat implements Transformable {
         for (const [i, { position, rotation }] of lightPoints.entries()) {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
             const light = new PointLight(`CylinderHabitatLight${i}`, position, scene, true);
-            light.range = 200;
+            light.range = sectorSize * 0.8;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             this.lights.push(light);

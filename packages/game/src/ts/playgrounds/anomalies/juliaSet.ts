@@ -17,7 +17,7 @@
 
 import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
+import { generateJuliaSetModel } from "@/backend/universe/proceduralGenerators/anomalies/juliaSetModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
@@ -40,7 +40,7 @@ export function createJuliaSetScene(
 
     const depthRenderer = scene.enableDepthRenderer(null, false, true);
 
-    const model = newSeededJuliaSetModel(
+    const model = generateJuliaSetModel(
         "juliaSet",
         Number(urlParams.get("seed") ?? Math.random() * 100_000),
         "Julia Set",

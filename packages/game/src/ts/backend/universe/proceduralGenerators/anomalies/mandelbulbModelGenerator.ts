@@ -27,7 +27,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 
-export function newSeededMandelbulbModel(
+export function generateMandelbulbModel(
     id: string,
     seed: number,
     name: string,

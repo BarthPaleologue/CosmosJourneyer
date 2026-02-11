@@ -17,5 +17,9 @@
 
 import { type HasSeed } from "../hasSeed";
 import { type OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
+import type { StationSectionModel } from "./sections";
 
-export type SpaceStationModel = OrbitalFacilityModelBase<"spaceStation"> & HasSeed;
+export type SpaceStationModel = OrbitalFacilityModelBase<"spaceStation"> &
+    HasSeed & {
+        sections: Array<StationSectionModel>;
+    };

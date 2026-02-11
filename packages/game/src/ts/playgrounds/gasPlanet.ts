@@ -17,7 +17,7 @@
 
 import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
-import { newSeededGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
+import { generateGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanetModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
@@ -67,7 +67,7 @@ export async function createGasPlanetScene(
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");
 
-    const gasPlanetModel = newSeededGasPlanetModel(
+    const gasPlanetModel = generateGasPlanetModel(
         "gasPlanet",
         seed !== null ? Number(seed) : Math.random() * 1000,
         "Gas Planet",

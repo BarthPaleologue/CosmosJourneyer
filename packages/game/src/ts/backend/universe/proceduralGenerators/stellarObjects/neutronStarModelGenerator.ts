@@ -34,7 +34,7 @@ import { clamp } from "@/utils/math";
  * @returns A new neutron star model
  * @see https://arxiv.org/pdf/2402.14030 "On the initial spin period distribution of neutron stars"
  */
-export function newSeededNeutronStarModel(
+export function generateNeutronStarModel(
     id: string,
     seed: number,
     name: string,

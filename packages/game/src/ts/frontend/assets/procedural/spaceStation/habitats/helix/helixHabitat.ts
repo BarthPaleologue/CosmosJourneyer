@@ -28,14 +28,14 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
-import { randRangeInt } from "extended-random";
+
+import type { HelixHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/helix";
 
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
@@ -46,8 +46,6 @@ import { HelixHabitatMaterial } from "./helixHabitatMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
-
-    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
     private readonly deltaRadius: number;
@@ -66,31 +64,31 @@ export class HelixHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: HelixHabitatModel, textures: Textures, scene: Scene) {
         this.root = new TransformNode("HelixHabitatRoot", scene);
 
-        this.rng = getRngFromSeed(seed);
+        this.radius = model.baseRadius;
+        this.deltaRadius = model.deltaRadius;
 
-        this.radius = 5e3 + this.rng(0) * 10e3;
-        this.deltaRadius = 400 + this.rng(1) * 100;
-
-        const helixCount = randRangeInt(2, 4, this.rng, 654);
-        const thicknessFactor = randRangeInt(1, 5 - helixCount, this.rng, 150);
+        const helixCount = model.helixCount;
+        const thicknessFactor = model.thicknessFactor;
 
         const helixThickness = this.deltaRadius * thicknessFactor;
         const perTurnPerimeter = 2 * Math.PI * this.radius;
         const perTurnHabitableSurface = perTurnPerimeter * helixThickness;
+
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / helixCount;
         const turnCount = Math.ceil(requiredHabitableSurfacePerHelix / perTurnHabitableSurface);
 
         this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * turnCount * helixThickness);
 
-        const helixPitch = 2 * this.radius * (1 + 0.3 * (this.rng(2) * 2 - 1));
+        const helixPitch = 2 * this.radius * model.helixPitchMultiplier;
 
         const helixLength = helixPitch * turnCount;
 
-        const attachmentTessellation = 6 + 2 * Math.floor(this.rng(4) * 2);
+        const attachmentTessellation = model.attachmentTessellation;
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "HelixHabitatMetalSectionMaterial",

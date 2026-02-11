@@ -15,25 +15,39 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getFactionFromGalacticPosition } from "@/backend/society/factions";
+import { getFactionFromCoordinates } from "@/backend/society/factions";
 import { type PlanetModel } from "@/backend/universe/orbitalObjects/index";
 import { type Orbit } from "@/backend/universe/orbitalObjects/orbit";
 import { type SpaceElevatorModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/spaceElevatorModel";
-import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { CropTypes, type CropType } from "@/utils/agriculture";
+import { CropTypes, getEdibleEnergyPerAreaPerDay, type CropType } from "@/utils/agriculture";
+import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { getOrbitRadiusFromPeriod } from "@/utils/physics/orbit";
-import { randomPieChart } from "@/utils/random";
+import { getSphereIrradianceAtDistance } from "@/utils/physics/thermodynamics";
+import { km2ToM2, kwhPerYearToWatts } from "@/utils/physics/unitConversions";
+import { randomPieChart, wheelOfFortune } from "@/utils/random";
+import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
-import type { Vector3Like } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
-export function newSeededSpaceElevatorModel(
+import { Settings } from "@/settings";
+
+import type { ElevatorSectionModel } from "../../orbitalObjects/orbitalFacilities/sections";
+import type { StarSystemModel } from "../../starSystemModel";
+import { generateFusionSectionModel } from "./sections/fusion";
+import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
+import { generateHelixHabitatModel } from "./sections/habitats/helix";
+import { generateRingHabitatModel } from "./sections/habitats/ring";
+import { generateLandingBayModel } from "./sections/landingBay";
+import { generateSolarSectionModel } from "./sections/solar";
+import { generateUtilitySectionModel } from "./sections/utility";
+
+export function generateSpaceElevatorModel(
     id: string,
     seed: number,
-    starSystemCoordinates: StarSystemCoordinates,
-    starSystemPosition: Vector3Like,
-    parentBody: PlanetModel,
+    parentBody: DeepReadonly<PlanetModel>,
+    systemModel: DeepReadonly<StarSystemModel>,
 ): SpaceElevatorModel {
     const rng = getRngFromSeed(seed);
 
@@ -60,13 +74,13 @@ export function newSeededSpaceElevatorModel(
     const siderealDaySeconds = parentSiderealDayDuration;
     const axialTilt = Math.PI / 2;
 
-    const faction = getFactionFromGalacticPosition(starSystemPosition, rng);
+    const faction = getFactionFromCoordinates(systemModel.coordinates, rng);
 
     //TODO: make this dependent on economic model
     const population = 2_000_000;
     const annualEnergyPerCapitaKWh = 200_000; // US average is at 80k KWh https://www.eia.gov/tools/faqs/faq.php?id=85&t=1
 
-    const populationDensity = 4_000;
+    const targetPopulationDensity = 4_000;
 
     const mix = randomPieChart(CropTypes.length, rng, 498);
     const agricultureMix: [number, CropType][] = mix.map((proportion, index) => {
@@ -81,10 +95,102 @@ export function newSeededSpaceElevatorModel(
 
     const solarPanelEfficiency = 0.4;
 
+    const sections: Array<ElevatorSectionModel> = [];
+
+    const utilitySectionCount1 = 5 + Math.floor(rng(564) * 5);
+    for (let i = 0; i < utilitySectionCount1; i++) {
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
+    }
+
+    const housingSurface = km2ToM2(population / targetPopulationDensity);
+    let agricultureSurface = 0;
+    for (const [fraction, cropType] of agricultureMix) {
+        const requiredDailyKCal = population * Settings.INDIVIDUAL_AVERAGE_DAILY_INTAKE;
+
+        const producedDailyKCalPerArea =
+            Settings.HYDROPONIC_TO_CONVENTIONAL_RATIO * nbHydroponicLayers * getEdibleEnergyPerAreaPerDay(cropType);
+
+        const requiredArea = requiredDailyKCal / producedDailyKCalPerArea;
+
+        agricultureSurface += fraction * requiredArea;
+    }
+
+    const habitatType = wheelOfFortune(
+        [
+            ["ring", 1 / 3],
+            ["helix", 1 / 3],
+            ["cylinder", 1 / 3],
+        ] as const,
+        rng(17),
+    );
+
+    switch (habitatType) {
+        case "ring":
+            sections.push(
+                generateRingHabitatModel(Settings.SEED_HALF_RANGE * rng(27), {
+                    housing: housingSurface,
+                    agriculture: agricultureSurface,
+                }),
+            );
+            break;
+        case "helix":
+            sections.push(
+                generateHelixHabitatModel(Settings.SEED_HALF_RANGE * rng(19), {
+                    housing: housingSurface,
+                    agriculture: agricultureSurface,
+                }),
+            );
+            break;
+        case "cylinder":
+            sections.push(
+                generateCylinderHabitatModel(Settings.SEED_HALF_RANGE * rng(13), {
+                    housing: housingSurface,
+                    agriculture: agricultureSurface,
+                }),
+            );
+            break;
+        default:
+            return assertUnreachable(habitatType);
+    }
+
+    const utilitySectionCount2 = 5 + Math.floor(rng(23) * 5);
+    for (let i = 0; i < utilitySectionCount2; i++) {
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
+    }
+
+    const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
+
+    let totalIrradiance = 0;
+    for (const [model, distance] of distancesToStellarObjects) {
+        totalIrradiance += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
+    }
+
+    const totalEnergyRequirementKWhPerYear = population * annualEnergyPerCapitaKWh;
+    const totalPowerRequirementW = kwhPerYearToWatts(totalEnergyRequirementKWhPerYear);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+        solarPanelEfficiency,
+        totalPowerRequirementW,
+        totalIrradiance,
+    );
+
+    const maxSolarPanelSurfaceM2 = km2ToM2(150);
+    if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
+        sections.push(generateSolarSectionModel(Settings.SEED_HALF_RANGE * rng(31), solarPanelSurfaceM2));
+    } else {
+        sections.push(generateFusionSectionModel(totalPowerRequirementW));
+    }
+
+    const utilitySectionCount3 = 5 + Math.floor(rng(23) * 5);
+    for (let i = 0; i < utilitySectionCount3; i++) {
+        sections.push(generateUtilitySectionModel(Settings.SEED_HALF_RANGE * rng(132 + 10 * sections.length)));
+    }
+
+    sections.push(generateLandingBayModel(Settings.SEED_HALF_RANGE * rng(37)));
+
     return {
         type: "spaceElevator",
         seed,
-        starSystemCoordinates: starSystemCoordinates,
+        starSystemCoordinates: systemModel.coordinates,
         id: id,
         name,
         orbit,
@@ -94,10 +200,11 @@ export function newSeededSpaceElevatorModel(
         tetherLength,
         population,
         annualEnergyPerCapitaKWh,
-        populationDensity,
+        populationDensity: targetPopulationDensity,
         agricultureMix,
         nbHydroponicLayers,
         faction,
         solarPanelEfficiency,
+        sections,
     };
 }

@@ -20,7 +20,7 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import { newSeededNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
+import { generateNeutronStarModel } from "@/backend/universe/proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";
@@ -56,7 +56,7 @@ export async function createNeutronStarScene(
 
     scene.enableDepthRenderer(camera, false, true);
 
-    const neutronStarModel = newSeededNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
+    const neutronStarModel = generateNeutronStarModel("neutronStar", 456, "Neutron Star Demo", []);
     const neutronStar = new NeutronStar(neutronStarModel, textures, scene);
     neutronStar.getTransform().position = new Vector3(0, 0, 1).scaleInPlace(neutronStar.getRadius() * 2000000);
 

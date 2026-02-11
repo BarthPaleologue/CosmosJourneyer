@@ -30,10 +30,10 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShapeSphere, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { UtilitySectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/utility";
+
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
-
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
 import { CollisionMask, Settings } from "@/settings";
 
@@ -41,8 +41,6 @@ import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class UtilitySection implements StationSection {
     private readonly attachment: Mesh;
-
-    readonly rng: (step: number) => number;
 
     private attachmentAggregate: PhysicsAggregate | null = null;
 
@@ -54,14 +52,12 @@ export class UtilitySection implements StationSection {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(seed: number, assets: RenderingAssets, scene: Scene) {
+    constructor(model: UtilitySectionModel, assets: RenderingAssets, scene: Scene) {
         this.metalSectionMaterial = new MetalSectionMaterial(
             "UtilitySectionMetalMaterial",
             assets.textures.materials.metalPanels,
             scene,
         );
-
-        this.rng = getRngFromSeed(seed);
 
         const attachmentRadius = 50;
         const tessellation = 6;
@@ -86,7 +82,7 @@ export class UtilitySection implements StationSection {
 
         this.tankShape = new PhysicsShapeSphere(Vector3.Zero(), tankRadius, scene);
 
-        const hasTanks = this.rng(0) < 0.3;
+        const hasTanks = model.hasTanks;
         if (hasTanks) {
             for (let ring = -3; ring <= 3; ring++) {
                 for (let sideIndex = 0; sideIndex < tessellation; sideIndex++) {

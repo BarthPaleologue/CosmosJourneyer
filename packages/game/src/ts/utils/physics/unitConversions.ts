@@ -83,6 +83,24 @@ export function km2ToM2(km2: number): number {
 }
 
 /**
+ * Converts an area from hectares to square meters
+ * @param hectares The area in hectares
+ * @returns The area in square meters
+ */
+export function haToM2(hectares: number): number {
+    return hectares * 10_000;
+}
+
+/**
+ * Converts a quantity expressed per hectare to the equivalent quantity per square meter.
+ * @param valuePerHa The quantity per hectare.
+ * @returns The quantity per square meter.
+ */
+export function perHaToPerM2(valuePerHa: number): number {
+    return valuePerHa / haToM2(1);
+}
+
+/**
  * Converts an annual energy consumption in kilowatt-hours to an average power in watts.
  * @param kwhPerYear The energy consumption in kWh per year.
  * @returns The average power in watts.

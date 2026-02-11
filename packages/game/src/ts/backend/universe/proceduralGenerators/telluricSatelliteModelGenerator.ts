@@ -34,7 +34,7 @@ import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversio
 
 import { Settings } from "@/settings";
 
-export function newSeededTelluricSatelliteModel(
+export function generateTelluricSatelliteModel(
     id: string,
     seed: number,
     name: string,

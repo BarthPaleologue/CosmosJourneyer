@@ -28,7 +28,7 @@ import { type DeepReadonly, type Vector3Like } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { type OrbitalObjectModel } from "./orbitalObjects/index";
-import { newSeededStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
+import { generateStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
 import { getObjectModelById, type StarSystemModel } from "./starSystemModel";
 
 /**
@@ -213,12 +213,7 @@ export class UniverseBackend {
         const systemRng = getRngFromSeed(hash);
 
         return this.applyPlugins(
-            newSeededStarSystemModel(
-                systemRng,
-                coordinates,
-                this.getSystemGalacticPosition(coordinates),
-                this.isSystemInHumanBubble(coordinates),
-            ),
+            generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates)),
         );
     }
 

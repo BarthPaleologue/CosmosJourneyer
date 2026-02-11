@@ -26,6 +26,8 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { FusionSectionModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/fusion";
+
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
@@ -53,7 +55,7 @@ export class TokamakSection implements StationSection {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredNetEnergyOutput: number, assets: RenderingAssets, scene: Scene) {
+    constructor(model: FusionSectionModel, assets: RenderingAssets, scene: Scene) {
         const attachmentRadius = 35;
         const tessellation = 6;
         const attachmentSize = 300;
@@ -71,6 +73,8 @@ export class TokamakSection implements StationSection {
         this.attachment.convertToFlatShadedMesh();
         this.attachment.material = assets.materials.metalSection;
         const efficiency = 0.4;
+
+        const requiredNetEnergyOutput = model.netPowerOutput;
 
         const requiredEnergyOutput = requiredNetEnergyOutput / efficiency;
 

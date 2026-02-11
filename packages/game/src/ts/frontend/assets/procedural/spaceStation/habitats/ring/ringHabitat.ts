@@ -27,12 +27,13 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 
+import type { RingHabitatModel } from "@/backend/universe/orbitalObjects/orbitalFacilities/sections/habitats/ring";
+
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 
@@ -43,8 +44,6 @@ import { RingHabitatMaterial } from "./ringHabitatMaterial";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
-
-    private readonly rng: (index: number) => number;
 
     private readonly radius: number;
 
@@ -64,14 +63,14 @@ export class RingHabitat implements Transformable {
 
     private readonly lights: Array<PointLight> = [];
 
-    constructor(requiredHabitableSurface: number, seed: number, textures: Textures, scene: Scene) {
+    constructor(model: RingHabitatModel, textures: Textures, scene: Scene) {
         this.root = new TransformNode("RingHabitatRoot", scene);
 
-        this.rng = getRngFromSeed(seed);
+        this.radius = model.baseRadius;
 
-        this.radius = 5e3 + this.rng(0) * 10e3;
+        const deltaRadius = 1e3;
 
-        const deltaRadius = 500;
+        const requiredHabitableSurface = model.surface.agriculture + model.surface.housing;
 
         const requiredHeight = requiredHabitableSurface / (2 * Math.PI * (this.radius + deltaRadius / 2));
         const yScaling = Math.ceil(requiredHeight / deltaRadius);
@@ -80,7 +79,7 @@ export class RingHabitat implements Transformable {
         // adjust the radius to fit the required habitable surface
         this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
 
-        const attachmentTessellation = 4 + 2 * Math.floor(this.rng(1) * 2);
+        const attachmentTessellation = model.attachmentTessellation;
 
         this.metalSectionMaterial = new MetalSectionMaterial(
             "RingHabitatMetalSectionMaterial",
@@ -251,7 +250,7 @@ export class RingHabitat implements Transformable {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
 
             const light = new PointLight("RingHabitatLight", position, scene, true);
-            light.range = 200;
+            light.range = deltaRadius * 0.8;
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             light.parent = this.getTransform();
             this.lights.push(light);

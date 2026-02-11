@@ -15,15 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Faction } from "@/backend/society/factions";
-import { OrbitSchema } from "@/backend/universe/orbitalObjects/orbit";
 import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 
-import { CropType } from "@/utils/agriculture";
 import { SolarMass, SolarRadius } from "@/utils/physics/constants";
 
+import { generateSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
+
 export function getLoneStarSystem(): StarSystemModel {
-    return {
+    const systemModel: StarSystemModel = {
         name: "Lone Star",
         coordinates: {
             starSectorX: 5,
@@ -60,35 +59,14 @@ export function getLoneStarSystem(): StarSystemModel {
         planets: [],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [
-            {
-                id: "loneStarStation",
-                name: "Lone Star Station",
-                type: "spaceStation",
-                mass: 1,
-                agricultureMix: [[1, CropType.LENTIL]],
-                population: 1e6,
-                axialTilt: 0,
-                orbit: OrbitSchema.parse({
-                    parentIds: ["loneStar"],
-                    semiMajorAxis: SolarRadius * 10,
-                }),
-                seed: 0,
-                faction: Faction.SATORI_CONCORD,
-                annualEnergyPerCapitaKWh: 1e3,
-                solarPanelEfficiency: 0.4,
-                siderealDaySeconds: 0,
-                starSystemCoordinates: {
-                    starSectorX: 5,
-                    starSectorY: -10,
-                    starSectorZ: 8,
-                    localX: 0.5,
-                    localY: 0.2,
-                    localZ: 0.8,
-                },
-                populationDensity: 1e3,
-                nbHydroponicLayers: 10,
-            },
-        ],
+        orbitalFacilities: [],
     };
+
+    const stationModel = generateSpaceStationModel("loneStarStation", 0, systemModel.stellarObjects[0], systemModel, {
+        name: "Lone Star Outpost",
+    });
+
+    systemModel.orbitalFacilities.push(stationModel);
+
+    return systemModel;
 }
