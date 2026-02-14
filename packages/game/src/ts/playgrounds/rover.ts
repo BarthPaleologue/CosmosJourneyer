@@ -77,6 +77,7 @@ export async function createRoverScene(
 
     const character = new CharacterControls(humanoidAvatar, scene);
     character.getTransform().position = new Vector3(10, 0, -10);
+    character.firstPersonCamera.minZ = 0.1;
 
     const soundPlayer = new SoundPlayer(sounds);
     const interactionSystem = new InteractionSystem(
