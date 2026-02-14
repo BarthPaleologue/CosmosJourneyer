@@ -18,7 +18,6 @@
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 
 import { clamp } from "@/utils/math";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
@@ -26,6 +25,7 @@ import { degreesToRadians } from "@/utils/physics/unitConversions";
 import { lerp } from "../helpers/animations/interpolations";
 import type { Transformable } from "../universe/architecture/transformable";
 import type { Door } from "./door";
+import type { Wheel } from "./wheel";
 
 export type SteeringMode = "counterPhase" | "inPhase";
 
@@ -34,29 +34,22 @@ export class Vehicle implements Transformable {
 
     readonly doors: ReadonlyArray<Door>;
 
-    readonly motorConstraints: ReadonlyArray<Physics6DoFConstraint>;
-    readonly steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>;
+    readonly wheels: ReadonlyArray<Wheel>;
 
     private steeringMode: SteeringMode = "counterPhase";
 
     private targetSpeed = 0;
     private targetSteeringAngle = 0;
 
-    readonly maxForwardSpeed = 40;
-    readonly maxReverseSpeed = 25;
+    readonly maxForwardSpeed = 30;
+    readonly maxReverseSpeed = 20;
     readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
     readonly maxSteeringAngleHighSpeed = degreesToRadians(4);
 
-    constructor(
-        frame: PhysicsAggregate,
-        doors: ReadonlyArray<Door>,
-        motorConstraints: ReadonlyArray<Physics6DoFConstraint>,
-        steeringConstraints: ReadonlyArray<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }>,
-    ) {
+    constructor(frame: PhysicsAggregate, doors: ReadonlyArray<Door>, wheels: ReadonlyArray<Wheel>) {
         this.frame = frame;
         this.doors = [...doors];
-        this.motorConstraints = [...motorConstraints];
-        this.steeringConstraints = [...steeringConstraints];
+        this.wheels = [...wheels];
     }
 
     getSteeringMode() {
@@ -75,24 +68,35 @@ export class Vehicle implements Transformable {
             Math.exp(-linearVelocity * 0.5),
         );
         this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
-        for (const { constraint, position } of this.steeringConstraints) {
+        for (const wheel of this.wheels) {
+            const steering = wheel.steering;
+            if (steering === undefined) {
+                continue;
+            }
+
             const wheelAngle =
-                position === "front"
+                steering.position === "front"
                     ? this.targetSteeringAngle
                     : this.getSteeringMode() === "counterPhase"
                       ? -this.targetSteeringAngle
                       : this.targetSteeringAngle;
-            constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 60000000);
-            constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelAngle);
+            steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 60_000_000);
+            steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelAngle);
         }
     }
 
     setTargetSpeed(speed: number) {
         this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
         const motorTorque = 330000 / 50;
-        for (const motor of this.motorConstraints) {
+        for (const { radius, motor } of this.wheels) {
+            if (motor === undefined) {
+                continue;
+            }
+
+            const targetAngularVelocity = this.targetSpeed / radius;
+
             motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
-            motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, this.targetSpeed);
+            motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, targetAngularVelocity);
         }
     }
 
@@ -103,7 +107,11 @@ export class Vehicle implements Transformable {
 
     brake() {
         const brakeTorque = 1e6;
-        for (const motor of this.motorConstraints) {
+        for (const { motor } of this.wheels) {
+            if (motor === undefined) {
+                continue;
+            }
+
             motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, brakeTorque);
             motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 0);
         }
@@ -125,12 +133,12 @@ export class Vehicle implements Transformable {
             door.dispose();
         }
 
-        for (const motor of this.motorConstraints) {
-            motor.dispose();
-        }
-
-        for (const { constraint } of this.steeringConstraints) {
-            constraint.dispose();
+        for (const wheel of this.wheels) {
+            wheel.motor?.dispose();
+            wheel.steering?.constraint.dispose();
+            wheel.body.dispose();
+            wheel.body.transformNode.dispose();
+            wheel.shape.dispose();
         }
 
         this.frame.dispose();

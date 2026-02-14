@@ -39,6 +39,7 @@ import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Door } from "./door";
 import { HingedDoor } from "./hingedDoor";
 import { Vehicle } from "./vehicle";
+import type { Wheel } from "./wheel";
 
 type FixationModel = {
     rotation?: {
@@ -253,8 +254,7 @@ export class VehicleBuilder {
             doors.push(door);
         }
 
-        const motorConstraints: Array<Physics6DoFConstraint> = [];
-        const steeringConstraints: Array<{ position: "rear" | "front"; constraint: Physics6DoFConstraint }> = [];
+        const physicWheels: Array<Wheel> = [];
         for (const wheel of this.wheels) {
             const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(
                 wheel.axleMesh,
@@ -304,17 +304,23 @@ export class VehicleBuilder {
                 wheel.steerable,
             );
 
-            if (wheel.steerable) {
-                const positionLabel = wheel.position.z > 0 ? "front" : "rear";
-                steeringConstraints.push({ position: positionLabel, constraint: frameAxleConstraint });
-            }
-
-            if (wheel.powered) {
-                motorConstraints.push(wheelAxleConstraint);
-            }
+            physicWheels.push({
+                radius: wheel.radius,
+                body: wheelBody,
+                shape: wheelShape,
+                ...(wheel.powered ? { motor: wheelAxleConstraint } : {}),
+                ...(wheel.steerable
+                    ? {
+                          steering: {
+                              position: wheel.position.z > 0 ? "front" : "rear",
+                              constraint: frameAxleConstraint,
+                          },
+                      }
+                    : {}),
+            });
         }
 
-        return new Vehicle(frameAggregate, doors, motorConstraints, steeringConstraints);
+        return new Vehicle(frameAggregate, doors, physicWheels);
     }
 }
 
