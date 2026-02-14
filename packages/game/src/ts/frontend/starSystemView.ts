@@ -508,6 +508,10 @@ export class StarSystemView implements View {
                         },
                     ],
                 });
+
+                for (const door of rover.doors) {
+                    this.interactionSystem.register(door);
+                }
             } else if (this.scene.getActiveControls() === this.vehicleControls) {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
