@@ -79,7 +79,7 @@ export async function createOnFootScene(
     const hemi = new HemisphericLight("ambient", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const groundSize = 64;
+    const groundSize = 4096;
     const ground = MeshBuilder.CreateGround(
         "ground",
         {
@@ -109,7 +109,7 @@ export async function createOnFootScene(
         return rng(rngState++);
     };
 
-    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 512, wrappedRng));
+    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 128, 128 * 6, wrappedRng));
     grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
     grassPatch.getCurrentMesh().parent = ground;
 
@@ -119,7 +119,7 @@ export async function createOnFootScene(
     const butterflyMaterial = new ButterflyMaterial(assets.textures.particles.butterfly, scene);
     butterflyMesh.material = butterflyMaterial.get();
 
-    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 64, wrappedRng));
+    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 128, 128, wrappedRng));
     butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
     const groundAggregate = new PhysicsAggregate(
