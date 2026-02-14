@@ -45,7 +45,7 @@ export class VehicleControls implements Controls {
         this.thirdPersonCamera = new ArcRotateCamera(
             "thirdPersonCamera",
             Math.PI / 2,
-            Math.PI / 3,
+            0.95 * (Math.PI / 2),
             20,
             Vector3.Zero(),
             scene,
