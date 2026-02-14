@@ -24,7 +24,6 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { Controls } from "../controls";
 import { lerpSmooth } from "../helpers/animations/interpolations";
-import { setUpVector } from "../helpers/transform";
 import { toggleDoor } from "./door";
 import { type Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
@@ -33,8 +32,6 @@ export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
 
     private readonly thirdPersonTransform: TransformNode;
-    private readonly smoothedMotionDirection = Vector3.Zero();
-
     private readonly thirdPersonCameraYOffset = 2;
 
     readonly thirdPersonCamera: ArcRotateCamera;
@@ -47,7 +44,7 @@ export class VehicleControls implements Controls {
         this.thirdPersonTransform = new TransformNode("thirdPersonTransform", scene);
         this.thirdPersonCamera = new ArcRotateCamera(
             "thirdPersonCamera",
-            -Math.PI / 3,
+            Math.PI / 2,
             Math.PI / 3,
             20,
             Vector3.Zero(),
@@ -106,17 +103,26 @@ export class VehicleControls implements Controls {
             return;
         }
 
+        const vehicleTransform = vehicle.getTransform();
         this.thirdPersonTransform.position.copyFrom(
-            vehicle
-                .getTransform()
+            vehicleTransform
                 .getAbsolutePosition()
                 .add(this.thirdPersonTransform.up.scale(this.thirdPersonCameraYOffset)),
         );
-        this.firstPersonCamera.parent = vehicle.getTransform();
+        this.thirdPersonTransform.rotationQuaternion = Quaternion.FromLookDirectionRH(
+            vehicleTransform.forward,
+            this.thirdPersonTransform.up,
+        );
+
+        this.firstPersonCamera.parent = vehicleTransform;
     }
 
     setUpDirection(up: Vector3) {
-        setUpVector(this.thirdPersonTransform, up);
+        this.thirdPersonTransform.rotationQuaternion = Quaternion.FromLookDirectionRHToRef(
+            this.thirdPersonTransform.forward,
+            up,
+            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+        );
     }
 
     getVehicle() {
@@ -149,55 +155,29 @@ export class VehicleControls implements Controls {
             Vector3.Lerp(thirdPersonCameraTarget, targetPosition, translationT),
         );
 
-        const vehicleLinearVelocity = vehicle.getTransform().physicsBody?.getLinearVelocity() ?? Vector3.Zero();
-        const vehicleLinearVelocityFlat = vehicleLinearVelocity.subtract(
-            this.thirdPersonTransform.up.scale(Vector3.Dot(vehicleLinearVelocity, this.thirdPersonTransform.up)),
+        const velocity = vehicle.getFrameAggregate().body.getLinearVelocity();
+        const verticalVelocity = this.thirdPersonTransform.up.scale(
+            Vector3.Dot(velocity, this.thirdPersonTransform.up),
         );
-        const vehicleFlatSpeed = vehicleLinearVelocityFlat.length();
-        const vehicleForwardFlat = vehicle
-            .getTransform()
-            .forward.subtract(
-                this.thirdPersonTransform.up.scale(
-                    Vector3.Dot(vehicle.getTransform().forward, this.thirdPersonTransform.up),
-                ),
-            );
+        const horizontalVelocity = velocity.subtract(verticalVelocity);
+        const horizontalSpeed = horizontalVelocity.length();
+        const horizontalDirection = horizontalVelocity.normalizeToNew();
 
-        if (this.smoothedMotionDirection.lengthSquared() < 1e-6) {
-            this.smoothedMotionDirection.copyFrom(vehicleForwardFlat.normalizeToNew());
-        }
-
-        const targetMotionDirection =
-            vehicleFlatSpeed > 0.2 ? vehicleLinearVelocityFlat.normalizeToNew() : this.smoothedMotionDirection;
-
-        const directionHalfLife = 0.2;
-        const directionT = lerpSmooth(0, 1, directionHalfLife, deltaSeconds);
-        this.smoothedMotionDirection.copyFrom(
-            Vector3.Lerp(this.smoothedMotionDirection, targetMotionDirection, directionT).normalize(),
+        const deltaRotation = Quaternion.FromUnitVectorsToRef(
+            this.thirdPersonTransform.forward,
+            horizontalDirection,
+            Quaternion.Identity(),
         );
-
+        const targetRotation = deltaRotation.multiply(
+            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+        );
         const rotationHalfLife = 0.5;
-        const baseRotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds);
-        const rotationBlendFullSpeed = 1;
-        const speedBlend = Math.min(vehicleFlatSpeed / rotationBlendFullSpeed, 1);
-        const rotationBlend = speedBlend * speedBlend;
-        const rotationT = baseRotationT * rotationBlend;
-        const currentRotation = this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity();
-        const currentForwardFlat = this.thirdPersonTransform.forward
-            .subtract(
-                this.thirdPersonTransform.up.scale(
-                    Vector3.Dot(this.thirdPersonTransform.forward, this.thirdPersonTransform.up),
-                ),
-            )
-            .normalize();
-        const desiredForward = this.smoothedMotionDirection.negate();
-        const clampedDot = Math.min(Math.max(Vector3.Dot(currentForwardFlat, desiredForward), -1), 1);
-        const cross = Vector3.Cross(currentForwardFlat, desiredForward);
-        const crossUpDot = Vector3.Dot(cross, this.thirdPersonTransform.up);
-        const signedAngle = Math.atan2(crossUpDot, clampedDot);
-        const targetRotation = Quaternion.RotationAxis(this.thirdPersonTransform.up, signedAngle).multiply(
-            currentRotation,
+        const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
+        this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
+            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+            targetRotation,
+            rotationT,
         );
-        this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(currentRotation, targetRotation, rotationT);
 
         const steeringAngle = VehicleInputs.map.steer.value * 0.03;
         vehicle.turn(steeringAngle);
