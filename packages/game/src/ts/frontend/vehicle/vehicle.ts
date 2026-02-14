@@ -21,7 +21,9 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { type Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 
 import { clamp } from "@/utils/math";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 
+import { lerp } from "../helpers/animations/interpolations";
 import type { Transformable } from "../universe/architecture/transformable";
 import type { Door } from "./door";
 
@@ -40,9 +42,10 @@ export class Vehicle implements Transformable {
     private targetSpeed = 0;
     private targetSteeringAngle = 0;
 
-    readonly maxForwardSpeed = 50;
+    readonly maxForwardSpeed = 40;
     readonly maxReverseSpeed = 25;
-    readonly maxSteeringAngle = Math.PI / 4;
+    readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
+    readonly maxSteeringAngleHighSpeed = degreesToRadians(4);
 
     constructor(
         frame: PhysicsAggregate,
@@ -65,11 +68,17 @@ export class Vehicle implements Transformable {
     }
 
     setTargetSteeringAngle(angle: number) {
-        this.targetSteeringAngle = clamp(angle, -this.maxSteeringAngle, this.maxSteeringAngle);
+        const linearVelocity = this.frame.body.getLinearVelocity().length();
+        const maxSteeringAngle = lerp(
+            this.maxSteeringAngleHighSpeed,
+            this.maxSteeringAngleLowSpeed,
+            Math.exp(-linearVelocity * 0.5),
+        );
+        this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
         for (const { constraint, position } of this.steeringConstraints) {
             const wheelAngle =
                 position === "front"
-                    ? angle
+                    ? this.targetSteeringAngle
                     : this.getSteeringMode() === "counterPhase"
                       ? -this.targetSteeringAngle
                       : this.targetSteeringAngle;

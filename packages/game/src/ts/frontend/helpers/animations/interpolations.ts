@@ -52,3 +52,14 @@ export function slerpSmoothToRef(
 export function lerpSmooth(a: number, b: number, halfLifeSeconds: number, deltaSeconds: number) {
     return b + (a - b) * 2 ** (-deltaSeconds / halfLifeSeconds);
 }
+
+/**
+ * Linear interpolation for numbers.
+ * @param a The start value
+ * @param b The target value
+ * @param t The interpolation factor (0 to 1)
+ * @returns The interpolated value
+ */
+export function lerp(a: number, b: number, t: number): number {
+    return a + (b - a) * t;
+}
