@@ -24,8 +24,6 @@ import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
-import { CollisionMask } from "@/settings";
-
 import type { Interaction } from "../inputs/interaction/interactionSystem";
 import type { Door, DoorState } from "./door";
 
@@ -46,9 +44,6 @@ export class HingedDoor implements Door {
         angles: { closed: number; opened: number },
     ) {
         this.doorAggregate = doorAggregate;
-        this.doorAggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
-        this.doorAggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
-
         this.axis = axis;
 
         this.hinge = hinge;
