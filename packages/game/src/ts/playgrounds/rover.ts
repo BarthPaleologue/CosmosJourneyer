@@ -134,7 +134,7 @@ export async function createRoverScene(
 
     enableShadows(sun);
 
-    const roverResult = createWolfMk2(assets, scene, new Vector3(0, 10, 0), {
+    const roverResult = createWolfMk2(assets, scene, new Vector3(0, 5, 0), {
         axis: new Vector3(0, 1, 0),
         angle: Math.PI / 4,
     });
