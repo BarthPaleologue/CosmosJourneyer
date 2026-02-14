@@ -101,6 +101,15 @@ export function perHaToPerM2(valuePerHa: number): number {
 }
 
 /**
+ * Converts a speed from kilometers per hour to meters per second.
+ * @param kilometersPerHour The speed in kilometers per hour.
+ * @returns The speed in meters per second.
+ */
+export function kmhToMetersPerSecond(kilometersPerHour: number): number {
+    return kilometersPerHour / 3.6;
+}
+
+/**
  * Converts an annual energy consumption in kilowatt-hours to an average power in watts.
  * @param kwhPerYear The energy consumption in kWh per year.
  * @returns The average power in watts.

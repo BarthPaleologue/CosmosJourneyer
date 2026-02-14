@@ -20,7 +20,7 @@ import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEngine
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { clamp } from "@/utils/math";
-import { degreesToRadians } from "@/utils/physics/unitConversions";
+import { degreesToRadians, kmhToMetersPerSecond } from "@/utils/physics/unitConversions";
 
 import { lerp } from "../helpers/animations/interpolations";
 import type { Transformable } from "../universe/architecture/transformable";
@@ -41,10 +41,10 @@ export class Vehicle implements Transformable {
     private targetSpeed = 0;
     private targetSteeringAngle = 0;
 
-    readonly maxForwardSpeed = 30;
-    readonly maxReverseSpeed = 20;
+    readonly maxForwardSpeed = kmhToMetersPerSecond(100);
+    readonly maxReverseSpeed = kmhToMetersPerSecond(70);
     readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
-    readonly maxSteeringAngleHighSpeed = degreesToRadians(4);
+    readonly maxSteeringAngleHighSpeed = degreesToRadians(3);
 
     constructor(frame: PhysicsAggregate, doors: ReadonlyArray<Door>, wheels: ReadonlyArray<Wheel>) {
         this.frame = frame;
@@ -65,7 +65,7 @@ export class Vehicle implements Transformable {
         const maxSteeringAngle = lerp(
             this.maxSteeringAngleHighSpeed,
             this.maxSteeringAngleLowSpeed,
-            Math.exp(-linearVelocity * 0.5),
+            2 ** (-linearVelocity / kmhToMetersPerSecond(20)),
         );
         this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
         for (const wheel of this.wheels) {
