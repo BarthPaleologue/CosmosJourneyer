@@ -122,7 +122,13 @@ export async function createOnFootScene(
     const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), groundSize, 64, wrappedRng));
     butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
 
-    new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0, restitution: 0.2, friction: 2 }, scene);
+    const groundAggregate = new PhysicsAggregate(
+        ground,
+        PhysicsShapeType.BOX,
+        { mass: 0, restitution: 0.2, friction: 2 },
+        scene,
+    );
+    groundAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
 
     const humanoids = await loadHumanoidPrefabs(scene, progressMonitor);
 
