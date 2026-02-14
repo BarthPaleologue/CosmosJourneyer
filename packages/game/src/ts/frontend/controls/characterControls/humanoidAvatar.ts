@@ -266,7 +266,7 @@ export class HumanoidAvatar implements Transformable {
                 };
             } else if (!this.downwardRaycastResult.hasHit) {
                 // no ground below but ground above, could be falling under the ground
-                const groundDistance = -this.upwardRaycastResult.hitDistance + rayOffset;
+                const groundDistance = rayOffset - this.upwardRaycastResult.hitDistance;
                 return {
                     type: "ground" as const,
                     distance: groundDistance,
@@ -338,7 +338,7 @@ export class HumanoidAvatar implements Transformable {
         if (
             this.lastSurfaceInfo !== null &&
             this.lastSurfaceInfo.type === "ground" &&
-            this.lastSurfaceInfo.distance < 0
+            this.lastSurfaceInfo.distance < -0.1
         ) {
             this.getTransform().position.addInPlace(
                 this.getTransform().up.scale(Math.abs(this.lastSurfaceInfo.distance)),
