@@ -277,8 +277,8 @@ export class VehicleBuilder {
                 wheel.radius,
                 wheel.thickness,
                 150,
-                0,
-                1.5,
+                0.2,
+                1.0,
                 this.scene,
             );
             FilterMeshCollisions(wheelShape);
@@ -338,12 +338,6 @@ export function AddWheelPhysics(
     friction: number,
     scene: Scene,
 ) {
-    /*const physicsShape = new PhysicsShapeCylinder(new Vector3(-0.8, 0, 0), new Vector3(0.8, 0, 0), radius, scene);
-    const physicsBody = new PhysicsBody(mesh, PhysicsMotionType.DYNAMIC, false, scene);
-    physicsBody.setMassProperties({ mass: mass });
-    physicsShape.material = { restitution: bounce, friction: friction };
-    physicsBody.shape = physicsShape;*/
-
     const aggregate = new PhysicsAggregate(
         mesh,
         PhysicsShapeType.CYLINDER,
@@ -388,7 +382,7 @@ export function AddAxlePhysics(
 }
 
 export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.5 * 2, height: radius }, scene);
+    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.7 * 2, height: radius }, scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
     axleMesh.bakeCurrentTransformIntoVertices();
     axleMesh.position.copyFrom(position);

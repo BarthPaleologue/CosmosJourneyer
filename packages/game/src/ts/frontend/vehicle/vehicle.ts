@@ -44,7 +44,7 @@ export class Vehicle implements Transformable {
     readonly maxForwardSpeed = kmhToMetersPerSecond(90);
     readonly maxReverseSpeed = kmhToMetersPerSecond(50);
     readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
-    readonly maxSteeringAngleHighSpeed = degreesToRadians(3);
+    readonly maxSteeringAngleHighSpeed = degreesToRadians(7);
 
     constructor(frame: PhysicsAggregate, doors: ReadonlyArray<Door>, wheels: ReadonlyArray<Wheel>) {
         this.frame = frame;
