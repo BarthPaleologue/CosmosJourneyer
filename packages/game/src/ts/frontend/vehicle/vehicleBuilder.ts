@@ -319,7 +319,7 @@ export class VehicleBuilder {
 }
 
 export function FilterMeshCollisions(shape: PhysicsShape) {
-    shape.filterMembershipMask = CollisionMask.VEHICLE_PARTS;
+    shape.filterMembershipMask = CollisionMask.VEHICLE_PARTS | CollisionMask.DYNAMIC_OBJECTS;
     shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.VEHICLE_PARTS;
 }
 
