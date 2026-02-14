@@ -120,7 +120,7 @@ export function createWolfMk2(
         "RoofSolarPanel1",
         {
             height: 0.05,
-            width: frameHalfWidth - 0.2,
+            width: frameHalfWidth - 0.4,
             depth: frameLength * 0.8,
         },
         scene,
@@ -132,7 +132,7 @@ export function createWolfMk2(
         "RoofSolarPanel2",
         {
             height: 0.05,
-            width: frameHalfWidth - 0.2,
+            width: frameHalfWidth - 0.4,
             depth: frameLength * 0.8,
         },
         scene,
@@ -274,7 +274,11 @@ export function createWolfMk2(
         .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
         .addFixedPart(
             roofSolarPanel1,
-            new Vector3((topHalfWidth + maxHalfWidth) / 2, (heightOfMaxWidth + frameHeight) / 2, roofSolarPanelZOffset),
+            new Vector3(
+                (topHalfWidth + maxHalfWidth) / 2,
+                0.05 + (heightOfMaxWidth + frameHeight) / 2,
+                roofSolarPanelZOffset,
+            ),
             100,
             { rotation: { z: -roofSolarPanelRotationAngle } },
         )
@@ -282,7 +286,7 @@ export function createWolfMk2(
             roofSolarPanel2,
             new Vector3(
                 -(topHalfWidth + maxHalfWidth) / 2,
-                (heightOfMaxWidth + frameHeight) / 2,
+                0.05 + (heightOfMaxWidth + frameHeight) / 2,
                 roofSolarPanelZOffset,
             ),
             100,
