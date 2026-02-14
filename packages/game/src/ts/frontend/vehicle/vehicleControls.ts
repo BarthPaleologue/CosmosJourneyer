@@ -118,9 +118,9 @@ export class VehicleControls implements Controls {
     }
 
     setUpDirection(up: Vector3) {
-        this.thirdPersonTransform.rotationQuaternion = Quaternion.FromLookDirectionRHToRef(
-            this.thirdPersonTransform.forward,
-            up,
+        const deltaRotation = Quaternion.FromUnitVectorsToRef(this.thirdPersonTransform.up, up, Quaternion.Identity());
+
+        this.thirdPersonTransform.rotationQuaternion = deltaRotation.multiply(
             this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
         );
     }
@@ -161,23 +161,25 @@ export class VehicleControls implements Controls {
         );
         const horizontalVelocity = velocity.subtract(verticalVelocity);
         const horizontalSpeed = horizontalVelocity.length();
-        const horizontalDirection = horizontalVelocity.normalizeToNew();
+        if (horizontalSpeed > 0.1) {
+            const horizontalDirection = horizontalVelocity.normalizeToNew();
 
-        const deltaRotation = Quaternion.FromUnitVectorsToRef(
-            this.thirdPersonTransform.forward,
-            horizontalDirection,
-            Quaternion.Identity(),
-        );
-        const targetRotation = deltaRotation.multiply(
-            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
-        );
-        const rotationHalfLife = 0.5;
-        const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
-        this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
-            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
-            targetRotation,
-            rotationT,
-        );
+            const deltaRotation = Quaternion.FromUnitVectorsToRef(
+                this.thirdPersonTransform.forward,
+                horizontalDirection,
+                Quaternion.Identity(),
+            );
+            const targetRotation = deltaRotation.multiply(
+                this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+            );
+            const rotationHalfLife = 0.5;
+            const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
+            this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
+                this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+                targetRotation,
+                rotationT,
+            );
+        }
 
         const steeringAngle = VehicleInputs.map.steer.value * 0.03;
         vehicle.turn(steeringAngle);
