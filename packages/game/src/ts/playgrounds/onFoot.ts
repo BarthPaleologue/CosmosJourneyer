@@ -257,7 +257,9 @@ export async function createOnFootScene(
         }
 
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
-        activeControls.update(deltaSeconds);
+        characterControls.update(deltaSeconds);
+        roverControls.update(deltaSeconds);
+        shipControls.update(deltaSeconds);
         interactionSystem.update(deltaSeconds);
         interactionLayer.update(deltaSeconds);
     });
