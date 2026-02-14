@@ -33,6 +33,7 @@ export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
 
     private readonly thirdPersonTransform: TransformNode;
+    private readonly smoothedMotionDirection = Vector3.Zero();
 
     private readonly thirdPersonCameraYOffset = 2;
 
@@ -149,30 +150,54 @@ export class VehicleControls implements Controls {
         );
 
         const vehicleLinearVelocity = vehicle.getTransform().physicsBody?.getLinearVelocity() ?? Vector3.Zero();
-        const vehicleLinearVelocityFlat = vehicleLinearVelocity
-            .subtract(
-                this.thirdPersonTransform.up.scale(Vector3.Dot(vehicleLinearVelocity, this.thirdPersonTransform.up)),
-            )
-            .negate();
-        const vehicleForward =
-            vehicleLinearVelocityFlat.length() > 3
-                ? vehicleLinearVelocityFlat.normalizeToNew()
-                : vehicle.getTransform().forward;
-        const vehicleForwardFlat = vehicleForward
-            .subtract(this.thirdPersonTransform.up.scale(Vector3.Dot(vehicleForward, this.thirdPersonTransform.up)))
-            .normalize();
-        const thirdPersonForward = Vector3.Normalize(this.thirdPersonTransform.forward);
-        const clampedDot = Math.min(Math.max(Vector3.Dot(vehicleForwardFlat, thirdPersonForward), -1), 1);
-        const cross = Vector3.Cross(thirdPersonForward, vehicleForwardFlat);
-        const signedAngle = Math.atan2(Vector3.Dot(cross, this.thirdPersonTransform.up), clampedDot);
+        const vehicleLinearVelocityFlat = vehicleLinearVelocity.subtract(
+            this.thirdPersonTransform.up.scale(Vector3.Dot(vehicleLinearVelocity, this.thirdPersonTransform.up)),
+        );
+        const vehicleFlatSpeed = vehicleLinearVelocityFlat.length();
+        const vehicleForwardFlat = vehicle
+            .getTransform()
+            .forward.subtract(
+                this.thirdPersonTransform.up.scale(
+                    Vector3.Dot(vehicle.getTransform().forward, this.thirdPersonTransform.up),
+                ),
+            );
+
+        if (this.smoothedMotionDirection.lengthSquared() < 1e-6) {
+            this.smoothedMotionDirection.copyFrom(vehicleForwardFlat.normalizeToNew());
+        }
+
+        const targetMotionDirection =
+            vehicleFlatSpeed > 0.2 ? vehicleLinearVelocityFlat.normalizeToNew() : this.smoothedMotionDirection;
+
+        const directionHalfLife = 0.2;
+        const directionT = lerpSmooth(0, 1, directionHalfLife, deltaSeconds);
+        this.smoothedMotionDirection.copyFrom(
+            Vector3.Lerp(this.smoothedMotionDirection, targetMotionDirection, directionT).normalize(),
+        );
 
         const rotationHalfLife = 0.5;
-        const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds);
-
-        const rotation = Quaternion.RotationAxis(this.thirdPersonTransform.up, signedAngle * rotationT);
-        this.thirdPersonTransform.rotationQuaternion = rotation.multiply(
-            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
+        const baseRotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds);
+        const rotationBlendFullSpeed = 1;
+        const speedBlend = Math.min(vehicleFlatSpeed / rotationBlendFullSpeed, 1);
+        const rotationBlend = speedBlend * speedBlend;
+        const rotationT = baseRotationT * rotationBlend;
+        const currentRotation = this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity();
+        const currentForwardFlat = this.thirdPersonTransform.forward
+            .subtract(
+                this.thirdPersonTransform.up.scale(
+                    Vector3.Dot(this.thirdPersonTransform.forward, this.thirdPersonTransform.up),
+                ),
+            )
+            .normalize();
+        const desiredForward = this.smoothedMotionDirection.negate();
+        const clampedDot = Math.min(Math.max(Vector3.Dot(currentForwardFlat, desiredForward), -1), 1);
+        const cross = Vector3.Cross(currentForwardFlat, desiredForward);
+        const crossUpDot = Vector3.Dot(cross, this.thirdPersonTransform.up);
+        const signedAngle = Math.atan2(crossUpDot, clampedDot);
+        const targetRotation = Quaternion.RotationAxis(this.thirdPersonTransform.up, signedAngle).multiply(
+            currentRotation,
         );
+        this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(currentRotation, targetRotation, rotationT);
 
         const steeringAngle = VehicleInputs.map.steer.value * 0.03;
         vehicle.turn(steeringAngle);
