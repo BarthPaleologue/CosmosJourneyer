@@ -52,9 +52,9 @@ export function createWolfMk2(
 
     const frameHalfWidth = 1.2;
 
-    const frameLength = 6.0;
+    const frameLength = 6.5;
 
-    const frameHeight = 2.0;
+    const frameHeight = 2.2;
 
     const heightOfMaxWidth = frameHeight * 0.7;
     const maxHalfWidth = frameHalfWidth * 1.4;
