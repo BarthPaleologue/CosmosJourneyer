@@ -114,7 +114,7 @@ export async function createRoverScene(
 
     createSky(sun.direction.scale(-1), scene);
 
-    const ground = MeshBuilder.CreateGround("ground", { width: 300, height: 300 }, scene);
+    const ground = MeshBuilder.CreateGround("ground", { width: 3000, height: 3000 }, scene);
     ground.receiveShadows = true;
     ground.position.y = -2;
 
