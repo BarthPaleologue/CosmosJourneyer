@@ -27,7 +27,8 @@ export function canEngageWarpDrive(
 ) {
     const shipPosition = shipTransform.getAbsolutePosition();
     const distanceToObject = Vector3.Distance(shipPosition, nearestOrbitalObject.getTransform().getAbsolutePosition());
-    if (distanceToObject < nearestOrbitalObject.getBoundingRadius() * 1.03) {
+    const emergencyStopDistance = nearestOrbitalObject.getBoundingRadius() * 1.05;
+    if (distanceToObject < emergencyStopDistance) {
         return false;
     }
 
