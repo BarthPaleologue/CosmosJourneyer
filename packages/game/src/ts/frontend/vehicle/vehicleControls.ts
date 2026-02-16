@@ -24,6 +24,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { Controls } from "../controls";
 import { lerpSmooth } from "../helpers/animations/interpolations";
+import { quickAnimation } from "../helpers/animations/quickAnimation";
 import { toggleDoor } from "./door";
 import { type Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
@@ -35,6 +36,9 @@ export class VehicleControls implements Controls {
     private readonly thirdPersonCameraYOffset = 2;
 
     readonly thirdPersonCamera: ArcRotateCamera;
+    private readonly thirdPersonCameraDefaultAlpha: number;
+    private readonly thirdPersonCameraDefaultBeta: number;
+    private readonly thirdPersonCameraDefaultRadius: number;
 
     readonly firstPersonCamera: FreeCamera;
 
@@ -52,6 +56,9 @@ export class VehicleControls implements Controls {
         );
         this.thirdPersonCamera.lowerRadiusLimit = 5;
         this.thirdPersonCamera.parent = this.thirdPersonTransform;
+        this.thirdPersonCameraDefaultAlpha = this.thirdPersonCamera.alpha;
+        this.thirdPersonCameraDefaultBeta = this.thirdPersonCamera.beta;
+        this.thirdPersonCameraDefaultRadius = this.thirdPersonCamera.radius;
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", new Vector3(0.5, 1, 2), scene);
         this.firstPersonCamera.speed = 0;
@@ -74,6 +81,31 @@ export class VehicleControls implements Controls {
             for (const door of this.vehicle.doors) {
                 toggleDoor(door);
             }
+        });
+
+        VehicleInputs.map.resetCamera.on("complete", () => {
+            quickAnimation(
+                this.thirdPersonCamera,
+                "alpha",
+                this.thirdPersonCamera.alpha,
+                this.thirdPersonCameraDefaultAlpha,
+                200,
+            );
+            quickAnimation(
+                this.thirdPersonCamera,
+                "beta",
+                this.thirdPersonCamera.beta,
+                this.thirdPersonCameraDefaultBeta,
+                200,
+            );
+            quickAnimation(
+                this.thirdPersonCamera,
+                "radius",
+                this.thirdPersonCamera.radius,
+                this.thirdPersonCameraDefaultRadius,
+                200,
+            );
+            quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
         });
     }
 

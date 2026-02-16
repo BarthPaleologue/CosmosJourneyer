@@ -54,18 +54,24 @@ const toggleDoorsAction = new Action({
     bindings: [keyboard.getControl("KeyI")],
 });
 
+const resetCameraAction = new Action({
+    bindings: [keyboard.getControl("Numpad0")],
+});
+
 export const VehicleInputs = new InputMap<{
     accelerate: Action;
     steer: Action;
     brake: Action;
     toggleCamera: PressInteraction;
     toggleDoors: PressInteraction;
+    resetCamera: PressInteraction;
 }>("VehicleInputs", {
     accelerate: accelerateAction,
     steer: steerAction,
     brake: brakeAction,
     toggleCamera: new PressInteraction(toggleCameraAction),
     toggleDoors: new PressInteraction(toggleDoorsAction),
+    resetCamera: new PressInteraction(resetCameraAction),
 });
 
 VehicleInputs.setEnabled(false);
