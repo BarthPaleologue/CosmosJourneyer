@@ -257,9 +257,9 @@ export class HumanoidAvatar implements Transformable {
         this.physicsEngine.raycastToRef(rayOrigin, upwardRayEnd, this.upwardRaycastResult, this.raycastQuery);
 
         if (this.upwardRaycastResult.hasHit) {
-            if ((this.upwardRaycastResult.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
-                // water above head, we are swimming
-                const waterDistance = this.upwardRaycastResult.hitDistance - rayOffset;
+            if ((this.upwardRaycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+                // keep distance referenced to feet so swimming threshold remains meaningful
+                const waterDistance = -this.upwardRaycastResult.hitDistance - rayOffset;
                 return {
                     type: "water" as const,
                     distance: waterDistance,
@@ -281,6 +281,14 @@ export class HumanoidAvatar implements Transformable {
             return null;
         }
 
+        if ((this.downwardRaycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+            // water below, we are falling towards the water
+            return {
+                type: "water" as const,
+                distance: this.downwardRaycastResult.hitDistance - rayOffset,
+            };
+        }
+
         const groundDistance = this.downwardRaycastResult.hitDistance - rayOffset;
         return {
             type: "ground" as const,
@@ -299,7 +307,7 @@ export class HumanoidAvatar implements Transformable {
 
         // start swimming when water is 1m above feet
         const waterLevelThreshold = 1;
-        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance < -waterLevelThreshold) {
+        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance <= -waterLevelThreshold) {
             return this.swimmingState;
         }
 
