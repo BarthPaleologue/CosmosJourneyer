@@ -33,6 +33,7 @@ import { sheerAlongY } from "../helpers/sheer";
 import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";
+import type { WheelModel } from "./wheel";
 import { WireframeTopology } from "./wireframeTopology";
 
 export function createWolfMk2(
@@ -96,7 +97,6 @@ export function createWolfMk2(
     frame.rotate(Axis.X, -Math.PI / 2);
     frame.position.z = -frameLength / 2;
     frame.bakeCurrentTransformIntoVertices();
-    frame.position.y = 0.5;
 
     const backDoorThickness = frameThickness;
     const backDoor = MeshBuilder.ExtrudePolygon(
@@ -249,26 +249,53 @@ export function createWolfMk2(
     const wheelDistanceFromCenter = frameHalfWidth + 1.0;
 
     const wheelSpread = 0.4;
+    const wheelYOffset = -0.5;
 
-    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, frameLength * wheelSpread);
-    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, frameLength * wheelSpread);
-    const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, 0);
-    const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, 0);
-    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, 0, -frameLength * wheelSpread);
-    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, 0, -frameLength * wheelSpread);
+    const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, wheelYOffset, frameLength * wheelSpread);
+    const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, wheelYOffset, frameLength * wheelSpread);
+    const middleLeftWheelPosition = new Vector3(wheelDistanceFromCenter, wheelYOffset, 0);
+    const middleRightWheelPosition = new Vector3(-wheelDistanceFromCenter, wheelYOffset, 0);
+    const rearLeftWheelPosition = new Vector3(wheelDistanceFromCenter, wheelYOffset, -frameLength * wheelSpread);
+    const rearRightWheelPosition = new Vector3(-wheelDistanceFromCenter, wheelYOffset, -frameLength * wheelSpread);
 
     const vehicleBuilder = new VehicleBuilder(frame, assets, scene);
 
     const wheelRadius = 0.7;
     const wheelThickness = 0.8;
+    const poweredSteerable: WheelModel["behavior"] = { powered: true, steerable: true };
+    const freeFixed: WheelModel["behavior"] = { powered: false, steerable: false };
 
     const vehicle = vehicleBuilder
-        .addWheel(forwardLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(forwardRightWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(middleLeftWheelPosition, wheelRadius, wheelThickness, false, false)
-        .addWheel(middleRightWheelPosition, wheelRadius, wheelThickness, false, false)
-        .addWheel(rearLeftWheelPosition, wheelRadius, wheelThickness, true, true)
-        .addWheel(rearRightWheelPosition, wheelRadius, wheelThickness, true, true)
+        .addWheel({
+            position: forwardLeftWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: poweredSteerable,
+        })
+        .addWheel({
+            position: forwardRightWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: poweredSteerable,
+        })
+        .addWheel({
+            position: middleLeftWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: freeFixed,
+        })
+        .addWheel({
+            position: middleRightWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: freeFixed,
+        })
+        .addWheel({
+            position: rearLeftWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: poweredSteerable,
+        })
+        .addWheel({
+            position: rearRightWheelPosition,
+            geometry: { radius: wheelRadius, thickness: wheelThickness },
+            behavior: poweredSteerable,
+        })
         .addFixedPart(
             roofSolarPanel1,
             new Vector3(

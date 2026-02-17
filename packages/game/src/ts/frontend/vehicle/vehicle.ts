@@ -70,7 +70,7 @@ export class Vehicle implements Transformable {
         this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
         for (const wheel of this.wheels) {
             const steering = wheel.steering;
-            if (steering === undefined) {
+            if (steering === null) {
                 continue;
             }
 
@@ -88,15 +88,15 @@ export class Vehicle implements Transformable {
     setTargetSpeed(speed: number) {
         this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
         const motorTorque = 330000 / 50;
-        for (const { radius, motor } of this.wheels) {
-            if (motor === undefined) {
+        for (const wheel of this.wheels) {
+            if (wheel.motor === null) {
                 continue;
             }
 
-            const targetAngularVelocity = this.targetSpeed / radius;
+            const targetAngularVelocity = this.targetSpeed / wheel.radius;
 
-            motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
-            motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, targetAngularVelocity);
+            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
+            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, targetAngularVelocity);
         }
     }
 
@@ -107,13 +107,13 @@ export class Vehicle implements Transformable {
 
     brake() {
         const brakeTorque = 1e6;
-        for (const { motor } of this.wheels) {
-            if (motor === undefined) {
+        for (const wheel of this.wheels) {
+            if (wheel.motor === null) {
                 continue;
             }
 
-            motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, brakeTorque);
-            motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 0);
+            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, brakeTorque);
+            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 0);
         }
 
         this.targetSpeed = 0;
@@ -138,11 +138,7 @@ export class Vehicle implements Transformable {
         }
 
         for (const wheel of this.wheels) {
-            wheel.motor?.dispose();
-            wheel.steering?.constraint.dispose();
-            wheel.body.dispose();
-            wheel.body.transformNode.dispose();
-            wheel.shape.dispose();
+            wheel.dispose();
         }
 
         this.frame.dispose();

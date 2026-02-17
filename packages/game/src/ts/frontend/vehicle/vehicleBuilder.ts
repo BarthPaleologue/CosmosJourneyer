@@ -15,31 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import {
-    PhysicsConstraintAxis,
-    PhysicsConstraintMotorType,
-    PhysicsShapeType,
-} from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsConstraintAxis, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
 import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Door } from "./door";
+import { filterVehicleShape } from "./filterVehicleShape";
 import { HingedDoor } from "./hingedDoor";
 import { Vehicle } from "./vehicle";
-import type { Wheel } from "./wheel";
+import { CreateAxle, CreateWheel, Wheel, type WheelModel } from "./wheel";
 
 type FixationModel = {
     rotation?: {
@@ -55,11 +46,7 @@ export class VehicleBuilder {
     private readonly frame: Mesh;
 
     private readonly wheels: Array<{
-        position: Vector3;
-        radius: number;
-        thickness: number;
-        powered: boolean;
-        steerable: boolean;
+        model: WheelModel;
         mesh: Mesh;
         axleMesh: Mesh;
     }> = [];
@@ -91,9 +78,12 @@ export class VehicleBuilder {
         this.scene = scene;
     }
 
-    addWheel(position: Vector3, radius: number, thickness: number, powered: boolean, steerable: boolean): this {
+    addWheel(model: WheelModel): this {
+        const { position } = model;
+        const { radius, thickness } = model.geometry;
+
         const wheelMesh = CreateWheel(
-            position,
+            Vector3.Zero(),
             radius,
             thickness,
             {
@@ -102,8 +92,26 @@ export class VehicleBuilder {
             },
             this.scene,
         );
-        const axleMesh = CreateAxle(position, radius, this.scene);
-        this.wheels.push({ position, radius, thickness, powered, steerable, mesh: wheelMesh, axleMesh: axleMesh });
+        const axleMesh = CreateAxle(Vector3.Zero(), radius, this.scene);
+        wheelMesh.parent = this.frame;
+        axleMesh.parent = this.frame;
+        wheelMesh.position.copyFrom(position);
+        axleMesh.position.copyFrom(position);
+        this.wheels.push({
+            model: {
+                position: position.clone(),
+                geometry: {
+                    radius,
+                    thickness,
+                },
+                behavior: {
+                    powered: model.behavior.powered,
+                    steerable: model.behavior.steerable,
+                },
+            },
+            mesh: wheelMesh,
+            axleMesh: axleMesh,
+        });
         return this;
     }
 
@@ -153,14 +161,7 @@ export class VehicleBuilder {
     }
 
     private getTransforms(): Array<TransformNode> {
-        const transforms: Array<TransformNode> = [];
-        transforms.push(this.frame);
-        for (const wheel of this.wheels) {
-            transforms.push(wheel.mesh);
-            transforms.push(wheel.axleMesh);
-        }
-
-        return transforms;
+        return [this.frame];
     }
 
     build(): Vehicle {
@@ -170,13 +171,13 @@ export class VehicleBuilder {
             friction: 1,
             center: new Vector3(0, -2.5, 0),
         });
-        FilterMeshCollisions(frameAggregate.shape);
+        filterVehicleShape(frameAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
         for (const { mesh, mass, connection } of this.fixedParts) {
             const positionInFrameSpace = mesh.position.clone();
             mesh.setParent(null);
             const partAggregate = new PhysicsAggregate(mesh, PhysicsShapeType.MESH, { mass }, this.scene);
-            FilterMeshCollisions(partAggregate.shape);
+            filterVehicleShape(partAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
             const joint = new Physics6DoFConstraint(
                 {
@@ -216,7 +217,7 @@ export class VehicleBuilder {
             const positionInFrameSpace = doorMesh.position.clone();
             doorMesh.setParent(null);
             const doorAggregate = new PhysicsAggregate(doorMesh, PhysicsShapeType.MESH, { mass }, this.scene);
-            FilterMeshCollisions(doorAggregate.shape);
+            filterVehicleShape(doorAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
             const joint = new Physics6DoFConstraint(
                 {
@@ -257,265 +258,19 @@ export class VehicleBuilder {
 
         const physicWheels: Array<Wheel> = [];
         for (const wheel of this.wheels) {
-            const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(
-                wheel.axleMesh,
-                wheel.radius,
-                190,
-                0,
-                0,
-                this.scene,
-            );
-            FilterMeshCollisions(axleShape);
-
-            const axle = {
-                mesh: wheel.axleMesh,
-                physicsBody: axleBody,
-                physicsShape: axleShape,
-            };
-
-            const { physicsBody: wheelBody, physicsShape: wheelShape } = AddWheelPhysics(
-                wheel.mesh,
-                wheel.radius,
-                wheel.thickness,
-                150,
-                0.2,
-                1.0,
-                this.scene,
-            );
-            FilterMeshCollisions(wheelShape);
-
-            const wheelObj = {
-                mesh: wheel.mesh,
-                physicsBody: wheelBody,
-                physicsShape: wheelShape,
-            };
-
-            const wheelAxleConstraint = AttachWheelToAxle(axle, wheelObj, this.scene);
-            if (wheel.powered) {
-                wheelAxleConstraint.setAxisMotorType(
-                    PhysicsConstraintAxis.ANGULAR_X,
-                    PhysicsConstraintMotorType.VELOCITY,
-                );
-            }
-
-            const frameAxleConstraint = AttachAxleToFrame(
-                axle.physicsBody,
-                frameAggregate.body,
-                this.scene,
-                wheel.steerable,
-            );
-
-            physicWheels.push({
-                radius: wheel.radius,
-                body: wheelBody,
-                shape: wheelShape,
-                ...(wheel.powered ? { motor: wheelAxleConstraint } : {}),
-                ...(wheel.steerable
-                    ? {
-                          steering: {
-                              position: wheel.position.z > 0 ? "front" : "rear",
-                              constraint: frameAxleConstraint,
-                          },
-                      }
-                    : {}),
+            wheel.mesh.setParent(null);
+            wheel.axleMesh.setParent(null);
+            const physicWheel = new Wheel({
+                model: wheel.model,
+                wheelMesh: wheel.mesh,
+                axleMesh: wheel.axleMesh,
+                frameBody: frameAggregate.body,
+                scene: this.scene,
             });
+
+            physicWheels.push(physicWheel);
         }
 
         return new Vehicle(frameAggregate, doors, physicWheels);
     }
-}
-
-export function FilterMeshCollisions(shape: PhysicsShape) {
-    shape.filterMembershipMask = CollisionMask.VEHICLE_PARTS | CollisionMask.DYNAMIC_OBJECTS;
-    shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.VEHICLE_PARTS;
-}
-
-export function AddWheelPhysics(
-    mesh: Mesh,
-    radius: number,
-    thickness: number,
-    mass: number,
-    bounce: number,
-    friction: number,
-    scene: Scene,
-) {
-    const aggregate = new PhysicsAggregate(
-        mesh,
-        PhysicsShapeType.CYLINDER,
-        {
-            mass: mass,
-            restitution: bounce,
-            friction: friction,
-            pointA: new Vector3(-thickness / 2, 0, 0),
-            pointB: new Vector3(thickness / 2, 0, 0),
-            radius: radius,
-        },
-        scene,
-    );
-    const physicsBody = aggregate.body;
-    const physicsShape = aggregate.shape;
-
-    return { physicsBody, physicsShape };
-}
-
-export function AddAxlePhysics(
-    mesh: Mesh,
-    wheelRadius: number,
-    mass: number,
-    bounce: number,
-    friction: number,
-    scene: Scene,
-) {
-    const aggregate = new PhysicsAggregate(
-        mesh,
-        PhysicsShapeType.BOX,
-        {
-            mass: mass,
-            restitution: bounce,
-            friction: friction,
-        },
-        scene,
-    );
-    const physicsBody = aggregate.body;
-    const physicsShape = aggregate.shape;
-
-    return { physicsBody, physicsShape };
-}
-
-export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.7 * 2, height: radius }, scene);
-    axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
-    axleMesh.bakeCurrentTransformIntoVertices();
-    axleMesh.position.copyFrom(position);
-
-    return axleMesh;
-}
-
-export function CreateWheel(
-    position: Vector3,
-    radius: number,
-    thickness: number,
-    materials: {
-        wheel: Material;
-        tire: Material;
-    },
-    scene: Scene,
-) {
-    const rimRadius = radius * 0.6;
-    const tireRadius = radius - rimRadius;
-
-    const wheelMesh = MeshBuilder.CreateCylinder("Wheel", { height: thickness, diameter: rimRadius * 2 }, scene);
-    wheelMesh.rotation = new Vector3(0, 0, Math.PI / 2);
-
-    const tireVertexData = CreateTorusVertexData({
-        diameter: rimRadius * 2,
-        thickness: tireRadius * 2,
-        tessellation: 64,
-        minorLpExponent: 5,
-        sideOrientation: VertexData.BACKSIDE,
-    });
-
-    const tireMesh = new Mesh("Tire", scene);
-    tireVertexData.applyToMesh(tireMesh, false);
-    tireMesh.scaling.y = thickness / (2.0 * tireRadius);
-    tireMesh.material = materials.tire;
-    tireMesh.parent = wheelMesh;
-
-    wheelMesh.material = materials.wheel;
-    wheelMesh.bakeCurrentTransformIntoVertices();
-    wheelMesh.position.copyFrom(position);
-
-    return wheelMesh;
-}
-
-export function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, steerable = false) {
-    const frameInverseWorldMatrix = frame.transformNode.getWorldMatrix().clone().invert();
-
-    const axlePosition = axle.transformNode.position;
-    const axlePositionInFrameSpace = Vector3.TransformCoordinates(axlePosition, frameInverseWorldMatrix);
-
-    const joint = new Physics6DoFConstraint(
-        {
-            pivotA: new Vector3(0, 0, 0),
-            pivotB: axlePositionInFrameSpace,
-        },
-        [
-            {
-                axis: PhysicsConstraintAxis.LINEAR_X,
-                minLimit: 0,
-                maxLimit: 0,
-            },
-            {
-                // Suspension
-                axis: PhysicsConstraintAxis.LINEAR_Y,
-                minLimit: -0.15,
-                maxLimit: 0.15,
-                stiffness: 100000,
-                damping: 4000,
-            },
-            {
-                axis: PhysicsConstraintAxis.LINEAR_Z,
-                minLimit: 0,
-                maxLimit: 0,
-            },
-            {
-                // Angular leeway X
-                axis: PhysicsConstraintAxis.ANGULAR_X,
-                minLimit: -0.25,
-                maxLimit: 0.25,
-            },
-            {
-                // Steering
-                axis: PhysicsConstraintAxis.ANGULAR_Y,
-                ...(steerable ? {} : { minLimit: 0, maxLimit: 0 }),
-            },
-            {
-                // Angular leeway Z
-                axis: PhysicsConstraintAxis.ANGULAR_Z,
-                minLimit: -0.05,
-                maxLimit: 0.05,
-            },
-        ],
-        scene,
-    );
-
-    axle.addConstraint(frame, joint);
-
-    if (steerable) {
-        joint.setAxisMotorType(PhysicsConstraintAxis.ANGULAR_Y, PhysicsConstraintMotorType.POSITION);
-    }
-
-    return joint;
-}
-
-function AttachWheelToAxle(
-    axle: { mesh: Mesh; physicsBody: PhysicsBody },
-    wheel: { mesh: Mesh; physicsBody: PhysicsBody },
-    scene: Scene,
-) {
-    const motorJoint = new Physics6DoFConstraint(
-        {},
-        [
-            {
-                axis: PhysicsConstraintAxis.LINEAR_DISTANCE,
-                minLimit: 0,
-                maxLimit: 0,
-            },
-            {
-                axis: PhysicsConstraintAxis.ANGULAR_Y,
-                minLimit: 0,
-                maxLimit: 0,
-            },
-            {
-                axis: PhysicsConstraintAxis.ANGULAR_Z,
-                minLimit: 0,
-                maxLimit: 0,
-            },
-        ],
-        scene,
-    );
-
-    axle.physicsBody.addConstraint(wheel.physicsBody, motorJoint);
-
-    return motorJoint;
 }
