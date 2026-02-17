@@ -515,6 +515,7 @@ export class StarSystemView implements View {
             } else if (this.scene.getActiveControls() === this.vehicleControls) {
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
+                VehicleInputs.setEnabled(false);
 
                 const vehiclePosition = this.vehicleControls.getTransform().getAbsolutePosition();
 
