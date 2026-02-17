@@ -1,10 +1,3 @@
-Name:
-Clean Car Tire Rubber Texture (Plastic 0022)
-
-Description:
-It is the pattern of rubber tires of vehicles.
-
-It can be a tire texture for sports cars, sedans or trucks.
-
-Author:
-https://www.texturecan.com
+version https://git-lfs.github.com/spec/v1
+oid sha256:4f7fe296a4c9d0fea6bcf17808ef4b61f05ce02f7ed6464d1abd2b0459699aac
+size 208
