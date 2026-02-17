@@ -24,6 +24,8 @@ import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
+import i18n from "@/i18n";
+
 import type { Interaction } from "../inputs/interaction/interactionSystem";
 import type { Door, DoorState } from "./door";
 
@@ -79,7 +81,7 @@ export class HingedDoor implements Door {
             case "opened":
                 return [
                     {
-                        label: "Close",
+                        label: i18n.t("interactions:close"),
                         perform: () => {
                             this.close();
                             return Promise.resolve();
@@ -89,7 +91,7 @@ export class HingedDoor implements Door {
             case "closed":
                 return [
                     {
-                        label: "Open",
+                        label: i18n.t("interactions:open"),
                         perform: () => {
                             this.open();
                             return Promise.resolve();
