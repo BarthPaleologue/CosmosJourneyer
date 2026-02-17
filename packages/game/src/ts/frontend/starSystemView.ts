@@ -495,7 +495,7 @@ export class StarSystemView implements View {
                     getPhysicsAggregate: () => rover.frame,
                     getInteractions: () => [
                         {
-                            label: i18n.t("interactions:enterVehicle", { vehicle: "Wolf Mk2" }),
+                            label: i18n.t("interactions:drive", { vehicle: "Wolf Mk2" }),
                             perform: async () => {
                                 await this.switchToVehicleControls();
                             },
