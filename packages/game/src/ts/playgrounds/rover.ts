@@ -24,6 +24,7 @@ import {
     PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
+    Quaternion,
     Scene,
     Vector3,
     type AbstractEngine,
@@ -137,10 +138,12 @@ export async function createRoverScene(
 
     enableShadows(sun);
 
-    const roverResult = createWolfMk2(assets, scene, new Vector3(0, 5, 0), {
-        axis: new Vector3(0, 1, 0),
-        angle: Math.PI / 4,
-    });
+    const roverResult = createWolfMk2(
+        assets,
+        scene,
+        new Vector3(0, 5, 0),
+        Quaternion.RotationAxis(Vector3.UpReadOnly, Math.PI / 4),
+    );
     if (!roverResult.success) {
         throw new Error(roverResult.error);
     }

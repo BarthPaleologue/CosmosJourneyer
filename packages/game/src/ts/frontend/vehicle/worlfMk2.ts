@@ -17,7 +17,7 @@
 
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { Scene } from "@babylonjs/core/scene";
@@ -39,10 +39,7 @@ export function createWolfMk2(
     assets: RenderingAssets,
     scene: Scene,
     spawnPosition: Vector3,
-    spawnRotation: {
-        axis: Vector3;
-        angle: number;
-    },
+    spawnRotation: Quaternion,
 ): Result<Vehicle, string> {
     const frameMat = new PBRMaterial("frame", scene);
     frameMat.metallic = 0;
@@ -305,7 +302,7 @@ export function createWolfMk2(
             },
         )
         .translateSpawn(spawnPosition)
-        .rotateSpawn(spawnRotation.axis, spawnRotation.angle)
+        .rotateSpawn(spawnRotation)
         .build();
 
     return ok(vehicle);

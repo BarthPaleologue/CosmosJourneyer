@@ -140,7 +140,8 @@ export class VehicleBuilder {
         return this;
     }
 
-    public rotateSpawn(axis: Vector3, angle: number): this {
+    public rotateSpawn(rotation: Quaternion): this {
+        const { axis, angle } = rotation.toAxisAngle();
         const transforms = this.getTransforms();
         for (const transform of transforms) {
             transform.rotateAround(this.spawnPosition, axis, angle);

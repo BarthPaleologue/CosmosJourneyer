@@ -23,6 +23,7 @@ import {
     PBRMaterial,
     PhysicsAggregate,
     PhysicsShapeType,
+    Quaternion,
     Vector3,
 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
@@ -151,7 +152,12 @@ export async function createOnFootScene(
     const notificationManager = new NotificationManagerMock();
     const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);
 
-    const roverResult = createWolfMk2(assets, scene, new Vector3(-16, 3, 16), { axis: Vector3.Up(), angle: 0.5 });
+    const roverResult = createWolfMk2(
+        assets,
+        scene,
+        new Vector3(-16, 3, 16),
+        Quaternion.RotationAxis(Vector3.UpReadOnly, 0.5),
+    );
     if (!roverResult.success) {
         throw new Error(`Failed to create rover: ${roverResult.error}`);
     }

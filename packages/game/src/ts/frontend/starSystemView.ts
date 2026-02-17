@@ -20,7 +20,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Space, Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -73,7 +73,6 @@ import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { clamp } from "@/utils/math";
 import { metersToLightYears } from "@/utils/physics/unitConversions";
 import { type DeepReadonly } from "@/utils/types";
 
@@ -482,14 +481,9 @@ export class StarSystemView implements View {
                 spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
 
                 const spawnPosition = shipPosition.add(up.scale(10).add(left.scale(20)));
+                const spawnRotation = Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, up, new Quaternion());
 
-                const spawnRotationAxis = Vector3.Cross(Vector3.Up(), up).normalize();
-                const spawnRotationAngle = Math.acos(clamp(Vector3.Dot(Vector3.Up(), up), -1, 1));
-
-                const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, {
-                    axis: spawnRotationAxis,
-                    angle: spawnRotationAngle,
-                });
+                const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, spawnRotation);
                 if (!roverResult.success) {
                     throw new Error("The rover had a stroke");
                 }
