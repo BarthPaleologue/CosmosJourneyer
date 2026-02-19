@@ -62,6 +62,7 @@ export class VehicleControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", new Vector3(0.5, 1, 2), scene);
         this.firstPersonCamera.speed = 0;
+        this.firstPersonCamera.minZ = 0.2;
 
         this.activeCamera = this.firstPersonCamera;
 
