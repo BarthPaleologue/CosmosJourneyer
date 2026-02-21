@@ -16,11 +16,13 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 float_eq = "1.0.1"
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.13"
 image = "0.24.5"
 rand = "0.8.5"
 chrono = "0.4.23"
 gilgamesh = "0.4.0"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3.13"
 
 [profile.release]
 # Tell `rustc` to optimize for speeeed.
