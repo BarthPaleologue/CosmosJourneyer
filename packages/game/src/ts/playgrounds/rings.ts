@@ -72,7 +72,8 @@ export async function createRingsScene(
         type: "procedural",
         seed: 0,
         frequency: 10.0,
-        albedo: { r: 120 / 255, g: 112 / 255, b: 104 / 255 },
+        iceAlbedo: { r: 0.93, g: 0.92, b: 0.9 },
+        dustAlbedo: { r: 156 / 255, g: 132 / 255, b: 108 / 255 },
     };
 
     const ringsUniforms = RingsUniforms.NewProcedural(ringsModel, ringsLutPool, 0, scene);
