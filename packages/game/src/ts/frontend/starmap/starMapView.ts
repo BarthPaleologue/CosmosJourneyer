@@ -18,6 +18,9 @@
 import "@babylonjs/core/Animations/animatable";
 import "@babylonjs/core/Culling/ray";
 
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
+import { ColorCurves } from "@babylonjs/core/Materials/colorCurves";
+import { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
@@ -39,6 +42,7 @@ import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotati
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import { lookAt } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
+import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";
@@ -90,6 +94,7 @@ export class StarMapView implements View {
     private readonly notificationManager: INotificationManager;
 
     private readonly starMap: StarMap;
+    private readonly starMapNebulaFog: StarMapNebulaPostProcess;
 
     constructor(
         player: Player,
@@ -103,6 +108,7 @@ export class StarMapView implements View {
         this.scene = scene;
         this.scene.onDisposeObservable.addOnce(() => {
             this.starMapUI.dispose();
+            this.starMapNebulaFog.dispose();
         });
 
         this.starMap = new StarMap(universeBackend, assets, this.scene);
@@ -184,14 +190,23 @@ export class StarMapView implements View {
             this.focusOnCurrentSystem();
         });
 
+        const glowLayer = new GlowLayer("GlowLayer", this.scene);
+        glowLayer.intensity = 0.5;
+
+        this.starMapNebulaFog = new StarMapNebulaPostProcess(this.scene, this.controls.getActiveCamera());
+
         const pipeline = new DefaultRenderingPipeline("pipeline", false, this.scene, this.controls.getCameras());
         pipeline.fxaaEnabled = true;
-        pipeline.bloomEnabled = true;
-        pipeline.bloomThreshold = 0.0;
-        pipeline.bloomWeight = 1.5;
-        pipeline.bloomKernel = 128;
-        pipeline.imageProcessing.exposure = 1.0;
+
+        pipeline.imageProcessing.exposure = 1.2;
         pipeline.imageProcessing.contrast = 1.0;
+
+        const colorCurves = new ColorCurves();
+        colorCurves.globalSaturation = 50;
+        pipeline.imageProcessing.colorCurvesEnabled = true;
+        pipeline.imageProcessing.colorCurves = colorCurves;
+
+        pipeline.imageProcessing.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES;
 
         this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
