@@ -146,7 +146,12 @@ void main() {
                     ringShadeColor += calculateStarLightingForRings(samplePoint, rayDir, ringAlbedo, star_positions[i], star_colors[i]);
                 }
 
-                finalColor = vec4(mix(finalColor.rgb, ringShadeColor, ringOpacity), 1.0);
+                float normalIncidenceExtinction = ringOpacity;
+                float opticalDepthAtNormalIncidence = -log(max(1e-4, 1.0 - normalIncidenceExtinction));
+                float opticalDepthAlongViewRay = opticalDepthAtNormalIncidence / max(abs(dot(rayDir, object_rotationAxis)), 0.3);
+                float transmittanceAlongViewRay = exp(-opticalDepthAlongViewRay);
+
+                finalColor = vec4(mix(ringShadeColor, finalColor.rgb, transmittanceAlongViewRay), 1.0);
             }
         }
     }
