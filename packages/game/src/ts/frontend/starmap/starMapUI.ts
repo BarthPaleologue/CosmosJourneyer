@@ -84,6 +84,13 @@ export class StarMapUI {
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
+    private formatLyDistance(distanceInLy: number): string {
+        return distanceInLy.toLocaleString(i18n.resolvedLanguage, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+        });
+    }
+
     constructor(scene: Scene, player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
@@ -367,7 +374,7 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
                 "units:shortLy",
                 {
-                    value: Vector3.Distance(currentPosition, targetPosition).toFixed(1),
+                    value: this.formatLyDistance(Vector3.Distance(currentPosition, targetPosition)),
                 },
             )}`;
         }
@@ -392,7 +399,7 @@ export class StarMapUI {
         this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
         this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${i18n.t("units:shortLy", {
-            value: Vector3.Distance(targetPosition, Vector3.Zero()).toFixed(1),
+            value: this.formatLyDistance(Vector3.Distance(targetPosition, Vector3.Zero())),
         })}`;
 
         if (this.universeBackend.isSystemInHumanBubble(targetSystemModel.coordinates)) {
