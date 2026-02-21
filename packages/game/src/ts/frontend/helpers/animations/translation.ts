@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 
 import { clamp } from "@/utils/math";
@@ -25,38 +25,48 @@ import { type CustomAnimation } from "./animation";
 import { easeInOutInterpolation } from "./interpolations";
 
 export class TransformTranslationAnimation implements CustomAnimation {
-    private clock = 0;
+    private elapsedSeconds = 0;
     private readonly duration: number;
     private distanceAcc = 0;
     private readonly totalDistance;
     private readonly direction: Vector3;
     private readonly transform: TransformNode;
+    private readonly targetPosition: Vector3;
+    private finished = false;
 
     constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
         this.transform = transform;
         this.duration = duration;
-        this.totalDistance = targetPosition.subtract(transform.getAbsolutePosition()).length();
-        this.direction = targetPosition.subtract(transform.getAbsolutePosition()).normalizeToNew();
+        this.targetPosition = targetPosition.clone();
+
+        const deltaToTarget = this.targetPosition.subtract(transform.getAbsolutePosition());
+        this.totalDistance = deltaToTarget.length();
+        this.direction = this.totalDistance > 0 ? deltaToTarget.normalizeToNew() : Vector3.Zero();
     }
 
-    update(deltaTime: number) {
-        if (this.isFinished()) return;
+    update(deltaSeconds: number) {
+        if (this.finished) return;
 
-        this.clock += deltaTime;
+        this.elapsedSeconds += deltaSeconds;
 
-        const t = clamp(this.clock / this.duration, 0, 1);
+        const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
 
         const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
         this.distanceAcc += dDistance;
 
         translate(this.transform, this.direction.scale(dDistance));
+
+        if (this.elapsedSeconds >= this.duration) {
+            this.transform.setAbsolutePosition(this.targetPosition);
+            this.finished = true;
+        }
     }
 
     isFinished(): boolean {
-        return this.clock >= this.duration;
+        return this.finished;
     }
 
     getProgress(): number {
-        return this.clock / this.duration;
+        return this.elapsedSeconds / this.duration;
     }
 }
