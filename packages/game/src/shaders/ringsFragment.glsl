@@ -73,10 +73,10 @@ float hgBulkPhase3(float cosA) {
 }
 // ───────────────────────────────────────────────────────────────────────────────
 
-float tan2(float cosA) {
-    float cosA2 = cosA * cosA;
-    // tan²(α) = (1 - cos²(α)) / cos²(α)
-    return (1.0 - cosA2) / (cosA2);
+float tanHalfFromCos(float cosA) {
+    float clampedCosA = clamp(cosA, -0.9999, 0.9999);
+    // tan(alpha / 2) from cos(alpha): tan^2(alpha/2) = (1 - cos(alpha)) / (1 + cos(alpha))
+    return sqrt(max(0.0, (1.0 - clampedCosA) / (1.0 + clampedCosA)));
 }
 
 // Calculates the lighting contribution from a single star for the rings
@@ -96,11 +96,13 @@ vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 rayDir, vec3 ringAlbed
     // single-scatter, triple-lobe HG
     float phase = rings_w * hgBulkPhase3(cosA);
 
-    // ── Opposition surge (Hapke SHOE term) ────────────────────
+    // Opposition surge (Hapke SHOE term):
+    // B_SH(alpha) = B0 / (1 + tan(alpha/2) / h)
     float B0 = 1.2;  // amplitude
-    float h  = 0.01; // half-width (rad)
-    float B = B0 / (1.0 + tan2(cosA)/(h*h));
-    phase *= 1.0 + B;
+    float h  = 0.02; // angular width parameter
+    float tanHalfPhaseAngle = tanHalfFromCos(cosA);
+    float shadowHidingOpposition = B0 / (1.0 + tanHalfPhaseAngle / h);
+    phase *= 1.0 + shadowHidingOpposition;
 
     // Isotropic multiple‐scattering approximation
     // This avoids the rings being too dark
