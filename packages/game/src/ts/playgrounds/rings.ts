@@ -66,11 +66,14 @@ export async function createRingsScene(
 
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const seed = urlParams.get("seed");
+
     const ringsModel: RingsModel = {
         innerRadius: 1.7 * scalingFactor,
         outerRadius: 3.5 * scalingFactor,
         type: "procedural",
-        seed: 0,
+        seed: seed !== null ? Number(seed) : Math.random() * 1000,
         frequency: 10.0,
         iceAlbedo: { r: 0.93, g: 0.92, b: 0.9 },
         dustAlbedo: { r: 156 / 255, g: 132 / 255, b: 108 / 255 },
