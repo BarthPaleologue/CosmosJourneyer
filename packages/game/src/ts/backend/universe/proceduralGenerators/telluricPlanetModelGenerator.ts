@@ -90,10 +90,10 @@ export function generateTelluricPlanetModel(
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
-        const radius = getTelluricPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, () =>
+        const orbitRadius = getTelluricPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, parent.type, () =>
             rng(GenerationSteps.ORBIT + orbitRadiuses.length),
         );
-        orbitRadiuses.push(radius);
+        orbitRadiuses.push(orbitRadius);
     }
 
     const orbitRadius = overrides?.orbit?.semiMajorAxis ?? (parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0);
