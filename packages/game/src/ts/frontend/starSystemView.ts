@@ -507,6 +507,7 @@ export class StarSystemView implements View {
                     this.interactionSystem.register(door);
                 }
             } else if (this.scene.getActiveControls() === this.vehicleControls) {
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 VehicleInputs.setEnabled(false);
@@ -1135,6 +1136,16 @@ export class StarSystemView implements View {
     }
 
     async switchToVehicleControls() {
+        const characterControls = this.getCharacterControls();
+        const vehicleTransform = this.vehicleControls.getTransform();
+
+        setCollisionsEnabled(characterControls.avatar.aggregate, false);
+        characterControls.getTransform().setEnabled(false);
+        characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
+        characterControls
+            .getTransform()
+            .setAbsolutePosition(vehicleTransform.getAbsolutePosition().add(vehicleTransform.forward.scale(2)));
+
         this.spaceShipLayer.setVisibility(false);
 
         SpaceShipControlsInputs.setEnabled(false);
