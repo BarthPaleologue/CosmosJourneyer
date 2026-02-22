@@ -45,9 +45,14 @@ export type ProceduralRingsModel = RingsModelBase & {
     frequency: number;
 
     /**
-     * The main color of the rings in RGB color space
+     * The ice-rich end-member color of the rings in RGB color space
      */
-    albedo: RGBColor;
+    iceAlbedo: RGBColor;
+
+    /**
+     * The dust-rich end-member color of the rings in RGB color space
+     */
+    dustAlbedo: RGBColor;
 };
 
 export type TexturedRingsModel = RingsModelBase & {
@@ -67,8 +72,11 @@ export type RingsModel = ProceduralRingsModel | TexturedRingsModel;
 export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
     const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
     const ringWidth = celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
-
-    const albedoMultiplier = randRange(0.7, 1.2, rng, 1430) / 255;
+    const dustBrightness = randRange(0.35, 0.65, rng, 1430);
+    const dustWarmth = randRange(0.0, 1.0, rng, 1431);
+    const dustRedBias = randRange(-0.03, 0.04, rng, 1432);
+    const dustGreenBias = randRange(-0.02, 0.03, rng, 1433);
+    const dustBlueBias = randRange(-0.03, 0.02, rng, 1434);
 
     return {
         innerRadius: innerRadius,
@@ -76,6 +84,11 @@ export function newSeededRingsModel(celestialBodyRadius: number, rng: (step: num
         type: "procedural",
         seed: randRange(-1, 1, rng, 1440),
         frequency: 10.0,
-        albedo: { r: 120 * albedoMultiplier, g: 112 * albedoMultiplier, b: 104 * albedoMultiplier },
+        iceAlbedo: { r: 0.93, g: 0.92, b: 0.9 },
+        dustAlbedo: {
+            r: dustBrightness * (0.86 + 0.1 * dustWarmth + dustRedBias),
+            g: dustBrightness * (0.78 + 0.08 * dustWarmth + dustGreenBias),
+            b: dustBrightness * (0.68 - 0.08 * dustWarmth + dustBlueBias),
+        },
     };
 }

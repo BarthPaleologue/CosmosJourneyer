@@ -29,6 +29,9 @@ import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsP
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
+import { SolarTemperature } from "@/utils/physics/constants";
+import { getRgbFromTemperature } from "@/utils/specrend";
+
 import { Settings } from "@/settings";
 
 import { ItemPool } from "../utils/itemPool";
@@ -63,6 +66,8 @@ export async function createGasPlanetScene(
     scene.enableDepthRenderer(null, false, true);
 
     const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
+    const lightColor = getRgbFromTemperature(SolarTemperature);
+    light.diffuse.set(lightColor.r, lightColor.g, lightColor.b);
 
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");

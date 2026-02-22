@@ -104,7 +104,7 @@ export class TokamakSection implements StationSection {
 
         const armCount = tessellation / 2;
         const armLength = majorRadius - attachmentRadius * Math.cos(Math.PI / tessellation) - minorRadius;
-        const armThickness = 20;
+        const armThickness = Math.min(1.8 * minorRadius * elongation, 20);
 
         for (let i = 0; i < armCount; i++) {
             const theta = (2 * Math.PI * i) / armCount;
@@ -134,7 +134,7 @@ export class TokamakSection implements StationSection {
 
         const heatOutput = requiredEnergyOutput - requiredNetEnergyOutput;
         // see DOI 10.1140/epja/i2008-10666-6 "Emissivity measurements of opaque gray bodies up to 2000 ◦C by a dual-frequency pyrometer"
-        const radiatorTargetTemperature = 2000;
+        const radiatorTargetTemperature = 1300;
         const emissivity = 0.8;
         const radiatorArea = getRadiatorAreaForHeat(heatOutput, radiatorTargetTemperature, emissivity, true);
         const radiatorEmissiveColor = getRgbFromTemperature(radiatorTargetTemperature);

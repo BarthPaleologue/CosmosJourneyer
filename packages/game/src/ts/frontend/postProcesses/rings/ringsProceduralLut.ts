@@ -53,7 +53,11 @@ export class RingsProceduralPatternLut {
     setModel(model: DeepReadonly<ProceduralRingsModel>): void {
         this.lut.setFloat("seed", model.seed);
         this.lut.setFloat("frequency", model.frequency);
-        this.lut.setColor3("albedo", Color3.FromArray([model.albedo.r, model.albedo.g, model.albedo.b]));
+        this.lut.setColor3("iceAlbedo", Color3.FromArray([model.iceAlbedo.r, model.iceAlbedo.g, model.iceAlbedo.b]));
+        this.lut.setColor3(
+            "dustAlbedo",
+            Color3.FromArray([model.dustAlbedo.r, model.dustAlbedo.g, model.dustAlbedo.b]),
+        );
         this.lut.setFloat("innerRadius", model.innerRadius);
         this.lut.setFloat("outerRadius", model.outerRadius);
 
