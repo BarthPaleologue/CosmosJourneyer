@@ -148,5 +148,7 @@ export class RingsUniforms {
         if (this.patternLut.type === "procedural") {
             texturePool.release(this.patternLut.lut);
         }
+
+        this.fallbackTexture.dispose();
     }
 }
