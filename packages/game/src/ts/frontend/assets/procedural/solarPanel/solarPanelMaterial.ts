@@ -49,7 +49,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         const normal = vertexAttribute("normal");
 
         const positionXZ = xz(position);
-        const uv = mul(positionXZ, float(1));
+        const uv = mul(positionXZ, float(0.1));
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);

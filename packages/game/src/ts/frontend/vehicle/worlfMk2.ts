@@ -112,13 +112,15 @@ export function createWolfMk2(
 
     const roofSolarPanelZOffset = -frameSheerAmount;
 
+    const roofSolarPanelLength = Math.floor(frameLength * 0.8);
+
     const roofSolarPanelRotationAngle = Math.atan2(frameHeight - heightOfMaxWidth, topHalfWidth - maxHalfWidth);
     const roofSolarPanel1 = MeshBuilder.CreateBox(
         "RoofSolarPanel1",
         {
             height: 0.05,
             width: frameHalfWidth - 0.4,
-            depth: frameLength * 0.8,
+            depth: roofSolarPanelLength,
         },
         scene,
     );
@@ -130,7 +132,7 @@ export function createWolfMk2(
         {
             height: 0.05,
             width: frameHalfWidth - 0.4,
-            depth: frameLength * 0.8,
+            depth: roofSolarPanelLength,
         },
         scene,
     );
@@ -141,8 +143,8 @@ export function createWolfMk2(
         "RoofSolarPanel3",
         {
             height: 0.05,
-            width: frameHalfWidth * 1.2,
-            depth: frameLength * 0.8,
+            width: frameHalfWidth * 1.3,
+            depth: roofSolarPanelLength,
         },
         scene,
     );
