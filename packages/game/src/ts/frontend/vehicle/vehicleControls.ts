@@ -22,6 +22,8 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
+import { EarthG } from "@/utils/physics/constants";
+
 import type { Controls } from "../controls";
 import { lerpSmooth } from "../helpers/animations/interpolations";
 import { quickAnimation } from "../helpers/animations/quickAnimation";
@@ -214,15 +216,15 @@ export class VehicleControls implements Controls {
             );
         }
 
-        const steeringAngle = VehicleInputs.map.steer.value * 0.03;
-        vehicle.turn(steeringAngle);
+        const steeringSpeed = VehicleInputs.map.steer.value * 1.8;
+        vehicle.turn(steeringSpeed, deltaSeconds);
 
         if (VehicleInputs.map.brake.value > 0) {
             vehicle.brake();
         } else {
-            const vehicleMaxAcceleration = 8;
+            const vehicleMaxAcceleration = 0.7 * EarthG;
             const vehicleAcceleration = VehicleInputs.map.accelerate.value * vehicleMaxAcceleration;
-            vehicle.accelerate(vehicleAcceleration);
+            vehicle.accelerate(vehicleAcceleration, deltaSeconds);
         }
 
         return;

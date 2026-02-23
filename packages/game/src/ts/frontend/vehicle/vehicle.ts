@@ -22,7 +22,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { clamp } from "@/utils/math";
 import { degreesToRadians, kmhToMetersPerSecond } from "@/utils/physics/unitConversions";
 
-import { lerp } from "../helpers/animations/interpolations";
+import { lerp, lerpSmooth } from "../helpers/animations/interpolations";
 import type { Transformable } from "../universe/architecture/transformable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
@@ -100,9 +100,9 @@ export class Vehicle implements Transformable {
         }
     }
 
-    accelerate(deltaSpeed: number) {
-        this.setTargetSpeed(this.targetSpeed + deltaSpeed);
-        this.targetSpeed *= 0.98;
+    accelerate(acceleration: number, deltaSeconds: number) {
+        this.setTargetSpeed(this.targetSpeed + acceleration * deltaSeconds);
+        this.targetSpeed = lerpSmooth(this.targetSpeed, 0, 2.5, deltaSeconds);
     }
 
     brake() {
@@ -119,9 +119,9 @@ export class Vehicle implements Transformable {
         this.targetSpeed = 0;
     }
 
-    turn(angle: number) {
-        this.setTargetSteeringAngle(this.targetSteeringAngle + angle);
-        this.targetSteeringAngle *= 0.95;
+    turn(steeringSpeed: number, deltaSeconds: number) {
+        this.setTargetSteeringAngle(this.targetSteeringAngle + steeringSpeed * deltaSeconds);
+        this.targetSteeringAngle = lerpSmooth(this.targetSteeringAngle, 0, 0.225, deltaSeconds);
     }
 
     getTransform(): TransformNode {
