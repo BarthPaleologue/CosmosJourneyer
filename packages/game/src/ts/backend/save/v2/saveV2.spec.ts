@@ -96,7 +96,7 @@ test("Loading a correct save file", () => {
                         },
                     },
                     tree: {
-                        type: 0,
+                        type: "fly_by",
                         objectId: {
                             idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
                             systemCoordinates: {
@@ -191,6 +191,77 @@ test("Loading a minimal save file", () => {
         console.log(parsedSaveFile.error);
     }
 
+    expect(parsedSaveFile.success).toBe(true);
+});
+
+test("Loading a save file with legacy numeric mission node types", () => {
+    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const shipId = crypto.randomUUID();
+    const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
+    if (fallbackStation === undefined) {
+        throw new Error("Fallback station is undefined!");
+    }
+
+    const saveFileString: Record<string, unknown> = {
+        player: {
+            name: "Python",
+            balance: 10000,
+            creationDate: "2024-11-03T17:04:46.662Z",
+            visitedSystemHistory: [],
+            currentItinerary: [],
+            systemBookmarks: [],
+            currentMissions: [
+                {
+                    missionGiver: {
+                        idInSystem: fallbackStation.id,
+                        systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    },
+                    tree: {
+                        type: 1001,
+                        children: [
+                            {
+                                type: 0,
+                                objectId: {
+                                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                                },
+                                state: "notInSystem",
+                            },
+                        ],
+                    },
+                    reward: 42,
+                    type: "sightSeeingFlyBy",
+                },
+            ],
+            completedMissions: [],
+        },
+        playerLocation: {
+            type: "inSpaceship",
+            shipId: shipId,
+        },
+        shipLocations: {
+            [shipId]: {
+                type: "relative",
+                universeObjectId: {
+                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                },
+                position: {
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                },
+                rotation: {
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    w: 1,
+                },
+            },
+        },
+    };
+
+    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
     expect(parsedSaveFile.success).toBe(true);
 });
 

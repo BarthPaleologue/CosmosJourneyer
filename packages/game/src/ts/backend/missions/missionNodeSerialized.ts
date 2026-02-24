@@ -22,64 +22,116 @@ import {
     type MissionAsteroidFieldNodeSerialized,
 } from "./missionAsteroidFieldNodeSerialized";
 import { MissionFlyByNodeSerializedSchema, type MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
-import { MissionNodeType } from "./missionNodeType";
 import {
     MissionTerminatorLandingNodeSerializedSchema,
     type MissionTerminatorLandingNodeSerialized,
 } from "./missionTerminatorLandingNodeSerialized";
+
+function preprocessLegacyMissionNodeType(type: unknown): unknown {
+    if (typeof type !== "number") {
+        return type;
+    }
+
+    switch (type) {
+        case 0:
+            return "fly_by";
+        case 1:
+            return "terminator_landing";
+        case 2:
+            return "asteroid_field";
+        case 1000:
+            return "and";
+        case 1001:
+            return "or";
+        case 1002:
+            return "xor";
+        case 1003:
+            return "sequence";
+        default:
+            return type;
+    }
+}
+
+function preprocessLegacyMissionNode(node: unknown): unknown {
+    if (typeof node !== "object" || node === null) {
+        return node;
+    }
+
+    const candidate = node as Record<string, unknown>;
+    const normalizedType = preprocessLegacyMissionNodeType(candidate["type"]);
+
+    if (!Array.isArray(candidate["children"])) {
+        if (normalizedType === candidate["type"]) {
+            return node;
+        }
+        return {
+            ...candidate,
+            type: normalizedType,
+        };
+    }
+
+    return {
+        ...candidate,
+        type: normalizedType,
+        children: candidate["children"].map((child) => preprocessLegacyMissionNode(child)),
+    };
+}
 
 export type MissionNodeSerializedShape =
     | MissionFlyByNodeSerialized
     | MissionTerminatorLandingNodeSerialized
     | MissionAsteroidFieldNodeSerialized
     | {
-          type: MissionNodeType.AND;
+          type: "and";
           children: MissionNodeSerializedShape[];
       }
     | {
-          type: MissionNodeType.OR;
+          type: "or";
           children: MissionNodeSerializedShape[];
       }
     | {
-          type: MissionNodeType.XOR;
+          type: "xor";
           children: MissionNodeSerializedShape[];
       }
     | {
-          type: MissionNodeType.SEQUENCE;
+          type: "sequence";
           activeChildIndex: number;
           children: MissionNodeSerializedShape[];
       };
 
 export const MissionOrNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.OR),
+    type: z.literal("or"),
     children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionAndNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.AND),
+    type: z.literal("and"),
     children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionXorNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.XOR),
+    type: z.literal("xor"),
     children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
 export const MissionSequenceNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.SEQUENCE),
+    type: z.literal("sequence"),
     activeChildIndex: z.number(),
     children: z.lazy(() => z.array(MissionNodeSerializedSchema)),
 });
 
-export const MissionNodeSerializedSchema: z.ZodType<MissionNodeSerializedShape> = z.discriminatedUnion("type", [
-    MissionFlyByNodeSerializedSchema,
-    MissionTerminatorLandingNodeSerializedSchema,
-    MissionAsteroidFieldNodeSerializedSchema,
-    MissionAndNodeSerializedSchema,
-    MissionOrNodeSerializedSchema,
-    MissionXorNodeSerializedSchema,
-    MissionSequenceNodeSerializedSchema,
-]);
+export const MissionNodeSerializedSchema: z.ZodType<MissionNodeSerializedShape> = z.preprocess(
+    (value) => preprocessLegacyMissionNode(value),
+    z.discriminatedUnion("type", [
+        MissionFlyByNodeSerializedSchema,
+        MissionTerminatorLandingNodeSerializedSchema,
+        MissionAsteroidFieldNodeSerializedSchema,
+        MissionAndNodeSerializedSchema,
+        MissionOrNodeSerializedSchema,
+        MissionXorNodeSerializedSchema,
+        MissionSequenceNodeSerializedSchema,
+    ]),
+);
 
 export type MissionNodeSerialized = z.infer<typeof MissionNodeSerializedSchema>;
 export type MissionAndNodeSerialized = z.infer<typeof MissionAndNodeSerializedSchema>;

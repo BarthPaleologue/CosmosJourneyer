@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import {
     LandMissionState,
     type MissionTerminatorLandingNodeSerialized,
@@ -43,7 +42,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 /**
  * Node used to describe a landing mission on a target object near the terminator line
  */
-export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNodeType.TERMINATOR_LANDING> {
+export class MissionTerminatorLandingNode implements MissionNodeBase<"terminator_landing"> {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -199,7 +198,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionNode
 
     serialize(): MissionTerminatorLandingNodeSerialized {
         return {
-            type: MissionNodeType.TERMINATOR_LANDING,
+            type: "terminator_landing",
             objectId: this.objectId,
             state: this.state,
         };

@@ -19,8 +19,6 @@ import { z } from "zod";
 
 import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
-import { MissionNodeType } from "./missionNodeType";
-
 export const FlyByState = {
     NOT_IN_SYSTEM: "notInSystem",
     TOO_FAR_IN_SYSTEM: "tooFarInSystem",
@@ -47,7 +45,7 @@ function preprocessLegacyFlyByState(state: unknown): unknown {
 }
 
 export const MissionFlyByNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.FLY_BY),
+    type: z.literal("fly_by"),
     objectId: UniverseObjectIdSchema,
     state: z.preprocess((value) => preprocessLegacyFlyByState(value), z.enum(FlyByState)),
 });

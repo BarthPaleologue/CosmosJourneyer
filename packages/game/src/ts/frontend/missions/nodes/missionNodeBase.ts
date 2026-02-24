@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type MissionNodeSerialized } from "@/backend/missions/missionNodeSerialized";
-import { type MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -27,7 +26,7 @@ import { type MissionNode } from "./missionNode";
  * Describes any node in the mission tree.
  */
 
-export interface MissionNodeBase<T extends MissionNodeType> {
+export interface MissionNodeBase<T extends MissionNodeSerialized["type"]> {
     /**
      * Returns true if the node is completed, false otherwise.
      */

@@ -21,7 +21,6 @@ import {
     AsteroidFieldMissionState,
     type MissionAsteroidFieldNodeSerialized,
 } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -43,7 +42,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 /**
  * Node used to describe a trek to an asteroid field
  */
-export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType.ASTEROID_FIELD> {
+export class MissionAsteroidFieldNode implements MissionNodeBase<"asteroid_field"> {
     private state: AsteroidFieldMissionState = AsteroidFieldMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -199,7 +198,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionNodeType
 
     serialize(): MissionAsteroidFieldNodeSerialized {
         return {
-            type: MissionNodeType.ASTEROID_FIELD,
+            type: "asteroid_field",
             objectId: this.objectId,
             state: this.state,
         };

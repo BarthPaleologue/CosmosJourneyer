@@ -18,7 +18,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { FlyByState, type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { universeObjectIdEquals, type UniverseObjectId } from "@/backend/universe/universeObjectId";
@@ -39,7 +38,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 /**
  * Node used to describe a fly-by mission around a target object
  */
-export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY> {
+export class MissionFlyByNode implements MissionNodeBase<"fly_by"> {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;
@@ -177,7 +176,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionNodeType.FLY_BY>
 
     serialize(): MissionFlyByNodeSerialized {
         return {
-            type: MissionNodeType.FLY_BY,
+            type: "fly_by",
             objectId: this.objectId,
             state: this.state,
         };

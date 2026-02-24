@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type MissionOrNodeSerialized } from "@/backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -29,7 +28,7 @@ import { type MissionNodeBase } from "../missionNodeBase";
 /**
  * Node used to describe a set of tasks where only a subset must be completed in any order.
  */
-export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
+export class MissionOrNode implements MissionNodeBase<"or"> {
     readonly children: MissionNode[];
 
     private hasCompletedLock = false;
@@ -87,7 +86,7 @@ export class MissionOrNode implements MissionNodeBase<MissionNodeType.OR> {
 
     serialize(): MissionOrNodeSerialized {
         return {
-            type: MissionNodeType.OR,
+            type: "or",
             children: this.children.map((child) => child.serialize()),
         };
     }

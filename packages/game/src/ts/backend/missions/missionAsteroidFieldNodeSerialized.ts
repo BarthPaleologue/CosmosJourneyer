@@ -19,8 +19,6 @@ import { z } from "zod";
 
 import { UniverseObjectIdSchema } from "@/backend/universe/universeObjectId";
 
-import { MissionNodeType } from "./missionNodeType";
-
 export const AsteroidFieldMissionState = {
     NOT_IN_SYSTEM: "notInSystem",
     TOO_FAR_IN_SYSTEM: "tooFarInSystem",
@@ -47,7 +45,7 @@ function preprocessLegacyAsteroidFieldMissionState(state: unknown): unknown {
 }
 
 export const MissionAsteroidFieldNodeSerializedSchema = z.object({
-    type: z.literal(MissionNodeType.ASTEROID_FIELD),
+    type: z.literal("asteroid_field"),
     objectId: UniverseObjectIdSchema,
     state: z.preprocess((value) => preprocessLegacyAsteroidFieldMissionState(value), z.enum(AsteroidFieldMissionState)),
 });
