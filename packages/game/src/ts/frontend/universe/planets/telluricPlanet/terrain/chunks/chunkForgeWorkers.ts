@@ -20,7 +20,7 @@ import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { type ChunkForge } from "./chunkForge";
-import { ReturnedChunkDataSchema, TaskType, type ApplyTask, type BuildTask } from "./taskTypes";
+import { ReturnedChunkDataSchema, type ApplyTask, type BuildTask } from "./taskTypes";
 import { type TransferBuildData } from "./workerDataTypes";
 import { WorkerPool } from "./workerPool";
 
@@ -64,7 +64,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         this.workerPool.busyWorkers.push(worker);
 
         const buildData: TransferBuildData = {
-            taskType: TaskType.BUILD,
+            taskType: "build",
             planetName: task.planetName,
             planetDiameter: task.planetDiameter,
             nbVerticesPerSide: this.nbVerticesPerRow,
@@ -96,7 +96,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                 vertexData.indices = data.indices;
 
                 const applyTask: ApplyTask = {
-                    type: TaskType.APPLY,
+                    type: "apply",
                     vertexData: vertexData,
                     chunk: task.chunk,
                     instancesMatrixBuffer: data.instancesMatrixBuffer,
