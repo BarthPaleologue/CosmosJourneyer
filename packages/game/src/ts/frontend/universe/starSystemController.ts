@@ -290,8 +290,6 @@ export class StarSystemController {
      * Updates only the orbital simulation (planets, stars, asteroids) forward in time.
      * Does not update ship systems or controls.
      * @param deltaSeconds The time elapsed since the last update
-     * @param cachedControlsPosition Optional pre-cached controls position to prevent reading
-     *        from a moving transform during initialization warm-up
      */
     private updateOrbitalSimulation(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
