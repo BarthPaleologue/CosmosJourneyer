@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import informationIcon from "@assets/icons/information.webp";
 import explorationIcon from "@assets/icons/space-exploration.webp";
@@ -89,16 +89,16 @@ export class Notification {
 
         switch (intent) {
             case "info":
-                soundPlayer.playNow(SoundType.INFO);
+                soundPlayer.playNow("info");
                 break;
             case "success":
-                soundPlayer.playNow(SoundType.SUCCESS);
+                soundPlayer.playNow("success");
                 break;
             case "warning":
-                soundPlayer.playNow(SoundType.WARNING);
+                soundPlayer.playNow("warning");
                 break;
             case "error":
-                soundPlayer.playNow(SoundType.ERROR);
+                soundPlayer.playNow("error");
                 break;
         }
 

@@ -21,26 +21,25 @@ import { type Sounds } from "@/frontend/assets/audio/sounds";
 
 import { SoundInstance, SoundInstanceMock, type ISoundInstance, type SoundInstanceOptions } from "./soundInstance";
 
-export const enum SoundType {
-    CLICK,
-    HOVER,
-    SUCCESS,
-    ERROR,
-    WARNING,
-    INFO,
-    ENABLE_ORBIT_DISPLAY,
-    DISABLE_ORBIT_DISPLAY,
-    TARGET_LOCK,
-    TARGET_UNLOCK,
-    ITINERARY_COMPUTED,
-    OPEN_PAUSE_MENU,
-    ENABLE_WARP_DRIVE,
-    DISABLE_WARP_DRIVE,
-    ACCELERATING_WARP_DRIVE,
-    DECELERATING_WARP_DRIVE,
-    HYPER_SPACE,
-    THRUSTER,
-}
+export type SoundType =
+    | "click"
+    | "hover"
+    | "success"
+    | "error"
+    | "warning"
+    | "info"
+    | "enable_orbit_display"
+    | "disable_orbit_display"
+    | "target_lock"
+    | "target_unlock"
+    | "itinerary_computed"
+    | "open_pause_menu"
+    | "enable_warp_drive"
+    | "disable_warp_drive"
+    | "accelerating_warp_drive"
+    | "decelerating_warp_drive"
+    | "hyper_space"
+    | "thruster";
 
 export interface ISoundPlayer {
     playNow(soundType: SoundType): void;
@@ -66,36 +65,36 @@ export class SoundPlayer implements ISoundPlayer {
 
     private getSoundFromType(soundType: SoundType): StaticSound {
         switch (soundType) {
-            case SoundType.CLICK:
-            case SoundType.WARNING:
-            case SoundType.INFO:
+            case "click":
+            case "warning":
+            case "info":
                 return this.sounds.menuSelect;
-            case SoundType.SUCCESS:
+            case "success":
                 return this.sounds.success;
-            case SoundType.ERROR:
+            case "error":
                 return this.sounds.error;
-            case SoundType.HOVER:
-            case SoundType.ENABLE_ORBIT_DISPLAY:
-            case SoundType.DISABLE_ORBIT_DISPLAY:
+            case "hover":
+            case "enable_orbit_display":
+            case "disable_orbit_display":
                 return this.sounds.menuHover;
-            case SoundType.TARGET_LOCK:
+            case "target_lock":
                 return this.sounds.targetLock;
-            case SoundType.TARGET_UNLOCK:
-            case SoundType.ITINERARY_COMPUTED:
+            case "target_unlock":
+            case "itinerary_computed":
                 return this.sounds.targetUnlock;
-            case SoundType.OPEN_PAUSE_MENU:
+            case "open_pause_menu":
                 return this.sounds.openPauseMenu;
-            case SoundType.ENABLE_WARP_DRIVE:
+            case "enable_warp_drive":
                 return this.sounds.enableWarpDrive;
-            case SoundType.DISABLE_WARP_DRIVE:
+            case "disable_warp_drive":
                 return this.sounds.disableWarpDrive;
-            case SoundType.ACCELERATING_WARP_DRIVE:
+            case "accelerating_warp_drive":
                 return this.sounds.acceleratingWarpDrive;
-            case SoundType.DECELERATING_WARP_DRIVE:
+            case "decelerating_warp_drive":
                 return this.sounds.deceleratingWarpDrive;
-            case SoundType.HYPER_SPACE:
+            case "hyper_space":
                 return this.sounds.hyperSpace;
-            case SoundType.THRUSTER:
+            case "thruster":
                 return this.sounds.thruster;
         }
     }

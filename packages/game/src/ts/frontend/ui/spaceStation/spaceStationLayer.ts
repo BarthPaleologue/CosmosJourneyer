@@ -21,7 +21,7 @@ import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/ency
 import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
@@ -136,7 +136,7 @@ export class SpaceStationLayer {
         this.editPlayerNameButton = document.createElement("button");
         this.editPlayerNameButton.setAttribute("class", "icon");
         this.editPlayerNameButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             const newName = await promptModalString(
                 i18n.t("spaceStation:cmdrNameChangePrompt"),
                 player.getName(),
@@ -279,27 +279,27 @@ export class SpaceStationLayer {
         this.takeOffButton.appendChild(takeOffButtonDescription);
 
         this.missionsButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             await this.setMainPanelState(MainPanelState.MISSIONS, player, universeBackend);
         });
 
         this.spaceshipHangarButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, universeBackend);
         });
 
         this.explorationCenterButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, universeBackend);
         });
 
         this.infoButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             await this.setMainPanelState(MainPanelState.INFO, player, universeBackend);
         });
 
         this.takeOffButton.addEventListener("click", () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             this.onTakeOffObservable.notifyObservers();
         });
 

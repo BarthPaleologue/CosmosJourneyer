@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
@@ -79,13 +79,13 @@ export function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): P
 
     return new Promise((resolve) => {
         modal.addEventListener("reset", () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             resolve(null);
             modal.remove();
         });
 
         modal.addEventListener("close", () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             if (modal.returnValue === "connect") {
                 resolve({
                     encyclopaediaUrlBase: urlInput.value,

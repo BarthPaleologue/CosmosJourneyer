@@ -17,7 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
@@ -77,19 +77,19 @@ export class PauseMenu {
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
         this.contributeButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
         });
         this.tutorialsButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
         });
         this.settingsButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
         });
         this.loadButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
         });
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
@@ -100,12 +100,12 @@ export class PauseMenu {
         listItems.forEach((li) => {
             // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
-                soundPlayer.playNow(SoundType.HOVER);
+                soundPlayer.playNow("hover");
             });
 
             // play a sound when clicking on a button
             li.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
             });
         });
 

@@ -49,7 +49,7 @@ import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 import { loadAssets, type Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer, SoundPlayerMock, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
@@ -514,14 +514,14 @@ export class CosmosJourneyer {
             this.starSystemView.stopBackgroundSounds();
         }
 
-        this.soundPlayer.playNow(SoundType.OPEN_PAUSE_MENU);
+        this.soundPlayer.playNow("open_pause_menu");
         this.pauseMenu.setVisibility(true);
     }
 
     public async resume(): Promise<void> {
         if (!this.isPaused()) return;
         this.state = "running";
-        this.soundPlayer.playNow(SoundType.CLICK);
+        this.soundPlayer.playNow("click");
         this.pauseMenu.setVisibility(false);
 
         if (

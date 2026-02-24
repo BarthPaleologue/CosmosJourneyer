@@ -1,6 +1,6 @@
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
@@ -22,7 +22,7 @@ export class StarMapBookmarkButton {
 
         this.rootNode.addEventListener("click", () => {
             if (this.selectedSystemCoordinates === null) return;
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
 
             const currentSystemSeed = this.selectedSystemCoordinates;
 

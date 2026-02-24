@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Mission } from "@/frontend/missions/mission";
 import { type Player } from "@/frontend/player/player";
 
@@ -35,7 +35,7 @@ export class AcceptMissionButton {
         }
 
         this.rootNode.addEventListener("click", () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             if (player.currentMissions.find((m) => m.equals(mission))) {
                 this.rootNode.classList.remove("accepted");
                 this.rootNode.innerText = i18n.t("missions:common:accept");

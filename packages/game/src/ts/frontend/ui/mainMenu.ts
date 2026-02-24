@@ -25,7 +25,7 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
@@ -239,12 +239,12 @@ export class MainMenu {
         allMenuItems.forEach((li) => {
             // on mouse hover, play a sound
             li.addEventListener("mouseenter", () => {
-                soundPlayer.playNow(SoundType.HOVER);
+                soundPlayer.playNow("hover");
             });
 
             // on click, play a sound
             li.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
             });
         });
 

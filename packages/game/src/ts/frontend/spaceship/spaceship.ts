@@ -41,7 +41,7 @@ import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
@@ -154,33 +154,33 @@ export class Spaceship implements Transformable, Targetable {
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
     ) {
-        const enableWarpDriveSound = await soundPlayer.createInstance(SoundType.ENABLE_WARP_DRIVE, {
+        const enableWarpDriveSound = await soundPlayer.createInstance("enable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
         });
 
-        const disableWarpDriveSound = await soundPlayer.createInstance(SoundType.DISABLE_WARP_DRIVE, {
+        const disableWarpDriveSound = await soundPlayer.createInstance("disable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
         });
 
-        const acceleratingWarpDriveSound = await soundPlayer.createInstance(SoundType.ACCELERATING_WARP_DRIVE, {
+        const acceleratingWarpDriveSound = await soundPlayer.createInstance("accelerating_warp_drive", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const deceleratingWarpDriveSound = await soundPlayer.createInstance(SoundType.DECELERATING_WARP_DRIVE, {
+        const deceleratingWarpDriveSound = await soundPlayer.createInstance("decelerating_warp_drive", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const hyperSpaceSound = await soundPlayer.createInstance(SoundType.HYPER_SPACE, {
+        const hyperSpaceSound = await soundPlayer.createInstance("hyper_space", {
             mask: AudioMasks.HYPER_SPACE,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const thrusterSound = await soundPlayer.createInstance(SoundType.THRUSTER, {
+        const thrusterSound = await soundPlayer.createInstance("thruster", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,

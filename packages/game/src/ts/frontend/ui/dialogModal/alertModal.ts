@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
@@ -34,7 +34,7 @@ export function alertModal(message: string, soundPlayer: ISoundPlayer): Promise<
 
     return new Promise((resolve) => {
         modal.addEventListener("close", () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             resolve();
             modal.remove();
         });

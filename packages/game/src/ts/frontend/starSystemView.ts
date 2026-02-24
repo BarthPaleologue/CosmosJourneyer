@@ -36,7 +36,7 @@ import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/u
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
@@ -299,13 +299,13 @@ export class StarSystemView implements View {
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
             this.notificationManager.setVisible(this.isUiEnabled);
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) this.soundPlayer.playNow(SoundType.ENABLE_ORBIT_DISPLAY);
-            else this.soundPlayer.playNow(SoundType.DISABLE_ORBIT_DISPLAY);
+            if (enabled) this.soundPlayer.playNow("enable_orbit_display");
+            else this.soundPlayer.playNow("disable_orbit_display");
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -1108,7 +1108,7 @@ export class StarSystemView implements View {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
-            this.soundPlayer.playNow(SoundType.TARGET_UNLOCK);
+            this.soundPlayer.playNow("target_unlock");
             return;
         }
 
@@ -1116,7 +1116,7 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.setTarget(target.getTransform());
         this.targetCursorLayer.setTarget(target);
-        this.soundPlayer.playNow(SoundType.TARGET_LOCK);
+        this.soundPlayer.playNow("target_lock");
     }
 
     /**

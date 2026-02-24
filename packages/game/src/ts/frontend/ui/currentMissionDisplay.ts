@@ -17,7 +17,7 @@
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { type Mission } from "@/frontend/missions/mission";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -119,7 +119,7 @@ export class CurrentMissionDisplay {
                     easing: "ease",
                 },
             );
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
         });
 
         SpaceShipControlsInputs.map.nextMission.on("complete", () => {
@@ -131,7 +131,7 @@ export class CurrentMissionDisplay {
                     easing: "ease",
                 },
             );
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
         });
     }
 

@@ -19,7 +19,7 @@ import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGa
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 
@@ -89,7 +89,7 @@ export class ExplorationCenterPanel {
         addEncyclopaediaInstanceButton.classList.add("disabled");
         addEncyclopaediaInstanceButton.textContent = i18n.t("explorationCenter:addNewInstance");
         addEncyclopaediaInstanceButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
 
             const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
             if (connectionInfo === null) return;
@@ -105,7 +105,7 @@ export class ExplorationCenterPanel {
 
         this.sellAllButton = document.createElement("button");
         this.sellAllButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
 
             for (const discovery of this.player.discoveries.local) {
                 const valueResult = await encyclopaedia.estimateDiscovery(discovery.objectId);
@@ -138,7 +138,7 @@ export class ExplorationCenterPanel {
 
         discoveryListSelect.value = ExplorationCenterFilter.ALL;
         discoveryListSelect.addEventListener("change", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
 
             switch (discoveryListSelect.value) {
                 case ExplorationCenterFilter.LOCAL_ONLY:
@@ -152,7 +152,7 @@ export class ExplorationCenterPanel {
             }
         });
         discoveryListSelect.addEventListener("click", () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
         });
 
         const horizontalContainer = document.createElement("div");
@@ -248,7 +248,7 @@ export class ExplorationCenterPanel {
             discoveryItem.classList.add("listItemContainer", "flex-column");
             discoveryItem.classList.toggle("uploaded", this.player.discoveries.uploaded.includes(discovery));
             discoveryItem.addEventListener("click", async () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
+                this.soundPlayer.playNow("click");
 
                 if (this.selectedDiscovery !== null) {
                     this.selectedDiscovery.classList.remove("selected");
