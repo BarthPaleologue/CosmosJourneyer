@@ -22,19 +22,9 @@ import explorationIcon from "@assets/icons/space-exploration.webp";
 import spaceStationIcon from "@assets/icons/space-station.webp";
 import spaceshipIcon from "@assets/icons/spaceship_gear.webp";
 
-export const enum NotificationOrigin {
-    GENERAL = "info",
-    SPACESHIP = "spaceship",
-    EXPLORATION = "exploration",
-    SPACE_STATION = "space-station",
-}
+export type NotificationOrigin = "general" | "spaceship" | "exploration" | "space-station";
 
-export const enum NotificationIntent {
-    INFO = "info",
-    SUCCESS = "success",
-    WARNING = "warning",
-    ERROR = "error",
-}
+export type NotificationIntent = "info" | "success" | "warning" | "error";
 
 export class Notification {
     private progressSeconds = 0;
@@ -66,16 +56,16 @@ export class Notification {
 
         const iconNode = doc.createElement("img");
         switch (origin) {
-            case NotificationOrigin.GENERAL:
+            case "general":
                 iconNode.src = informationIcon;
                 break;
-            case NotificationOrigin.SPACESHIP:
+            case "spaceship":
                 iconNode.src = spaceshipIcon;
                 break;
-            case NotificationOrigin.EXPLORATION:
+            case "exploration":
                 iconNode.src = explorationIcon;
                 break;
-            case NotificationOrigin.SPACE_STATION:
+            case "space-station":
                 iconNode.src = spaceStationIcon;
                 break;
         }
@@ -98,16 +88,16 @@ export class Notification {
         container.appendChild(this.htmlRoot);
 
         switch (intent) {
-            case NotificationIntent.INFO:
+            case "info":
                 soundPlayer.playNow(SoundType.INFO);
                 break;
-            case NotificationIntent.SUCCESS:
+            case "success":
                 soundPlayer.playNow(SoundType.SUCCESS);
                 break;
-            case NotificationIntent.WARNING:
+            case "warning":
                 soundPlayer.playNow(SoundType.WARNING);
                 break;
-            case NotificationIntent.ERROR:
+            case "error":
                 soundPlayer.playNow(SoundType.ERROR);
                 break;
         }

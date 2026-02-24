@@ -44,7 +44,6 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";
 
 import { type DeepReadonly } from "@/utils/types";
@@ -243,8 +242,8 @@ export class StarMapView implements View {
                         this.player.currentItinerary = parsedItinerary.data;
                     } else {
                         this.notificationManager.create(
-                            NotificationOrigin.GENERAL,
-                            NotificationIntent.ERROR,
+                            "general",
+                            "error",
                             `Failed to parse itinerary: ${parsedItinerary.error.message}`,
                             5000,
                         );
@@ -258,8 +257,8 @@ export class StarMapView implements View {
                     }
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.ERROR,
+                        "general",
+                        "error",
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
                         5000,
                     );

@@ -8,7 +8,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { type DeepReadonly, type Result } from "@/utils/types";
 
@@ -221,8 +220,8 @@ export class SaveLoadingPanelContent {
                 }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.SUCCESS,
+                        "general",
+                        "success",
                         i18n.t("notifications:copiedToClipboard"),
                         5000,
                     );
@@ -350,12 +349,7 @@ export class SaveLoadingPanelContent {
                 return;
             }
             await navigator.clipboard.writeText(url.toString()).then(() => {
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.INFO,
-                    i18n.t("notifications:copiedToClipboard"),
-                    5000,
-                );
+                this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 5000);
             });
         });
         saveButtons.appendChild(shareButton);

@@ -22,7 +22,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
@@ -111,12 +110,7 @@ export class ExplorationCenterPanel {
             for (const discovery of this.player.discoveries.local) {
                 const valueResult = await encyclopaedia.estimateDiscovery(discovery.objectId);
                 if (!valueResult.success) {
-                    this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.ERROR,
-                        valueResult.error,
-                        5_000,
-                    );
+                    this.notificationManager.create("general", "error", valueResult.error, 5_000);
                     continue;
                 }
                 player.earn(valueResult.value);
@@ -209,12 +203,7 @@ export class ExplorationCenterPanel {
         for (const discovery of this.player.discoveries.local) {
             const result = await this.encyclopaedia.estimateDiscovery(discovery.objectId);
             if (!result.success) {
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    result.error,
-                    5_000,
-                );
+                this.notificationManager.create("general", "error", result.error, 5_000);
                 continue;
             }
 

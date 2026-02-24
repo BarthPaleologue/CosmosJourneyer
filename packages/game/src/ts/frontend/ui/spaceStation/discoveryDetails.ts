@@ -25,7 +25,6 @@ import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
@@ -102,12 +101,7 @@ export class DiscoveryDetails {
             this.soundPlayer.playNow(SoundType.SUCCESS);
             const valueResult = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             if (!valueResult.success) {
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    valueResult.error,
-                    5_000,
-                );
+                this.notificationManager.create("general", "error", valueResult.error, 5_000);
                 return;
             }
 

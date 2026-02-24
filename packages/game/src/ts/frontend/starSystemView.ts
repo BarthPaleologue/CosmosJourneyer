@@ -57,7 +57,6 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
@@ -353,12 +352,7 @@ export class StarSystemView implements View {
             const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                this.notificationManager.create(
-                    NotificationOrigin.SPACESHIP,
-                    NotificationIntent.ERROR,
-                    i18n.t("notifications:notEnoughFuel"),
-                    5000,
-                );
+                this.notificationManager.create("spaceship", "error", i18n.t("notifications:notEnoughFuel"), 5000);
                 this.jumpLock = false;
                 return;
             }
@@ -711,8 +705,8 @@ export class StarSystemView implements View {
                                     throw new Error("Up down is not an axis composite");
                                 }
                                 this.notificationManager.create(
-                                    NotificationOrigin.SPACESHIP,
-                                    NotificationIntent.INFO,
+                                    "spaceship",
+                                    "info",
                                     i18n.t("notifications:howToLiftOff", {
                                         bindingsString: axisCompositeToString(control, this.keyboardLayoutMap)[1]?.[1],
                                     }),
@@ -830,8 +824,8 @@ export class StarSystemView implements View {
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
                 this.notificationManager.create(
-                    NotificationOrigin.EXPLORATION,
-                    NotificationIntent.SUCCESS,
+                    "exploration",
+                    "success",
                     i18n.t("notifications:newDiscovery", {
                         objectName: nearestCelestialBody.model.name,
                     }),
@@ -1071,8 +1065,8 @@ export class StarSystemView implements View {
             );
             const keys = horizontalKeys.concat(verticalKeys);
             this.notificationManager.create(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.INFO,
+                "general",
+                "info",
                 `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
                 20_000,
             );

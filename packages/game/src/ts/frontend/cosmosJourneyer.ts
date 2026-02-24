@@ -60,7 +60,6 @@ import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
@@ -323,31 +322,15 @@ export class CosmosJourneyer {
                 }
 
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.INFO,
-                        i18n.t("notifications:copiedToClipboard"),
-                        2000,
-                    );
+                    this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.createManualSave();
             if (saveSuccess)
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.SUCCESS,
-                    i18n.t("notifications:saveOk"),
-                    2000,
-                );
-            else
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    i18n.t("notifications:cantSaveTutorial"),
-                    2000,
-                );
+                this.notificationManager.create("general", "success", i18n.t("notifications:saveOk"), 2000);
+            else this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
