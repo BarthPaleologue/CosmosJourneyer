@@ -37,7 +37,7 @@ import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/u
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
+import { type ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -831,7 +831,7 @@ export class StarSystemView implements View {
                     }),
                     15_000,
                 );
-                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.NEW_DISCOVERY);
+                this.tts.enqueueSay("Charlotte", "new_discovery");
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
@@ -874,7 +874,7 @@ export class StarSystemView implements View {
             mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.earn(mission.getReward());
-                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.MISSION_COMPLETE);
+                this.tts.enqueueSay("Charlotte", "mission_complete");
                 newlyCompletedMissions.push(mission);
             }
         });
