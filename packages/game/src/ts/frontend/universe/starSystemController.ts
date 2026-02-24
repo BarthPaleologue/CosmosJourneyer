@@ -94,6 +94,8 @@ export class StarSystemController {
 
     private elapsedSeconds = 0;
 
+    private readonly orbitalSimulationTimeMultiplier = 1;
+
     private readonly assets: RenderingAssets;
 
     readonly gravitySystem: GravitySystem;
@@ -278,7 +280,6 @@ export class StarSystemController {
      * @param timestampSeconds The timestamp to which we want to advance the simulation (in seconds)
      */
     public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge, timestampSeconds: number): void {
-        // Use updateOrbitalSimulation
         this.updateOrbitalSimulation(timestampSeconds);
 
         // Perform warm-up updates with small time steps
@@ -292,12 +293,11 @@ export class StarSystemController {
      * @param cachedControlsPosition Optional pre-cached controls position to prevent reading
      *        from a moving transform during initialization warm-up
      */
-    private updateOrbitalSimulation(deltaSeconds: number, cachedControlsPosition?: Vector3): void {
+    private updateOrbitalSimulation(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         const controls = this.scene.getActiveControls();
-        // Use cached position if provided (during initialization), otherwise read current position
-        const controlsPosition = cachedControlsPosition ?? controls.getTransform().getAbsolutePosition();
+        const controlsPosition = controls.getTransform().getAbsolutePosition();
 
         const celestialBodies = this.getCelestialBodies();
         const orbitalFacilities = this.getOrbitalFacilities();
@@ -420,7 +420,7 @@ export class StarSystemController {
      * @param chunkForge The chunk forge used to update the LOD of the telluric planets
      */
     public update(deltaSeconds: number, chunkForge: ChunkForge): void {
-        this.updateOrbitalSimulation(deltaSeconds);
+        this.updateOrbitalSimulation(deltaSeconds * this.orbitalSimulationTimeMultiplier);
 
         const controls = this.scene.getActiveControls();
         controls.update(deltaSeconds);
