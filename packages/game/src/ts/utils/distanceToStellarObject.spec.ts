@@ -17,7 +17,6 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Faction } from "@/backend/society/factions";
 import { getObjectModelById, type StarSystemModel } from "@/backend/universe/starSystemModel";
 
 import { EarthMass, SolarMass, SolarRadius } from "@/utils/physics/constants";
@@ -126,7 +125,7 @@ describe("distanceToStellarObject", () => {
                     localZ: 0,
                 },
                 nbHydroponicLayers: 15,
-                faction: Faction.SATORI_CONCORD,
+                faction: "satori_concord",
                 annualEnergyPerCapitaKWh: 4000,
                 mass: 1e6,
                 axialTilt: 0,
