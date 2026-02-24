@@ -52,18 +52,18 @@ import { generateStarModel } from "./stellarObjects/starModelGenerator";
 import { generateTelluricPlanetModel } from "./telluricPlanetModelGenerator";
 import { generateTelluricSatelliteModel } from "./telluricSatelliteModelGenerator";
 
-const enum GenerationSteps {
-    NAME,
-    NB_STARS = 20,
-    STARS = 21,
-    NB_PLANETS = 30,
-    PLANETS = 200,
-    PLANET_TYPE = 400,
-    NB_MOONS = 10,
-    MOONS = 11,
-    ANOMALIES = 666,
-    SPACE_STATIONS = 2000,
-}
+const GenerationSteps = {
+    NAME: 0,
+    NB_STARS: 20,
+    STARS: 21,
+    NB_PLANETS: 30,
+    PLANETS: 200,
+    PLANET_TYPE: 400,
+    NB_MOONS: 10,
+    MOONS: 11,
+    ANOMALIES: 666,
+    SPACE_STATIONS: 2000,
+} as const satisfies Record<string, number>;
 
 /**
  * Generates a new star system data model given a seed using a pseudo-random number generator.
