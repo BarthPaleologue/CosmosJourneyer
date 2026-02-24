@@ -81,11 +81,7 @@ import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
 import { type Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
-const enum EngineState {
-    UNINITIALIZED,
-    RUNNING,
-    PAUSED,
-}
+type EngineState = "uninitialized" | "running" | "paused";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -120,7 +116,7 @@ export class CosmosJourneyer {
 
     private activeView: View;
 
-    private state = EngineState.UNINITIALIZED;
+    private state: EngineState = "uninitialized";
 
     private videoRecorder: VideoRecorder | null = null;
 
@@ -510,7 +506,7 @@ export class CosmosJourneyer {
     public pause(): void {
         if (this.isPaused()) return;
         if (this.mainMenu.isVisible()) return;
-        this.state = EngineState.PAUSED;
+        this.state = "paused";
 
         document.exitPointerLock();
 
@@ -524,7 +520,7 @@ export class CosmosJourneyer {
 
     public async resume(): Promise<void> {
         if (!this.isPaused()) return;
-        this.state = EngineState.RUNNING;
+        this.state = "running";
         this.soundPlayer.playNow(SoundType.CLICK);
         this.pauseMenu.setVisibility(false);
 
@@ -537,7 +533,7 @@ export class CosmosJourneyer {
     }
 
     public isPaused(): boolean {
-        return this.state === EngineState.PAUSED;
+        return this.state === "paused";
     }
 
     /**
@@ -577,7 +573,7 @@ export class CosmosJourneyer {
             if (this.isPaused()) return;
             this.activeView.render();
         });
-        this.state = EngineState.RUNNING;
+        this.state = "running";
     }
 
     /**
@@ -890,7 +886,7 @@ export class CosmosJourneyer {
 
         await this.starSystemView.loadStarSystem(systemModel);
 
-        if (this.state === EngineState.UNINITIALIZED) {
+        if (this.state === "uninitialized") {
             await this.init(true);
         } else {
             this.starSystemView.initStarSystem(Date.now() / 1000);
