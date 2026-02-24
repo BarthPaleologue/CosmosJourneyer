@@ -14,14 +14,7 @@ import { LoadSavePanel } from "./panels/loadSavePanel";
 import { SettingsPanel } from "./panels/settingsPanel";
 import { TutorialsPanel } from "./panels/tutorialsPanel";
 
-export const enum PanelType {
-    LOAD_SAVE,
-    SETTINGS,
-    TUTORIALS,
-    CONTRIBUTE,
-    CREDITS,
-    ABOUT,
-}
+export type PanelType = "load_save" | "settings" | "tutorials" | "contribute" | "credits" | "about";
 
 export class SidePanels {
     private activeRightPanel: HTMLElement | null = null;
@@ -74,17 +67,17 @@ export class SidePanels {
 
     private panelFromType(type: PanelType): HTMLElement {
         switch (type) {
-            case PanelType.LOAD_SAVE:
+            case "load_save":
                 return this.loadSavePanel.htmlRoot;
-            case PanelType.SETTINGS:
+            case "settings":
                 return this.settingsPanel.htmlRoot;
-            case PanelType.TUTORIALS:
+            case "tutorials":
                 return this.tutorialsPanel.htmlRoot;
-            case PanelType.CONTRIBUTE:
+            case "contribute":
                 return this.contributePanel.htmlRoot;
-            case PanelType.CREDITS:
+            case "credits":
                 return this.creditsPanel.htmlRoot;
-            case PanelType.ABOUT:
+            case "about":
                 return this.aboutPanel.htmlRoot;
             default:
                 return assertUnreachable(type);
@@ -110,7 +103,7 @@ export class SidePanels {
             return;
         }
 
-        if (type === PanelType.LOAD_SAVE) {
+        if (type === "load_save") {
             await this.loadSavePanel.content.populateCmdrList(this.universeBackend, this.saveBackend);
         }
 

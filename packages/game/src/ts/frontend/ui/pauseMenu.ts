@@ -21,7 +21,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-import { PanelType, type SidePanels } from "./sidePanels";
+import { type SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -78,19 +78,19 @@ export class PauseMenu {
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
         this.contributeButton.addEventListener("click", async () => {
             soundPlayer.playNow("click");
-            await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
+            await this.sidePanels.toggleActivePanel("contribute");
         });
         this.tutorialsButton.addEventListener("click", async () => {
             soundPlayer.playNow("click");
-            await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+            await this.sidePanels.toggleActivePanel("tutorials");
         });
         this.settingsButton.addEventListener("click", async () => {
             soundPlayer.playNow("click");
-            await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+            await this.sidePanels.toggleActivePanel("settings");
         });
         this.loadButton.addEventListener("click", async () => {
             soundPlayer.playNow("click");
-            await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+            await this.sidePanels.toggleActivePanel("load_save");
         });
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
