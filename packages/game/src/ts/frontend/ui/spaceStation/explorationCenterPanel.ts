@@ -23,6 +23,8 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 
+import { assertUnreachable } from "@/utils/types";
+
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
@@ -197,6 +199,9 @@ export class ExplorationCenterPanel {
                 break;
             case ExplorationCenterFilter.ALL:
                 discoveries.push(...this.player.discoveries.local, ...this.player.discoveries.uploaded);
+                break;
+            default:
+                assertUnreachable(this.filter);
         }
 
         let totalValue = 0;

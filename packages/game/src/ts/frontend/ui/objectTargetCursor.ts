@@ -23,6 +23,7 @@ import { getAngularSize } from "@/frontend/helpers/isObjectVisibleOnScreen";
 
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
+import { assertUnreachable } from "@/utils/types";
 
 import { type HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";
@@ -97,6 +98,8 @@ export class ObjectTargetCursor {
                 this.minSize = 1.5;
                 this.maxSize = 1.5;
                 break;
+            default:
+                assertUnreachable(object.targetInfo.type);
         }
 
         this.textBlock = document.createElement("div");

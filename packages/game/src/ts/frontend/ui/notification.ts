@@ -17,6 +17,8 @@
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+import { assertUnreachable } from "@/utils/types";
+
 import informationIcon from "@assets/icons/information.webp";
 import explorationIcon from "@assets/icons/space-exploration.webp";
 import spaceStationIcon from "@assets/icons/space-station.webp";
@@ -68,6 +70,8 @@ export class Notification {
             case "space-station":
                 iconNode.src = spaceStationIcon;
                 break;
+            default:
+                assertUnreachable(origin);
         }
         iconNode.classList.add("notification-icon");
         contentContainer.appendChild(iconNode);
@@ -100,6 +104,8 @@ export class Notification {
             case "error":
                 soundPlayer.playNow("error");
                 break;
+            default:
+                assertUnreachable(intent);
         }
 
         // animate progress bar

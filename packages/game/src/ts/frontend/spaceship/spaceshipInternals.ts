@@ -19,7 +19,7 @@ import { type SerializedComponent } from "@/backend/spaceship/serializedComponen
 import { type SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
 import { type SerializedSpaceship, type ShipType } from "@/backend/spaceship/serializedSpaceship";
 
-import type { DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { DiscoveryScanner } from "./components/discoveryScanner";
 import { FuelScoop } from "./components/fuelScoop";
@@ -59,6 +59,8 @@ export class SpaceshipInternals {
                     ComponentSlot.NewOptional(2),
                 ];
                 break;
+            default:
+                assertUnreachable(serializedSpaceship.type);
         }
 
         if (primary.warpDrive !== null) {
@@ -105,6 +107,8 @@ export class SpaceshipInternals {
                 case "discoveryScanner":
                     component = new DiscoveryScanner(optional);
                     break;
+                default:
+                    return assertUnreachable(optional);
             }
 
             const success = slot.setComponent(component);
@@ -189,6 +193,8 @@ export class SpaceshipInternals {
                     primary: primaryComponents,
                     optional: [optionals[0], optionals[1], optionals[2]],
                 };
+            default:
+                return assertUnreachable(this.type);
         }
     }
 }

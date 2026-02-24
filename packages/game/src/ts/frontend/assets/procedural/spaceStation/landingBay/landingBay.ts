@@ -41,7 +41,7 @@ import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFac
 import { EarthG } from "@/utils/physics/constants";
 import { getRotationPeriodForArtificialGravity } from "@/utils/physics/physics";
 import { degreesToRadians } from "@/utils/physics/unitConversions";
-import { type DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
@@ -276,6 +276,8 @@ export class LandingBay {
             case LandingPadStatus.OCCUPIED:
                 statusColor.copyFromFloats(1, 0, 0);
                 break;
+            default:
+                assertUnreachable(status);
         }
         this.landingPadLights.setColorAt(landingPadIndex * 4, statusColor);
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 1, statusColor);

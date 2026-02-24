@@ -1,5 +1,7 @@
 import { uniformRandBool } from "extended-random";
 
+import { assertUnreachable } from "@/utils/types";
+
 import type { StarSystemCoordinates } from "../universe/starSystemCoordinates";
 import { getPowerPlayData } from "./powerplay";
 
@@ -15,6 +17,8 @@ export function factionToString(faction: Faction): string {
             return "Human Commonwealth";
         case "satori_concord":
             return "Satori Concord";
+        default:
+            return assertUnreachable(faction);
     }
 }
 

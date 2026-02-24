@@ -48,7 +48,7 @@ import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar
 import { type Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelboxPostProcess";
@@ -602,6 +602,8 @@ export class PostProcessManager {
                 case "darkKnight":
                     // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
                     break;
+                default:
+                    assertUnreachable(object);
             }
         }
 
@@ -786,6 +788,8 @@ export class PostProcessManager {
                 case "lens_flare":
                     //this.renderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
+                default:
+                    assertUnreachable(postProcessType);
             }
         }
 
@@ -834,6 +838,8 @@ export class PostProcessManager {
                 case "shadow":
                     //this.renderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
+                default:
+                    assertUnreachable(postProcessType);
             }
         }
 

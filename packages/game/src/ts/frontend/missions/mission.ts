@@ -20,7 +20,7 @@ import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordin
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import type { DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 
@@ -114,7 +114,7 @@ export class Mission {
             case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
                 return i18n.t("missions:sightseeing:asteroidFieldTrek");
             default:
-                throw new Error(`Unknown sight seeing type: ${String(this.missionType)}`);
+                return assertUnreachable(this.missionType);
         }
     }
 

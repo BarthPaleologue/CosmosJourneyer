@@ -95,11 +95,11 @@ type LandingPlanStep = {
 };
 
 export const LandingComputerStatusBit = {
-    PROGRESS: 1 << 0,
-    COMPLETE: 1 << 1,
-    TIMEOUT: 1 << 2,
-    IDLE: 1 << 3,
-    NO_LANDING_SPOT: 1 << 4,
+    PROGRESS: 1,
+    COMPLETE: 2,
+    TIMEOUT: 4,
+    IDLE: 8,
+    NO_LANDING_SPOT: 16,
 } as const;
 
 export type LandingComputerStatusBit = (typeof LandingComputerStatusBit)[keyof typeof LandingComputerStatusBit];

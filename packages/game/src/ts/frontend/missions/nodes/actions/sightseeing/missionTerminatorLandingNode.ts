@@ -30,6 +30,7 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
+import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
@@ -189,6 +190,8 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
                 });
             case LandMissionState.LANDED:
                 return i18n.t("missions:terminatorLanding:missionCompleted");
+            default:
+                return assertUnreachable(this.state);
         }
     }
 

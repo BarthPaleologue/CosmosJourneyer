@@ -27,6 +27,7 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
+import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 
@@ -111,6 +112,8 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
             case "blackHole":
                 thresholdMultiplier = 10;
                 break;
+            default:
+                assertUnreachable(targetObject);
         }
 
         const distanceThreshold = targetObject.getBoundingRadius() * thresholdMultiplier;
@@ -167,6 +170,8 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
                 });
             case FlyByState.CLOSE_ENOUGH:
                 return i18n.t("missions:flyBy:missionCompleted");
+            default:
+                return assertUnreachable(this.state);
         }
     }
 

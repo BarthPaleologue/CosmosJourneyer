@@ -23,6 +23,8 @@ import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
+import { assertUnreachable } from "@/utils/types";
+
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
@@ -53,6 +55,8 @@ function generateMissionTree(target: SightSeeingTarget, universeBackend: Univers
             return new MissionTerminatorLandingNode(target.objectId);
         case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
             return MissionAsteroidFieldNode.New(target.objectId, universeBackend);
+        default:
+            return assertUnreachable(target.type);
     }
 }
 

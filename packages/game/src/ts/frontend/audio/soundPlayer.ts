@@ -19,6 +19,8 @@ import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSo
 
 import { type Sounds } from "@/frontend/assets/audio/sounds";
 
+import { assertUnreachable } from "@/utils/types";
+
 import { SoundInstance, SoundInstanceMock, type ISoundInstance, type SoundInstanceOptions } from "./soundInstance";
 
 export type SoundType =
@@ -96,6 +98,8 @@ export class SoundPlayer implements ISoundPlayer {
                 return this.sounds.hyperSpace;
             case "thruster":
                 return this.sounds.thruster;
+            default:
+                return assertUnreachable(soundType);
         }
     }
 

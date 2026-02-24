@@ -19,6 +19,8 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 
 import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
+import { assertUnreachable } from "@/utils/types";
+
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
@@ -137,6 +139,8 @@ export class ComponentBrowserUI {
                                 currentFuel01: 1,
                             });
                             break;
+                        default:
+                            assertUnreachable(componentType);
                     }
                 });
                 otherSparePartsContainer.appendChild(componentButton);

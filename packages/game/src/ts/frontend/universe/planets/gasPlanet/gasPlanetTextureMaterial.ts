@@ -22,6 +22,8 @@ import { type GasPlanetTextureId } from "@/backend/universe/orbitalObjects/gasPl
 
 import { type GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
 
+import { assertUnreachable } from "@/utils/types";
+
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,
     textures: GasPlanetTextures,
@@ -41,6 +43,8 @@ export function createGasPlanetTextureMaterial(
         case "neptune":
             material.diffuseTexture = textures.neptune;
             break;
+        default:
+            assertUnreachable(textureId);
     }
 
     material.specularColor.setAll(0.1);

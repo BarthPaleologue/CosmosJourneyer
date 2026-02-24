@@ -29,7 +29,7 @@ import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTextu
 import { type Textures } from "@/frontend/assets/textures";
 
 import { type ItemPool } from "@/utils/itemPool";
-import { type DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { type RingsProceduralPatternLut } from "./ringsProceduralLut";
 
@@ -104,6 +104,8 @@ export class RingsUniforms {
             case "uranus":
                 texture = textures.rings.uranus;
                 break;
+            default:
+                return assertUnreachable(model.textureId);
         }
 
         return new RingsUniforms(model, { type: "textured", texture }, fadeOutDistance, scene);
@@ -115,6 +117,8 @@ export class RingsUniforms {
                 return RingsUniforms.NewProcedural(model, textures.pools.ringsPatternLut, fadeOutDistance, scene);
             case "textured":
                 return RingsUniforms.NewTextured(model, textures, fadeOutDistance, scene);
+            default:
+                return assertUnreachable(model);
         }
     }
 

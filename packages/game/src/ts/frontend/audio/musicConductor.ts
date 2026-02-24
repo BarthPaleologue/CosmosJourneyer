@@ -23,6 +23,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Musics } from "@/frontend/assets/audio/musics";
 import { type StarSystemView } from "@/frontend/starSystemView";
 
+import { assertUnreachable } from "@/utils/types";
+
 export class MusicConductor {
     private currentMusic: AbstractSound | null = null;
 
@@ -189,6 +191,9 @@ export class MusicConductor {
                     this.setMusic(this.musics.equatorialComplex);
                     return;
                 }
+                break;
+            default:
+                assertUnreachable(closestOrbitalObject.model);
         }
 
         if (warpDrive !== null && warpDrive.isEnabled()) {
