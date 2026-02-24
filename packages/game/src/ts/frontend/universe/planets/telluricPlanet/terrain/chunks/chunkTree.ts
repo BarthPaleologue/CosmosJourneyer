@@ -39,7 +39,7 @@ import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { type Direction } from "./direction";
 import { PlanetChunk } from "./planetChunk";
-import { TaskType, type BuildTask } from "./taskTypes";
+import { type BuildTask } from "./taskTypes";
 
 /**
  * A quadTree is defined recursively
@@ -260,7 +260,7 @@ export class ChunkTree implements Cullable {
         );
 
         const buildTask: BuildTask = {
-            type: TaskType.BUILD,
+            type: "build",
             planetName: this.planetName,
             planetSeed: this.planetSeed,
             planetDiameter: this.rootChunkLength,

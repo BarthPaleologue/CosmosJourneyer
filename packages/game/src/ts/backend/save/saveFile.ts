@@ -21,7 +21,7 @@ import { jsonSafeParse } from "@/utils/json";
 import { err, type Result } from "@/utils/types";
 
 import { safeParseSave, type Save } from "./saveFileData";
-import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
+import { type SaveLoadingError } from "./saveLoadingError";
 
 export async function parseSaveFile(
     rawSaveFile: File,
@@ -37,7 +37,7 @@ export async function parseSaveFile(
 
             const parsedData = jsonSafeParse(data);
             if (parsedData === null) {
-                resolve(err({ type: SaveLoadingErrorType.INVALID_JSON }));
+                resolve(err({ type: "INVALID_JSON" }));
                 return;
             }
 

@@ -15,19 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export const enum PostProcessType {
-    VOLUMETRIC_LIGHT,
-    OCEAN,
-    CLOUDS,
-    ATMOSPHERE,
-    RING,
-    MATTER_JETS,
-    MANDELBULB,
-    JULIA_SET,
-    MANDELBOX,
-    SIERPINSKI_PYRAMID,
-    MENGER_SPONGE,
-    BLACK_HOLE,
-    SHADOW,
-    LENS_FLARE,
-}
+export type PostProcessType =
+    | "volumetric_light"
+    | "ocean"
+    | "clouds"
+    | "atmosphere"
+    | "ring"
+    | "matter_jets"
+    | "mandelbulb"
+    | "julia_set"
+    | "mandelbox"
+    | "sierpinski_pyramid"
+    | "menger_sponge"
+    | "black_hole"
+    | "shadow"
+    | "lens_flare";

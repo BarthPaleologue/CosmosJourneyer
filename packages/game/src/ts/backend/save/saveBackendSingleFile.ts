@@ -24,7 +24,7 @@ import { Settings } from "@/settings";
 
 import type { ISaveBackend } from "./saveBackend";
 import { parseSaveArray, SavesSchema, type CmdrSaves, type Save } from "./saveFileData";
-import { SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
+import { type SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Interface defining the storage backend for save data.
@@ -88,24 +88,24 @@ export class SaveBackendSingleFile implements ISaveBackend {
 
         const parsedSaves = jsonSafeParse(rawSaves ?? "{}");
         if (parsedSaves === null) {
-            return err({ type: SaveLoadingErrorType.INVALID_JSON });
+            return err({ type: "INVALID_JSON" });
         }
 
         const parsedBackupSaves = jsonSafeParse(rawBackupSaves ?? "{}");
         if (parsedBackupSaves === null) {
-            return err({ type: SaveLoadingErrorType.INVALID_JSON });
+            return err({ type: "INVALID_JSON" });
         }
 
         const savesResult = SavesSchema.safeParse(parsedSaves);
         if (!savesResult.success) {
             console.error(savesResult.error);
-            return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: savesResult.error });
+            return err({ type: "INVALID_STORAGE_FORMAT", content: savesResult.error });
         }
 
         const backupSavesResult = SavesSchema.safeParse(parsedBackupSaves);
         if (!backupSavesResult.success) {
             console.error(backupSavesResult.error);
-            return err({ type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT, content: backupSavesResult.error });
+            return err({ type: "INVALID_STORAGE_FORMAT", content: backupSavesResult.error });
         }
 
         const saves = savesResult.data;

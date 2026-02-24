@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import { Settings } from "@/settings";
 
@@ -165,7 +165,7 @@ export function radialChoiceModal<T>(
         }
         hasSettled = true;
         cleanup();
-        soundPlayer.playNow(SoundType.CLICK);
+        soundPlayer.playNow("click");
         resolveChoice(result);
     };
 

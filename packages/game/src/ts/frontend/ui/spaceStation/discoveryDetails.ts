@@ -21,11 +21,10 @@ import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/
 import { getObjectModelById } from "@/backend/universe/starSystemModel";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { getOrbitalPeriod } from "@/utils/physics/orbit";
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
@@ -99,15 +98,10 @@ export class DiscoveryDetails {
                 throw new Error("The sell button should not be displayed when currentDiscovery is null");
             }
 
-            this.soundPlayer.playNow(SoundType.SUCCESS);
+            this.soundPlayer.playNow("success");
             const valueResult = await encyclopaedia.estimateDiscovery(this.currentDiscovery.objectId);
             if (!valueResult.success) {
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    valueResult.error,
-                    5_000,
-                );
+                this.notificationManager.create("general", "error", valueResult.error, 5_000);
                 return;
             }
 

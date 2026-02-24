@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 
 import i18n from "@/i18n";
@@ -75,7 +75,7 @@ export class SpaceshipDockUI {
             fuelManagementContainer.appendChild(outfittingButton);
 
             outfittingButton.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
 
                 if (outfittingButton.classList.contains("active")) {
                     outfittingButton.classList.remove("active");
@@ -92,7 +92,7 @@ export class SpaceshipDockUI {
             refuelButton.innerText = i18n.t("spaceStation:refuel");
 
             refuelButton.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
                 const fuelAmount = currentSpaceship.getTotalFuelCapacity() - currentSpaceship.getRemainingFuel();
                 const fuelUnitPrice = 10;
                 player.pay(Math.round(fuelAmount * fuelUnitPrice));

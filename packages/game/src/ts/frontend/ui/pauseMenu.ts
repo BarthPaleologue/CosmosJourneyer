@@ -17,11 +17,11 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-import { PanelType, type SidePanels } from "./sidePanels";
+import { type SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;
@@ -77,20 +77,20 @@ export class PauseMenu {
         this.screenshotButton.addEventListener("click", () => this.onScreenshot.notifyObservers());
         this.shareButton.addEventListener("click", () => this.onShare.notifyObservers());
         this.contributeButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
-            await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
+            soundPlayer.playNow("click");
+            await this.sidePanels.toggleActivePanel("contribute");
         });
         this.tutorialsButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
-            await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+            soundPlayer.playNow("click");
+            await this.sidePanels.toggleActivePanel("tutorials");
         });
         this.settingsButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
-            await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+            soundPlayer.playNow("click");
+            await this.sidePanels.toggleActivePanel("settings");
         });
         this.loadButton.addEventListener("click", async () => {
-            soundPlayer.playNow(SoundType.CLICK);
-            await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+            soundPlayer.playNow("click");
+            await this.sidePanels.toggleActivePanel("load_save");
         });
         this.saveButton.addEventListener("click", () => this.onSave.notifyObservers());
         this.resumeButton.addEventListener("click", () => this.onResume.notifyObservers());
@@ -100,12 +100,12 @@ export class PauseMenu {
         listItems.forEach((li) => {
             // play a sound when hovering over a button
             li.addEventListener("mouseenter", () => {
-                soundPlayer.playNow(SoundType.HOVER);
+                soundPlayer.playNow("hover");
             });
 
             // play a sound when clicking on a button
             li.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
             });
         });
 

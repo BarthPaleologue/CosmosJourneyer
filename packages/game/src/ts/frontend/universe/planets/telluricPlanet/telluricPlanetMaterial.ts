@@ -38,7 +38,7 @@ import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { type ItemPool } from "@/utils/itemPool";
 import { type DeepReadonly } from "@/utils/types";
 
-import { ColorMode } from "./colorSettingsInterface";
+import { getColorModeIndex, type ColorMode } from "./colorSettingsInterface";
 import { type TelluricPlanetMaterialLut } from "./telluricPlanetMaterialLut";
 
 import surfaceMaterialFragment from "@shaders/telluricPlanetMaterial/fragment.glsl";
@@ -133,7 +133,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.planetModel = model;
 
         this.beachSize = 100 + 50 * centeredRand(rng, 85);
-        this.colorMode = ColorMode.DEFAULT;
+        this.colorMode = "default";
         this.steepSharpness = 2;
 
         this.plainNormalMetallicMap = textures.grass.normalMetallic;
@@ -211,7 +211,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
     public updateConstants(): void {
         this.setFloat(TelluricPlanetMaterialUniformNames.PLANET_RADIUS, this.planetModel.radius);
 
-        this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, this.colorMode);
+        this.setInt(TelluricPlanetMaterialUniformNames.COLOR_MODE, getColorModeIndex(this.colorMode));
 
         this.setFloat(TelluricPlanetMaterialUniformNames.WATER_LEVEL, this.planetModel.ocean?.depth ?? 0);
         this.setFloat(TelluricPlanetMaterialUniformNames.BEACH_SIZE, this.beachSize);

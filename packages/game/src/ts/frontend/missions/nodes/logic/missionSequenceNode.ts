@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type MissionSequenceNodeSerialized } from "@/backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -27,7 +26,7 @@ import { type MissionNodeBase } from "../missionNodeBase";
 /**
  * Node used to describe a sequence of tasks that must be completed in order.
  */
-export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQUENCE> {
+export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeSerialized> {
     public children: MissionNode[];
 
     private hasCompletedLock = false;
@@ -109,7 +108,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionNodeType.SEQU
 
     serialize(): MissionSequenceNodeSerialized {
         return {
-            type: MissionNodeType.SEQUENCE,
+            type: "sequence",
             children: this.children.map((child) => child.serialize()),
             activeChildIndex: this.activeChildIndex,
         };

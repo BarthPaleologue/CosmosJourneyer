@@ -3,22 +3,17 @@ import { uniformRandBool } from "extended-random";
 import type { StarSystemCoordinates } from "../universe/starSystemCoordinates";
 import { getPowerPlayData } from "./powerplay";
 
-export const enum Faction {
-    FEYNMAN_INTERSTELLAR,
-    CHURCH_OF_AWAKENING,
-    HUMAN_COMMONWEALTH,
-    SATORI_CONCORD,
-}
+export type Faction = "feynman_interstellar" | "church_of_awakening" | "human_commonwealth" | "satori_concord";
 
 export function factionToString(faction: Faction): string {
     switch (faction) {
-        case Faction.FEYNMAN_INTERSTELLAR:
+        case "feynman_interstellar":
             return "Feynman Interstellar";
-        case Faction.CHURCH_OF_AWAKENING:
+        case "church_of_awakening":
             return "Church of Awakening";
-        case Faction.HUMAN_COMMONWEALTH:
+        case "human_commonwealth":
             return "Human Commonwealth";
-        case Faction.SATORI_CONCORD:
+        case "satori_concord":
             return "Satori Concord";
     }
 }
@@ -34,12 +29,12 @@ export function getFactionFromCoordinates(coordinates: StarSystemCoordinates, rn
     const isCapitalist = uniformRandBool(powerplayData.capitalistCommunist, rng, 498);
 
     if (isMaterialist && isCapitalist) {
-        return Faction.FEYNMAN_INTERSTELLAR;
+        return "feynman_interstellar";
     } else if (isMaterialist && !isCapitalist) {
-        return Faction.HUMAN_COMMONWEALTH;
+        return "human_commonwealth";
     } else if (!isMaterialist && isCapitalist) {
-        return Faction.CHURCH_OF_AWAKENING;
+        return "church_of_awakening";
     } else {
-        return Faction.SATORI_CONCORD;
+        return "satori_concord";
     }
 }

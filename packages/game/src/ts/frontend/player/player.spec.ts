@@ -19,8 +19,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { FlyByState } from "@/backend/missions/missionFlyByNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
-import { MissionType } from "@/backend/missions/missionSerialized";
+import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
 import { SerializedPlayerSchema, type SerializedPlayer } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -258,7 +257,7 @@ describe("Player", () => {
                     idInSystem: spaceStation.id,
                 },
                 tree: {
-                    type: MissionNodeType.FLY_BY as const,
+                    type: "fly_by",
                     objectId: {
                         systemCoordinates: fallbackSystem.coordinates,
                         idInSystem: fallbackSystem.stellarObjects[0].id,
@@ -267,7 +266,7 @@ describe("Player", () => {
                 },
                 reward: 1000,
                 type: MissionType.SIGHT_SEEING_FLY_BY,
-            };
+            } satisfies MissionSerialized;
 
             // Directly add to serialized data to bypass mission creation issues
             const serializedPlayer: SerializedPlayer = {

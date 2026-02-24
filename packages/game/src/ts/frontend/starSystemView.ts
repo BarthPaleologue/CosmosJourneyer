@@ -36,8 +36,8 @@ import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/u
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -57,7 +57,6 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
@@ -300,13 +299,13 @@ export class StarSystemView implements View {
         StarSystemInputs.map.toggleUi.on("complete", () => {
             this.isUiEnabled = !this.isUiEnabled;
             this.notificationManager.setVisible(this.isUiEnabled);
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
         });
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) this.soundPlayer.playNow(SoundType.ENABLE_ORBIT_DISPLAY);
-            else this.soundPlayer.playNow(SoundType.DISABLE_ORBIT_DISPLAY);
+            if (enabled) this.soundPlayer.playNow("enable_orbit_display");
+            else this.soundPlayer.playNow("disable_orbit_display");
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -353,12 +352,7 @@ export class StarSystemView implements View {
             const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
 
             if (spaceship.getRemainingFuel() < fuelForJump) {
-                this.notificationManager.create(
-                    NotificationOrigin.SPACESHIP,
-                    NotificationIntent.ERROR,
-                    i18n.t("notifications:notEnoughFuel"),
-                    5000,
-                );
+                this.notificationManager.create("spaceship", "error", i18n.t("notifications:notEnoughFuel"), 5000);
                 this.jumpLock = false;
                 return;
             }
@@ -711,8 +705,8 @@ export class StarSystemView implements View {
                                     throw new Error("Up down is not an axis composite");
                                 }
                                 this.notificationManager.create(
-                                    NotificationOrigin.SPACESHIP,
-                                    NotificationIntent.INFO,
+                                    "spaceship",
+                                    "info",
                                     i18n.t("notifications:howToLiftOff", {
                                         bindingsString: axisCompositeToString(control, this.keyboardLayoutMap)[1]?.[1],
                                     }),
@@ -830,14 +824,14 @@ export class StarSystemView implements View {
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
                 this.notificationManager.create(
-                    NotificationOrigin.EXPLORATION,
-                    NotificationIntent.SUCCESS,
+                    "exploration",
+                    "success",
                     i18n.t("notifications:newDiscovery", {
                         objectName: nearestCelestialBody.model.name,
                     }),
                     15_000,
                 );
-                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.NEW_DISCOVERY);
+                this.tts.enqueueSay("Charlotte", "new_discovery");
                 this.onNewDiscovery.notifyObservers(universeId);
             }
         }
@@ -880,7 +874,7 @@ export class StarSystemView implements View {
             mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.earn(mission.getReward());
-                this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.MISSION_COMPLETE);
+                this.tts.enqueueSay("Charlotte", "mission_complete");
                 newlyCompletedMissions.push(mission);
             }
         });
@@ -1071,8 +1065,8 @@ export class StarSystemView implements View {
             );
             const keys = horizontalKeys.concat(verticalKeys);
             this.notificationManager.create(
-                NotificationOrigin.GENERAL,
-                NotificationIntent.INFO,
+                "general",
+                "info",
                 `Move using ${keys.map((key) => key[1].replace("Key", "")).join(", ")}`,
                 20_000,
             );
@@ -1114,7 +1108,7 @@ export class StarSystemView implements View {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
-            this.soundPlayer.playNow(SoundType.TARGET_UNLOCK);
+            this.soundPlayer.playNow("target_unlock");
             return;
         }
 
@@ -1122,7 +1116,7 @@ export class StarSystemView implements View {
 
         this.spaceShipLayer.setTarget(target.getTransform());
         this.targetCursorLayer.setTarget(target);
-        this.soundPlayer.playNow(SoundType.TARGET_LOCK);
+        this.soundPlayer.playNow("target_lock");
     }
 
     /**

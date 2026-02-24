@@ -24,11 +24,10 @@ import {
     type MissionSequenceNodeSerialized,
     type MissionXorNodeSerialized,
 } from "@/backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
@@ -47,21 +46,24 @@ export function deserializeMissionNode(
     missionNodeSerialized: DeepReadonly<MissionNodeSerialized>,
     universeBackend: UniverseBackend,
 ): MissionNode | null {
-    switch (missionNodeSerialized.type) {
-        case MissionNodeType.AND:
+    const missionType = missionNodeSerialized.type;
+    switch (missionType) {
+        case "and":
             return deserializeMissionAndNode(missionNodeSerialized, universeBackend);
-        case MissionNodeType.OR:
+        case "or":
             return deserializeMissionOrNode(missionNodeSerialized, universeBackend);
-        case MissionNodeType.XOR:
+        case "xor":
             return deserializeMissionXorNode(missionNodeSerialized, universeBackend);
-        case MissionNodeType.SEQUENCE:
+        case "sequence":
             return deserializeMissionSequenceNode(missionNodeSerialized, universeBackend);
-        case MissionNodeType.ASTEROID_FIELD:
+        case "asteroid_field":
             return deserializeMissionAsteroidFieldNode(missionNodeSerialized, universeBackend);
-        case MissionNodeType.FLY_BY:
+        case "fly_by":
             return deserializeMissionFlyByNode(missionNodeSerialized);
-        case MissionNodeType.TERMINATOR_LANDING:
+        case "terminator_landing":
             return deserializeMissionTerminatorLandingNode(missionNodeSerialized);
+        default:
+            return assertUnreachable(missionType);
     }
 }
 

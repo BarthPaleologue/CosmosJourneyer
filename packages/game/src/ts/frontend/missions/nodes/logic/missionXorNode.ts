@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type MissionXorNodeSerialized } from "@/backend/missions/missionNodeSerialized";
-import { MissionNodeType } from "@/backend/missions/missionNodeType";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -27,7 +26,7 @@ import { type MissionNodeBase } from "../missionNodeBase";
 /**
  * Node used to describe a set of tasks where only one must be completed.
  */
-export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
+export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized> {
     readonly children: MissionNode[];
 
     private hasCompletedLock = false;
@@ -83,7 +82,7 @@ export class MissionXorNode implements MissionNodeBase<MissionNodeType.XOR> {
 
     serialize(): MissionXorNodeSerialized {
         return {
-            type: MissionNodeType.XOR,
+            type: "xor",
             children: this.children.map((child) => child.serialize()),
         };
     }

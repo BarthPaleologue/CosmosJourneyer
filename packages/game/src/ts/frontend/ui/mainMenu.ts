@@ -25,7 +25,7 @@ import { type StarSystemModel } from "@/backend/universe/starSystemModel";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { getUniverseObjectId, type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
@@ -41,7 +41,7 @@ import { type DeepReadonly } from "@/utils/types";
 import i18n from "@/i18n";
 
 import packageInfo from "../../../../package.json";
-import { PanelType, type SidePanels } from "./sidePanels";
+import { type SidePanels } from "./sidePanels";
 
 export class MainMenu {
     readonly scene: UberScene;
@@ -239,12 +239,12 @@ export class MainMenu {
         allMenuItems.forEach((li) => {
             // on mouse hover, play a sound
             li.addEventListener("mouseenter", () => {
-                soundPlayer.playNow(SoundType.HOVER);
+                soundPlayer.playNow("hover");
             });
 
             // on click, play a sound
             li.addEventListener("click", () => {
-                soundPlayer.playNow(SoundType.CLICK);
+                soundPlayer.playNow("click");
             });
         });
 
@@ -262,7 +262,7 @@ export class MainMenu {
         });
 
         this.loadSaveButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.LOAD_SAVE);
+            await this.sidePanels.toggleActivePanel("load_save");
         });
 
         this.sidePanels.loadSavePanel.content.onLoadSaveObservable.add(() => {
@@ -270,25 +270,25 @@ export class MainMenu {
         });
 
         this.settingsButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.SETTINGS);
+            await this.sidePanels.toggleActivePanel("settings");
         });
 
         this.tutorialsButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.TUTORIALS);
+            await this.sidePanels.toggleActivePanel("tutorials");
         });
 
         this.contributeButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.CONTRIBUTE);
+            await this.sidePanels.toggleActivePanel("contribute");
             this.onContributeObservable.notifyObservers();
         });
 
         this.creditsButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.CREDITS);
+            await this.sidePanels.toggleActivePanel("credits");
             this.onCreditsObservable.notifyObservers();
         });
 
         this.aboutButton.addEventListener("click", async () => {
-            await this.sidePanels.toggleActivePanel(PanelType.ABOUT);
+            await this.sidePanels.toggleActivePanel("about");
             this.onAboutObservable.notifyObservers();
         });
     }

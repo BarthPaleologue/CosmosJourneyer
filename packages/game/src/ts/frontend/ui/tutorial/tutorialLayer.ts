@@ -1,7 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type IDisposable } from "@babylonjs/core/scene";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { promptModalBoolean } from "@/frontend/ui/dialogModal";
 
@@ -103,7 +103,7 @@ export class TutorialLayer implements IDisposable {
                     easing: "ease",
                 },
             );
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
         });
 
         TutorialControlsInputs.map.nextPanel.on("complete", async () => {
@@ -128,7 +128,7 @@ export class TutorialLayer implements IDisposable {
                     easing: "ease",
                 },
             );
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
         });
     }
 
@@ -143,7 +143,7 @@ export class TutorialLayer implements IDisposable {
 
     public quitTutorial() {
         this.setEnabled(false);
-        this.soundPlayer.playNow(SoundType.CLICK);
+        this.soundPlayer.playNow("click");
         this.onQuitTutorial.notifyObservers();
     }
 

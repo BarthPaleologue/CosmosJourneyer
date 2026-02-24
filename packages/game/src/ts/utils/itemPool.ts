@@ -18,11 +18,15 @@
 export class ItemPool<TItem> {
     private pool: Array<TItem> = [];
 
-    constructor(private readonly ctor: () => TItem) {}
+    private readonly makeItem: () => TItem;
+
+    constructor(makeItem: () => TItem) {
+        this.makeItem = makeItem;
+    }
 
     /** Grab one from the pool, or make a fresh one with `new ctor(...args)` */
     get(): TItem {
-        return this.pool.pop() ?? this.ctor();
+        return this.pool.pop() ?? this.makeItem();
     }
 
     /** Return an instance to the pool */

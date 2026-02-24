@@ -49,7 +49,7 @@ import { getUniverseObjectId } from "@/backend/universe/universeObjectId";
 import { loadAssets, type Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock, SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer, SoundPlayerMock, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
@@ -60,7 +60,6 @@ import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
@@ -82,11 +81,7 @@ import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
 import { type Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
-const enum EngineState {
-    UNINITIALIZED,
-    RUNNING,
-    PAUSED,
-}
+type EngineState = "uninitialized" | "running" | "paused";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -121,7 +116,7 @@ export class CosmosJourneyer {
 
     private activeView: View;
 
-    private state = EngineState.UNINITIALIZED;
+    private state: EngineState = "uninitialized";
 
     private videoRecorder: VideoRecorder | null = null;
 
@@ -323,31 +318,15 @@ export class CosmosJourneyer {
                 }
 
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.INFO,
-                        i18n.t("notifications:copiedToClipboard"),
-                        2000,
-                    );
+                    this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.createManualSave();
             if (saveSuccess)
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.SUCCESS,
-                    i18n.t("notifications:saveOk"),
-                    2000,
-                );
-            else
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.ERROR,
-                    i18n.t("notifications:cantSaveTutorial"),
-                    2000,
-                );
+                this.notificationManager.create("general", "success", i18n.t("notifications:saveOk"), 2000);
+            else this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
         window.addEventListener("blur", () => {
@@ -527,7 +506,7 @@ export class CosmosJourneyer {
     public pause(): void {
         if (this.isPaused()) return;
         if (this.mainMenu.isVisible()) return;
-        this.state = EngineState.PAUSED;
+        this.state = "paused";
 
         document.exitPointerLock();
 
@@ -535,14 +514,14 @@ export class CosmosJourneyer {
             this.starSystemView.stopBackgroundSounds();
         }
 
-        this.soundPlayer.playNow(SoundType.OPEN_PAUSE_MENU);
+        this.soundPlayer.playNow("open_pause_menu");
         this.pauseMenu.setVisibility(true);
     }
 
     public async resume(): Promise<void> {
         if (!this.isPaused()) return;
-        this.state = EngineState.RUNNING;
-        this.soundPlayer.playNow(SoundType.CLICK);
+        this.state = "running";
+        this.soundPlayer.playNow("click");
         this.pauseMenu.setVisibility(false);
 
         if (
@@ -554,7 +533,7 @@ export class CosmosJourneyer {
     }
 
     public isPaused(): boolean {
-        return this.state === EngineState.PAUSED;
+        return this.state === "paused";
     }
 
     /**
@@ -594,7 +573,7 @@ export class CosmosJourneyer {
             if (this.isPaused()) return;
             this.activeView.render();
         });
-        this.state = EngineState.RUNNING;
+        this.state = "running";
     }
 
     /**
@@ -907,7 +886,7 @@ export class CosmosJourneyer {
 
         await this.starSystemView.loadStarSystem(systemModel);
 
-        if (this.state === EngineState.UNINITIALIZED) {
+        if (this.state === "uninitialized") {
             await this.init(true);
         } else {
             this.starSystemView.initStarSystem(Date.now() / 1000);

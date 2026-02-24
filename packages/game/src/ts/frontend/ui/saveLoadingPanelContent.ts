@@ -6,9 +6,8 @@ import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 
 import { type DeepReadonly, type Result } from "@/utils/types";
 
@@ -92,7 +91,7 @@ export class SaveLoadingPanelContent {
         });
 
         dropFileZone.addEventListener("click", () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.accept = "application/json";
@@ -201,7 +200,7 @@ export class SaveLoadingPanelContent {
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
             continueButton.addEventListener("click", () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
+                this.soundPlayer.playNow("click");
                 this.onLoadSaveObservable.notifyObservers(latestSave);
             });
             cmdrHeaderButtons.appendChild(continueButton);
@@ -213,7 +212,7 @@ export class SaveLoadingPanelContent {
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
             shareButton.addEventListener("click", async () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
+                this.soundPlayer.playNow("click");
                 const url = createUrlFromSave(latestSave);
                 if (url === null) {
                     await alertModal("Could not create a URL from the save file.", this.soundPlayer);
@@ -221,8 +220,8 @@ export class SaveLoadingPanelContent {
                 }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.SUCCESS,
+                        "general",
+                        "success",
                         i18n.t("notifications:copiedToClipboard"),
                         5000,
                     );
@@ -255,7 +254,7 @@ export class SaveLoadingPanelContent {
             expandButton.classList.add("expandButton", "icon", "large");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
-                this.soundPlayer.playNow(SoundType.CLICK);
+                this.soundPlayer.playNow("click");
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
                 expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
@@ -331,7 +330,7 @@ export class SaveLoadingPanelContent {
         const loadButton = document.createElement("button");
         loadButton.classList.add("icon", "large");
         loadButton.addEventListener("click", () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             this.onLoadSaveObservable.notifyObservers(save);
         });
         saveButtons.appendChild(loadButton);
@@ -343,19 +342,14 @@ export class SaveLoadingPanelContent {
         const shareButton = document.createElement("button");
         shareButton.classList.add("icon", "large");
         shareButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             const url = createUrlFromSave(save);
             if (url === null) {
                 await alertModal("Could not create a URL from the save file.", this.soundPlayer);
                 return;
             }
             await navigator.clipboard.writeText(url.toString()).then(() => {
-                this.notificationManager.create(
-                    NotificationOrigin.GENERAL,
-                    NotificationIntent.INFO,
-                    i18n.t("notifications:copiedToClipboard"),
-                    5000,
-                );
+                this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 5000);
             });
         });
         saveButtons.appendChild(shareButton);
@@ -367,7 +361,7 @@ export class SaveLoadingPanelContent {
         const downloadButton = document.createElement("button");
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -385,7 +379,7 @@ export class SaveLoadingPanelContent {
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("danger", "icon", "large");
         deleteButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
 
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
             if (!shouldProceed) return;

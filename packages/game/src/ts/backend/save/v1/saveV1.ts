@@ -23,7 +23,7 @@ import { StarSystemCoordinatesSchema } from "@/backend/universe/starSystemCoordi
 import { err, ok, type Result } from "@/utils/types";
 
 import projectInfo from "../../../../../package.json";
-import { SaveLoadingErrorType, type SaveLoadingError } from "../saveLoadingError";
+import { type SaveLoadingError } from "../saveLoadingError";
 
 export const SystemObjectType = {
     STELLAR_OBJECT: 0,
@@ -195,5 +195,5 @@ export function safeParseSaveV1(json: Record<string, unknown>): Result<SaveV1, S
         return ok(result.data);
     }
 
-    return err({ type: SaveLoadingErrorType.INVALID_SAVE, content: result.error });
+    return err({ type: "INVALID_SAVE", content: result.error });
 }

@@ -26,14 +26,13 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Speaker, VoiceLine, type ITts } from "@/frontend/audio/tts";
+import { type ITts } from "@/frontend/audio/tts";
 import { type Controls } from "@/frontend/controls";
 import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -137,7 +136,7 @@ export class ShipControls implements Controls {
                 nearestOrbitalObject !== null &&
                 !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
             ) {
-                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.CANNOT_ENGAGE_WARP_DRIVE);
+                tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;
             }
 
@@ -145,11 +144,11 @@ export class ShipControls implements Controls {
 
             spaceship.toggleWarpDrive();
             if (warpDrive.isEnabled()) {
-                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.ENGAGING_WARP_DRIVE);
+                tts.sayNow("Charlotte", "engaging_warp_drive");
                 this.cameraShakeAnimation.reset();
                 spaceship.setMainEngineThrottle(0);
             } else {
-                tts.sayNow(Speaker.CHARLOTTE, VoiceLine.WARP_DRIVE_DISENGAGED);
+                tts.sayNow("Charlotte", "warp_drive_disengaged");
                 this.cameraShakeAnimation.reset();
 
                 if (this.closestLandableFacility !== null) {
@@ -164,8 +163,8 @@ export class ShipControls implements Controls {
                         ).join(", ");
                         //FIXME: localize
                         this.notificationManager.create(
-                            NotificationOrigin.SPACE_STATION,
-                            NotificationIntent.INFO,
+                            "space-station",
+                            "info",
                             `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
                             5000,
                         );
@@ -186,8 +185,8 @@ export class ShipControls implements Controls {
                     keyboardLayout,
                 );
                 this.notificationManager.create(
-                    NotificationOrigin.SPACESHIP,
-                    NotificationIntent.ERROR,
+                    "spaceship",
+                    "error",
                     `Cannot land while warp drive is enabled. You can use ${relevantKeys.join(", ")} to toggle your warp drive.`,
                     5000,
                 );
@@ -204,12 +203,7 @@ export class ShipControls implements Controls {
 
             // If the object is too far, don't engage landing
             if (distance > closestWalkableObject.getBoundingRadius() + 100e3) {
-                this.notificationManager.create(
-                    NotificationOrigin.SPACESHIP,
-                    NotificationIntent.ERROR,
-                    "Too high to land",
-                    2000,
-                );
+                this.notificationManager.create("spaceship", "error", "Too high to land", 2000);
                 return;
             }
 
@@ -226,19 +220,14 @@ export class ShipControls implements Controls {
                 minimumPadSize: LandingPadSize.SMALL,
             });
             if (landingPad === null) {
-                this.notificationManager.create(
-                    NotificationOrigin.SPACE_STATION,
-                    NotificationIntent.ERROR,
-                    "Landing request rejected",
-                    2000,
-                );
+                this.notificationManager.create("space-station", "error", "Landing request rejected", 2000);
                 return;
             }
 
-            tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_REQUEST_GRANTED);
+            tts.enqueueSay("Charlotte", "landing_request_granted");
             this.notificationManager.create(
-                NotificationOrigin.SPACE_STATION,
-                NotificationIntent.SUCCESS,
+                "space-station",
+                "success",
                 `Landing request granted. Proceed to ${landingPad.getTransform().name}`,
                 30000,
             );
@@ -424,26 +413,21 @@ export class ShipControls implements Controls {
         this.firstPersonCamera.parent = this.getTransform();
 
         this.spaceship.onFuelScoopStart.add(() => {
-            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.FUEL_SCOOPING);
+            this.tts.enqueueSay("Charlotte", "fuel_scooping");
         });
 
         this.spaceship.onFuelScoopEnd.add(() => {
-            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.FUEL_SCOOPING_COMPLETE);
+            this.tts.enqueueSay("Charlotte", "fuel_scooping_complete");
         });
 
         this.spaceship.onLowFuelWarning.add(() => {
-            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LOW_FUEL_WARNING);
-            this.notificationManager.create(
-                NotificationOrigin.SPACESHIP,
-                NotificationIntent.WARNING,
-                i18n.t("notifications:lowFuelWarning"),
-                5000,
-            );
+            this.tts.enqueueSay("Charlotte", "low_fuel_warning");
+            this.notificationManager.create("spaceship", "warning", i18n.t("notifications:lowFuelWarning"), 5000);
         });
 
         this.spaceship.onLandingObservable.add(async () => {
             const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.LANDING_COMPLETE);
+            this.tts.enqueueSay("Charlotte", "landing_complete");
 
             if (!this.getSpaceship().isLandedAtFacility()) {
                 const bindingsString = pressInteractionToStrings(
@@ -451,8 +435,8 @@ export class ShipControls implements Controls {
                     keyboardLayoutMap,
                 ).join(", ");
                 this.notificationManager.create(
-                    NotificationOrigin.SPACESHIP,
-                    NotificationIntent.INFO,
+                    "spaceship",
+                    "info",
                     i18n.t("notifications:landingComplete", { bindingsString: bindingsString }),
                     5000,
                 );
@@ -460,44 +444,24 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            this.notificationManager.create(
-                NotificationOrigin.SPACESHIP,
-                NotificationIntent.INFO,
-                i18n.t("notifications:landingSequenceEngaged"),
-                5000,
-            );
-            this.tts.enqueueSay(Speaker.CHARLOTTE, VoiceLine.INITIATING_PLANETARY_LANDING);
+            this.notificationManager.create("spaceship", "info", i18n.t("notifications:landingSequenceEngaged"), 5000);
+            this.tts.enqueueSay("Charlotte", "initiating_planetary_landing");
         });
 
         this.spaceship.onLandingCancelled.add(() => {
-            this.notificationManager.create(
-                NotificationOrigin.SPACESHIP,
-                NotificationIntent.INFO,
-                i18n.t("notifications:landingCancelled"),
-                5000,
-            );
+            this.notificationManager.create("spaceship", "info", i18n.t("notifications:landingCancelled"), 5000);
         });
 
         this.spaceship.onTakeOff.add(() => {
-            this.notificationManager.create(
-                NotificationOrigin.SPACESHIP,
-                NotificationIntent.INFO,
-                i18n.t("notifications:takeOffSuccess"),
-                2000,
-            );
+            this.notificationManager.create("spaceship", "info", i18n.t("notifications:takeOffSuccess"), 2000);
         });
 
         this.spaceship.onAutoPilotEngaged.add(() => {
-            this.notificationManager.create(
-                NotificationOrigin.SPACESHIP,
-                NotificationIntent.INFO,
-                i18n.t("notifications:autoPilotEngaged"),
-                30_000,
-            );
+            this.notificationManager.create("spaceship", "info", i18n.t("notifications:autoPilotEngaged"), 30_000);
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
-            if (isEmergency) this.tts.sayNow(Speaker.CHARLOTTE, VoiceLine.WARP_DRIVE_EMERGENCY_SHUT_DOWN);
+            if (isEmergency) this.tts.sayNow("Charlotte", "warp_drive_emergency_shut_down");
             this.onToggleWarpDrive.notifyObservers(false);
         });
 

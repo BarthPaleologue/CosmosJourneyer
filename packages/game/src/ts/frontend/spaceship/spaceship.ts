@@ -41,7 +41,7 @@ import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
@@ -56,15 +56,11 @@ import { CollisionMask } from "@/settings";
 
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
-import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
+import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";
 
-const enum ShipState {
-    FLYING,
-    LANDING,
-    LANDED,
-}
+type ShipState = "flying" | "landing" | "landed";
 
 type SoundInstances = {
     enableWarpDrive: ISoundInstance;
@@ -102,7 +98,7 @@ export class Spaceship implements Transformable, Targetable {
 
     private closestWalkableObject: (Transformable & HasBoundingSphere) | null = null;
 
-    private state = ShipState.FLYING;
+    private state: ShipState = "flying";
 
     private nearestOrbitalObject: OrbitalObject | null = null;
     private nearestCelestialBody: CelestialBody | null = null;
@@ -154,33 +150,33 @@ export class Spaceship implements Transformable, Targetable {
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
     ) {
-        const enableWarpDriveSound = await soundPlayer.createInstance(SoundType.ENABLE_WARP_DRIVE, {
+        const enableWarpDriveSound = await soundPlayer.createInstance("enable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
         });
 
-        const disableWarpDriveSound = await soundPlayer.createInstance(SoundType.DISABLE_WARP_DRIVE, {
+        const disableWarpDriveSound = await soundPlayer.createInstance("disable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
         });
 
-        const acceleratingWarpDriveSound = await soundPlayer.createInstance(SoundType.ACCELERATING_WARP_DRIVE, {
+        const acceleratingWarpDriveSound = await soundPlayer.createInstance("accelerating_warp_drive", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const deceleratingWarpDriveSound = await soundPlayer.createInstance(SoundType.DECELERATING_WARP_DRIVE, {
+        const deceleratingWarpDriveSound = await soundPlayer.createInstance("decelerating_warp_drive", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const hyperSpaceSound = await soundPlayer.createInstance(SoundType.HYPER_SPACE, {
+        const hyperSpaceSound = await soundPlayer.createInstance("hyper_space", {
             mask: AudioMasks.HYPER_SPACE,
             initialTargetVolume: 0,
             loop: true,
         });
 
-        const thrusterSound = await soundPlayer.createInstance(SoundType.THRUSTER, {
+        const thrusterSound = await soundPlayer.createInstance("thruster", {
             mask: AudioMasks.STAR_SYSTEM_VIEW,
             initialTargetVolume: 0,
             loop: true,
@@ -410,9 +406,9 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     public engageSurfaceLanding(landingTarget: TransformNode) {
-        this.state = ShipState.LANDING;
+        this.state = "landing";
         this.landingComputer?.setTarget({
-            kind: LandingTargetKind.CELESTIAL_BODY,
+            kind: "celestial_body",
             celestialBody: landingTarget,
         });
 
@@ -432,7 +428,7 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     private completeLanding() {
-        this.state = ShipState.LANDED;
+        this.state = "landed";
 
         if (this.targetLandingPad !== null) {
             this.getTransform().setParent(this.targetLandingPad.getTransform());
@@ -444,7 +440,7 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     public cancelLanding() {
-        this.state = ShipState.FLYING;
+        this.state = "flying";
 
         this.getTransform().setParent(null);
 
@@ -466,11 +462,11 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     public isLanded(): boolean {
-        return this.state === ShipState.LANDED;
+        return this.state === "landed";
     }
 
     public isLanding(): boolean {
-        return this.state === ShipState.LANDING;
+        return this.state === "landing";
     }
 
     public isLandedAtFacility(): boolean {
@@ -484,7 +480,7 @@ export class Spaceship implements Transformable, Targetable {
 
         translate(this.getTransform(), this.getTransform().up.scale(5));
 
-        this.state = ShipState.FLYING;
+        this.state = "flying";
 
         this.aggregate.body.applyImpulse(
             this.getTransform().up.scale(200_000),
@@ -624,14 +620,14 @@ export class Spaceship implements Transformable, Targetable {
         const currentMotionType = this.aggregate.body.getMotionType();
         const warpDrive = this.getInternals().getWarpDrive();
         switch (this.state) {
-            case ShipState.LANDED:
+            case "landed":
                 if (currentMotionType !== PhysicsMotionType.STATIC) {
                     this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
                     this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
                 }
                 break;
-            case ShipState.FLYING:
-            case ShipState.LANDING:
+            case "flying":
+            case "landing":
                 if (warpDrive !== null && warpDrive.isEnabled()) {
                     if (currentMotionType !== PhysicsMotionType.ANIMATED) {
                         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
@@ -682,7 +678,7 @@ export class Spaceship implements Transformable, Targetable {
             this.lowFuelWarningTriggered = false;
         }
 
-        if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== ShipState.LANDED) {
+        if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== "landed") {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = this.getTransform().forward;
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
@@ -729,13 +725,13 @@ export class Spaceship implements Transformable, Targetable {
                 const distanceToPad = shipRelativePosition.length();
                 const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
                 if (distanceToPad < 600 && verticalDistance > 0) {
-                    if (this.state !== ShipState.LANDING) {
+                    if (this.state !== "landing") {
                         this.landingComputer.setTarget({
-                            kind: LandingTargetKind.LANDING_PAD,
+                            kind: "landing_pad",
                             landingPad: this.targetLandingPad,
                         });
 
-                        this.state = ShipState.LANDING;
+                        this.state = "landing";
 
                         this.onAutoPilotEngaged.notifyObservers();
                     }

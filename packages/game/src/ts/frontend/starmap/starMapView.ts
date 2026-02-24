@@ -35,7 +35,7 @@ import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlay
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
 import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
@@ -44,7 +44,6 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { NotificationIntent, NotificationOrigin } from "@/frontend/ui/notification";
 import { type View } from "@/frontend/view";
 
 import { type DeepReadonly } from "@/utils/types";
@@ -114,7 +113,7 @@ export class StarMapView implements View {
         this.starMap = new StarMap(universeBackend, assets, this.scene);
         this.starMap.onSystemHoverStart.add((starSystemCoordinates) => {
             this.starMapUI.setHoveredSystem(starSystemCoordinates);
-            this.soundPlayer.playNow(SoundType.HOVER);
+            this.soundPlayer.playNow("hover");
         });
         this.starMap.onSystemHoverEnd.add(() => {
             this.starMapUI.setHoveredSystem(null);
@@ -127,7 +126,7 @@ export class StarMapView implements View {
                 );
             }
 
-            this.soundPlayer.playNow(SoundType.TARGET_LOCK);
+            this.soundPlayer.playNow("target_lock");
             this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
             this.selectedSystemCoordinates = starSystemCoordinates;
             this.focusOnSystem(starSystemCoordinates);
@@ -182,7 +181,7 @@ export class StarMapView implements View {
             const jumpRange = warpDrive.rangeLY;
 
             if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) return;
-            this.soundPlayer.playNow(SoundType.CLICK);
+            this.soundPlayer.playNow("click");
             this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, jumpRange);
         });
 
@@ -230,7 +229,7 @@ export class StarMapView implements View {
                 this.stellarPathfinder.update();
 
                 if (this.stellarPathfinder.hasFoundPath()) {
-                    this.soundPlayer.playNow(SoundType.ITINERARY_COMPUTED);
+                    this.soundPlayer.playNow("itinerary_computed");
                     const path = this.stellarPathfinder.getPath();
                     if (!path.success) {
                         await alertModal(path.error.message, this.soundPlayer);
@@ -243,8 +242,8 @@ export class StarMapView implements View {
                         this.player.currentItinerary = parsedItinerary.data;
                     } else {
                         this.notificationManager.create(
-                            NotificationOrigin.GENERAL,
-                            NotificationIntent.ERROR,
+                            "general",
+                            "error",
                             `Failed to parse itinerary: ${parsedItinerary.error.message}`,
                             5000,
                         );
@@ -258,8 +257,8 @@ export class StarMapView implements View {
                     }
                 } else if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
                     this.notificationManager.create(
-                        NotificationOrigin.GENERAL,
-                        NotificationIntent.ERROR,
+                        "general",
+                        "error",
                         `Could not find a path to the target system after ${pathfinderMaxIterations} iterations`,
                         5000,
                     );

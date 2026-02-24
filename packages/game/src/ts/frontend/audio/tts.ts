@@ -19,24 +19,23 @@ import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstra
 
 import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
 
-export const enum Speaker {
-    CHARLOTTE,
-}
+import { assertUnreachable } from "@/utils/types";
 
-export const enum VoiceLine {
-    INITIATING_PLANETARY_LANDING,
-    LANDING_REQUEST_GRANTED,
-    LANDING_COMPLETE,
-    MISSION_COMPLETE,
-    NEW_DISCOVERY,
-    CANNOT_ENGAGE_WARP_DRIVE,
-    WARP_DRIVE_EMERGENCY_SHUT_DOWN,
-    WARP_DRIVE_DISENGAGED,
-    ENGAGING_WARP_DRIVE,
-    FUEL_SCOOPING,
-    FUEL_SCOOPING_COMPLETE,
-    LOW_FUEL_WARNING,
-}
+export type Speaker = "Charlotte";
+
+export type VoiceLine =
+    | "initiating_planetary_landing"
+    | "landing_request_granted"
+    | "landing_complete"
+    | "mission_complete"
+    | "new_discovery"
+    | "cannot_engage_warp_drive"
+    | "warp_drive_emergency_shut_down"
+    | "warp_drive_disengaged"
+    | "engaging_warp_drive"
+    | "fuel_scooping"
+    | "fuel_scooping_complete"
+    | "low_fuel_warning";
 
 export interface ITts {
     sayNow(speaker: Speaker, line: VoiceLine): void;
@@ -56,37 +55,41 @@ export class Tts implements ITts {
 
     private getLineFromVoiceLines(voiceLines: VoiceLines, line: VoiceLine): AbstractSound {
         switch (line) {
-            case VoiceLine.INITIATING_PLANETARY_LANDING:
+            case "initiating_planetary_landing":
                 return voiceLines.initiatingPlanetaryLanding;
-            case VoiceLine.LANDING_REQUEST_GRANTED:
+            case "landing_request_granted":
                 return voiceLines.landingRequestGranted;
-            case VoiceLine.LANDING_COMPLETE:
+            case "landing_complete":
                 return voiceLines.landingComplete;
-            case VoiceLine.MISSION_COMPLETE:
+            case "mission_complete":
                 return voiceLines.missionComplete;
-            case VoiceLine.NEW_DISCOVERY:
+            case "new_discovery":
                 return voiceLines.newDiscovery;
-            case VoiceLine.CANNOT_ENGAGE_WARP_DRIVE:
+            case "cannot_engage_warp_drive":
                 return voiceLines.cannotEngageWarpDrive;
-            case VoiceLine.WARP_DRIVE_EMERGENCY_SHUT_DOWN:
+            case "warp_drive_emergency_shut_down":
                 return voiceLines.warpDriveEmergencyShutDown;
-            case VoiceLine.WARP_DRIVE_DISENGAGED:
+            case "warp_drive_disengaged":
                 return voiceLines.warpDriveDisengaged;
-            case VoiceLine.ENGAGING_WARP_DRIVE:
+            case "engaging_warp_drive":
                 return voiceLines.engagingWarpDrive;
-            case VoiceLine.FUEL_SCOOPING:
+            case "fuel_scooping":
                 return voiceLines.fuelScooping;
-            case VoiceLine.FUEL_SCOOPING_COMPLETE:
+            case "fuel_scooping_complete":
                 return voiceLines.fuelScoopingComplete;
-            case VoiceLine.LOW_FUEL_WARNING:
+            case "low_fuel_warning":
                 return voiceLines.lowFuelWarning;
+            default:
+                return assertUnreachable(line);
         }
     }
 
     private getVoiceLinesFromSpeaker(speaker: Speaker): VoiceLines {
         switch (speaker) {
-            case Speaker.CHARLOTTE:
+            case "Charlotte":
                 return this.voiceLines.charlotte;
+            default:
+                return assertUnreachable(speaker);
         }
     }
 

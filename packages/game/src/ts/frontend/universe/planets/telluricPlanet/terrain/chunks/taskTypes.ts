@@ -24,10 +24,7 @@ import { type TerrainSettings } from "@/backend/universe/orbitalObjects/terrainS
 import { type Direction } from "./direction";
 import { type PlanetChunk } from "./planetChunk";
 
-export const enum TaskType {
-    BUILD,
-    APPLY,
-}
+export type TaskType = "build" | "apply";
 
 export type Task = {
     type: TaskType;

@@ -1,9 +1,9 @@
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 
-export const enum SystemIconMask {
-    BOOKMARK = 0b01,
-    MISSION = 0b10,
-}
+const SystemIconMask = {
+    BOOKMARK: 0b01,
+    MISSION: 0b10,
+} as const;
 
 export class SystemIcons {
     readonly htmlRoot: HTMLElement;

@@ -18,7 +18,7 @@
 import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { deserializeComponent } from "@/frontend/spaceship/components/component";
 import { type ComponentSlot } from "@/frontend/spaceship/componentSlot";
@@ -135,7 +135,7 @@ export class SpaceshipOutfittingUI {
                 return;
             }
 
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
 
             const componentValue = getComponentValue(component.serialize());
             const componentSellingPrice = componentValue * 0.75;
@@ -272,7 +272,7 @@ export class SpaceshipOutfittingUI {
         slotUI.textContent = component !== null ? getComponentTypeI18n(component.type) : i18n.t("components:emptySlot");
         slotUI.classList.add("componentSlot");
         slotUI.addEventListener("click", () => {
-            soundPlayer.playNow(SoundType.CLICK);
+            soundPlayer.playNow("click");
             this.handleClickOnSlot(componentSlot, player);
 
             if (this.activeSlotDiv !== null) {

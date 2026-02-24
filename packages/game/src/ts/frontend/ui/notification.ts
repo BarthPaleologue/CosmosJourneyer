@@ -15,26 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SoundType, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import informationIcon from "@assets/icons/information.webp";
 import explorationIcon from "@assets/icons/space-exploration.webp";
 import spaceStationIcon from "@assets/icons/space-station.webp";
 import spaceshipIcon from "@assets/icons/spaceship_gear.webp";
 
-export const enum NotificationOrigin {
-    GENERAL = "info",
-    SPACESHIP = "spaceship",
-    EXPLORATION = "exploration",
-    SPACE_STATION = "space-station",
-}
+export type NotificationOrigin = "general" | "spaceship" | "exploration" | "space-station";
 
-export const enum NotificationIntent {
-    INFO = "info",
-    SUCCESS = "success",
-    WARNING = "warning",
-    ERROR = "error",
-}
+export type NotificationIntent = "info" | "success" | "warning" | "error";
 
 export class Notification {
     private progressSeconds = 0;
@@ -66,16 +56,16 @@ export class Notification {
 
         const iconNode = doc.createElement("img");
         switch (origin) {
-            case NotificationOrigin.GENERAL:
+            case "general":
                 iconNode.src = informationIcon;
                 break;
-            case NotificationOrigin.SPACESHIP:
+            case "spaceship":
                 iconNode.src = spaceshipIcon;
                 break;
-            case NotificationOrigin.EXPLORATION:
+            case "exploration":
                 iconNode.src = explorationIcon;
                 break;
-            case NotificationOrigin.SPACE_STATION:
+            case "space-station":
                 iconNode.src = spaceStationIcon;
                 break;
         }
@@ -98,17 +88,17 @@ export class Notification {
         container.appendChild(this.htmlRoot);
 
         switch (intent) {
-            case NotificationIntent.INFO:
-                soundPlayer.playNow(SoundType.INFO);
+            case "info":
+                soundPlayer.playNow("info");
                 break;
-            case NotificationIntent.SUCCESS:
-                soundPlayer.playNow(SoundType.SUCCESS);
+            case "success":
+                soundPlayer.playNow("success");
                 break;
-            case NotificationIntent.WARNING:
-                soundPlayer.playNow(SoundType.WARNING);
+            case "warning":
+                soundPlayer.playNow("warning");
                 break;
-            case NotificationIntent.ERROR:
-                soundPlayer.playNow(SoundType.ERROR);
+            case "error":
+                soundPlayer.playNow("error");
                 break;
         }
 

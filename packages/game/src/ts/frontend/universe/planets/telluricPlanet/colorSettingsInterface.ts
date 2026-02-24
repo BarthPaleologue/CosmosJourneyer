@@ -17,12 +17,21 @@
 
 import { type Color3 } from "@babylonjs/core/Maths/math.color";
 
-export const enum ColorMode {
-    DEFAULT,
-    MOISTURE,
-    TEMPERATURE,
-    NORMAL,
-    HEIGHT,
+export type ColorMode = "default" | "moisture" | "temperature" | "normal" | "height";
+
+export function getColorModeIndex(colorMode: ColorMode): number {
+    switch (colorMode) {
+        case "default":
+            return 0;
+        case "moisture":
+            return 1;
+        case "temperature":
+            return 2;
+        case "normal":
+            return 3;
+        case "height":
+            return 4;
+    }
 }
 
 export interface GazColorSettings {
