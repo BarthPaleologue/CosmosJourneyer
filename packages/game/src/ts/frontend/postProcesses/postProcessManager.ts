@@ -61,7 +61,7 @@ import { ColorCorrection } from "./colorCorrection";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { OceanPostProcess } from "./ocean/oceanPostProcess";
-import { PostProcessType } from "./postProcessTypes";
+import { type PostProcessType } from "./postProcessTypes";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
 import { ShadowPostProcess } from "./shadowPostProcess";
 import { type UpdatablePostProcess } from "./updatablePostProcess";
@@ -71,36 +71,36 @@ import { VolumetricLight } from "./volumetricLight/volumetricLight";
  * The order in which the post processes are rendered when away from a planet
  */
 const spaceRenderingOrder: PostProcessType[] = [
-    PostProcessType.VOLUMETRIC_LIGHT,
-    PostProcessType.MATTER_JETS,
-    PostProcessType.OCEAN,
-    PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE,
-    PostProcessType.MANDELBULB,
-    PostProcessType.JULIA_SET,
-    PostProcessType.MANDELBOX,
-    PostProcessType.SIERPINSKI_PYRAMID,
-    PostProcessType.MENGER_SPONGE,
-    PostProcessType.RING,
-    PostProcessType.BLACK_HOLE,
+    "volumetric_light",
+    "matter_jets",
+    "ocean",
+    "clouds",
+    "atmosphere",
+    "mandelbulb",
+    "julia_set",
+    "mandelbox",
+    "sierpinski_pyramid",
+    "menger_sponge",
+    "ring",
+    "black_hole",
 ];
 
 /**
  * The order in which the post processes are rendered when close to a planet
  */
 const surfaceRenderingOrder: PostProcessType[] = [
-    PostProcessType.VOLUMETRIC_LIGHT,
-    PostProcessType.MATTER_JETS,
-    PostProcessType.BLACK_HOLE,
-    PostProcessType.MANDELBULB,
-    PostProcessType.JULIA_SET,
-    PostProcessType.MANDELBOX,
-    PostProcessType.SIERPINSKI_PYRAMID,
-    PostProcessType.MENGER_SPONGE,
-    PostProcessType.RING,
-    PostProcessType.OCEAN,
-    PostProcessType.CLOUDS,
-    PostProcessType.ATMOSPHERE,
+    "volumetric_light",
+    "matter_jets",
+    "black_hole",
+    "mandelbulb",
+    "julia_set",
+    "mandelbox",
+    "sierpinski_pyramid",
+    "menger_sponge",
+    "ring",
+    "ocean",
+    "clouds",
+    "atmosphere",
 ];
 
 /**
@@ -744,46 +744,46 @@ export class PostProcessManager {
         // other objects are viewed in their space configuration
         for (const postProcessType of spaceRenderingOrder) {
             switch (postProcessType) {
-                case PostProcessType.VOLUMETRIC_LIGHT:
+                case "volumetric_light":
                     this.renderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
                     break;
-                case PostProcessType.BLACK_HOLE:
+                case "black_hole":
                     this.renderingPipeline.addEffect(otherBlackHolesRenderEffect);
                     break;
-                case PostProcessType.OCEAN:
+                case "ocean":
                     this.renderingPipeline.addEffect(otherOceansRenderEffect);
                     break;
-                case PostProcessType.CLOUDS:
+                case "clouds":
                     this.renderingPipeline.addEffect(otherCloudsRenderEffect);
                     break;
-                case PostProcessType.ATMOSPHERE:
+                case "atmosphere":
                     this.renderingPipeline.addEffect(otherAtmospheresRenderEffect);
                     break;
-                case PostProcessType.RING:
+                case "ring":
                     this.renderingPipeline.addEffect(otherRingsRenderEffect);
                     break;
-                case PostProcessType.MATTER_JETS:
+                case "matter_jets":
                     this.renderingPipeline.addEffect(otherMatterJetsRenderEffect);
                     break;
-                case PostProcessType.MANDELBULB:
+                case "mandelbulb":
                     this.renderingPipeline.addEffect(otherMandelbulbsRenderEffect);
                     break;
-                case PostProcessType.JULIA_SET:
+                case "julia_set":
                     this.renderingPipeline.addEffect(otherJuliaSetsRenderEffect);
                     break;
-                case PostProcessType.MANDELBOX:
+                case "mandelbox":
                     this.renderingPipeline.addEffect(otherMandelboxesRenderEffect);
                     break;
-                case PostProcessType.SIERPINSKI_PYRAMID:
+                case "sierpinski_pyramid":
                     this.renderingPipeline.addEffect(otherSierpinskiPyramidsRenderEffect);
                     break;
-                case PostProcessType.MENGER_SPONGE:
+                case "menger_sponge":
                     this.renderingPipeline.addEffect(otherMengerSpongesRenderEffect);
                     break;
-                case PostProcessType.SHADOW:
+                case "shadow":
                     //this.renderingPipeline.addEffect(otherShadowRenderEffect);
                     break;
-                case PostProcessType.LENS_FLARE:
+                case "lens_flare":
                     //this.renderingPipeline.addEffect(otherLensFlaresRenderEffect);
                     break;
             }
@@ -792,46 +792,46 @@ export class PostProcessManager {
         // closest object is either in surface or space configuration depending on distance to camera
         for (const postProcessType of this.currentRenderingOrder) {
             switch (postProcessType) {
-                case PostProcessType.VOLUMETRIC_LIGHT:
+                case "volumetric_light":
                     this.renderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
                     break;
-                case PostProcessType.BLACK_HOLE:
+                case "black_hole":
                     this.renderingPipeline.addEffect(bodyBlackHolesRenderEffect);
                     break;
-                case PostProcessType.OCEAN:
+                case "ocean":
                     this.renderingPipeline.addEffect(bodyOceansRenderEffect);
                     break;
-                case PostProcessType.CLOUDS:
+                case "clouds":
                     this.renderingPipeline.addEffect(bodyCloudsRenderEffect);
                     break;
-                case PostProcessType.ATMOSPHERE:
+                case "atmosphere":
                     this.renderingPipeline.addEffect(bodyAtmospheresRenderEffect);
                     break;
-                case PostProcessType.RING:
+                case "ring":
                     this.renderingPipeline.addEffect(bodyRingsRenderEffect);
                     break;
-                case PostProcessType.MATTER_JETS:
+                case "matter_jets":
                     this.renderingPipeline.addEffect(bodyMatterJetsRenderEffect);
                     break;
-                case PostProcessType.MANDELBULB:
+                case "mandelbulb":
                     this.renderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
                     break;
-                case PostProcessType.JULIA_SET:
+                case "julia_set":
                     this.renderingPipeline.addEffect(bodyJuliaSetRenderEffect);
                     break;
-                case PostProcessType.MANDELBOX:
+                case "mandelbox":
                     this.renderingPipeline.addEffect(bodyMandelboxRenderEffect);
                     break;
-                case PostProcessType.SIERPINSKI_PYRAMID:
+                case "sierpinski_pyramid":
                     this.renderingPipeline.addEffect(bodySierpinskiPyramidsRenderEffect);
                     break;
-                case PostProcessType.MENGER_SPONGE:
+                case "menger_sponge":
                     this.renderingPipeline.addEffect(bodyMengerSpongesRenderEffect);
                     break;
-                case PostProcessType.LENS_FLARE:
+                case "lens_flare":
                     //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
                     break;
-                case PostProcessType.SHADOW:
+                case "shadow":
                     //this.renderingPipeline.addEffect(bodyShadowRenderEffect);
                     break;
             }
