@@ -47,7 +47,6 @@ import { CollisionMask, Settings } from "@/settings";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
-import { Direction } from "./terrain/chunks/direction";
 
 export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
@@ -148,12 +147,12 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
         );
 
         this.sides = [
-            new ChunkTree(Direction.UP, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.DOWN, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.FORWARD, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.BACKWARD, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.RIGHT, this.model, this.aggregate, this.material, scene),
-            new ChunkTree(Direction.LEFT, this.model, this.aggregate, this.material, scene),
+            new ChunkTree("up", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("down", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("forward", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("backward", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("right", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("left", this.model, this.aggregate, this.material, scene),
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());

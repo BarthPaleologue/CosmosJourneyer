@@ -19,6 +19,7 @@ import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-gen
 
 import { Settings } from "@/settings";
 
+import { getFaceIndexFromDirection } from "../chunks/direction";
 import { type ReturnedChunkData } from "../chunks/taskTypes";
 import { type TransferBuildData } from "../chunks/workerDataTypes";
 
@@ -55,7 +56,7 @@ function handle_build(data: TransferBuildData): void {
     const buildData: BuildData = new BuildData(
         data.planetDiameter,
         data.depth,
-        data.direction as number,
+        getFaceIndexFromDirection(data.direction),
         data.position[0],
         data.position[1],
         data.position[2],
