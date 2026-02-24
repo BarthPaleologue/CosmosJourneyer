@@ -42,7 +42,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 /**
  * Node used to describe a landing mission on a target object near the terminator line
  */
-export class MissionTerminatorLandingNode implements MissionNodeBase<"terminator_landing"> {
+export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerminatorLandingNodeSerialized> {
     private state: LandMissionState = LandMissionState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;

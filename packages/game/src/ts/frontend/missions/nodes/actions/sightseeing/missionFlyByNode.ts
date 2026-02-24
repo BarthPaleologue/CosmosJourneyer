@@ -38,7 +38,7 @@ import type { MissionNodeBase } from "../../missionNodeBase";
 /**
  * Node used to describe a fly-by mission around a target object
  */
-export class MissionFlyByNode implements MissionNodeBase<"fly_by"> {
+export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSerialized> {
     private state: FlyByState = FlyByState.NOT_IN_SYSTEM;
 
     private readonly objectId: UniverseObjectId;

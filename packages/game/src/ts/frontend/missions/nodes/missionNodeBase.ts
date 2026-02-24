@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type MissionNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { type StarSystemCoordinates } from "@/backend/universe/starSystemCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -26,7 +25,7 @@ import { type MissionNode } from "./missionNode";
  * Describes any node in the mission tree.
  */
 
-export interface MissionNodeBase<T extends MissionNodeSerialized["type"]> {
+export interface MissionNodeBase<TSerialized> {
     /**
      * Returns true if the node is completed, false otherwise.
      */
@@ -69,5 +68,5 @@ export interface MissionNodeBase<T extends MissionNodeSerialized["type"]> {
     /**
      * Serializes the node recursively.
      */
-    serialize(): Extract<MissionNodeSerialized, { type: T }>;
+    serialize(): TSerialized;
 }

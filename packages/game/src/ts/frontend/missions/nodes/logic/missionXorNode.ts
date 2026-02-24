@@ -26,7 +26,7 @@ import { type MissionNodeBase } from "../missionNodeBase";
 /**
  * Node used to describe a set of tasks where only one must be completed.
  */
-export class MissionXorNode implements MissionNodeBase<"xor"> {
+export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized> {
     readonly children: MissionNode[];
 
     private hasCompletedLock = false;

@@ -28,7 +28,7 @@ import { type MissionNodeBase } from "../missionNodeBase";
 /**
  * Node used to describe a set of tasks that must all be completed in any order.
  */
-export class MissionAndNode implements MissionNodeBase<"and"> {
+export class MissionAndNode implements MissionNodeBase<MissionAndNodeSerialized> {
     readonly children: MissionNode[];
 
     private hasCompletedLock = false;
