@@ -17,34 +17,32 @@
 
 import { type z } from "zod";
 
-import i18n from "@/i18n";
+import { assertUnreachable } from "@/utils/types";
 
-export const enum SaveLoadingErrorType {
-    INVALID_JSON = "INVALID_JSON",
-    INVALID_SAVE = "INVALID_SAVE",
-    INVALID_STORAGE_FORMAT = "INVALID_STORAGE_FORMAT",
-}
+import i18n from "@/i18n";
 
 export type SaveLoadingError =
     | {
-          type: SaveLoadingErrorType.INVALID_JSON;
+          type: "INVALID_JSON";
       }
     | {
-          type: SaveLoadingErrorType.INVALID_SAVE;
+          type: "INVALID_SAVE";
           content: z.ZodError;
       }
     | {
-          type: SaveLoadingErrorType.INVALID_STORAGE_FORMAT;
+          type: "INVALID_STORAGE_FORMAT";
           content: z.ZodError;
       };
 
 export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
     switch (error.type) {
-        case SaveLoadingErrorType.INVALID_JSON:
+        case "INVALID_JSON":
             return i18n.t("notifications:invalidSaveFileJson");
-        case SaveLoadingErrorType.INVALID_SAVE:
+        case "INVALID_SAVE":
             return i18n.t("notifications:invalidSaveFile");
-        case SaveLoadingErrorType.INVALID_STORAGE_FORMAT:
+        case "INVALID_STORAGE_FORMAT":
             return i18n.t("notifications:invalidStorageFormat");
+        default:
+            return assertUnreachable(error);
     }
 }

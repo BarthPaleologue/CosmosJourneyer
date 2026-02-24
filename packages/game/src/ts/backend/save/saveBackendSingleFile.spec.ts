@@ -23,7 +23,6 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SaveBackendSingleFile, type IFile } from "./saveBackendSingleFile";
 import { type CmdrSaves, type Save } from "./saveFileData";
-import { SaveLoadingErrorType } from "./saveLoadingError";
 
 /**
  * Mock implementation of SaveBackend for testing
@@ -166,7 +165,7 @@ describe("SaveManager", () => {
 
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error).toEqual({ type: SaveLoadingErrorType.INVALID_JSON });
+                expect(result.error).toEqual({ type: "INVALID_JSON" });
             }
         });
 

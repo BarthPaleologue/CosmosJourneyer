@@ -24,7 +24,7 @@ import { Settings } from "@/settings";
 
 import type { ISaveBackend } from "./saveBackend";
 import { safeParseSave, type CmdrSaves, type Save } from "./saveFileData";
-import { saveLoadingErrorToI18nString, SaveLoadingErrorType, type SaveLoadingError } from "./saveLoadingError";
+import { saveLoadingErrorToI18nString, type SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Interface defining the file system operations for save data.
@@ -136,7 +136,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
         } catch (error) {
             console.error("Failed to create SaveBackendMultiFile:", error);
             // For file system initialization errors, we use INVALID_JSON as a generic failure
-            return err({ type: SaveLoadingErrorType.INVALID_JSON });
+            return err({ type: "INVALID_JSON" });
         }
     }
 
