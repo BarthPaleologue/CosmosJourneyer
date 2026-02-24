@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { type LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 
-import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
+import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 
 // Mock BabylonJS classes
 vi.mock("@babylonjs/core/Physics/v2/physicsAggregate", () => ({
@@ -78,12 +78,12 @@ describe("LandingComputer", () => {
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
-            kind: LandingTargetKind.LANDING_PAD,
+            kind: "landing_pad",
             landingPad: mockLandingPad,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
-        expect(landingComputer.getTarget()?.kind).toBe(LandingTargetKind.LANDING_PAD);
+        expect(landingComputer.getTarget()?.kind).toBe("landing_pad");
     });
 
     it("should set celestial body target", () => {
@@ -92,12 +92,12 @@ describe("LandingComputer", () => {
         } as unknown as TransformNode;
 
         landingComputer.setTarget({
-            kind: LandingTargetKind.CELESTIAL_BODY,
+            kind: "celestial_body",
             celestialBody: mockCelestialBody,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
-        expect(landingComputer.getTarget()?.kind).toBe(LandingTargetKind.CELESTIAL_BODY);
+        expect(landingComputer.getTarget()?.kind).toBe("celestial_body");
     });
 
     it("should return IDLE status when no target", () => {
@@ -116,7 +116,7 @@ describe("LandingComputer", () => {
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
-            kind: LandingTargetKind.LANDING_PAD,
+            kind: "landing_pad",
             landingPad: mockLandingPad,
         });
 
@@ -137,7 +137,7 @@ describe("LandingComputer", () => {
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
-            kind: LandingTargetKind.LANDING_PAD,
+            kind: "landing_pad",
             landingPad: mockLandingPad,
         });
 

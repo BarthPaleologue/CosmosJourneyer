@@ -24,24 +24,20 @@ import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { EarthG } from "@/utils/physics/constants";
+import { assertUnreachable } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
 
 import { AttitudePDController } from "./attitudePdController";
 import { PositionPDController } from "./positionPdController";
 
-export const enum LandingTargetKind {
-    LANDING_PAD,
-    CELESTIAL_BODY,
-}
-
 export type LandingTargetPad = {
-    kind: LandingTargetKind.LANDING_PAD;
+    kind: "landing_pad";
     landingPad: ILandingPad;
 };
 
 export type LandingTargetCelestialBody = {
-    kind: LandingTargetKind.CELESTIAL_BODY;
+    kind: "celestial_body";
     celestialBody: TransformNode;
 };
 
@@ -160,12 +156,14 @@ export class LandingComputer {
         }
 
         switch (this.target.kind) {
-            case LandingTargetKind.LANDING_PAD:
+            case "landing_pad":
                 this.actionPlan = this.createLandingPadActionPlan(this.target.landingPad);
                 break;
-            case LandingTargetKind.CELESTIAL_BODY:
+            case "celestial_body":
                 this.actionPlan = this.createSurfaceActionPlan(this.target.celestialBody);
                 break;
+            default:
+                return assertUnreachable(this.target);
         }
     }
 

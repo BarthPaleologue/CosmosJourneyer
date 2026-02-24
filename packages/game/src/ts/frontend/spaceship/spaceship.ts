@@ -56,7 +56,7 @@ import { CollisionMask } from "@/settings";
 
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
-import { LandingComputer, LandingComputerStatusBit, LandingTargetKind } from "./landingComputer";
+import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";
 
@@ -408,7 +408,7 @@ export class Spaceship implements Transformable, Targetable {
     public engageSurfaceLanding(landingTarget: TransformNode) {
         this.state = "landing";
         this.landingComputer?.setTarget({
-            kind: LandingTargetKind.CELESTIAL_BODY,
+            kind: "celestial_body",
             celestialBody: landingTarget,
         });
 
@@ -727,7 +727,7 @@ export class Spaceship implements Transformable, Targetable {
                 if (distanceToPad < 600 && verticalDistance > 0) {
                     if (this.state !== "landing") {
                         this.landingComputer.setTarget({
-                            kind: LandingTargetKind.LANDING_PAD,
+                            kind: "landing_pad",
                             landingPad: this.targetLandingPad,
                         });
 
