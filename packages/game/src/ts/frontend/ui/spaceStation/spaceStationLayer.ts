@@ -25,7 +25,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
-import { type DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
@@ -44,13 +44,7 @@ import shipHangarIcon from "@assets/icons/spaceship_gear.webp";
 import explorationIcon from "@assets/icons/telescope.webp";
 import tradingIcon from "@assets/icons/trade.webp";
 
-const enum MainPanelState {
-    NONE,
-    INFO,
-    MISSIONS,
-    SPACE_SHIP,
-    EXPLORATION_CENTER,
-}
+type MainPanelState = "none" | "info" | "missions" | "spaceship" | "exploration_center";
 
 export class SpaceStationLayer {
     readonly rootHtml: HTMLElement;
@@ -78,7 +72,7 @@ export class SpaceStationLayer {
     private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
     private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
 
-    private mainPanelState: MainPanelState = MainPanelState.NONE;
+    private mainPanelState: MainPanelState = "none";
 
     readonly explorationCenterPanel: ExplorationCenterPanel;
 
@@ -280,22 +274,22 @@ export class SpaceStationLayer {
 
         this.missionsButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
-            await this.setMainPanelState(MainPanelState.MISSIONS, player, universeBackend);
+            await this.setMainPanelState("missions", player, universeBackend);
         });
 
         this.spaceshipHangarButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
-            await this.setMainPanelState(MainPanelState.SPACE_SHIP, player, universeBackend);
+            await this.setMainPanelState("spaceship", player, universeBackend);
         });
 
         this.explorationCenterButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
-            await this.setMainPanelState(MainPanelState.EXPLORATION_CENTER, player, universeBackend);
+            await this.setMainPanelState("exploration_center", player, universeBackend);
         });
 
         this.infoButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
-            await this.setMainPanelState(MainPanelState.INFO, player, universeBackend);
+            await this.setMainPanelState("info", player, universeBackend);
         });
 
         this.takeOffButton.addEventListener("click", () => {
@@ -308,7 +302,7 @@ export class SpaceStationLayer {
 
     private async setMainPanelState(state: MainPanelState, player: Player, universeBackend: UniverseBackend) {
         if (this.mainPanelState === state) {
-            this.mainPanelState = MainPanelState.NONE;
+            this.mainPanelState = "none";
         } else {
             this.mainPanelState = state;
         }
@@ -319,33 +313,35 @@ export class SpaceStationLayer {
         }
 
         switch (this.mainPanelState) {
-            case MainPanelState.INFO:
+            case "info":
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = generateInfoHTML(this.currentStation, this.currentStationParents);
                 break;
-            case MainPanelState.MISSIONS:
+            case "missions":
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(
                     generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer),
                 );
                 break;
-            case MainPanelState.SPACE_SHIP:
+            case "spaceship":
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.spaceshipDockPanel.generate(player, this.soundPlayer);
                 this.mainPanel.appendChild(this.spaceshipDockPanel.root);
                 break;
-            case MainPanelState.EXPLORATION_CENTER:
+            case "exploration_center":
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 await this.explorationCenterPanel.populate(universeBackend);
                 this.mainPanel.appendChild(this.explorationCenterPanel.htmlRoot);
                 break;
-            case MainPanelState.NONE:
+            case "none":
                 this.mainPanel.classList.add("hidden");
                 this.mainPanel.innerHTML = "";
                 break;
+            default:
+                return assertUnreachable(this.mainPanelState);
         }
     }
 
