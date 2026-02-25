@@ -321,8 +321,6 @@ export class StarSystemView implements View {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
                 await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
-                await this.switchToCharacterControls();
-            } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
                 await this.switchToSpaceshipControls();
             }
         });
@@ -1033,6 +1031,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
+        DefaultControlsInputs.setEnabled(false);
         VehicleInputs.setEnabled(false);
 
         const previousControls = this.scene.getActiveControls();
