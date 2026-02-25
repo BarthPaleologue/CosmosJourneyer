@@ -17,6 +17,8 @@
 
 import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
+import { assertUnreachable } from "@/utils/types";
+
 import { DiscoveryScanner } from "./discoveryScanner";
 import { FuelScoop } from "./fuelScoop";
 import { FuelTank } from "./fuelTank";
@@ -37,5 +39,7 @@ export function deserializeComponent(serializedComponent: SerializedComponent): 
             return new DiscoveryScanner(serializedComponent);
         case "thrusters":
             return new Thrusters(serializedComponent);
+        default:
+            return assertUnreachable(serializedComponent);
     }
 }

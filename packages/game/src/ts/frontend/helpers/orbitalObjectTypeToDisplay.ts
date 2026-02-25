@@ -18,7 +18,7 @@
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 
 import { getStellarTypeFromTemperature } from "@/utils/physics/stellarTypes";
-import { type DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 
@@ -51,5 +51,7 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
             return i18n.t("objectTypes:blackHole");
         case "custom":
             return i18n.t("objectTypes:custom");
+        default:
+            return assertUnreachable(model);
     }
 }

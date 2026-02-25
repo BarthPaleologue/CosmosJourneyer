@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable } from "@/utils/types";
+
 import { type SerializedComponent } from "./component";
 
 export function getComponentValue(serializedComponent: SerializedComponent): number {
@@ -29,5 +31,7 @@ export function getComponentValue(serializedComponent: SerializedComponent): num
             return 5_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
         case "thrusters":
             return 15_000 * (serializedComponent.size ** 2 + serializedComponent.quality);
+        default:
+            return assertUnreachable(serializedComponent);
     }
 }

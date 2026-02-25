@@ -22,7 +22,7 @@ import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpa
 import { type OrbitalObjectModel } from "@/backend/universe/orbitalObjects/index";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { ok, type DeepReadonly, type Result } from "@/utils/types";
+import { assertUnreachable, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type SaveLoadingError } from "../saveLoadingError";
 import { UniverseCoordinatesSchema, type UniverseCoordinates } from "../universeCoordinates";
@@ -74,6 +74,8 @@ export function migrateV1ToV2(saveV1: SaveV1, universeBackend: UniverseBackend):
             closestObject = systemModel.orbitalFacilities.at(saveV1.universeCoordinates.universeObjectId.objectIndex);
             radius = 40e3;
             break;
+        default:
+            assertUnreachable(saveV1.universeCoordinates.universeObjectId.objectType);
     }
 
     closestObject ??= systemModel.stellarObjects[0];

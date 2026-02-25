@@ -49,7 +49,7 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { distanceToAsteroidField } from "@/frontend/universe/asteroidFields/helpers/distance";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import type { DeepReadonly } from "@/utils/types";
+import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
@@ -541,6 +541,9 @@ export class Spaceship implements Transformable, Targetable {
             case "mengerSponge":
             case "darkKnight":
                 fuelAvailability = 0;
+                break;
+            default:
+                assertUnreachable(this.nearestCelestialBody.model);
         }
 
         this.refuel(fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
@@ -638,6 +641,8 @@ export class Spaceship implements Transformable, Targetable {
                     this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING;
                 }
                 break;
+            default:
+                assertUnreachable(this.state);
         }
     }
 
@@ -758,6 +763,9 @@ export class Spaceship implements Transformable, Targetable {
                     break;
                 case LandingComputerStatusBit.NO_LANDING_SPOT:
                     this.cancelLanding();
+                    break;
+                default:
+                    assertUnreachable(landingComputerStatus);
             }
         }
 
@@ -829,6 +837,8 @@ export class Spaceship implements Transformable, Targetable {
                     type: this.shipType,
                     components: this.getInternals().serialize(),
                 };
+            default:
+                return assertUnreachable(this.shipType);
         }
     }
 

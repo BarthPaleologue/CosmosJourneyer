@@ -24,7 +24,7 @@ import { wheelOfFortune } from "@/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "@/utils/strings/parseToStrings";
 import { romanNumeral } from "@/utils/strings/romanNumerals";
 import { generateStarName } from "@/utils/strings/starNameGenerator";
-import { isNonEmptyArray } from "@/utils/types";
+import { assertUnreachable, isNonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
@@ -99,6 +99,8 @@ export function generateStarSystemModel(
                 generateNeutronStarModel(createOrbitalObjectId([], "neutronStar", 0), seed, stellarObjectName, []),
             );
             break;
+        default:
+            assertUnreachable(stellarObjectType);
     }
 
     // Afterward planets are generated. We can assume they only depend on the stellar objects.
@@ -143,6 +145,8 @@ export function generateStarSystemModel(
                     ),
                 );
                 break;
+            default:
+                assertUnreachable(bodyType);
         }
     }
 
@@ -232,6 +236,8 @@ export function generateStarSystemModel(
                     ),
                 );
                 break;
+            default:
+                assertUnreachable(anomalyType);
         }
     }
 

@@ -26,6 +26,8 @@ import { getComponentValue } from "@/backend/spaceship/serializedComponents/pric
 import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
 import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
+import { assertUnreachable } from "@/utils/types";
+
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
@@ -82,6 +84,8 @@ export class ComponentSpecUI {
             case "thrusters":
                 this.root.appendChild(this.displayThrusters(serializedComponent));
                 break;
+            default:
+                assertUnreachable(serializedComponent);
         }
     }
 

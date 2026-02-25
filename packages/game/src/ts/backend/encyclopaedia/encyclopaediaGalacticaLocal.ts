@@ -4,7 +4,7 @@ import { type TelluricSatelliteModel } from "@/backend/universe/orbitalObjects/t
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type UniverseObjectId } from "@/backend/universe/universeObjectId";
 
-import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
+import { assertUnreachable, err, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
@@ -116,6 +116,8 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             case "custom":
                 objectTypeMultiplier = 0;
                 break;
+            default:
+                return assertUnreachable(model);
         }
 
         return ok(Math.ceil(valueFromDistance * objectTypeMultiplier));

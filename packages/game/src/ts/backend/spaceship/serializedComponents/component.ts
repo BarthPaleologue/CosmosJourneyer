@@ -17,6 +17,8 @@
 
 import { z } from "zod";
 
+import { assertUnreachable } from "@/utils/types";
+
 import i18n from "@/i18n";
 
 import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
@@ -47,5 +49,7 @@ export function getComponentTypeI18n(type: SerializedComponent["type"]): string 
             return i18n.t("components:discoveryScanner");
         case "thrusters":
             return i18n.t("components:thrusters");
+        default:
+            return assertUnreachable(type);
     }
 }

@@ -17,6 +17,8 @@
 
 import { type Color3 } from "@babylonjs/core/Maths/math.color";
 
+import { assertUnreachable } from "@/utils/types";
+
 export type ColorMode = "default" | "moisture" | "temperature" | "normal" | "height";
 
 export function getColorModeIndex(colorMode: ColorMode): number {
@@ -31,6 +33,8 @@ export function getColorModeIndex(colorMode: ColorMode): number {
             return 3;
         case "height":
             return 4;
+        default:
+            return assertUnreachable(colorMode);
     }
 }
 

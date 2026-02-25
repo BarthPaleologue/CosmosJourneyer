@@ -29,7 +29,7 @@ import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHol
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import { isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
+import { assertUnreachable, isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 
 import { type Anomaly, type OrbitalFacility, type Planet, type StellarObject } from "./architecture/orbitalObject";
@@ -107,6 +107,8 @@ export class StarSystemLoader {
                 case "neutronStar":
                     stellarObject = new NeutronStar(stellarObjectModel, assets.textures, scene);
                     break;
+                default:
+                    return assertUnreachable(stellarObjectModel);
             }
             stellarObjects.push(stellarObject);
 
@@ -149,6 +151,8 @@ export class StarSystemLoader {
                 case "darkKnight":
                     anomaly = new DarkKnight(anomalyModel, scene);
                     break;
+                default:
+                    return assertUnreachable(anomalyModel);
             }
             anomalies.push(anomaly);
 
@@ -174,6 +178,9 @@ export class StarSystemLoader {
                     break;
                 case "spaceElevator":
                     orbitalFacility = new SpaceElevator(orbitalFacilityModel, assets, scene);
+                    break;
+                default:
+                    return assertUnreachable(orbitalFacilityModel);
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
@@ -201,6 +208,8 @@ export class StarSystemLoader {
                 case "gasPlanet":
                     planet = new GasPlanet(planetModel, assets.textures, assets.textures.pools.ringsPatternLut, scene);
                     break;
+                default:
+                    return assertUnreachable(planetModel);
             }
 
             planet.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));

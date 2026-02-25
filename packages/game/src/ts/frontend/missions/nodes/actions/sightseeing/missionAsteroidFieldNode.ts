@@ -31,6 +31,7 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { clamp } from "@/utils/math";
 import { lightYearsToMeters } from "@/utils/physics/unitConversions";
 import { parseDistance } from "@/utils/strings/parseToStrings";
+import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 
@@ -189,6 +190,8 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
                 });
             case AsteroidFieldMissionState.CLOSE_ENOUGH:
                 return i18n.t("missions:asteroidField:missionCompleted");
+            default:
+                return assertUnreachable(this.state);
         }
     }
 

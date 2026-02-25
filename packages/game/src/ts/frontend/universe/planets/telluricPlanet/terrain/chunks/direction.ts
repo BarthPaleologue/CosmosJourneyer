@@ -18,6 +18,8 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
+import { assertUnreachable } from "@/utils/types";
+
 export type Direction = "up" | "down" | "left" | "right" | "forward" | "backward";
 
 export function getQuaternionFromDirection(direction: Direction): Quaternion {
@@ -34,6 +36,8 @@ export function getQuaternionFromDirection(direction: Direction): Quaternion {
             return Quaternion.RotationAxis(Axis.Y, Math.PI / 2);
         case "right":
             return Quaternion.RotationAxis(Axis.Y, -Math.PI / 2);
+        default:
+            return assertUnreachable(direction);
     }
 }
 
@@ -51,5 +55,7 @@ export function getFaceIndexFromDirection(direction: Direction): number {
             return 4;
         case "backward":
             return 5;
+        default:
+            return assertUnreachable(direction);
     }
 }

@@ -20,6 +20,7 @@ import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/
 import { lerpSmooth } from "@/frontend/helpers/animations/interpolations";
 
 import { clamp, remap } from "@/utils/math";
+import { assertUnreachable } from "@/utils/types";
 
 type WarpDriveState = "disabled" | "enabled" | "disengaging";
 
@@ -246,6 +247,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
                 this.currentSpeed = 0;
                 this.throttle = 0;
                 break;
+            default:
+                assertUnreachable(this.state);
         }
     }
 
