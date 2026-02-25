@@ -1025,7 +1025,6 @@ export class StarSystemView implements View {
     public async switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
-        const defaultControls = this.getDefaultControls();
 
         this.spaceShipLayer.setVisibility(this.isUiEnabled);
 
@@ -1043,7 +1042,7 @@ export class StarSystemView implements View {
             .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
         setRotationQuaternion(
             shipControls.getTransform(),
-            getRotationQuaternion(defaultControls.getTransform()).clone(),
+            getRotationQuaternion(previousControls.getTransform()).clone(),
         );
 
         shipControls.syncCameraTransform();
@@ -1113,7 +1112,7 @@ export class StarSystemView implements View {
             .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
 
         setRotationQuaternion(
-            previousControls.getTransform(),
+            defaultControls.getTransform(),
             getRotationQuaternion(shipControls.getTransform()).clone(),
         );
 
