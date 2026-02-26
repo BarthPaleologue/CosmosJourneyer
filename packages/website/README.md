@@ -40,7 +40,7 @@ Run the following from `packages/website`:
 - `pnpm lint` - Run ESLint
 - `pnpm lint:fix` - Fix ESLint issues
 - `pnpm typecheck` - Run TypeScript type checking
-- `pnpm format` - Format code with Prettier
+- `pnpm format` - Format code with oxfmt
 - `pnpm format:check` - Check code formatting
 
 ### Testing & Deployment
@@ -54,4 +54,4 @@ Run the following from `packages/website`:
 - **React 18** - UI library with modern features
 - **TypeScript** - Type-safe JavaScript
 - **Sass/SCSS** - CSS preprocessor
-- **ESLint + Prettier** - Code quality tools
+- **ESLint + oxfmt** - Code quality tools

@@ -25,7 +25,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type SolidParticle } from "@babylonjs/core/Particles/solidParticle";
 import { SolidParticleSystem } from "@babylonjs/core/Particles/solidParticleSystem";
 import { type Scene } from "@babylonjs/core/scene";
-
 //import { getForwardDirection } from "@/frontend/helpers/transform";
 
 import { type Transformable } from "../../universe/architecture/transformable";

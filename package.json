@@ -1,40 +1,36 @@
 {
     "name": "cosmos-journeyer",
-    "private": true,
     "version": "1.11.0-dev",
-    "packageManager": "pnpm@10.18.0",
-    "engines": {
-        "node": ">=24.0.0"
-    },
+    "private": true,
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
+    "keywords": [
+        "babylonjs",
+        "exploration",
+        "game",
+        "procedural-generation",
+        "space",
+        "webgl",
+        "webgpu"
+    ],
     "homepage": "https://cosmosjourneyer.com",
+    "bugs": {
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
+        "email": "barth.paleologue@cosmosjourneyer.com"
+    },
+    "license": "AGPL-3.0-only",
     "author": {
         "name": "Barthélemy Paléologue",
         "email": "barth.paleologue@cosmosjourneyer.com",
         "url": "https://barth.paleologue.fr"
     },
-    "license": "AGPL-3.0-only",
-    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/BarthPaleologue/CosmosJourneyer"
     },
-    "bugs": {
-        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
-        "email": "barth.paleologue@cosmosjourneyer.com"
-    },
-    "keywords": [
-        "space",
-        "game",
-        "exploration",
-        "babylonjs",
-        "procedural-generation",
-        "webgl",
-        "webgpu"
-    ],
     "workspaces": [
         "packages/*"
     ],
+    "type": "module",
     "scripts": {
         "build": "pnpm -r build",
         "build:game": "pnpm --filter @cosmos-journeyer/game build",
@@ -59,7 +55,6 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.39.2",
-        "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
         "@next/eslint-plugin-next": "^16.0.10",
         "eslint": "^9.39.2",
         "eslint-import-resolver-typescript": "^4.4.4",
@@ -68,14 +63,18 @@
         "http-server": "^14.1.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
-        "prettier": "^3.7.4",
+        "oxfmt": "^0.35.0",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.49.0"
     },
     "lint-staged": {
-        "*": "prettier --write --ignore-unknown"
+        "*.{js,jsx,ts,tsx,mjs,cjs,json,md,css,scss,html,yml,yaml}": "oxfmt --write"
     },
+    "engines": {
+        "node": ">=24.0.0"
+    },
+    "packageManager": "pnpm@10.18.0",
     "pnpm": {
         "onlyBuiltDependencies": [
             "husky"

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "@styles/index.css";
+
 import "@babylonjs/inspector";
 import "@babylonjs/node-editor";
 

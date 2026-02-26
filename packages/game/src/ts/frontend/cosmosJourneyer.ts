@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Engines/Extensions/";
+import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Physics/physicsEngineComponent";
-import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import "@babylonjs/core/Engines/Extensions/";
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudioEngine";
