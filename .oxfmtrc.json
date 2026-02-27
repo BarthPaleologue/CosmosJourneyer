@@ -1,0 +1,72 @@
+{
+    "tabWidth": 4,
+    "printWidth": 120,
+    "sortImports": {
+        "internalPattern": ["@/", "@assets/", "@shaders/"],
+        "customGroups": [
+            {
+                "groupName": "internal-backend",
+                "selector": "internal",
+                "elementNamePattern": ["@/backend", "@/backend/**"]
+            },
+            {
+                "groupName": "internal-frontend",
+                "selector": "internal",
+                "elementNamePattern": ["@/frontend", "@/frontend/**"]
+            },
+            {
+                "groupName": "internal-utils",
+                "selector": "internal",
+                "elementNamePattern": ["@/utils", "@/utils/**"]
+            },
+            {
+                "groupName": "internal-root",
+                "selector": "internal",
+                "elementNamePattern": ["@/**"]
+            },
+            {
+                "groupName": "internal-assets",
+                "selector": "internal",
+                "elementNamePattern": ["@assets", "@assets/**"]
+            },
+            {
+                "groupName": "internal-shaders",
+                "selector": "internal",
+                "elementNamePattern": ["@shaders", "@shaders/**"]
+            }
+        ],
+        "groups": [
+            "side_effect_style",
+            "side_effect",
+            "builtin",
+            "external",
+            "internal-backend",
+            "internal-frontend",
+            "internal-utils",
+            "internal-root",
+            ["parent", "sibling", "index"],
+            "internal-assets",
+            "internal-shaders",
+            "style",
+            "unknown"
+        ],
+        "newlinesBetween": true,
+        "sortSideEffects": true
+    },
+    "ignorePatterns": [
+        "packages/game/src/ts/utils/TWGSL",
+        "pnpm-lock.yaml",
+        "packages/game/dist",
+        "node_modules",
+        "packages/game/src-tauri",
+        "packages/game/src/styles/nasalization",
+        "packages/game/src/asset",
+        "packages/game/doc",
+        "coverage",
+        ".eslintcache",
+        "packages/website/public",
+        "packages/website/.next",
+        "packages/website/out",
+        "packages/terrain-generation/pkg"
+    ]
+}

@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Rendering/edgesRenderer";
+
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
@@ -22,8 +24,6 @@ import { Settings } from "@/settings";
 
 import { pressInteractionToStrings } from "../helpers/inputControlsString";
 import type { InteractionSystem } from "../inputs/interaction/interactionSystem";
-
-import "@babylonjs/core/Rendering/edgesRenderer";
 
 export class InteractionLayer {
     readonly root: HTMLDivElement;

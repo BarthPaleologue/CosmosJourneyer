@@ -1,15 +1,15 @@
 {
     "name": "@cosmos-journeyer/website",
-    "private": true,
     "version": "0.1.0",
+    "private": true,
     "scripts": {
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
         "lint": "eslint . --max-warnings=0",
         "lint:fix": "eslint . --max-warnings=0 --fix",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check",
         "typecheck": "tsc --noEmit",
         "typecheck:watch": "tsc --noEmit --watch",
         "test:all": "pnpm lint && pnpm typecheck && pnpm build",
@@ -25,8 +25,6 @@
     "devDependencies": {
         "@types/node": "^24.8.0",
         "@types/react": "^19.2.2",
-        "@types/react-dom": "^19.2.2",
-        "http-server": "^14.1.1",
-        "typescript": "^5.9.3"
+        "@types/react-dom": "^19.2.2"
     }
 }

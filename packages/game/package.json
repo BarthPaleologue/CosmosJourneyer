@@ -1,39 +1,39 @@
 {
     "name": "@cosmos-journeyer/game",
-    "private": true,
     "version": "1.11.0-dev",
+    "private": true,
     "description": "Cosmos Journeyer is a space exploration game featuring fully explorable planets, across millions of star systems. It is built using Babylon.JS, and a lot of passion.",
+    "keywords": [
+        "babylonjs",
+        "exploration",
+        "game",
+        "procedural-generation",
+        "space",
+        "webgl",
+        "webgpu"
+    ],
     "homepage": "https://cosmosjourneyer.com",
+    "bugs": {
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
+        "email": "barth.paleologue@cosmosjourneyer.com"
+    },
+    "license": "AGPL-3.0-only",
     "author": {
         "name": "Barthélemy Paléologue",
         "email": "barth.paleologue@cosmosjourneyer.com",
         "url": "https://barth.paleologue.fr"
     },
-    "license": "AGPL-3.0-only",
-    "type": "module",
     "repository": {
         "type": "git",
         "url": "https://github.com/BarthPaleologue/CosmosJourneyer"
     },
-    "bugs": {
-        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/issues",
-        "email": "barth.paleologue@cosmosjourneyer.com"
-    },
-    "keywords": [
-        "space",
-        "game",
-        "exploration",
-        "babylonjs",
-        "procedural-generation",
-        "webgl",
-        "webgpu"
-    ],
+    "type": "module",
     "scripts": {
         "build": "rspack --mode=production --node-env=production --configLoader=native",
         "serve": "rspack serve --configLoader=native",
         "serve:prod": "http-server dist -p 8080",
-        "format:check": "prettier . --check",
-        "format": "prettier . --write",
+        "format:check": "oxfmt . --check",
+        "format": "oxfmt . --write",
         "test:unit": "vitest run",
         "test:coverage": "vitest run --coverage",
         "test:e2e": "playwright test",
@@ -66,8 +66,6 @@
         "zod": "^4.3.5"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
-        "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
         "@playwright/test": "^1.57.0",
         "@rspack/cli": "^1.6.8",
         "@rspack/core": "^1.6.8",
@@ -77,19 +75,13 @@
         "@types/webpack": "^5.28.5",
         "@types/webpack-env": "^1.18.8",
         "@vitest/coverage-v8": "^4.0.17",
-        "eslint": "^9.39.2",
-        "eslint-import-resolver-typescript": "^4.4.4",
-        "eslint-plugin-import": "^2.32.0",
         "http-server": "^14.1.1",
         "jsdom": "^27.4.0",
-        "prettier": "^3.8.1",
         "ts-checker-rspack-plugin": "^1.2.6",
         "ts-shader-loader": "^2.1.0",
         "typedoc": "^0.28.16",
         "typedoc-github-theme": "^0.3.1",
         "typedoc-plugin-missing-exports": "^4.1.2",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.53.1",
         "vite-tsconfig-paths": "^6.0.4",
         "vitest": "^4.0.17"
     }

@@ -1,7 +1,0 @@
-src/ts/utils/TWGSL
-src/styles/nasalization
-src/asset
-src-tauri
-node_modules
-dist
-doc

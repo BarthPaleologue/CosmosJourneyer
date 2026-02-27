@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "@babylonjs/core/Loading/loadingScreen";
 import "@babylonjs/core/Lights/Clustered/clusteredLightingSceneComponent";
+import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";

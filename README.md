@@ -155,7 +155,7 @@ Cosmos Journeyer is built using the following technologies:
 - [Pnpm](https://pnpm.io/) for the package manager
 - [Tauri](https://tauri.app/) for building the desktop application
 - [Playwright](https://playwright.dev/) for end-to-end testing
-- [Prettier](https://prettier.io/) for code formatting
+- [oxfmt](https://oxc.rs/docs/guide/usage/oxfmt) for code formatting
 - [Vitest](https://vitest.dev/) for unit testing
 - [ESLint](https://eslint.org/) for linting
 - [Git LFS](https://git-lfs.github.com/) for versioning large files like screenshots
@@ -206,7 +206,7 @@ You can run the unit tests with `pnpm test:unit` and the end-to-end tests with `
 
 ### Formatting
 
-Cosmos Journeyer uses [Prettier](https://prettier.io/) for code formatting. Changed files are automatically formatted via a pre-commit hook. You can also format the entire project with `pnpm format`.
+Cosmos Journeyer uses [oxfmt](https://oxc.rs/docs/guide/usage/oxfmt) for code formatting. Changed files are automatically formatted via a pre-commit hook. You can also format the entire project with `pnpm format`.
 
 ### Linting
 

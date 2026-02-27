@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 import "@babylonjs/core/Helpers/sceneHelpers";
+import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
