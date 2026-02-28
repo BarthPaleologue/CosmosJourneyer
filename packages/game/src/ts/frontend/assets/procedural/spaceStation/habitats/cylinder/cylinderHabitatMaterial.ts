@@ -18,8 +18,6 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     abs,
     atan2,
@@ -47,7 +45,9 @@ import {
     vec2,
     vertexAttribute,
     xz,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
+
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
     constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {

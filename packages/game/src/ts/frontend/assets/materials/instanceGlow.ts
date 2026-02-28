@@ -17,7 +17,6 @@
 
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
-
 import {
     getInstanceData,
     instanceAttribute,
@@ -28,7 +27,7 @@ import {
     uniformViewProjection,
     uniformWorld,
     vertexAttribute,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
 
 export class InstanceGlowMaterial {
     private readonly material: NodeMaterial;

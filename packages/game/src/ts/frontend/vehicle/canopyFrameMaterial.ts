@@ -18,7 +18,6 @@
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
-
 import {
     f,
     mul,
@@ -35,7 +34,7 @@ import {
     uniformViewProjection,
     uniformWorld,
     vertexAttribute,
-} from "../helpers/bsl";
+} from "babylonjs-shading-language";
 
 export class CanopyFrameMaterial {
     private readonly material: NodeMaterial;

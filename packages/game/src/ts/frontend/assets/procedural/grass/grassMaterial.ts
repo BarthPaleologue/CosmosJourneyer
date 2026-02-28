@@ -19,7 +19,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
-
 import {
     add,
     cos,
@@ -54,7 +53,7 @@ import {
     vec3,
     vertexAttribute,
     xz,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
 
 export class GrassMaterial {
     private readonly material: NodeMaterial;

@@ -19,7 +19,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
-
 import {
     abs,
     add,
@@ -55,7 +54,7 @@ import {
     vec,
     vec3,
     vertexAttribute,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
 
 export class ButterflyMaterial {
     private readonly material: NodeMaterial;

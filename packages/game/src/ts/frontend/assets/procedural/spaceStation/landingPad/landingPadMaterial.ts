@@ -19,8 +19,6 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     add,
     f,
@@ -48,7 +46,9 @@ import {
     vec2,
     vertexAttribute,
     xz,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
+
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 import { Settings } from "@/settings";
 

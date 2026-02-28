@@ -48,6 +48,12 @@ importers:
         specifier: ^8.49.0
         version: 8.49.0(eslint@9.39.2)(typescript@5.9.3)
 
+  packages/babylonjs-shading-language:
+    dependencies:
+      '@babylonjs/core':
+        specifier: ^8.48.0
+        version: 8.48.0
+
   packages/game:
     dependencies:
       '@babylonjs/core':
@@ -74,6 +80,9 @@ importers:
       '@brianchirls/game-input':
         specifier: ^0.1.1
         version: 0.1.1
+      babylonjs-shading-language:
+        specifier: workspace:^
+        version: link:../babylonjs-shading-language
       d3:
         specifier: ^7.9.0
         version: 7.9.0

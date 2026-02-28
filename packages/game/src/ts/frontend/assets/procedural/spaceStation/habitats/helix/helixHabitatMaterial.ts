@@ -17,8 +17,6 @@
 
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
 import {
     abs,
     f,
@@ -41,7 +39,9 @@ import {
     uniformWorld,
     vec2,
     vertexAttribute,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
+
+import { type PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class HelixHabitatMaterial extends NodeMaterial {
     constructor(
