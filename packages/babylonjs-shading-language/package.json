@@ -27,7 +27,13 @@
         "lint": "eslint .",
         "typecheck": "tsc --noEmit"
     },
-    "dependencies": {
-        "@babylonjs/core": "^8.48.0"
+    "devDependencies": {
+        "@babylonjs/core": "catalog:",
+        "eslint": "catalog:",
+        "oxfmt": "catalog:",
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "@babylonjs/core": "catalog:"
     }
 }

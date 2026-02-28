@@ -54,19 +54,19 @@
         "tauri": "pnpm --filter @cosmos-journeyer/game exec -- tauri"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
-        "@next/eslint-plugin-next": "^16.0.10",
-        "eslint": "^9.39.2",
-        "eslint-import-resolver-typescript": "^4.4.4",
-        "eslint-plugin-import": "^2.32.0",
-        "globals": "^16.5.0",
-        "http-server": "^14.1.1",
+        "@eslint/js": "catalog:",
+        "@next/eslint-plugin-next": "catalog:",
+        "eslint": "catalog:",
+        "eslint-import-resolver-typescript": "catalog:",
+        "eslint-plugin-import": "catalog:",
+        "globals": "catalog:",
+        "http-server": "catalog:",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
-        "oxfmt": "^0.35.0",
+        "oxfmt": "catalog:",
         "tsx": "^4.21.0",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.49.0"
+        "typescript": "catalog:",
+        "typescript-eslint": "catalog:"
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx,mjs,cjs,json,md,css,scss,html,yml,yaml}": "oxfmt --write"
