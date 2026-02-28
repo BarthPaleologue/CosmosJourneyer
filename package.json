@@ -47,8 +47,8 @@
         "test:e2e:update": "pnpm --filter @cosmos-journeyer/game test:e2e:update",
         "test:e2e:docker": "pnpm --filter @cosmos-journeyer/game test:e2e:docker",
         "test:e2e:docker:update": "pnpm --filter @cosmos-journeyer/game test:e2e:docker:update",
-        "doc": "pnpm --filter @cosmos-journeyer/game doc",
-        "lint": "pnpm -r run lint",
+        "doc": "pnpm -r doc",
+        "lint": "pnpm -r lint",
         "typecheck": "pnpm -r typecheck",
         "prepare": "husky",
         "tauri": "pnpm --filter @cosmos-journeyer/game exec -- tauri"

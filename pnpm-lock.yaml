@@ -4,6 +4,45 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@eslint/js':
+      specifier: ^9.39.2
+      version: 9.39.2
+    '@next/eslint-plugin-next':
+      specifier: ^16.0.10
+      version: 16.0.10
+    eslint:
+      specifier: ^9.39.2
+      version: 9.39.2
+    eslint-import-resolver-typescript:
+      specifier: ^4.4.4
+      version: 4.4.4
+    eslint-plugin-import:
+      specifier: ^2.32.0
+      version: 2.32.0
+    http-server:
+      specifier: ^14.1.1
+      version: 14.1.1
+    oxfmt:
+      specifier: ^0.35.0
+      version: 0.35.0
+    typedoc:
+      specifier: ^0.28.16
+      version: 0.28.16
+    typedoc-github-theme:
+      specifier: ^0.3.1
+      version: 0.3.1
+    typedoc-plugin-missing-exports:
+      specifier: ^4.1.2
+      version: 4.1.2
+    typescript:
+      specifier: ^5.9.3
+      version: 5.9.3
+    typescript-eslint:
+      specifier: ^8.49.0
+      version: 8.49.0
+
 importers:
 
   .:
@@ -53,9 +92,21 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.39.2
+      http-server:
+        specifier: 'catalog:'
+        version: 14.1.1
       oxfmt:
         specifier: 'catalog:'
         version: 0.35.0
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.16(typescript@5.9.3)
+      typedoc-github-theme:
+        specifier: 'catalog:'
+        version: 0.3.1(typedoc@0.28.16(typescript@5.9.3))
+      typedoc-plugin-missing-exports:
+        specifier: 'catalog:'
+        version: 4.1.2(typedoc@0.28.16(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -132,12 +183,12 @@ importers:
       '@types/d3':
         specifier: ^7.4.3
         version: 7.4.3
-      '@types/qrcode':
-        specifier: ^1.5.6
-        version: 1.5.6
       '@types/earcut':
         specifier: ^3.0.0
         version: 3.0.0
+      '@types/qrcode':
+        specifier: ^1.5.6
+        version: 1.5.6
       '@types/webpack':
         specifier: ^5.28.5
         version: 5.28.5
@@ -165,18 +216,18 @@ importers:
       ts-shader-loader:
         specifier: ^2.1.0
         version: 2.1.0
+      typedoc:
+        specifier: 'catalog:'
+        version: 0.28.16(typescript@5.9.3)
+      typedoc-github-theme:
+        specifier: 'catalog:'
+        version: 0.3.1(typedoc@0.28.16(typescript@5.9.3))
+      typedoc-plugin-missing-exports:
+        specifier: 'catalog:'
+        version: 4.1.2(typedoc@0.28.16(typescript@5.9.3))
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      typedoc:
-        specifier: ^0.28.16
-        version: 0.28.16(typescript@5.9.3)
-      typedoc-github-theme:
-        specifier: ^0.3.1
-        version: 0.3.1(typedoc@0.28.16(typescript@5.9.3))
-      typedoc-plugin-missing-exports:
-        specifier: ^4.1.2
-        version: 4.1.2(typedoc@0.28.16(typescript@5.9.3))
       vite-tsconfig-paths:
         specifier: ^6.0.4
         version: 6.0.4(typescript@5.9.3)(vite@7.3.1(@types/node@25.0.10)(less@4.3.0)(sass@1.97.3)(stylus@0.64.0)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
@@ -3134,10 +3185,6 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
-    engines: {node: '>=18'}
-
-  globals@16.5.0:
-    resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -7692,8 +7739,6 @@ snapshots:
     optional: true
 
   globals@14.0.0: {}
-
-  globals@16.5.0: {}
 
   globalthis@1.0.4:
     dependencies:

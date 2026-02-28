@@ -1,0 +1,17 @@
+{
+    "name": "BabylonJS Shading Language API Documentation",
+    "out": "doc",
+    "plugin": ["typedoc-github-theme", "typedoc-plugin-missing-exports"],
+    "theme": "typedoc-github-theme",
+    "sourceLinkTemplate": "https://github.com/BarthPaleologue/CosmosJourneyer/blob/{gitRevision}/packages/babylonjs-shading-language/{path}#L{line}",
+
+    "entryPointStrategy": "expand",
+    "entryPoints": ["src"],
+    "exclude": ["**/node_modules/**/*.*", "**/tests/**/*.*"],
+
+    "includeVersion": true,
+    "excludeInternal": true,
+    "excludePrivate": true,
+
+    "treatWarningsAsErrors": true
+}

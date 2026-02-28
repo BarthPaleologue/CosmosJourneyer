@@ -61,7 +61,7 @@ pnpm add babylonjs-shading-language
 
 ## Documentation
 
-You can build the documentation locally with `pnpm docs` and open the `docs/index.html` file in your browser.
+You can build the documentation locally with `pnpm doc`, then open `doc/index.html` in your browser or run `pnpm serve:doc`.
 
 ## Missing features
 

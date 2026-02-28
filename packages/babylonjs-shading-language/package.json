@@ -24,13 +24,19 @@
     "scripts": {
         "format": "oxfmt . --write",
         "format:check": "oxfmt . --check",
+        "doc": "typedoc --options typedoc.json",
+        "serve:doc": "http-server doc -p 8081",
         "lint": "eslint .",
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
         "@babylonjs/core": "^8.48.0",
         "eslint": "catalog:",
+        "http-server": "catalog:",
         "oxfmt": "catalog:",
+        "typedoc": "catalog:",
+        "typedoc-github-theme": "catalog:",
+        "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:"
     },
     "peerDependencies": {
