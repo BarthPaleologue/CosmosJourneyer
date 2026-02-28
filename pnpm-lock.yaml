@@ -48,7 +48,7 @@ importers:
   packages/babylonjs-shading-language:
     devDependencies:
       '@babylonjs/core':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0
       eslint:
         specifier: 'catalog:'
@@ -63,25 +63,25 @@ importers:
   packages/game:
     dependencies:
       '@babylonjs/core':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0
       '@babylonjs/gui':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0(@babylonjs/core@8.48.0)
       '@babylonjs/havok':
-        specifier: 'catalog:'
+        specifier: ^1.3.11
         version: 1.3.11
       '@babylonjs/inspector':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0(@babylonjs/addons@8.10.0(@babylonjs/core@8.48.0))(@babylonjs/core@8.48.0)(@babylonjs/gui-editor@8.4.0(@babylonjs/core@8.48.0)(@babylonjs/gui@8.48.0(@babylonjs/core@8.48.0))(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2))(@babylonjs/gui@8.48.0(@babylonjs/core@8.48.0))(@babylonjs/loaders@8.48.0(@babylonjs/core@8.48.0)(babylonjs-gltf2interface@8.4.0))(@babylonjs/materials@8.48.0(@babylonjs/core@8.48.0))(@babylonjs/serializers@8.4.0(@babylonjs/core@8.48.0)(babylonjs-gltf2interface@8.4.0))(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)
       '@babylonjs/loaders':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0(@babylonjs/core@8.48.0)(babylonjs-gltf2interface@8.4.0)
       '@babylonjs/materials':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0(@babylonjs/core@8.48.0)
       '@babylonjs/node-editor':
-        specifier: 'catalog:'
+        specifier: ^8.48.0
         version: 8.48.0(@babylonjs/core@8.48.0)(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)
       '@brianchirls/game-input':
         specifier: ^0.1.1

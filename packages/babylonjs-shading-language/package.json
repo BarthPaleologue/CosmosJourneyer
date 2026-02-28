@@ -28,12 +28,12 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
-        "@babylonjs/core": "catalog:",
+        "@babylonjs/core": "^8.48.0",
         "eslint": "catalog:",
         "oxfmt": "catalog:",
         "typescript": "catalog:"
     },
     "peerDependencies": {
-        "@babylonjs/core": "catalog:"
+        "@babylonjs/core": "^8.48.0"
     }
 }
