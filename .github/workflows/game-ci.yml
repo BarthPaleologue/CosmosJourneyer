@@ -4,27 +4,23 @@ on:
         branches: [main]
         paths:
             - "packages/game/**"
-            - "scripts/**"
             - "Dockerfile"
             - "package.json"
             - "pnpm-lock.yaml"
             - "pnpm-workspace.yaml"
             - "tsconfig.base.json"
             - "tsconfig.json"
-            - "eslint.config.mjs"
             - ".github/workflows/game-ci.yml"
     pull_request:
         branches: [main]
         paths:
             - "packages/game/**"
-            - "scripts/**"
             - "Dockerfile"
             - "package.json"
             - "pnpm-lock.yaml"
             - "pnpm-workspace.yaml"
             - "tsconfig.base.json"
             - "tsconfig.json"
-            - "eslint.config.mjs"
             - ".github/workflows/game-ci.yml"
     workflow_dispatch:
 
@@ -34,7 +30,7 @@ concurrency:
 
 jobs:
     game-validation:
-        name: game-full-pipeline
+        name: game-specific-checks
         runs-on: ubuntu-latest
         timeout-minutes: 20
         strategy:
@@ -70,17 +66,8 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Format check
-              run: pnpm format:check
-
-            - name: Lint
-              run: pnpm lint
-
             - name: Test
-              run: pnpm test:unit
-
-            - name: Build documentation
-              run: pnpm doc
+              run: pnpm --filter @cosmos-journeyer/game test:unit
 
               # ─────────── build test image (local load, no push)
             - name: Build Docker image

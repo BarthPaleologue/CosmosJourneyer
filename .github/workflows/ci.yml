@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
     verify:
-        name: format-lint-build
+        name: monorepo-checks
         runs-on: ubuntu-latest
         timeout-minutes: 20
         steps:
@@ -37,8 +37,14 @@ jobs:
             - name: Format check
               run: pnpm format:check
 
+            - name: Typecheck
+              run: pnpm typecheck
+
             - name: Lint
               run: pnpm lint
 
-            - name: Build production bundle
-              run: pnpm build:prod
+            - name: Build documentation
+              run: pnpm doc
+
+            - name: Build packages
+              run: pnpm build
