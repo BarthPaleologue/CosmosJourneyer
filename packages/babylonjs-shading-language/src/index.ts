@@ -57,6 +57,7 @@ import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
 import { MatrixSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/matrixSplitterBlock";
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
+import { ModBlock } from "@babylonjs/core/Materials/Node/Blocks/modBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
@@ -1138,6 +1139,26 @@ export function sub(
     right.connectTo(subBlock.right);
 
     return subBlock.output;
+}
+
+/**
+ * Returns the remainder of dividing the left value by the right value.
+ * @param left - The dividend value.
+ * @param right - The divisor value.
+ * @param options - Optional target options.
+ */
+export function mod(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const modBlock = new ModBlock("mod");
+    modBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(modBlock.left);
+    right.connectTo(modBlock.right);
+
+    return modBlock.output;
 }
 
 /**
