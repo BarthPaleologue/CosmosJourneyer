@@ -511,6 +511,7 @@ export class StarSystemView implements View {
                 setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
+                this.vehicleControls.getVehicle()?.brake();
                 VehicleInputs.setEnabled(false);
 
                 const vehiclePosition = this.vehicleControls.getTransform().getAbsolutePosition();
