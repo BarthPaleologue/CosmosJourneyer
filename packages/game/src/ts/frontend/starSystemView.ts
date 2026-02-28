@@ -91,7 +91,7 @@ import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
 import { VehicleControls } from "./vehicle/vehicleControls";
 import { VehicleInputs } from "./vehicle/vehicleControlsInputs";
-import { createWolfMk2 } from "./vehicle/worlfMk2";
+import { createWolfMk2 } from "./vehicle/wolfMk2";
 
 // register cosmos journeyer as part of window object
 declare global {

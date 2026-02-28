@@ -43,7 +43,7 @@ import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
-import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
+import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

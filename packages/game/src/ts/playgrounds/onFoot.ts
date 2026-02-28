@@ -54,7 +54,7 @@ import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPl
 import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
-import { createWolfMk2 } from "@/frontend/vehicle/worlfMk2";
+import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

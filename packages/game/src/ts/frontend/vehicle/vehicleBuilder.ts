@@ -219,6 +219,7 @@ export class VehicleBuilder {
             const doorAggregate = new PhysicsAggregate(doorMesh, PhysicsShapeType.MESH, { mass }, this.scene);
             filterVehicleShape(doorAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
+            // allow rotation around X axis
             const joint = new Physics6DoFConstraint(
                 {
                     pivotA: positionInFrameSpace,
@@ -230,11 +231,6 @@ export class VehicleBuilder {
                         minLimit: 0,
                         maxLimit: 0,
                     },
-                    /*{
-                axis: PhysicsConstraintAxis.ANGULAR_X,
-                minLimit: 0,
-                maxLimit: 0,
-            },*/
                     {
                         axis: PhysicsConstraintAxis.ANGULAR_Y,
                         minLimit: 0,
