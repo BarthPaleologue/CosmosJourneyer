@@ -19,6 +19,7 @@ import "@babylonjs/core/Engines/Extensions/engine.query";
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Material } from "@babylonjs/core/Materials/material";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode, type VertexData } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -113,6 +114,15 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
         this.planetLocalPosition = position.clone();
         this.getTransform().position = position;
+
+        // Node material hack: we store the planet-space position of the chunk in the instance color for easy access from Babylon NodeMaterial
+        this.mesh.registerInstancedBuffer("instanceColor", 4);
+        this.mesh.instancedBuffers["instanceColor"] = new Color4(
+            this.planetLocalPosition.x,
+            this.planetLocalPosition.y,
+            this.planetLocalPosition.z,
+            1,
+        );
     }
 
     public getTransform(): TransformNode {

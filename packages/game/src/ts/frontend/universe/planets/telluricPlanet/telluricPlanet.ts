@@ -44,7 +44,8 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask, Settings } from "@/settings";
 
-import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
+//import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
+import { TelluricPlanetMaterial2 } from "./telluricPlanetMaterial2";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
 
@@ -55,7 +56,7 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
 
     readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
 
-    readonly material: TelluricPlanetMaterial;
+    readonly material: TelluricPlanetMaterial2;
 
     private readonly transform: TransformNode;
     readonly aggregate: PhysicsAggregate;
@@ -139,20 +140,21 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(
+        /*this.material = new TelluricPlanetMaterial(
             this.model,
             assets.textures.terrains,
             assets.textures.pools.telluricPlanetMaterialLut,
             scene,
-        );
+        );*/
+        this.material = new TelluricPlanetMaterial2(assets.textures.terrains.grass.albedoRoughness, scene);
 
         this.sides = [
-            new ChunkTree("up", this.model, this.aggregate, this.material, scene),
-            new ChunkTree("down", this.model, this.aggregate, this.material, scene),
-            new ChunkTree("forward", this.model, this.aggregate, this.material, scene),
-            new ChunkTree("backward", this.model, this.aggregate, this.material, scene),
-            new ChunkTree("right", this.model, this.aggregate, this.material, scene),
-            new ChunkTree("left", this.model, this.aggregate, this.material, scene),
+            new ChunkTree("up", this.model, this.aggregate, this.material.get(), scene),
+            new ChunkTree("down", this.model, this.aggregate, this.material.get(), scene),
+            new ChunkTree("forward", this.model, this.aggregate, this.material.get(), scene),
+            new ChunkTree("backward", this.model, this.aggregate, this.material.get(), scene),
+            new ChunkTree("right", this.model, this.aggregate, this.material.get(), scene),
+            new ChunkTree("left", this.model, this.aggregate, this.material.get(), scene),
         ];
 
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
@@ -182,7 +184,7 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
     }
 
     public updateMaterial(stellarObjects: ReadonlyArray<PointLight>): void {
-        this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
+        //this.material.update(this.getTransform().getWorldMatrix(), stellarObjects);
     }
 
     public getRadius(): number {
