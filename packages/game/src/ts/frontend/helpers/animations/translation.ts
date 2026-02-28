@@ -31,15 +31,12 @@ export class TransformTranslationAnimation implements CustomAnimation {
     private readonly totalDistance;
     private readonly direction: Vector3;
     private readonly transform: TransformNode;
-    private readonly targetPosition: Vector3;
     private finished = false;
 
     constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
         this.transform = transform;
         this.duration = duration;
-        this.targetPosition = targetPosition.clone();
-
-        const deltaToTarget = this.targetPosition.subtract(transform.getAbsolutePosition());
+        const deltaToTarget = targetPosition.subtract(transform.getAbsolutePosition());
         this.totalDistance = deltaToTarget.length();
         this.direction = this.totalDistance > 0 ? deltaToTarget.normalizeToNew() : Vector3.Zero();
     }
@@ -57,7 +54,11 @@ export class TransformTranslationAnimation implements CustomAnimation {
         translate(this.transform, this.direction.scale(dDistance));
 
         if (this.elapsedSeconds >= this.duration) {
-            this.transform.setAbsolutePosition(this.targetPosition);
+            const remainingDistance = this.totalDistance - this.distanceAcc;
+            if (remainingDistance !== 0) {
+                translate(this.transform, this.direction.scale(remainingDistance));
+                this.distanceAcc = this.totalDistance;
+            }
             this.finished = true;
         }
     }

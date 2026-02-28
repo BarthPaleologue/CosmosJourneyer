@@ -321,8 +321,6 @@ export class StarSystemView implements View {
             if (this.scene.getActiveControls() === this.getSpaceshipControls()) {
                 await this.switchToDefaultControls(true);
             } else if (this.scene.getActiveControls() === this.getDefaultControls()) {
-                await this.switchToCharacterControls();
-            } else if (this.scene.getActiveControls() === this.getCharacterControls()) {
                 await this.switchToSpaceshipControls();
             }
         });
@@ -1027,12 +1025,12 @@ export class StarSystemView implements View {
     public async switchToSpaceshipControls() {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
-        const defaultControls = this.getDefaultControls();
 
         this.spaceShipLayer.setVisibility(this.isUiEnabled);
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
+        DefaultControlsInputs.setEnabled(false);
         VehicleInputs.setEnabled(false);
 
         const previousControls = this.scene.getActiveControls();
@@ -1044,7 +1042,7 @@ export class StarSystemView implements View {
             .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
         setRotationQuaternion(
             shipControls.getTransform(),
-            getRotationQuaternion(defaultControls.getTransform()).clone(),
+            getRotationQuaternion(previousControls.getTransform()).clone(),
         );
 
         shipControls.syncCameraTransform();
@@ -1114,7 +1112,7 @@ export class StarSystemView implements View {
             .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
 
         setRotationQuaternion(
-            previousControls.getTransform(),
+            defaultControls.getTransform(),
             getRotationQuaternion(shipControls.getTransform()).clone(),
         );
 
