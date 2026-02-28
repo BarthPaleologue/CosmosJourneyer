@@ -485,7 +485,8 @@ export class StarSystemView implements View {
 
                 const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, spawnRotation);
                 if (!roverResult.success) {
-                    throw new Error("The rover had a stroke");
+                    await alertModal(`Could not create Wolf Mk2 because ${roverResult.error}`, this.soundPlayer);
+                    return;
                 }
 
                 const rover = roverResult.value;
