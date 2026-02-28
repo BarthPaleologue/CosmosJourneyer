@@ -58,6 +58,7 @@ import { MatrixSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/matri
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
+import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
@@ -670,6 +671,23 @@ export function pow(
     power.connectTo(powBlock.power);
 
     return powBlock.output;
+}
+
+/**
+ * Returns the normalized version of the input vector.
+ * @param input - The input vector.
+ * @param options - Optional target options.
+ */
+export function normalize(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const normalizeBlock = new NormalizeBlock("normalize");
+    normalizeBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(normalizeBlock.input);
+
+    return normalizeBlock.output;
 }
 
 /**
