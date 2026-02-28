@@ -17,9 +17,9 @@
 
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import type { PBRTextures } from "./materials";
-import { loadTextureAsync } from "./utils";
+import type { PBRTextures } from ".";
+import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import { loadTextureAsync } from "../utils";
 
 import concreteAlbedo from "@assets/degraded-concrete-ue/degraded-concrete_albedo.webp";
 import concreteAmbientOcclusion from "@assets/degraded-concrete-ue/degraded-concrete_ao.webp";

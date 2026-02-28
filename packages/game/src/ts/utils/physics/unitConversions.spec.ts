@@ -23,6 +23,7 @@ import {
     degreesToRadians,
     haToM2,
     kelvinToCelsius,
+    kmhToMetersPerSecond,
     kwhPerYearToWatts,
     metersToLightYears,
     perHaToPerM2,
@@ -128,5 +129,23 @@ describe("perHaToPerM2", () => {
 
     it("handles zero input", () => {
         expect(perHaToPerM2(0)).toBe(0);
+    });
+});
+
+describe("kmhToMetersPerSecond", () => {
+    it("converts 0 km/h to 0 m/s", () => {
+        expect(kmhToMetersPerSecond(0)).toBe(0);
+    });
+
+    it("converts 36 km/h to 10 m/s", () => {
+        expect(kmhToMetersPerSecond(36)).toBeCloseTo(10);
+    });
+
+    it("converts 72 km/h to 20 m/s", () => {
+        expect(kmhToMetersPerSecond(72)).toBeCloseTo(20);
+    });
+
+    it("handles negative values", () => {
+        expect(kmhToMetersPerSecond(-18)).toBeCloseTo(-5);
     });
 });

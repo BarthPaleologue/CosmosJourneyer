@@ -18,21 +18,18 @@
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { type ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import { loadTextureAsync } from "../utils";
 import { loadConcreteTextures } from "./concrete";
-import { loadTextureAsync } from "./utils";
+import { loadCrateTextures, type CrateTextures } from "./crate";
+import { loadSolarPanelTextures, type SolarPanelTextures } from "./solarPanel";
+import { loadStyroFoamTextures, type StyroFoamTextures } from "./styrofoam";
+import { loadTireTextures, type TireTextures } from "./tire";
 
-import crateAlbedo from "@assets/crateMaterial/space-crate1-albedo.webp";
-import crateAmbientOcclusion from "@assets/crateMaterial/space-crate1-ao.webp";
-import crateMetallicRoughness from "@assets/crateMaterial/space-crate1-metallic-roughness.webp";
-import crateNormal from "@assets/crateMaterial/space-crate1-normal-dx.webp";
 import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRoughness.webp";
 import metalPanelsAlbedo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";
 import metalPanelsAmbientOcclusion from "@assets/metalPanelMaterial/sci-fi-panel1-ao.webp";
 import metalPanelsNormal from "@assets/metalPanelMaterial/sci-fi-panel1-normal-dx.webp";
-import solarPanelMetallicRoughness from "@assets/SolarPanelMaterial/metallicRougness.webp";
-import solarPanelAlbedo from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_Color.webp";
-import solarPanelNormal from "@assets/SolarPanelMaterial/SolarPanel002_2K-PNG_NormalDX.webp";
 import spaceStationMetallicRoughness from "@assets/spaceStationMaterial/metallicRoughness.webp";
 import spaceStationAlbedo from "@assets/spaceStationMaterial/spaceship-panels1-albedo.webp";
 import spaceStationAmbientOcclusion from "@assets/spaceStationMaterial/spaceship-panels1-ao.webp";
@@ -47,11 +44,13 @@ export type PBRTextures = {
 };
 
 export type AllMaterialTextures = {
-    solarPanel: Omit<PBRTextures, "ambientOcclusion">;
+    solarPanel: SolarPanelTextures;
     spaceStation: PBRTextures;
     metalPanels: PBRTextures;
     concrete: PBRTextures;
-    crate: PBRTextures;
+    crate: CrateTextures;
+    tire: TireTextures;
+    styroFoam: StyroFoamTextures;
     tree: Pick<PBRTextures, "albedo">;
 };
 
@@ -59,17 +58,6 @@ export async function loadMaterialTextures(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<AllMaterialTextures> {
-    // Material textures
-    // Solar Panel
-    const solarPanelAlbedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedo, scene, progressMonitor);
-    const solarPanelNormalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormal, scene, progressMonitor);
-    const solarPanelMetallicRoughnessPromise = loadTextureAsync(
-        "SolarPanelMetallicRoughness",
-        solarPanelMetallicRoughness,
-        scene,
-        progressMonitor,
-    );
-
     // Space Station
     const spaceStationAlbedoPromise = loadTextureAsync(
         "SpaceStationAlbedo",
@@ -116,31 +104,19 @@ export async function loadMaterialTextures(
 
     const concretePromise = loadConcreteTextures(scene, progressMonitor);
 
-    // Crate
-    const crateAlbedoPromise = loadTextureAsync("CrateAlbedo", crateAlbedo, scene, progressMonitor);
-    const crateNormalPromise = loadTextureAsync("CrateNormal", crateNormal, scene, progressMonitor);
-    const crateMetallicRoughnessPromise = loadTextureAsync(
-        "CrateMetallicRoughness",
-        crateMetallicRoughness,
-        scene,
-        progressMonitor,
-    );
-    const crateAmbientOcclusionPromise = loadTextureAsync(
-        "CrateAmbientOcclusion",
-        crateAmbientOcclusion,
-        scene,
-        progressMonitor,
-    );
+    const cratePromise = loadCrateTextures(scene, progressMonitor);
+
+    const tirePromise = loadTireTextures(scene, progressMonitor);
+
+    const styroFoamPromise = loadStyroFoamTextures(scene, progressMonitor);
+
+    const solarPanelPromise = loadSolarPanelTextures(scene, progressMonitor);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
     return {
-        solarPanel: {
-            albedo: await solarPanelAlbedoPromise,
-            normal: await solarPanelNormalPromise,
-            metallicRoughness: await solarPanelMetallicRoughnessPromise,
-        },
+        solarPanel: await solarPanelPromise,
         spaceStation: {
             albedo: await spaceStationAlbedoPromise,
             normal: await spaceStationNormalPromise,
@@ -154,14 +130,11 @@ export async function loadMaterialTextures(
             ambientOcclusion: await metalPanelsAmbientOcclusionPromise,
         },
         concrete: await concretePromise,
-        crate: {
-            albedo: await crateAlbedoPromise,
-            normal: await crateNormalPromise,
-            metallicRoughness: await crateMetallicRoughnessPromise,
-            ambientOcclusion: await crateAmbientOcclusionPromise,
-        },
+        crate: await cratePromise,
         tree: {
             albedo: treeAlbedo,
         },
+        tire: await tirePromise,
+        styroFoam: await styroFoamPromise,
     };
 }

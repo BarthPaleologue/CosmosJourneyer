@@ -20,7 +20,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Space, Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -89,6 +89,9 @@ import { type INotificationManager } from "./ui/notificationManager";
 import { type Transformable } from "./universe/architecture/transformable";
 import { type TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
+import { VehicleControls } from "./vehicle/vehicleControls";
+import { VehicleInputs } from "./vehicle/vehicleControlsInputs";
+import { createWolfMk2 } from "./vehicle/wolfMk2";
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -150,6 +153,8 @@ export class StarSystemView implements View {
      * @private
      */
     private characterControls: CharacterControls | null = null;
+
+    private vehicleControls: VehicleControls;
 
     /**
      * A debug helper to display the orbits of the orbital objects
@@ -291,6 +296,8 @@ export class StarSystemView implements View {
 
         this.interactionLayer = new InteractionLayer(this.interactionSystem, this.keyboardLayoutMap);
         document.body.appendChild(this.interactionLayer.root);
+
+        this.vehicleControls = new VehicleControls(scene);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
             this.keyboardLayoutMap = keyboardLayoutMap ?? new Map<string, string>();
@@ -472,6 +479,48 @@ export class StarSystemView implements View {
 
                 spaceship.soundInstances.acceleratingWarpDrive.setVolume(0);
                 spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
+
+                const spawnPosition = shipPosition.add(up.scale(10).add(left.scale(20)));
+                const spawnRotation = Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, up, new Quaternion());
+
+                const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, spawnRotation);
+                if (!roverResult.success) {
+                    await alertModal(`Could not create Wolf Mk2 because ${roverResult.error}`, this.soundPlayer);
+                    return;
+                }
+
+                const rover = roverResult.value;
+                this.vehicleControls.setVehicle(rover);
+
+                this.interactionSystem.register({
+                    getPhysicsAggregate: () => rover.frame,
+                    getInteractions: () => [
+                        {
+                            label: i18n.t("interactions:drive", { vehicle: "Wolf Mk2" }),
+                            perform: async () => {
+                                await this.switchToVehicleControls();
+                            },
+                        },
+                    ],
+                });
+
+                for (const door of rover.doors) {
+                    this.interactionSystem.register(door);
+                }
+            } else if (this.scene.getActiveControls() === this.vehicleControls) {
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
+                characterControls.getTransform().setEnabled(true);
+                CharacterInputs.setEnabled(true);
+                this.vehicleControls.getVehicle()?.brake();
+                VehicleInputs.setEnabled(false);
+
+                const vehiclePosition = this.vehicleControls.getTransform().getAbsolutePosition();
+
+                characterControls
+                    .getTransform()
+                    .setAbsolutePosition(vehiclePosition.add(this.vehicleControls.getTransform().forward.scale(10)));
+
+                await this.scene.setActiveControls(characterControls);
             }
         });
 
@@ -667,6 +716,8 @@ export class StarSystemView implements View {
             this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
         }
 
+        this.vehicleControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+
         const spaceshipSerialized = this.player.serializedSpaceships.shift();
         if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
 
@@ -693,6 +744,9 @@ export class StarSystemView implements View {
 
                             characterControls.getTransform().setEnabled(false);
                             CharacterInputs.setEnabled(false);
+
+                            this.vehicleControls.getVehicle()?.dispose();
+                            this.vehicleControls.setVehicle(null);
 
                             await this.scene.setActiveControls(shipControls);
                             SpaceShipControlsInputs.setEnabled(true);
@@ -858,6 +912,12 @@ export class StarSystemView implements View {
             fuelRequiredForJump / spaceship.getTotalFuelCapacity(),
         );
 
+        const cameraPosition = this.scene.getActiveControls().getActiveCamera().getWorldMatrix().getTranslation();
+        const upDirection = cameraPosition
+            .subtract(nearestCelestialBody.getTransform().getAbsolutePosition())
+            .normalize();
+        this.vehicleControls.setUpDirection(upDirection);
+
         this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
 
         // update missions
@@ -973,6 +1033,7 @@ export class StarSystemView implements View {
 
         characterControls.getTransform().setEnabled(false);
         CharacterInputs.setEnabled(false);
+        VehicleInputs.setEnabled(false);
 
         const previousControls = this.scene.getActiveControls();
         await this.scene.setActiveControls(shipControls);
@@ -1015,6 +1076,7 @@ export class StarSystemView implements View {
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
+        VehicleInputs.setEnabled(false);
         this.stopBackgroundSounds();
     }
 
@@ -1036,6 +1098,8 @@ export class StarSystemView implements View {
         const spaceship = shipControls.getSpaceship();
         spaceship.warpTunnel.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
+
+        VehicleInputs.setEnabled(false);
 
         this.stopBackgroundSounds();
 
@@ -1071,6 +1135,26 @@ export class StarSystemView implements View {
                 20_000,
             );
         }
+    }
+
+    async switchToVehicleControls() {
+        const characterControls = this.getCharacterControls();
+        const vehicleTransform = this.vehicleControls.getTransform();
+
+        setCollisionsEnabled(characterControls.avatar.aggregate, false);
+        characterControls.getTransform().setEnabled(false);
+        characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
+        characterControls
+            .getTransform()
+            .setAbsolutePosition(vehicleTransform.getAbsolutePosition().add(vehicleTransform.forward.scale(2)));
+
+        this.spaceShipLayer.setVisibility(false);
+
+        SpaceShipControlsInputs.setEnabled(false);
+        CharacterInputs.setEnabled(false);
+        VehicleInputs.setEnabled(true);
+
+        await this.scene.setActiveControls(this.vehicleControls);
     }
 
     /**

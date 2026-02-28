@@ -22,29 +22,31 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
 
+import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
+
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
 import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
 import { type Textures } from "../textures";
+import { CrateMaterial } from "./crate";
 
 export type Materials = {
     readonly butterfly: Material;
     readonly grass: Material;
-    readonly crate: PBRMetallicRoughnessMaterial;
+    readonly crate: CrateMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: Material;
     readonly landingPad: Material;
     readonly metalSection: Material;
+    readonly tire: TireMaterial;
+    readonly glass: PBRMaterial;
 };
 
 export function initMaterials(textures: Textures, scene: Scene): Materials {
-    const crateMaterial = new PBRMetallicRoughnessMaterial("crateMaterial", scene);
-    crateMaterial.baseTexture = textures.materials.crate.albedo;
-    crateMaterial.normalTexture = textures.materials.crate.normal;
-    crateMaterial.metallicRoughnessTexture = textures.materials.crate.metallicRoughness;
+    const crateMaterial = new CrateMaterial(textures.materials.crate, scene);
 
     const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
     treeMaterial.backFaceCulling = false;
@@ -63,6 +65,18 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         scene,
     );
 
+    const tireMaterial = new TireMaterial(textures.materials.tire, scene);
+
+    const glass = new PBRMaterial("glass", scene);
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+    glass.metallic = 0;
+    glass.roughness = 0.05;
+    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    glass.alpha = 0.1;
+    glass.indexOfRefraction = 1.5;
+    glass.backFaceCulling = false;
+
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
@@ -72,6 +86,8 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         tank: tankMaterial,
         landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
         metalSection: metalSectionMaterial,
+        tire: tireMaterial,
+        glass: glass,
     };
 }
 

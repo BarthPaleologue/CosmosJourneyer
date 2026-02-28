@@ -96,11 +96,16 @@ export class HumanoidAvatar implements Transformable {
 
     private lastSurfaceInfo: SurfaceInfo | null = null;
 
-    private readonly raycastResult = new PhysicsRaycastResult();
-
     private readonly root: AbstractMesh;
 
     private readonly physicsEngine: PhysicsEngineV2;
+
+    private readonly downwardRaycastResult = new PhysicsRaycastResult();
+    private readonly upwardRaycastResult = new PhysicsRaycastResult();
+    private readonly raycastQuery = {
+        membership: CollisionMask.EVERYTHING,
+        collideWith: CollisionMask.EVERYTHING & ~CollisionMask.AVATARS,
+    };
 
     private readonly mass = 80;
     readonly aggregate: PhysicsAggregate;
@@ -236,32 +241,58 @@ export class HumanoidAvatar implements Transformable {
         }
     }
 
-    private querySurfaceBelow() {
-        const up = this.getTransform().up;
-        const rayStartOffset = 150;
-        const rayDepth = 100;
-        const start = this.getTransform().getAbsolutePosition().add(up.scale(rayStartOffset));
-        const end = this.getTransform().getAbsolutePosition().add(up.scale(-rayDepth));
-        this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
-            membership: CollisionMask.EVERYTHING,
-            collideWith: CollisionMask.EVERYTHING & ~CollisionMask.AVATARS,
-        });
+    private querySurface(): SurfaceInfo | null {
+        this.getTransform().computeWorldMatrix(true);
 
-        if (!this.raycastResult.hasHit) {
+        const downwardRayLength = 150;
+        const upwardRayLength = 20;
+        const rayOffset = 1.0;
+
+        const up = this.getTransform().up;
+        const rayOrigin = this.getTransform().getAbsolutePosition().add(up.scale(rayOffset));
+        const downwardRayEnd = rayOrigin.add(up.scale(-downwardRayLength));
+        const upwardRayEnd = rayOrigin.add(up.scale(upwardRayLength));
+
+        this.physicsEngine.raycastToRef(rayOrigin, downwardRayEnd, this.downwardRaycastResult, this.raycastQuery);
+        this.physicsEngine.raycastToRef(rayOrigin, upwardRayEnd, this.upwardRaycastResult, this.raycastQuery);
+
+        if (this.upwardRaycastResult.hasHit) {
+            if ((this.upwardRaycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+                // keep distance referenced to feet so swimming threshold remains meaningful
+                const waterDistance = -this.upwardRaycastResult.hitDistance - rayOffset;
+                return {
+                    type: "water" as const,
+                    distance: waterDistance,
+                };
+            } else if (!this.downwardRaycastResult.hasHit) {
+                // no ground below but ground above, could be falling under the ground
+                const groundDistance = rayOffset - this.upwardRaycastResult.hitDistance;
+                return {
+                    type: "ground" as const,
+                    distance: groundDistance,
+                };
+            }
+
+            // ground above head and ground below, nothing to do here
+        }
+
+        if (!this.downwardRaycastResult.hasHit) {
+            // nothing above, nothing below, we are in the air
             return null;
         }
 
-        const distance = this.raycastResult.hitDistance - rayStartOffset;
-        if ((this.raycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+        if ((this.downwardRaycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
+            // water below, we are falling towards the water
             return {
                 type: "water" as const,
-                distance,
+                distance: this.downwardRaycastResult.hitDistance - rayOffset,
             };
         }
 
+        const groundDistance = this.downwardRaycastResult.hitDistance - rayOffset;
         return {
             type: "ground" as const,
-            distance,
+            distance: groundDistance,
         };
     }
 
@@ -276,7 +307,7 @@ export class HumanoidAvatar implements Transformable {
 
         // start swimming when water is 1m above feet
         const waterLevelThreshold = 1;
-        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance < -waterLevelThreshold) {
+        if (this.lastSurfaceInfo.type === "water" && this.lastSurfaceInfo.distance <= -waterLevelThreshold) {
             return this.swimmingState;
         }
 
@@ -309,13 +340,13 @@ export class HumanoidAvatar implements Transformable {
     }
 
     public update(deltaSeconds: number): void {
-        this.lastSurfaceInfo = this.querySurfaceBelow();
+        this.lastSurfaceInfo = this.querySurface();
 
         // Do not fall through the ground
         if (
             this.lastSurfaceInfo !== null &&
             this.lastSurfaceInfo.type === "ground" &&
-            this.lastSurfaceInfo.distance < 0
+            this.lastSurfaceInfo.distance < -0.1
         ) {
             this.getTransform().position.addInPlace(
                 this.getTransform().up.scale(Math.abs(this.lastSurfaceInfo.distance)),

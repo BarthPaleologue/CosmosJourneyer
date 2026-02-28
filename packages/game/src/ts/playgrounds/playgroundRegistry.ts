@@ -42,6 +42,7 @@ import { createLandingPadScene } from "./landingPad";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
+import { createRoverScene } from "./rover";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
 import { createJupiterScene } from "./sol/jupiter";
 import { createSaturnScene } from "./sol/saturn";
@@ -110,6 +111,7 @@ export class PlaygroundRegistry {
         ["spotLights", createSpotLightsScene],
         ["stationLanding", createStationLandingScene],
         ["spaceElevator", createSpaceElevatorScene],
+        ["rover", createRoverScene],
     ]);
 
     register(

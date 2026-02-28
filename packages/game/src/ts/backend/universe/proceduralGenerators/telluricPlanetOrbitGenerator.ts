@@ -15,27 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SolarLuminosity } from "@/utils/physics/constants";
+import { SolarLuminosity, SolarRadius } from "@/utils/physics/constants";
 import { getBlackBodyLuminosity } from "@/utils/physics/thermodynamics";
 import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
+
+import type { StellarObjectModel } from "../orbitalObjects";
 
 /**
  * Uses stellar luminosity to determine a plausible semi-major axis range for a Telluric planet then samples it
  * @param stellarTemperature Temperature of the parent star in K
  * @param stellarRadius Radius of the parent star in meters
+ * @param stellarType Type of the parent stellar object
  * @param rng A random number generator function returning a uniform float in [0, 1)
  * @returns Semi-major axis of the telluric planet orbit in meters
  */
 export function getTelluricPlanetOrbitRadius(
     stellarTemperature: number,
     stellarRadius: number,
+    stellarType: StellarObjectModel["type"],
     rng: () => number,
 ): number {
     const stellarLuminosity = getBlackBodyLuminosity(stellarTemperature, stellarRadius);
     const relativeLuminosity = stellarLuminosity / SolarLuminosity;
 
     // Avoid orbits too close to the star
-    const lowerBound = (3 + 2 * rng()) * stellarRadius;
+    const stellarBound = (3 + 2 * rng()) * stellarRadius;
+    const neutronStarExclusionBound = stellarType === "neutronStar" ? SolarRadius * 10 : stellarRadius * 1.5;
+    const lowerBound = Math.max(stellarBound, neutronStarExclusionBound);
 
     // Snow line scaling (2.7 comes from empirical Solar System data)
     let upperBound = astronomicalUnitToMeters(2.7) * Math.sqrt(Math.max(relativeLuminosity, 0));
