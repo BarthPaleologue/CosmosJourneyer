@@ -59,7 +59,6 @@
         "eslint": "catalog:",
         "eslint-import-resolver-typescript": "catalog:",
         "eslint-plugin-import": "catalog:",
-        "globals": "catalog:",
         "http-server": "catalog:",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",

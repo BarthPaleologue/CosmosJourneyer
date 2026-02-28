@@ -14,7 +14,6 @@ catalog:
     eslint: ^9.39.2
     eslint-import-resolver-typescript: ^4.4.4
     eslint-plugin-import: ^2.32.0
-    globals: ^16.5.0
     http-server: ^14.1.1
     oxfmt: ^0.35.0
     typescript: ^5.9.3

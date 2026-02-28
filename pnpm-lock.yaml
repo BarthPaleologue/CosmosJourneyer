@@ -23,9 +23,6 @@ importers:
       eslint-plugin-import:
         specifier: 'catalog:'
         version: 2.32.0(@typescript-eslint/parser@8.49.0(eslint@9.39.2)(typescript@5.9.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.39.2)
-      globals:
-        specifier: 'catalog:'
-        version: 16.5.0
       http-server:
         specifier: 'catalog:'
         version: 14.1.1
