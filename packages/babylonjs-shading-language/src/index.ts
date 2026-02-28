@@ -83,8 +83,6 @@ import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
-import { assertUnreachable } from "@/utils/types";
-
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
     FRAG: NodeMaterialBlockTargets.Fragment,
@@ -935,7 +933,7 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
             inputVec.connectTo(splitBlock.xyzw);
             break;
         default:
-            assertUnreachable(inputVec.type);
+            throw new Error(`Invalid input type: ${String(inputVec.type)}`);
     }
 
     return splitBlock;

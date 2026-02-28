@@ -1,2 +1,16 @@
 packages:
     - packages/*
+
+catalog:
+    "@eslint/js": ^9.39.2
+    "@next/eslint-plugin-next": ^16.0.10
+    eslint: ^9.39.2
+    eslint-import-resolver-typescript: ^4.4.4
+    eslint-plugin-import: ^2.32.0
+    http-server: ^14.1.1
+    oxfmt: ^0.35.0
+    typedoc: ^0.28.16
+    typedoc-github-theme: ^0.3.1
+    typedoc-plugin-missing-exports: ^4.1.2
+    typescript: ^5.9.3
+    typescript-eslint: ^8.49.0

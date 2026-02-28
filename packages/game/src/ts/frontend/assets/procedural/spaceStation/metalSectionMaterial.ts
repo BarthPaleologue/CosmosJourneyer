@@ -18,9 +18,9 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
+import * as BSL from "babylonjs-shading-language";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
-import * as BSL from "@/frontend/helpers/bsl";
 
 export class MetalSectionMaterial extends NodeMaterial {
     constructor(name: string, textures: PBRTextures, scene: Scene) {

@@ -4,7 +4,11 @@ import importPlugin from "eslint-plugin-import";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-const projectConfigs = ["./packages/game/tsconfig.json", "./packages/website/tsconfig.json"];
+const projectConfigs = [
+    "./packages/babylonjs-shading-language/tsconfig.json",
+    "./packages/game/tsconfig.json",
+    "./packages/website/tsconfig.json",
+];
 const tsParserOptions = {
     projectService: true,
     tsconfigRootDir: import.meta.dirname,

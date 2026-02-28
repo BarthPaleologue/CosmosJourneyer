@@ -18,7 +18,6 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { type Scene } from "@babylonjs/core/scene";
-
 import {
     float,
     mul,
@@ -36,7 +35,7 @@ import {
     uniformWorld,
     vertexAttribute,
     xz,
-} from "@/frontend/helpers/bsl";
+} from "babylonjs-shading-language";
 
 import type { SolarPanelTextures } from "../../textures/materials/solarPanel";
 
