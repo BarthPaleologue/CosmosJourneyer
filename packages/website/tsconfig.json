@@ -19,6 +19,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "typeRoots": ["./node_modules/@types"],
+        "types": ["node", "react", "react-dom"],
         "allowJs": true,
         "module": "esnext"
     },

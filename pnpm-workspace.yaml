@@ -12,5 +12,5 @@ catalog:
     typedoc: ^0.28.16
     typedoc-github-theme: ^0.3.1
     typedoc-plugin-missing-exports: ^4.1.2
-    typescript: ^5.9.3
+    typescript: 6.0.0-beta
     typescript-eslint: ^8.49.0
