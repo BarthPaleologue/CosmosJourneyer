@@ -128,13 +128,11 @@ export class LandingBayMaterial extends NodeMaterial {
         const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
         const distanceToCenter = length(positionXZ, { target: Target.FRAG });
 
-        const distanceToCenter01 = remap(
-            distanceToCenter,
-            f(meanRadius - deltaRadius / 2.0),
-            f(meanRadius + deltaRadius / 2.0),
-            f(0.0),
-            f(1.0),
-        );
+        const distanceToCenter01 = remap(distanceToCenter, [
+            "number",
+            [meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0],
+            [0.0, 1.0],
+        ]);
 
         const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
         const proceduralUV = vec2(proceduralUvX, scaledUvY);

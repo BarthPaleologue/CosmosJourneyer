@@ -80,10 +80,10 @@ import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDi
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
-import { type NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
+import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
@@ -566,6 +566,14 @@ export function distance(
     return distanceBlock.output;
 }
 
+type RemapRanges =
+    | ["number", Readonly<[number, number]>, Readonly<[number, number]>]
+    | [
+          "connectionPoint",
+          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
+          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
+      ];
+
 /**
  * Remaps a value from one range to another.
  * @param input - The input value to remap.
@@ -577,20 +585,26 @@ export function distance(
  */
 export function remap(
     input: NodeMaterialConnectionPoint,
-    sourceMin: NodeMaterialConnectionPoint,
-    sourceMax: NodeMaterialConnectionPoint,
-    targetMin: NodeMaterialConnectionPoint,
-    targetMax: NodeMaterialConnectionPoint,
+    ranges: RemapRanges,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const remapBlock = new RemapBlock("remap");
     remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
+    switch (ranges[0]) {
+        case "number":
+            remapBlock.sourceRange = new Vector2(ranges[1][0], ranges[1][1]);
+            remapBlock.targetRange = new Vector2(ranges[2][0], ranges[2][1]);
+            break;
+        case "connectionPoint":
+            ranges[1][0].connectTo(remapBlock.sourceMin);
+            ranges[1][1].connectTo(remapBlock.sourceMax);
+            ranges[2][0].connectTo(remapBlock.targetMin);
+            ranges[2][1].connectTo(remapBlock.targetMax);
+            break;
+    }
+
     input.connectTo(remapBlock.input);
-    sourceMin.connectTo(remapBlock.sourceMin);
-    sourceMax.connectTo(remapBlock.sourceMax);
-    targetMin.connectTo(remapBlock.targetMin);
-    targetMax.connectTo(remapBlock.targetMax);
 
     return remapBlock.output;
 }
