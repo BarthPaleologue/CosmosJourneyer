@@ -709,96 +709,43 @@ export function getFrontFacing() {
     return frontFacingBlock.output;
 }
 
+type MergeInput = Partial<{
+    xyzw: NodeMaterialConnectionPoint;
+    xyz: NodeMaterialConnectionPoint;
+    xy: NodeMaterialConnectionPoint;
+    zw: NodeMaterialConnectionPoint;
+    x: NodeMaterialConnectionPoint;
+    y: NodeMaterialConnectionPoint;
+    z: NodeMaterialConnectionPoint;
+    w: NodeMaterialConnectionPoint;
+}>;
+
+type MergeOutput = {
+    xyzw: VectorMergerBlock["xyzw"];
+    xyzOut: VectorMergerBlock["xyzOut"];
+    xyOut: VectorMergerBlock["xyOut"];
+    zwOut: VectorMergerBlock["zwOut"];
+};
+
 /**
  * Merges the given components into a vector.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component (optional).
- * @param w - The w component (optional).
+ * @param inputs - The components to merge (x, y, z, w or xy, zw or xyz, xyzw).
  * @param options - Optional target options.
  */
-export function merge(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint | null,
-    w: NodeMaterialConnectionPoint | null,
-    options?: Partial<TargetOptions>,
-) {
+export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): MergeOutput {
     const merger = new VectorMergerBlock("Merge");
     merger.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    x.connectTo(merger.x);
-    y.connectTo(merger.y);
-
-    if (z) {
-        z.connectTo(merger.z);
-    }
-
-    if (w) {
-        w.connectTo(merger.w);
-    }
+    inputs.xyzw?.connectTo(merger.xyzw);
+    inputs.xyz?.connectTo(merger.xyzIn);
+    inputs.xy?.connectTo(merger.xyIn);
+    inputs.zw?.connectTo(merger.zwIn);
+    inputs.x?.connectTo(merger.x);
+    inputs.y?.connectTo(merger.y);
+    inputs.z?.connectTo(merger.z);
+    inputs.w?.connectTo(merger.w);
 
     return merger;
-}
-
-/**
- * Replaces the X component of a vector with a new value.
- * @param input - The input vector.
- * @param x - The new X component.
- * @param options - Optional target options.
- */
-export function withX(
-    input: NodeMaterialConnectionPoint,
-    x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(x, splitInput.y, splitInput.z, splitInput.w, options);
-}
-
-/**
- * Replaces the Y component of a vector with a new value.
- * @param input - The input vector.
- * @param y - The new Y component.
- * @param options - Optional target options.
- */
-export function withY(
-    input: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, y, splitInput.z, splitInput.w, options);
-}
-
-/**
- * Replaces the Z component of a vector with a new value.
- * @param input - The input vector.
- * @param z - The new Z component.
- * @param options - Optional target options.
- */
-export function withZ(
-    input: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, splitInput.y, z, splitInput.w, options);
-}
-
-/**
- * Replaces the W component of a vector with a new value.
- * @param input - The input vector.
- * @param w - The new W component.
- * @param options - Optional target options.
- */
-export function withW(
-    input: NodeMaterialConnectionPoint,
-    w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
 }
 
 /**
@@ -894,7 +841,7 @@ export function vec2(
     y: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    return merge(x, y, null, null, options).xyOut;
+    return merge({ x, y }, options).xyOut;
 }
 
 /**
@@ -910,7 +857,7 @@ export function vec3(
     z: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    return merge(x, y, z, null, options).xyzOut;
+    return merge({ x, y, z }, options).xyzOut;
 }
 
 /**
@@ -928,7 +875,7 @@ export function vec4(
     w: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    return merge(x, y, z, w, options).xyzw;
+    return merge({ x, y, z, w }, options).xyzw;
 }
 
 /**
