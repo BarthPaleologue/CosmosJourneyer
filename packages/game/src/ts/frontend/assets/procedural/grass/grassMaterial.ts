@@ -92,7 +92,7 @@ export class GrassMaterial {
             textureSample(noiseTexture, add(mul(f(0.01), xz(instancePosition)), mul(f(0.01), elapsedSeconds))).r,
         );
 
-        const windCurveAmount = remap(windStrength, f(0), f(1), f(-0.25), f(1));
+        const windCurveAmount = remap(windStrength, ["number", [0, 1], [-0.25, 1]]);
 
         const leanAxis = vec3(cos(windDir), f(0.0), sin(windDir));
 
@@ -106,7 +106,7 @@ export class GrassMaterial {
         const curvedPosition = rotateAround(position, leanAxis, curveAmount);
 
         const scalingTextureValue = textureSample(noiseTexture, mul(f(0.05), xz(instancePosition))).r;
-        const scalingFactor = remap(scalingTextureValue, f(0), f(1), f(0.1), f(0.7));
+        const scalingFactor = remap(scalingTextureValue, ["number", [0, 1], [0.1, 0.7]]);
 
         const cameraPosition = uniformCameraPosition();
 
