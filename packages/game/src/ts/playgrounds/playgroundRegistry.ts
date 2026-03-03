@@ -60,6 +60,7 @@ import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
 import { createTelluricPlanetScene } from "./telluricPlanet";
+import { createTriPlanarNormalScene } from "./triPlanarNormal";
 import { createTutorialScene } from "./tutorial";
 import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
@@ -112,6 +113,7 @@ export class PlaygroundRegistry {
         ["stationLanding", createStationLandingScene],
         ["spaceElevator", createSpaceElevatorScene],
         ["rover", createRoverScene],
+        ["triPlanarNormal", createTriPlanarNormalScene],
     ]);
 
     register(
