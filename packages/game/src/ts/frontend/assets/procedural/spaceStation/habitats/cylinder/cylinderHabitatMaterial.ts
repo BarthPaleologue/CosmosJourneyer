@@ -44,7 +44,6 @@ import {
     uniformWorld,
     vec2,
     vertexAttribute,
-    xz,
 } from "babylonjs-shading-language";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
@@ -62,8 +61,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const normal = vertexAttribute("normal");
         const uv = vertexAttribute("uv");
 
-        const positionXZ = xz(position);
-        const splitPositionXZ = splitVec(positionXZ);
+        const splitPosition = splitVec(position);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -81,8 +79,8 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         this.addOutputNode(vertexOutput);
 
-        const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
-
+        const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
+        const positionXZ = vec2(splitPosition.x, splitPosition.z);
         const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), f(1.0 / sectorSize));
 
         const proceduralUvX = remap(theta, ["number", [0, 2 * Math.PI], [0, nbSectors]]);

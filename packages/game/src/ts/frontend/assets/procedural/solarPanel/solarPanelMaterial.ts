@@ -25,6 +25,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    swizzle,
     textureSample,
     transformDirection,
     transformPosition,
@@ -34,7 +35,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vertexAttribute,
-    xz,
 } from "babylonjs-shading-language";
 
 import type { SolarPanelTextures } from "../../textures/materials/solarPanel";
@@ -47,7 +47,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         const position = vertexAttribute("position");
         const normal = vertexAttribute("normal");
 
-        const positionXZ = xz(position);
+        const positionXZ = swizzle(position, "xz");
         const uv = mul(positionXZ, float(0.1));
 
         const world = uniformWorld();
