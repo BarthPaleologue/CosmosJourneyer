@@ -15,43 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import { add, mul, type TargetOptions } from "babylonjs-shading-language";
-
-export { sampleDisk, type DiskSampleOptions } from "./random";
-
-type ConnectionPointList = readonly [
-    NodeMaterialConnectionPoint,
-    NodeMaterialConnectionPoint,
-    ...NodeMaterialConnectionPoint[],
-];
-
-export function addN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
-    let result = add(inputs[0], inputs[1], options);
-
-    for (let i = 2; i < inputs.length; i++) {
-        const input = inputs[i];
-        if (input === undefined) {
-            console.warn("addN: input", i, "is undefined, skipping");
-            continue;
-        }
-        result = add(result, input, options);
-    }
-
-    return result;
-}
-
-export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
-    let result = mul(inputs[0], inputs[1], options);
-
-    for (let i = 2; i < inputs.length; i++) {
-        const input = inputs[i];
-        if (input === undefined) {
-            console.warn("mulN: input", i, "is undefined, skipping");
-            continue;
-        }
-        result = mul(result, input, options);
-    }
-
-    return result;
-}
+export * from "./random";
+export * from "./utils";
+export * from "./triPlanar";
