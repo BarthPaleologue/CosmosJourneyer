@@ -748,6 +748,52 @@ export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): Mer
     return merger;
 }
 
+type SwizzleComponent = "x" | "y" | "z" | "w";
+
+type SwizzleString =
+    | `${SwizzleComponent}${SwizzleComponent}`
+    | `${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}`
+    | `${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}`;
+
+export function swizzle(input: NodeMaterialConnectionPoint, swizzleStr: SwizzleString): NodeMaterialConnectionPoint {
+    const swizzleBlock = new VectorMergerBlock("Swizzle");
+    swizzleBlock.target = NodeMaterialBlockTargets.Neutral;
+
+    if (input.canConnectTo(swizzleBlock.xyzwIn)) {
+        input.connectTo(swizzleBlock.xyzwIn);
+    } else if (input.canConnectTo(swizzleBlock.xyzIn)) {
+        input.connectTo(swizzleBlock.xyzIn);
+    } else if (input.canConnectTo(swizzleBlock.xyIn)) {
+        input.connectTo(swizzleBlock.xyIn);
+    } else {
+        throw new Error("Input type is not compatible with swizzle block");
+    }
+
+    if (swizzleStr[0] !== undefined) {
+        swizzleBlock.xSwizzle = swizzleStr[0] as SwizzleComponent;
+    }
+    if (swizzleStr[1] !== undefined) {
+        swizzleBlock.ySwizzle = swizzleStr[1] as SwizzleComponent;
+    }
+    if (swizzleStr[2] !== undefined) {
+        swizzleBlock.zSwizzle = swizzleStr[2] as SwizzleComponent;
+    }
+    if (swizzleStr[3] !== undefined) {
+        swizzleBlock.wSwizzle = swizzleStr[3] as SwizzleComponent;
+    }
+
+    switch (swizzleStr.length) {
+        case 2:
+            return swizzleBlock.xyOut;
+        case 3:
+            return swizzleBlock.xyzOut;
+        case 4:
+            return swizzleBlock.xyzw;
+        default:
+            throw new Error("Invalid swizzle string length");
+    }
+}
+
 /**
  * Returns a constant color input block.
  * @param color - The color value.
@@ -940,28 +986,6 @@ export function splitMatrix(
     input.connectTo(splitBlock.input);
 
     return splitBlock;
-}
-
-/**
- * Creates a vec2 using the input vector's X and Z components.
- * Useful for projecting 3D positions onto a 2D plane.
- * @param inputVec - The input vector (must be vec3 or vec4).
- * @param options - Optional target options.
- * @returns A vec2 containing the X and Z components.
- */
-export function xz(
-    inputVec: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    const inputSplitted = splitVec(inputVec, options);
-
-    const outputXZ = new VectorMergerBlock("OutputXZ");
-    outputXZ.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
-
-    inputSplitted.x.connectTo(outputXZ.x);
-    inputSplitted.z.connectTo(outputXZ.y);
-
-    return outputXZ.xyOut;
 }
 
 /**

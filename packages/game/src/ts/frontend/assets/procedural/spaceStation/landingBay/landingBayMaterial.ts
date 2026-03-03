@@ -46,7 +46,6 @@ import {
     uniformWorld,
     vec2,
     vertexAttribute,
-    xz,
 } from "babylonjs-shading-language";
 
 import { type OrbitalFacilityModel } from "@/backend/universe/orbitalObjects/index";
@@ -106,8 +105,7 @@ export class LandingBayMaterial extends NodeMaterial {
         const normal = vertexAttribute("normal");
         const uv = vertexAttribute("uv");
 
-        const positionXZ = xz(position);
-        const splitPositionXZ = splitVec(positionXZ);
+        const splitPosition = splitVec(position);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -125,7 +123,8 @@ export class LandingBayMaterial extends NodeMaterial {
 
         this.addOutputNode(vertexOutput);
 
-        const theta = atan2(splitPositionXZ.y, splitPositionXZ.x, { target: Target.FRAG });
+        const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
+        const positionXZ = vec2(splitPosition.x, splitPosition.z);
         const distanceToCenter = length(positionXZ, { target: Target.FRAG });
 
         const distanceToCenter01 = remap(distanceToCenter, [

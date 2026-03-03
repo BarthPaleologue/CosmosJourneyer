@@ -34,6 +34,7 @@ import {
     splitVec,
     step,
     sub,
+    swizzle,
     textureSample,
     transformDirection,
     transformPosition,
@@ -45,7 +46,6 @@ import {
     vec,
     vec2,
     vertexAttribute,
-    xz,
 } from "babylonjs-shading-language";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
@@ -67,7 +67,8 @@ export class LandingPadMaterial extends NodeMaterial {
         const centeredUV = splitVec(sub(uv, f(0.5)));
         const centeredUVScaled = vec2(mul(centeredUV.x, f(Settings.LANDING_PAD_ASPECT_RATIO)), centeredUV.y);
 
-        const proceduralUV = mul(xz(position), f(0.1));
+        const positionXZ = swizzle(position, "xz");
+        const proceduralUV = mul(positionXZ, f(0.1));
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
