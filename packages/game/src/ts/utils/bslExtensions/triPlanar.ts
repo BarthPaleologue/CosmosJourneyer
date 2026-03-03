@@ -23,6 +23,7 @@ import {
     div,
     dot,
     f,
+    mix,
     mul,
     normalize,
     pow,
@@ -39,17 +40,19 @@ import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
 
 import { addN, unpackNormal } from "./utils";
 
+export type TriPlanarMaterialSamples = {
+    albedo: NodeMaterialConnectionPoint;
+    metallic: NodeMaterialConnectionPoint;
+    roughness: NodeMaterialConnectionPoint;
+    normal: NodeMaterialConnectionPoint;
+};
+
 export function triPlanarMaterial(
     textures: TerrainTextures,
     samplePoint: NodeMaterialConnectionPoint,
     surfaceNormal: NodeMaterialConnectionPoint,
     options?: Partial<{ normalStrength: NodeMaterialConnectionPoint; invertNormalY: boolean }>,
-): {
-    albedo: NodeMaterialConnectionPoint;
-    metallic: NodeMaterialConnectionPoint;
-    roughness: NodeMaterialConnectionPoint;
-    normal: NodeMaterialConnectionPoint;
-} {
+): TriPlanarMaterialSamples {
     const { uvX, uvY, uvZ } = getTriPlanarUVs(samplePoint);
 
     const albedoRoughnessTexture = uniformTexture2d(textures.albedoRoughness).source;
@@ -149,5 +152,18 @@ export function getTriPlanarBlending(surfaceNormal: NodeMaterialConnectionPoint,
             mul(sampleY, normalizedBlendWeights.y),
             mul(sampleZ, normalizedBlendWeights.z),
         ]);
+    };
+}
+
+export function mixTriPlanarSamples(
+    samplesA: TriPlanarMaterialSamples,
+    samplesB: TriPlanarMaterialSamples,
+    blendFactor: NodeMaterialConnectionPoint,
+): TriPlanarMaterialSamples {
+    return {
+        albedo: mix(samplesA.albedo, samplesB.albedo, blendFactor),
+        roughness: mix(samplesA.roughness, samplesB.roughness, blendFactor),
+        metallic: mix(samplesA.metallic, samplesB.metallic, blendFactor),
+        normal: normalize(mix(samplesA.normal, samplesB.normal, blendFactor)),
     };
 }
