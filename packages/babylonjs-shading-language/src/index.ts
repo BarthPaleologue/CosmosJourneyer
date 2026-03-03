@@ -844,38 +844,30 @@ export function vec2(
     return merge({ x, y }, options).xyOut;
 }
 
+type Vec3Input = Partial<{
+    xyz: NodeMaterialConnectionPoint;
+    xy: NodeMaterialConnectionPoint;
+    x: NodeMaterialConnectionPoint;
+    y: NodeMaterialConnectionPoint;
+    z: NodeMaterialConnectionPoint;
+}>;
+
 /**
  * Creates a vec3 from the given components.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component.
+ * @param inputs - The components to merge into a vec3 (x, y, z or xy, z or xyz).
  * @param options - Optional target options.
  */
-export function vec3(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    return merge({ x, y, z }, options).xyzOut;
+export function vec3(inputs: Vec3Input, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return merge(inputs, options).xyzOut;
 }
 
 /**
  * Creates a vec4 from the given components.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component.
- * @param w - The w component.
+ * @param inputs - The components to merge into a vec4 (x, y, z, w or xy, z, w or xyz, w or xyzw).
  * @param options - Optional target options.
  */
-export function vec4(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    return merge({ x, y, z, w }, options).xyzw;
+export function vec4(inputs: MergeInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return merge(inputs, options).xyzw;
 }
 
 /**

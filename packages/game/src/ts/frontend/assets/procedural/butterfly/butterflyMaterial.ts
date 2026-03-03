@@ -105,12 +105,11 @@ export class ButterflyMaterial {
 
         const splitFlappingPosition = splitVec(flappingPosition);
 
-        const position2 = vec3(
-            splitFlappingPosition.x,
-            add(splitFlappingPosition.y, totalMovementY),
-            splitFlappingPosition.z,
-        );
-
+        const position2 = vec3({
+            x: splitFlappingPosition.x,
+            y: add(splitFlappingPosition.y, totalMovementY),
+            z: splitFlappingPosition.z,
+        });
         const rotationAngle = cos(elapsedSeconds);
 
         const position3 = rotateAround(position2, vec(Vector3.Up()), rotationAngle);
@@ -134,7 +133,7 @@ export class ButterflyMaterial {
         const splitAlbedoHsl = splitVec(albedoHsl);
         const hueShift = hash;
         const shiftedHue = fract(add(splitAlbedoHsl.x, hueShift));
-        const shiftedAlbedoHsl = vec3(shiftedHue, splitAlbedoHsl.y, splitAlbedoHsl.z);
+        const shiftedAlbedoHsl = vec3({ x: shiftedHue, y: splitAlbedoHsl.y, z: splitAlbedoHsl.z });
         const shiftedAlbedo = hslToRgb(shiftedAlbedoHsl);
 
         const view = uniformView();

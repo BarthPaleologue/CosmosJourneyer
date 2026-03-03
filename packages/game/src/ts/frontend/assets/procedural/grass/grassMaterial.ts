@@ -94,7 +94,11 @@ export class GrassMaterial {
 
         const windCurveAmount = remap(windStrength, ["number", [0, 1], [-0.25, 1]]);
 
-        const leanAxis = vec3(cos(windDir), f(0.0), sin(windDir));
+        const leanAxis = vec3({
+            x: cos(windDir),
+            y: f(0.0),
+            z: sin(windDir),
+        });
 
         const maxCurveAngle = f(0.6);
 
