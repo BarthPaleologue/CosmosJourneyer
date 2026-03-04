@@ -111,6 +111,27 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/channel-packer:
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 9.39.2
+      jsdom:
+        specifier: ^27.4.0
+        version: 27.4.0
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.35.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.12
+        version: 7.3.1(@types/node@25.0.10)(less@4.3.0)(sass@1.97.3)(stylus@0.64.0)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+      vitest:
+        specifier: ^4.0.17
+        version: 4.0.17(@types/node@25.0.10)(jsdom@27.4.0)(less@4.3.0)(sass@1.97.3)(stylus@0.64.0)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/game:
     dependencies:
       '@babylonjs/core':

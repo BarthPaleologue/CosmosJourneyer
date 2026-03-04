@@ -33,16 +33,17 @@
     "type": "module",
     "scripts": {
         "build": "pnpm -r build",
+        "build:channel-packer": "pnpm --filter @cosmos-journeyer/channel-packer build",
         "build:game": "pnpm --filter @cosmos-journeyer/game build",
         "build:website": "pnpm --filter @cosmos-journeyer/website build",
         "build:prod": "tsx ./scripts/build-prod.ts",
         "serve:prod": "http-server dist -p 8080",
+        "dev:channel-packer": "pnpm --filter @cosmos-journeyer/channel-packer dev",
         "dev:game": "pnpm --filter @cosmos-journeyer/game serve",
         "dev:website": "pnpm --filter @cosmos-journeyer/website dev",
         "format": "pnpm -r format",
         "format:check": "pnpm -r format:check",
-        "test:unit": "pnpm --filter @cosmos-journeyer/game test:unit",
-        "test:coverage": "pnpm --filter @cosmos-journeyer/game test:coverage",
+        "test:unit": "pnpm -r test:unit",
         "test:e2e": "pnpm --filter @cosmos-journeyer/game test:e2e",
         "test:e2e:update": "pnpm --filter @cosmos-journeyer/game test:e2e:update",
         "test:e2e:docker": "pnpm --filter @cosmos-journeyer/game test:e2e:docker",
@@ -50,8 +51,7 @@
         "doc": "pnpm -r doc",
         "lint": "pnpm -r lint",
         "typecheck": "pnpm -r typecheck",
-        "prepare": "husky",
-        "tauri": "pnpm --filter @cosmos-journeyer/game exec -- tauri"
+        "prepare": "husky"
     },
     "devDependencies": {
         "@eslint/js": "catalog:",

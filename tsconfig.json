@@ -3,6 +3,9 @@
     "files": [],
     "references": [
         {
+            "path": "./packages/channel-packer/tsconfig.json"
+        },
+        {
             "path": "./packages/game/tsconfig.json"
         },
         {
