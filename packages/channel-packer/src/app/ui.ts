@@ -226,7 +226,7 @@ function createAppShellMarkup(state: AppState): string {
                 <div class="status-meta">
                     <span class="row-note">Drop a file directly onto an output row or use the file picker.</span>
                     <div class="status-links">
-                        <a href="https://github.com/BarthPaleologue/CosmosJourneyer" target="_blank" rel="noreferrer">GitHub</a>
+                        <a href="https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/channel-packer" target="_blank" rel="noreferrer">GitHub</a>
                         <a href="https://bsky.app/profile/barthpaleologue.bsky.social" target="_blank" rel="noreferrer">Bluesky</a>
                     </div>
                 </div>
