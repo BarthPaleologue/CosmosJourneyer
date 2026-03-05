@@ -5,6 +5,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/game/package.json packages/game/
 COPY packages/website/package.json packages/website/
+COPY packages/babylonjs-shading-language/package.json packages/babylonjs-shading-language/
+COPY packages/terrain-generation/package.json packages/terrain-generation/
 
 RUN corepack enable \
     && PNPM_VERSION=$(node -p "const pm=require('./package.json').packageManager; pm.substring(pm.indexOf('@') + 1)") \
