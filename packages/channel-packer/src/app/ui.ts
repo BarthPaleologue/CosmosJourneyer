@@ -7,6 +7,7 @@ interface RowElements {
     readonly row: HTMLElement;
     readonly caption: HTMLParagraphElement;
     readonly fileName: HTMLParagraphElement;
+    readonly previewCanvas: HTMLCanvasElement;
     readonly chooseButton: HTMLButtonElement;
     readonly clearButton: HTMLButtonElement;
     readonly sourceSelect: HTMLSelectElement;
@@ -239,14 +240,19 @@ function createAppShellMarkup(state: AppState): string {
 function createRowMarkup(row: ChannelRowState): string {
     return `
         <section class="channel-row" data-row="${row.outputChannel}">
-            <div class="row-heading">
-                <span class="channel-badge" data-channel="${row.outputChannel}">${ChannelLabels[row.outputChannel]}</span>
-                <div class="row-title">
-                    <h3>Output ${ChannelLabels[row.outputChannel]}</h3>
-                    <p class="row-caption" data-role="row-caption">${row.inputKey === null ? "Uses constant fill" : "Texture assigned"}</p>
+            <div class="row-overview">
+                <div class="row-heading">
+                    <span class="channel-badge" data-channel="${row.outputChannel}">${ChannelLabels[row.outputChannel]}</span>
+                    <div class="row-title">
+                        <h3>Output ${ChannelLabels[row.outputChannel]}</h3>
+                        <p class="row-caption" data-role="row-caption">${row.inputKey === null ? "Uses constant fill" : "Texture assigned"}</p>
+                    </div>
                 </div>
+                <div class="row-preview-frame" data-channel="${row.outputChannel}" aria-hidden="true">
+                    <canvas class="row-preview-canvas" data-role="row-preview-canvas" data-channel="${row.outputChannel}" hidden></canvas>
+                </div>
+                <p class="file-name" data-role="file-name">${escapeHtml(row.inputFileName ?? "No texture selected")}</p>
             </div>
-            <p class="file-name" data-role="file-name">${escapeHtml(row.inputFileName ?? "No texture selected")}</p>
             <div class="row-controls">
                 <button data-action="choose" data-channel="${row.outputChannel}">Choose Texture</button>
                 <button class="ghost-button" data-action="clear" data-channel="${row.outputChannel}" disabled>Clear</button>
@@ -289,6 +295,11 @@ function collectRowElements(channel: ColorChannel): RowElements {
         row,
         caption: requireElement(row, '[data-role="row-caption"]', HTMLParagraphElement),
         fileName: requireElement(row, '[data-role="file-name"]', HTMLParagraphElement),
+        previewCanvas: requireElement(
+            row,
+            `[data-role="row-preview-canvas"][data-channel="${channel}"]`,
+            HTMLCanvasElement,
+        ),
         chooseButton: requireElement(row, `[data-action="choose"][data-channel="${channel}"]`, HTMLButtonElement),
         clearButton: requireElement(row, `[data-action="clear"][data-channel="${channel}"]`, HTMLButtonElement),
         sourceSelect: requireElement(row, `[data-role="source-select"][data-channel="${channel}"]`, HTMLSelectElement),

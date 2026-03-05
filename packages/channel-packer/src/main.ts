@@ -1,4 +1,4 @@
-import { MaxPreviewEdge } from "./app/constants";
+import { ChannelOrder, MaxPreviewEdge, RowPreviewResolution } from "./app/constants";
 import { downloadBlob, formatError, waitForNextPaint } from "./app/helpers";
 import {
     applyPreviewResponse,
@@ -203,11 +203,13 @@ function drawPreviewCanvas(appState: AppState, uiRefs: UiRefs): void {
         appState.preview.previewWidth === null ||
         appState.preview.previewHeight === null
     ) {
+        clearRowPreviews(uiRefs);
         return;
     }
 
     const context = uiRefs.previewCanvas.getContext("2d");
     if (context === null) {
+        clearRowPreviews(uiRefs);
         return;
     }
 
@@ -230,6 +232,82 @@ function drawPreviewCanvas(appState: AppState, uiRefs: UiRefs): void {
     const imageData = context.createImageData(appState.preview.previewWidth, appState.preview.previewHeight);
     imageData.data.set(appState.preview.pixelBytes);
     context.putImageData(imageData, 0, 0);
+
+    drawRowPreviews(appState, uiRefs);
+}
+
+function clearRowPreviews(uiRefs: UiRefs): void {
+    for (const channel of ChannelOrder) {
+        const canvas = uiRefs.rows[channel].previewCanvas;
+        canvas.hidden = true;
+        canvas.width = 1;
+        canvas.height = 1;
+    }
+}
+
+function drawRowPreviews(appState: AppState, uiRefs: UiRefs): void {
+    const sourcePixels = appState.preview.pixelBytes;
+    const sourceWidth = appState.preview.previewWidth;
+    const sourceHeight = appState.preview.previewHeight;
+    if (sourcePixels === null || sourceWidth === null || sourceHeight === null) {
+        clearRowPreviews(uiRefs);
+        return;
+    }
+
+    for (const channel of ChannelOrder) {
+        const previewCanvas = uiRefs.rows[channel].previewCanvas;
+        const context = previewCanvas.getContext("2d");
+        if (context === null) {
+            continue;
+        }
+
+        previewCanvas.hidden = false;
+        previewCanvas.width = RowPreviewResolution;
+        previewCanvas.height = RowPreviewResolution;
+
+        const imageData = context.createImageData(RowPreviewResolution, RowPreviewResolution);
+        const outputPixels = imageData.data;
+        const sourceOffset = getChannelOffset(channel);
+
+        for (let y = 0; y < RowPreviewResolution; y += 1) {
+            const sourceY = Math.min(sourceHeight - 1, Math.floor((y * sourceHeight) / RowPreviewResolution));
+
+            for (let x = 0; x < RowPreviewResolution; x += 1) {
+                const sourceX = Math.min(sourceWidth - 1, Math.floor((x * sourceWidth) / RowPreviewResolution));
+                const packedIndex = (sourceY * sourceWidth + sourceX) * 4 + sourceOffset;
+                const outputIndex = (y * RowPreviewResolution + x) * 4;
+                const value = sourcePixels[packedIndex] ?? 0;
+
+                if (channel === "a") {
+                    outputPixels[outputIndex] = 255;
+                    outputPixels[outputIndex + 1] = 255;
+                    outputPixels[outputIndex + 2] = 255;
+                    outputPixels[outputIndex + 3] = value;
+                } else {
+                    outputPixels[outputIndex] = value;
+                    outputPixels[outputIndex + 1] = value;
+                    outputPixels[outputIndex + 2] = value;
+                    outputPixels[outputIndex + 3] = 255;
+                }
+            }
+        }
+
+        context.putImageData(imageData, 0, 0);
+    }
+}
+
+function getChannelOffset(channel: ColorChannel): number {
+    if (channel === "r") {
+        return 0;
+    }
+    if (channel === "g") {
+        return 1;
+    }
+    if (channel === "b") {
+        return 2;
+    }
+
+    return 3;
 }
 
 function handleDragEnter(event: DragEvent, channel: ColorChannel): void {
