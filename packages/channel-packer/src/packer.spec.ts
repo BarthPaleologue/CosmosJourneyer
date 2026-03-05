@@ -10,11 +10,12 @@ interface TestInput {
 }
 
 const decodeImage = vi.fn((input: TestInput): Promise<DecodedImage> => Promise.resolve(input.image));
+const readSignature = vi.fn((input: TestInput): Promise<FileSignature> => Promise.resolve(input.signature));
 
 const engine = createPackerEngine<TestInput, Uint8Array>(
     {
         readSignature(input) {
-            return Promise.resolve(input.signature);
+            return readSignature(input);
         },
         async decodeImage(input) {
             return decodeImage(input);
@@ -148,6 +149,7 @@ describe("packer core", () => {
     it("evicts cached images that are no longer referenced", () => {
         const cache = new ImageCache();
         cache.set("first", {
+            inputRef: "first",
             signature: {
                 byteLength: 1,
                 contentHash: "a",
@@ -156,6 +158,7 @@ describe("packer core", () => {
             image: createImage(1, 1, [1, 2, 3, 4]),
         });
         cache.set("second", {
+            inputRef: "second",
             signature: {
                 byteLength: 1,
                 contentHash: "b",
@@ -202,6 +205,7 @@ describe("packer core", () => {
 
     it("distinguishes same-size files with different contents", async () => {
         decodeImage.mockClear();
+        readSignature.mockClear();
         const cache = new ImageCache();
         const first = createInput("source.png", 1, 1, [1, 2, 3, 4], {
             signature: {
@@ -245,6 +249,30 @@ describe("packer core", () => {
         );
 
         expect(decodeImage.mock.calls.length).toBe(beforeCalls + 1);
+    });
+
+    it("avoids signature reads on stable cache hits", async () => {
+        decodeImage.mockClear();
+        readSignature.mockClear();
+
+        const cache = new ImageCache();
+        const source = createInput("source.png", 1, 1, [1, 2, 3, 4]);
+        const request = createPackRequest([
+            assignment("r", "source", "r", 0),
+            assignment("g", null, "g", 0),
+            assignment("b", null, "b", 0),
+            assignment("a", null, "a", 255),
+        ]);
+        const inputs = new Map([["source", source]]);
+
+        await engine.generatePreview(request, inputs, cache, 1024);
+        const signatureCallsAfterFirstPass = readSignature.mock.calls.length;
+        const decodeCallsAfterFirstPass = decodeImage.mock.calls.length;
+
+        await engine.generatePreview(request, inputs, cache, 1024);
+
+        expect(readSignature.mock.calls.length).toBe(signatureCallsAfterFirstPass);
+        expect(decodeImage.mock.calls.length).toBe(decodeCallsAfterFirstPass);
     });
 });
 

@@ -6,6 +6,7 @@ interface LoadedImage {
 }
 
 interface CachedImage {
+    readonly inputRef: unknown;
     readonly signature: FileSignature;
     readonly image: DecodedImage;
 }
@@ -233,14 +234,26 @@ async function loadCachedImage<TInput>(
     cache: ImageCache,
     fileAdapter: PackerFileAdapter<TInput>,
 ): Promise<DecodedImage> {
-    const signature = await fileAdapter.readSignature(input);
     const cached = cache.get(key);
+    // Repeated preview refreshes keep the same input object, so we can bypass
+    // signature reads (and browser-side hashing) for an immediate cache hit.
+    if (cached !== undefined && Object.is(cached.inputRef, input)) {
+        return cached.image;
+    }
+
+    const signature = await fileAdapter.readSignature(input);
     if (cached !== undefined && areSignaturesEqual(cached.signature, signature)) {
+        cache.set(key, {
+            inputRef: input,
+            signature: cached.signature,
+            image: cached.image,
+        });
         return cached.image;
     }
 
     const decoded = await fileAdapter.decodeImage(input);
     cache.set(key, {
+        inputRef: input,
         signature,
         image: decoded,
     });

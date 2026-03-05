@@ -1,8 +1,6 @@
 import type { AppState, ChannelRowState, ColorChannel, PackRequest, PreviewResponse, PreviewState } from "../types";
 import { ChannelOrder, DefaultFills } from "./constants";
 
-let nextFileKeyId = 0;
-
 export function createInitialState(): AppState {
     return {
         rows: {
@@ -43,8 +41,7 @@ export function createEmptyPreviewState(): PreviewState {
 }
 
 export function createFileKey(file: File): string {
-    nextFileKeyId += 1;
-    return `${nextFileKeyId}:${file.name}:${file.size}:${file.lastModified}:${file.type}`;
+    return `${file.name}:${file.size}:${file.lastModified}:${file.type}`;
 }
 
 export function buildPackRequest(state: AppState): PackRequest {

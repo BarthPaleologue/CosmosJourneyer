@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createFileKey } from "./state";
 
 describe("state helpers", () => {
-    it("creates distinct keys for files with identical metadata", () => {
+    it("reuses keys for files with identical metadata", () => {
         const first = new File(["abcd"], "texture.png", {
             type: "image/png",
             lastModified: 123,
@@ -16,6 +16,6 @@ describe("state helpers", () => {
         const firstKey = createFileKey(first);
         const secondKey = createFileKey(second);
 
-        expect(firstKey).not.toBe(secondKey);
+        expect(firstKey).toBe(secondKey);
     });
 });
