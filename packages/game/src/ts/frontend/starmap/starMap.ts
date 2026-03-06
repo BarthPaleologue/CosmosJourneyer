@@ -209,7 +209,7 @@ export class StarMap {
 
         const instanceName = `${starSystemModel.name} Billboard instance`;
 
-        let instance: InstancedMesh | null = null;
+        let instance: InstancedMesh;
         if (stellarObjectModel.type !== "blackHole") {
             const recycledStar = this.recycledStars.pop();
             if (recycledStar !== undefined) {

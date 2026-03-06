@@ -86,16 +86,16 @@ export function createGrassBlade(scene: Scene, nbStacks: number) {
     // the last vertex is the tip of the blade
     positions[vertexIndex++] = 0;
     positions[vertexIndex++] = nbStacks * step;
-    positions[vertexIndex++] = 0;
+    positions[vertexIndex] = 0;
 
-    normals[normalIndex++] = 0;
-    normals[normalIndex++] = 0;
-    normals[normalIndex++] = 1;
+    normals[normalIndex] = 0;
+    normals[normalIndex + 1] = 0;
+    normals[normalIndex + 2] = 1;
 
     // last triangle
     indices[indexIndex++] = 2 * (nbStacks - 1);
     indices[indexIndex++] = 2 * (nbStacks - 1) + 1;
-    indices[indexIndex++] = 2 * nbStacks;
+    indices[indexIndex] = 2 * nbStacks;
 
     const vertexData = new VertexData();
     vertexData.positions = positions;
