@@ -1,0 +1,28 @@
+{
+    "name": "@cosmos-journeyer/channel-packer",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Web texture channel packing utility for Cosmos Journeyer.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/channel-packer"
+    },
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "test:unit": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint . --max-warnings=0",
+        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check"
+    },
+    "devDependencies": {
+        "eslint": "catalog:",
+        "jsdom": "^27.4.0",
+        "oxfmt": "catalog:",
+        "typescript": "catalog:",
+        "vite": "^7.1.12",
+        "vitest": "^4.0.17"
+    }
+}

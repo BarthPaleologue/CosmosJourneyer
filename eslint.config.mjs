@@ -6,6 +6,7 @@ import tseslint from "typescript-eslint";
 
 const projectConfigs = [
     "./packages/babylonjs-shading-language/tsconfig.json",
+    "./packages/channel-packer/tsconfig.json",
     "./packages/game/tsconfig.json",
     "./packages/website/tsconfig.json",
 ];
@@ -153,6 +154,7 @@ export default defineConfig([
         "packages/game/rspack.config.js",
         "tsconfig.json",
         "packages/game/dist",
+        "packages/channel-packer/dist",
         "packages/game/doc",
         "packages/game/src/asset",
         "coverage",

@@ -24,7 +24,7 @@
     - [Setup](#setup)
     - [Building](#building)
         - [Web](#web)
-        - [Tauri](#tauri)
+        - [Desktop (Tauri)](#desktop-tauri)
     - [Testing](#testing)
     - [Formatting](#formatting)
     - [Linting](#linting)
@@ -188,13 +188,15 @@ You can start the development server for the game with `pnpm dev:game` and for t
 
 To build the web version of Cosmos Journeyer, run `pnpm build:game`. Everything will be built in `packages/game/dist`.
 
-#### Tauri
+#### Desktop (Tauri)
 
 Cosmos Journeyer can be built as a desktop application using Tauri.
 
-To find what dependencies your OS is missing, run `pnpm tauri info`.
+For the game app, run `pnpm --filter @cosmos-journeyer/game tauri info` to find what dependencies your OS is missing.
 
-Then you can build the application with `pnpm tauri build` or run the dev version with `pnpm tauri dev`.
+Then you can build the game desktop application with `pnpm --filter @cosmos-journeyer/game tauri build` or run the dev version with `pnpm --filter @cosmos-journeyer/game tauri dev`.
+
+Channel Packer is web-only and can be started with `pnpm dev:channel-packer`.
 
 The build artifacts will appear in `packages/game/src-tauri/target/release/bundle/<platform>`.
 

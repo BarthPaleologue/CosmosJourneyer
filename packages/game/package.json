@@ -45,7 +45,8 @@
         "lint": "eslint .",
         "lint:fast": "eslint . --rule \"import/no-cycle: 0\" --rule \"import/namespace: 0\" --cache",
         "typecheck:watch": "tsc --noEmit --watch",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "tauri": "tauri"
     },
     "dependencies": {
         "@babylonjs/core": "^8.48.0",
