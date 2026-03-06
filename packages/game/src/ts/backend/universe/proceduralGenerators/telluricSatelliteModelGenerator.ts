@@ -79,7 +79,6 @@ export function generateTelluricSatelliteModel(
         minTemperature + Math.exp(-pressure / EarthSeaLevelPressure) * randRangeInt(30, 200, rng, 81);
 
     const axialTilt = 0;
-    let siderealDaySeconds = (60 * 60 * 24) / 10;
     const waterAmount = Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0);
 
     const atmosphere: AtmosphereModel | null =
@@ -131,8 +130,7 @@ export function generateTelluricSatelliteModel(
         initialMeanAnomaly: 0,
     };
 
-    // tidal lock
-    siderealDaySeconds = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
+    const siderealDaySeconds = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
 
     const clouds: CloudsModel | null =
         ocean !== null

@@ -536,16 +536,15 @@ function bb_spectrum(wavelength: number): number {
 */
 
 export function demonstrate() {
-    let [t, x, y, z, r, g, b] = [1000, 0, 0, 0, 0, 0, 0];
     const cs = HDTVsystem;
 
     console.log("Temperature       x      y      z       R     G     B");
     console.log("-----------    ------ ------ ------   ----- ----- -----");
 
-    for (t = 1000; t <= 10000; t += 500) {
+    for (let t = 1000; t <= 10000; t += 500) {
         bbTemp = t;
-        [x, y, z] = spectrum_to_xyz(bb_spectrum);
-        [r, g, b] = xyz_to_rgb(cs, x, y, z);
+        const [x, y, z] = spectrum_to_xyz(bb_spectrum);
+        let [r, g, b] = xyz_to_rgb(cs, x, y, z);
         [r, g, b] = constrain_rgb(r, g, b);
         [r, g, b] = norm_rgb(r, g, b);
         console.log(
