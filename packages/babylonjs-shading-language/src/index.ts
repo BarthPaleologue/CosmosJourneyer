@@ -59,6 +59,7 @@ import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
 import { ModBlock } from "@babylonjs/core/Materials/Node/Blocks/modBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
+import { NegateBlock } from "@babylonjs/core/Materials/Node/Blocks/negateBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
@@ -528,6 +529,14 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
  */
 export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     return trig(x, TrigonometryBlockOperations.Sign, options);
+}
+
+export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const negateBlock = new NegateBlock("negate");
+    negateBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    x.connectTo(negateBlock.value);
+    return negateBlock.output;
 }
 
 /**
