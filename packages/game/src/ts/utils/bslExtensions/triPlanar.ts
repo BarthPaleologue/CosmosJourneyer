@@ -26,6 +26,7 @@ import {
     mul,
     normalize,
     pow,
+    sign,
     splitVec,
     swizzle,
     textureSample,
@@ -50,7 +51,12 @@ export function triPlanarMaterial(
     roughness: NodeMaterialConnectionPoint;
     normal: NodeMaterialConnectionPoint;
 } {
-    const { uvX, uvY, uvZ } = getTriPlanarUVs(samplePoint);
+    let { uvX, uvY, uvZ } = getTriPlanarUVs(samplePoint);
+
+    const axisSign = splitVec(sign(surfaceNormal));
+    uvX = mul(uvX, vec2(axisSign.x, f(1)));
+    uvY = mul(uvY, vec2(axisSign.y, f(1)));
+    uvZ = mul(uvZ, vec2(axisSign.z, f(1)));
 
     const albedoRoughnessTexture = uniformTexture2d(textures.albedoRoughness).source;
     const { rgb: albedoX, a: roughnessX } = textureSample(albedoRoughnessTexture, uvX, { convertToLinearSpace: true });
@@ -64,9 +70,14 @@ export function triPlanarMaterial(
 
     const normalStrength = f(options?.perturbNormalStrength ?? 1);
     const invertY = options?.invertNormalY ?? false;
-    const tangentNormalX = unpackNormal(normalX01, { normalStrength, invertY });
-    const tangentNormalY = unpackNormal(normalY01, { normalStrength, invertY });
-    const tangentNormalZ = unpackNormal(normalZ01, { normalStrength, invertY });
+    let tangentNormalX = unpackNormal(normalX01, { normalStrength, invertY });
+    let tangentNormalY = unpackNormal(normalY01, { normalStrength, invertY });
+    let tangentNormalZ = unpackNormal(normalZ01, { normalStrength, invertY });
+
+    // Flip normal maps' x axis to account for flipped UVs, exactly like the reference shader.
+    tangentNormalX = mul(tangentNormalX, vec3({ x: axisSign.x, y: f(1), z: f(1) }));
+    tangentNormalY = mul(tangentNormalY, vec3({ x: axisSign.y, y: f(1), z: f(1) }));
+    tangentNormalZ = mul(tangentNormalZ, vec3({ x: axisSign.z, y: f(1), z: f(1) }));
 
     const { finalNormalX, finalNormalY, finalNormalZ } = whiteoutBlend(
         tangentNormalX,
@@ -90,11 +101,11 @@ export function triPlanarMaterial(
 }
 
 export function getTriPlanarUVs(samplePoint: NodeMaterialConnectionPoint) {
-    const samplePointSplit = splitVec(samplePoint);
+    const { x, y, z } = splitVec(samplePoint);
     return {
-        uvX: vec2(samplePointSplit.z, samplePointSplit.y),
-        uvY: vec2(samplePointSplit.x, samplePointSplit.z),
-        uvZ: vec2(samplePointSplit.x, samplePointSplit.y),
+        uvX: vec2(z, y),
+        uvY: vec2(x, z),
+        uvZ: vec2(x, y),
     };
 }
 
@@ -116,15 +127,15 @@ export function whiteoutBlend(
 
     const whiteoutNormalX = vec3({
         xy: add(tangentNormalXSplit.xyOut, surfaceNormalZY),
-        z: mul(abs(tangentNormalXSplit.z), surfaceNormalX),
+        z: mul(tangentNormalXSplit.z, surfaceNormalX),
     });
     const whiteoutNormalY = vec3({
         xy: add(tangentNormalYSplit.xyOut, surfaceNormalXZ),
-        z: mul(abs(tangentNormalYSplit.z), surfaceNormalY),
+        z: mul(tangentNormalYSplit.z, surfaceNormalY),
     });
     const whiteoutNormalZ = vec3({
         xy: add(tangentNormalZSplit.xyOut, surfaceNormalXY),
-        z: mul(abs(tangentNormalZSplit.z), surfaceNormalZ),
+        z: mul(tangentNormalZSplit.z, surfaceNormalZ),
     });
 
     return {
