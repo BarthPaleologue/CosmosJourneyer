@@ -61,6 +61,7 @@ import { ModBlock } from "@babylonjs/core/Materials/Node/Blocks/modBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
 import { NegateBlock } from "@babylonjs/core/Materials/Node/Blocks/negateBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
+import { OneMinusBlock } from "@babylonjs/core/Materials/Node/Blocks/oneMinusBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
@@ -1134,6 +1135,14 @@ export function mod(
     right.connectTo(modBlock.right);
 
     return modBlock.output;
+}
+
+export function oneMinus(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const oneMinusBlock = new OneMinusBlock("oneMinus");
+    oneMinusBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(oneMinusBlock.input);
+    return oneMinusBlock.output;
 }
 
 /**
