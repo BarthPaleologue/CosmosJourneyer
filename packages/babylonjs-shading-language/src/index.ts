@@ -57,7 +57,11 @@ import { LerpBlock } from "@babylonjs/core/Materials/Node/Blocks/lerpBlock";
 import { MatrixSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/matrixSplitterBlock";
 import { MaxBlock } from "@babylonjs/core/Materials/Node/Blocks/maxBlock";
 import { MinBlock } from "@babylonjs/core/Materials/Node/Blocks/minBlock";
+import { ModBlock } from "@babylonjs/core/Materials/Node/Blocks/modBlock";
 import { MultiplyBlock } from "@babylonjs/core/Materials/Node/Blocks/multiplyBlock";
+import { NegateBlock } from "@babylonjs/core/Materials/Node/Blocks/negateBlock";
+import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
+import { OneMinusBlock } from "@babylonjs/core/Materials/Node/Blocks/oneMinusBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
@@ -78,10 +82,10 @@ import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDi
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
-import { type NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
+import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { type Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
+import { Vector2, type Vector3, type Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
@@ -529,6 +533,19 @@ export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpt
 }
 
 /**
+ * Returns the negated value of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
+export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const negateBlock = new NegateBlock("negate");
+    negateBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    x.connectTo(negateBlock.value);
+    return negateBlock.output;
+}
+
+/**
  * Returns the length (magnitude) of a vector.
  * @param input - The input vector.
  * @param options - Optional target options.
@@ -564,31 +581,42 @@ export function distance(
     return distanceBlock.output;
 }
 
+type RemapRanges =
+    | ["number", Readonly<[number, number]>, Readonly<[number, number]>]
+    | [
+          "connectionPoint",
+          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
+          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
+      ];
+
 /**
  * Remaps a value from one range to another.
  * @param input - The input value to remap.
- * @param sourceMin - The minimum value of the source range.
- * @param sourceMax - The maximum value of the source range.
- * @param targetMin - The minimum value of the target range.
- * @param targetMax - The maximum value of the target range.
+ * @param ranges - The source and target ranges, expressed either as numeric tuples or connection-point tuples.
  * @param options - Optional target options.
  */
 export function remap(
     input: NodeMaterialConnectionPoint,
-    sourceMin: NodeMaterialConnectionPoint,
-    sourceMax: NodeMaterialConnectionPoint,
-    targetMin: NodeMaterialConnectionPoint,
-    targetMax: NodeMaterialConnectionPoint,
+    ranges: RemapRanges,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const remapBlock = new RemapBlock("remap");
     remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
+    switch (ranges[0]) {
+        case "number":
+            remapBlock.sourceRange = new Vector2(ranges[1][0], ranges[1][1]);
+            remapBlock.targetRange = new Vector2(ranges[2][0], ranges[2][1]);
+            break;
+        case "connectionPoint":
+            ranges[1][0].connectTo(remapBlock.sourceMin);
+            ranges[1][1].connectTo(remapBlock.sourceMax);
+            ranges[2][0].connectTo(remapBlock.targetMin);
+            ranges[2][1].connectTo(remapBlock.targetMax);
+            break;
+    }
+
     input.connectTo(remapBlock.input);
-    sourceMin.connectTo(remapBlock.sourceMin);
-    sourceMax.connectTo(remapBlock.sourceMax);
-    targetMin.connectTo(remapBlock.targetMin);
-    targetMax.connectTo(remapBlock.targetMax);
 
     return remapBlock.output;
 }
@@ -673,6 +701,23 @@ export function pow(
 }
 
 /**
+ * Returns the normalized version of the input vector.
+ * @param input - The input vector.
+ * @param options - Optional target options.
+ */
+export function normalize(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const normalizeBlock = new NormalizeBlock("normalize");
+    normalizeBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(normalizeBlock.input);
+
+    return normalizeBlock.output;
+}
+
+/**
  * Returns whether the current fragment is front-facing.
  */
 export function getFrontFacing() {
@@ -681,96 +726,99 @@ export function getFrontFacing() {
     return frontFacingBlock.output;
 }
 
+type MergeInput = Partial<{
+    xyzw: NodeMaterialConnectionPoint;
+    xyz: NodeMaterialConnectionPoint;
+    xy: NodeMaterialConnectionPoint;
+    zw: NodeMaterialConnectionPoint;
+    x: NodeMaterialConnectionPoint;
+    y: NodeMaterialConnectionPoint;
+    z: NodeMaterialConnectionPoint;
+    w: NodeMaterialConnectionPoint;
+}>;
+
+type MergeOutput = {
+    xyzw: VectorMergerBlock["xyzw"];
+    xyzOut: VectorMergerBlock["xyzOut"];
+    xyOut: VectorMergerBlock["xyOut"];
+    zwOut: VectorMergerBlock["zwOut"];
+};
+
 /**
  * Merges the given components into a vector.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component (optional).
- * @param w - The w component (optional).
+ * @param inputs - The components to merge (x, y, z, w or xy, zw or xyz, xyzw).
  * @param options - Optional target options.
  */
-export function merge(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint | null,
-    w: NodeMaterialConnectionPoint | null,
-    options?: Partial<TargetOptions>,
-) {
+export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): MergeOutput {
     const merger = new VectorMergerBlock("Merge");
     merger.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    x.connectTo(merger.x);
-    y.connectTo(merger.y);
-
-    if (z) {
-        z.connectTo(merger.z);
-    }
-
-    if (w) {
-        w.connectTo(merger.w);
-    }
+    inputs.xyzw?.connectTo(merger.xyzwIn);
+    inputs.xyz?.connectTo(merger.xyzIn);
+    inputs.xy?.connectTo(merger.xyIn);
+    inputs.zw?.connectTo(merger.zwIn);
+    inputs.x?.connectTo(merger.x);
+    inputs.y?.connectTo(merger.y);
+    inputs.z?.connectTo(merger.z);
+    inputs.w?.connectTo(merger.w);
 
     return merger;
 }
 
-/**
- * Replaces the X component of a vector with a new value.
- * @param input - The input vector.
- * @param x - The new X component.
- * @param options - Optional target options.
- */
-export function withX(
-    input: NodeMaterialConnectionPoint,
-    x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(x, splitInput.y, splitInput.z, splitInput.w, options);
-}
+type SwizzleComponent = "x" | "y" | "z" | "w";
+
+type SwizzleString =
+    | `${SwizzleComponent}${SwizzleComponent}`
+    | `${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}`
+    | `${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}`;
 
 /**
- * Replaces the Y component of a vector with a new value.
+ * Rearranges vector components according to the given swizzle string.
  * @param input - The input vector.
- * @param y - The new Y component.
+ * @param swizzleStr - The component order to produce.
  * @param options - Optional target options.
  */
-export function withY(
+export function swizzle(
     input: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
+    swizzleStr: SwizzleString,
     options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, y, splitInput.z, splitInput.w, options);
-}
+): NodeMaterialConnectionPoint {
+    const swizzleBlock = new VectorMergerBlock("Swizzle");
+    swizzleBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-/**
- * Replaces the Z component of a vector with a new value.
- * @param input - The input vector.
- * @param z - The new Z component.
- * @param options - Optional target options.
- */
-export function withZ(
-    input: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, splitInput.y, z, splitInput.w, options);
-}
+    if (input.canConnectTo(swizzleBlock.xyzwIn)) {
+        input.connectTo(swizzleBlock.xyzwIn);
+    } else if (input.canConnectTo(swizzleBlock.xyzIn)) {
+        input.connectTo(swizzleBlock.xyzIn);
+    } else if (input.canConnectTo(swizzleBlock.xyIn)) {
+        input.connectTo(swizzleBlock.xyIn);
+    } else {
+        throw new Error("Input type is not compatible with swizzle block");
+    }
 
-/**
- * Replaces the W component of a vector with a new value.
- * @param input - The input vector.
- * @param w - The new W component.
- * @param options - Optional target options.
- */
-export function withW(
-    input: NodeMaterialConnectionPoint,
-    w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-) {
-    const splitInput = splitVec(input, options);
-    return merge(splitInput.x, splitInput.y, splitInput.z, w, options);
+    if (swizzleStr[0] !== undefined) {
+        swizzleBlock.xSwizzle = swizzleStr[0] as SwizzleComponent;
+    }
+    if (swizzleStr[1] !== undefined) {
+        swizzleBlock.ySwizzle = swizzleStr[1] as SwizzleComponent;
+    }
+    if (swizzleStr[2] !== undefined) {
+        swizzleBlock.zSwizzle = swizzleStr[2] as SwizzleComponent;
+    }
+    if (swizzleStr[3] !== undefined) {
+        swizzleBlock.wSwizzle = swizzleStr[3] as SwizzleComponent;
+    }
+
+    switch (swizzleStr.length) {
+        case 2:
+            return swizzleBlock.xyOut;
+        case 3:
+            return swizzleBlock.xyzOut;
+        case 4:
+            return swizzleBlock.xyzw;
+        default:
+            throw new Error("Invalid swizzle string length");
+    }
 }
 
 /**
@@ -866,41 +914,33 @@ export function vec2(
     y: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    return merge(x, y, null, null, options).xyOut;
+    return merge({ x, y }, options).xyOut;
 }
+
+type Vec3Input = Partial<{
+    xyz: NodeMaterialConnectionPoint;
+    xy: NodeMaterialConnectionPoint;
+    x: NodeMaterialConnectionPoint;
+    y: NodeMaterialConnectionPoint;
+    z: NodeMaterialConnectionPoint;
+}>;
 
 /**
  * Creates a vec3 from the given components.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component.
+ * @param inputs - The components to merge into a vec3 (x, y, z or xy, z or xyz).
  * @param options - Optional target options.
  */
-export function vec3(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    return merge(x, y, z, null, options).xyzOut;
+export function vec3(inputs: Vec3Input, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return merge(inputs, options).xyzOut;
 }
 
 /**
  * Creates a vec4 from the given components.
- * @param x - The x component.
- * @param y - The y component.
- * @param z - The z component.
- * @param w - The w component.
+ * @param inputs - The components to merge into a vec4 (x, y, z, w or xy, z, w or xyz, w or xyzw).
  * @param options - Optional target options.
  */
-export function vec4(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    z: NodeMaterialConnectionPoint,
-    w: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    return merge(x, y, z, w, options).xyzw;
+export function vec4(inputs: MergeInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return merge(inputs, options).xyzw;
 }
 
 /**
@@ -939,6 +979,11 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
     return splitBlock;
 }
 
+/**
+ * Splits an RGBA color into its individual channels.
+ * @param inputColor - The input color.
+ * @param options - Optional target options.
+ */
 export function splitRgba(inputColor: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     const splitBlock = new ColorSplitterBlock("splitColor");
     splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -973,28 +1018,6 @@ export function splitMatrix(
     input.connectTo(splitBlock.input);
 
     return splitBlock;
-}
-
-/**
- * Creates a vec2 using the input vector's X and Z components.
- * Useful for projecting 3D positions onto a 2D plane.
- * @param inputVec - The input vector (must be vec3 or vec4).
- * @param options - Optional target options.
- * @returns A vec2 containing the X and Z components.
- */
-export function xz(
-    inputVec: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    const inputSplitted = splitVec(inputVec, options);
-
-    const outputXZ = new VectorMergerBlock("OutputXZ");
-    outputXZ.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
-
-    inputSplitted.x.connectTo(outputXZ.x);
-    inputSplitted.z.connectTo(outputXZ.y);
-
-    return outputXZ.xyOut;
 }
 
 /**
@@ -1120,6 +1143,39 @@ export function sub(
     right.connectTo(subBlock.right);
 
     return subBlock.output;
+}
+
+/**
+ * Returns the remainder of dividing the left value by the right value.
+ * @param left - The dividend value.
+ * @param right - The divisor value.
+ * @param options - Optional target options.
+ */
+export function mod(
+    left: NodeMaterialConnectionPoint,
+    right: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+) {
+    const modBlock = new ModBlock("mod");
+    modBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    left.connectTo(modBlock.left);
+    right.connectTo(modBlock.right);
+
+    return modBlock.output;
+}
+
+/**
+ * Returns one minus the input value.
+ * @param input - The input value.
+ * @param options - Optional target options.
+ */
+export function oneMinus(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    const oneMinusBlock = new OneMinusBlock("oneMinus");
+    oneMinusBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
+
+    input.connectTo(oneMinusBlock.input);
+    return oneMinusBlock.output;
 }
 
 /**
