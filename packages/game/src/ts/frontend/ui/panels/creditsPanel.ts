@@ -65,6 +65,7 @@ export class CreditsPanel {
             'Mandelbox raymarching based on <a target="_blank" href="https://www.shadertoy.com/view/llGXDR">geoff\'s implementation</a> on shadertoy',
             'Sierpinski raymarching based on <a target="_blank" href="https://www.shadertoy.com/view/4dl3Wl">Inigo Quilez\'s implementation</a> on shadertoy',
             'Menger Sponge raymarching based on <a target="_blank" href="https://www.shadertoy.com/view/XttfRN">reinder\'s implementation</a> on shadertoy',
+            'Volumetric thruster exhaust based on <a target="_blank" href="https://www.shadertoy.com/view/t3XyzB">wedesoft\'s implementation</a> on shadertoy',
         ];
 
         programmingCredits.forEach((credit) => {

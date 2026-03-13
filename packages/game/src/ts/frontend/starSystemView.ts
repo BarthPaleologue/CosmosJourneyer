@@ -592,6 +592,10 @@ export class StarSystemView implements View {
 
         this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects(), [
             starSystem.starFieldBox.mesh,
+            ...(this.spaceshipControls
+                ?.getSpaceship()
+                .getMainThrusters()
+                .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
         ]);
 
         const celestialBodies = starSystem.getCelestialBodies();

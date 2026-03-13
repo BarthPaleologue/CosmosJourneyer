@@ -112,7 +112,7 @@ export class ShipControls implements Controls {
         );
         this.thirdPersonCamera.parent = this.thirdPersonCameraTransform;
         this.thirdPersonCamera.lowerRadiusLimit =
-            (1.2 *
+            (1.5 *
                 Math.max(
                     this.spaceship.boundingExtent.x,
                     this.spaceship.boundingExtent.y,

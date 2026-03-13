@@ -814,6 +814,10 @@ export class Spaceship implements Transformable, Targetable {
         return amount - fuelLeftToRefuel;
     }
 
+    public getMainThrusters() {
+        return this.mainThrusters;
+    }
+
     public static CreateDefault(scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer): Promise<Spaceship> {
         return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets, soundPlayer);
     }

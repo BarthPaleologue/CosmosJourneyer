@@ -17,21 +17,24 @@
 
 import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { degreesToRadians } from "@/utils/physics/unitConversions";
 
-import { SolidPlume } from "./solidPlume";
+import type { Transformable } from "../universe/architecture/transformable";
+import { ThrusterExhaust } from "./thrusterExhaust";
 
-export class Thruster {
+export class Thruster implements Transformable {
     protected readonly maxAuthority = 3e3;
 
-    readonly mesh: AbstractMesh;
+    private readonly mesh: AbstractMesh;
 
     protected throttle = 0;
 
-    readonly plume: SolidPlume;
+    readonly exhaust: ThrusterExhaust;
 
     readonly parentAggregate: PhysicsAggregate;
 
@@ -41,8 +44,25 @@ export class Thruster {
     constructor(mesh: AbstractMesh, direction: Vector3, parentAggregate: PhysicsAggregate) {
         this.mesh = mesh;
 
-        this.plume = new SolidPlume(mesh, mesh.getScene());
-        this.plume.solidParticleSystem.mesh.parent = mesh;
+        this.exhaust = new ThrusterExhaust(`${mesh.name}Exhaust`, mesh.getScene(), {
+            crossSection: {
+                x: 0.17,
+                z: 0.3,
+            },
+            emissionIntensity: 3.0,
+            rayMarchStepCount: 16,
+        });
+        this.exhaust.getTransform().parent = mesh;
+        this.exhaust.getTransform().rotationQuaternion = Quaternion.FromUnitVectorsToRef(
+            Vector3.Down(),
+            direction.normalizeToNew().negate(),
+            Quaternion.Identity(),
+        );
+        this.exhaust.getTransform().rotate(Vector3.Down(), Math.PI / 2);
+        this.exhaust.getTransform().scaling.x = 5;
+        this.exhaust.getTransform().scaling.z = 5;
+        this.exhaust.setLength(8);
+        this.exhaust.setPressure(1, 3);
 
         this.parentAggregate = parentAggregate;
 
@@ -58,6 +78,10 @@ export class Thruster {
         this.light.range = 200;
         this.light.parent = mesh;
         this.light.position.addInPlace(direction.scale(1.0));
+    }
+
+    public getTransform(): TransformNode {
+        return this.mesh;
     }
 
     /**
@@ -77,12 +101,12 @@ export class Thruster {
     }
 
     public update(deltaSeconds: number): void {
-        this.plume.update(deltaSeconds);
-        this.plume.setThrottle(this.throttle);
+        this.exhaust.setThrottle(this.throttle);
+        this.exhaust.update(deltaSeconds);
     }
 
     public dispose() {
-        this.plume.solidParticleSystem.dispose();
+        this.exhaust.dispose();
         this.mesh.dispose();
         this.light.dispose();
     }
