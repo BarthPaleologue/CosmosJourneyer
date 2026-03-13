@@ -979,6 +979,11 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
     return splitBlock;
 }
 
+/**
+ * Splits an RGBA color into its individual channels.
+ * @param inputColor - The input color.
+ * @param options - Optional target options.
+ */
 export function splitRgba(inputColor: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
     const splitBlock = new ColorSplitterBlock("splitColor");
     splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
