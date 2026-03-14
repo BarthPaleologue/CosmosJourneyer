@@ -18,6 +18,8 @@
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { add, mul, type TargetOptions } from "babylonjs-shading-language";
 
+export { sampleDisk, type DiskSampleOptions } from "./random";
+
 type ConnectionPointList = readonly [
     NodeMaterialConnectionPoint,
     NodeMaterialConnectionPoint,
