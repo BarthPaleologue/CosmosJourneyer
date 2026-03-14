@@ -235,23 +235,23 @@ export function constFloat(name: string, value: number, options?: Partial<Target
     return inputBlock.output;
 }
 
+export type UniformFloatOptions = TargetOptions & {
+    defaultValue: number;
+};
+
 /**
- * Returns a uniform float input block with the given name and value.
+ * Returns a uniform float input block with the given name.
  * @param name - The name of the input block.
- * @param value - The float value.
- * @param options - Optional target options.
+ * @param options - Optional input block options, including `defaultValue` and `target`.
+ * @returns The uniform float input block.
  */
-export function uniformFloat(
-    name: string,
-    value: number,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function uniformFloat(name: string, options?: Partial<UniformFloatOptions>): InputBlock {
     const inputBlock = new InputBlock(name);
     inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
-    inputBlock.value = value;
     inputBlock.matrixMode = 0;
+    inputBlock.value = options?.defaultValue ?? 0;
 
-    return inputBlock.output;
+    return inputBlock;
 }
 
 /**
