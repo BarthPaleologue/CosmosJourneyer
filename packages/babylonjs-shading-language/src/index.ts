@@ -524,6 +524,15 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
 }
 
 /**
+ * Returns the square root of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
+export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.Sqrt, options);
+}
+
+/**
  * Returns the sign of the input.
  * @param x - The input value.
  * @param options - Optional target options.
