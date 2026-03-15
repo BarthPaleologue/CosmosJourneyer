@@ -590,40 +590,24 @@ export function distance(
     return distanceBlock.output;
 }
 
-type RemapRanges =
-    | ["number", Readonly<[number, number]>, Readonly<[number, number]>]
-    | [
-          "connectionPoint",
-          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
-          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
-      ];
-
 /**
  * Remaps a value from one range to another.
  * @param input - The input value to remap.
- * @param ranges - The source and target ranges, expressed either as numeric tuples or connection-point tuples.
+ * @param sourceRange - The input range tuple as `[min, max]`.
+ * @param targetRange - The output range tuple as `[min, max]`.
  * @param options - Optional target options.
  */
 export function remap(
     input: NodeMaterialConnectionPoint,
-    ranges: RemapRanges,
+    sourceRange: Readonly<[number, number]>,
+    targetRange: Readonly<[number, number]>,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const remapBlock = new RemapBlock("remap");
     remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    switch (ranges[0]) {
-        case "number":
-            remapBlock.sourceRange = new Vector2(ranges[1][0], ranges[1][1]);
-            remapBlock.targetRange = new Vector2(ranges[2][0], ranges[2][1]);
-            break;
-        case "connectionPoint":
-            ranges[1][0].connectTo(remapBlock.sourceMin);
-            ranges[1][1].connectTo(remapBlock.sourceMax);
-            ranges[2][0].connectTo(remapBlock.targetMin);
-            ranges[2][1].connectTo(remapBlock.targetMax);
-            break;
-    }
+    remapBlock.sourceRange = new Vector2(sourceRange[0], sourceRange[1]);
+    remapBlock.targetRange = new Vector2(targetRange[0], targetRange[1]);
 
     input.connectTo(remapBlock.input);
 

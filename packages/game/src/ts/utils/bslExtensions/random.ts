@@ -30,7 +30,7 @@ export function sampleDisk(
     const radiusHash = hash11(add(id, f(11)));
     const thetaHash = hash11(add(id, f(29)));
 
-    const radius = remap(sqrt(radiusHash), ["number", [0, 1], [options.minRadius, options.maxRadius]]);
+    const radius = remap(sqrt(radiusHash), [0, 1], [options.minRadius, options.maxRadius]);
     const theta = mul(thetaHash, f(2.0 * Math.PI));
 
     return {
