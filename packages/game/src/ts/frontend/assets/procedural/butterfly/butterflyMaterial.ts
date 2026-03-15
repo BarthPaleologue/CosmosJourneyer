@@ -79,11 +79,11 @@ export class ButterflyMaterial {
 
         const hash = hash11(instanceID);
 
-        const scaling = remap(hash, ["number", [0, 1], [0.02, 0.1]]);
+        const scaling = remap(hash, [0, 1], [0.02, 0.1]);
 
         const scaledPosition = mul(position, scaling);
 
-        const flappingPeriod = remap(hash, ["number", [0, 1], [0.25, 0.75]]);
+        const flappingPeriod = remap(hash, [0, 1], [0.25, 0.75]);
         const flappingOmega = div(f(2 * Math.PI), flappingPeriod);
         const phase = mul(hash, f(2 * Math.PI));
         const wingFlapJitter = sin(add(mul(flappingOmega, elapsedSeconds), phase));
@@ -91,7 +91,7 @@ export class ButterflyMaterial {
         const movementY = add(sin(add(mul(f(0.2), elapsedSeconds), phase)), f(3));
 
         const wingAngleShape = abs(cos(add(mul(flappingOmega, elapsedSeconds), phase)));
-        const wingAngle = remap(sub(f(1), wingAngleShape), ["number", [0, 1], [-0.7, 1]]);
+        const wingAngle = remap(sub(f(1), wingAngleShape), [0, 1], [-0.7, 1]);
 
         const splitPosition = splitVec(position);
         const butterflyForward = vec(new Vector3(1, 0, 0));
