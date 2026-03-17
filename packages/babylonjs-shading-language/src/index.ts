@@ -1287,11 +1287,10 @@ export function max(
  * @see https://www.shadertoy.com/view/4djSRW
  */
 export function hash11(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
-    const a = mul(input, f(0.1031, options), options);
-    const b = fract(a, options);
-    const c = add(mul(b, b, options), f(33.33, options), options);
-    const d = mul(c, add(b, b, options), options);
-    return fract(d, options);
+    const a = fract(mul(input, f(0.1031, options), options), options);
+    const b = mul(a, add(a, f(33.33, options), options), options);
+    const c = mul(b, add(b, b, options), options);
+    return fract(c, options);
 }
 
 export type PerturbNormalOptions = TargetOptions & {

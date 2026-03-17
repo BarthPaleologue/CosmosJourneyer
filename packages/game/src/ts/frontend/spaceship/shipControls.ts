@@ -50,6 +50,8 @@ import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
+    private readonly spaceDotsYawResponse = 5.0;
+    private readonly spaceDotsPitchResponse = 5.0;
 
     readonly thirdPersonCameraDefaultRadius = 60;
     readonly thirdPersonCameraDefaultAlpha = 3.14 / 2;
@@ -304,17 +306,28 @@ export class ShipControls implements Controls {
 
     public update(deltaSeconds: number): void {
         const spaceship = this.getSpaceship();
-        spaceship.update(deltaSeconds);
-
-        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
-
         let [inputRoll, inputPitch] = SpaceShipControlsInputs.map.rollPitch.value;
         if (SpaceShipControlsInputs.map.ignorePointer.value > 0 || spaceship.isAutoPiloted()) {
             inputRoll *= 0;
             inputPitch *= 0;
         }
 
+        let spaceDotsYawIntent = 0;
+        let spaceDotsPitchIntent = 0;
+
         const warpDrive = spaceship.getInternals().getWarpDrive();
+        if (warpDrive !== null && warpDrive.isEnabled()) {
+            const nextRotationInertiaX = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
+            const nextRotationInertiaY = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
+            spaceDotsYawIntent = this.spaceDotsYawResponse * nextRotationInertiaX;
+            spaceDotsPitchIntent = this.spaceDotsPitchResponse * nextRotationInertiaY;
+        }
+
+        spaceship.spaceDots.setSteering(spaceDotsYawIntent, spaceDotsPitchIntent);
+        spaceship.update(deltaSeconds);
+
+        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
+
         if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
@@ -372,10 +385,6 @@ export class ShipControls implements Controls {
             roll(this.getTransform(), this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds);
             yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
             pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
-
-            this.spaceship.warpTunnel.applyForce(
-                new Vector3(this.rotationInertia.x, this.rotationInertia.y, 0).scale(-1),
-            );
         }
 
         this.thirdPersonCameraTransform.position =

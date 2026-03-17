@@ -394,13 +394,13 @@ export class StarSystemView implements View {
             // then, initiate hyper space jump
             if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
             spaceship.hyperSpaceTunnel.setEnabled(true);
-            spaceship.warpTunnel.getTransform().setEnabled(false);
+            spaceship.spaceDots.getTransform().setEnabled(false);
             spaceship.soundInstances.hyperSpace.setVolume(0.5);
             soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
             const observer = this.scene.onBeforeRenderObservable.add(() => {
                 const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
                 spaceship.hyperSpaceTunnel.update(deltaSeconds);
-                spaceship.warpTunnel.update(deltaSeconds);
+                spaceship.spaceDots.update(deltaSeconds);
             });
 
             spaceship.burnFuel(fuelForJump);
@@ -414,7 +414,7 @@ export class StarSystemView implements View {
             this.initStarSystem(Date.now() / 1000);
 
             spaceship.hyperSpaceTunnel.setEnabled(false);
-            spaceship.warpTunnel.getTransform().setEnabled(true);
+            spaceship.spaceDots.getTransform().setEnabled(true);
             spaceship.soundInstances.hyperSpace.setVolume(0);
 
             spaceship.idleThrottle();
@@ -1076,7 +1076,7 @@ export class StarSystemView implements View {
             .setAbsolutePosition(previousControls.getActiveCamera().getWorldMatrix().getTranslation());
 
         const spaceship = shipControls.getSpaceship();
-        spaceship.warpTunnel.setThrottle(0);
+        spaceship.spaceDots.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
         VehicleInputs.setEnabled(false);
         this.stopBackgroundSounds();
@@ -1098,7 +1098,7 @@ export class StarSystemView implements View {
         CharacterInputs.setEnabled(false);
 
         const spaceship = shipControls.getSpaceship();
-        spaceship.warpTunnel.setThrottle(0);
+        spaceship.spaceDots.setThrottle(0);
         SpaceShipControlsInputs.setEnabled(false);
 
         VehicleInputs.setEnabled(false);
