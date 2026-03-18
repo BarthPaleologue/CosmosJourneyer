@@ -43,7 +43,7 @@ Make sure you read and understand the root level `.md` files. Other `.md` files 
 - Install dependencies (`pnpm install`).
 - Incrementally develop in small, testable chunks.
 - Write unit tests for new functionality or bug fixes by adding `*.spec.ts` files alongside implementation.
-- Run **build**, then **unit tests**, then **lint** (allow ~1 minute), and finally **E2E tests via Docker** before opening a PR.
+- Run **build**, then **unit tests**, then **lint** (allow ~1 minute), and finally **E2E tests** before opening a PR.
 - When opening the PR, follow the template at `.github/PULL_REQUEST_TEMPLATE.md`. If you don't know the issue number, remove the "Related Tickets" section.
 
 ## Communication

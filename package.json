@@ -46,8 +46,6 @@
         "test:unit": "pnpm -r test:unit",
         "test:e2e": "pnpm --filter @cosmos-journeyer/game test:e2e",
         "test:e2e:update": "pnpm --filter @cosmos-journeyer/game test:e2e:update",
-        "test:e2e:docker": "pnpm --filter @cosmos-journeyer/game test:e2e:docker",
-        "test:e2e:docker:update": "pnpm --filter @cosmos-journeyer/game test:e2e:docker:update",
         "doc": "pnpm -r doc",
         "lint": "pnpm -r lint",
         "typecheck": "pnpm -r typecheck",
