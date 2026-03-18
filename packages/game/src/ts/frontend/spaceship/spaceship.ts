@@ -37,7 +37,6 @@ import {
 } from "@/backend/spaceship/serializedSpaceship";
 
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import { WarpTunnel } from "@/frontend/assets/procedural/warpTunnel";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundInstance } from "@/frontend/audio/soundInstance";
@@ -49,11 +48,13 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { distanceToAsteroidField } from "@/frontend/universe/asteroidFields/helpers/distance";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { C } from "@/utils/physics/constants/fundamental";
 import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
+import { SpaceDots } from "../assets/procedural/spaceDots";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
@@ -103,7 +104,7 @@ export class Spaceship implements Transformable, Targetable {
     private nearestOrbitalObject: OrbitalObject | null = null;
     private nearestCelestialBody: CelestialBody | null = null;
 
-    readonly warpTunnel: WarpTunnel;
+    readonly spaceDots: SpaceDots;
     readonly hyperSpaceTunnel: HyperSpaceTunnel;
 
     private readonly scene: Scene;
@@ -250,17 +251,22 @@ export class Spaceship implements Transformable, Targetable {
 
         this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
 
-        this.warpTunnel = new WarpTunnel(scene);
-        this.warpTunnel.getTransform().parent = this.getTransform();
+        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
+        this.boundingExtent = boundingMax.subtract(boundingMin);
+
+        this.spaceDots = new SpaceDots(scene, {
+            minRadius: this.getBoundingRadius() * 1.5,
+            maxRadius: this.getBoundingRadius() * 4,
+            width: 0.2,
+            minSpeed: 30,
+            maxSpeed: 500,
+        });
+        this.spaceDots.getTransform().parent = this.getTransform();
 
         this.hyperSpaceTunnel = new HyperSpaceTunnel(this.getTransform().forward, scene, assets.textures.noises);
         this.hyperSpaceTunnel.setParent(this.getTransform());
         this.hyperSpaceTunnel.setEnabled(false);
         this.internals = new SpaceshipInternals(serializedSpaceShip, unfitComponents);
-
-        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
-
-        this.boundingExtent = boundingMax.subtract(boundingMin);
 
         this.getTransform().name = this.name;
         this.targetInfo = {
@@ -556,7 +562,7 @@ export class Spaceship implements Transformable, Targetable {
         }
 
         const warpSpeed = this.aggregate.transformNode.forward.scale(warpDrive.getWarpSpeed());
-        this.warpTunnel.update(deltaSeconds);
+        this.spaceDots.update(deltaSeconds);
 
         let closestDistance = Number.POSITIVE_INFINITY;
         let objectHalfThickness = 0;
@@ -614,9 +620,12 @@ export class Spaceship implements Transformable, Targetable {
 
         warpDrive.update(closestDistance, objectHalfThickness, deltaSeconds);
 
-        // the warp throttle goes from 0.1 to 1 smoothly using an inverse function
-        if (warpDrive.isEnabled()) this.warpTunnel.setThrottle(1 - 1 / (1.1 * (1 + 1e-7 * warpDrive.getWarpSpeed())));
-        else this.warpTunnel.setThrottle(0);
+        if (warpDrive.isEnabled())
+            this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));
+        else {
+            this.spaceDots.setThrottle(0);
+            this.spaceDots.setSteering(0, 0);
+        }
     }
 
     private updatePhysicsState() {
@@ -860,7 +869,7 @@ export class Spaceship implements Transformable, Targetable {
         this.mainThrusters.length = 0;
         this.lightContainer.dispose();
 
-        this.warpTunnel.dispose();
+        this.spaceDots.dispose();
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();
         this.frame.dispose();

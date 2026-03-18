@@ -235,23 +235,23 @@ export function constFloat(name: string, value: number, options?: Partial<Target
     return inputBlock.output;
 }
 
+export type UniformFloatOptions = TargetOptions & {
+    defaultValue: number;
+};
+
 /**
- * Returns a uniform float input block with the given name and value.
+ * Returns a uniform float input block with the given name.
  * @param name - The name of the input block.
- * @param value - The float value.
- * @param options - Optional target options.
+ * @param options - Optional input block options, including `defaultValue` and `target`.
+ * @returns The uniform float input block.
  */
-export function uniformFloat(
-    name: string,
-    value: number,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function uniformFloat(name: string, options?: Partial<UniformFloatOptions>): InputBlock {
     const inputBlock = new InputBlock(name);
     inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
-    inputBlock.value = value;
     inputBlock.matrixMode = 0;
+    inputBlock.value = options?.defaultValue ?? 0;
 
-    return inputBlock.output;
+    return inputBlock;
 }
 
 /**
@@ -524,6 +524,15 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
 }
 
 /**
+ * Returns the square root of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
+export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.Sqrt, options);
+}
+
+/**
  * Returns the sign of the input.
  * @param x - The input value.
  * @param options - Optional target options.
@@ -581,40 +590,24 @@ export function distance(
     return distanceBlock.output;
 }
 
-type RemapRanges =
-    | ["number", Readonly<[number, number]>, Readonly<[number, number]>]
-    | [
-          "connectionPoint",
-          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
-          Readonly<[NodeMaterialConnectionPoint, NodeMaterialConnectionPoint]>,
-      ];
-
 /**
  * Remaps a value from one range to another.
  * @param input - The input value to remap.
- * @param ranges - The source and target ranges, expressed either as numeric tuples or connection-point tuples.
+ * @param sourceRange - The input range tuple as `[min, max]`.
+ * @param targetRange - The output range tuple as `[min, max]`.
  * @param options - Optional target options.
  */
 export function remap(
     input: NodeMaterialConnectionPoint,
-    ranges: RemapRanges,
+    sourceRange: Readonly<[number, number]>,
+    targetRange: Readonly<[number, number]>,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const remapBlock = new RemapBlock("remap");
     remapBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    switch (ranges[0]) {
-        case "number":
-            remapBlock.sourceRange = new Vector2(ranges[1][0], ranges[1][1]);
-            remapBlock.targetRange = new Vector2(ranges[2][0], ranges[2][1]);
-            break;
-        case "connectionPoint":
-            ranges[1][0].connectTo(remapBlock.sourceMin);
-            ranges[1][1].connectTo(remapBlock.sourceMax);
-            ranges[2][0].connectTo(remapBlock.targetMin);
-            ranges[2][1].connectTo(remapBlock.targetMax);
-            break;
-    }
+    remapBlock.sourceRange = new Vector2(sourceRange[0], sourceRange[1]);
+    remapBlock.targetRange = new Vector2(targetRange[0], targetRange[1]);
 
     input.connectTo(remapBlock.input);
 
@@ -1294,11 +1287,10 @@ export function max(
  * @see https://www.shadertoy.com/view/4djSRW
  */
 export function hash11(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
-    const a = mul(input, f(0.1031, options), options);
-    const b = fract(a, options);
-    const c = add(mul(b, b, options), f(33.33, options), options);
-    const d = mul(c, add(b, b, options), options);
-    return fract(d, options);
+    const a = fract(mul(input, f(0.1031, options), options), options);
+    const b = mul(a, add(a, f(33.33, options), options), options);
+    const c = mul(b, add(b, b, options), options);
+    return fract(c, options);
 }
 
 export type PerturbNormalOptions = TargetOptions & {

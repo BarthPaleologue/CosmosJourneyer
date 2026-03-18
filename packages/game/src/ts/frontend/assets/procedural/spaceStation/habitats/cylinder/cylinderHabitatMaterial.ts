@@ -83,7 +83,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const positionXZ = vec2(splitPosition.x, splitPosition.z);
         const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), f(1.0 / sectorSize));
 
-        const proceduralUvX = remap(theta, ["number", [0, 2 * Math.PI], [0, nbSectors]]);
+        const proceduralUvX = remap(theta, [0, 2 * Math.PI], [0, nbSectors]);
         const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
         const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 

@@ -48,6 +48,7 @@ import { createJupiterScene } from "./sol/jupiter";
 import { createSaturnScene } from "./sol/saturn";
 import { createSolScene } from "./sol/sol";
 import { createSunScene } from "./sol/sun";
+import { createSpaceDotsScene } from "./spaceDots";
 import { createSpaceElevatorScene } from "./spaceElevator";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
@@ -62,7 +63,6 @@ import { CreateSwimmingScene } from "./swimming";
 import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createThrusterExhaustScene } from "./thrusterExhaust";
 import { createTutorialScene } from "./tutorial";
-import { createWarpTunnelScene } from "./warpTunnel";
 import { createXrScene } from "./xr";
 
 export class PlaygroundRegistry {
@@ -99,7 +99,7 @@ export class PlaygroundRegistry {
         ["saturn", createSaturnScene],
         ["sol", createSolScene],
         ["grass", createGrassScene],
-        ["warpTunnel", createWarpTunnelScene],
+        ["spaceDots", createSpaceDotsScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
         ["gravitySystem", createGravitySystemScene],

@@ -15,14 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    DirectionalLight,
-    MeshBuilder,
-    PBRMaterial,
-    SolidParticleSystem,
-    type SolidParticle,
-} from "@babylonjs/core";
+import { Color3, DirectionalLight, Matrix, MeshBuilder, PBRMaterial } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -69,24 +62,19 @@ export async function createFlightDemoScene(
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 0.1;
 
-    // Shape to follow
     const box = MeshBuilder.CreateBox("box", { size: 50 }, scene);
 
-    //create solid particle system of stationery grey boxes to show movement of box and camera
-    const boxesSPS = new SolidParticleSystem("boxes", scene, { updatable: false });
-
     const randRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
     const range = 5e3;
-
-    //add 400 boxes
-    boxesSPS.addShape(box, 10_000, {
-        positionFunction: (particle: SolidParticle) => {
-            particle.position = new Vector3(randRange(-1, 1), randRange(-1, 1), randRange(-1, 1)).scaleInPlace(range);
-        },
-    });
-
-    const mesh = boxesSPS.buildMesh();
+    const instanceCount = 10_000;
+    const matrixBuffer = new Float32Array(instanceCount * 16);
+    for (let i = 0; i < instanceCount; i++) {
+        matrixBuffer.set(
+            Matrix.Translation(randRange(-range, range), randRange(-range, range), randRange(-range, range)).m,
+            i * 16,
+        );
+    }
+    box.thinInstanceSetBuffer("matrix", matrixBuffer, 16, true);
 
     const material = new PBRMaterial("material", scene);
     material.albedoColor = new Color3(0.5, 0.5, 0.5);
@@ -94,9 +82,7 @@ export async function createFlightDemoScene(
     material.roughness = 0.5;
     material.useGLTFLightFalloff = true;
 
-    mesh.material = material;
-
-    box.setEnabled(false);
+    box.material = material;
 
     enableShadows(sun, { maxZ: 3e3 });
 
