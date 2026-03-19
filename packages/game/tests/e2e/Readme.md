@@ -30,7 +30,7 @@ To run the tests locally, you need to have [Node.js](https://nodejs.org/) and [p
 npm install -g pnpm
 ```
 
-Then, you can install the dependencies and run the tests:
+Then, you can install the dependencies:
 
 ```bash
 pnpm install
@@ -39,19 +39,17 @@ pnpm install
 then install the playwright browsers:
 
 ```bash
-pnpm playwright install
+pnpm --filter @cosmos-journeyer/game exec playwright install
 ```
 
-Finally, you can run the tests:
+Finally, you can run the tests. The production bundle is built automatically before Playwright starts:
 
 ```bash
 pnpm test:e2e
 ```
 
-## Run in Docker
-
-If you can't or don't want to setup playwright locally, you can run the tests in a docker container instead:
+To update the screenshots, run the update command. This also rebuilds the production bundle first:
 
 ```bash
-pnpm test:e2e:docker
+pnpm test:e2e:update
 ```

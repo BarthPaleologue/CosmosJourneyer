@@ -204,7 +204,11 @@ The build artifacts will appear in `packages/game/src-tauri/target/release/bundl
 
 Cosmos Journeyer has unit tests and end-to-end tests.
 
-You can run the unit tests with `pnpm test:unit` and the end-to-end tests with `pnpm test:e2e:docker`.
+You can run the unit tests with `pnpm test:unit`.
+
+Before running the end-to-end tests for the first time, install the Playwright browser binaries with `pnpm --filter @cosmos-journeyer/game exec playwright install`.
+
+Then run the end-to-end tests with `pnpm test:e2e`.
 
 ### Formatting
 

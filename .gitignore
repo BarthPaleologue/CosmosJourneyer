@@ -15,6 +15,9 @@ artifacts
 packages/game/dist
 packages/game/doc
 packages/game/coverage
+packages/game/artifacts
+packages/game/test-results
+packages/game/playwright-report
 .pnpm-store
 .next
 out
