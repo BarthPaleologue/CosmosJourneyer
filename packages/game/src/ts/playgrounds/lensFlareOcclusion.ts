@@ -25,15 +25,9 @@ import {
     Vector3,
     type AbstractEngine,
 } from "@babylonjs/core";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
-
-import { CollisionMask } from "@/settings";
-
-import { enablePhysics } from "./utils";
 
 const SOURCE_POSITION = new Vector3(120, 0, 220);
 const OCCLUDER_POSITIONS = {
@@ -42,15 +36,14 @@ const OCCLUDER_POSITIONS = {
     occluded: new Vector3(60, 0, 110),
 } as const;
 
-export async function createLensFlareOcclusionScene(
+export function createLensFlareOcclusionScene(
     engine: AbstractEngine,
-    _progressMonitor: ILoadingProgressMonitor | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progressMonitor: ILoadingProgressMonitor | null,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0.002, 0.002, 0.01, 1);
-
-    await enablePhysics(scene);
 
     const camera = new FreeCamera("lensFlareOcclusionCamera", Vector3.Zero(), scene);
     camera.minZ = 0.1;
@@ -64,7 +57,7 @@ export async function createLensFlareOcclusionScene(
     const flareTarget = new TransformNode("lensFlareOcclusionTarget", scene);
     flareTarget.position.copyFrom(SOURCE_POSITION);
 
-    const sourceMesh = MeshBuilder.CreateSphere("lensFlareOcclusionSource", { diameter: 8, segments: 32 }, scene);
+    const sourceMesh = MeshBuilder.CreateSphere("lensFlareOcclusionSource", { diameter: 10, segments: 32 }, scene);
     sourceMesh.parent = flareTarget;
     const sourceMaterial = new StandardMaterial("lensFlareOcclusionSourceMaterial", scene);
     sourceMaterial.disableLighting = true;
@@ -86,11 +79,6 @@ export async function createLensFlareOcclusionScene(
     }
     occluder.position.copyFrom(OCCLUDER_POSITIONS[occlusion as keyof typeof OCCLUDER_POSITIONS]);
 
-    const occluderAggregate = new PhysicsAggregate(occluder, PhysicsShapeType.BOX, { mass: 0 }, scene);
-    occluderAggregate.body.disablePreStep = false;
-    occluderAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-    occluderAggregate.shape.filterCollideMask = CollisionMask.SUN_OCCLUSION_QUERY;
-
     const lensFlare = new LensFlarePostProcess(flareTarget, 5, new Color3(1.0, 0.92, 0.68), scene);
     camera.attachPostProcess(lensFlare);
 
@@ -102,5 +90,5 @@ export async function createLensFlareOcclusionScene(
         }
     });
 
-    return scene;
+    return Promise.resolve(scene);
 }

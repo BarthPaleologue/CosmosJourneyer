@@ -1,4 +1,4 @@
-precision lowp float;
+precision highp float;
 
 // based on https://www.shadertoy.com/view/wlcyzj
 
@@ -9,6 +9,8 @@ uniform sampler2D depthSampler;// the depth map of the camera
 
 uniform float visibility;
 uniform vec3 clipPosition;
+uniform float frontDepth;
+uniform vec2 screenRadius;
 
 #include "./utils/camera.glsl";
 
@@ -16,10 +18,86 @@ uniform vec3 clipPosition;
 
 #include "./utils/worldFromUV.glsl";
 
-#include "./utils/remap.glsl";
+#include "./utils/rayIntersectSphere.glsl";
 
 uniform vec3 flareColor;
 uniform float aspectRatio;
+
+float projectDepth(vec3 worldPosition) {
+    vec4 clip = camera_projection * camera_view * vec4(worldPosition, 1.0);
+#ifdef USE_REVERSE_DEPTHBUFFER
+    return (-clip.z + camera_near) / (camera_near + camera_far);
+#else
+    return (clip.z + camera_near) / (camera_near + camera_far);
+#endif
+}
+
+float sampleVisibilityAtUV(vec2 sampleUV, float depthEpsilon) {
+    vec3 sampleWorldPosition = worldFromUV(sampleUV, camera_inverseProjection, camera_inverseView);
+    vec3 sampleRay = normalize(sampleWorldPosition - camera_position);
+    float sphereEnterDistance;
+    float sphereExitDistance;
+    if (!rayIntersectSphere(
+        camera_position,
+        sampleRay,
+        object_position,
+        object_radius,
+        sphereEnterDistance,
+        sphereExitDistance
+    )) {
+        return 1.0;
+    }
+
+    float sampleDepth = texture(depthSampler, sampleUV).r;
+    if (sampleDepth >= 0.9999) {
+        return 1.0;
+    }
+
+    float sphereHitDistance = max(sphereEnterDistance, 0.0);
+    vec3 sphereHitPosition = camera_position + sampleRay * sphereHitDistance;
+    float sphereHitDepth = projectDepth(sphereHitPosition);
+#ifdef USE_REVERSE_DEPTHBUFFER
+    return sampleDepth < sphereHitDepth - depthEpsilon ? 0.0 : 1.0;
+#else
+    return sampleDepth > sphereHitDepth + depthEpsilon ? 0.0 : 1.0;
+#endif
+}
+
+float computeOcclusionVisibility() {
+    vec2 centerUV = vec2(clipPosition.x, 1.0 - clipPosition.y);
+    vec2 radius = max(screenRadius, vec2(0.0));
+    float maxRadius = max(radius.x, radius.y);
+    if (maxRadius <= 0.0) {
+        return 1.0;
+    }
+
+    vec2 innerRadius = radius * 0.4;
+    vec2 outerRadius = radius * 0.8;
+    float depthEpsilon = max(abs(frontDepth - clipPosition.z) * 2.0, 0.0025);
+    vec2 sampleOffsets[13];
+    sampleOffsets[0] = vec2(0.0);
+    sampleOffsets[1] = vec2(-innerRadius.x, 0.0);
+    sampleOffsets[2] = vec2(innerRadius.x, 0.0);
+    sampleOffsets[3] = vec2(0.0, -innerRadius.y);
+    sampleOffsets[4] = vec2(0.0, innerRadius.y);
+    sampleOffsets[5] = vec2(-innerRadius.x, -innerRadius.y);
+    sampleOffsets[6] = vec2(innerRadius.x, -innerRadius.y);
+    sampleOffsets[7] = vec2(-innerRadius.x, innerRadius.y);
+    sampleOffsets[8] = vec2(innerRadius.x, innerRadius.y);
+    sampleOffsets[9] = vec2(-outerRadius.x, 0.0);
+    sampleOffsets[10] = vec2(outerRadius.x, 0.0);
+    sampleOffsets[11] = vec2(0.0, -outerRadius.y);
+    sampleOffsets[12] = vec2(0.0, outerRadius.y);
+
+    float visibleSampleCount = 0.0;
+    for (int i = 0; i < 13; i++) {
+        vec2 sampleUV = centerUV + sampleOffsets[i];
+        float sampleVisibility = sampleVisibilityAtUV(sampleUV, depthEpsilon);
+        visibleSampleCount += sampleVisibility;
+    }
+
+    return visibleSampleCount / 13.0;
+}
 
 float getSun(vec2 uv){
     return length(uv) < 0.009 ? 1.0 : 0.0;
@@ -142,7 +220,7 @@ void main() {
     // no lensflare when looking away from the sun
     sun *= smoothstep(0.0, 0.1, dot(objectDirection, rayDir));
 
-    col += sun * visibility;
+    col += sun * visibility * computeOcclusionVisibility();
 
     // Output to screen
     gl_FragColor = vec4(col, screenColor.a);

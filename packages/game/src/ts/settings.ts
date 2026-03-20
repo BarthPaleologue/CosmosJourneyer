@@ -84,7 +84,6 @@ export const CollisionMask = {
     AVATARS: 1 << 4,
     WATER: 1 << 5,
     SURFACE_QUERY: 1 << 6,
-    SUN_OCCLUSION_QUERY: 1 << 7,
     VEHICLE_PARTS: 1 << 8,
     EVERYTHING: 0xffffffff,
 } as const;
