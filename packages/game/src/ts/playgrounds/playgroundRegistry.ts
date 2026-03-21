@@ -39,6 +39,7 @@ import { createGravitySystemScene } from "./gravitySystem";
 import { createHyperspaceTunnelDemo } from "./hyperspaceTunnel";
 import { createInteractionDemo } from "./interaction";
 import { createLandingPadScene } from "./landingPad";
+import { createLensFlareOcclusionScene } from "./lensFlareOcclusion";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
@@ -104,6 +105,7 @@ export class PlaygroundRegistry {
         ["sun", createSunScene],
         ["gravitySystem", createGravitySystemScene],
         ["interaction", createInteractionDemo],
+        ["lensFlareOcclusion", createLensFlareOcclusionScene],
         ["swimming", CreateSwimmingScene],
         ["onFoot", createOnFootScene],
         ["butterfly", createButterflyScene],

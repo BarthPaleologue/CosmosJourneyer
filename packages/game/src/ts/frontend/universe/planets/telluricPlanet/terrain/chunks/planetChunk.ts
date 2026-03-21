@@ -37,7 +37,7 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 
 import { type DeepReadonly } from "@/utils/types";
 
-import { CollisionMask } from "@/settings";
+import { CollisionMask, Settings } from "@/settings";
 
 import { InstancePatch } from "../instancePatch/instancePatch";
 import { type IPatch } from "../instancePatch/iPatch";
@@ -151,7 +151,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 }*/
         this.mesh.freezeNormals();
 
-        if (this.depth > 3) {
+        if (this.chunkSideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
             this.aggregate = new PhysicsAggregate(
                 this.mesh,
                 PhysicsShapeType.MESH,

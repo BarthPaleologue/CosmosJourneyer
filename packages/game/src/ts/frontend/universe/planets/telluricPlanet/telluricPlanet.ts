@@ -90,7 +90,7 @@ export class TelluricPlanet implements PlanetaryMassObjectBase<"telluricPlanet" 
 
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.getBoundingRadius(), scene);
         physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-        physicsShape.filterCollideMask = CollisionMask.SURFACE_QUERY | CollisionMask.SUN_OCCLUSION_QUERY;
+        physicsShape.filterCollideMask = CollisionMask.SURFACE_QUERY;
         if (model.ocean !== null) {
             physicsShape.filterMembershipMask |= CollisionMask.WATER;
         }

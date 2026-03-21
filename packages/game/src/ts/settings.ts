@@ -26,6 +26,7 @@ export const Settings = {
 
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,
+    MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES: 50,
 
     CLOUD_LAYER_HEIGHT: 7e3,
     EARTH_ATMOSPHERE_THICKNESS: 100e3,
@@ -84,7 +85,6 @@ export const CollisionMask = {
     AVATARS: 1 << 4,
     WATER: 1 << 5,
     SURFACE_QUERY: 1 << 6,
-    SUN_OCCLUSION_QUERY: 1 << 7,
     VEHICLE_PARTS: 1 << 8,
     EVERYTHING: 0xffffffff,
 } as const;
