@@ -159,7 +159,8 @@ export class CurrentMissionDisplay {
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
         const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
-        if (nextTaskText !== this.missionPanelNextTask.innerText) this.missionPanelNextTask.innerText = nextTaskText;
+        if (nextTaskText !== this.missionPanelNextTask.textContent)
+            this.missionPanelNextTask.textContent = nextTaskText;
     }
 
     public setNextMission(universeBackend: UniverseBackend) {

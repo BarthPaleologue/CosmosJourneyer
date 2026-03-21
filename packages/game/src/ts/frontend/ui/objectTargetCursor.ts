@@ -154,7 +154,9 @@ export class ObjectTargetCursor {
         const cameraToObject = objectRay.scale(1 / distance);
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
-        if (Vector3.Dot(cameraToObject, cameraForward) > 0 && this.alpha > 0) {
+        const isOnScreen = Vector3.Dot(cameraToObject, cameraForward) > 0;
+
+        if (isOnScreen && this.alpha > 0) {
             Vector3.ProjectToRef(
                 this.object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
@@ -194,10 +196,13 @@ export class ObjectTargetCursor {
         this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
         this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
 
-        this.distanceText.innerText = parseDistance(distance);
+        const isTextVisible = isOnScreen && this.isInformationEnabled && this.alpha > 0;
+        if (isTextVisible) {
+            this.distanceText.textContent = parseDistance(distance);
 
-        const nbSeconds = distance / speed;
-        this.etaText.innerText = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds) : "∞");
+            const nbSeconds = distance / speed;
+            this.etaText.textContent = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds) : "∞");
+        }
 
         this.lastDistance = distance;
     }

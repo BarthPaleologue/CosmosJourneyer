@@ -101,6 +101,9 @@ export class TargetCursorLayer implements IDisposable {
     }
 
     public update(camera: Camera) {
+        if (!this.isEnabled()) {
+            return;
+        }
         for (const targetCursor of this.targetCursors) {
             targetCursor.update(camera);
             const distanceToCenterSquared =
