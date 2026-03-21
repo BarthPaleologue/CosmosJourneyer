@@ -135,6 +135,10 @@ export class SpaceShipLayer {
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
     ) {
+        if (!this.isVisible()) {
+            return;
+        }
+
         if (this.currentTarget !== null) {
             const directionWorld = this.currentTarget
                 .getAbsolutePosition()
@@ -157,12 +161,16 @@ export class SpaceShipLayer {
     }
 
     displaySpeed(shipThrottle: number, speed: number) {
+        if (!this.isVisible()) {
+            return;
+        }
+
         this.throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
 
         this.throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
         this.throttleStripes.classList.toggle("reversed", shipThrottle < 0);
 
-        this.speedIndicator.innerText = parseSpeed(speed);
+        this.speedIndicator.textContent = parseSpeed(speed);
     }
 
     displayFuel(fuelRemainingFraction: number, nextJumpFuelFraction: number) {

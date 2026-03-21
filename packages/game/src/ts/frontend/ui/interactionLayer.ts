@@ -113,7 +113,7 @@ export class InteractionLayer {
             const keys = pressInteractionToStrings(this.interactionSystem.pressInteraction, this.keyboardLayoutMap);
             const keyString = keys.join(" / ");
             this.interactionText.style.display = "block";
-            this.interactionText.innerText = `[${keyString}] ${currentInteractions[0].label}`;
+            this.interactionText.textContent = `[${keyString}] ${currentInteractions[0].label}`;
             this.crosshair.style.display = "none";
         }
     }
