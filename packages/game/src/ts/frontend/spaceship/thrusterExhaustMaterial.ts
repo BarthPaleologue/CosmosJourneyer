@@ -92,6 +92,13 @@ export class ThrusterExhaustMaterial {
 
         this.transform = exhaustTransform;
         this.scene = scene;
+
+        this.material.onBindObservable.add(() => {
+            const world = this.transform.getWorldMatrix(); //computeWorldMatrix(true);
+            OffsetWorldToRef(this.scene.floatingOriginOffset, world, this.offsetWorld);
+            this.offsetWorld.invertToRef(this.inverseWorld);
+            this.material.getEffect().setMatrix("inverseWorld", this.inverseWorld);
+        });
     }
 
     get(): ShaderMaterial {
@@ -101,11 +108,6 @@ export class ThrusterExhaustMaterial {
     update(deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
         this.material.setFloat("elapsedSeconds", this.elapsedSeconds);
-
-        const world = this.transform.computeWorldMatrix(true);
-        OffsetWorldToRef(this.scene.floatingOriginOffset, world, this.offsetWorld);
-        this.offsetWorld.invertToRef(this.inverseWorld);
-        this.material.setMatrix("inverseWorld", this.inverseWorld);
     }
 
     setInverseWorld(inverseWorld: Matrix) {
