@@ -220,7 +220,7 @@ export class TelluricPlanetMaterial extends ShaderMaterial {
         this.setFloat(TelluricPlanetMaterialUniformNames.MIN_TEMPERATURE, this.planetModel.temperature.min);
         this.setFloat(TelluricPlanetMaterialUniformNames.MAX_TEMPERATURE, this.planetModel.temperature.max);
         this.setFloat(TelluricPlanetMaterialUniformNames.PRESSURE, this.planetModel.atmosphere?.pressure ?? 0);
-        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.waterAmount);
+        this.setFloat(TelluricPlanetMaterialUniformNames.WATER_AMOUNT, this.planetModel.composition["h2o"] ?? 0);
 
         this.setFloat(
             TelluricPlanetMaterialUniformNames.MAX_ELEVATION,

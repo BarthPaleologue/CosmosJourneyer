@@ -148,7 +148,10 @@ export function generateTelluricPlanetModel(
         mass,
         axialTilt,
         siderealDaySeconds,
-        waterAmount,
+        composition: {
+            rock: 1 - waterAmount,
+            h2o: waterAmount,
+        },
         radius: radius,
         temperature: {
             min: minTemperature,

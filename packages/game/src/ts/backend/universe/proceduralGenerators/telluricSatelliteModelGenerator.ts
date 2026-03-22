@@ -160,7 +160,10 @@ export function generateTelluricSatelliteModel(
         radius: radius,
         axialTilt: axialTilt,
         siderealDaySeconds: siderealDaySeconds,
-        waterAmount: waterAmount,
+        composition: {
+            rock: 1 - waterAmount,
+            h2o: waterAmount,
+        },
         orbit: orbit,
         terrainSettings: terrainSettings,
         temperature: {

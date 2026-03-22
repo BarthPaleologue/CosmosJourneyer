@@ -23,9 +23,14 @@ import { type OrbitalObjectType } from "./index";
 import { type OceanModel } from "./oceanModel";
 import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
 
+type Elements = "rock" | "h2o";
+
+export type TelluricPlanetaryMassObjectComposition = Partial<Record<Elements, number>>;
+
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
-    waterAmount: number;
     terrainSettings: TerrainSettings;
+
+    composition: TelluricPlanetaryMassObjectComposition;
 
     /**
      * The temperature range of the object in Kelvin

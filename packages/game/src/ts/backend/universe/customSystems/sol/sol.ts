@@ -42,7 +42,9 @@ export function getSolSystemModel(): StarSystemModel {
         mass: 3.301e23,
         axialTilt: degreesToRadians(0.034),
         siderealDaySeconds: 60 * 60 * 24 * 58.646,
-        waterAmount: 0,
+        composition: {
+            rock: 1,
+        },
         temperature: {
             min: 437,
             max: 437,
@@ -84,7 +86,9 @@ export function getSolSystemModel(): StarSystemModel {
         mass: 4.8e20,
         axialTilt: degreesToRadians(177.36),
         siderealDaySeconds: 60 * 60 * 24 * 243.025,
-        waterAmount: 0,
+        composition: {
+            rock: 1,
+        },
         temperature: {
             min: 719,
             max: 763,
@@ -140,7 +144,10 @@ export function getSolSystemModel(): StarSystemModel {
         mass: 5.972e24,
         axialTilt: degreesToRadians(23.44),
         siderealDaySeconds: 60 * 60 * 24,
-        waterAmount: 1,
+        composition: {
+            rock: 0.9998,
+            h2o: 0.0002,
+        },
         temperature: {
             min: celsiusToKelvin(-50),
             max: celsiusToKelvin(50),
@@ -198,7 +205,9 @@ export function getSolSystemModel(): StarSystemModel {
         mass: 7.342e22,
         axialTilt: degreesToRadians(6.68),
         siderealDaySeconds: 60 * 60 * 24 * 27.322,
-        waterAmount: 0,
+        composition: {
+            rock: 1,
+        },
         temperature: {
             min: 100,
             max: 100,
@@ -239,7 +248,9 @@ export function getSolSystemModel(): StarSystemModel {
         mass: 6.4171e23,
         axialTilt: degreesToRadians(25.19),
         siderealDaySeconds: 60 * 60 * 24 * 1.027,
-        waterAmount: 0,
+        composition: {
+            rock: 1,
+        },
         temperature: {
             min: celsiusToKelvin(-140),
             max: celsiusToKelvin(20),
