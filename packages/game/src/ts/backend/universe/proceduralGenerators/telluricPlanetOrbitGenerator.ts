@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { SolarLuminosity, SolarRadius } from "@/utils/physics/constants";
-import { getBlackBodyLuminosity } from "@/utils/physics/thermodynamics";
-import { astronomicalUnitToMeters } from "@/utils/physics/unitConversions";
+import { SolarRadius } from "@/utils/physics/constants";
+import { getWaterIceFrostLine } from "@/utils/physics/physics";
 
 import type { StellarObjectModel } from "../orbitalObjects";
 
@@ -35,16 +34,12 @@ export function getTelluricPlanetOrbitRadius(
     stellarType: StellarObjectModel["type"],
     rng: () => number,
 ): number {
-    const stellarLuminosity = getBlackBodyLuminosity(stellarTemperature, stellarRadius);
-    const relativeLuminosity = stellarLuminosity / SolarLuminosity;
-
     // Avoid orbits too close to the star
     const stellarBound = (3 + 2 * rng()) * stellarRadius;
     const neutronStarExclusionBound = stellarType === "neutronStar" ? SolarRadius * 10 : stellarRadius * 1.5;
     const lowerBound = Math.max(stellarBound, neutronStarExclusionBound);
 
-    // Snow line scaling (2.7 comes from empirical Solar System data)
-    let upperBound = astronomicalUnitToMeters(2.7) * Math.sqrt(Math.max(relativeLuminosity, 0));
+    let upperBound = getWaterIceFrostLine(stellarTemperature, stellarRadius);
     if (upperBound <= lowerBound) {
         upperBound = lowerBound * 1.5;
     }

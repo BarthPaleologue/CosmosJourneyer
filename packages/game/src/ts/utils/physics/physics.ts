@@ -131,3 +131,14 @@ export function getApparentGravityOnSpaceTether(period: number, mass: number, di
     const omega = (2 * Math.PI) / period;
     return (-G * mass) / (distance * distance) + distance * omega * omega;
 }
+
+/**
+ * @param stellarTemperature The temperature of the star in Kelvin
+ * @param stellarRadius The radius of the star in meters
+ * @returns An estimation of the distance beyond which water ice can exist in solid form even in the presence of stellar radiation, in meters
+ * @see https://en.wikipedia.org/wiki/Frost_line_(astrophysics)
+ */
+export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: number): number {
+    const iceSublimationTemperature = 170;
+    return 0.5 * stellarRadius * (stellarTemperature / iceSublimationTemperature) ** 2;
+}

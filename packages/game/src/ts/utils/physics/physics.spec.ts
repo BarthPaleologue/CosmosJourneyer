@@ -23,6 +23,7 @@ import {
     getApparentGravityOnSpaceTether,
     getGravitationalLensFocalDistance,
     getRotationPeriodForArtificialGravity,
+    getWaterIceFrostLine,
     hasLiquidWater,
     waterBoilingTemperature,
 } from "./physics";
@@ -177,5 +178,17 @@ describe("getApparentGravityOnSpaceTether", () => {
             geostationaryOrbitRadius - 10_000e3,
         );
         expect(apparentGravityBelowGeoOrbit).toBeLessThan(0);
+    });
+});
+
+describe("getWaterIceFrostLine", () => {
+    test("sol places the water ice line inside the asteroid belt", () => {
+        const sunTemperature = 5778; // in Kelvin
+        const sunRadius = 6.9634e8; // in meters
+
+        const frostLine = getWaterIceFrostLine(sunTemperature, sunRadius);
+
+        expect(frostLine).toBeGreaterThan(astronomicalUnitToMeters(2.2));
+        expect(frostLine).toBeLessThan(astronomicalUnitToMeters(3.2));
     });
 });
