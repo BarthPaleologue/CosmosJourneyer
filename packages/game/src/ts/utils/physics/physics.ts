@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "../types";
 import { C, G, SolarMass, SolarRadius } from "./constants";
 import { celsiusToKelvin } from "./unitConversions";
 
@@ -36,26 +37,38 @@ export function waterBoilingTemperature(pressure: number): number {
     return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH));
 }
 
+export type EffectiveTemperatureStar = {
+    temperature: number;
+    radius: number;
+    distance: number;
+};
+
 /**
- * Computes the mean temperature of a planet given the properties of its star and itself
- * @param starTemperature The temperature of the star in Kelvin
- * @param starRadius The radius of the star in meters
- * @param starDistance The distance between the planet and the star in meters
+ * Computes the effective temperature of a planet from stellar irradiation and albedo.
+ * @param stars The irradiating stars
  * @param planetAlbedo The albedo of the planet (0 = black, 1 = white)
- * @param planetGreenHouseEffect The greenhouse effect of the planet (0 = none, 1 = total)
- * @returns The mean temperature of the planet in Kelvin
+ * @returns The effective temperature of the planet in Kelvin
  */
-export function computeMeanTemperature(
-    starTemperature: number,
-    starRadius: number,
-    starDistance: number,
+export function computeEffectiveTemperature(
+    stars: DeepReadonly<Array<EffectiveTemperatureStar>>,
     planetAlbedo: number,
-    planetGreenHouseEffect: number,
 ) {
-    return (
-        starTemperature *
-        Math.pow(((1 - planetAlbedo) * starRadius ** 2) / (4 * (1 - planetGreenHouseEffect) * starDistance ** 2), 0.25)
-    );
+    let totalFlux = 0;
+    for (const { temperature, radius, distance } of stars) {
+        totalFlux += (temperature ** 4 * radius ** 2) / distance ** 2;
+    }
+
+    return Math.pow(((1 - planetAlbedo) * totalFlux) / 4, 0.25);
+}
+
+/**
+ * Computes the temperature at optical depth tau using the gray-atmosphere / Eddington approximation.
+ * @param effectiveTemperature The effective temperature in Kelvin
+ * @param opticalDepth The infrared optical depth tau at the level of interest
+ * @returns The gray-atmosphere temperature in Kelvin
+ */
+export function computeGrayAtmosphereTemperature(effectiveTemperature: number, opticalDepth: number) {
+    return effectiveTemperature * Math.pow((3 / 4) * (opticalDepth + 2 / 3), 0.25);
 }
 
 /**

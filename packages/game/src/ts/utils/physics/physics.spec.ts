@@ -18,7 +18,8 @@
 import { describe, expect, test } from "vitest";
 
 import {
-    computeMeanTemperature,
+    computeEffectiveTemperature,
+    computeGrayAtmosphereTemperature,
     estimateStarRadiusFromMass,
     getApparentGravityOnSpaceTether,
     getGravitationalLensFocalDistance,
@@ -30,34 +31,49 @@ import {
 } from "./physics";
 import { astronomicalUnitToMeters } from "./unitConversions";
 
-test("computeMeanTemperature", () => {
+test("computeEffectiveTemperature", () => {
     const sunTemperature = 5778; // in Kelvin
     const sunRadius = 6.9634e8; // in meters
     const sunEarthDistance = 1.496e11; // in meters
     const earthAlbedo = 0.3;
 
-    const meanTemperatureWithoutGreenHouseEffect = computeMeanTemperature(
-        sunTemperature,
-        sunRadius,
-        sunEarthDistance,
+    const effectiveTemperature = computeEffectiveTemperature(
+        [{ temperature: sunTemperature, radius: sunRadius, distance: sunEarthDistance }],
         earthAlbedo,
-        0,
     );
-    const targetEarthTemperatureWithoutGreenHouseEffect = 255; // in Kelvin
-    expect(meanTemperatureWithoutGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithoutGreenHouseEffect - 5);
-    expect(meanTemperatureWithoutGreenHouseEffect).toBeLessThan(targetEarthTemperatureWithoutGreenHouseEffect + 5);
+    const targetEarthEffectiveTemperature = 255; // in Kelvin
+    expect(effectiveTemperature).toBeGreaterThan(targetEarthEffectiveTemperature - 5);
+    expect(effectiveTemperature).toBeLessThan(targetEarthEffectiveTemperature + 5);
+});
 
-    const greenHouseEffect = 0.4;
-    const meanTemperatureWithGreenHouseEffect = computeMeanTemperature(
-        sunTemperature,
-        sunRadius,
-        sunEarthDistance,
-        earthAlbedo,
-        greenHouseEffect,
+test("computeEffectiveTemperature with two identical stars", () => {
+    const starTemperature = 5778; // in Kelvin
+    const starRadius = 6.9634e8; // in meters
+    const starDistance = 1.496e11; // in meters
+    const planetAlbedo = 0.3;
+
+    const singleStarTemperature = computeEffectiveTemperature(
+        [{ temperature: starTemperature, radius: starRadius, distance: starDistance }],
+        planetAlbedo,
     );
+    const binaryStarTemperature = computeEffectiveTemperature(
+        [
+            { temperature: starTemperature, radius: starRadius, distance: starDistance },
+            { temperature: starTemperature, radius: starRadius, distance: starDistance },
+        ],
+        planetAlbedo,
+    );
+
+    expect(binaryStarTemperature).toBeCloseTo(singleStarTemperature * Math.pow(2, 0.25), 10);
+});
+
+test("computeGrayAtmosphereTemperature", () => {
+    const effectiveTemperature = 255; // in Kelvin
+    const earthOpticalDepth = 1.5;
+    const surfaceTemperature = computeGrayAtmosphereTemperature(effectiveTemperature, earthOpticalDepth);
     const targetEarthTemperatureWithGreenHouseEffect = 289; // in Kelvin
-    expect(meanTemperatureWithGreenHouseEffect).toBeGreaterThan(targetEarthTemperatureWithGreenHouseEffect - 5);
-    expect(meanTemperatureWithGreenHouseEffect).toBeLessThan(targetEarthTemperatureWithGreenHouseEffect + 5);
+    expect(surfaceTemperature).toBeGreaterThan(targetEarthTemperatureWithGreenHouseEffect - 5);
+    expect(surfaceTemperature).toBeLessThan(targetEarthTemperatureWithGreenHouseEffect + 5);
 });
 
 describe("waterBoilingPointCelsius", () => {
