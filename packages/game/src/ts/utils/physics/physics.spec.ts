@@ -22,6 +22,7 @@ import {
     estimateStarRadiusFromMass,
     getApparentGravityOnSpaceTether,
     getGravitationalLensFocalDistance,
+    getOceanDepth,
     getRotationPeriodForArtificialGravity,
     getWaterIceFrostLine,
     hasLiquidWater,
@@ -190,5 +191,31 @@ describe("getWaterIceFrostLine", () => {
 
         expect(frostLine).toBeGreaterThan(astronomicalUnitToMeters(2.2));
         expect(frostLine).toBeLessThan(astronomicalUnitToMeters(3.2));
+    });
+});
+
+describe("getOceanDepth", () => {
+    test("earth", () => {
+        const earthRadius = 6_371e3; // in meters
+        const earthMass = 5.972e24; // in kilograms
+        const earthLiquidWaterMassFraction = 1.4e21 / earthMass; // total water mass relative to Earth mass
+        const earthOceanCoverage = 0.71; // about 71% ocean coverage
+
+        const oceanDepth = getOceanDepth(earthRadius, earthMass, earthLiquidWaterMassFraction, earthOceanCoverage);
+
+        // Earth's mean ocean depth is about 3.7 km.
+        expect(oceanDepth).toBeGreaterThan(3.5e3);
+        expect(oceanDepth).toBeLessThan(4.0e3);
+    });
+
+    test("gets shallower as ocean coverage increases for the same water inventory", () => {
+        const planetRadius = 6_371e3;
+        const planetMass = 5.972e24;
+        const liquidWaterMassFraction = 1.4e21 / planetMass;
+
+        const deepOcean = getOceanDepth(planetRadius, planetMass, liquidWaterMassFraction, 0.1);
+        const shallowOcean = getOceanDepth(planetRadius, planetMass, liquidWaterMassFraction, 0.5);
+
+        expect(deepOcean).toBeGreaterThan(shallowOcean);
     });
 });

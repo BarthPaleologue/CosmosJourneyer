@@ -142,3 +142,22 @@ export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: 
     const iceSublimationTemperature = 170;
     return 0.5 * stellarRadius * (stellarTemperature / iceSublimationTemperature) ** 2;
 }
+
+/**
+ * Estimates ocean depth from a planet's water inventory and ocean coverage.
+ * @param planetRadius The planet radius in meters
+ * @param planetMass The planet mass in kilograms
+ * @param surfaceLiquidWaterMassRatio The fraction of planet mass made of surface liquid water
+ * @param oceanCoverage The fraction of the surface covered by oceans, between 0 and 1
+ */
+export function getOceanDepth(
+    planetRadius: number,
+    planetMass: number,
+    surfaceLiquidWaterMassRatio: number,
+    oceanCoverage: number,
+): number {
+    const liquidWaterDensity = 1000; // kg/m³
+    const oceanMass = surfaceLiquidWaterMassRatio * planetMass;
+    const oceanVolume = oceanMass / liquidWaterDensity;
+    return Math.cbrt(planetRadius ** 3 + (3 * oceanVolume) / (4 * Math.PI * oceanCoverage)) - planetRadius;
+}
