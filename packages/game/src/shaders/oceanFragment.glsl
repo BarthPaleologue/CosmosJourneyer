@@ -129,6 +129,14 @@ void main() {
         float foamSize = 10.0;
         float foamFactor = saturate((foamSize - distanceThroughOcean) / foamSize);
         foamFactor = smoothstep(0.01, 1.0, foamFactor);
+
+        float cameraDistanceToSurface = length(camera_position - samplePoint - object_position);
+        foamFactor *= 1.0 - smoothstep(
+            8e3,
+            20e3,
+            cameraDistanceToSurface
+        );
+
         vec3 foamColor = vec3(0.8);
         ambiant = mix(ambiant, foamColor, foamFactor);
 
