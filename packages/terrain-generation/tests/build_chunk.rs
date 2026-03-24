@@ -9,11 +9,10 @@ mod common;
 
 use common::*;
 
-#[test]
-pub fn build_chunk_data() {
-    let start_time = Utc::now();
-    // Setting up planetary data
-    let build_data = BuildData {
+const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD: f32 = 32768.0;
+
+fn make_build_data() -> BuildData {
+    BuildData {
         planet_diameter: PLANET_RADIUS * 2.0,
         chunk_depth: 0,
         chunk_tree_direction: Direction::Forward,
@@ -23,16 +22,16 @@ pub fn build_chunk_data() {
         planet_seed: SEED,
         resolution: 64,
         terrain_settings: SETTINGS,
-    };
+    }
+}
+
+#[test]
+pub fn build_chunk_data() {
+    let start_time = Utc::now();
+    // Setting up planetary data
+    let build_data = make_build_data();
 
     let nb_subdivisions = build_data.resolution - 1;
-
-    // initialization of empty buffers
-    let mut positions: Vec<f32> =
-        vec![0.0; (build_data.resolution * build_data.resolution * 3) as usize];
-    let mut normals: Vec<f32> =
-        vec![0.0; (build_data.resolution * build_data.resolution * 3) as usize];
-    let mut indices: Vec<u16> = vec![0; (nb_subdivisions * nb_subdivisions * 2 * 3) as usize];
 
     let size = build_data.planet_diameter / i32::pow(2, build_data.chunk_depth) as f32;
     let space_between_vertices = size / nb_subdivisions as f32;
@@ -42,6 +41,32 @@ pub fn build_chunk_data() {
     } else {
         0.0
     };
+    let should_generate_skirt = space_between_vertices < SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD;
+    let skirt_vertex_count = if should_generate_skirt {
+        4 * build_data.resolution
+    } else {
+        0
+    };
+    let skirt_index_count = if should_generate_skirt {
+        4 * nb_subdivisions * 2 * 3
+    } else {
+        0
+    };
+
+    // initialization of empty buffers
+    let mut positions: Vec<f32> = vec![
+        0.0;
+        ((build_data.resolution * build_data.resolution + skirt_vertex_count) * 3)
+            as usize
+    ];
+    let mut normals: Vec<f32> = vec![
+        0.0;
+        ((build_data.resolution * build_data.resolution + skirt_vertex_count) * 3)
+            as usize
+    ];
+    let mut indices: Vec<u16> =
+        vec![0; (nb_subdivisions * nb_subdivisions * 2 * 3 + skirt_index_count) as usize];
+
     println!("scatter_per_square_meter: {}", scatter_per_square_meter);
     let flat_area = size * size;
     let max_nb_instances = f32::floor(flat_area * scatter_per_square_meter * 2.0) as usize;
@@ -67,6 +92,14 @@ pub fn build_chunk_data() {
         max_nb_instances
     );
     assert!(nb_instances.average_height.is_finite());
+    assert_eq!(
+        positions.len(),
+        ((build_data.resolution * build_data.resolution + skirt_vertex_count) * 3) as usize
+    );
+    assert_eq!(
+        indices.len(),
+        (nb_subdivisions * nb_subdivisions * 2 * 3 + skirt_index_count) as usize
+    );
 
     println!("matrix_buffer: {:?}", instances_matrix_buffer);
     println!(
@@ -123,4 +156,38 @@ pub fn build_chunk_data() {
     chunk_elevation_image
         .save("test_outputs/chunk_elevation.png")
         .unwrap();
+}
+
+#[test]
+pub fn build_chunk_data_without_skirt_buffers() {
+    let build_data = make_build_data();
+    let nb_subdivisions = build_data.resolution - 1;
+
+    let mut positions: Vec<f32> =
+        vec![0.0; (build_data.resolution * build_data.resolution * 3) as usize];
+    let mut normals: Vec<f32> =
+        vec![0.0; (build_data.resolution * build_data.resolution * 3) as usize];
+    let mut indices: Vec<u16> = vec![0; (nb_subdivisions * nb_subdivisions * 2 * 3) as usize];
+    let mut instances_matrix_buffer: Vec<f32> = Vec::new();
+    let mut aligned_instances_matrix_buffer: Vec<f32> = Vec::new();
+
+    let result = build_chunk_vertex_data(
+        &build_data,
+        &mut positions,
+        &mut indices,
+        &mut normals,
+        &mut instances_matrix_buffer,
+        &mut aligned_instances_matrix_buffer,
+        0.0,
+    );
+
+    assert!(result.average_height.is_finite());
+    assert_eq!(
+        positions.len(),
+        (build_data.resolution * build_data.resolution * 3) as usize
+    );
+    assert_eq!(
+        indices.len(),
+        (nb_subdivisions * nb_subdivisions * 2 * 3) as usize
+    );
 }

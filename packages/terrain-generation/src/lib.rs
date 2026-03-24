@@ -1,10 +1,12 @@
 pub mod build_data;
+mod chunk_skirt;
 pub mod landscape;
 pub mod return_data;
 pub mod terrain_settings;
 pub mod utils;
 
 use crate::build_data::BuildData;
+use crate::chunk_skirt::append_chunk_skirt;
 use crate::landscape::make_terrain_function::TerrainFunction;
 use crate::return_data::ReturnData;
 use crate::utils::direction::Direction;
@@ -60,8 +62,32 @@ pub fn build_chunk_vertex_data(
 
     let nb_vertices_per_row = data.resolution as usize;
     let nb_subdivisions = nb_vertices_per_row - 1;
+    let base_vertex_count = nb_vertices_per_row * nb_vertices_per_row;
+    let base_index_count = nb_subdivisions * nb_subdivisions * 2 * 3;
+    let skirt_vertex_count = 4 * nb_vertices_per_row;
+    let skirt_index_count = 4 * nb_subdivisions * 2 * 3;
 
     let rescale_factor = chunk_size / nb_subdivisions as f32;
+    let skirt_depth = rescale_factor * 2.0;
+    let has_base_buffers = positions.len() == base_vertex_count * 3
+        && normals.len() == base_vertex_count * 3
+        && indices.len() == base_index_count;
+    let has_skirt_buffers = positions.len() == (base_vertex_count + skirt_vertex_count) * 3
+        && normals.len() == (base_vertex_count + skirt_vertex_count) * 3
+        && indices.len() == base_index_count + skirt_index_count;
+
+    let should_generate_skirt = if has_skirt_buffers {
+        true
+    } else if has_base_buffers {
+        false
+    } else {
+        panic!(
+            "Invalid chunk buffer sizes: positions={}, normals={}, indices={}",
+            positions.len(),
+            normals.len(),
+            indices.len()
+        );
+    };
 
     let mut instance_index: usize = 0;
     let mut excess_instance_number: f32 = 0.0;
@@ -227,6 +253,17 @@ pub fn build_chunk_vertex_data(
             }
         }
     });
+
+    if should_generate_skirt {
+        append_chunk_skirt(
+            positions,
+            normals,
+            indices,
+            nb_vertices_per_row,
+            &chunk_sphere_position,
+            skirt_depth,
+        );
+    }
 
     ReturnData {
         nb_instances_created: instance_index,
