@@ -23,18 +23,23 @@ import { getFaceIndexFromDirection } from "../chunks/direction";
 import { type ReturnedChunkData } from "../chunks/taskTypes";
 import { type TransferBuildData } from "../chunks/workerDataTypes";
 
+const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
+
 function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
-
-    const verticesPositions = new Float32Array(nbVerticesPerSide * nbVerticesPerSide * 3);
-    const indices = new Uint16Array(nbSubdivisions * nbSubdivisions * 2 * 3);
-    const normals = new Float32Array(verticesPositions.length);
 
     const size = data.planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
     //console.log(data.depth, space_between_vertices);
     const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 16 : 0;
+    const shouldGenerateSkirt = space_between_vertices < SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD;
+    const skirtVertexCount = shouldGenerateSkirt ? 4 * nbVerticesPerSide : 0;
+    const skirtIndexCount = shouldGenerateSkirt ? 4 * nbSubdivisions * 2 * 3 : 0;
+
+    const verticesPositions = new Float32Array((nbVerticesPerSide * nbVerticesPerSide + skirtVertexCount) * 3);
+    const indices = new Uint16Array(nbSubdivisions * nbSubdivisions * 2 * 3 + skirtIndexCount);
+    const normals = new Float32Array(verticesPositions.length);
 
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);
