@@ -34,7 +34,7 @@ import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/te
 
 import { Settings } from "@/settings";
 
-import { enablePhysics } from "./utils";
+import { addToWindow, enablePhysics } from "./utils";
 
 export async function createTelluricPlanetScene(
     engine: AbstractEngine,
@@ -70,14 +70,10 @@ export async function createTelluricPlanetScene(
     light.falloffType = PointLight.FALLOFF_STANDARD;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const seed = urlParams.get("seed");
+    const seed = Number(urlParams.get("seed") ?? Math.floor(Math.random() * 1000));
+    console.log("seed", seed);
 
-    const telluricPlanetModel = generateTelluricPlanetModel(
-        "telluricPlanet",
-        seed !== null ? Number(seed) : Math.random() * 1000,
-        "Telluric Planet",
-        [getSunModel()],
-    );
+    const telluricPlanetModel = generateTelluricPlanetModel("telluricPlanet", seed, "Telluric Planet", [getSunModel()]);
 
     const planet = new TelluricPlanet(telluricPlanetModel, assets, scene);
 
@@ -155,6 +151,8 @@ export async function createTelluricPlanetScene(
             }
         });
     }
+
+    addToWindow("planet", planet);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
