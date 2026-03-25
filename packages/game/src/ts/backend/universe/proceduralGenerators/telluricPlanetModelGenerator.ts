@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { normalRandom, randRangeInt, uniformRandBool } from "extended-random";
+import { normalRandom, uniformRandBool } from "extended-random";
 
 import { type AtmosphereModel } from "@/backend/universe/orbitalObjects/atmosphereModel";
 import { newCloudsModel, type CloudsModel } from "@/backend/universe/orbitalObjects/cloudsModel";
@@ -29,13 +29,14 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 import { EarthMass, EarthSeaLevelPressure } from "@/utils/physics/constants";
-import { hasLiquidWater } from "@/utils/physics/physics";
-import { celsiusToKelvin, degreesToRadians } from "@/utils/physics/unitConversions";
+import { computeEffectiveTemperature, hasLiquidWater } from "@/utils/physics/physics";
+import { degreesToRadians } from "@/utils/physics/unitConversions";
 import type { DeepPartial, DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
+import { getTemperatureRange } from "./temperatureRange";
 
 export function generateTelluricPlanetModel(
     id: string,
@@ -50,43 +51,6 @@ export function generateTelluricPlanetModel(
 
     //TODO: make mass dependent on more physical properties like density
     const mass = EarthMass * (radius / 6_371e3) ** 3;
-
-    let pressure = Math.max(
-        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
-        0,
-    );
-    if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
-
-    const atmosphere: AtmosphereModel | null =
-        pressure > 0
-            ? {
-                  pressure,
-                  greenHouseEffectFactor: 0.5,
-              }
-            : null;
-
-    //TODO: use distance to star to determine min temperature when using 1:1 scale
-    const minTemperature = Math.max(0, normalRandom(celsiusToKelvin(-20), 30, rng, 80));
-    // when pressure is close to 1, the max temperature is close to the min temperature (the atmosphere does thermal regulation)
-    const maxTemperature =
-        minTemperature + Math.exp(-pressure / EarthSeaLevelPressure) * randRangeInt(30, 200, rng, 81);
-
-    const axialTilt = normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT);
-    const siderealDaySeconds = (60 * 60 * 24) / 10;
-    const waterAmount = Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0);
-
-    const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
-
-    const ocean: OceanModel | null = canHaveLiquidWater
-        ? {
-              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / EarthSeaLevelPressure,
-          }
-        : null;
-
-    const clouds: CloudsModel | null =
-        ocean !== null
-            ? newCloudsModel(radius + ocean.depth, Settings.CLOUD_LAYER_HEIGHT, waterAmount, pressure)
-            : null;
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
@@ -123,6 +87,48 @@ export function generateTelluricPlanetModel(
         initialMeanAnomaly: 0,
     };
 
+    let pressure = Math.max(
+        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
+        0,
+    );
+    if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
+
+    const atmosphere: AtmosphereModel | null =
+        pressure > 0
+            ? {
+                  pressure,
+                  greenHouseEffectFactor: 0.5,
+              }
+            : null;
+
+    const effectiveTemperature = computeEffectiveTemperature(
+        parentBodies.map((body) => ({
+            temperature: body.blackBodyTemperature,
+            radius: body.radius,
+            distance: orbit.semiMajorAxis,
+        })),
+        0.3,
+    );
+
+    const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
+
+    const axialTilt = normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT);
+    const siderealDaySeconds = (60 * 60 * 24) / 10;
+    const waterAmount = Math.max(normalRandom(1.0, 0.3, rng, GenerationSteps.WATER_AMOUNT), 0);
+
+    const canHaveLiquidWater = hasLiquidWater(pressure, temperatureRange.min, temperatureRange.max);
+
+    const ocean: OceanModel | null = canHaveLiquidWater
+        ? {
+              depth: (Settings.OCEAN_DEPTH * waterAmount * pressure) / EarthSeaLevelPressure,
+          }
+        : null;
+
+    const clouds: CloudsModel | null =
+        ocean !== null
+            ? newCloudsModel(radius + ocean.depth, Settings.CLOUD_LAYER_HEIGHT, waterAmount, pressure)
+            : null;
+
     const terrainSettings = {
         continents_frequency: radius / Settings.EARTH_RADIUS,
         continents_fragmentation: clamp(normalRandom(0.65, 0.03, rng, GenerationSteps.TERRAIN), 0, 0.95),
@@ -153,10 +159,7 @@ export function generateTelluricPlanetModel(
             h2o: waterAmount,
         },
         radius: radius,
-        temperature: {
-            min: minTemperature,
-            max: maxTemperature,
-        },
+        temperature: temperatureRange,
         orbit: orbit,
         terrainSettings: terrainSettings,
         rings: rings,
