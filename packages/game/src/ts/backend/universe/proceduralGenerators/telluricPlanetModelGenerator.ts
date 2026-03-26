@@ -47,7 +47,7 @@ export function generateTelluricPlanetModel(
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = Math.max(0.3, normalRandom(1.0, 0.1, rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
+    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * Settings.EARTH_RADIUS;
 
     //TODO: make mass dependent on more physical properties like density
     const mass = EarthMass * (radius / 6_371e3) ** 3;
@@ -87,10 +87,7 @@ export function generateTelluricPlanetModel(
         initialMeanAnomaly: 0,
     };
 
-    let pressure = Math.max(
-        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
-        0,
-    );
+    let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
     if (radius <= 0.3 * Settings.EARTH_RADIUS) pressure = 0;
 
     const atmosphere: AtmosphereModel | null =
@@ -131,7 +128,7 @@ export function generateTelluricPlanetModel(
 
     const terrainSettings = {
         continents_frequency: radius / Settings.EARTH_RADIUS,
-        continents_fragmentation: clamp(normalRandom(0.65, 0.03, rng, GenerationSteps.TERRAIN), 0, 0.95),
+        continents_fragmentation: clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0, 0.95),
 
         bumps_frequency: (30 * radius) / Settings.EARTH_RADIUS,
 
@@ -141,6 +138,12 @@ export function generateTelluricPlanetModel(
 
         mountains_frequency: (60 * radius) / 1000e3,
     };
+    if (pressure === 0) {
+        terrainSettings.continents_fragmentation = 0;
+    }
+    if (ocean === null) {
+        terrainSettings.continents_fragmentation /= 1.3;
+    }
 
     const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS)
         ? newSeededRingsModel(radius, rng)
