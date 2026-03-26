@@ -34,7 +34,7 @@ pub fn continent_layer(
         noise_value /= total_amplitude;
         *gradient /= total_amplitude;
 
-        smoothstep(continents_fragmentation, 1.0, noise_value, gradient);
+        noise_value = smoothstep(0.0, 1.0, noise_value, gradient);
 
         let mut detail_gradient = Vector3::zero();
         let mut detail_noise = simplex401(&(coords * 10.0), seed, &mut detail_gradient);
@@ -44,6 +44,9 @@ pub fn continent_layer(
 
         noise_value -= detail_noise * 0.3;
         *gradient -= &(detail_gradient * 0.3);
+
+        noise_value = 1.0 - continents_fragmentation * (1.0 - noise_value);
+        *gradient *= continents_fragmentation;
 
         noise_value
     }
