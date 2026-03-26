@@ -156,6 +156,19 @@ export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: 
     return 0.5 * stellarRadius * (stellarTemperature / iceSublimationTemperature) ** 2;
 }
 
+export function getIceVaporEquilibriumTemperature(waterVaporPartialPressure: number): number | null {
+    const triplePointPressure = 611.657; // in pascal
+    if (waterVaporPartialPressure > triplePointPressure) {
+        return null;
+    }
+
+    const Lsub = 2.834e6; // J/kg
+    const R = 461.5; // J/(kg*K)
+    const C = 28.89; // dimensionless, for pressure in Pa
+
+    return Lsub / (R * (C - Math.log(waterVaporPartialPressure)));
+}
+
 /**
  * Estimates ocean depth from a planet's water inventory and ocean coverage.
  * @param planetRadius The planet radius in meters
