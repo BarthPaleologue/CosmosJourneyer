@@ -524,6 +524,15 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
 }
 
 /**
+ * Returns the arc cosine of the input.
+ * @param x - The input value.
+ * @param options - Optional target options.
+ */
+export function acos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+    return trig(x, TrigonometryBlockOperations.ArcCos, options);
+}
+
+/**
  * Returns the square root of the input.
  * @param x - The input value.
  * @param options - Optional target options.
