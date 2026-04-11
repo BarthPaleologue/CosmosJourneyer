@@ -148,6 +148,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
         }
 
+        this.mesh.receiveShadows = true;
         this.mesh.setEnabled(true);
         this.loaded = true;
 

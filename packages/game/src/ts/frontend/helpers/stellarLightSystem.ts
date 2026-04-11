@@ -15,10 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
+
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import type { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
@@ -26,6 +30,7 @@ export class StellarLightSystem {
     private readonly stellarObjects: Array<{
         transform: TransformNode;
         light: DirectionalLight;
+        shadowGenerator: CascadedShadowGenerator;
     }> = [];
 
     private readonly scene: Scene;
@@ -38,7 +43,31 @@ export class StellarLightSystem {
         const light = new DirectionalLight(`${transform.name}Light`, Vector3.Down(), this.scene);
         light.diffuse.copyFrom(color);
 
-        this.stellarObjects.push({ transform, light });
+        const shadowGenerator = new CascadedShadowGenerator(2048, light);
+        shadowGenerator.shadowMaxZ = 1e3;
+        shadowGenerator.lambda = 0.95;
+        shadowGenerator.usePercentageCloserFiltering = true;
+        shadowGenerator.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
+
+        this.stellarObjects.push({ transform, light, shadowGenerator });
+    }
+
+    public addShadowCaster(mesh: TransformNode | AbstractMesh) {
+        for (const { shadowGenerator } of this.stellarObjects) {
+            if (mesh instanceof AbstractMesh) {
+                shadowGenerator.addShadowCaster(mesh);
+            } else {
+                for (const childMesh of mesh.getChildMeshes()) {
+                    shadowGenerator.addShadowCaster(childMesh);
+                }
+            }
+        }
+    }
+
+    public addShadowCasters(meshes: ReadonlyArray<TransformNode | AbstractMesh>) {
+        for (const mesh of meshes) {
+            this.addShadowCaster(mesh);
+        }
     }
 
     public update(camera: Camera) {
@@ -54,8 +83,9 @@ export class StellarLightSystem {
     }
 
     public dispose() {
-        for (const { light } of this.stellarObjects) {
+        for (const { light, shadowGenerator } of this.stellarObjects) {
             light.dispose();
+            shadowGenerator.dispose();
         }
         this.stellarObjects.length = 0;
     }

@@ -52,7 +52,6 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
-import type { StellarLightSystem } from "../helpers/stellarLightSystem";
 import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";
 import { MandelboxPostProcess } from "./anomalies/mandelboxPostProcess";
 import { MandelbulbPostProcess } from "./anomalies/mandelbulbPostProcess";

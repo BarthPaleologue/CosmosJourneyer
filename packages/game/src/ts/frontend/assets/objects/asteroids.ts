@@ -40,6 +40,7 @@ export async function loadAsteroids(
     const asteroids = assetContainers.flatMap((container) => processAsteroids(container, scalings));
 
     return asteroids.map((asteroid) => {
+        asteroid.receiveShadows = true;
         return {
             mesh: asteroid,
             physicsShape: createAsteroidPhysicsShape(asteroid, scene),

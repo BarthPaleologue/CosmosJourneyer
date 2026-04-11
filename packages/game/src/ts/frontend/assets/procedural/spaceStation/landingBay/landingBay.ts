@@ -92,6 +92,7 @@ export class LandingBay {
         }
 
         this.ring = createRing(this.radius, deltaRadius, heightFactor * deltaRadius, nbSteps, scene);
+        this.ring.receiveShadows = true;
 
         const lightMeshMaterial = new StandardMaterial("LandingBayLightMeshMaterial", scene);
         lightMeshMaterial.emissiveColor.set(1, 1, 1);

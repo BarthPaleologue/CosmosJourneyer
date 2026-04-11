@@ -501,6 +501,8 @@ export class StarSystemView implements View {
                 const rover = roverResult.value;
                 this.vehicleControls.setVehicle(rover);
 
+                this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
+
                 this.interactionSystem.register({
                     getPhysicsAggregate: () => rover.frame,
                     getInteractions: () => [
@@ -593,6 +595,16 @@ export class StarSystemView implements View {
         }
 
         this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
+
+        const shipMesh = this.spaceshipControls?.getSpaceship();
+        if (shipMesh !== undefined) {
+            this.starSystem.stellarLightSystem.addShadowCaster(shipMesh.getTransform());
+        }
+
+        const characterRoot = this.characterControls?.avatar.instance.root;
+        if (characterRoot !== undefined) {
+            this.starSystem.stellarLightSystem.addShadowCaster(characterRoot);
+        }
 
         return this.starSystem;
     }
