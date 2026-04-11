@@ -51,7 +51,7 @@ void main() {
 
     float ndl = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 starLightRayW = normalize(star_positions[i] - vPositionW);// light ray direction in world space
+        vec3 starLightRayW = star_directions[i]; // light ray direction in world space
         ndl = max(ndl, max(0.0, dot(normalW, starLightRayW)));
     }
 
@@ -81,7 +81,7 @@ void main() {
     vec3 Lo = vec3(0.0);
     vec3 viewRayW = normalize(cameraPosition - vPositionW);
     for (int i = 0; i < nbStars; i++) {
-        vec3 L = normalize(star_positions[i] - vPositionW);
+        vec3 L = star_directions[i];
 
         Lo += calculateLight(albedo, normalW, roughness, metallic, L, viewRayW, star_colors[i]);
     }

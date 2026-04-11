@@ -17,6 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -26,8 +27,6 @@ import { type Scene } from "@babylonjs/core/scene";
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 import { type CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type LightEmitter } from "@/frontend/universe/architecture/lightEmitter";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -57,7 +56,7 @@ export class ShadowPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms | null,
         cloudsUniforms: CloudsUniforms | null,
         hasOcean: boolean,
-        stellarObjects: ReadonlyArray<HasBoundingSphere & LightEmitter>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {
@@ -122,17 +121,9 @@ export class ShadowPostProcess extends PostProcess {
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(
-                effect,
-                stellarObjects.map((star) => star.getLight()),
-                floatingOriginOffset,
-            );
+            setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
-            effect.setFloatArray(
-                ShadowUniformNames.STAR_RADIUSES,
-                stellarObjects.map((star) => star.getBoundingRadius()),
-            );
             effect.setBool(ShadowUniformNames.HAS_RINGS, shadowUniforms.hasRings);
             effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);
             effect.setBool(ShadowUniformNames.HAS_OCEAN, shadowUniforms.hasOcean);

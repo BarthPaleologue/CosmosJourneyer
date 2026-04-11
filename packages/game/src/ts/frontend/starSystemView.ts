@@ -606,13 +606,17 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, timestampSeconds);
         this.targetCursorLayer.reset();
 
-        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects(), [
-            starSystem.starFieldBox.mesh,
-            ...(this.spaceshipControls
-                ?.getSpaceship()
-                .getMainThrusters()
-                .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
-        ]);
+        this.postProcessManager.addCelestialBodies(
+            starSystem.getCelestialBodies(),
+            starSystem.stellarLightSystem.getLights(),
+            [
+                starSystem.starFieldBox.mesh,
+                ...(this.spaceshipControls
+                    ?.getSpaceship()
+                    .getMainThrusters()
+                    .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
+            ],
+        );
 
         const celestialBodies = starSystem.getCelestialBodies();
         const spaceStations = starSystem.getOrbitalFacilities();

@@ -81,7 +81,7 @@ export async function createSolScene(
     const postProcessManager = new PostProcessManager(assets.textures, depthRendererManager, scene);
     postProcessManager.addCelestialBodies(
         starSystemController.getCelestialBodies(),
-        starSystemController.getStellarObjects(),
+        starSystemController.stellarLightSystem.getLights(),
         [starSystemController.starFieldBox.mesh],
     );
 

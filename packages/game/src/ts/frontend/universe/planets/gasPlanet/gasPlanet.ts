@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
@@ -140,7 +140,7 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
     }
 
-    updateMaterial(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number): void {
+    updateMaterial(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
         if (this.material instanceof GasPlanetProceduralMaterial) {
             this.material.update(stellarObjects, deltaSeconds);
         }

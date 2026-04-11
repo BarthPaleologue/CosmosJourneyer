@@ -17,7 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -50,7 +50,7 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
         model: DeepReadonly<SierpinskiPyramidModel>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const shaderName = "SierpinskiPyramid";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -100,7 +100,7 @@ export class SierpinskiPyramidPostProcess extends PostProcess implements Updatab
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
+            setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setColor3(SierpinskiPyramidUniformNames.ACCENT_COLOR, model.accentColor);

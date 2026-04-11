@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
+import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { type RingsModel } from "@cosmos-journeyer/universe-model";
@@ -49,19 +49,13 @@ export async function createRingsScene(
 
     controls.getTransform().setAbsolutePosition(new Vector3(0, 5, -10).scaleInPlace(scalingFactor));
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
-
-    // This attaches the camera to the canvas
     camera.attachControl();
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new PointLight("light1", new Vector3(-1, 0.5, -2).scaleInPlace(10 * scalingFactor), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
+    const light = new DirectionalLight("light1", new Vector3(1, -0.5, 2).normalize(), scene);
     light.intensity = 0.7;
 
-    // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 32 }, scene);
 
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));

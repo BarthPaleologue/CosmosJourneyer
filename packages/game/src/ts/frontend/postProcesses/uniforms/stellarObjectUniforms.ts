@@ -15,51 +15,39 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { type Effect } from "@babylonjs/core/Materials/effect";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-
-import { flattenColor3Array, flattenVector3Array } from "@/frontend/helpers/algebra";
 
 export const StellarObjectUniformNames = {
-    STAR_POSITIONS: "star_positions",
+    STAR_DIRECTIONS: "star_directions",
     STAR_COLORS: "star_colors",
     NB_STARS: "nbStars",
 };
 
-const tempVectorMap = new Map<number, Vector3>();
-function getTempVector(index: number) {
-    let vector = tempVectorMap.get(index);
-    if (vector === undefined) {
-        vector = Vector3.Zero();
-        tempVectorMap.set(index, vector);
-    }
-    return vector;
-}
+let starDirections = new Float32Array(0);
+let starColors = new Float32Array(0);
 
-export function setStellarObjectUniforms(
-    effect: Effect,
-    stellarObjects: ReadonlyArray<PointLight>,
-    floatingOriginOffset: Vector3,
-): void {
+export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<DirectionalLight>): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 
     if (stellarObjects.length === 0) {
-        effect.setArray3(StellarObjectUniformNames.STAR_POSITIONS, [0, 0, 0]);
-        effect.setArray3(StellarObjectUniformNames.STAR_COLORS, [1, 1, 1]);
         return;
     }
 
-    effect.setArray3(
-        StellarObjectUniformNames.STAR_POSITIONS,
-        flattenVector3Array(
-            stellarObjects.map((stellarObject, index) =>
-                stellarObject.getAbsolutePosition().subtractToRef(floatingOriginOffset, getTempVector(index)),
-            ),
-        ),
-    );
-    effect.setArray3(
-        StellarObjectUniformNames.STAR_COLORS,
-        flattenColor3Array(stellarObjects.map((stellarObject) => stellarObject.diffuse)),
-    );
+    if (stellarObjects.length * 3 > starDirections.length) {
+        starDirections = new Float32Array(stellarObjects.length * 3);
+        starColors = new Float32Array(stellarObjects.length * 3);
+    }
+
+    for (const [index, stellarObject] of stellarObjects.entries()) {
+        starDirections[index * 3] = -stellarObject.direction.x;
+        starDirections[index * 3 + 1] = -stellarObject.direction.y;
+        starDirections[index * 3 + 2] = -stellarObject.direction.z;
+        starColors[index * 3] = stellarObject.diffuse.r;
+        starColors[index * 3 + 1] = stellarObject.diffuse.g;
+        starColors[index * 3 + 2] = stellarObject.diffuse.b;
+    }
+
+    effect.setFloatArray3(StellarObjectUniformNames.STAR_DIRECTIONS, starDirections);
+    effect.setFloatArray3(StellarObjectUniformNames.STAR_COLORS, starColors);
 }

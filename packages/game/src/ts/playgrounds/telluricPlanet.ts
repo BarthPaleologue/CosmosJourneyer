@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
@@ -70,8 +70,7 @@ export async function createTelluricPlanetScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
-    light.falloffType = PointLight.FALLOFF_STANDARD;
+    const light = new DirectionalLight("light1", new Vector3(-7, -5, 10).normalize(), scene);
 
     const urlParams = new URLSearchParams(window.location.search);
     const seed = Number(urlParams.get("seed") ?? Math.floor(Math.random() * 1000));
@@ -87,12 +86,7 @@ export async function createTelluricPlanetScene(
         planet.ringsUniforms,
         null,
         false,
-        [
-            {
-                getBoundingRadius: () => 0,
-                getLight: () => light,
-            },
-        ],
+        [light],
         depthRendererManager,
         scene,
     );

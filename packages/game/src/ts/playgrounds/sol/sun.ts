@@ -76,7 +76,7 @@ export async function createSunScene(
     const lensFlare = new LensFlarePostProcess(
         sun.getTransform(),
         sun.getBoundingRadius(),
-        sun.getLight().diffuse,
+        sun.getEmissiveColor(),
         depthRendererManager,
         scene,
     );

@@ -83,7 +83,7 @@ export function enableShadows(
         debug: boolean;
     }>,
 ): CascadedShadowGenerator {
-    const shadowGenerator = new CascadedShadowGenerator(options?.resolution ?? 2048, light);
+    const shadowGenerator = new CascadedShadowGenerator(options?.resolution ?? 2048, light, true);
     shadowGenerator.transparencyShadow = true;
 
     // see https://doc.babylonjs.com/features/featuresDeepDive/lights/shadows_csm#optimizing-for-quality

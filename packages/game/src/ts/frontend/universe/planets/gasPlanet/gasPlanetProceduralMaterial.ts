@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -104,12 +104,11 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
         });
     }
 
-    public update(stellarObjects: ReadonlyArray<PointLight>, deltaSeconds: number) {
+    public update(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number) {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {
-            const floatingOriginOffset = this.getScene().floatingOriginOffset;
-            setStellarObjectUniforms(this.getEffect(), stellarObjects, floatingOriginOffset);
+            setStellarObjectUniforms(this.getEffect(), stellarObjects);
             this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }

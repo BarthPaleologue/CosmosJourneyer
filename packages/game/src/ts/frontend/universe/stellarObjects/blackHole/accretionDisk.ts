@@ -15,9 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-import { type CelestialBodyBase } from "./celestialBody";
-import { type LightEmitter } from "./lightEmitter";
+import { getRgbFromTemperature } from "@/utils/specrend";
 
-export interface StellarObjectBase<T extends OrbitalObjectType> extends CelestialBodyBase<T>, LightEmitter {}
+import type { LightEmitter } from "../../architecture/lightEmitter";
+
+export class AccretionDisk implements LightEmitter {
+    private readonly emissiveColor: Color3;
+    constructor(temperature: number) {
+        const rgb = getRgbFromTemperature(temperature);
+        this.emissiveColor = new Color3(rgb.r, rgb.g, rgb.b);
+    }
+
+    getEmissiveColor(): Color3 {
+        return this.emissiveColor;
+    }
+}

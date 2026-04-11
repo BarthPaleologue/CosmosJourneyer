@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { Color3 } from "@babylonjs/core/Maths/math.color";
 
 export interface LightEmitter {
-    getLight(): PointLight;
+    getEmissiveColor(): Color3;
 }

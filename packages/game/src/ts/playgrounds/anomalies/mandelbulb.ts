@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ArcRotateCamera, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { ArcRotateCamera, DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { generateMandelbulbModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelbulbModelGenerator";
 
@@ -39,6 +39,8 @@ export function createMandelbulbScene(
     camera.wheelPrecision /= 30e3;
     camera.maxZ = 10e7;
 
+    const light = new DirectionalLight("anomalyLight", new Vector3(-1, -1, -1).normalize(), scene);
+
     const depthRendererManager = new DepthRendererManager(scene);
 
     const model = generateMandelbulbModel(
@@ -56,7 +58,7 @@ export function createMandelbulbScene(
         model,
         depthRendererManager,
         scene,
-        [],
+        [light],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 import { SolarTemperature } from "@cosmos-journeyer/physics";
 
 import { generateGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanet/gasPlanetModelGenerator";
@@ -76,11 +76,7 @@ export async function createGasPlanetScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const light = new PointLight(
-        "light1",
-        new Vector3(7, 5, -10).normalize().scaleInPlace(gasPlanetModel.radius * 100),
-        scene,
-    );
+    const light = new DirectionalLight("light1", new Vector3(-7, -5, 10).normalize(), scene);
     const lightColor = getRgbFromTemperature(SolarTemperature);
     light.diffuse.set(lightColor.r, lightColor.g, lightColor.b);
 
@@ -90,12 +86,7 @@ export async function createGasPlanetScene(
         planet.ringsUniforms,
         null,
         false,
-        [
-            {
-                getBoundingRadius: () => 0,
-                getLight: () => light,
-            },
-        ],
+        [light],
         depthRendererManager,
         scene,
     );

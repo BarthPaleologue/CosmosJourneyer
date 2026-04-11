@@ -147,7 +147,7 @@ float cloudShadows(vec3 closestPoint) {
     float lightAmount = 1.0;
     for (int i = 0; i < nbStars; i++) {
         // direction to sun from point
-        vec3 sunDir = normalize(star_positions[i] - closestPoint);
+        vec3 sunDir = star_directions[i];
 
         // if ray toward sun does not intersect the cloud layer, then there can't be any cloud shadow
         float t0, t1;
@@ -194,7 +194,7 @@ void main() {
         float ndl = 0.0;// dimming factor due to light inclination relative to vertex normal in world space
         float specularHighlight = 0.0;
         for (int i = 0; i < nbStars; i++) {
-            vec3 sunDir = normalize(star_positions[i] - object_position);
+            vec3 sunDir = star_directions[i];
 
             ndl += max(dot(cloudNormal, sunDir), -0.3) + 0.3;
 

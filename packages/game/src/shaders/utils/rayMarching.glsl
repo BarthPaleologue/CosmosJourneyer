@@ -58,7 +58,7 @@ vec3 getNormal(vec3 p){
 }
 
 //Determine if a point is in shadow - 1.0 = not in shadow
-float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
+float getShadow(vec3 rayOrigin, vec3 rayDir) {
     float t = 0.01;
     float d = 0.0;
     float shadow = 1.0;
@@ -66,9 +66,6 @@ float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
         d = map(rayOrigin + rayDir * t);
         if(d < 0.0001){
             return 0.5;
-        }
-        if(t > length(rayOrigin - starPosition) - 0.5){
-            break;
         }
         shadow = min(shadow, 32.0 * d / t);
         t += d;

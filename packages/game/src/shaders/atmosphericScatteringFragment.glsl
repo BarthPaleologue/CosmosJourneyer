@@ -75,12 +75,8 @@ vec3 opticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
     return accumulatedOpticalDepth;
 }
 
-vec3 calculateLight(vec3 rayOrigin, vec3 starPosition, vec3 rayDir, float rayLength, vec3 originalColor) {
-
+vec3 calculateLight(vec3 rayOrigin, vec3 starDir, vec3 rayDir, float rayLength, vec3 originalColor) {
     vec3 samplePoint = rayOrigin;// first sampling point coming from camera ray
-
-    vec3 starDir = normalize(starPosition - object_position);// direction to the light source
-
     float stepSize = rayLength / (float(POINTS_FROM_CAMERA) - 1.0);// the ray length between sample points
 
     vec3 inScatteredRayleigh = vec3(0.0);
@@ -150,7 +146,7 @@ vec3 scatter(vec3 originalColor, vec3 rayOrigin, vec3 rayDir, float maximumDista
 
     vec3 light = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        light = max(light, calculateLight(firstPointInAtmosphere, star_positions[i], rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
+        light = max(light, calculateLight(firstPointInAtmosphere, star_directions[i], rayDir, distanceThroughAtmosphere, originalColor.rgb));// calculate scattering
     }
 
     return light;

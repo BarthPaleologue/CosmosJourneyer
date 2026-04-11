@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { MeshBuilder, PointLight, Vector3 } from "@babylonjs/core";
+import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -50,10 +50,8 @@ export function createAtmosphericScatteringScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new PointLight("light1", new Vector3(10 * scalingFactor, 0, 0), scene);
+    const light = new DirectionalLight("light1", new Vector3(-1, 0, 0), scene);
 
-    // Our built-in 'sphere' shape. Params: name, options, scene
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 64 }, scene);
 
     const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
