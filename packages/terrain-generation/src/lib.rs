@@ -215,7 +215,6 @@ pub fn build_chunk_vertex_data(
                 let index = vertex_index;
 
                 scatter_in_triangle(
-                    &chunk_sphere_position,
                     scatter_per_square_meter,
                     &mut excess_instance_number,
                     &mut instance_index,
@@ -230,7 +229,6 @@ pub fn build_chunk_vertex_data(
                 );
 
                 scatter_in_triangle(
-                    &chunk_sphere_position,
                     scatter_per_square_meter,
                     &mut excess_instance_number,
                     &mut instance_index,

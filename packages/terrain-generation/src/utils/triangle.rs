@@ -101,7 +101,6 @@ pub fn random_point_in_triangle_from_buffer(
 
 #[allow(clippy::too_many_arguments)]
 pub fn scatter_in_triangle(
-    chunk_position: &Vector3,
     scatter_per_square_meter: f32,
     excess_instance_number: &mut f32,
     instance_index: &mut usize,
@@ -135,17 +134,17 @@ pub fn scatter_in_triangle(
 
         let rotation_on_itself =
             Quaternion::rotation_axis(&Vector3::up(), random01() * 2.0 * std::f32::consts::PI);
-        let position = &Vector3::new(x, y, z) + chunk_position;
+        let local_position = Vector3::new(x, y, z);
 
         let aligned_matrix = Matrix4::compose(
             &scaling_vector,
             &(&align_quaternion * &rotation_on_itself),
-            &position,
+            &local_position,
         );
         let matrix = Matrix4::compose(
             &scaling_vector,
             &(&vertical_quaternion * &rotation_on_itself),
-            &position,
+            &local_position,
         );
 
         aligned_matrix.copy_to_array(aligned_instances_matrix_buffer, 16 * *instance_index);

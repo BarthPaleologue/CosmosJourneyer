@@ -82,13 +82,13 @@ export class InstancePatch implements IPatch {
         if (this.currentLod === null) throw new Error("Tried to send matrix buffer to GPU but no base mesh was set.");
         for (const transform of this.transforms) {
             const instance = this.currentLod.mesh.createInstance(`instance${this.instances.length}`);
-            instance.position.copyFrom(transform.position.add(this.currentLod.mesh.position));
+            instance.parent = this.parent;
+            instance.position.copyFrom(transform.position);
             instance.rotationQuaternion = transform.rotation;
             instance.scaling.copyFrom(transform.scaling);
-            this.instances.push(instance);
-
-            instance.parent = this.parent;
+            instance.computeWorldMatrix(true);
             instance.setParent(null);
+            this.instances.push(instance);
         }
     }
 

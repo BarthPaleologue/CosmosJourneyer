@@ -176,6 +176,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.loaded = true;
 
         this.averageHeight = averageHeight;
+        this.mesh.computeWorldMatrix(true);
+        const chunkAbsolutePosition = this.mesh.getAbsolutePosition();
+        const chunkRotationQuaternion = this.parent.rotationQuaternion;
 
         if (instancesMatrixBuffer.length === 0) return;
 
@@ -183,8 +186,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         rockPatch.createInstances([{ mesh: assets.objects.rock, distance: 0 }]);
         this.instancePatches.push(rockPatch);
         for (const rockMesh of rockPatch.getLodMeshes()) {
-            rockMesh.position.copyFrom(this.parent.position);
-            rockMesh.rotationQuaternion = this.parent.rotationQuaternion;
+            rockMesh.position.copyFrom(chunkAbsolutePosition);
+            rockMesh.rotationQuaternion = chunkRotationQuaternion;
             rockMesh.computeWorldMatrix(true);
         }
 
@@ -193,15 +196,15 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.planetModel.ocean !== null &&
             this.getAverageHeight() > this.planetModel.ocean.depth + 50
         ) {
-            const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
+            const treePatch = new InstancePatch(this.mesh, randomDownSample(instancesMatrixBuffer, 4800));
             treePatch.createInstances([{ mesh: assets.objects.tree, distance: 0 }]);
             this.instancePatches.push(treePatch);
 
             const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
             butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
             for (const butterflyMesh of butterflyPatch.getLodMeshes()) {
-                butterflyMesh.position.copyFrom(this.parent.position);
-                butterflyMesh.rotationQuaternion = this.parent.rotationQuaternion;
+                butterflyMesh.position.copyFrom(chunkAbsolutePosition);
+                butterflyMesh.rotationQuaternion = chunkRotationQuaternion;
                 butterflyMesh.computeWorldMatrix(true);
             }
             this.instancePatches.push(butterflyPatch);
@@ -212,8 +215,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
                 { mesh: assets.objects.grassBlades[1], distance: 50 },
             ]);
             for (const grassMesh of grassPatch.getLodMeshes()) {
-                grassMesh.position.copyFrom(this.parent.position);
-                grassMesh.rotationQuaternion = this.parent.rotationQuaternion;
+                grassMesh.position.copyFrom(chunkAbsolutePosition);
+                grassMesh.rotationQuaternion = chunkRotationQuaternion;
                 grassMesh.computeWorldMatrix(true);
             }
             this.instancePatches.push(grassPatch);
