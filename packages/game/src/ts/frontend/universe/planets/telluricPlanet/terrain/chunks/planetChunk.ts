@@ -179,9 +179,14 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
         if (instancesMatrixBuffer.length === 0) return;
 
-        const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
+        const rockPatch = new ThinInstancePatch(randomDownSample(alignedInstancesMatrixBuffer, 3200));
         rockPatch.createInstances([{ mesh: assets.objects.rock, distance: 0 }]);
         this.instancePatches.push(rockPatch);
+        for (const rockMesh of rockPatch.getLodMeshes()) {
+            rockMesh.position.copyFrom(this.parent.position);
+            rockMesh.rotationQuaternion = this.parent.rotationQuaternion;
+            rockMesh.computeWorldMatrix(true);
+        }
 
         if (
             this.planetModel.atmosphere !== null &&
@@ -195,7 +200,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
             butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
             for (const butterflyMesh of butterflyPatch.getLodMeshes()) {
-                butterflyMesh.parent = this.parent;
+                butterflyMesh.position.copyFrom(this.parent.position);
+                butterflyMesh.rotationQuaternion = this.parent.rotationQuaternion;
+                butterflyMesh.computeWorldMatrix(true);
             }
             this.instancePatches.push(butterflyPatch);
 
@@ -205,7 +212,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
                 { mesh: assets.objects.grassBlades[1], distance: 50 },
             ]);
             for (const grassMesh of grassPatch.getLodMeshes()) {
-                grassMesh.parent = this.parent;
+                grassMesh.position.copyFrom(this.parent.position);
+                grassMesh.rotationQuaternion = this.parent.rotationQuaternion;
+                grassMesh.computeWorldMatrix(true);
             }
             this.instancePatches.push(grassPatch);
         }
@@ -261,7 +270,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     }
 
     computeCulling(camera: Camera) {
-        if (!this.isLoaded()) return;
+        if (!this.isLoaded()) {
+            return;
+        }
 
         // chunks on the other side of the planet are culled
         // as chunks have dimensions, we use the bounding sphere to do conservative culling
@@ -272,7 +283,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         const conservativeSphereNormal = closestPointToCamera
             .subtract(this.parent.getAbsolutePosition())
             .normalizeToNew();
-        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+
+        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalize();
 
         const isEnabled =
             Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
@@ -280,24 +292,24 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
         this.mesh.setEnabled(isEnabled);
 
-        this.instancePatches.forEach((patch) => {
-            let minDistance = Number.MAX_VALUE;
-            const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+        if (this.instancePatches.length === 0) {
+            return;
+        }
 
-            // instance patches are not rendered when the chunk is too far
-            const sphereNormal = this.getTransform()
-                .getAbsolutePosition()
-                .subtract(this.parent.getAbsolutePosition())
-                .normalizeToNew();
+        const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
+        // instance patches are not rendered when the chunk is too far
+        const sphereNormal = this.getTransform()
+            .getAbsolutePosition()
+            .subtract(this.parent.getAbsolutePosition())
+            .normalize();
 
-            const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
-            const tangentialDistance = distanceVector.subtract(normalComponent).length();
+        const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
+        const tangentialDistance = distanceVector.subtract(normalComponent).length();
+        const isVisible = tangentialDistance < 200;
 
-            const isVisible = tangentialDistance < 200;
-            minDistance = Math.min(minDistance, tangentialDistance);
-
+        for (const patch of this.instancePatches) {
             patch.setEnabled(isVisible);
-            patch.handleLod(minDistance);
-        });
+            patch.handleLod(tangentialDistance);
+        }
     }
 }

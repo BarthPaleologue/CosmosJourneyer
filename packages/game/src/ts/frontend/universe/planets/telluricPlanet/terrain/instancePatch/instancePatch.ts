@@ -88,6 +88,7 @@ export class InstancePatch implements IPatch {
             this.instances.push(instance);
 
             instance.parent = this.parent;
+            instance.setParent(null);
         }
     }
 
