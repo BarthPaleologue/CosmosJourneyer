@@ -17,11 +17,6 @@ fn instance_translations_are_chunk_relative() {
         1.0, 0.0, 0.0, //
         0.0, 0.0, 1.0,
     ];
-    let normals = vec![
-        0.0, 1.0, 0.0, //
-        0.0, 1.0, 0.0, //
-        0.0, 1.0, 0.0,
-    ];
 
     let mut excess_instance_number = 0.0;
     let mut instance_index = 0;
@@ -35,7 +30,6 @@ fn instance_translations_are_chunk_relative() {
         &mut instances_matrix_buffer,
         &mut aligned_instances_matrix_buffer,
         &positions,
-        &normals,
         &local_vertical_direction,
         0,
         1,

@@ -3,8 +3,13 @@ use crate::utils::quaternion::Quaternion;
 use crate::utils::random::random01;
 use crate::utils::vector3::Vector3;
 
+pub struct TriangleSurface {
+    pub area: f32,
+    pub normal: [f32; 3],
+}
+
 #[allow(clippy::too_many_arguments)]
-pub fn triangle_area(
+pub fn triangle_surface(
     x1: f32,
     y1: f32,
     z1: f32,
@@ -14,8 +19,7 @@ pub fn triangle_area(
     x3: f32,
     y3: f32,
     z3: f32,
-) -> f32 {
-    // use cross product to calculate area of triangle
+) -> TriangleSurface {
     let ux = x2 - x1;
     let uy = y2 - y1;
     let uz = z2 - z1;
@@ -28,38 +32,54 @@ pub fn triangle_area(
     let ny = uz * vx - ux * vz;
     let nz = ux * vy - uy * vx;
 
-    f32::sqrt(nx * nx + ny * ny + nz * nz) / 2.0
+    let length = f32::sqrt(nx * nx + ny * ny + nz * nz);
+
+    TriangleSurface {
+        area: length / 2.0,
+        normal: [nx / length, ny / length, nz / length],
+    }
 }
 
-pub fn triangle_area_from_buffer(
-    positions: &[f32],
-    index1: usize,
-    index2: usize,
-    index3: usize,
-) -> f32 {
-    triangle_area(
-        positions[3 * index1],
-        positions[3 * index1 + 1],
-        positions[3 * index1 + 2],
-        positions[3 * index2],
-        positions[3 * index2 + 1],
-        positions[3 * index2 + 2],
-        positions[3 * index3],
-        positions[3 * index3 + 1],
-        positions[3 * index3 + 2],
-    )
-}
-
-pub fn random_point_in_triangle_from_buffer(
-    positions: &[f32],
-    normals: &[f32],
-    index1: usize,
-    index2: usize,
-    index3: usize,
-) -> [f32; 6] {
+#[allow(clippy::too_many_arguments)]
+pub fn random_point_in_triangle(
+    x1: f32,
+    y1: f32,
+    z1: f32,
+    x2: f32,
+    y2: f32,
+    z2: f32,
+    x3: f32,
+    y3: f32,
+    z3: f32,
+) -> [f32; 3] {
     let r1 = random01();
     let r2 = random01();
 
+    let r1_sqrt = r1.sqrt();
+    let f1 = 1.0 - r1_sqrt;
+    let f2 = r1_sqrt * (1.0 - r2);
+    let f3 = r1_sqrt * r2;
+
+    let x = f1 * x1 + f2 * x2 + f3 * x3;
+    let y = f1 * y1 + f2 * y2 + f3 * y3;
+    let z = f1 * z1 + f2 * z2 + f3 * z3;
+
+    [x, y, z]
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn scatter_in_triangle(
+    scatter_per_square_meter: f32,
+    excess_instance_number: &mut f32,
+    instance_index: &mut usize,
+    instances_matrix_buffer: &mut [f32],
+    aligned_instances_matrix_buffer: &mut [f32],
+    positions: &[f32],
+    local_vertical_direction: &Vector3,
+    index1: usize,
+    index2: usize,
+    index3: usize,
+) {
     let x1 = positions[3 * index1];
     let y1 = positions[3 * index1 + 1];
     let z1 = positions[3 * index1 + 2];
@@ -72,57 +92,16 @@ pub fn random_point_in_triangle_from_buffer(
     let y3 = positions[3 * index3 + 1];
     let z3 = positions[3 * index3 + 2];
 
-    let n1x = normals[3 * index1];
-    let n1y = normals[3 * index1 + 1];
-    let n1z = normals[3 * index1 + 2];
-
-    let n2x = normals[3 * index2];
-    let n2y = normals[3 * index2 + 1];
-    let n2z = normals[3 * index2 + 2];
-
-    let n3x = normals[3 * index3];
-    let n3y = normals[3 * index3 + 1];
-    let n3z = normals[3 * index3 + 2];
-
-    let f1 = 1.0 - r1.sqrt();
-    let f2 = r1.sqrt() * (1.0 - r2);
-    let f3 = r1.sqrt() * r2;
-
-    let x = f1 * x1 + f2 * x2 + f3 * x3;
-    let y = f1 * y1 + f2 * y2 + f3 * y3;
-    let z = f1 * z1 + f2 * z2 + f3 * z3;
-
-    let nx = f1 * n1x + f2 * n2x + f3 * n3x;
-    let ny = f1 * n1y + f2 * n2y + f3 * n3y;
-    let nz = f1 * n1z + f2 * n2z + f3 * n3z;
-
-    [x, y, z, nx, ny, nz]
-}
-
-#[allow(clippy::too_many_arguments)]
-pub fn scatter_in_triangle(
-    scatter_per_square_meter: f32,
-    excess_instance_number: &mut f32,
-    instance_index: &mut usize,
-    instances_matrix_buffer: &mut [f32],
-    aligned_instances_matrix_buffer: &mut [f32],
-    positions: &[f32],
-    normals: &[f32],
-    local_vertical_direction: &Vector3,
-    index1: usize,
-    index2: usize,
-    index3: usize,
-) {
-    let triangle_area = triangle_area_from_buffer(positions, index1, index2, index3);
-    let nb_instances =
-        f32::floor(triangle_area * scatter_per_square_meter + *excess_instance_number) as u32;
+    let TriangleSurface { area, normal } = triangle_surface(x1, y1, z1, x2, y2, z2, x3, y3, z3);
+    let nb_instances = f32::floor(area * scatter_per_square_meter + *excess_instance_number) as u32;
 
     *excess_instance_number =
-        triangle_area * scatter_per_square_meter + *excess_instance_number - nb_instances as f32;
+        area * scatter_per_square_meter + *excess_instance_number - nb_instances as f32;
+
+    let [nx, ny, nz] = normal;
 
     for _ in 0..nb_instances {
-        let [x, y, z, nx, ny, nz] =
-            random_point_in_triangle_from_buffer(positions, normals, index1, index2, index3);
+        let [x, y, z] = random_point_in_triangle(x1, y1, z1, x2, y2, z2, x3, y3, z3);
 
         let align_quaternion =
             Quaternion::get_transformation(&Vector3::up(), &Vector3::new(nx, ny, nz));

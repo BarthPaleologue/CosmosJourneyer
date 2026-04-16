@@ -355,14 +355,14 @@ export class TerrainSettings {
      * @returns {number}
      */
     get bumps_frequency() {
-        const ret = wasm.__wbg_get_terrainsettings_bumps_frequency(this.__wbg_ptr);
+        const ret = wasm.__wbg_get_returndata_average_height(this.__wbg_ptr);
         return ret;
     }
     /**
      * @param {number} arg0
      */
     set bumps_frequency(arg0) {
-        wasm.__wbg_set_terrainsettings_bumps_frequency(this.__wbg_ptr, arg0);
+        wasm.__wbg_set_returndata_average_height(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
