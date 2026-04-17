@@ -54,7 +54,7 @@ Then, paste inside the content of another language directory and translate the c
 
 You don't need to code at all, the language will be automatically bundled and available inside Cosmos Journeyer.
 
-To test your changes, simply run the project using `npm run serve` and change the url in this format:
+To test your changes, run `pnpm dev:game` from the repository root and change the URL in this format:
 
 ```
 http://localhost:8080/?lang=fr-FR

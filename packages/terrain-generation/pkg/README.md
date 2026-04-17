@@ -13,8 +13,9 @@ pnpm add terrain-generation
 ```
 
 The published package exposes typed WebAssembly bindings and does not require runtime configuration. When this
-repository is used as a workspace dependency, keep in mind that the game project intentionally depends on the npm
-distribution via the `npm:` protocol so that only maintainers need the Rust toolchain.
+repository is used as a workspace dependency, keep in mind that the game project currently consumes
+`terrain-generation` via a workspace dependency. The checked-in `pkg/` artifacts keep Rust tooling optional for most
+contributors, while maintainers touching the Rust source should install the toolchain.
 
 ## Runtime usage
 
@@ -57,7 +58,7 @@ buildData.free();
 
 ## Developing the WASM module locally
 
-Most contributors only need Node.js ≥ 20 and pnpm ≥ 10 to consume the published package. To rebuild the WebAssembly
+Most contributors only need Node.js ≥ 24 and pnpm ≥ 10 to consume the package in this workspace. To rebuild the WebAssembly
 artifacts or run the Rust toolchain you will additionally need:
 
 - [Rust](https://www.rust-lang.org/tools/install) with `wasm32-unknown-unknown` target (`rustup target add wasm32-unknown-unknown`)

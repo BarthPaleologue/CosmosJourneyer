@@ -54,7 +54,7 @@ If you want the cutting edge version, follow these steps:
 1. Install prerequisites:
 
 - [Git](https://git-scm.com/) (install with your package manager or from https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/) (version 20 or higher)
+- [Node.js](https://nodejs.org/) (version 24 or higher)
 - [Pnpm](https://pnpm.io/) (install with `npm install -g pnpm`)
 
 2. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
@@ -162,7 +162,7 @@ Cosmos Journeyer is built using the following technologies:
 
 ### Setup
 
-1. Install [Node.js](https://nodejs.org/)
+1. Install [Node.js](https://nodejs.org/) (version 24 or higher)
 2. Install [Pnpm](https://pnpm.io/installation)
 3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 4. Navigate to the project directory with `cd CosmosJourneyer`
@@ -181,6 +181,7 @@ This project uses a pnpm workspace. Packages live under `packages/` and share to
 - `packages/universe-model`: shared source-only star system and orbital object data models
 - `packages/babylonjs-shader-language`: shared source-only wrapper for BabylonJS Node Materials, to be used in the game and in the shader playgrounds
 - `packages/channel-packer`: web-only tool to pack the game channels into a single file for easier distribution
+- `packages/terrain-generation`: Rust + WebAssembly terrain-generation engine consumed by the game
 - `packages/website`: Next.js website sources and build config
 
 ### Development
@@ -192,6 +193,8 @@ You can start the development server for the game with `pnpm dev:game`, for the 
 #### Web
 
 To build the web version of Cosmos Journeyer, run `pnpm build:game`. Everything will be built in `packages/game/dist`.
+
+If you run `pnpm build` at the repository root, it also builds `packages/terrain-generation`, which requires Rust (`wasm32-unknown-unknown` target) and `wasm-pack`.
 
 #### Desktop (Electron)
 

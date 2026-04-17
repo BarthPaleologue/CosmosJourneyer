@@ -1,5 +1,6 @@
 {
   "name": "terrain-generation",
+  "type": "module",
   "collaborators": [
     "Barthélemy Paléologue"
   ],
@@ -10,7 +11,7 @@
     "terrain_generation_bg.js",
     "terrain_generation.d.ts"
   ],
-  "module": "terrain_generation.js",
+  "main": "terrain_generation.js",
   "types": "terrain_generation.d.ts",
   "sideEffects": [
     "./terrain_generation.js",
