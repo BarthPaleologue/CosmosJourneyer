@@ -33,6 +33,7 @@ import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
 import { createFlightDemoScene } from "./flightDemo";
+import { createForestScene } from "./forest";
 import { createGasPlanetScene } from "./gasPlanet";
 import { createGrassScene } from "./grass";
 import { createGravitySystemScene } from "./gravitySystem";
@@ -118,6 +119,7 @@ export class PlaygroundRegistry {
         ["spaceElevator", createSpaceElevatorScene],
         ["rover", createRoverScene],
         ["triPlanarNormal", createTriPlanarNormalScene],
+        ["forest", createForestScene],
     ]);
 
     register(
