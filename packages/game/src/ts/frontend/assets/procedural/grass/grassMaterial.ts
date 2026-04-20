@@ -111,7 +111,7 @@ export class GrassMaterial {
         const curvedPosition = rotateAround(position, leanAxis, curveAmount);
 
         const scalingTextureValue = textureSample(noiseTexture, mul(f(0.015), instancePositionXZ)).r;
-        const scalingFactor = remap(scalingTextureValue, [0, 1], [0.1, 0.7]);
+        const scalingFactor = remap(scalingTextureValue, [0, 1], [0.4, 1.0]);
 
         const cameraPosition = uniformCameraPosition();
 
