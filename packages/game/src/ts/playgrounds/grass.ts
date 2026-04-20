@@ -32,8 +32,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
 import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
 import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
-import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
-import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
+import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
 
 import { createSky } from "./utils";
 
@@ -87,9 +86,11 @@ export async function createGrassScene(
         return rng(rngState++);
     };
 
-    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng));
-    grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
-    grassPatch.getCurrentMesh().parent = ground;
+    const grassPatch = createInstancePatch(
+        grassBladeMesh,
+        createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng),
+    );
+    grassPatch.parent = ground;
 
     return scene;
 }

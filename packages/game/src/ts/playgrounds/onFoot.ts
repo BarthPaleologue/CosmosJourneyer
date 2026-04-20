@@ -43,6 +43,7 @@ import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
@@ -50,8 +51,6 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { radialChoiceModal } from "@/frontend/ui/dialogModal/radialChoiceModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
-import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
 import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
 import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
@@ -110,9 +109,11 @@ export async function createOnFootScene(
         return rng(rngState++);
     };
 
-    const grassPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 128, 128 * 6, wrappedRng));
-    grassPatch.createInstances([{ mesh: grassBladeMesh, distance: 0 }]);
-    grassPatch.getCurrentMesh().parent = ground;
+    const grassPatch = createInstancePatch(
+        grassBladeMesh,
+        createSquareMatrixBuffer(Vector3.Zero(), 128, 128 * 6, wrappedRng),
+    );
+    grassPatch.parent = ground;
 
     const butterflyMesh = createButterfly(scene);
     butterflyMesh.isVisible = false;
@@ -120,8 +121,11 @@ export async function createOnFootScene(
     const butterflyMaterial = new ButterflyMaterial(assets.textures.particles.butterfly, scene);
     butterflyMesh.material = butterflyMaterial.get();
 
-    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 128, 128, wrappedRng));
-    butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
+    const butterflyPatch = createInstancePatch(
+        butterflyMesh,
+        createSquareMatrixBuffer(Vector3.Zero(), 128, 128, wrappedRng),
+    );
+    butterflyPatch.parent = ground;
 
     const groundAggregate = new PhysicsAggregate(
         ground,

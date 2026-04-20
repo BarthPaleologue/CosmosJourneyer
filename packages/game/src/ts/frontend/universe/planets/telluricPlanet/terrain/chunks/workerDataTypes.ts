@@ -15,18 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type TerrainSettings } from "@cosmos-journeyer/universe-model";
+import {
+    type DeepReadonly,
+    type TelluricPlanetModel,
+    type TelluricSatelliteModel,
+} from "@cosmos-journeyer/universe-model";
 
 import { type Direction } from "./direction";
 import { type TaskType } from "./taskTypes";
 
 export type WorkerData = {
     taskType: TaskType;
-    planetName: string;
-    planetDiameter: number;
-    terrainSettings: TerrainSettings;
+    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     position: [number, number, number];
-    seed: number;
 };
 
 export type TransferBuildData = WorkerData & {

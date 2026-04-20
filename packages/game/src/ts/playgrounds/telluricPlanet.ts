@@ -32,6 +32,7 @@ import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProces
 import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
 
 import { Settings } from "@/settings";
 
@@ -50,6 +51,8 @@ export async function createTelluricPlanetScene(
     const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
+
+    const scatteringSystem = new ScatteringSystem(assets.objects);
 
     const scalingFactor = Settings.EARTH_RADIUS * 2;
 
@@ -164,16 +167,16 @@ export async function createTelluricPlanetScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        planet.updateLOD(camera.globalPosition, chunkForge);
-        chunkForge.update(assets);
+        planet.updateLOD(camera.globalPosition, chunkForge, scatteringSystem);
+        chunkForge.update();
 
         planet.computeCulling(camera);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge);
-            chunkForge.update(assets);
+            planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge, scatteringSystem);
+            chunkForge.update();
 
             if (chunkForge.applyTaskQueue.length === 0 && chunkForge.workerPool.busyWorkers.length === 0) {
                 engine.onBeginFrameObservable.remove(observer);

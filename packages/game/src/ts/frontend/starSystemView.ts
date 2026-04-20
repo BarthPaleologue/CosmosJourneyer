@@ -871,7 +871,7 @@ export class StarSystemView implements View {
             return;
         }
 
-        this.chunkForge.update(this.assets);
+        this.chunkForge.update();
 
         activeControls.update(deltaSeconds);
 

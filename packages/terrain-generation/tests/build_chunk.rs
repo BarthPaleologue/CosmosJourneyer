@@ -71,8 +71,7 @@ pub fn build_chunk_data() {
     let flat_area = size * size;
     let max_nb_instances = f32::floor(flat_area * scatter_per_square_meter * 2.0) as usize;
     println!("max_nb_instances: {}", max_nb_instances);
-    let mut instances_matrix_buffer = vec![0.0; 16 * max_nb_instances];
-    let mut aligned_instances_matrix_buffer = vec![0.0; 16 * max_nb_instances];
+    let mut scattered_points_buffer = vec![0.0; 6 * max_nb_instances];
 
     // filling the buffers with vertex data
     let nb_instances = build_chunk_vertex_data(
@@ -80,8 +79,7 @@ pub fn build_chunk_data() {
         &mut positions,
         &mut indices,
         &mut normals,
-        &mut instances_matrix_buffer,
-        &mut aligned_instances_matrix_buffer,
+        &mut scattered_points_buffer,
         scatter_per_square_meter,
     );
 
@@ -101,11 +99,7 @@ pub fn build_chunk_data() {
         (nb_subdivisions * nb_subdivisions * 2 * 3 + skirt_index_count) as usize
     );
 
-    println!("matrix_buffer: {:?}", instances_matrix_buffer);
-    println!(
-        "aligned_matrix_buffer: {:?}",
-        aligned_instances_matrix_buffer
-    );
+    println!("scattered_points_buffer: {:?}", scattered_points_buffer);
 
     println!(
         "Chunk took {}ms to be generated",
@@ -168,16 +162,14 @@ pub fn build_chunk_data_without_skirt_buffers() {
     let mut normals: Vec<f32> =
         vec![0.0; (build_data.resolution * build_data.resolution * 3) as usize];
     let mut indices: Vec<u16> = vec![0; (nb_subdivisions * nb_subdivisions * 2 * 3) as usize];
-    let mut instances_matrix_buffer: Vec<f32> = Vec::new();
-    let mut aligned_instances_matrix_buffer: Vec<f32> = Vec::new();
+    let mut scattered_points_buffer: Vec<f32> = Vec::new();
 
     let result = build_chunk_vertex_data(
         &build_data,
         &mut positions,
         &mut indices,
         &mut normals,
-        &mut instances_matrix_buffer,
-        &mut aligned_instances_matrix_buffer,
+        &mut scattered_points_buffer,
         0.0,
     );
 

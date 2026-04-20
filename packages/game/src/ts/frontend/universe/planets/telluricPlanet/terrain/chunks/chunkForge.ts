@@ -15,12 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-
 import { type BuildTask } from "./taskTypes";
 
 export interface ChunkForge {
     addTask(task: BuildTask): void;
-    update(assets: RenderingAssets): void;
+    update(): void;
     reset(): void;
 }

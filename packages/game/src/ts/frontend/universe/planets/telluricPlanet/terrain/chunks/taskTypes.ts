@@ -17,11 +17,16 @@
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-import { type TerrainSettings } from "@cosmos-journeyer/universe-model";
+import {
+    type DeepReadonly,
+    type TelluricPlanetModel,
+    type TelluricSatelliteModel,
+} from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
 import { type Direction } from "./direction";
 import { type PlanetChunk } from "./planetChunk";
+import { ScatteredInstancesSchema, type ScatteredInstances } from "./scatteringSystem";
 
 export type TaskType = "build" | "apply";
 
@@ -31,10 +36,7 @@ export type Task = {
 };
 
 export type BuildTask = Task & {
-    planetName: string;
-    planetSeed: number;
-    planetDiameter: number;
-    terrainSettings: TerrainSettings;
+    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     depth: number;
     direction: Direction;
     position: Vector3;
@@ -42,8 +44,7 @@ export type BuildTask = Task & {
 
 export type ApplyTask = Task & {
     vertexData: VertexData;
-    instancesMatrixBuffer: Float32Array;
-    alignedInstancesMatrixBuffer: Float32Array;
+    scatteredInstances: ScatteredInstances;
     averageHeight: number;
 };
 
@@ -51,8 +52,7 @@ export const ReturnedChunkDataSchema = z.object({
     positions: z.instanceof(Float32Array),
     normals: z.instanceof(Float32Array),
     indices: z.instanceof(Uint16Array),
-    instancesMatrixBuffer: z.instanceof(Float32Array),
-    alignedInstancesMatrixBuffer: z.instanceof(Float32Array),
+    scatteredInstances: ScatteredInstancesSchema,
     averageHeight: z.number(),
 });
 

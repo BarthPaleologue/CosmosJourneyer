@@ -73,6 +73,8 @@ type WorldType =
     /** World without atmosphere */
     | "airless";
 
+export const BeachElevationSpan = 100;
+
 export class TelluricPlanetMaterial {
     private readonly material: NodeMaterial;
 
@@ -318,7 +320,7 @@ export class TelluricPlanetMaterial {
 
         let flatSamples = mixTriPlanarSamples(sandSamples, grassSamples, wetnessFactor);
         if (oceanDepth !== undefined) {
-            const beachElevationSpan = 100;
+            const beachElevationSpan = BeachElevationSpan;
             const beachElevationStart = f(-beachElevationSpan / 2);
             const beachElevationEnd = f(beachElevationSpan / 2);
             const beachWeight = mul(

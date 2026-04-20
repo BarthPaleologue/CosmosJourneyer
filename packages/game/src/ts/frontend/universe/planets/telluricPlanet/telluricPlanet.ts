@@ -44,6 +44,7 @@ import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import { ChunkTree } from "./terrain/chunks/chunkTree";
+import type { ScatteringSystem } from "./terrain/chunks/scatteringSystem";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
@@ -179,8 +180,8 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
      * @param observerPosition
      * @param chunkForge
      */
-    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge): void {
-        for (const side of this.sides) side.update(observerPosition, chunkForge);
+    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
+        for (const side of this.sides) side.update(observerPosition, chunkForge, scatteringSystem);
     }
 
     public getRadius(): number {

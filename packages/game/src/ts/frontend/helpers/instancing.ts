@@ -15,7 +15,35 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+
+export function createSquareMatrixBuffer(position: Vector3, size: number, resolution: number, rng: () => number) {
+    const matrixBuffer = new Float32Array(resolution * resolution * 16);
+    const cellSize = size / resolution;
+    let index = 0;
+    for (let x = 0; x < resolution; x++) {
+        for (let z = 0; z < resolution; z++) {
+            const randomCellPositionX = rng() * cellSize;
+            const randomCellPositionZ = rng() * cellSize;
+            const positionX = position.x + x * cellSize - size / 2 + randomCellPositionX;
+            const positionZ = position.z + z * cellSize - size / 2 + randomCellPositionZ;
+            const scaling = 0.7 + rng() * 0.6;
+
+            const matrix = Matrix.Compose(
+                Vector3.One().scaleInPlace(scaling),
+                Quaternion.RotationAxis(Axis.Y, rng() * 2 * Math.PI),
+                new Vector3(positionX, 0, positionZ),
+            );
+            matrix.copyToArray(matrixBuffer, 16 * index);
+
+            index += 1;
+        }
+    }
+
+    return matrixBuffer;
+}
 
 export function createCircleInstanceBuffer(radius: number, nbPoints: number) {
     const buffer = new Float32Array(16 * nbPoints);
@@ -33,4 +61,85 @@ export function createCircleInstanceBuffer(radius: number, nbPoints: number) {
     }
 
     return buffer;
+}
+
+export type ScatteringLayer = (
+    position: Vector3,
+    normal: Vector3,
+) => {
+    density: number;
+    rotationOverride?: Quaternion;
+    scalingOverride?: Vector3;
+};
+
+type ScatteringLayerBuffers<TLayers extends ReadonlyArray<ScatteringLayer>> = {
+    readonly [Index in keyof TLayers]: Float32Array<ArrayBuffer>;
+};
+
+export const MaxScatterDensity = 16;
+
+/**
+ * @param pointBuffer Buffer of points (stride is 6: 3 for position, 3 for surface normal)
+ * @param layers The scattering layers to generate the matrices for. Each layer has a density function that determines the probability of scattering an object at a given position with a given normal. The density function should return a value between 0 and MaxScatterDensity, where 0 means no chance of scattering and MaxScatterDensity means 100% chance of scattering.
+ * @returns One Float32Array for each layer, containing the transformation matrices of the scattered objects (16 floats per matrix)
+ */
+export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer>>(
+    pointBuffer: Float32Array,
+    layers: TLayers,
+): ScatteringLayerBuffers<TLayers> {
+    const pointStride = 6;
+
+    const instanceBuffers = layers.map(() => {
+        return {
+            buffer: new Float32Array((pointBuffer.length * 16) / pointStride),
+            count: 0,
+        };
+    });
+
+    const instanceMatrix = Matrix.Identity();
+    const instanceRotation = Quaternion.Identity();
+
+    const position = new Vector3();
+    const normal = new Vector3();
+
+    for (let i = 0; i < pointBuffer.length; i += pointStride) {
+        Vector3.FromArrayToRef(pointBuffer, i, position);
+        Vector3.FromArrayToRef(pointBuffer, i + 3, normal);
+
+        for (let j = 0; j < layers.length; j++) {
+            const layer = layers[j];
+            const instanceBuffer = instanceBuffers[j];
+            if (layer === undefined || instanceBuffer === undefined) {
+                continue;
+            }
+
+            const { density, rotationOverride, scalingOverride } = layer(position, normal);
+
+            const probability = density / MaxScatterDensity;
+            if (Math.random() > probability) {
+                continue;
+            }
+
+            Matrix.ComposeToRef(
+                scalingOverride ?? Vector3.OneReadOnly,
+                rotationOverride ?? Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, normal, instanceRotation),
+                position,
+                instanceMatrix,
+            );
+
+            instanceBuffer.buffer.set(instanceMatrix.m, instanceBuffer.count * 16);
+            instanceBuffer.count++;
+        }
+    }
+
+    return instanceBuffers.map((b) => b.buffer.subarray(0, b.count * 16)) as ScatteringLayerBuffers<TLayers>;
+}
+
+export function createInstancePatch(baseMesh: Mesh, matrixBuffer: Float32Array): Mesh {
+    const mesh = baseMesh.clone();
+    mesh.makeGeometryUnique();
+    mesh.isVisible = true;
+    mesh.alwaysSelectAsActiveMesh = true;
+    mesh.thinInstanceSetBuffer("matrix", matrixBuffer, 16, false);
+    return mesh;
 }

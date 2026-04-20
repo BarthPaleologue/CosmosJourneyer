@@ -15,11 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
+
+import { smoothstep } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
+import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "../../../../../helpers/instancing";
+import { BeachElevationSpan } from "../../telluricPlanetMaterial";
 import { getFaceIndexFromDirection } from "../chunks/direction";
+import type { ScatteredInstances } from "../chunks/scatteringSystem";
 import { type ReturnedChunkData } from "../chunks/taskTypes";
 import { type TransferBuildData } from "../chunks/workerDataTypes";
 
@@ -29,10 +36,14 @@ function handle_build(data: TransferBuildData): void {
     const nbVerticesPerSide = data.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
 
-    const size = data.planetDiameter / 2 ** data.depth;
+    const planetModel = data.planetModel;
+    const planetDiameter = planetModel.radius * 2;
+
+    const size = planetDiameter / 2 ** data.depth;
     const space_between_vertices = size / nbSubdivisions;
-    //console.log(data.depth, space_between_vertices);
-    const scatter_per_square_meter = space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? 16 : 0;
+    const scatter_per_square_meter =
+        space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? MaxScatterDensity : 0;
+
     const shouldGenerateSkirt = space_between_vertices < SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD;
     const skirtVertexCount = shouldGenerateSkirt ? 4 * nbVerticesPerSide : 0;
     const skirtIndexCount = shouldGenerateSkirt ? 4 * nbSubdivisions * 2 * 3 : 0;
@@ -44,28 +55,27 @@ function handle_build(data: TransferBuildData): void {
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);
 
-    let instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
-    let aligned_instances_matrix_buffer = new Float32Array(16 * max_nb_instances);
+    let scattered_point_buffer = new Float32Array(6 * max_nb_instances);
 
     const terrain_settings = new TerrainSettings();
-    terrain_settings.continent_base_height = data.terrainSettings.continent_base_height;
-    terrain_settings.continents_fragmentation = data.terrainSettings.continents_fragmentation;
-    terrain_settings.continents_frequency = data.terrainSettings.continents_frequency;
+    terrain_settings.continent_base_height = planetModel.terrainSettings.continent_base_height;
+    terrain_settings.continents_fragmentation = planetModel.terrainSettings.continents_fragmentation;
+    terrain_settings.continents_frequency = planetModel.terrainSettings.continents_frequency;
 
-    terrain_settings.max_mountain_height = data.terrainSettings.max_mountain_height;
-    terrain_settings.mountains_frequency = data.terrainSettings.mountains_frequency;
+    terrain_settings.max_mountain_height = planetModel.terrainSettings.max_mountain_height;
+    terrain_settings.mountains_frequency = planetModel.terrainSettings.mountains_frequency;
 
-    terrain_settings.bumps_frequency = data.terrainSettings.bumps_frequency;
-    terrain_settings.max_bump_height = data.terrainSettings.max_bump_height;
+    terrain_settings.bumps_frequency = planetModel.terrainSettings.bumps_frequency;
+    terrain_settings.max_bump_height = planetModel.terrainSettings.max_bump_height;
 
     const buildData: BuildData = new BuildData(
-        data.planetDiameter,
+        planetDiameter,
         data.depth,
         getFaceIndexFromDirection(data.direction),
         data.position[0],
         data.position[1],
         data.position[2],
-        data.seed,
+        planetModel.seed,
         data.nbVerticesPerSide,
         terrain_settings,
     );
@@ -75,49 +85,131 @@ function handle_build(data: TransferBuildData): void {
         verticesPositions,
         indices,
         normals,
-        instances_matrix_buffer,
-        aligned_instances_matrix_buffer,
+        scattered_point_buffer,
         scatter_per_square_meter,
     );
 
-    instances_matrix_buffer = instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
-    aligned_instances_matrix_buffer = aligned_instances_matrix_buffer.subarray(0, result.nb_instances_created * 16);
+    const transfer: Array<Transferable> = [verticesPositions.buffer, indices.buffer, normals.buffer];
+
+    scattered_point_buffer = scattered_point_buffer.subarray(0, result.nb_instances_created * 6);
+
+    const scatteredInstances: ScatteredInstances = {};
+    if (scattered_point_buffer.length !== 0) {
+        const rockLayer: ScatteringLayer = () => ({
+            density: 1 / 15 ** 2,
+            scalingOverride: Vector3.One().scaleInPlace(0.2 + Math.random() * 4),
+            rotationOverride: Quaternion.FromEulerAngles(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+            ),
+        });
+
+        if (planetModel.atmosphere !== null && planetModel.ocean !== null) {
+            const gravityUp = new Vector3(data.position[0], data.position[1], data.position[2]).normalize();
+            const chunkPosition = gravityUp.scale(planetModel.radius);
+            const grassLayer: ScatteringLayer = (position, normal) => {
+                const flatness = normal.dot(gravityUp);
+                const flatnessMask = smoothstep(0.9, 0.95, flatness);
+
+                const positionPlanetSpace = position.add(chunkPosition);
+                const heightAboveSeaLevel =
+                    positionPlanetSpace.length() - (planetModel.radius + (planetModel.ocean?.depth ?? 0));
+                const heightMask = smoothstep(
+                    (0.7 * BeachElevationSpan) / 2,
+                    (0.85 * BeachElevationSpan) / 2,
+                    heightAboveSeaLevel,
+                );
+
+                return {
+                    density: MaxScatterDensity * flatnessMask * heightMask,
+                    rotationOverride: Quaternion.FromUnitVectorsToRef(
+                        Vector3.UpReadOnly,
+                        normal,
+                        Quaternion.Identity(),
+                    ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
+                };
+            };
+
+            const treeLayer: ScatteringLayer = (position, normal) => {
+                const flatness = normal.dot(gravityUp);
+                const flatnessMask = smoothstep(0.9, 0.95, flatness);
+
+                const positionPlanetSpace = position.add(chunkPosition);
+                const heightAboveSeaLevel =
+                    positionPlanetSpace.length() - (planetModel.radius + (planetModel.ocean?.depth ?? 0));
+                const heightMask = smoothstep(
+                    (0.9 * BeachElevationSpan) / 2,
+                    (0.95 * BeachElevationSpan) / 2,
+                    heightAboveSeaLevel,
+                );
+
+                return {
+                    density: (1 / 17 ** 2) * flatnessMask * heightMask,
+                    rotationOverride: Quaternion.FromUnitVectorsToRef(
+                        Vector3.UpReadOnly,
+                        gravityUp,
+                        Quaternion.Identity(),
+                    ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
+                    scalingOverride: Vector3.One().scaleInPlace(0.5 + Math.random() * 2),
+                };
+            };
+
+            const butterflyLayer: ScatteringLayer = (position, normal) => {
+                const flatness = normal.dot(gravityUp);
+                const flatnessMask = smoothstep(0.9, 0.95, flatness);
+
+                const positionPlanetSpace = position.add(chunkPosition);
+                const heightAboveSeaLevel =
+                    positionPlanetSpace.length() - (planetModel.radius + (planetModel.ocean?.depth ?? 0));
+                const heightMask = smoothstep(
+                    (1.05 * BeachElevationSpan) / 2,
+                    (1.1 * BeachElevationSpan) / 2,
+                    heightAboveSeaLevel,
+                );
+
+                return {
+                    density: (1 / 7 ** 2) * flatnessMask * heightMask,
+                    rotationOverride: Quaternion.FromUnitVectorsToRef(
+                        Vector3.UpReadOnly,
+                        gravityUp,
+                        Quaternion.Identity(),
+                    ),
+                };
+            };
+
+            const [rockBuffer, grassBuffer, treeBuffer, butterflyBuffer] = filterPoints(scattered_point_buffer, [
+                rockLayer,
+                grassLayer,
+                treeLayer,
+                butterflyLayer,
+            ]);
+            scatteredInstances.rock = rockBuffer;
+            scatteredInstances.grass = grassBuffer;
+            scatteredInstances.tree = treeBuffer;
+            scatteredInstances.butterfly = butterflyBuffer;
+            transfer.push(rockBuffer.buffer, grassBuffer.buffer, treeBuffer.buffer, butterflyBuffer.buffer);
+        } else {
+            const [rockBuffer] = filterPoints(scattered_point_buffer, [rockLayer]);
+            scatteredInstances.rock = rockBuffer;
+            transfer.push(rockBuffer.buffer);
+        }
+    }
 
     self.postMessage(
         {
             positions: verticesPositions,
             indices: indices,
             normals: normals,
-            instancesMatrixBuffer: instances_matrix_buffer,
-            alignedInstancesMatrixBuffer: aligned_instances_matrix_buffer,
+            scatteredInstances,
             averageHeight: result.average_height,
         } satisfies ReturnedChunkData,
-        {
-            transfer: [
-                verticesPositions.buffer,
-                indices.buffer,
-                normals.buffer,
-                instances_matrix_buffer.buffer,
-                aligned_instances_matrix_buffer.buffer,
-            ],
-        },
+        { transfer },
     );
 
     buildData.free();
 }
 
-self.onmessage = (e) => {
-    //const clock = Date.now();
-    handle_build(e.data as TransferBuildData);
-    //console.log("The chunk took: " + (Date.now() - clock));
-
-    // benchmark fait le 5/10/2021 (normale non analytique) : ~2s/chunk
-    // benchmark fait le 12/11/2021 (normale non analyique) : ~0.5s/chunk
-    // benchmark fait le 20/11/2021 20h30 (normale analytique v2) : ~0.8s/chunk
-    // benchmark fait le 20/11/2021 21h20 (normale analytique v2.1) : ~0.03s/chunk (30ms/chunk)
-    // benchmark fait le 10/12/2021 (normale analytique v2.5) : ~ 50ms/chunk
-    // benchmark fait le 19/02/2022 (normale analytique v2.6) : ~ 40ms/chunk
-    // benchmark fait le 28/07/2022 (Terrain V3.1) : ~70ms/chunk
-    // benchmark fait le 06/12/2022 (Terrain WASM v1) : ~140ms/chunk wtf
-    // benchmark fait le 06/12/2022 (Terrain WASM v1.5) : ~60ms/chunk
+self.onmessage = (e: MessageEvent<TransferBuildData>) => {
+    handle_build(e.data);
 };

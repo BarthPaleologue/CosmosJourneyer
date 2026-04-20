@@ -37,13 +37,13 @@ thread_local! {
 /// * `positions` - A mutable reference to the buffer that will be filled with vertex positions
 /// * `indices` - A mutable reference to the buffer that will be filled with the face indices
 /// * `normals` - A mutable reference to the buffer that will be filled with the vertex normals
+/// * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
 pub fn build_chunk_vertex_data(
     data: &BuildData,
     positions: &mut [f32],
     indices: &mut [u16],
     normals: &mut [f32],
-    instances_matrix_buffer: &mut [f32],
-    aligned_instances_matrix_buffer: &mut [f32],
+    scattered_points_buffer: &mut [f32],
     scatter_per_square_meter: f32,
 ) -> ReturnData {
     let planet_diameter = data.planet_diameter;
@@ -218,10 +218,8 @@ pub fn build_chunk_vertex_data(
                     scatter_per_square_meter,
                     &mut excess_instance_number,
                     &mut instance_index,
-                    instances_matrix_buffer,
-                    aligned_instances_matrix_buffer,
+                    scattered_points_buffer,
                     positions,
-                    &unit_sphere_coords,
                     index - 1,
                     index,
                     index - nb_vertices_per_row - 1,
@@ -231,19 +229,17 @@ pub fn build_chunk_vertex_data(
                     scatter_per_square_meter,
                     &mut excess_instance_number,
                     &mut instance_index,
-                    instances_matrix_buffer,
-                    aligned_instances_matrix_buffer,
+                    scattered_points_buffer,
                     positions,
-                    &unit_sphere_coords,
                     index,
                     index - nb_vertices_per_row,
                     index - nb_vertices_per_row - 1,
                 );
-                if instance_index > aligned_instances_matrix_buffer.len() / 16 {
+                if instance_index > scattered_points_buffer.len() / 6 {
                     panic!(
                         "Too many instances: {} > {}",
                         instance_index,
-                        aligned_instances_matrix_buffer.len() / 16
+                        scattered_points_buffer.len() / 6
                     );
                 }
             }

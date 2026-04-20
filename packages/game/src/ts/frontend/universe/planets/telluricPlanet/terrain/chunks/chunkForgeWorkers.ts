@@ -17,8 +17,6 @@
 
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-
 import { type ChunkForge } from "./chunkForge";
 import { ReturnedChunkDataSchema, type ApplyTask, type BuildTask } from "./taskTypes";
 import { type TransferBuildData } from "./workerDataTypes";
@@ -65,22 +63,11 @@ export class ChunkForgeWorkers implements ChunkForge {
 
         const buildData: TransferBuildData = {
             taskType: "build",
-            planetName: task.planetName,
-            planetDiameter: task.planetDiameter,
+            planetModel: task.planetModel,
             nbVerticesPerSide: this.nbVerticesPerRow,
             depth: task.depth,
             direction: task.direction,
             position: [task.position.x, task.position.y, task.position.z],
-            terrainSettings: {
-                continents_frequency: task.terrainSettings.continents_frequency,
-                continents_fragmentation: task.terrainSettings.continents_fragmentation,
-                continent_base_height: task.terrainSettings.continent_base_height,
-                max_mountain_height: task.terrainSettings.max_mountain_height,
-                max_bump_height: task.terrainSettings.max_bump_height,
-                bumps_frequency: task.terrainSettings.bumps_frequency,
-                mountains_frequency: task.terrainSettings.mountains_frequency,
-            },
-            seed: task.planetSeed,
         };
 
         worker.postMessage(buildData);
@@ -99,8 +86,7 @@ export class ChunkForgeWorkers implements ChunkForge {
                     type: "apply",
                     vertexData: vertexData,
                     chunk: task.chunk,
-                    instancesMatrixBuffer: data.instancesMatrixBuffer,
-                    alignedInstancesMatrixBuffer: data.alignedInstancesMatrixBuffer,
+                    scatteredInstances: data.scatteredInstances,
                     averageHeight: data.averageHeight,
                 };
                 this.applyTaskQueue.push(applyTask);
@@ -117,26 +103,22 @@ export class ChunkForgeWorkers implements ChunkForge {
     /**
      * Apply generated vertexData to waiting chunks
      */
-    private executeNextApplyTask(assets: RenderingAssets) {
+    private executeNextApplyTask() {
         let task = this.applyTaskQueue.shift();
         while (task !== undefined && task.chunk.hasBeenDisposed()) {
             // if the chunk has been disposed, we skip it
             task = this.applyTaskQueue.shift();
         }
-        if (task)
-            task.chunk.init(
-                task.vertexData,
-                task.instancesMatrixBuffer,
-                task.alignedInstancesMatrixBuffer,
-                task.averageHeight,
-                assets,
-            );
+
+        if (task !== undefined) {
+            task.chunk.init(task.vertexData, task.scatteredInstances, task.averageHeight);
+        }
     }
 
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    public update(assets: RenderingAssets) {
+    public update() {
         this.workerPool.availableWorkers.push(...this.workerPool.finishedWorkers);
         this.workerPool.finishedWorkers = [];
 
@@ -149,7 +131,7 @@ export class ChunkForgeWorkers implements ChunkForge {
             this.executeNextTask(worker);
         }
 
-        this.executeNextApplyTask(assets);
+        this.executeNextApplyTask();
     }
 
     public reset() {
