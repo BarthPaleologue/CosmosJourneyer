@@ -44,6 +44,7 @@ import { createLensFlareOcclusionScene } from "./lensFlareOcclusion";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
 import { createRingsScene } from "./rings";
+import { createRockScene } from "./rock";
 import { createRoverScene } from "./rover";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
 import { createJupiterScene } from "./sol/jupiter";
@@ -103,6 +104,7 @@ export class PlaygroundRegistry {
         ["saturn", createSaturnScene],
         ["sol", createSolScene],
         ["grass", createGrassScene],
+        ["rock", createRockScene],
         ["spaceDots", createSpaceDotsScene],
         ["saveLoadingPanelContent", createSaveLoadingPanelContentScene],
         ["sun", createSunScene],
