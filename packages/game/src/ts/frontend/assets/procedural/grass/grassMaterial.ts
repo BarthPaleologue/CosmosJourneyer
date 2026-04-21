@@ -134,13 +134,13 @@ export class GrassMaterial {
 
         const view = uniformView();
 
-        const baseColor = Color3.FromHexString("#0C4909");
-        const tipColor = Color3.FromHexString("#347215");
+        const baseColor = Color3.FromHexString("#1F220C");
+        const tipColor = Color3.FromHexString("#1C3F0C");
 
         const albedoRgb = sampleGradient(
             [
-                [0, baseColor],
-                [0.5, tipColor],
+                [0.1, baseColor],
+                [0.35, tipColor],
             ],
             height01,
         );
