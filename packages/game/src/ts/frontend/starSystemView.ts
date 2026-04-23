@@ -20,7 +20,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -539,10 +538,6 @@ export class StarSystemView implements View {
             const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
             console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
-
-        // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
-        const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.02;
 
         this.depthRendererManager = new DepthRendererManager(this.scene);
         this.postProcessManager = new PostProcessManager(assets.textures, this.depthRendererManager, this.scene);

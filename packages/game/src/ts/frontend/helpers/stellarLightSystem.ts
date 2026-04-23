@@ -19,6 +19,7 @@ import "@babylonjs/core/Lights/Shadows/shadowGeneratorSceneComponent";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { CascadedShadowGenerator } from "@babylonjs/core/Lights/Shadows/cascadedShadowGenerator";
 import type { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -35,8 +36,13 @@ export class StellarLightSystem {
 
     private readonly scene: Scene;
 
+    private readonly ambientLight: HemisphericLight;
+
     constructor(scene: Scene) {
         this.scene = scene;
+
+        this.ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
+        this.ambientLight.intensity = 0.02;
     }
 
     public registerStellarObject(transform: TransformNode, color: Color3) {
@@ -72,10 +78,14 @@ export class StellarLightSystem {
 
     public update(camera: Camera) {
         const cameraPosition = camera.globalPosition;
+        const overallDirection = Vector3.Zero();
         for (const { transform, light } of this.stellarObjects) {
             const newDirection = cameraPosition.subtract(transform.getAbsolutePosition()).normalize();
             light.direction.copyFrom(newDirection);
+            overallDirection.addInPlace(newDirection);
         }
+        overallDirection.normalize();
+        this.ambientLight.direction.copyFrom(overallDirection);
     }
 
     public getLights(): Array<DirectionalLight> {
@@ -88,5 +98,6 @@ export class StellarLightSystem {
             shadowGenerator.dispose();
         }
         this.stellarObjects.length = 0;
+        this.ambientLight.dispose();
     }
 }
