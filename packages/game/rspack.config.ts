@@ -43,7 +43,6 @@ export default defineConfig({
     mode: isProduction ? "production" : "development",
     entry: {
         main: "./src/ts/index.ts",
-        blackHole: "./src/ts/blackHoleDemo.ts",
         playground: "./src/ts/playground.ts",
     },
     output: {
@@ -99,16 +98,6 @@ export default defineConfig({
             inject: true,
             template: path.join(htmlPath, "index.html"),
             chunks: ["main"],
-            favicon: path.join(htmlPath, "../asset/favicon.png"),
-        }),
-        new rspack.HtmlRspackPlugin({
-            title: "Black Hole - Cosmos Journeyer",
-            meta: {
-                description: "Black hole simulation for Cosmos Journeyer with light bending and accretion disk.",
-            },
-            filename: "blackhole.html",
-            template: path.join(htmlPath, "index.html"),
-            chunks: ["blackHole"],
             favicon: path.join(htmlPath, "../asset/favicon.png"),
         }),
         new rspack.HtmlRspackPlugin({
