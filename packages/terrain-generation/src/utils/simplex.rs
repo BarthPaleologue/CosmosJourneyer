@@ -367,7 +367,7 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
     if t3 < 0.0 {
         t3 = 0.0;
     } else {
-        (gx3, gy3, gz3) = grad3(PERM[ii + 1 + PERM[jj + 1 + PERM[kk + 1]]] as usize);
+        (gx3, gy3, gz3) = grad3(PERM[ii + 1 + PERM[jj + 1 + PERM[kk + 1]]]);
         t23 = t3 * t3;
         t43 = t23 * t23;
         n3 = t43 * (gx3 * x3 + gy3 * y3 + gz3 * z3);
