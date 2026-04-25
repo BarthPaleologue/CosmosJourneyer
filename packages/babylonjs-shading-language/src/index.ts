@@ -63,6 +63,7 @@ import { NegateBlock } from "@babylonjs/core/Materials/Node/Blocks/negateBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { OneMinusBlock } from "@babylonjs/core/Materials/Node/Blocks/oneMinusBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
+import { SubSurfaceBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/subSurfaceBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
 import { SmoothStepBlock } from "@babylonjs/core/Materials/Node/Blocks/smoothStepBlock";
@@ -1346,14 +1347,38 @@ export function perturbNormal(
     return perturbedNormal;
 }
 
+export type SubSurfaceScatteringOptions = {
+    tintColor: SubSurfaceBlock["tintColor"];
+    translucencyIntensity: SubSurfaceBlock["translucencyIntensity"];
+    translucencyDiffusionDistance: SubSurfaceBlock["translucencyDiffusionDist"];
+    refraction: SubSurfaceBlock["refraction"];
+    dispersion: SubSurfaceBlock["dispersion"];
+};
+
+export function subSurfaceScatter(
+    thickness: NodeMaterialConnectionPoint,
+    options?: Partial<SubSurfaceScatteringOptions>,
+): NodeMaterialConnectionPoint {
+    const sssBlock = new SubSurfaceBlock("SubSurfaceScattering");
+    sssBlock.target = NodeMaterialBlockTargets.Fragment;
+    thickness.connectTo(sssBlock.thickness);
+    options?.tintColor?.connectTo(sssBlock.tintColor);
+    options?.translucencyIntensity?.connectTo(sssBlock.translucencyIntensity);
+    options?.translucencyDiffusionDistance?.connectTo(sssBlock.translucencyDiffusionDist);
+    options?.refraction?.connectTo(sssBlock.refraction);
+    options?.dispersion?.connectTo(sssBlock.dispersion);
+    return sssBlock.subsurface;
+}
+
 export type PBROptions = {
     useEnergyConservation: boolean;
     useRadianceOcclusion: boolean;
     useHorizonOcclusion: boolean;
-    albedoRgb: NodeMaterialConnectionPoint;
-    ambientOcclusion: NodeMaterialConnectionPoint;
-    opacity: NodeMaterialConnectionPoint;
-    perturbedNormal: NodeMaterialConnectionPoint;
+    albedoRgb: PBRMetallicRoughnessBlock["baseColor"];
+    ambientOcclusion: PBRMetallicRoughnessBlock["ambientOcc"];
+    opacity: PBRMetallicRoughnessBlock["opacity"];
+    perturbedNormal: PBRMetallicRoughnessBlock["perturbedNormal"];
+    subSurfaceScattering: PBRMetallicRoughnessBlock["subsurface"];
     lightFalloff: typeof Light.FALLOFF_PHYSICAL | typeof Light.FALLOFF_GLTF | typeof Light.FALLOFF_STANDARD;
 };
 
@@ -1400,6 +1425,7 @@ export function pbr(
     options?.ambientOcclusion?.connectTo(PBRMetallicRoughness.ambientOcc);
     options?.opacity?.connectTo(PBRMetallicRoughness.opacity);
     options?.perturbedNormal?.connectTo(PBRMetallicRoughness.perturbedNormal);
+    options?.subSurfaceScattering?.connectTo(PBRMetallicRoughness.subsurface);
 
     return PBRMetallicRoughness;
 }
