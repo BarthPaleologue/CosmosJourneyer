@@ -40,6 +40,7 @@ import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
 import { DeleteSemaphore } from "./deleteSemaphore";
 import { type Direction } from "./direction";
 import { PlanetChunk } from "./planetChunk";
+import type { ScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
 
 /**
@@ -145,14 +146,14 @@ export class ChunkTree implements Cullable {
      * @param observerPosition The observer position
      * @param chunkForge
      */
-    public update(observerPosition: Vector3, chunkForge: ChunkForge): void {
+    public update(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
         this.deleteSemaphores.forEach((semaphore) => {
             semaphore.update();
         });
         // remove delete semaphores that have been resolved
         this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
 
-        this.tree = this.updateLODRecursively(observerPosition, chunkForge);
+        this.tree = this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem);
 
         this.executeOnEveryChunk((chunk) => {
             chunk.updatePosition();
@@ -170,6 +171,7 @@ export class ChunkTree implements Cullable {
     private updateLODRecursively(
         observerPositionW: Vector3,
         chunkForge: ChunkForge,
+        scatteringSystem: ScatteringSystem,
         tree: QuadTree = this.tree,
         walked: number[] = [],
     ): QuadTree {
@@ -215,10 +217,10 @@ export class ChunkTree implements Cullable {
             if (!tree.mesh.isEnabled()) return tree;
 
             const newTree = [
-                this.createChunk(walked.concat([0]), chunkForge),
-                this.createChunk(walked.concat([1]), chunkForge),
-                this.createChunk(walked.concat([2]), chunkForge),
-                this.createChunk(walked.concat([3]), chunkForge),
+                this.createChunk(walked.concat([0]), chunkForge, scatteringSystem),
+                this.createChunk(walked.concat([1]), chunkForge, scatteringSystem),
+                this.createChunk(walked.concat([2]), chunkForge, scatteringSystem),
+                this.createChunk(walked.concat([3]), chunkForge, scatteringSystem),
             ];
             this.requestDeletion(tree, newTree);
             return newTree;
@@ -226,16 +228,16 @@ export class ChunkTree implements Cullable {
 
         if (tree instanceof Array) {
             if (targetLOD <= walked.length) {
-                const newChunk = this.createChunk(walked, chunkForge);
+                const newChunk = this.createChunk(walked, chunkForge, scatteringSystem);
                 this.requestDeletion(tree, [newChunk]);
                 return newChunk;
             }
 
             return [
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, tree[3], walked.concat([3])),
+                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[0], walked.concat([0])),
+                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[1], walked.concat([1])),
+                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[2], walked.concat([2])),
+                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[3], walked.concat([3])),
             ];
         }
 
@@ -248,7 +250,7 @@ export class ChunkTree implements Cullable {
      * @param chunkForge
      * @returns The new Chunk
      */
-    private createChunk(path: number[], chunkForge: ChunkForge): PlanetChunk {
+    private createChunk(path: number[], chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): PlanetChunk {
         const chunk = new PlanetChunk(
             path,
             this.direction,
@@ -256,15 +258,13 @@ export class ChunkTree implements Cullable {
             this.material,
             this.planetModel,
             this.rootChunkLength,
+            scatteringSystem,
             this.scene,
         );
 
         const buildTask: BuildTask = {
             type: "build",
-            planetName: this.planetName,
-            planetSeed: this.planetSeed,
-            planetDiameter: this.rootChunkLength,
-            terrainSettings: this.terrainSettings,
+            planetModel: this.planetModel,
             position: chunk.cubePosition,
             depth: path.length,
             direction: this.direction,

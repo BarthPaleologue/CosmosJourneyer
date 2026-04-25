@@ -28,7 +28,6 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
@@ -38,12 +37,9 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask, Settings } from "@/settings";
 
-import { InstancePatch } from "../instancePatch/instancePatch";
-import { type IPatch } from "../instancePatch/iPatch";
-import { randomDownSample } from "../instancePatch/matrixBuffer";
-import { ThinInstancePatch } from "../instancePatch/thinInstancePatch";
 import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
 import { getQuaternionFromDirection, type Direction } from "./direction";
+import type { ScatteredInstances, ScatteringSystem } from "./scatteringSystem";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -51,23 +47,19 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
 
-    private readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
-
     private readonly chunkSideLength: number;
 
     private loaded = false;
 
     private readonly parent: TransformNode;
 
-    readonly instancePatches: IPatch[] = [];
-
     private aggregate: PhysicsAggregate | null = null;
 
     private averageHeight = 0;
 
-    readonly helpers: Mesh[] = [];
-
     private disposed = false;
+
+    private readonly scatteringSystem: ScatteringSystem;
 
     constructor(
         path: number[],
@@ -76,6 +68,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         rootLength: number,
+        scatteringSystem: ScatteringSystem,
         scene: Scene,
     ) {
         const id = `D${direction}P${path.join("")}`;
@@ -83,8 +76,6 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.depth = path.length;
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
-
-        this.planetModel = planetModel;
 
         this.mesh = new Mesh(`${planetModel.name}_Chunk${id}`, scene);
         this.mesh.setEnabled(false);
@@ -121,6 +112,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             this.planetLocalPosition.z,
             1,
         );
+
+        this.scatteringSystem = scatteringSystem;
     }
 
     public getTransform(): TransformNode {
@@ -128,35 +121,18 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     }
 
     /**
-     * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given instancesMatrixBuffer and alignedInstancesMatrixBuffer
+     * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given scattered point buffer.
      * @param vertexData the vertex data to apply to the chunk
-     * @param instancesMatrixBuffer the matrix buffer containing the instances matrix
-     * @param alignedInstancesMatrixBuffer the matrix buffer containing the vertically aligned instances matrix
+     * @param scatteredInstances Matrix buffers for scattered assets on the chunk
      * @param averageHeight
      */
-    public init(
-        vertexData: VertexData,
-        instancesMatrixBuffer: Float32Array,
-        alignedInstancesMatrixBuffer: Float32Array,
-        averageHeight: number,
-        assets: RenderingAssets,
-    ) {
+    public init(vertexData: VertexData, scatteredInstances: ScatteredInstances, averageHeight: number) {
         if (this.hasBeenDisposed()) {
-            throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
+            console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
+            return;
         }
 
         vertexData.applyToMesh(this.mesh, false);
-        // The following is a code snippet to use the approximate normals of the mesh instead of
-        // the analytic normals. This is useful for debugging purposes
-        /*if(!analyticNormal) {
-    this.mesh.createNormals(true);
-    const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
-    if (normals === null) throw new Error("Mesh has no normals");
-    for(let i = 0; i < normals.length; i++) {
-        normals[i] = -normals[i];
-    }
-    this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
-}*/
         this.mesh.freezeNormals();
 
         if (this.chunkSideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
@@ -176,39 +152,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.loaded = true;
 
         this.averageHeight = averageHeight;
+        this.mesh.computeWorldMatrix(true);
 
-        if (instancesMatrixBuffer.length === 0) return;
-
-        const rockPatch = new InstancePatch(this.parent, randomDownSample(alignedInstancesMatrixBuffer, 3200));
-        rockPatch.createInstances([{ mesh: assets.objects.rock, distance: 0 }]);
-        this.instancePatches.push(rockPatch);
-
-        if (
-            this.planetModel.atmosphere !== null &&
-            this.planetModel.ocean !== null &&
-            this.getAverageHeight() > this.planetModel.ocean.depth + 50
-        ) {
-            const treePatch = new InstancePatch(this.parent, randomDownSample(instancesMatrixBuffer, 4800));
-            treePatch.createInstances([{ mesh: assets.objects.tree, distance: 0 }]);
-            this.instancePatches.push(treePatch);
-
-            const butterflyPatch = new ThinInstancePatch(randomDownSample(instancesMatrixBuffer, 800));
-            butterflyPatch.createInstances([{ mesh: assets.objects.butterfly, distance: 0 }]);
-            for (const butterflyMesh of butterflyPatch.getLodMeshes()) {
-                butterflyMesh.parent = this.parent;
-            }
-            this.instancePatches.push(butterflyPatch);
-
-            const grassPatch = new ThinInstancePatch(alignedInstancesMatrixBuffer);
-            grassPatch.createInstances([
-                { mesh: assets.objects.grassBlades[0], distance: 0 },
-                { mesh: assets.objects.grassBlades[1], distance: 50 },
-            ]);
-            for (const grassMesh of grassPatch.getLodMeshes()) {
-                grassMesh.parent = this.parent;
-            }
-            this.instancePatches.push(grassPatch);
-        }
+        this.scatteringSystem.scatterInChunk(this.mesh, scatteredInstances);
     }
 
     /**
@@ -243,25 +189,16 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     }
 
     public dispose() {
+        this.scatteringSystem.clearChunk(this.mesh.name);
         this.aggregate?.dispose();
-
-        this.helpers.forEach((helper) => {
-            helper.dispose();
-        });
-        this.helpers.length = 0;
-
-        this.instancePatches.forEach((patch) => {
-            patch.dispose();
-        });
-        this.instancePatches.length = 0;
-
         this.mesh.dispose();
-
         this.disposed = true;
     }
 
     computeCulling(camera: Camera) {
-        if (!this.isLoaded()) return;
+        if (!this.isLoaded()) {
+            return;
+        }
 
         // chunks on the other side of the planet are culled
         // as chunks have dimensions, we use the bounding sphere to do conservative culling
@@ -272,32 +209,13 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         const conservativeSphereNormal = closestPointToCamera
             .subtract(this.parent.getAbsolutePosition())
             .normalizeToNew();
-        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalizeToNew();
+
+        const observerToCenter = camera.globalPosition.subtract(this.parent.getAbsolutePosition()).normalize();
 
         const isEnabled =
             Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
             isSizeOnScreenEnough(this, camera, 0.002 / 5);
 
         this.mesh.setEnabled(isEnabled);
-
-        this.instancePatches.forEach((patch) => {
-            let minDistance = Number.MAX_VALUE;
-            const distanceVector = camera.globalPosition.subtract(this.getTransform().getAbsolutePosition());
-
-            // instance patches are not rendered when the chunk is too far
-            const sphereNormal = this.getTransform()
-                .getAbsolutePosition()
-                .subtract(this.parent.getAbsolutePosition())
-                .normalizeToNew();
-
-            const normalComponent = sphereNormal.scale(distanceVector.dot(sphereNormal));
-            const tangentialDistance = distanceVector.subtract(normalComponent).length();
-
-            const isVisible = tangentialDistance < 200;
-            minDistance = Math.min(minDistance, tangentialDistance);
-
-            patch.setEnabled(isVisible);
-            patch.handleLod(minDistance);
-        });
     }
 }

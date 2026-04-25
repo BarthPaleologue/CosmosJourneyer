@@ -56,6 +56,7 @@ import { GravitySystem } from "./gravitySystem";
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { type ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
+import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
 import { StarFieldBox } from "./starFieldBox";
 import { type StarSystemLoader } from "./starSystemLoader";
 
@@ -103,6 +104,8 @@ export class StarSystemController {
     readonly gravitySystem: GravitySystem;
     private readonly floatingOriginSystem: FloatingOriginSystem;
 
+    private readonly scatteringSystem: ScatteringSystem;
+
     /**
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
@@ -135,6 +138,7 @@ export class StarSystemController {
 
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
+        this.scatteringSystem = new ScatteringSystem(this.assets.objects);
 
         this.getOrbitalObjects().forEach((object) => {
             this.objectToParents.set(
@@ -438,7 +442,7 @@ export class StarSystemController {
         for (const object of this.getPlanetaryMassObjects()) {
             object.computeCulling(camera);
             if (object.type === "telluricPlanet" || object.type === "telluricSatellite") {
-                object.updateLOD(cameraPosition, chunkForge);
+                object.updateLOD(cameraPosition, chunkForge, this.scatteringSystem);
             }
         }
 
@@ -517,6 +521,7 @@ export class StarSystemController {
      * Disposes all the bodies in the system
      */
     public dispose() {
+        this.scatteringSystem.dispose();
         this.objectToParents.clear();
 
         const pools = this.assets.textures.pools;

@@ -79,8 +79,9 @@ export class TerrainSettings {
  * * `positions` - A mutable reference to the buffer that will be filled with vertex positions
  * * `indices` - A mutable reference to the buffer that will be filled with the face indices
  * * `normals` - A mutable reference to the buffer that will be filled with the vertex normals
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
  */
-export function build_chunk_vertex_data(data: BuildData, positions: Float32Array, indices: Uint16Array, normals: Float32Array, instances_matrix_buffer: Float32Array, aligned_instances_matrix_buffer: Float32Array, scatter_per_square_meter: number): ReturnData;
+export function build_chunk_vertex_data(data: BuildData, positions: Float32Array, indices: Uint16Array, normals: Float32Array, scattered_points_buffer: Float32Array, scatter_per_square_meter: number): ReturnData;
 
 export function clamp(x: number, min: number, max: number): number;
 

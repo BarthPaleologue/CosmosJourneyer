@@ -1,6 +1,15 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const __wbg_get_returndata_average_height: (a: number) => number;
+export const __wbg_get_returndata_nb_instances_created: (a: number) => number;
+export const __wbg_returndata_free: (a: number, b: number) => void;
+export const __wbg_set_returndata_average_height: (a: number, b: number) => void;
+export const __wbg_set_returndata_nb_instances_created: (a: number, b: number) => void;
+export const clamp: (a: number, b: number, c: number) => number;
+export const gcd: (a: number, b: number) => number;
+export const s_max: (a: number, b: number, c: number) => number;
+export const s_min: (a: number, b: number, c: number) => number;
 export const __wbg_builddata_free: (a: number, b: number) => void;
 export const __wbg_get_builddata_chunk_cube_position_x: (a: number) => number;
 export const __wbg_get_builddata_chunk_cube_position_y: (a: number) => number;
@@ -37,16 +46,7 @@ export const __wbg_set_terrainsettings_max_mountain_height: (a: number, b: numbe
 export const __wbg_set_terrainsettings_mountains_frequency: (a: number, b: number) => void;
 export const __wbg_terrainsettings_free: (a: number, b: number) => void;
 export const terrainsettings_new: () => number;
-export const build_chunk_vertex_data: (a: number, b: number, c: number, d: any, e: number, f: number, g: any, h: number, i: number, j: any, k: number, l: number, m: any, n: number, o: number, p: any, q: number) => number;
-export const __wbg_get_returndata_average_height: (a: number) => number;
-export const __wbg_get_returndata_nb_instances_created: (a: number) => number;
-export const __wbg_returndata_free: (a: number, b: number) => void;
-export const __wbg_set_returndata_average_height: (a: number, b: number) => void;
-export const __wbg_set_returndata_nb_instances_created: (a: number, b: number) => void;
-export const clamp: (a: number, b: number, c: number) => number;
-export const gcd: (a: number, b: number) => number;
-export const s_max: (a: number, b: number, c: number) => number;
-export const s_min: (a: number, b: number, c: number) => number;
+export const build_chunk_vertex_data: (a: number, b: number, c: number, d: any, e: number, f: number, g: any, h: number, i: number, j: any, k: number, l: number, m: any, n: number) => number;
 export const __wbindgen_externrefs: WebAssembly.Table;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_start: () => void;

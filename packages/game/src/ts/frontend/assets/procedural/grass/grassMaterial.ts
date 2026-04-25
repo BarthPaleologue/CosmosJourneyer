@@ -111,7 +111,7 @@ export class GrassMaterial {
         const curvedPosition = rotateAround(position, leanAxis, curveAmount);
 
         const scalingTextureValue = textureSample(noiseTexture, mul(f(0.015), instancePositionXZ)).r;
-        const scalingFactor = remap(scalingTextureValue, [0, 1], [0.1, 0.7]);
+        const scalingFactor = remap(scalingTextureValue, [0, 1], [0.4, 1.0]);
 
         const cameraPosition = uniformCameraPosition();
 
@@ -134,13 +134,13 @@ export class GrassMaterial {
 
         const view = uniformView();
 
-        const baseColor = Color3.FromHexString("#0C4909");
-        const tipColor = Color3.FromHexString("#347215");
+        const baseColor = Color3.FromHexString("#1F220C");
+        const tipColor = Color3.FromHexString("#1C3F0C");
 
         const albedoRgb = sampleGradient(
             [
-                [0, baseColor],
-                [0.5, tipColor],
+                [0.1, baseColor],
+                [0.35, tipColor],
             ],
             height01,
         );

@@ -64,16 +64,14 @@ fn chunk_skirt_triangles_face_toward_chunk_interior_on_all_edges() {
     let mut positions = vec![0.0; (base_vertex_count + skirt_vertex_count) * 3];
     let mut normals = vec![0.0; (base_vertex_count + skirt_vertex_count) * 3];
     let mut indices = vec![0; base_index_count + skirt_index_count];
-    let mut instances_matrix_buffer = Vec::new();
-    let mut aligned_instances_matrix_buffer = Vec::new();
+    let mut scattered_points_buffer = Vec::new();
 
     build_chunk_vertex_data(
         &build_data,
         &mut positions,
         &mut indices,
         &mut normals,
-        &mut instances_matrix_buffer,
-        &mut aligned_instances_matrix_buffer,
+        &mut scattered_points_buffer,
         0.0,
     );
 

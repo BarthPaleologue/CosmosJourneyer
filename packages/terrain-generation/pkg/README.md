@@ -46,8 +46,7 @@ const result = build_chunk_vertex_data(
     positions,
     indices,
     normals,
-    /* instances */ new Float32Array(0),
-    /* alignedInstances */ new Float32Array(0),
+    /* scatteredPoints */ new Float32Array(0),
     /* scatterPerSquareMeter */ 0,
 );
 

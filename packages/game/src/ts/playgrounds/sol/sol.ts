@@ -95,7 +95,7 @@ export async function createSolScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        chunkForge.update(assets);
+        chunkForge.update();
         postProcessManager.update(deltaSeconds);
         starSystemController.update(deltaSeconds, chunkForge);
         targetCursorLayer.update(camera);

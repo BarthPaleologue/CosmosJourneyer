@@ -1,8 +1,6 @@
 pub mod direction;
 pub mod erosion;
 pub mod math;
-pub mod matrix4;
-pub mod quaternion;
 pub mod random;
 pub mod simplex;
 pub mod triangle;

@@ -24,8 +24,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
 import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";
 import { loadParticleTextures } from "@/frontend/assets/textures/particles";
-import { createSquareMatrixBuffer } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/matrixBuffer";
-import { ThinInstancePatch } from "@/frontend/universe/planets/telluricPlanet/terrain/instancePatch/thinInstancePatch";
+import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
 
 import { createSky } from "./utils";
 
@@ -63,8 +62,8 @@ export async function createButterflyScene(
         return rng(rngState++);
     };
 
-    const butterflyPatch = new ThinInstancePatch(createSquareMatrixBuffer(Vector3.Zero(), 32, 128, wrappedRng));
-    butterflyPatch.createInstances([{ mesh: butterflyMesh, distance: 0 }]);
+    const matrixBuffer = createSquareMatrixBuffer(Vector3.Zero(), 32, 128, wrappedRng);
+    createInstancePatch(butterflyMesh, matrixBuffer);
 
     return scene;
 }

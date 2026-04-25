@@ -438,16 +438,16 @@ if (Symbol.dispose) TerrainSettings.prototype[Symbol.dispose] = TerrainSettings.
  * * `positions` - A mutable reference to the buffer that will be filled with vertex positions
  * * `indices` - A mutable reference to the buffer that will be filled with the face indices
  * * `normals` - A mutable reference to the buffer that will be filled with the vertex normals
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
  * @param {BuildData} data
  * @param {Float32Array} positions
  * @param {Uint16Array} indices
  * @param {Float32Array} normals
- * @param {Float32Array} instances_matrix_buffer
- * @param {Float32Array} aligned_instances_matrix_buffer
+ * @param {Float32Array} scattered_points_buffer
  * @param {number} scatter_per_square_meter
  * @returns {ReturnData}
  */
-export function build_chunk_vertex_data(data, positions, indices, normals, instances_matrix_buffer, aligned_instances_matrix_buffer, scatter_per_square_meter) {
+export function build_chunk_vertex_data(data, positions, indices, normals, scattered_points_buffer, scatter_per_square_meter) {
     _assertClass(data, BuildData);
     var ptr0 = passArrayF32ToWasm0(positions, wasm.__wbindgen_malloc);
     var len0 = WASM_VECTOR_LEN;
@@ -455,11 +455,9 @@ export function build_chunk_vertex_data(data, positions, indices, normals, insta
     var len1 = WASM_VECTOR_LEN;
     var ptr2 = passArrayF32ToWasm0(normals, wasm.__wbindgen_malloc);
     var len2 = WASM_VECTOR_LEN;
-    var ptr3 = passArrayF32ToWasm0(instances_matrix_buffer, wasm.__wbindgen_malloc);
+    var ptr3 = passArrayF32ToWasm0(scattered_points_buffer, wasm.__wbindgen_malloc);
     var len3 = WASM_VECTOR_LEN;
-    var ptr4 = passArrayF32ToWasm0(aligned_instances_matrix_buffer, wasm.__wbindgen_malloc);
-    var len4 = WASM_VECTOR_LEN;
-    const ret = wasm.build_chunk_vertex_data(data.__wbg_ptr, ptr0, len0, positions, ptr1, len1, indices, ptr2, len2, normals, ptr3, len3, instances_matrix_buffer, ptr4, len4, aligned_instances_matrix_buffer, scatter_per_square_meter);
+    const ret = wasm.build_chunk_vertex_data(data.__wbg_ptr, ptr0, len0, positions, ptr1, len1, indices, ptr2, len2, normals, ptr3, len3, scattered_points_buffer, scatter_per_square_meter);
     return ReturnData.__wrap(ret);
 }
 
