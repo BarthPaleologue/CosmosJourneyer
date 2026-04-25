@@ -41,6 +41,10 @@ export class StellarLightSystem {
 
     private readonly ambientLight: HemisphericLight;
 
+    private readonly skyLightIntensity = 0.2;
+
+    private readonly planetShineIntensity = 0.3;
+
     constructor(scene: Scene) {
         this.scene = scene;
 
@@ -117,13 +121,13 @@ export class StellarLightSystem {
         if (distanceToBody < atmosphere.atmosphereRadius) {
             // ambient light from the sky
             this.ambientLight.direction.copyFrom(upDirection);
-            this.ambientLight.intensity = 0.2 * atmosphereDensity * lightExtinction;
+            this.ambientLight.intensity = this.skyLightIntensity * atmosphereDensity * lightExtinction;
         } else {
             // planet shine
             const bodyViewFraction =
                 0.5 * (1 - Math.sqrt(1 - (nearestCelestialBody.getBoundingRadius() / distanceToBody) ** 2));
             this.ambientLight.direction.copyFrom(upDirection.negate());
-            this.ambientLight.intensity = 0.3 * bodyViewFraction * lightExtinction;
+            this.ambientLight.intensity = this.planetShineIntensity * bodyViewFraction * lightExtinction;
         }
 
         this.ambientLight.diffuse.copyFromFloats(0.6, 0.7, 0.8);
