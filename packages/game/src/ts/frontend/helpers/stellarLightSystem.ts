@@ -37,6 +37,8 @@ export class StellarLightSystem {
         shadowGenerator: CascadedShadowGenerator;
     }> = [];
 
+    private readonly lights: Array<DirectionalLight> = [];
+
     private readonly scene: Scene;
 
     private readonly ambientLight: HemisphericLight;
@@ -63,6 +65,7 @@ export class StellarLightSystem {
         shadowGenerator.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
 
         this.stellarObjects.push({ transform, light, shadowGenerator });
+        this.lights.push(light);
     }
 
     public addShadowCaster(mesh: TransformNode | AbstractMesh) {
@@ -134,7 +137,7 @@ export class StellarLightSystem {
     }
 
     public getLights(): Array<DirectionalLight> {
-        return this.stellarObjects.map(({ light }) => light);
+        return this.lights;
     }
 
     public dispose() {
@@ -143,6 +146,7 @@ export class StellarLightSystem {
             shadowGenerator.dispose();
         }
         this.stellarObjects.length = 0;
+        this.lights.length = 0;
         this.ambientLight.dispose();
     }
 }
