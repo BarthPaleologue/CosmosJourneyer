@@ -173,7 +173,7 @@ export async function createTelluricPlanetScene(
 
         planet.updateLOD(camera.globalPosition, chunkForge, scatteringSystem);
         chunkForge.update();
-        stellarLightSystem.update(camera);
+        stellarLightSystem.update(camera, planet);
 
         planet.computeCulling(camera);
     });

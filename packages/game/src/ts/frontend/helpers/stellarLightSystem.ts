@@ -27,6 +27,9 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
+import type { AtmosphereUniforms } from "../postProcesses/atmosphere/atmosphereUniforms";
+import type { CelestialBody } from "../universe/architecture/orbitalObject";
+
 export class StellarLightSystem {
     private readonly stellarObjects: Array<{
         transform: TransformNode;
@@ -76,16 +79,54 @@ export class StellarLightSystem {
         }
     }
 
-    public update(camera: Camera) {
+    public update(camera: Camera, nearestCelestialBody: CelestialBody) {
         const cameraPosition = camera.globalPosition;
-        const overallDirection = Vector3.Zero();
+        const overallDirectionToLight = Vector3.Zero();
         for (const { transform, light } of this.stellarObjects) {
             const newDirection = cameraPosition.subtract(transform.getAbsolutePosition()).normalize();
             light.direction.copyFrom(newDirection);
-            overallDirection.addInPlace(newDirection);
+            overallDirectionToLight.addInPlace(newDirection.scale(light.intensity));
         }
-        overallDirection.normalize();
-        this.ambientLight.direction.copyFrom(overallDirection);
+        overallDirectionToLight.normalize().negateInPlace();
+
+        let atmosphere: AtmosphereUniforms | null = null;
+        if (
+            nearestCelestialBody.type === "telluricPlanet" ||
+            nearestCelestialBody.type === "gasPlanet" ||
+            nearestCelestialBody.type === "telluricSatellite"
+        ) {
+            atmosphere = nearestCelestialBody.atmosphereUniforms;
+        }
+
+        if (atmosphere === null) {
+            // gentle ambient lighting from the starry sky
+            this.ambientLight.direction.copyFrom(overallDirectionToLight);
+            this.ambientLight.intensity = 0.02;
+            this.ambientLight.diffuse.copyFromFloats(1, 1, 1);
+            return;
+        }
+
+        const bodyToCamera = cameraPosition.subtract(nearestCelestialBody.getTransform().position);
+        const distanceToBody = bodyToCamera.length();
+        const upDirection = bodyToCamera.scaleInPlace(1 / distanceToBody);
+
+        const heightAboveSurface = distanceToBody - nearestCelestialBody.getBoundingRadius();
+        const atmosphereDensity = Math.exp(-heightAboveSurface / atmosphere.rayleighHeight);
+        const lightExtinction = Math.max(upDirection.dot(overallDirectionToLight), 0.0);
+
+        if (distanceToBody < atmosphere.atmosphereRadius) {
+            // ambient light from the sky
+            this.ambientLight.direction.copyFrom(upDirection);
+            this.ambientLight.intensity = 0.2 * atmosphereDensity * lightExtinction;
+        } else {
+            // planet shine
+            const bodyViewFraction =
+                0.5 * (1 - Math.sqrt(1 - (nearestCelestialBody.getBoundingRadius() / distanceToBody) ** 2));
+            this.ambientLight.direction.copyFrom(upDirection.negate());
+            this.ambientLight.intensity = 0.3 * bodyViewFraction * lightExtinction;
+        }
+
+        this.ambientLight.diffuse.copyFromFloats(0.6, 0.7, 0.8);
     }
 
     public getLights(): Array<DirectionalLight> {

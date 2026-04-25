@@ -477,7 +477,7 @@ export class StarSystemController {
         this.floatingOriginSystem.update(cameraPosition);
         this.floatingOriginSystem.getOffsetToRef(this.referencePosition);
 
-        this.stellarLightSystem.update(camera);
+        this.stellarLightSystem.update(camera, this.getNearestCelestialBody(cameraPosition));
 
         this.updateShaders(deltaSeconds);
     }
