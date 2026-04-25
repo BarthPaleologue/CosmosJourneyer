@@ -128,21 +128,11 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
      */
     public init(vertexData: VertexData, scatteredInstances: ScatteredInstances, averageHeight: number) {
         if (this.hasBeenDisposed()) {
-            throw new Error(`Tried to init ${this.mesh.name} but it has been disposed`);
+            console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
+            return;
         }
 
         vertexData.applyToMesh(this.mesh, false);
-        // The following is a code snippet to use the approximate normals of the mesh instead of
-        // the analytic normals. This is useful for debugging purposes
-        /*if(!analyticNormal) {
-    this.mesh.createNormals(true);
-    const normals = this.mesh.getVerticesData(VertexBuffer.NormalKind);
-    if (normals === null) throw new Error("Mesh has no normals");
-    for(let i = 0; i < normals.length; i++) {
-        normals[i] = -normals[i];
-    }
-    this.mesh.setVerticesData(VertexBuffer.NormalKind, normals);
-}*/
         this.mesh.freezeNormals();
 
         if (this.chunkSideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
