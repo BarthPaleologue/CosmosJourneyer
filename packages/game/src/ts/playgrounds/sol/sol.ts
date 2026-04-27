@@ -60,7 +60,11 @@ export async function createSolScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
+    if (!chunkForgeResult.success) {
+        throw chunkForgeResult.error;
+    }
+    const chunkForge = chunkForgeResult.value;
 
     const starSystemLoader = new StarSystemLoader();
     const starSystemController = await StarSystemController.CreateAsync(

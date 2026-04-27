@@ -51,7 +51,11 @@ export async function createTelluricPlanetScene(
 
     await enablePhysics(scene);
 
-    const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
+    if (!chunkForgeResult.success) {
+        throw chunkForgeResult.error;
+    }
+    const chunkForge = chunkForgeResult.value;
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -183,7 +187,7 @@ export async function createTelluricPlanetScene(
             planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge, scatteringSystem);
             chunkForge.update();
 
-            if (chunkForge.applyTaskQueue.length === 0 && chunkForge.workerPool.busyWorkers.length === 0) {
+            if (chunkForge.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

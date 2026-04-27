@@ -39,7 +39,7 @@ import { CollisionMask, Settings } from "@/settings";
 
 import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
 import { getQuaternionFromDirection, type Direction } from "./direction";
-import type { ScatteredInstances, ScatteringSystem } from "./scatteringSystem";
+import type { IScatteringSystem, ScatteredInstances } from "./scatteringSystem";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     public readonly mesh: Mesh;
@@ -59,16 +59,16 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
     private disposed = false;
 
-    private readonly scatteringSystem: ScatteringSystem;
+    private readonly scatteringSystem: IScatteringSystem;
 
     constructor(
         path: number[],
         direction: Direction,
-        parentAggregate: PhysicsAggregate,
+        parentTransform: TransformNode,
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         rootLength: number,
-        scatteringSystem: ScatteringSystem,
+        scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
         const id = `D${direction}P${path.join("")}`;
@@ -83,12 +83,12 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.mesh.material = material;
         //this.mesh.material = Materials.DebugMaterial(id, false, false, scene);
 
-        this.mesh.parent = parentAggregate.transformNode;
+        this.mesh.parent = parentTransform;
 
         //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
         //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
-        this.parent = parentAggregate.transformNode;
+        this.parent = parentTransform;
 
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePositionFromPath(rootLength, path);

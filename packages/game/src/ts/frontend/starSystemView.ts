@@ -69,7 +69,6 @@ import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoun
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -191,7 +190,7 @@ export class StarSystemView implements View {
      * The chunk forge used to generate surface chunks for telluric planets. It is constant for the whole game.
      * @private
      */
-    private readonly chunkForge: ChunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+    private readonly chunkForge: ChunkForge;
 
     /**
      * An observable that notifies when the star system is initialized.
@@ -251,6 +250,7 @@ export class StarSystemView implements View {
      * @param tts The text-to-speech system
      * @param notificationManager The notification manager
      * @param assets The rendering assets
+     * @param chunkForge The chunk forge used to generate surface chunks for telluric planets
      */
     constructor(
         scene: Scene,
@@ -263,6 +263,7 @@ export class StarSystemView implements View {
         tts: ITts,
         notificationManager: INotificationManager,
         assets: RenderingAssets,
+        chunkForge: ChunkForge,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -281,6 +282,7 @@ export class StarSystemView implements View {
         this.tts = tts;
         this.notificationManager = notificationManager;
         this.assets = assets;
+        this.chunkForge = chunkForge;
 
         this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, [], async (interactions) => {
             if (interactions.length === 0) {

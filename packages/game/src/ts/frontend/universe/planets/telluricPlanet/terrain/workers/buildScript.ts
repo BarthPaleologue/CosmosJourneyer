@@ -198,6 +198,7 @@ function handle_build(data: TransferBuildData): void {
 
     self.postMessage(
         {
+            chunkId: data.chunkId,
             positions: verticesPositions,
             indices: indices,
             normals: normals,
@@ -213,3 +214,5 @@ function handle_build(data: TransferBuildData): void {
 self.onmessage = (e: MessageEvent<TransferBuildData>) => {
     handle_build(e.data);
 };
+
+self.postMessage("ready");

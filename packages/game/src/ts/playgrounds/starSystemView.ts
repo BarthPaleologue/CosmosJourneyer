@@ -30,8 +30,10 @@ import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObj
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { NotificationManagerMock, type INotificationManager } from "@/frontend/ui/notificationManager";
+import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 
 import { initI18n } from "@/i18n";
+import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
 
@@ -59,6 +61,11 @@ export async function createStarSystemViewScene(
     const havokPlugin = await enablePhysics(scene);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
+    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
+    if (!chunkForgeResult.success) {
+        throw chunkForgeResult.error;
+    }
+    const chunkForge = chunkForgeResult.value;
 
     const starSystemView = new StarSystemView(
         scene,
@@ -71,6 +78,7 @@ export async function createStarSystemViewScene(
         ttsMock,
         notificationManager,
         assets,
+        chunkForge,
     );
 
     await starSystemView.resetPlayer();

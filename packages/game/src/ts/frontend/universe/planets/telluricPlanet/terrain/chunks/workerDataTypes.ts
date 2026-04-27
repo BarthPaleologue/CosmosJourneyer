@@ -31,6 +31,7 @@ export type WorkerData = {
 };
 
 export type TransferBuildData = WorkerData & {
+    chunkId: string;
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;

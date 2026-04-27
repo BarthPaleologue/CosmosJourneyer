@@ -49,6 +49,7 @@ export type ApplyTask = Task & {
 };
 
 export const ReturnedChunkDataSchema = z.object({
+    chunkId: z.string(),
     positions: z.instanceof(Float32Array),
     normals: z.instanceof(Float32Array),
     indices: z.instanceof(Uint16Array),

@@ -17,59 +17,114 @@
 
 import { PriorityQueue } from "@/utils/priorityQueue";
 
-import { type BuildTask } from "./taskTypes";
+export class WorkerPool<TTask, TWorkerInput> {
+    private readonly availableWorkers: Set<Worker> = new Set();
+    private readonly busyWorkers: Set<Worker> = new Set();
+    private readonly finishedWorkers: Set<Worker> = new Set();
+    private readonly taskQueue: PriorityQueue<TTask>;
 
-/*export class BuildTaskQueue {
-    array: ArrayBuffer
-    constructor(array: ArrayBuffer) {
-        this.array = array;
+    private readonly serializeTask: (task: TTask) => TWorkerInput;
+    private readonly handleWorkerResult: (event: MessageEvent<unknown>) => void;
+
+    public constructor(
+        workers: ReadonlyArray<Worker>,
+        serializeTask: (task: TTask) => TWorkerInput,
+        handleWorkerResult: (event: MessageEvent<unknown>) => void,
+        comparator: (a: TTask, b: TTask) => boolean,
+    ) {
+        this.taskQueue = new PriorityQueue<TTask>(comparator);
+        for (const worker of workers) {
+            worker.onerror = (error) => {
+                console.error("Worker error:", error);
+            };
+            worker.onmessageerror = (error) => {
+                console.error("Worker message error:", error);
+            };
+            this.availableWorkers.add(worker);
+        }
+
+        this.serializeTask = serializeTask;
+        this.handleWorkerResult = handleWorkerResult;
     }
-}*/
 
-export class WorkerPool {
-    availableWorkers: Worker[] = []; // liste des workers disponibles pour exécuter des tâches
-    busyWorkers: Worker[] = []; // liste des workers occupés à exécuter une tâche
-    finishedWorkers: Worker[] = []; // liste des workers ayant terminé leur tâche (prêts à être réintégré dans la liste des workers disponibles)
-    taskQueue: PriorityQueue<BuildTask>;
+    public isIdle(): boolean {
+        return this.busyWorkers.size === 0 && this.taskQueue.isEmpty();
+    }
 
-    //TODO: continuer à expérimenter avec le SharedArrayBuffer
-    //sharedMemoryBuffer: SharedArrayBuffer;
-    //sharedTaskQueue: BuildTaskQueue;
+    public update(): void {
+        for (const worker of this.finishedWorkers) {
+            this.availableWorkers.add(worker);
+            this.finishedWorkers.delete(worker);
+        }
 
-    constructor(nbWorkers: number, comparator: (a: BuildTask, b: BuildTask) => boolean) {
-        //this.sharedMemoryBuffer = new SharedArrayBuffer(0);
-        //this.sharedTaskQueue = new BuildTaskQueue(this.sharedMemoryBuffer);
-        this.taskQueue = new PriorityQueue<BuildTask>(comparator);
-        for (let i = 0; i < nbWorkers; i++) {
-            const worker = new Worker(new URL("../workers/buildScript", import.meta.url), {
-                type: "module",
-            });
-            this.availableWorkers.push(worker);
-            //worker.postMessage(this.sharedMemoryBuffer);
+        for (const worker of this.availableWorkers) {
+            const nextTask = this.nextTask();
+            if (nextTask === undefined) {
+                break;
+            }
+
+            this.dispatchTask(worker, nextTask);
         }
     }
 
-    public submitTask(task: BuildTask) {
+    private dispatchTask(worker: Worker, task: TTask): void {
+        this.availableWorkers.delete(worker);
+        this.busyWorkers.add(worker);
+
+        worker.onerror = (event) => {
+            console.error("Worker error", event);
+            this.busyWorkers.delete(worker);
+            this.finishedWorkers.add(worker);
+        };
+
+        worker.onmessageerror = (event) => {
+            console.error("Worker message error", event);
+            this.busyWorkers.delete(worker);
+            this.finishedWorkers.add(worker);
+        };
+
+        const serializedTask = this.serializeTask(task);
+        worker.postMessage(serializedTask);
+
+        worker.onmessage = (event: MessageEvent<unknown>) => {
+            this.handleWorkerResult(event);
+
+            const nextTask = this.nextTask();
+
+            if (nextTask !== undefined) {
+                this.dispatchTask(worker, nextTask);
+            } else {
+                this.busyWorkers.delete(worker);
+                this.finishedWorkers.add(worker);
+            }
+        };
+    }
+
+    public submitTask(task: TTask) {
         this.taskQueue.push(task);
     }
 
-    public hasTask(): boolean {
-        return this.taskQueue.size() > 0;
-    }
-
-    public nextTask(): BuildTask {
-        if (this.hasTask()) return this.taskQueue.pop() as BuildTask;
-        throw new Error("The workerpool has no task to dispatch");
+    public nextTask(): TTask | undefined {
+        return this.taskQueue.pop();
     }
 
     public reset() {
-        this.busyWorkers.forEach((worker) => {
-            worker.terminate();
-        });
-        this.availableWorkers = this.availableWorkers.concat(this.finishedWorkers).concat(this.busyWorkers);
-        this.finishedWorkers = [];
-        this.busyWorkers = [];
-        this.availableWorkers.forEach((worker) => (worker.onmessage = null));
+        for (const worker of this.busyWorkers) {
+            this.availableWorkers.add(worker);
+            this.busyWorkers.delete(worker);
+        }
+
+        for (const worker of this.finishedWorkers) {
+            this.availableWorkers.add(worker);
+            this.finishedWorkers.delete(worker);
+        }
+
+        this.finishedWorkers.clear();
+        this.busyWorkers.clear();
+
+        for (const worker of this.availableWorkers) {
+            worker.onmessage = null;
+        }
 
         this.taskQueue.clear();
     }

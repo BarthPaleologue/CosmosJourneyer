@@ -61,6 +61,7 @@ import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
+import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -455,6 +456,12 @@ export class CosmosJourneyer {
         const soundPlayer = new SoundPlayer(starSystemViewAssets.audio.sounds);
         const tts = new Tts(starSystemViewAssets.audio.speakerVoiceLines);
         const notificationManager = new NotificationManager(soundPlayer);
+        const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
+        if (!chunkForgeResult.success) {
+            await alertModal(`Failed to initialize the terrain engine: ${chunkForgeResult.error.message}`, soundPlayer);
+            throw chunkForgeResult.error;
+        }
+        const chunkForge = chunkForgeResult.value;
 
         // Init star system view
         const starSystemView = new StarSystemView(
@@ -468,6 +475,7 @@ export class CosmosJourneyer {
             tts,
             notificationManager,
             starSystemViewAssets.rendering,
+            chunkForge,
         );
 
         const starMapView = new StarMapView(

@@ -16,8 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { TransformNode } from "@babylonjs/core/Meshes";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
@@ -43,19 +43,18 @@ import { CollisionMask, Settings } from "@/settings";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import { type ChunkForge } from "./terrain/chunks/chunkForge";
-import { ChunkTree } from "./terrain/chunks/chunkTree";
 import type { ScatteringSystem } from "./terrain/chunks/scatteringSystem";
+import { SphericalHeightFieldTerrain } from "./terrain/sphericalHeightFieldTerrain";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
     readonly type: "telluricPlanet" | "telluricSatellite";
 
-    readonly sides: ChunkTree[]; // stores the 6 sides of the sphere
-
     readonly material: TelluricPlanetMaterial;
 
-    private readonly transform: TransformNode;
+    readonly terrain: SphericalHeightFieldTerrain;
+
     readonly aggregate: PhysicsAggregate;
 
     readonly atmosphereUniforms: AtmosphereUniforms | null;
@@ -83,15 +82,26 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
 
         this.type = model.type;
 
-        this.transform = new TransformNode(this.model.name, scene);
-        this.transform.rotationQuaternion = Quaternion.Identity();
-
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.getBoundingRadius(), scene);
         physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         physicsShape.filterCollideMask = CollisionMask.SURFACE_QUERY;
         if (model.ocean !== null) {
             physicsShape.filterMembershipMask |= CollisionMask.WATER;
         }
+
+        this.material = new TelluricPlanetMaterial(
+            this.model,
+            {
+                grass: assets.textures.terrains.grass,
+                rock: assets.textures.terrains.rock,
+                sand: assets.textures.terrains.sand,
+                snow: assets.textures.terrains.snow,
+                noise: assets.textures.noises.seamlessPerlin,
+            },
+            scene,
+        );
+
+        this.terrain = new SphericalHeightFieldTerrain(this.model, this.material.get(), scene);
 
         this.aggregate = new PhysicsAggregate(this.getTransform(), physicsShape, undefined, scene);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
@@ -137,34 +147,13 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
             this.cloudsUniforms = null;
         }
 
-        this.material = new TelluricPlanetMaterial(
-            this.model,
-            {
-                grass: assets.textures.terrains.grass,
-                rock: assets.textures.terrains.rock,
-                sand: assets.textures.terrains.sand,
-                snow: assets.textures.terrains.snow,
-                noise: assets.textures.noises.seamlessPerlin,
-            },
-            scene,
-        );
-
-        this.sides = [
-            new ChunkTree("up", this.model, this.aggregate, this.material.get(), scene),
-            new ChunkTree("down", this.model, this.aggregate, this.material.get(), scene),
-            new ChunkTree("forward", this.model, this.aggregate, this.material.get(), scene),
-            new ChunkTree("backward", this.model, this.aggregate, this.material.get(), scene),
-            new ChunkTree("right", this.model, this.aggregate, this.material.get(), scene),
-            new ChunkTree("left", this.model, this.aggregate, this.material.get(), scene),
-        ];
-
         this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
         this.targetInfo.maxDistance =
             this.model.type === "telluricSatellite" ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }
 
     getTransform(): TransformNode {
-        return this.transform;
+        return this.terrain.getTransform();
     }
 
     getCloudsUniforms(): CloudsUniforms | null {
@@ -181,7 +170,7 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
      * @param chunkForge
      */
     public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
-        for (const side of this.sides) side.update(observerPosition, chunkForge, scatteringSystem);
+        this.terrain.updateLOD(observerPosition, chunkForge, scatteringSystem);
     }
 
     public getRadius(): number {
@@ -193,21 +182,16 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
     }
 
     public computeCulling(camera: Camera): void {
-        for (const side of this.sides) side.computeCulling(camera);
+        this.terrain.computeCulling(camera);
     }
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>, cloudsLutPool: ItemPool<CloudsLut>): void {
-        this.sides.forEach((side) => {
-            side.dispose();
-        });
-        this.sides.length = 0;
-
         this.cloudsUniforms?.dispose(cloudsLutPool);
         this.ringsUniforms?.dispose(ringsLutPool);
 
         this.material.dispose();
         this.aggregate.dispose();
-        this.transform.dispose();
+        this.terrain.dispose();
         this.asteroidField?.dispose();
     }
 }
