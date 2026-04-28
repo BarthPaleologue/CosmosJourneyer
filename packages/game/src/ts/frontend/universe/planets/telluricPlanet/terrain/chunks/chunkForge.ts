@@ -15,10 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { ScatteredInstances } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
+
+export type ChunkId = string;
+
+type ChunkForgePendingOutput = {
+    status: "pending";
+};
+
+export type ChunkForgeCompletedOutput = {
+    status: "completed";
+    positions: Float32Array;
+    normals: Float32Array;
+    indices: Uint16Array;
+    scatteredInstances: ScatteredInstances;
+    averageHeight: number;
+};
+
+export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;
 
 export interface ChunkForge {
     addTask(task: BuildTask): void;
+    getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined;
     update(): void;
     reset(): void;
 }

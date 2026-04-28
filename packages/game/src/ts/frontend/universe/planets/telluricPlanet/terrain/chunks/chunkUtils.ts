@@ -25,7 +25,7 @@ import { getQuaternionFromDirection, type Direction } from "./direction";
  * @param path the path of the node
  * @returns the plane space coordinates of the chunk
  */
-export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: number[]): Vector3 {
+export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: ReadonlyArray<number>): Vector3 {
     let x = 0;
     let y = 0;
     for (const [i, pathValue] of path.entries()) {

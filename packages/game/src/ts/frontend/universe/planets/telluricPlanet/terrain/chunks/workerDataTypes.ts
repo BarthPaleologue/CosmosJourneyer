@@ -22,19 +22,12 @@ import {
 } from "@cosmos-journeyer/universe-model";
 
 import { type Direction } from "./direction";
-import { type TaskType } from "./taskTypes";
 
-export type WorkerData = {
-    taskType: TaskType;
+export type TransferBuildData = {
+    chunkId: string;
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     position: [number, number, number];
-};
-
-export type TransferBuildData = WorkerData & {
-    chunkId: string;
     nbVerticesPerSide: number;
     depth: number;
     direction: Direction;
 };
-
-export type TransferCollisionData = WorkerData;

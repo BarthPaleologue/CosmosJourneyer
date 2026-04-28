@@ -219,10 +219,17 @@ export class ChunkTree implements Cullable {
 
         const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
 
+        if (tree instanceof PlanetChunk && !tree.isLoaded()) {
+            const chunkOutput = chunkForge.getOutput(tree.id);
+            if (chunkOutput !== undefined && chunkOutput.status === "completed") {
+                tree.init(chunkOutput);
+            }
+        }
+
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
             if (!tree.isLoaded()) return tree;
-            if (!tree.mesh.isVisible) return tree;
-            if (!tree.mesh.isEnabled()) return tree;
+            if (!tree.getTransform().isVisible) return tree;
+            if (!tree.getTransform().isEnabled()) return tree;
 
             const newTree: [PlanetChunk, PlanetChunk, PlanetChunk, PlanetChunk] = [
                 this.createChunk(walked.concat([0]), chunkForge, scatteringSystem),
@@ -259,7 +266,11 @@ export class ChunkTree implements Cullable {
      * @param scatteringSystem
      * @returns The new Chunk
      */
-    private createChunk(path: number[], chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): PlanetChunk {
+    private createChunk(
+        path: ReadonlyArray<number>,
+        chunkForge: ChunkForge,
+        scatteringSystem: IScatteringSystem,
+    ): PlanetChunk {
         const chunk = new PlanetChunk(
             path,
             this.direction,
@@ -271,16 +282,18 @@ export class ChunkTree implements Cullable {
             this.scene,
         );
 
-        const buildTask: BuildTask = {
-            type: "build",
-            planetModel: this.planetModel,
-            position: chunk.cubePosition,
-            depth: path.length,
-            direction: this.direction,
-            chunk: chunk,
-        };
+        const chunkOutput = chunkForge.getOutput(chunk.id);
+        if (chunkOutput === undefined) {
+            const buildTask: BuildTask = {
+                chunkId: chunk.id,
+                planetModel: this.planetModel,
+                position: chunk.cubePosition,
+                depth: path.length,
+                direction: this.direction,
+            };
 
-        chunkForge.addTask(buildTask);
+            chunkForge.addTask(buildTask);
+        }
 
         return chunk;
     }

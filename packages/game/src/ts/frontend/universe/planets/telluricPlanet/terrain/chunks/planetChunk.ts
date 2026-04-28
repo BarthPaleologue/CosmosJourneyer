@@ -21,7 +21,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode, type VertexData } from "@babylonjs/core/Meshes";
+import { VertexData, type TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -37,12 +37,14 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask, Settings } from "@/settings";
 
+import type { ChunkForgeCompletedOutput, ChunkId } from "./chunkForge";
 import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
 import { getQuaternionFromDirection, type Direction } from "./direction";
-import type { IScatteringSystem, ScatteredInstances } from "./scatteringSystem";
+import type { IScatteringSystem } from "./scatteringSystem";
 
 export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
-    public readonly mesh: Mesh;
+    readonly id: ChunkId;
+    private readonly mesh: Mesh;
     private readonly depth: number;
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
@@ -62,7 +64,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
     private readonly scatteringSystem: IScatteringSystem;
 
     constructor(
-        path: number[],
+        path: ReadonlyArray<number>,
         direction: Direction,
         parentTransform: TransformNode,
         material: Material,
@@ -71,22 +73,16 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
-        const id = `D${direction}P${path.join("")}`;
+        this.id = `${parentTransform.name}->d${direction}-pP${path.join("")}`;
 
         this.depth = path.length;
 
         this.chunkSideLength = rootLength / 2 ** this.depth;
 
-        this.mesh = new Mesh(`${planetModel.name}_Chunk${id}`, scene);
+        this.mesh = new Mesh(`${planetModel.name}_Chunk${this.id}`, scene);
         this.mesh.setEnabled(false);
-
         this.mesh.material = material;
-        //this.mesh.material = Materials.DebugMaterial(id, false, false, scene);
-
         this.mesh.parent = parentTransform;
-
-        //this.mesh.occlusionQueryAlgorithmType = AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
-        //this.mesh.occlusionType = AbstractMesh.OCCLUSION_TYPE_OPTIMISTIC;
 
         this.parent = parentTransform;
 
@@ -122,16 +118,18 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
     /**
      * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given scattered point buffer.
-     * @param vertexData the vertex data to apply to the chunk
-     * @param scatteredInstances Matrix buffers for scattered assets on the chunk
-     * @param averageHeight
+     * @param forgeOutput the vertex data and scattered point buffer to initialize the chunk with
      */
-    public init(vertexData: VertexData, scatteredInstances: ScatteredInstances, averageHeight: number) {
+    public init(forgeOutput: ChunkForgeCompletedOutput) {
         if (this.hasBeenDisposed()) {
             console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
             return;
         }
 
+        const vertexData = new VertexData();
+        vertexData.positions = forgeOutput.positions;
+        vertexData.normals = forgeOutput.normals;
+        vertexData.indices = forgeOutput.indices;
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
@@ -152,10 +150,10 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.mesh.setEnabled(true);
         this.loaded = true;
 
-        this.averageHeight = averageHeight;
+        this.averageHeight = forgeOutput.averageHeight;
         this.mesh.computeWorldMatrix(true);
 
-        this.scatteringSystem.scatterInChunk(this.mesh, scatteredInstances);
+        this.scatteringSystem.scatterInChunk(this.mesh, forgeOutput.scatteredInstances);
     }
 
     /**

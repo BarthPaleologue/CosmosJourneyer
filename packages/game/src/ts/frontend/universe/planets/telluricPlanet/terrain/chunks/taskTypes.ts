@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import {
     type DeepReadonly,
     type TelluricPlanetModel,
@@ -24,28 +23,16 @@ import {
 } from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
+import type { ChunkId } from "./chunkForge";
 import { type Direction } from "./direction";
-import { type PlanetChunk } from "./planetChunk";
-import { ScatteredInstancesSchema, type ScatteredInstances } from "./scatteringSystem";
+import { ScatteredInstancesSchema } from "./scatteringSystem";
 
-export type TaskType = "build" | "apply";
-
-export type Task = {
-    type: TaskType;
-    chunk: PlanetChunk;
-};
-
-export type BuildTask = Task & {
+export type BuildTask = {
+    chunkId: ChunkId;
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     depth: number;
     direction: Direction;
     position: Vector3;
-};
-
-export type ApplyTask = Task & {
-    vertexData: VertexData;
-    scatteredInstances: ScatteredInstances;
-    averageHeight: number;
 };
 
 export const ReturnedChunkDataSchema = z.object({

@@ -15,13 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
-
 import { err, ok, type Result } from "@/utils/types";
 
-import { type ChunkForge } from "./chunkForge";
-import type { PlanetChunk } from "./planetChunk";
-import { ReturnedChunkDataSchema, type ApplyTask, type BuildTask } from "./taskTypes";
+import { type ChunkForge, type ChunkForgeOutput, type ChunkId } from "./chunkForge";
+import { ReturnedChunkDataSchema, type BuildTask } from "./taskTypes";
 import { type TransferBuildData } from "./workerDataTypes";
 import { WorkerPool } from "./workerPool";
 
@@ -31,16 +28,13 @@ export class ChunkForgeWorkers implements ChunkForge {
 
     private readonly workerPool: WorkerPool<BuildTask, TransferBuildData>;
 
-    /** The queue of tasks containing chunks ready to be enabled */
-    private readonly applyTaskQueue: Array<ApplyTask> = [];
-
-    private readonly pendingChunks = new Map<string, PlanetChunk>();
+    private readonly output = new Map<ChunkId, ChunkForgeOutput>();
 
     private constructor(workers: ReadonlyArray<Worker>, nbVerticesPerRow: number) {
         this.workerPool = new WorkerPool(
             workers,
             (task) => {
-                this.pendingChunks.set(this.getChunkId(task.chunk), task.chunk);
+                this.output.set(task.chunkId, { status: "pending" });
                 return this.serializeBuildTask(task);
             },
             (event) => {
@@ -116,14 +110,13 @@ export class ChunkForgeWorkers implements ChunkForge {
         this.workerPool.submitTask(task);
     }
 
-    private getChunkId(chunk: PlanetChunk): string {
-        return chunk.getTransform().name;
+    public getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined {
+        return this.output.get(chunkId);
     }
 
     private serializeBuildTask(task: BuildTask): TransferBuildData {
         return {
-            taskType: "build",
-            chunkId: this.getChunkId(task.chunk),
+            chunkId: task.chunkId,
             planetModel: task.planetModel,
             nbVerticesPerSide: this.nbVerticesPerRow,
             depth: task.depth,
@@ -140,41 +133,20 @@ export class ChunkForgeWorkers implements ChunkForge {
 
         const data = dataResult.data;
 
-        const vertexData = new VertexData();
-        vertexData.positions = data.positions;
-        vertexData.normals = data.normals;
-        vertexData.indices = data.indices;
-
-        const chunk = this.pendingChunks.get(data.chunkId);
-        if (chunk === undefined) {
+        const existingOutput = this.output.get(data.chunkId);
+        if (existingOutput === undefined) {
             return;
         }
 
-        this.pendingChunks.delete(data.chunkId);
-
-        const applyTask: ApplyTask = {
-            type: "apply",
-            vertexData,
-            chunk,
+        this.output.delete(data.chunkId);
+        this.output.set(data.chunkId, {
+            status: "completed",
+            positions: data.positions,
+            normals: data.normals,
+            indices: data.indices,
             scatteredInstances: data.scatteredInstances,
             averageHeight: data.averageHeight,
-        };
-        this.applyTaskQueue.push(applyTask);
-    }
-
-    /**
-     * Apply generated vertexData to waiting chunks
-     */
-    private executeNextApplyTask() {
-        let task = this.applyTaskQueue.shift();
-        while (task !== undefined && task.chunk.hasBeenDisposed()) {
-            // if the chunk has been disposed, we skip it
-            task = this.applyTaskQueue.shift();
-        }
-
-        if (task !== undefined) {
-            task.chunk.init(task.vertexData, task.scatteredInstances, task.averageHeight);
-        }
+        });
     }
 
     /**
@@ -182,15 +154,14 @@ export class ChunkForgeWorkers implements ChunkForge {
      */
     public update() {
         this.workerPool.update();
-        this.executeNextApplyTask();
     }
 
     public isIdle() {
-        return this.applyTaskQueue.length === 0 && this.workerPool.isIdle();
+        return this.workerPool.isIdle();
     }
 
     public reset() {
-        this.applyTaskQueue.length = 0;
         this.workerPool.reset();
+        this.output.clear();
     }
 }
