@@ -51,7 +51,7 @@ type QuadTree = QuadTreeNode | PlanetChunk;
 /**
  * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
-export class ChunkTree implements Cullable {
+export class TerrainFaceQuadTree implements Cullable {
     readonly minDepth: number; // minimum depth of the tree
     readonly maxDepth: number; // maximum depth of the tree
 

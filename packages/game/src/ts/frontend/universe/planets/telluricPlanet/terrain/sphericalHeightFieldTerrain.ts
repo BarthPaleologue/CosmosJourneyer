@@ -26,12 +26,19 @@ import type { Cullable } from "@/frontend/helpers/cullable";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import type { ChunkForge } from "./chunks/chunkForge";
-import { ChunkTree } from "./chunks/chunkTree";
 import type { IScatteringSystem } from "./chunks/scatteringSystem";
+import { TerrainFaceQuadTree } from "./chunks/terrainFaceQuadTree";
 
 export class SphericalHeightFieldTerrain implements Transformable, Cullable {
     private readonly transform: TransformNode;
-    private readonly faces: [ChunkTree, ChunkTree, ChunkTree, ChunkTree, ChunkTree, ChunkTree];
+    private readonly faces: [
+        TerrainFaceQuadTree,
+        TerrainFaceQuadTree,
+        TerrainFaceQuadTree,
+        TerrainFaceQuadTree,
+        TerrainFaceQuadTree,
+        TerrainFaceQuadTree,
+    ];
 
     constructor(
         model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
@@ -41,12 +48,12 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         this.transform = new TransformNode("sphericalHeightFieldTerrain", scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
         this.faces = [
-            new ChunkTree("up", model, this.transform, material, scene),
-            new ChunkTree("down", model, this.transform, material, scene),
-            new ChunkTree("forward", model, this.transform, material, scene),
-            new ChunkTree("backward", model, this.transform, material, scene),
-            new ChunkTree("right", model, this.transform, material, scene),
-            new ChunkTree("left", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("up", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("down", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("forward", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("backward", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("right", model, this.transform, material, scene),
+            new TerrainFaceQuadTree("left", model, this.transform, material, scene),
         ];
     }
 
