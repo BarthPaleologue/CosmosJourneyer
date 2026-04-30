@@ -131,16 +131,9 @@ void main() {
 
     vec3 color = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(star_positions[i] - object_position);
-        float shadow = getShadow(intersectionPoint, starDir, star_positions[i]);
+        vec3 starDir = star_directions[i];
+        float shadow = getShadow(intersectionPoint, starDir);
         color += calculateLight(albedo, normal, roughness, metallic, starDir, viewDir, star_colors[i]) * shadow;
-    }
-
-    if(nbStars == 0) {
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 lightColor = vec3(1.0);
-        float shadow = getShadow(intersectionPoint, lightDir, intersectionPoint + lightDir * 100.0);
-        color += calculateLight(albedo, normal, roughness, metallic, lightDir, viewDir, lightColor) * shadow;
     }
 
     color = smoothstep(0.0, 0.8, color * 2.0) * 2.0;

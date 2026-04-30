@@ -80,15 +80,14 @@ float tanHalfFromCos(float cosA) {
 }
 
 // Calculates the lighting contribution from a single star for the rings
-vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 rayDir, vec3 ringAlbedo, vec3 starPosition, vec3 starColor) {
-    vec3 rayToSun = normalize(starPosition - samplePoint);
-    float cosA = dot(rayToSun, -rayDir);
+vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 viewDir, vec3 ringAlbedo, vec3 starDir, vec3 starColor) {
+    float cosA = dot(starDir, -viewDir);
 
     // soft shadow from planet
     float softShadowFactor = 1.0;
     float t2, t3;
-    if (object_position != starPosition && rayIntersectSphere(samplePoint, rayToSun, object_position, object_radius, t2, t3)) {
-        vec3 cp = samplePoint + rayToSun * (t2 + t3) * 0.5;
+    if (rayIntersectSphere(samplePoint, starDir, object_position, object_radius, t2, t3)) {
+        vec3 cp = samplePoint + starDir * (t2 + t3) * 0.5;
         float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
         softShadowFactor = smoothstep(0.98, 1.0, r01);
     }
@@ -122,19 +121,19 @@ void main() {
     // actual depth of the scene
     float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
 
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position); // normalized direction of the ray
+    vec3 viewDir = normalize(pixelWorldPosition - camera_position); // normalized direction of the ray
 
     vec4 finalColor = screenColor;
 
     float impactPoint;
-    if (rayIntersectsPlane(camera_position, rayDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
+    if (rayIntersectsPlane(camera_position, viewDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
         // if the ray intersect the ring plane
         if (impactPoint >= 0.0 && impactPoint < maximumDistance) {
             // if the ray intersects the ring before any other object
             float t0, t1;
-            if (!rayIntersectSphere(camera_position, rayDir, object_position, object_radius, t0, t1) || t0 > impactPoint) {
+            if (!rayIntersectSphere(camera_position, viewDir, object_position, object_radius, t0, t1) || t0 > impactPoint) {
                 // if the ray is impacting a solid object after the ring plane
-                vec3 samplePoint = camera_position + impactPoint * rayDir;
+                vec3 samplePoint = camera_position + impactPoint * viewDir;
                 vec4 pattern = ringPatternAtPoint(samplePoint);
 
                 vec3 ringAlbedo = pattern.rgb;
@@ -145,12 +144,12 @@ void main() {
                 vec3 ringShadeColor = vec3(0.0);
 
                 for (int i = 0; i < nbStars; i++) {
-                    ringShadeColor += calculateStarLightingForRings(samplePoint, rayDir, ringAlbedo, star_positions[i], star_colors[i]);
+                    ringShadeColor += calculateStarLightingForRings(samplePoint, viewDir, ringAlbedo, star_directions[i], star_colors[i]);
                 }
 
                 float normalIncidenceExtinction = ringOpacity;
                 float opticalDepthAtNormalIncidence = -log(max(1e-4, 1.0 - normalIncidenceExtinction));
-                float opticalDepthAlongViewRay = opticalDepthAtNormalIncidence / max(abs(dot(rayDir, object_rotationAxis)), 0.3);
+                float opticalDepthAlongViewRay = opticalDepthAtNormalIncidence / max(abs(dot(viewDir, object_rotationAxis)), 0.3);
                 float transmittanceAlongViewRay = exp(-opticalDepthAlongViewRay);
 
                 finalColor = vec4(mix(ringShadeColor, finalColor.rgb, transmittanceAlongViewRay), 1.0);

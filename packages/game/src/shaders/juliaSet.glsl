@@ -126,7 +126,7 @@ float map(vec3 p){
 }
 
 //Determine if a point is in shadow - 1.0 = not in shadow
-float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
+float getShadow(vec3 rayOrigin, vec3 rayDir) {
     float t = 0.01;
     float d = 0.0;
     float shadow = 1.0;
@@ -134,9 +134,6 @@ float getShadow(vec3 rayOrigin, vec3 rayDir, vec3 starPosition) {
         d = map(rayOrigin + rayDir * t);
         if(d < 0.0001){
             return 0.5;
-        }
-        if(t > length(rayOrigin - starPosition) - 0.5){
-            break;
         }
         shadow = min(shadow, 32.0 * d / t);
         t += d;
@@ -210,18 +207,10 @@ void main() {
     
     vec3 color = vec3(0.0);
     for (int i = 0; i < nbStars; i++) {
-        vec3 starDir = normalize(star_positions[i] - object_position);
-        float shadow = getShadow(intersectionPoint, starDir, star_positions[i]);
+        vec3 starDir = star_directions[i];
+        float shadow = getShadow(intersectionPoint, starDir);
         color += calculateLight(albedo, normal, roughness, metallic, starDir, viewDir, star_colors[i]) * shadow;
     }
-
-    if(nbStars == 0) {
-        vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-        vec3 lightColor = vec3(1.0);
-        float shadow = getShadow(intersectionPoint, lightDir, intersectionPoint + lightDir * 100.0);
-        color += calculateLight(albedo, normal, roughness, metallic, lightDir, viewDir, lightColor) * shadow;
-    }
-
 
     float ao = steps * 0.01;
     ao = 1.0 - ao / (ao + 0.5);// reinhard

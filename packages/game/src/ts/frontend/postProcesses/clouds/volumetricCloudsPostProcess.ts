@@ -17,7 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -52,7 +52,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
         cloudsUniforms: CloudsUniforms,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
-        stars: ReadonlyArray<PointLight>,
+        stars: ReadonlyArray<DirectionalLight>,
     ) {
         const shaderName = "volumetricClouds";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -104,7 +104,7 @@ export class VolumetricCloudsPostProcess extends PostProcess {
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
-            setStellarObjectUniforms(effect, stars, floatingOriginOffset);
+            setStellarObjectUniforms(effect, stars);
 
             effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MIN_HEIGHT, boundingRadius);
             effect.setFloat(VolumetricCloudsUniformNames.CLOUD_LAYER_MAX_HEIGHT, boundingRadius + 30e3);

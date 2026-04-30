@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis, Light, PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Axis, DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
@@ -55,13 +55,11 @@ export async function createJupiterScene(
     controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
-    // This attaches the camera to the canvas
     camera.attachControl();
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
-    light.falloffType = Light.FALLOFF_STANDARD;
+    const light = new DirectionalLight("light1", new Vector3(-7, -5, 10).normalize(), scene);
 
     const gasPlanetModel = getJupiterModel([]);
 

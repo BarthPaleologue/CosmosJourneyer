@@ -78,6 +78,7 @@ export async function loadObjects(
     grassBlades.forEach((blade) => {
         blade.material = materials.grass;
         blade.isVisible = false;
+        blade.receiveShadows = true;
     });
 
     const crate = MeshBuilder.CreateBox("crate", { size: 1 }, scene);
@@ -117,6 +118,7 @@ export async function loadObjects(
     rock.scaling.scaleInPlace(0.2);
     rock.bakeCurrentTransformIntoVertices();
     rock.isVisible = false;
+    rock.receiveShadows = true;
 
     rockContainer.addAllToScene();
 

@@ -17,7 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -49,7 +49,7 @@ export class RingsPostProcess extends PostProcess {
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<Pick<CelestialBodyModel, "radius" | "name">>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {
@@ -97,7 +97,7 @@ export class RingsPostProcess extends PostProcess {
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
+            setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, bodyTransform, bodyModel.radius, floatingOriginOffset);
 
             this.ringsUniforms.setUniforms(effect);

@@ -15,28 +15,25 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Light } from "@babylonjs/core/Lights/light";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { type StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 
 import { type DeepReadonly } from "@/utils/types";
 
+import type { CelestialBodyBase } from "../../architecture/celestialBody";
+import { AccretionDisk } from "./accretionDisk";
 import { BlackHoleUniforms } from "./blackHoleUniforms";
 
-export class BlackHole implements StellarObjectBase<"blackHole"> {
+export class BlackHole implements CelestialBodyBase<"blackHole"> {
     readonly name: string;
 
     private readonly transform: TransformNode;
-
-    readonly light: PointLight;
 
     readonly model: DeepReadonly<BlackHoleModel>;
 
@@ -50,6 +47,8 @@ export class BlackHole implements StellarObjectBase<"blackHole"> {
 
     readonly targetInfo: TargetInfo;
 
+    readonly accretionDisk: AccretionDisk | null;
+
     constructor(model: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture, scene: Scene) {
         this.model = model;
 
@@ -58,11 +57,8 @@ export class BlackHole implements StellarObjectBase<"blackHole"> {
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
-        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
-        //this.light.diffuse.fromArray(getRgbFromTemperature(this.model.physicalProperties.temperature).asArray());
-        this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.getTransform();
-        if (this.model.accretionDiskRadius === 0) this.light.intensity = 0;
+        this.accretionDisk =
+            this.model.accretionDiskRadius > 0 ? new AccretionDisk(this.model.blackBodyTemperature) : null;
 
         this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundTexture);
 
@@ -71,10 +67,6 @@ export class BlackHole implements StellarObjectBase<"blackHole"> {
 
     getTransform(): TransformNode {
         return this.transform;
-    }
-
-    getLight(): PointLight {
-        return this.light;
     }
 
     getTypeName(): string {
@@ -90,7 +82,6 @@ export class BlackHole implements StellarObjectBase<"blackHole"> {
     }
 
     public dispose(): void {
-        this.light.dispose();
         this.transform.dispose();
     }
 }

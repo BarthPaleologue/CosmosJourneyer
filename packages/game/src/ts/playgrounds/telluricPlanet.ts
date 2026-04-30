@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { PointLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Color3, Scene, TransformNode, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
@@ -24,6 +24,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
+import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloudsPostProcess";
@@ -33,6 +34,8 @@ import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+
+import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
@@ -52,7 +55,9 @@ export async function createTelluricPlanetScene(
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
-    const scatteringSystem = new ScatteringSystem(assets.objects);
+    const stellarLightSystem = new StellarLightSystem(scene);
+
+    const scatteringSystem = new ScatteringSystem(assets.objects, stellarLightSystem);
 
     const scalingFactor = Settings.EARTH_RADIUS * 2;
 
@@ -70,14 +75,18 @@ export async function createTelluricPlanetScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const light = new PointLight("light1", new Vector3(7, 5, -10).scaleInPlace(scalingFactor), scene);
-    light.falloffType = PointLight.FALLOFF_STANDARD;
+    const sunModel = getSunModel();
+    const sunTransform = new TransformNode("sunTransform", scene);
+    sunTransform.position = new Vector3(7, 5, -10).scale(10_000e3);
+
+    const sunColor = getRgbFromTemperature(sunModel.blackBodyTemperature);
+    stellarLightSystem.registerStellarObject(sunTransform, new Color3(sunColor.r, sunColor.g, sunColor.b));
 
     const urlParams = new URLSearchParams(window.location.search);
     const seed = Number(urlParams.get("seed") ?? Math.floor(Math.random() * 1000));
     console.log("seed", seed);
 
-    const telluricPlanetModel = generateTelluricPlanetModel("telluricPlanet", seed, "Telluric Planet", [getSunModel()]);
+    const telluricPlanetModel = generateTelluricPlanetModel("telluricPlanet", seed, "Telluric Planet", [sunModel]);
 
     const planet = new TelluricPlanet(telluricPlanetModel, assets, scene);
 
@@ -87,12 +96,7 @@ export async function createTelluricPlanetScene(
         planet.ringsUniforms,
         null,
         false,
-        [
-            {
-                getBoundingRadius: () => 0,
-                getLight: () => light,
-            },
-        ],
+        stellarLightSystem.getLights(),
         depthRendererManager,
         scene,
     );
@@ -103,7 +107,7 @@ export async function createTelluricPlanetScene(
             planet.getTransform(),
             planet.getBoundingRadius(),
             planet.oceanUniforms,
-            [light],
+            stellarLightSystem.getLights(),
             assets.textures.water,
             depthRendererManager,
             scene,
@@ -116,7 +120,7 @@ export async function createTelluricPlanetScene(
             planet.getTransform(),
             planet.getBoundingRadius(),
             planet.cloudsUniforms,
-            [light],
+            stellarLightSystem.getLights(),
             depthRendererManager,
             scene,
         );
@@ -134,7 +138,7 @@ export async function createTelluricPlanetScene(
             planet.getTransform(),
             planet.getBoundingRadius(),
             planet.atmosphereUniforms,
-            [light],
+            stellarLightSystem.getLights(),
             depthRendererManager,
             scene,
         );
@@ -146,7 +150,7 @@ export async function createTelluricPlanetScene(
             planet.getTransform(),
             planet.ringsUniforms,
             telluricPlanetModel,
-            [light],
+            stellarLightSystem.getLights(),
             depthRendererManager,
             scene,
         );
@@ -169,6 +173,7 @@ export async function createTelluricPlanetScene(
 
         planet.updateLOD(camera.globalPosition, chunkForge, scatteringSystem);
         chunkForge.update();
+        stellarLightSystem.update(camera, planet);
 
         planet.computeCulling(camera);
     });

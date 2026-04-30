@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Light, PointLight, Scene, TransformNode, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
@@ -63,12 +63,7 @@ export async function createSaturnScene(
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const sun = new TransformNode("sun", scene);
-    sun.position = new Vector3(7, 5.5, -10).scaleInPlace(scalingFactor);
-
-    const light = new PointLight("light1", Vector3.Zero(), scene);
-    light.falloffType = Light.FALLOFF_STANDARD;
-    light.parent = sun;
+    const light = new DirectionalLight("light1", new Vector3(-7, -5, 10).normalize(), scene);
 
     const gasPlanetModel = getSaturnModel([]);
 
@@ -93,12 +88,7 @@ export async function createSaturnScene(
         planet.ringsUniforms,
         null,
         false,
-        [
-            {
-                getBoundingRadius: () => 0,
-                getLight: () => light,
-            },
-        ],
+        [light],
         depthRendererManager,
         scene,
     );

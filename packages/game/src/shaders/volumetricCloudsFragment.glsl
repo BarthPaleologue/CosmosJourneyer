@@ -79,7 +79,7 @@ const float lightAbsorptionTowardSun = 0.94;
 const float lightAbsorptionThroughClouds = 0.85;
 
 float lightMarch(vec3 position) {
-    vec3 sunDir = normalize(star_positions[i] - position);
+    vec3 sunDir = star_directions[i];
     float t0, t1;
     rayIntersectSphere(position, sunDir, object_position, cloudLayerMaxHeight, t0, t1);
 
@@ -105,7 +105,7 @@ vec3 clouds(vec3 rayOrigin, vec3 rayDir, float distance, vec3 originalColor, vec
     float transmittance = 1.0;
     vec3 lightEnergy = vec3(0.0);
 
-    float costheta = dot(rayDir, normalize(star_positions[0] - object_position));
+    float costheta = dot(rayDir, star_directions[0]);
     float phaseCloud = HenyeyGreenstein(0.3, costheta);
 
     for (int i = 0; i < POINTS_FROM_CAMERA; i++) {

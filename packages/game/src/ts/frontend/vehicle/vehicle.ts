@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
@@ -45,10 +46,18 @@ export class Vehicle implements Transformable {
     readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
     readonly maxSteeringAngleHighSpeed = degreesToRadians(7);
 
-    constructor(frame: PhysicsAggregate, doors: ReadonlyArray<Door>, wheels: ReadonlyArray<Wheel>) {
+    readonly allMeshes: ReadonlyArray<AbstractMesh>;
+
+    constructor(
+        frame: PhysicsAggregate,
+        doors: ReadonlyArray<Door>,
+        wheels: ReadonlyArray<Wheel>,
+        allMeshes: ReadonlyArray<AbstractMesh>,
+    ) {
         this.frame = frame;
         this.doors = [...doors];
         this.wheels = [...wheels];
+        this.allMeshes = [...allMeshes];
     }
 
     getSteeringMode() {

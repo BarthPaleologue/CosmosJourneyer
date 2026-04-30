@@ -20,7 +20,6 @@ import "@babylonjs/core/Loading/loadingScreen";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
@@ -501,6 +500,8 @@ export class StarSystemView implements View {
                 const rover = roverResult.value;
                 this.vehicleControls.setVehicle(rover);
 
+                this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
+
                 this.interactionSystem.register({
                     getPhysicsAggregate: () => rover.frame,
                     getInteractions: () => [
@@ -537,10 +538,6 @@ export class StarSystemView implements View {
             const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
             console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
-
-        // small ambient light helps with seeing dark objects. This is unrealistic but I feel it is better.
-        const ambientLight = new HemisphericLight("ambientLight", Vector3.Zero(), this.scene);
-        ambientLight.intensity = 0.02;
 
         this.depthRendererManager = new DepthRendererManager(this.scene);
         this.postProcessManager = new PostProcessManager(assets.textures, this.depthRendererManager, this.scene);
@@ -594,6 +591,16 @@ export class StarSystemView implements View {
 
         this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
 
+        const shipMesh = this.spaceshipControls?.getSpaceship();
+        if (shipMesh !== undefined) {
+            this.starSystem.stellarLightSystem.addShadowCaster(shipMesh.getTransform());
+        }
+
+        const characterRoot = this.characterControls?.avatar.instance.root;
+        if (characterRoot !== undefined) {
+            this.starSystem.stellarLightSystem.addShadowCaster(characterRoot);
+        }
+
         return this.starSystem;
     }
 
@@ -606,13 +613,17 @@ export class StarSystemView implements View {
         starSystem.initPositions(2, this.chunkForge, timestampSeconds);
         this.targetCursorLayer.reset();
 
-        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.getStellarObjects(), [
-            starSystem.starFieldBox.mesh,
-            ...(this.spaceshipControls
-                ?.getSpaceship()
-                .getMainThrusters()
-                .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
-        ]);
+        this.postProcessManager.addCelestialBodies(
+            starSystem.getCelestialBodies(),
+            starSystem.stellarLightSystem.getLights(),
+            [
+                starSystem.starFieldBox.mesh,
+                ...(this.spaceshipControls
+                    ?.getSpaceship()
+                    .getMainThrusters()
+                    .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
+            ],
+        );
 
         const celestialBodies = starSystem.getCelestialBodies();
         const spaceStations = starSystem.getOrbitalFacilities();

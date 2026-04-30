@@ -79,6 +79,7 @@ export class LandingPad implements ILandingPad {
             },
             scene,
         );
+        this.deck.receiveShadows = true;
         this.deck.material = this.deckMaterial;
 
         if (options?.centerDecalTexture !== undefined) {

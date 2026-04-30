@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix } from "@babylonjs/core/Maths/math";
+import { type Color3, Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
@@ -44,6 +44,7 @@ import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
+import { StellarLightSystem } from "../helpers/stellarLightSystem";
 import {
     type Anomaly,
     type CelestialBody,
@@ -103,6 +104,7 @@ export class StarSystemController {
 
     readonly gravitySystem: GravitySystem;
     private readonly floatingOriginSystem: FloatingOriginSystem;
+    readonly stellarLightSystem: StellarLightSystem;
 
     private readonly scatteringSystem: ScatteringSystem;
 
@@ -138,16 +140,33 @@ export class StarSystemController {
 
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
-        this.scatteringSystem = new ScatteringSystem(this.assets.objects);
+        this.stellarLightSystem = new StellarLightSystem(this.scene);
+        this.scatteringSystem = new ScatteringSystem(this.assets.objects, this.stellarLightSystem);
 
-        this.getOrbitalObjects().forEach((object) => {
+        for (const object of this.getOrbitalObjects()) {
             this.objectToParents.set(
                 object,
                 this.getOrbitalObjects().filter((otherObject) =>
                     object.model.orbit.parentIds.includes(otherObject.model.id),
                 ),
             );
-        });
+        }
+
+        for (const stellarObject of this.stellarObjects) {
+            let color: Color3 | null;
+            if (stellarObject.type === "blackHole") {
+                const accretionDisk = stellarObject.accretionDisk;
+                if (accretionDisk === null) {
+                    continue;
+                }
+
+                color = accretionDisk.getEmissiveColor();
+            } else {
+                color = stellarObject.getEmissiveColor();
+            }
+
+            this.stellarLightSystem.registerStellarObject(stellarObject.getTransform(), color);
+        }
     }
 
     public static async CreateAsync(
@@ -458,6 +477,8 @@ export class StarSystemController {
         this.floatingOriginSystem.update(cameraPosition);
         this.floatingOriginSystem.getOffsetToRef(this.referencePosition);
 
+        this.stellarLightSystem.update(camera, this.getNearestCelestialBody(cameraPosition));
+
         this.updateShaders(deltaSeconds);
     }
 
@@ -466,15 +487,12 @@ export class StarSystemController {
      * @param deltaSeconds The time elapsed in seconds since the last update
      */
     private updateShaders(deltaSeconds: number) {
-        const stellarObjects = this.getStellarObjects();
+        const lightSources = this.stellarLightSystem.getLights();
         for (const planet of this.getGasPlanets()) {
-            planet.updateMaterial(
-                stellarObjects.map((object) => object.getLight()),
-                deltaSeconds,
-            );
+            planet.updateMaterial(lightSources, deltaSeconds);
         }
 
-        const stars = stellarObjects.filter((object) => object.type === "star");
+        const stars = this.getStellarObjects().filter((object) => object.type === "star");
         for (const star of stars) {
             star.updateMaterial(deltaSeconds);
         }
@@ -523,6 +541,8 @@ export class StarSystemController {
     public dispose() {
         this.scatteringSystem.dispose();
         this.objectToParents.clear();
+
+        this.stellarLightSystem.dispose();
 
         const pools = this.assets.textures.pools;
 

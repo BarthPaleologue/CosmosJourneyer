@@ -17,7 +17,7 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -50,7 +50,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
         model: DeepReadonly<MandelboxModel>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const shaderName = "mandelbox";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
@@ -102,7 +102,7 @@ export class MandelboxPostProcess extends PostProcess implements UpdatablePostPr
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects, floatingOriginOffset);
+            setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
             effect.setFloat(MandelboxUniformNames.MR2, model.mr2);

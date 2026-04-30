@@ -165,6 +165,9 @@ export class VehicleBuilder {
     }
 
     build(): Vehicle {
+        const allMeshes = this.frame.getChildMeshes();
+        allMeshes.push(this.frame);
+
         const frameAggregate = new PhysicsAggregate(this.frame, PhysicsShapeType.MESH, {
             mass: 2000,
             restitution: 0,
@@ -267,6 +270,6 @@ export class VehicleBuilder {
             physicWheels.push(physicWheel);
         }
 
-        return new Vehicle(frameAggregate, doors, physicWheels);
+        return new Vehicle(frameAggregate, doors, physicWheels, allMeshes);
     }
 }

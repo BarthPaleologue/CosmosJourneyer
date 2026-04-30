@@ -142,7 +142,7 @@ void main() {
 
         finalColor.rgb = vec3(0.0);
         for (int i = 0; i < nbStars; i++) {
-            vec3 sunDir = normalize(star_positions[i] - samplePoint);
+            vec3 sunDir = star_directions[i];
 
             float ndl = max(dot(planetNormal, sunDir), 0.0);
             finalColor.rgb += ambiant * ndl * star_colors[i];

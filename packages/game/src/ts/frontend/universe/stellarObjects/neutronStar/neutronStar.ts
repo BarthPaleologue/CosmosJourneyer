@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { Light } from "@babylonjs/core/Lights/light";
-import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -35,7 +34,6 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
-import { type StellarObjectBase } from "@/frontend/universe/architecture/stellarObject";
 import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
@@ -45,15 +43,18 @@ import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import type { CelestialBodyBase } from "../../architecture/celestialBody";
+import type { LightEmitter } from "../../architecture/lightEmitter";
 import { StarMaterial } from "../star/starMaterial";
 
-export class NeutronStar implements StellarObjectBase<"neutronStar">, Cullable {
+export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, LightEmitter {
     readonly model: DeepReadonly<NeutronStarModel>;
 
     readonly type = "neutronStar";
 
     readonly mesh: Mesh;
-    readonly light: PointLight;
+
+    private readonly emissiveColor: Color3;
 
     private readonly material: StarMaterial;
 
@@ -99,11 +100,8 @@ export class NeutronStar implements StellarObjectBase<"neutronStar">, Cullable {
         const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
         this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
-        this.light = new PointLight(`${this.model.name}Light`, Vector3.Zero(), scene);
         const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
-        this.light.diffuse.copyFromFloats(starColor.r, starColor.g, starColor.b);
-        this.light.falloffType = Light.FALLOFF_STANDARD;
-        this.light.parent = this.getTransform();
+        this.emissiveColor = new Color3(starColor.r, starColor.g, starColor.b);
 
         this.material = new StarMaterial(
             this.model.seed,
@@ -139,8 +137,8 @@ export class NeutronStar implements StellarObjectBase<"neutronStar">, Cullable {
         return getOrbitalObjectTypeToI18nString(this.model);
     }
 
-    getLight(): PointLight {
-        return this.light;
+    public getEmissiveColor(): Color3 {
+        return this.emissiveColor;
     }
 
     public updateMaterial(deltaTime: number): void {
@@ -162,7 +160,6 @@ export class NeutronStar implements StellarObjectBase<"neutronStar">, Cullable {
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.aggregate.dispose();
         this.mesh.dispose();
-        this.light.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
         this.ringsUniforms?.dispose(ringsLutPool);

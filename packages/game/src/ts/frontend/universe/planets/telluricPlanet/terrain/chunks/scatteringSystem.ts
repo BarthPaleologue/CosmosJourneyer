@@ -20,6 +20,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { z } from "zod";
 
 import type { Objects } from "@/frontend/assets/objects";
+import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 
 import { assertUnreachable } from "@/utils/types";
 
@@ -38,8 +39,11 @@ export class ScatteringSystem {
 
     private readonly chunkToScatteredAssets = new Map<string, Partial<Record<AssetType, Mesh>>>();
 
-    public constructor(assets: Objects) {
+    private readonly stellarLightSystem: StellarLightSystem;
+
+    public constructor(assets: Objects, stellarLightSystem: StellarLightSystem) {
         this.assets = assets;
+        this.stellarLightSystem = stellarLightSystem;
     }
 
     public scatterInChunk(chunkTransform: TransformNode, scattering: ScatteredInstances): void {
@@ -73,6 +77,19 @@ export class ScatteringSystem {
             mesh.position.copyFrom(chunkAbsolutePosition);
             mesh.rotationQuaternion = chunkRotationQuaternion;
             mesh.computeWorldMatrix(true);
+            mesh.receiveShadows = true;
+
+            switch (assetType) {
+                case "rock":
+                case "tree":
+                    this.stellarLightSystem.addShadowCaster(mesh);
+                    break;
+                case "grass":
+                case "butterfly":
+                    break;
+                default:
+                    assertUnreachable(assetType);
+            }
 
             chunkPatches[assetType] = mesh;
         }

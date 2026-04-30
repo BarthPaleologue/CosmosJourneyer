@@ -47,11 +47,7 @@ uniform bool shadowUniforms_hasOcean;
 #include "./rings/ringsPatternLookup.glsl";
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
-    if(length(camera_position + rayDir * maximumDistance - star_positions[0]) <= star_radiuses[0] + 1.0) {
-        // The point is on the surface of the star
-        return 1.0;
-    }
-    vec3 towardLight = normalize(star_positions[0] - (camera_position + rayDir * maximumDistance));
+    vec3 towardLight = star_directions[0];
     float t0, t1;
     if (lineIntersectSphere(camera_position + rayDir * maximumDistance, towardLight, object_position, object_radius, t0, t1)) {
         if (t0 > object_radius) {
@@ -72,7 +68,7 @@ float ringOccultation(vec3 rayDir, float maximumDistance) {
 
     float accDensity = 0.0;
     for (int i = 0; i < nbStars; i++) {
-        vec3 towardLight = normalize(star_positions[i] - (camera_position + rayDir * maximumDistance));
+        vec3 towardLight = star_directions[i];
         float t2;
         if (rayIntersectsPlane(camera_position + rayDir * maximumDistance, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
             vec3 shadowSamplePoint = camera_position + rayDir * maximumDistance + t2 * towardLight;

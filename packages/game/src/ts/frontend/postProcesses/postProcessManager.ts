@@ -19,7 +19,7 @@ import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineMa
 
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
-import { type PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -40,7 +40,7 @@ import {
 } from "@cosmos-journeyer/universe-model";
 
 import { type Textures } from "@/frontend/assets/textures";
-import { type CelestialBody, type StellarObject } from "@/frontend/universe/architecture/orbitalObject";
+import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -276,7 +276,11 @@ export class PostProcessManager {
         return [otherRenderEffect, relevantRenderEffect];
     }
 
-    public addStar(star: Star, excludedMeshes: ReadonlyArray<AbstractMesh>) {
+    public addStar(
+        star: Star,
+        lightSources: ReadonlyArray<DirectionalLight>,
+        excludedMeshes: ReadonlyArray<AbstractMesh>,
+    ) {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             star.mesh,
@@ -302,7 +306,7 @@ export class PostProcessManager {
                 star.getTransform(),
                 star.ringsUniforms,
                 star.model,
-                [star.getLight()],
+                lightSources,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -313,7 +317,11 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(star.getTransform(), postProcesses);
     }
 
-    public addNeutronStar(neutronStar: NeutronStar, excludedMeshes: ReadonlyArray<AbstractMesh>) {
+    public addNeutronStar(
+        neutronStar: NeutronStar,
+        lightSources: ReadonlyArray<DirectionalLight>,
+        excludedMeshes: ReadonlyArray<AbstractMesh>,
+    ) {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             neutronStar.mesh,
@@ -349,7 +357,7 @@ export class PostProcessManager {
                 neutronStar.getTransform(),
                 neutronStar.ringsUniforms,
                 neutronStar.model,
-                [neutronStar.getLight()],
+                lightSources,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -376,7 +384,7 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(blackHole.getTransform(), [blackHolePostProcess]);
     }
 
-    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<StellarObject>) {
+    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
         const postProcesses: PostProcess[] = [];
 
         if (planet.atmosphereUniforms !== null) {
@@ -384,7 +392,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.atmosphereUniforms,
-                stellarObjects.map((star) => star.getLight()),
+                stellarObjects,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -397,7 +405,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.oceanUniforms,
-                stellarObjects.map((star) => star.getLight()),
+                stellarObjects,
                 this.textures.water,
                 this.depthRendererManager,
                 this.scene,
@@ -411,7 +419,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.getBoundingRadius(),
                 planet.cloudsUniforms,
-                stellarObjects.map((star) => star.getLight()),
+                stellarObjects,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -424,7 +432,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
-                stellarObjects.map((star) => star.getLight()),
+                stellarObjects,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -448,14 +456,14 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
 
-    public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<StellarObject>) {
+    public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
         const postProcesses: PostProcess[] = [];
 
         const atmosphere = new AtmosphericScatteringPostProcess(
             planet.getTransform(),
             planet.getBoundingRadius(),
             planet.atmosphereUniforms,
-            stellarObjects.map((star) => star.getLight()),
+            stellarObjects,
             this.depthRendererManager,
             this.scene,
         );
@@ -467,7 +475,7 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
-                stellarObjects.map((star) => star.getLight()),
+                stellarObjects,
                 this.depthRendererManager,
                 this.scene,
             );
@@ -501,7 +509,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelbulbModel>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const mandelbulb = new MandelbulbPostProcess(
             transform,
@@ -527,7 +535,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<JuliaSetModel>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const juliaSetPostProcess = new JuliaSetPostProcess(
             transform,
@@ -546,7 +554,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MandelboxModel>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const mandelbox = new MandelboxPostProcess(
             transform,
@@ -565,7 +573,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<SierpinskiPyramidModel>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
             transform,
@@ -584,7 +592,7 @@ export class PostProcessManager {
         transform: TransformNode,
         radius: number,
         model: DeepReadonly<MengerSpongeModel>,
-        stellarObjects: ReadonlyArray<PointLight>,
+        stellarObjects: ReadonlyArray<DirectionalLight>,
     ) {
         const mengerSponge = new MengerSpongePostProcess(
             transform,
@@ -601,29 +609,28 @@ export class PostProcessManager {
 
     public addCelestialBodies(
         bodies: ReadonlyArray<CelestialBody>,
-        stellarObjects: ReadonlyArray<StellarObject>,
+        lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
     ) {
-        const lightSources = stellarObjects.map((object) => object.getLight());
         for (const object of bodies) {
             switch (object.type) {
                 case "star":
-                    this.addStar(object, excludedMeshes);
+                    this.addStar(object, lightSources, excludedMeshes);
                     break;
                 case "neutronStar":
-                    this.addNeutronStar(object, excludedMeshes);
+                    this.addNeutronStar(object, lightSources, excludedMeshes);
                     break;
                 case "blackHole":
                     this.addBlackHole(object);
                     break;
                 case "telluricPlanet":
-                    this.addTelluricPlanet(object, stellarObjects);
+                    this.addTelluricPlanet(object, lightSources);
                     break;
                 case "telluricSatellite":
-                    this.addTelluricPlanet(object, stellarObjects);
+                    this.addTelluricPlanet(object, lightSources);
                     break;
                 case "gasPlanet":
-                    this.addGasPlanet(object, stellarObjects);
+                    this.addGasPlanet(object, lightSources);
                     break;
                 case "mandelbulb":
                     this.addMandelbulb(object.getTransform(), object.getRadius(), object.model, lightSources);
@@ -648,7 +655,7 @@ export class PostProcessManager {
             }
         }
 
-        const newCurrentBody = bodies[0] ?? stellarObjects[0];
+        const newCurrentBody = bodies[0];
         if (newCurrentBody === undefined) {
             throw new Error("No arguments provided to addCelestialBodies");
         }
