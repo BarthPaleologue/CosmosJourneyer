@@ -57,6 +57,7 @@ export default defineConfig({
         open: false,
         host: "0.0.0.0",
         allowedHosts: "all",
+        hot: false,
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",
             "Cross-Origin-Embedder-Policy": "same-origin",
@@ -122,6 +123,10 @@ export default defineConfig({
                 exclude: /node_modules/,
             },
             {
+                test: /\.css$/,
+                type: "css/auto",
+            },
+            {
                 test: /\.(eot|svg|ttf|woff2?|otf|png|jpe?g|gif|webp|glb|obj|mp3|ogg|babylon|env|dds)$/i,
                 type: "asset/resource",
                 exclude: /node_modules/,
@@ -139,8 +144,6 @@ export default defineConfig({
     },
     experiments: {
         asyncWebAssembly: true,
-        topLevelAwait: true,
-        css: true,
     },
     optimization: {
         minimize: isProduction,
