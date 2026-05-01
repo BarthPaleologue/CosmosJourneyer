@@ -52,8 +52,8 @@ type QuadTree = QuadTreeNode | PlanetChunk;
  * A ChunkTree is a structure designed to manage LOD using a quadtree
  */
 export class TerrainFaceQuadTree implements Cullable {
-    readonly minDepth: number; // minimum depth of the tree
-    readonly maxDepth: number; // maximum depth of the tree
+    readonly minDepth: number;
+    readonly maxDepth: number;
 
     private tree: QuadTree | null = null;
 
@@ -63,7 +63,7 @@ export class TerrainFaceQuadTree implements Cullable {
 
     private readonly scene: Scene;
 
-    private deleteSemaphores: DeleteSemaphore[] = [];
+    private deleteSemaphores: Array<DeleteSemaphore> = [];
 
     readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
@@ -140,8 +140,8 @@ export class TerrainFaceQuadTree implements Cullable {
         this.deleteSemaphores.push(new DeleteSemaphore(newChunks, chunksToDelete));
     }
 
-    public getChunkList(tree: QuadTree): PlanetChunk[] {
-        const result: PlanetChunk[] = [];
+    public getChunkList(tree: QuadTree): Array<PlanetChunk> {
+        const result: Array<PlanetChunk> = [];
         this.executeOnEveryChunk((chunk) => result.push(chunk), tree);
         return result;
     }
@@ -152,9 +152,10 @@ export class TerrainFaceQuadTree implements Cullable {
      * @param chunkForge
      */
     public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
-        this.deleteSemaphores.forEach((semaphore) => {
+        for (const semaphore of this.deleteSemaphores) {
             semaphore.update();
-        });
+        }
+
         // remove delete semaphores that have been resolved
         this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
 
@@ -315,9 +316,9 @@ export class TerrainFaceQuadTree implements Cullable {
         });
         this.tree = null;
 
-        this.deleteSemaphores.forEach((deleteSemaphore) => {
+        for (const deleteSemaphore of this.deleteSemaphores) {
             deleteSemaphore.dispose();
-        });
+        }
         this.deleteSemaphores.length = 0;
     }
 }

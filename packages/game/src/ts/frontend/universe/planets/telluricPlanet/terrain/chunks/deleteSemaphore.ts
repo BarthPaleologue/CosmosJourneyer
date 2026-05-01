@@ -59,7 +59,7 @@ export class DeleteSemaphore {
      * This happens when one of the new chunks has been disposed before receiving its vertex data.
      * If this is the case, we resolve the semaphore immediately
      */
-    public resolveIfZombie() {
+    private resolveIfZombie() {
         for (const chunk of this.newChunks) {
             if (chunk.hasBeenDisposed()) {
                 this.resolve();
@@ -68,7 +68,7 @@ export class DeleteSemaphore {
         }
     }
 
-    public isReadyToResolve() {
+    private isReadyToResolve() {
         let flag = this.newChunks.length;
         this.newChunks.forEach((chunk) => {
             if (chunk.isLoaded()) {
