@@ -34,12 +34,31 @@ export class WorkerPool<TTask, TWorkerInput> {
     ) {
         this.taskQueue = new PriorityQueue<TTask>(comparator);
         for (const worker of workers) {
-            worker.onerror = (error) => {
-                console.error("Worker error:", error);
+            worker.onerror = (event) => {
+                console.error("Worker error", event);
+                this.busyWorkers.delete(worker);
+                this.finishedWorkers.add(worker);
             };
-            worker.onmessageerror = (error) => {
-                console.error("Worker message error:", error);
+
+            worker.onmessageerror = (event) => {
+                console.error("Worker message error", event);
+                this.busyWorkers.delete(worker);
+                this.finishedWorkers.add(worker);
             };
+
+            worker.onmessage = (event: MessageEvent<unknown>) => {
+                this.handleWorkerResult(event);
+
+                const nextTask = this.nextTask();
+
+                if (nextTask !== undefined) {
+                    this.dispatchTask(worker, nextTask);
+                } else {
+                    this.busyWorkers.delete(worker);
+                    this.finishedWorkers.add(worker);
+                }
+            };
+
             this.availableWorkers.add(worker);
         }
 
@@ -71,33 +90,8 @@ export class WorkerPool<TTask, TWorkerInput> {
         this.availableWorkers.delete(worker);
         this.busyWorkers.add(worker);
 
-        worker.onerror = (event) => {
-            console.error("Worker error", event);
-            this.busyWorkers.delete(worker);
-            this.finishedWorkers.add(worker);
-        };
-
-        worker.onmessageerror = (event) => {
-            console.error("Worker message error", event);
-            this.busyWorkers.delete(worker);
-            this.finishedWorkers.add(worker);
-        };
-
         const serializedTask = this.serializeTask(task);
         worker.postMessage(serializedTask);
-
-        worker.onmessage = (event: MessageEvent<unknown>) => {
-            this.handleWorkerResult(event);
-
-            const nextTask = this.nextTask();
-
-            if (nextTask !== undefined) {
-                this.dispatchTask(worker, nextTask);
-            } else {
-                this.busyWorkers.delete(worker);
-                this.finishedWorkers.add(worker);
-            }
-        };
     }
 
     public submitTask(task: TTask) {
@@ -121,10 +115,6 @@ export class WorkerPool<TTask, TWorkerInput> {
 
         this.finishedWorkers.clear();
         this.busyWorkers.clear();
-
-        for (const worker of this.availableWorkers) {
-            worker.onmessage = null;
-        }
 
         this.taskQueue.clear();
     }
