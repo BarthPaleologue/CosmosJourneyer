@@ -180,6 +180,14 @@ export class TerrainFaceQuadTree implements Cullable {
             return this.createChunk(walked, chunkForge, scatteringSystem);
         }
 
+        if (tree instanceof PlanetChunk && !tree.isLoaded()) {
+            const chunkOutput = chunkForge.getOutput(tree.id);
+            if (chunkOutput !== undefined && chunkOutput.status === "completed" && this.remainingGpuUploads > 0) {
+                tree.init(chunkOutput);
+                this.remainingGpuUploads -= 1;
+            }
+        }
+
         if (walked.length === this.maxDepth) return tree;
 
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(
@@ -217,14 +225,6 @@ export class TerrainFaceQuadTree implements Cullable {
         kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
 
         const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
-
-        if (tree instanceof PlanetChunk && !tree.isLoaded()) {
-            const chunkOutput = chunkForge.getOutput(tree.id);
-            if (chunkOutput !== undefined && chunkOutput.status === "completed" && this.remainingGpuUploads > 0) {
-                tree.init(chunkOutput);
-                this.remainingGpuUploads -= 1;
-            }
-        }
 
         if (tree instanceof PlanetChunk && targetLOD > walked.length) {
             if (!tree.isLoaded()) return tree;
@@ -296,6 +296,18 @@ export class TerrainFaceQuadTree implements Cullable {
         }
 
         return chunk;
+    }
+
+    public isIdle(): boolean {
+        if (this.tree === null) {
+            return false;
+        }
+
+        if (this.deleteSemaphores.length > 0) {
+            return false;
+        }
+
+        return this.getChunks().every((chunk) => chunk.isLoaded());
     }
 
     public computeCulling(camera: Camera): void {

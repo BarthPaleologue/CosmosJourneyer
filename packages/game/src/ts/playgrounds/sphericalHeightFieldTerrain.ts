@@ -93,7 +93,7 @@ export async function createSphericalHeightFieldTerrainScene(
             terrain.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge, scatteringSystem);
             chunkForge.update();
 
-            if (chunkForge.isIdle()) {
+            if (chunkForge.isIdle() && terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

@@ -187,7 +187,7 @@ export async function createTelluricPlanetScene(
             planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge, scatteringSystem);
             chunkForge.update();
 
-            if (chunkForge.isIdle()) {
+            if (chunkForge.isIdle() && planet.terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

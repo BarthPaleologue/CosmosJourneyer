@@ -63,6 +63,10 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         }
     }
 
+    isIdle(): boolean {
+        return this.faces.every((face) => face.isIdle());
+    }
+
     getTransform(): TransformNode {
         return this.transform;
     }
