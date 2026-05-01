@@ -17,10 +17,11 @@
 
 import "@styles/index.css";
 
-import "@babylonjs/inspector";
+import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
+import { Inspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
@@ -66,22 +67,7 @@ window.scene = scene;
 loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
-    const inspectorRoot = document.createElement("div");
-    inspectorRoot.id = "inspectorLayer";
-    document.body.appendChild(inspectorRoot);
-    await scene.debugLayer.show({
-        globalRoot: inspectorRoot,
-    });
-
-    document.addEventListener("keypress", async (e) => {
-        if (e.key === "i") {
-            if (scene.debugLayer.isVisible()) {
-                scene.debugLayer.hide();
-            } else {
-                await scene.debugLayer.show({ globalRoot: inspectorRoot });
-            }
-        }
-    });
+    Inspector.Show(scene, { overlay: true });
 }
 
 if (urlParams.get("physicsViewer") !== null) {
