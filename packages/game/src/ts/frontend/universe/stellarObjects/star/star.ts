@@ -123,7 +123,7 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
             this.asteroidField = null;
         }
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

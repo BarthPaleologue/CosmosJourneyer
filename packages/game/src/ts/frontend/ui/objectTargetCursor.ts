@@ -62,7 +62,7 @@ export class ObjectTargetCursor {
     constructor(object: Targetable) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
-        this.htmlRoot.dataset["name"] = object.getTransform().name + " Target Cursor Root";
+        this.htmlRoot.dataset["name"] = object.targetInfo.name + " Target Cursor Root";
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
@@ -107,7 +107,7 @@ export class ObjectTargetCursor {
 
         this.nameText = document.createElement("p");
         this.nameText.classList.add("targetCursorName");
-        this.nameText.textContent = object.getTransform().name;
+        this.nameText.textContent = object.targetInfo.name;
 
         this.typeText = document.createElement("p");
         this.typeText.classList.add("targetCursorType");

@@ -147,6 +147,7 @@ export class SpaceElevatorClimber implements Targetable {
         this.boundingRadius = globalRadius + solarPanelWidth;
 
         this.targetInfo = {
+            name: i18n.t("objectTypes:spaceElevatorClimber"),
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 7.0,
             maxDistance: this.getBoundingRadius() * 3000,

@@ -33,6 +33,7 @@ class MockLandingPad implements ILandingPad {
 
     readonly targetInfo: TargetInfo = {
         type: ObjectTargetCursorType.LANDING_PAD,
+        name: "Mock Landing Pad",
         minDistance: 0,
         maxDistance: 0,
     };

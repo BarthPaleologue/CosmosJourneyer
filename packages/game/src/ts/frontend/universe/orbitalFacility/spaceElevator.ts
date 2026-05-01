@@ -158,6 +158,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         this.targetInfo = {
             type: ObjectTargetCursorType.FACILITY,
+            name: this.name,
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };

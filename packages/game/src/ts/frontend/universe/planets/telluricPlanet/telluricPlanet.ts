@@ -147,7 +147,7 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
             this.cloudsUniforms = null;
         }
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
         this.targetInfo.maxDistance =
             this.model.type === "telluricSatellite" ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }

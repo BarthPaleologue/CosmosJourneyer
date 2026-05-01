@@ -268,8 +268,8 @@ export class Spaceship implements Transformable, Targetable {
         this.hyperSpaceTunnel.setEnabled(false);
         this.internals = new SpaceshipInternals(serializedSpaceShip, unfitComponents);
 
-        this.getTransform().name = this.name;
         this.targetInfo = {
+            name: this.name,
             type: ObjectTargetCursorType.SPACESHIP,
             minDistance: this.getBoundingRadius() * 15,
             maxDistance: 0,
