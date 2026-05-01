@@ -75,6 +75,9 @@ export class TerrainFaceQuadTree implements Cullable {
 
     readonly material: Material;
 
+    private readonly maxGpuUploadsPerFrame = 1;
+    private remainingGpuUploads = this.maxGpuUploadsPerFrame;
+
     /**
      *
      * @param direction
@@ -155,6 +158,7 @@ export class TerrainFaceQuadTree implements Cullable {
         // remove delete semaphores that have been resolved
         this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
 
+        this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
         this.tree = this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem);
 
         this.executeOnEveryChunk((chunk) => {
@@ -221,8 +225,9 @@ export class TerrainFaceQuadTree implements Cullable {
 
         if (tree instanceof PlanetChunk && !tree.isLoaded()) {
             const chunkOutput = chunkForge.getOutput(tree.id);
-            if (chunkOutput !== undefined && chunkOutput.status === "completed") {
+            if (chunkOutput !== undefined && chunkOutput.status === "completed" && this.remainingGpuUploads > 0) {
                 tree.init(chunkOutput);
+                this.remainingGpuUploads -= 1;
             }
         }
 
