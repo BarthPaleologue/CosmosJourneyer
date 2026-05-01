@@ -1,26 +1,40 @@
-name: Monorepo Checks
+name: CI
 
 on:
-    push:
-        branches: [main]
     pull_request:
         branches: [main]
     workflow_dispatch:
 
 concurrency:
-    group: monorepo-checks-${{ github.head_ref || github.ref_name || github.run_id }}
+    group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
     cancel-in-progress: true
 
 jobs:
-    verify:
-        name: monorepo-checks
+    ci:
+        name: ci
         runs-on: ubuntu-latest
-        timeout-minutes: 20
+        timeout-minutes: 40
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
               with:
-                  lfs: true
+                  lfs: false
+
+            - name: Compute Git LFS cache key
+              id: git-lfs-cache-key
+              run: |
+                  git lfs ls-files --long | sort | sha256sum | cut -d " " -f 1 > /tmp/git-lfs-cache-key
+                  echo "key=$(cat /tmp/git-lfs-cache-key)" >> "$GITHUB_OUTPUT"
+
+            - name: Cache Git LFS objects
+              uses: actions/cache@v4
+              with:
+                  path: .git/lfs
+                  key: git-lfs-${{ runner.os }}-${{ steps.git-lfs-cache-key.outputs.key }}
+                  restore-keys: git-lfs-${{ runner.os }}-
+
+            - name: Pull Git LFS assets
+              run: git lfs pull
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
@@ -59,3 +73,22 @@ jobs:
 
             - name: Build packages
               run: pnpm build
+
+            - name: Install Playwright Chromium
+              run: pnpm --filter @cosmos-journeyer/game exec playwright install --with-deps chromium
+
+            - name: Run Playwright suite
+              run: |
+                  mkdir -p packages/game/artifacts
+                  pnpm --filter @cosmos-journeyer/game exec playwright test \
+                    --output=artifacts/test-results \
+                    --reporter=line,html
+
+            - name: Upload Playwright artifacts
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: test-results
+                  path: |
+                      packages/game/artifacts
+                      packages/game/playwright-report
