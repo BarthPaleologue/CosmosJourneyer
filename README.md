@@ -151,7 +151,7 @@ Cosmos Journeyer is built using the following technologies:
 - [BabylonJS](https://www.babylonjs.com/) for the 3D engine
 - [Next.js](https://nextjs.org/) for the website
 - [TypeScript](https://www.typescriptlang.org/) for the programming language
-- [Rspack](https://rspack.dev/) for bundling the application
+- [Vite](https://vite.dev/) for bundling the game application and development server
 - [Pnpm](https://pnpm.io/) for the package manager
 - [Electron](https://www.electronjs.org/) for building the desktop application
 - [Playwright](https://playwright.dev/) for end-to-end testing

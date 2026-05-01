@@ -19,10 +19,10 @@
     },
     "devDependencies": {
         "eslint": "catalog:",
-        "jsdom": "^29.0.2",
+        "jsdom": "catalog:",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
-        "vite": "^8.0.8",
+        "vite": "catalog:",
         "vitest": "catalog:"
     }
 }
