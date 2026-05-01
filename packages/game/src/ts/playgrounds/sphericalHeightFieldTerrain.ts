@@ -57,13 +57,15 @@ export async function createSphericalHeightFieldTerrainScene(
     controls.speed = scalingFactor;
     camera.maxZ *= scalingFactor;
 
-    controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).scaleInPlace(scalingFactor));
+    const urlParams = new URLSearchParams(window.location.search);
+    const startingDistance = Number(urlParams.get("startingDistance") ?? scalingFactor * 1.5);
+
+    controls.getTransform().setAbsolutePosition(new Vector3(0, 1, -2).normalize().scaleInPlace(startingDistance));
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
     camera.attachControl();
 
     new DirectionalLight("light", new Vector3(-7, -5, 10).normalize(), scene);
 
-    const urlParams = new URLSearchParams(window.location.search);
     const seed = Number(urlParams.get("seed") ?? Math.floor(Math.random() * 1000));
     console.log("seed", seed);
 
