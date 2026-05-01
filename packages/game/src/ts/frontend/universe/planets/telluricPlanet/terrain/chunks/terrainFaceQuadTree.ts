@@ -116,18 +116,18 @@ export class TerrainFaceQuadTree implements Cullable {
         this.material = material;
     }
 
-    /**
-     * Function used to execute code on every chunk of the quadtree
-     * @param tree the tree to explore
-     * @param f the function to apply on every chunk
-     */
-    public executeOnEveryChunk(f: (chunk: PlanetChunk) => void, tree: QuadTree | null = this.tree): void {
+    public *getChunks(tree: QuadTree | null = this.tree): Generator<PlanetChunk, void, unknown> {
         if (tree === null) {
             return;
         }
 
-        if (tree instanceof PlanetChunk) f(tree);
-        else for (const stem of tree) this.executeOnEveryChunk(f, stem);
+        if (tree instanceof PlanetChunk) {
+            yield tree;
+        } else {
+            for (const stem of tree) {
+                yield* this.getChunks(stem);
+            }
+        }
     }
 
     /**
@@ -136,14 +136,8 @@ export class TerrainFaceQuadTree implements Cullable {
      * @param newChunks
      */
     private requestDeletion(tree: QuadTree, newChunks: PlanetChunk[]): void {
-        const chunksToDelete = this.getChunkList(tree);
+        const chunksToDelete = Array.from(this.getChunks(tree));
         this.deleteSemaphores.push(new DeleteSemaphore(newChunks, chunksToDelete));
-    }
-
-    public getChunkList(tree: QuadTree): Array<PlanetChunk> {
-        const result: Array<PlanetChunk> = [];
-        this.executeOnEveryChunk((chunk) => result.push(chunk), tree);
-        return result;
     }
 
     /**
@@ -162,9 +156,9 @@ export class TerrainFaceQuadTree implements Cullable {
         this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
         this.tree = this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem);
 
-        this.executeOnEveryChunk((chunk) => {
+        for (const chunk of this.getChunks()) {
             chunk.updatePosition();
-        });
+        }
     }
 
     /**
@@ -305,15 +299,15 @@ export class TerrainFaceQuadTree implements Cullable {
     }
 
     public computeCulling(camera: Camera): void {
-        this.executeOnEveryChunk((chunk: PlanetChunk) => {
+        for (const chunk of this.getChunks()) {
             chunk.computeCulling(camera);
-        });
+        }
     }
 
     public dispose(): void {
-        this.executeOnEveryChunk((chunk: PlanetChunk) => {
+        for (const chunk of this.getChunks()) {
             chunk.dispose();
-        });
+        }
         this.tree = null;
 
         for (const deleteSemaphore of this.deleteSemaphores) {
