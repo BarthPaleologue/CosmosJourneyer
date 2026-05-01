@@ -45,7 +45,7 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         material: Material,
         scene: Scene,
     ) {
-        this.transform = new TransformNode("sphericalHeightFieldTerrain", scene);
+        this.transform = new TransformNode(`${model.name}SphericalHeightFieldTerrain`, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
         this.faces = [
             new TerrainFaceQuadTree("up", model, this.transform, material, scene),
