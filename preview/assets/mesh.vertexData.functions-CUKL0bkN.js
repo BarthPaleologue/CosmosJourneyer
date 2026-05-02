@@ -1,0 +1,1 @@
+import{n as e,t}from"./mesh.vertexData.functions-D1lJd4wK.js";e();export{t as OptimizeIndices};

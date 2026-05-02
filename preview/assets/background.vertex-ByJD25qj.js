@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.vertex-CegTOO4a.js";e();export{t as backgroundVertexShaderWGSL};

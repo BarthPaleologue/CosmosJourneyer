@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblCombineVoxelGrids.fragment-KJ4XdQSj.js";e();export{t as iblCombineVoxelGridsPixelShaderWGSL};

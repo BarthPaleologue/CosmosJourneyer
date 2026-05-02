@@ -1,0 +1,1 @@
+import{n as e}from"./chunk-Dy9vhvp_.js";import{a as t,s as n}from"./math.vector-BnOCKX5n.js";var r,i,a,o=e((()=>{n(),(function(e){e[e.LOCAL=0]=`LOCAL`,e[e.WORLD=1]=`WORLD`,e[e.BONE=2]=`BONE`})(r||={}),i=class{},i.X=new t(1,0,0),i.Y=new t(0,1,0),i.Z=new t(0,0,1),(function(e){e[e.X=0]=`X`,e[e.Y=1]=`Y`,e[e.Z=2]=`Z`})(a||={})}));export{o as i,a as n,r,i as t};

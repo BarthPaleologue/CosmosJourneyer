@@ -1,0 +1,1 @@
+import{t as e}from"./color.vertex-FECc574S.js";export{e as colorVertexShaderWGSL};

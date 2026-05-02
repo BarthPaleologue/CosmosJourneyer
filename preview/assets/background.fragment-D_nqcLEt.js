@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.fragment-CZ7cZWIp.js";e();export{t as backgroundPixelShaderWGSL};

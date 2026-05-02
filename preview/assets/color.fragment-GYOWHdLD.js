@@ -1,0 +1,1 @@
+import{n as e,t}from"./color.fragment-hqLmZEIT.js";e();export{t as colorPixelShader};

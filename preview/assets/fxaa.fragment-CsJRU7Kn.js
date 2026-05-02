@@ -1,0 +1,1 @@
+import{n as e,t}from"./fxaa.fragment-Clu1M2vw.js";e();export{t as fxaaPixelShaderWGSL};

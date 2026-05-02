@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.fragment-BvhD13AI.js";t();export{e as particlesPixelShaderWGSL};

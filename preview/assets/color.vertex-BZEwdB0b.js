@@ -1,0 +1,1 @@
+import{n as e,t}from"./color.vertex-BSYXbI9A.js";e();export{t as colorVertexShaderWGSL};

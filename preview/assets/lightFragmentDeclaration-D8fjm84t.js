@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightFragmentDeclaration-qe5u-kSv.js";t();export{e as lightFragmentDeclaration};

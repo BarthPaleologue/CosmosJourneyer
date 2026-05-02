@@ -1,0 +1,1 @@
+import{n as e,t}from"./procedural.vertex-BFTN1OkB.js";t();export{e as proceduralVertexShader};

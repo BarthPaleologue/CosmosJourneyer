@@ -1,0 +1,1 @@
+import{n as e}from"./chunk-Dy9vhvp_.js";function t(e,t=!1){if(!(t&&n[e]))return n[e]=!0,`${e} needs to be imported before as it contains a side-effect required by your code.`}var n,r=e((()=>{n={}}));export{r as n,t};

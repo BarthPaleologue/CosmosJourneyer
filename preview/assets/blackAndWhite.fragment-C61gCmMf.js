@@ -1,0 +1,1 @@
+import{n as e,t}from"./blackAndWhite.fragment-CK5qkaB1.js";e();export{t as blackAndWhitePixelShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./clipPlaneFragmentDeclaration-Cu2zO80O.js";e();export{t as clipPlaneFragmentDeclarationWGSL};

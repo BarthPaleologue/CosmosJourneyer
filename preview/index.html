@@ -1,1 +1,190 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="keywords" content="space,exploration,game,open-source,planet,procedural,universe,procedural universe,procedural planet,webgl,webgpu"><meta name="author" content="Barthélemy Paléologue"><meta name="robots" content="index, follow"><title>Cosmos Journeyer</title><meta content="Cosmos Journeyer is an immersive space exploration game focused on the beauty and vastness of the universe. Embark on a personal journey through breathtaking cosmic landscapes, uncover strange anomalies, and engage in relaxing activities on alien worlds. Experience seamless transitions from starship to planet surface, and discover a story that reveals the mysteries of existence." name="description"><link href="favicon.png" rel="icon"><script defer src="2808.04230452394ef05b.js"></script><script defer src="8087.3e3ad0e403686f10.js"></script><script defer src="6296.d6aab4707550d697.js"></script><script defer src="5288.ac8e351d050413e2.js"></script><script defer src="3948.e75c7fae5eb3ec41.js"></script><script defer src="5897.74c9054a7397613c.js"></script><script defer src="main.93c3aaefd921aaf5.js"></script><link href="5897.c373916d9da51d42.css" rel="stylesheet"></head><body></body></html>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Cosmos Journeyer is an immersive space exploration game focused on the beauty and vastness of the universe. Embark on a personal journey through breathtaking cosmic landscapes, uncover strange anomalies, and engage in relaxing activities on alien worlds. Experience seamless transitions from starship to planet surface, and discover a story that reveals the mysteries of existence."
+        />
+        <meta
+            name="keywords"
+            content="space, exploration, game, open-source, planet, procedural, universe, procedural universe, procedural planet, webgl, webgpu"
+        />
+        <meta name="author" content="Barthélemy Paléologue" />
+        <meta name="robots" content="index, follow" />
+        <link rel="icon" type="image/png" href="./assets/favicon-CWv4eNsU.png" />
+        <title>Cosmos Journeyer</title>
+      <script type="module" crossorigin src="./assets/main-DLznqZth.js"></script>
+      <link rel="modulepreload" crossorigin href="./assets/chunk-Dy9vhvp_.js">
+      <link rel="modulepreload" crossorigin href="./assets/dataBuffer-DWnY7O2C.js">
+      <link rel="modulepreload" crossorigin href="./assets/logger-CtYBTeuf.js">
+      <link rel="modulepreload" crossorigin href="./assets/buffer-CtnY_A0L.js">
+      <link rel="modulepreload" crossorigin href="./assets/observable-D84Ceivi.js">
+      <link rel="modulepreload" crossorigin href="./assets/performanceConfigurator-DxAYJLq1.js">
+      <link rel="modulepreload" crossorigin href="./assets/shaderStore-CAkcDnHW.js">
+      <link rel="modulepreload" crossorigin href="./assets/devTools-Ctw7ge8c.js">
+      <link rel="modulepreload" crossorigin href="./assets/precisionDate-CyWdfGaE.js">
+      <link rel="modulepreload" crossorigin href="./assets/tools.functions-CLshJ4y7.js">
+      <link rel="modulepreload" crossorigin href="./assets/postprocess.vertex-d2hj7jnt.js">
+      <link rel="modulepreload" crossorigin href="./assets/postprocess.vertex-C_VE2Vgn.js">
+      <link rel="modulepreload" crossorigin href="./assets/effectRenderer-R14n8eTm.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.scalar.functions-BAsnBYGN.js">
+      <link rel="modulepreload" crossorigin href="./assets/typeStore-C6t6AjEm.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.vector-BnOCKX5n.js">
+      <link rel="modulepreload" crossorigin href="./assets/pickingInfo-Vh-1fcXL.js">
+      <link rel="modulepreload" crossorigin href="./assets/pointerEvents-Dj1A9jdm.js">
+      <link rel="modulepreload" crossorigin href="./assets/lightConstants-CXIYF66w.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.color-CoIQ44NW.js">
+      <link rel="modulepreload" crossorigin href="./assets/decorators-DId8wCHD.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.size-CM4KtJFy.js">
+      <link rel="modulepreload" crossorigin href="./assets/imageProcessingConfiguration-CnEAZfpc.js">
+      <link rel="modulepreload" crossorigin href="./assets/webRequest-BOZ5sRp3.js">
+      <link rel="modulepreload" crossorigin href="./assets/instantiationTools-FUjFMpGp.js">
+      <link rel="modulepreload" crossorigin href="./assets/guid-BCckxcTk.js">
+      <link rel="modulepreload" crossorigin href="./assets/tools-xghK9enf.js">
+      <link rel="modulepreload" crossorigin href="./assets/uniformBuffer-Ddv4YiAf.js">
+      <link rel="modulepreload" crossorigin href="./assets/floatingOriginMatrixOverrides-BpV-5wcD.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.plane-BwBgHNpY.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.frustum-Cc6kekaP.js">
+      <link rel="modulepreload" crossorigin href="./assets/perfCounter-DuntYJ5Z.js">
+      <link rel="modulepreload" crossorigin href="./assets/uniqueIdGenerator-B4SM1PY6.js">
+      <link rel="modulepreload" crossorigin href="./assets/scene-BLom26Kb.js">
+      <link rel="modulepreload" crossorigin href="./assets/node-bi-QDiDu.js">
+      <link rel="modulepreload" crossorigin href="./assets/animation-BOscbQzY.js">
+      <link rel="modulepreload" crossorigin href="./assets/animationGroup-BFLK2knA.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.path-C-Q2EHUQ.js">
+      <link rel="modulepreload" crossorigin href="./assets/easing-B9Iq6L_r.js">
+      <link rel="modulepreload" crossorigin href="./assets/abstractAudioNode-D_Qph7Qs.js">
+      <link rel="modulepreload" crossorigin href="./assets/spatialWebAudioUpdaterComponent-C2oIpjTM.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.functions-BhJGhPui.js">
+      <link rel="modulepreload" crossorigin href="./assets/subMesh-DRQ5PZF9.js">
+      <link rel="modulepreload" crossorigin href="./assets/texture-GcpVQ9yf.js">
+      <link rel="modulepreload" crossorigin href="./assets/thinEngine-D1f_wNIQ.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.axis-D5D4S2um.js">
+      <link rel="modulepreload" crossorigin href="./assets/textureTools-DmAZctvc.js">
+      <link rel="modulepreload" crossorigin href="./assets/webgpuPerfCounter-DvPII-De.js">
+      <link rel="modulepreload" crossorigin href="./assets/bakedVertexAnimation-DpdUHLfA.js">
+      <link rel="modulepreload" crossorigin href="./assets/bakedVertexAnimationDeclaration-C5lPXkc7.js">
+      <link rel="modulepreload" crossorigin href="./assets/decalFragment-kICYgouY.js">
+      <link rel="modulepreload" crossorigin href="./assets/fresnelFunction-Dugkz-xQ.js">
+      <link rel="modulepreload" crossorigin href="./assets/helperFunctions-CjimQ7bX.js">
+      <link rel="modulepreload" crossorigin href="./assets/instancesDeclaration-B7ap1PGG.js">
+      <link rel="modulepreload" crossorigin href="./assets/instancesVertex-CRsVoSk9.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUboDeclaration-CbscdDj-.js">
+      <link rel="modulepreload" crossorigin href="./assets/sceneUboDeclaration-B56gRjPP.js">
+      <link rel="modulepreload" crossorigin href="./assets/engine.multiRender-CyfYbQK_.js">
+      <link rel="modulepreload" crossorigin href="./assets/webAudioBaseSubGraph-CH6wzyVh.js">
+      <link rel="modulepreload" crossorigin href="./assets/abstractSoundSource-BnQfyiqx.js">
+      <link rel="modulepreload" crossorigin href="./assets/abstractSoundInstance-CpmCm61d.js">
+      <link rel="modulepreload" crossorigin href="./assets/spatialWebAudio-BN_dG9v-.js">
+      <link rel="modulepreload" crossorigin href="./assets/webAudioStaticSound-Cf6F4nCt.js">
+      <link rel="modulepreload" crossorigin href="./assets/webAudioStreamingSound-C2XW-IBt.js">
+      <link rel="modulepreload" crossorigin href="./assets/webAudioSoundSource-CV93qYwa.js">
+      <link rel="modulepreload" crossorigin href="./assets/storageBuffer-sbKd0UTs.js">
+      <link rel="modulepreload" crossorigin href="./assets/cubemapToSphericalPolynomial-DeU9YB0O.js">
+      <link rel="modulepreload" crossorigin href="./assets/dds-CZwHy0ph.js">
+      <link rel="modulepreload" crossorigin href="./assets/engine.multiRender-51KYPAe4.js">
+      <link rel="modulepreload" crossorigin href="./assets/constants--_He3wkM.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphBlock-CJVWjep1.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphAssetsContext-YxmVYkYC.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphExecutionBlock-DNTHXorF.js">
+      <link rel="modulepreload" crossorigin href="./assets/utils-BapFY-pz.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphCoordinator-BIArFB8S.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphExecutionBlockWithOutSignal-D6D1iw1_.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphAsyncExecutionBlock-BLrm95jq.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphEventBlock-B2y-Ycn1.js">
+      <link rel="modulepreload" crossorigin href="./assets/glTFLoaderAnimation-DUJ_p7Z8.js">
+      <link rel="modulepreload" crossorigin href="./assets/baseTexture.polynomial-BRsYcntd.js">
+      <link rel="modulepreload" crossorigin href="./assets/materialHelper.functions-CfnMHxFr.js">
+      <link rel="modulepreload" crossorigin href="./assets/rgbdTextureTools-CrQVd82x.js">
+      <link rel="modulepreload" crossorigin href="./assets/imageProcessing-DippLlWl.js">
+      <link rel="modulepreload" crossorigin href="./assets/pbrMaterial-DUBML8RM.js">
+      <link rel="modulepreload" crossorigin href="./assets/ddsTextureLoader-stLXxIKa.js">
+      <link rel="modulepreload" crossorigin href="./assets/dumpTools-KeIgRMjh.js">
+      <link rel="modulepreload" crossorigin href="./assets/envTextureLoader-CXasa-0s.js">
+      <link rel="modulepreload" crossorigin href="./assets/ktxTextureLoader-U9VvGubK.js">
+      <link rel="modulepreload" crossorigin href="./assets/math.vector.functions-CgRFo5p3.js">
+      <link rel="modulepreload" crossorigin href="./assets/mesh.vertexData.functions-D1lJd4wK.js">
+      <link rel="modulepreload" crossorigin href="./assets/hdr-BPJUjD9B.js">
+      <link rel="modulepreload" crossorigin href="./assets/timer-Da4OblUv.js">
+      <link rel="modulepreload" crossorigin href="./assets/bakedVertexAnimation-B2IYzsaa.js">
+      <link rel="modulepreload" crossorigin href="./assets/bonesDeclaration-z6zw-Cnj.js">
+      <link rel="modulepreload" crossorigin href="./assets/bonesVertex-D2mbYmA_.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneVertex-BW-PqQBf.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneVertexDeclaration-CtNex3wB.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogVertex-D_kLEcDX.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogVertexDeclaration-BcuMI541.js">
+      <link rel="modulepreload" crossorigin href="./assets/helperFunctions-CwX7ufNs.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthDeclaration-CBgNGOLC.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthVertex-B8gDFpaz.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUboDeclaration-jmeVjD0-.js">
+      <link rel="modulepreload" crossorigin href="./assets/sceneUboDeclaration-gi2SMQ_g.js">
+      <link rel="modulepreload" crossorigin href="./assets/gaussianSplatting.vertex-CFXmR8D4.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneFragment-De5LTEwJ.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneFragmentDeclaration-ZydEbf85.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogFragment-C1WFlwAh.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogFragmentDeclaration-vDS-NW1c.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthFragment-BDez7JpP.js">
+      <link rel="modulepreload" crossorigin href="./assets/gaussianSplatting.fragment-7WgMUfjq.js">
+      <link rel="modulepreload" crossorigin href="./assets/instancesDeclaration-CaW2Z_u3.js">
+      <link rel="modulepreload" crossorigin href="./assets/instancesVertex-CevDItO8.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertex-CLyGaKXM.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexDeclaration-DrBWkgdN.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexGlobal-B74u-a2A.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexGlobalDeclaration-DvsNmtni.js">
+      <link rel="modulepreload" crossorigin href="./assets/pointCloudVertex-D-OExflD.js">
+      <link rel="modulepreload" crossorigin href="./assets/depth.vertex-X68Jb7ck.js">
+      <link rel="modulepreload" crossorigin href="./assets/color.fragment-hqLmZEIT.js">
+      <link rel="modulepreload" crossorigin href="./assets/vertexColorMixing-COLpiv1D.js">
+      <link rel="modulepreload" crossorigin href="./assets/color.vertex-DTR-a2zz.js">
+      <link rel="modulepreload" crossorigin href="./assets/packingFunctions-B9UyP_bH.js">
+      <link rel="modulepreload" crossorigin href="./assets/depth.fragment-DZgwkjoB.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRenderer.fragment-CJbjerE-.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRenderer.vertex-C3HjYXAT.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererFinaliser.fragment-h2xeiDLb.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererFinaliser.vertex-8lKQ61Z5.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererMasker.fragment-D5sGHKsV.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererMasker.vertex-D9fbOVv_.js">
+      <link rel="modulepreload" crossorigin href="./assets/minmaxRedux.fragment-B9ThG8MY.js">
+      <link rel="modulepreload" crossorigin href="./assets/sharpen.fragment-D1yxMUpj.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneVertex-KkN9sPFQ.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneVertexDeclaration-DtMDQIyz.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogVertex-CiAjcqWI.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogVertexDeclaration-CINJ0JvW.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthDeclaration-DJNNTDCh.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthVertex-DhIja7UR.js">
+      <link rel="modulepreload" crossorigin href="./assets/gaussianSplatting.vertex-DyqBAVtR.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneFragment-ZzQwUm06.js">
+      <link rel="modulepreload" crossorigin href="./assets/clipPlaneFragmentDeclaration-Cu2zO80O.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogFragment-BDj2dsPc.js">
+      <link rel="modulepreload" crossorigin href="./assets/fogFragmentDeclaration-XSoOsOgg.js">
+      <link rel="modulepreload" crossorigin href="./assets/logDepthFragment-BpBWNd0L.js">
+      <link rel="modulepreload" crossorigin href="./assets/gaussianSplatting.fragment-IccIg0aY.js">
+      <link rel="modulepreload" crossorigin href="./assets/color.fragment-aM4MWTYm.js">
+      <link rel="modulepreload" crossorigin href="./assets/bonesDeclaration-geejcpom.js">
+      <link rel="modulepreload" crossorigin href="./assets/bonesVertex-Bh2kXNtN.js">
+      <link rel="modulepreload" crossorigin href="./assets/vertexColorMixing-D0pNlsQe.js">
+      <link rel="modulepreload" crossorigin href="./assets/color.vertex-BSYXbI9A.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRenderer.fragment-DHJ_52Nf.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertex-Cnr9SjvW.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexDeclaration-Cbfc-DdP.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexGlobal-CUgEnb8G.js">
+      <link rel="modulepreload" crossorigin href="./assets/morphTargetsVertexGlobalDeclaration-DqRlq5QZ.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRenderer.vertex-BMf1VNmt.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererFinaliser.fragment-DtXyh7wg.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererFinaliser.vertex-D9Rnjk2H.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererMasker.fragment-WL0zr1gi.js">
+      <link rel="modulepreload" crossorigin href="./assets/meshUVSpaceRendererMasker.vertex-waNz3hIn.js">
+      <link rel="modulepreload" crossorigin href="./assets/minmaxRedux.fragment-BoAl7Jwb.js">
+      <link rel="modulepreload" crossorigin href="./assets/flowGraphGLTFDataProvider-gh74_gu6.js">
+      <link rel="modulepreload" crossorigin href="./assets/openpbrMaterialLoadingAdapter-CldCyUUg.js">
+      <link rel="modulepreload" crossorigin href="./assets/pbrMaterialLoadingAdapter-Bn9r97LA.js">
+      <link rel="modulepreload" crossorigin href="./assets/tutorialLayer-DP1_qfn7.js">
+      <link rel="stylesheet" crossorigin href="./assets/tutorialLayer-4Xbmd2Hb.css">
+    </head>
+
+    <body>
+    </body>
+</html>

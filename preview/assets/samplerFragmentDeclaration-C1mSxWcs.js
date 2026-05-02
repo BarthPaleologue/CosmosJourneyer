@@ -1,0 +1,19 @@
+import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-CAkcDnHW.js";var r,i,a=e((()=>{t(),r=`samplerFragmentDeclaration`,i=`#ifdef _DEFINENAME_
+#if _DEFINENAME_DIRECTUV==1
+#define v_VARYINGNAME_UV vMainUV1
+#elif _DEFINENAME_DIRECTUV==2
+#define v_VARYINGNAME_UV vMainUV2
+#elif _DEFINENAME_DIRECTUV==3
+#define v_VARYINGNAME_UV vMainUV3
+#elif _DEFINENAME_DIRECTUV==4
+#define v_VARYINGNAME_UV vMainUV4
+#elif _DEFINENAME_DIRECTUV==5
+#define v_VARYINGNAME_UV vMainUV5
+#elif _DEFINENAME_DIRECTUV==6
+#define v_VARYINGNAME_UV vMainUV6
+#else
+varying vec2 v_VARYINGNAME_UV;
+#endif
+uniform sampler2D _SAMPLERNAME_Sampler;
+#endif
+`,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};

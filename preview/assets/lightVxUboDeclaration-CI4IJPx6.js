@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightVxUboDeclaration-DK22D-Cn.js";t();export{e as lightVxUboDeclarationWGSL};

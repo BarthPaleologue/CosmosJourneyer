@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightProxy.vertex-4cNGYx0S.js";t();export{e as lightProxyVertexShader};

@@ -1,0 +1,1 @@
+import{t as e}from"./color.fragment-BLFQDmyk.js";export{e as colorPixelShader};

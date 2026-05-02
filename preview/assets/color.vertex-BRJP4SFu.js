@@ -1,0 +1,1 @@
+import{t as e}from"./color.vertex-Y9E4rE8C.js";export{e as colorVertexShader};

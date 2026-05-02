@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.vertex-BeB2ClYi.js";e();export{t as backgroundVertexShader};

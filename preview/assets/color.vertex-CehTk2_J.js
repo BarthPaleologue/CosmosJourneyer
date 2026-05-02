@@ -1,0 +1,1 @@
+import{n as e,t}from"./color.vertex-DTR-a2zz.js";e();export{t as colorVertexShader};

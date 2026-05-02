@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightProxy.fragment-1kE-R6eh.js";t();export{e as lightProxyPixelShaderWGSL};

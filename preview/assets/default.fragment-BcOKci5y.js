@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.fragment-DaIFIgJs.js";e();export{t as defaultPixelShaderWGSL};

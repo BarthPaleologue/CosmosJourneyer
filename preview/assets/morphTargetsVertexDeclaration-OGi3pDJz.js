@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertexDeclaration-Cbfc-DdP.js";t();export{e as morphTargetsVertexDeclarationWGSL};

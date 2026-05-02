@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesDeclaration-geejcpom.js";e();export{t as bonesDeclarationWGSL};

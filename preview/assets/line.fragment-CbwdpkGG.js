@@ -1,0 +1,1 @@
+import{n as e,t}from"./line.fragment-B52lW4mE.js";t();export{e as linePixelShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightProxy.vertex-DhntKrMR.js";t();export{e as lightProxyVertexShaderWGSL};

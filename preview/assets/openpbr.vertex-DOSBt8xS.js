@@ -1,0 +1,1 @@
+import{n as e,t}from"./openpbr.vertex-BmvBVpb8.js";t();export{e as openpbrVertexShader};

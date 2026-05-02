@@ -1,0 +1,1 @@
+import{n as e,t}from"./picking.fragment-BfFPmH6O.js";t();export{e as pickingPixelShader};

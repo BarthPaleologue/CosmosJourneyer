@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.fragment-CSAD3Ye-.js";t();export{e as spritesPixelShader};

@@ -1,0 +1,6 @@
+import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-CAkcDnHW.js";var r,i,a,o=e((()=>{t(),r=`morphTargetsVertexGlobal`,i=`#ifdef MORPHTARGETS
+#ifdef MORPHTARGETS_TEXTURE
+var vertexID : f32;
+#endif
+#endif
+`,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};

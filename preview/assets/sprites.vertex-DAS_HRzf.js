@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.vertex-Dvzy3x8I.js";t();export{e as spritesVertexShader};

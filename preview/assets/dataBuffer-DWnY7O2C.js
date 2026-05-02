@@ -1,0 +1,1 @@
+import{n as e}from"./chunk-Dy9vhvp_.js";var t,n=e((()=>{t=class e{get underlyingResource(){return null}constructor(){this.references=0,this.capacity=0,this.is32Bits=!1,this.uniqueId=e._Counter++}},t._Counter=0}));export{n,t};

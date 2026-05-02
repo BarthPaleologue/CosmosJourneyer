@@ -1,0 +1,1 @@
+import{n as e,t}from"./rsmGlobalIllumination.fragment-D_Aq8__w.js";t();export{e as rsmGlobalIlluminationPixelShaderWGSL};

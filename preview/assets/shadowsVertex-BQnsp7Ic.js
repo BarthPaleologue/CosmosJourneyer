@@ -1,0 +1,1 @@
+import{n as e,t}from"./shadowsVertex-DhVmyY2E.js";t();export{e as shadowsVertexWGSL};

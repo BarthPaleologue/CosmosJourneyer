@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.fragment-tmW53oiS.js";e();export{t as defaultPixelShader};

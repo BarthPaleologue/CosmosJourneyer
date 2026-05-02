@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.vertex-DP8lq73V.js";t();export{e as particlesVertexShader};

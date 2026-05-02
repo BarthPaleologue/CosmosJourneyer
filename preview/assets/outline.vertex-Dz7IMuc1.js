@@ -1,0 +1,1 @@
+import{n as e,t}from"./outline.vertex-DbJK4BDQ.js";t();export{e as outlineVertexShader};

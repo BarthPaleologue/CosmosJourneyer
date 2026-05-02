@@ -1,0 +1,1 @@
+import{n as e,t}from"./fxaa.vertex-krVgH4gj.js";e();export{t as fxaaVertexShaderWGSL};

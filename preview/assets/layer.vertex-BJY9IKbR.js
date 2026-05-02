@@ -1,0 +1,1 @@
+import{n as e,t}from"./layer.vertex-Q4S5Nuxl.js";t();export{e as layerVertexShaderWGSL};

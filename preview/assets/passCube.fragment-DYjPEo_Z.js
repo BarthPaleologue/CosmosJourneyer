@@ -1,0 +1,1 @@
+import{n as e,t}from"./passCube.fragment-B4Ays-4W.js";t();export{e as passCubePixelShader};
