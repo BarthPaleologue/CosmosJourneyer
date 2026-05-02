@@ -50,28 +50,14 @@ export class DeleteSemaphore {
         if (this.isReadyToResolve()) {
             this.resolve();
         }
-
-        this.resolveIfZombie();
-    }
-
-    /**
-     * Checks if the semaphore is a zombie (it can't be resolved anymore).
-     * This happens when one of the new chunks has been disposed before receiving its vertex data.
-     * If this is the case, we resolve the semaphore immediately
-     */
-    private resolveIfZombie() {
-        for (const chunk of this.newChunks) {
-            if (chunk.hasBeenDisposed()) {
-                this.resolve();
-                return;
-            }
-        }
     }
 
     private isReadyToResolve() {
         let flag = this.newChunks.length;
         this.newChunks.forEach((chunk) => {
-            if (chunk.isLoaded()) {
+            // A disposed replacement has been superseded by another LOD transition. It should no longer block this
+            // semaphore, but it must not release the fallback before its still-pending siblings are ready.
+            if (chunk.isLoaded() || chunk.hasBeenDisposed()) {
                 flag--;
             }
         });
