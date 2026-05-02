@@ -23,19 +23,23 @@ import { z } from "zod";
  * This takes place at build time, so the resources are bundled with the application.
  */
 function loadResources() {
-    const requireContext = require.context("../locales/", true, /\.json$/);
+    const localeModules = import.meta.glob("../locales/**/*.json", {
+        eager: true,
+        import: "default",
+    });
     const resources: Resource = {}; // { "en-US": { "notifications": { ... } }, "es-ES": { "notifications": { ... } } }
 
     const jsonSchema = z.record(z.string(), z.string());
 
-    requireContext.keys().forEach((key: string) => {
-        const parts = key.split("/");
-        const languageFolder = parts[1]; // (./en-US/notifications.json) => en-US
+    Object.entries(localeModules).forEach(([key, moduleContent]) => {
+        const localePath = key.replace(/^.*\/locales\//, "");
+        const parts = localePath.split("/");
+        const languageFolder = parts[0]; // (en-US/notifications.json) => en-US
         if (languageFolder === undefined) {
             throw new Error("Language folder is undefined: some json files are at root level in the locales folder");
         }
 
-        const subFolders: string[] = parts.slice(2, parts.length - 1); // (./en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
+        const subFolders: string[] = parts.slice(1, parts.length - 1); // (en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
         const fileName = parts.at(-1); // (./en-US/notifications.json) => notifications.json
         if (fileName === undefined) {
             throw new Error("File name is undefined");
@@ -58,7 +62,7 @@ function loadResources() {
             currentResource = currentResource[subFolder] as ResourceLanguage;
         });
 
-        const fileContent = jsonSchema.parse(requireContext(key));
+        const fileContent = jsonSchema.parse(moduleContent);
         currentResource[nameSpace] = fileContent;
     });
 
@@ -72,7 +76,7 @@ export async function initI18n() {
 
     await init({
         lng: language, // change this if you want to test a specific language
-        debug: process.env["NODE_ENV"] === "development",
+        debug: import.meta.env.DEV,
         fallbackLng: "en-US",
         resources: loadResources(),
     });
