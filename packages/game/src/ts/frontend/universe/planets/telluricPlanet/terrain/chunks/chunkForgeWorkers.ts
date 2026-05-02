@@ -15,7 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { LRUMap } from "@/utils/dataStructures/lruMap";
 import { err, ok, type Result } from "@/utils/types";
+
+import { Settings } from "@/settings";
 
 import { type ChunkForge, type ChunkForgeOutput, type ChunkId } from "./chunkForge";
 import { ReturnedChunkDataSchema, type BuildTask } from "./taskTypes";
@@ -28,7 +31,7 @@ export class ChunkForgeWorkers implements ChunkForge {
 
     private readonly workerPool: WorkerPool<BuildTask, TransferBuildData>;
 
-    private readonly output = new Map<ChunkId, ChunkForgeOutput>();
+    private readonly output = new LRUMap<ChunkId, ChunkForgeOutput>(Settings.MAX_CACHED_CHUNKS);
 
     private constructor(workers: ReadonlyArray<Worker>, nbVerticesPerRow: number) {
         this.workerPool = new WorkerPool(
@@ -138,7 +141,6 @@ export class ChunkForgeWorkers implements ChunkForge {
             return;
         }
 
-        this.output.delete(data.chunkId);
         this.output.set(data.chunkId, {
             status: "completed",
             positions: data.positions,
