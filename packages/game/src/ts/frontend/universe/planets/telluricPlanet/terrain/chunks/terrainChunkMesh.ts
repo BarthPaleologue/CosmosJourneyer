@@ -46,10 +46,10 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     readonly id: ChunkId;
     private readonly mesh: Mesh;
     public readonly indices: DeepReadonly<ChunkIndices>;
-    public readonly cubePosition: Vector3;
-    private readonly planetLocalPosition: Vector3;
+    public readonly positionOnCube: Vector3;
+    private readonly positionOnSphere: Vector3;
 
-    private readonly chunkSideLength: number;
+    private readonly sideLength: number;
 
     private loaded = false;
 
@@ -79,7 +79,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         this.indices = structuredClone(indices);
 
-        this.chunkSideLength = (2 * planetModel.radius) / 2 ** this.indices.lod;
+        this.sideLength = (2 * planetModel.radius) / 2 ** this.indices.lod;
 
         this.mesh = new Mesh(this.id, scene);
         this.mesh.setEnabled(false);
@@ -94,19 +94,19 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         const faceRotation = getQuaternionFromFaceIndex(faceIndex);
         position.applyRotationQuaternionInPlace(faceRotation);
 
-        this.cubePosition = position.clone();
+        this.positionOnCube = position.clone();
 
         position.normalize().scaleInPlace(planetModel.radius);
 
-        this.planetLocalPosition = position.clone();
+        this.positionOnSphere = position.clone();
         this.getTransform().position = position;
 
         // Node material hack: we store the planet-space position of the chunk in the instance color for easy access from Babylon NodeMaterial
         this.mesh.registerInstancedBuffer("instanceColor", 4);
         this.mesh.instancedBuffers["instanceColor"] = new Color4(
-            this.planetLocalPosition.x,
-            this.planetLocalPosition.y,
-            this.planetLocalPosition.z,
+            this.positionOnSphere.x,
+            this.positionOnSphere.y,
+            this.positionOnSphere.z,
             1,
         );
 
@@ -134,7 +134,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
-        if (this.chunkSideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
+        if (this.sideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
             this.aggregate = new PhysicsAggregate(
                 this.mesh,
                 PhysicsShapeType.MESH,
@@ -164,7 +164,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     public updatePosition() {
         if (this.aggregate === null) return;
         this.getTransform().setAbsolutePosition(
-            Vector3.TransformCoordinates(this.planetLocalPosition, this.parent.getWorldMatrix()),
+            Vector3.TransformCoordinates(this.positionOnSphere, this.parent.getWorldMatrix()),
         );
     }
 
@@ -173,7 +173,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     }
 
     public getBoundingRadius(): number {
-        return this.chunkSideLength / 2;
+        return this.sideLength / 2;
     }
 
     /**

@@ -260,7 +260,7 @@ export class TerrainFaceQuadTree implements Cullable {
             const buildTask: BuildTask = {
                 chunkId: chunk.id,
                 planetModel: this.planetModel,
-                position: chunk.cubePosition,
+                position: chunk.positionOnCube,
                 depth: chunk.indices.lod,
                 faceIndex: this.faceIndex,
             };
