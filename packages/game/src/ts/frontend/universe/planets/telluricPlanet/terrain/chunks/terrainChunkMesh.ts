@@ -38,14 +38,14 @@ import { type DeepReadonly } from "@/utils/types";
 import { CollisionMask, Settings } from "@/settings";
 
 import type { ChunkForgeCompletedOutput, ChunkId } from "./chunkForge";
-import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
+import { chunkIndicesToString, getChunkPlaneSpacePosition, type ChunkIndices } from "./chunkUtils";
 import { getQuaternionFromDirection, type Direction } from "./direction";
 import type { IScatteringSystem } from "./scatteringSystem";
 
 export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Cullable {
     readonly id: ChunkId;
     private readonly mesh: Mesh;
-    private readonly depth: number;
+    public readonly indices: DeepReadonly<ChunkIndices>;
     public readonly cubePosition: Vector3;
     private readonly planetLocalPosition: Vector3;
 
@@ -67,7 +67,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     private readonly scatteringSystem: IScatteringSystem;
 
     constructor(
-        path: ReadonlyArray<number>,
+        indices: ChunkIndices,
         direction: Direction,
         parentTransform: TransformNode,
         material: Material,
@@ -75,13 +75,13 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
-        this.id = `${parentTransform.name}->d${direction}-pP${path.join("")}`;
+        this.id = `${parentTransform.name}->d${direction}-${chunkIndicesToString(indices)}`;
 
-        this.depth = path.length;
+        this.indices = structuredClone(indices);
 
-        this.chunkSideLength = (2 * planetModel.radius) / 2 ** this.depth;
+        this.chunkSideLength = (2 * planetModel.radius) / 2 ** this.indices.lod;
 
-        this.mesh = new Mesh(`${planetModel.name}_Chunk${this.id}`, scene);
+        this.mesh = new Mesh(this.id, scene);
         this.mesh.setEnabled(false);
         this.mesh.material = material;
         this.mesh.parent = parentTransform;
@@ -89,11 +89,10 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.parent = parentTransform;
 
         // computing the position of the chunk on the side of the planet
-        const position = getChunkPlaneSpacePositionFromPath(2 * planetModel.radius, path);
+        const position = getChunkPlaneSpacePosition(2 * planetModel.radius, indices);
 
-        // offseting from planet center to position on the side (default side then rotation for all sides)
-        position.z -= planetModel.radius;
-        position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
+        const faceRotation = getQuaternionFromDirection(direction);
+        position.applyRotationQuaternionInPlace(faceRotation);
 
         this.cubePosition = position.clone();
 

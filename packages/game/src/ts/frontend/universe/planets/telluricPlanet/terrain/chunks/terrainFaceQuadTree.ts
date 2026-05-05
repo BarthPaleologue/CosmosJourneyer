@@ -35,7 +35,7 @@ import { type DeepReadonly } from "@/utils/types";
 import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
-import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
+import { getChunkChildIndices, getChunkSphereSpacePosition, type ChunkIndices } from "./chunkUtils";
 import { type Direction } from "./direction";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
@@ -117,7 +117,15 @@ export class TerrainFaceQuadTree implements Cullable {
     public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
         this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
         if (this.root === null) {
-            this.root = this.createNode([], chunkForge, scatteringSystem);
+            this.root = this.createNode(
+                {
+                    lod: 0,
+                    x: 0,
+                    y: 0,
+                },
+                chunkForge,
+                scatteringSystem,
+            );
         }
 
         this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem, this.root);
@@ -133,14 +141,12 @@ export class TerrainFaceQuadTree implements Cullable {
      * @param observerPositionW The observer position in world space
      * @param chunkForge
      * @param node The node to update recursively
-     * @param walked The position of the current root relative to the absolute root
      */
     private updateLODRecursively(
         observerPositionW: Vector3,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
         node: TerrainQuadTreeNode,
-        walked: number[] = [],
     ): void {
         if (!node.chunk.isLoaded()) {
             const chunkOutput = chunkForge.getOutput(node.chunk.id);
@@ -150,14 +156,14 @@ export class TerrainFaceQuadTree implements Cullable {
             }
         }
 
-        if (walked.length === this.maxDepth) {
+        if (node.chunk.indices.lod === this.maxDepth) {
             return;
         }
 
-        const targetLOD = this.computeTargetLOD(observerPositionW, walked);
+        const targetLOD = this.computeTargetLOD(observerPositionW, node.chunk.indices);
         const children = node.getChildren();
 
-        if (targetLOD <= walked.length) {
+        if (targetLOD <= node.chunk.indices.lod) {
             if (children !== null) {
                 node.disposeChildren();
                 node.chunk.setActiveForLOD(true);
@@ -170,7 +176,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 return;
             }
 
-            node.setChildren(this.createChildren(walked, chunkForge, scatteringSystem));
+            node.setChildren(this.createChildren(node.chunk.indices, chunkForge, scatteringSystem));
         }
 
         const updatedChildren = node.getChildren();
@@ -178,20 +184,14 @@ export class TerrainFaceQuadTree implements Cullable {
             return;
         }
 
-        for (const [childIndex, child] of updatedChildren.entries()) {
-            this.updateLODRecursively(
-                observerPositionW,
-                chunkForge,
-                scatteringSystem,
-                child,
-                walked.concat(childIndex),
-            );
+        for (const child of updatedChildren) {
+            this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, child);
         }
     }
 
-    private computeTargetLOD(observerPositionW: Vector3, walked: number[]): number {
-        const nodeRelativePosition = getChunkSphereSpacePositionFromPath(
-            walked,
+    private computeTargetLOD(observerPositionW: Vector3, chunkIndices: ChunkIndices): number {
+        const nodeRelativePosition = getChunkSphereSpacePosition(
+            chunkIndices,
             this.direction,
             this.rootChunkLength / 2,
             getRotationQuaternion(this.parentTransform),
@@ -212,7 +212,7 @@ export class TerrainFaceQuadTree implements Cullable {
         const observerDistanceToCenter = observerRelativePosition.length();
 
         const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
-        const nodeLength = this.rootChunkLength / 2 ** walked.length;
+        const nodeLength = this.rootChunkLength / 2 ** chunkIndices.lod;
 
         const chunkGreatDistanceFactor = Math.max(
             0.0,
@@ -228,25 +228,25 @@ export class TerrainFaceQuadTree implements Cullable {
     }
 
     private createChildren(
-        path: ReadonlyArray<number>,
+        parentIndices: ChunkIndices,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
     ): TerrainQuadTreeChildren {
         return [
-            this.createNode(path.concat(0), chunkForge, scatteringSystem),
-            this.createNode(path.concat(1), chunkForge, scatteringSystem),
-            this.createNode(path.concat(2), chunkForge, scatteringSystem),
-            this.createNode(path.concat(3), chunkForge, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 0), chunkForge, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 1), chunkForge, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 2), chunkForge, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 3), chunkForge, scatteringSystem),
         ];
     }
 
     private createNode(
-        path: ReadonlyArray<number>,
+        indices: ChunkIndices,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
     ): TerrainQuadTreeNode {
         const chunk = new TerrainChunkMesh(
-            path,
+            indices,
             this.direction,
             this.parentTransform,
             this.material,
@@ -261,7 +261,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 chunkId: chunk.id,
                 planetModel: this.planetModel,
                 position: chunk.cubePosition,
-                depth: path.length,
+                depth: chunk.indices.lod,
                 direction: this.direction,
             };
 

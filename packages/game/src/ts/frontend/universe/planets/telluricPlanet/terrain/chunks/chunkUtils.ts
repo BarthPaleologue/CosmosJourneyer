@@ -17,76 +17,67 @@
 
 import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 
+import { assertUnreachable } from "@/utils/types";
+
 import { getQuaternionFromDirection, type Direction } from "./direction";
 
-/**
- * Returns the node position in plane space
- * @param chunkLength the length of a chunk
- * @param path the path of the node
- * @returns the plane space coordinates of the chunk
- */
-export function getChunkPlaneSpacePositionFromPath(chunkLength: number, path: ReadonlyArray<number>): Vector3 {
-    let x = 0;
-    let y = 0;
-    for (const [i, pathValue] of path.entries()) {
-        /*
-            3   2
-              +
-            0   1
-        */
-        // offset to get to the center of the children from the center of the current chunk
-        // (chunkLength / 2) / (2 ** (i + 1)) est la moitié de la taille d'un chunk enfant (offset) donc on simplifie pas : c'est plus clair ainsi
-        switch (pathValue) {
-            case 0:
-                x -= chunkLength / 2 / 2 ** (i + 1);
-                y -= chunkLength / 2 / 2 ** (i + 1);
-                break;
-            case 1:
-                x += chunkLength / 2 / 2 ** (i + 1);
-                y -= chunkLength / 2 / 2 ** (i + 1);
-                break;
-            case 2:
-                x += chunkLength / 2 / 2 ** (i + 1);
-                y += chunkLength / 2 / 2 ** (i + 1);
-                break;
-            case 3:
-                x -= chunkLength / 2 / 2 ** (i + 1);
-                y += chunkLength / 2 / 2 ** (i + 1);
-                break;
-            default:
-                throw new Error(`${pathValue} is not a valid index for a child of a quadtree node !`);
-        }
-    }
-    return new Vector3(x, y, 0);
-}
+export type ChunkIndices = {
+    readonly lod: number;
+    readonly x: number;
+    readonly y: number;
+};
 
 /**
- * Returns chunk position in planet space
- * @param path the path to the chunk in the quadtree
- * @param direction direction of the parent plane
- * @param planetRadius
- * @param planetRotationQuaternion
- * @returns the position in planet space
+ * Returns a stable human-readable identifier for a chunk on one cube face.
+ * The x/y coordinates are integer tile coordinates in a 2^depth by 2^depth grid.
  */
-export function getChunkSphereSpacePositionFromPath(
-    path: number[],
+export function chunkIndicesToString(index: ChunkIndices): string {
+    return `l${index.lod}-x${index.x}-y${index.y}`;
+}
+
+export function getChunkChildIndices(parent: ChunkIndices, childIndex: 0 | 1 | 2 | 3): ChunkIndices {
+    /*
+        3   2
+          +
+        0   1
+    */
+    switch (childIndex) {
+        case 0:
+            return { lod: parent.lod + 1, x: parent.x * 2, y: parent.y * 2 };
+        case 1:
+            return { lod: parent.lod + 1, x: parent.x * 2 + 1, y: parent.y * 2 };
+        case 2:
+            return { lod: parent.lod + 1, x: parent.x * 2 + 1, y: parent.y * 2 + 1 };
+        case 3:
+            return { lod: parent.lod + 1, x: parent.x * 2, y: parent.y * 2 + 1 };
+        default:
+            return assertUnreachable(childIndex);
+    }
+}
+
+export function getChunkPlaneSpacePosition(rootChunkLength: number, index: ChunkIndices): Vector3 {
+    const tileCount = 2 ** index.lod;
+    const chunkSideLength = rootChunkLength / tileCount;
+
+    return new Vector3(
+        -rootChunkLength / 2 + (index.x + 0.5) * chunkSideLength,
+        -rootChunkLength / 2 + (index.y + 0.5) * chunkSideLength,
+        -rootChunkLength / 2,
+    );
+}
+
+export function getChunkSphereSpacePosition(
+    chunkIndices: ChunkIndices,
     direction: Direction,
     planetRadius: number,
     planetRotationQuaternion: Quaternion,
 ): Vector3 {
-    // on récupère la position dans le plan
-    const position = getChunkPlaneSpacePositionFromPath(2 * planetRadius, path);
-
-    // on l'offset pour préparer à récupérer la position dans le cube
-    position.addInPlace(new Vector3(0, 0, -planetRadius));
+    const position = getChunkPlaneSpacePosition(2 * planetRadius, chunkIndices);
 
     const rotationQuaternion = getQuaternionFromDirection(direction);
     position.applyRotationQuaternionInPlace(rotationQuaternion);
-
-    // on projette cette position sur la sphère
     position.normalize().scaleInPlace(planetRadius);
 
-    // on match cette position avec la rotation de la planète
     position.applyRotationQuaternionInPlace(planetRotationQuaternion);
 
     return position;
