@@ -57,7 +57,6 @@ export class ReturnData {
   free(): void;
   [Symbol.dispose](): void;
   nb_instances_created: number;
-  average_height: number;
 }
 
 export class TerrainSettings {

@@ -30,7 +30,6 @@ export type ChunkForgeCompletedOutput = {
     normals: Float32Array;
     indices: Uint16Array;
     scatteredInstances: ScatteredInstances;
-    averageHeight: number;
 };
 
 export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;

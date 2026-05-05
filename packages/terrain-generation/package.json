@@ -48,9 +48,9 @@
     },
     "scripts": {
         "build": "wasm-pack build --release --out-dir pkg --target bundler --out-name terrain_generation",
-        "format": "if command -v cargo >/dev/null 2>&1; then cargo fmt; else echo \"cargo not found; skipping Rust formatting\"; fi",
-        "format:check": "if command -v cargo >/dev/null 2>&1; then cargo fmt --check; else echo \"cargo not found; skipping Rust format check\"; fi",
-        "lint": "if command -v cargo >/dev/null 2>&1; then cargo clippy --all-targets --all-features -- -D warnings; else echo \"cargo not found; skipping Rust lint\"; fi",
-        "test:unit": "if command -v cargo >/dev/null 2>&1; then cargo test; else echo \"cargo not found; skipping Rust tests\"; fi"
+        "format": "cargo fmt",
+        "format:check": "cargo fmt --check",
+        "lint": "cargo clippy --all-targets --all-features -- -D warnings",
+        "test:unit": "cargo test"
     }
 }

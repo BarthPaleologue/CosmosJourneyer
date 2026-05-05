@@ -147,7 +147,6 @@ export class ChunkForgeWorkers implements ChunkForge {
             normals: data.normals,
             indices: data.indices,
             scatteredInstances: data.scatteredInstances,
-            averageHeight: data.averageHeight,
         });
     }
 

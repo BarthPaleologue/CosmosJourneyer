@@ -50,7 +50,6 @@ const result = build_chunk_vertex_data(
     /* scatterPerSquareMeter */ 0,
 );
 
-console.log(result.average_height);
 buildData.free();
 ```
 

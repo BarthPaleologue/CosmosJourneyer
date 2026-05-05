@@ -64,8 +64,6 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     private aggregate: PhysicsAggregate | null = null;
 
-    private averageHeight = 0;
-
     private lodMetrics: ChunkLodMetrics | null = null;
 
     private disposed = false;
@@ -159,7 +157,6 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.loaded = true;
         this.updateEnabledState();
 
-        this.averageHeight = forgeOutput.averageHeight;
         this.mesh.computeWorldMatrix(true);
 
         this.scatteringSystem.scatterInChunk(this.mesh, forgeOutput.scatteredInstances);
@@ -218,10 +215,6 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.getTransform().setAbsolutePosition(
             Vector3.TransformCoordinates(this.positionOnSphere, this.parent.getWorldMatrix()),
         );
-    }
-
-    public getAverageHeight(): number {
-        return this.averageHeight;
     }
 
     public getBoundingRadius(): number {

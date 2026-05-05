@@ -202,7 +202,6 @@ function handle_build(data: TransferBuildData): void {
             indices: indices,
             normals: normals,
             scatteredInstances,
-            averageHeight: result.average_height,
         } satisfies ReturnedChunkData,
         { transfer },
     );

@@ -41,7 +41,6 @@ export const ReturnedChunkDataSchema = z.object({
     normals: z.instanceof(Float32Array),
     indices: z.instanceof(Uint16Array),
     scatteredInstances: ScatteredInstancesSchema,
-    averageHeight: z.number(),
 });
 
 export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;
