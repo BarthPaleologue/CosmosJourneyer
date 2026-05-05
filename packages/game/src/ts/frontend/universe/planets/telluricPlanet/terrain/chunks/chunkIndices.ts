@@ -15,11 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
-
 import { assertUnreachable } from "@/utils/types";
-
-import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 
 export type ChunkIndices = {
     readonly lod: number;
@@ -45,32 +41,4 @@ export function getChunkChildIndices(parent: ChunkIndices, childIndex: 0 | 1 | 2
         default:
             return assertUnreachable(childIndex);
     }
-}
-
-export function getChunkPlaneSpacePosition(rootChunkLength: number, index: ChunkIndices): Vector3 {
-    const tileCount = 2 ** index.lod;
-    const chunkSideLength = rootChunkLength / tileCount;
-
-    return new Vector3(
-        -rootChunkLength / 2 + (index.x + 0.5) * chunkSideLength,
-        -rootChunkLength / 2 + (index.y + 0.5) * chunkSideLength,
-        -rootChunkLength / 2,
-    );
-}
-
-export function getChunkSphereSpacePosition(
-    chunkIndices: ChunkIndices,
-    faceIndex: FaceIndex,
-    planetRadius: number,
-    planetRotationQuaternion: Quaternion,
-): Vector3 {
-    const position = getChunkPlaneSpacePosition(2 * planetRadius, chunkIndices);
-
-    const rotationQuaternion = getQuaternionFromFaceIndex(faceIndex);
-    position.applyRotationQuaternionInPlace(rotationQuaternion);
-    position.normalize().scaleInPlace(planetRadius);
-
-    position.applyRotationQuaternionInPlace(planetRotationQuaternion);
-
-    return position;
 }

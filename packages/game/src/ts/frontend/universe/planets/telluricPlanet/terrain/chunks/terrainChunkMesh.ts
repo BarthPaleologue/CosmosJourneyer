@@ -38,9 +38,16 @@ import { type DeepReadonly } from "@/utils/types";
 import { CollisionMask, Settings } from "@/settings";
 
 import type { ChunkForgeCompletedOutput, ChunkId } from "./chunkForge";
-import { getChunkPlaneSpacePosition, type ChunkIndices } from "./chunkUtils";
+import { type ChunkIndices } from "./chunkIndices";
 import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
+import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
+
+type ChunkLodMetrics = {
+    readonly centerPlanetSpace: Vector3;
+    readonly radiusPlanetSpace: number;
+    readonly error: number;
+};
 
 export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Cullable {
     readonly id: ChunkId;
@@ -58,6 +65,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     private aggregate: PhysicsAggregate | null = null;
 
     private averageHeight = 0;
+
+    private lodMetrics: ChunkLodMetrics | null = null;
 
     private disposed = false;
 
@@ -88,18 +97,15 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         this.parent = parentTransform;
 
-        // computing the position of the chunk on the side of the planet
-        const position = getChunkPlaneSpacePosition(2 * planetModel.radius, indices);
-
         const faceRotation = getQuaternionFromFaceIndex(faceIndex);
-        position.applyRotationQuaternionInPlace(faceRotation);
+        this.positionOnCube = new Vector3(
+            -planetModel.radius + (this.indices.x + 0.5) * this.sideLength,
+            -planetModel.radius + (this.indices.y + 0.5) * this.sideLength,
+            -planetModel.radius,
+        ).applyRotationQuaternionInPlace(faceRotation);
 
-        this.positionOnCube = position.clone();
-
-        position.normalize().scaleInPlace(planetModel.radius);
-
-        this.positionOnSphere = position.clone();
-        this.getTransform().position = position;
+        this.positionOnSphere = this.positionOnCube.normalizeToNew().scaleInPlace(planetModel.radius);
+        this.getTransform().position = this.positionOnSphere;
 
         // Node material hack: we store the planet-space position of the chunk in the instance color for easy access from Babylon NodeMaterial
         this.mesh.registerInstancedBuffer("instanceColor", 4);
@@ -134,6 +140,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
+        this.lodMetrics = this.computeLodMetrics(forgeOutput.positions);
+
         if (this.sideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
             this.aggregate = new PhysicsAggregate(
                 this.mesh,
@@ -155,6 +163,50 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.mesh.computeWorldMatrix(true);
 
         this.scatteringSystem.scatterInChunk(this.mesh, forgeOutput.scatteredInstances);
+    }
+
+    private computeLodMetrics(positions: Float32Array): ChunkLodMetrics {
+        const rowVertexCount = Settings.VERTEX_RESOLUTION;
+        const lastRowVertexIndex = rowVertexCount - 1;
+        const lastColumnVertexIndex = rowVertexCount * (rowVertexCount - 1);
+        const lastVertexIndex = rowVertexCount * rowVertexCount - 1;
+
+        const corners = [
+            Vector3.FromArray(positions),
+            Vector3.FromArray(positions, lastRowVertexIndex * 3),
+            Vector3.FromArray(positions, lastColumnVertexIndex * 3),
+            Vector3.FromArray(positions, lastVertexIndex * 3),
+        ] as const;
+
+        for (const corner of corners) {
+            corner.addInPlace(this.positionOnSphere);
+        }
+
+        const center = corners[0].add(corners[1]).add(corners[2]).add(corners[3]).scaleInPlace(0.25);
+
+        let radius = 0;
+        for (const corner of corners) {
+            radius = Math.max(radius, Vector3.Distance(center, corner));
+        }
+
+        const edgeLength = Math.sqrt(
+            Math.max(
+                Vector3.DistanceSquared(corners[0], corners[1]),
+                Vector3.DistanceSquared(corners[1], corners[3]),
+                Vector3.DistanceSquared(corners[3], corners[2]),
+                Vector3.DistanceSquared(corners[2], corners[0]),
+            ),
+        );
+        const sphereRadius = this.positionOnSphere.length();
+        // Sagitta approximation: the spherical patch bows beyond the straight edge chord.
+        const curvaturePadding = (edgeLength * edgeLength) / (8 * sphereRadius);
+        radius += curvaturePadding;
+
+        return {
+            centerPlanetSpace: center,
+            radiusPlanetSpace: radius,
+            error: (2 * this.sideLength) / (rowVertexCount - 1),
+        };
     }
 
     /**
@@ -186,6 +238,18 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     public canBeSubdivided(): boolean {
         return this.loaded && this.activeForLOD && this.activeForCulling;
+    }
+
+    public computeScreenSpaceError(lodContext: LodUpdateContext): number {
+        if (this.lodMetrics === null) {
+            return 0;
+        }
+
+        const distance =
+            Vector3.Distance(lodContext.cameraPositionPlanetSpace, this.lodMetrics.centerPlanetSpace) -
+            this.lodMetrics.radiusPlanetSpace;
+
+        return (this.lodMetrics.error * lodContext.projectionScale) / Math.max(1e-3, distance);
     }
 
     public setActiveForLOD(active: boolean): void {

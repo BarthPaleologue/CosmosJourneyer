@@ -166,11 +166,11 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
 
     /**
      * Update terrain of the sphere relative to the observer position
-     * @param observerPosition
+     * @param camera
      * @param chunkForge
      */
-    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
-        this.terrain.updateLOD(observerPosition, chunkForge, scatteringSystem);
+    public updateLOD(camera: Camera, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
+        this.terrain.updateLOD(camera, chunkForge, scatteringSystem);
     }
 
     public getRadius(): number {

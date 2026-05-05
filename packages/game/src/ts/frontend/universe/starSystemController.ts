@@ -461,7 +461,7 @@ export class StarSystemController {
         for (const object of this.getPlanetaryMassObjects()) {
             object.computeCulling(camera);
             if (object.type === "telluricPlanet" || object.type === "telluricSatellite") {
-                object.updateLOD(cameraPosition, chunkForge, this.scatteringSystem);
+                object.updateLOD(camera, chunkForge, this.scatteringSystem);
             }
         }
 

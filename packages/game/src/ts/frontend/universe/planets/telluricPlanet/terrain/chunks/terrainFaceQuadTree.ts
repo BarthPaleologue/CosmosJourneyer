@@ -17,7 +17,6 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Material } from "@babylonjs/core/Materials/material";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
 import {
@@ -27,20 +26,22 @@ import {
 } from "@cosmos-journeyer/universe-model";
 
 import { type Cullable } from "@/frontend/helpers/cullable";
-import { getRotationQuaternion } from "@/frontend/helpers/transform";
 
-import { clamp } from "@/utils/math";
 import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
-import { getChunkChildIndices, getChunkSphereSpacePosition, type ChunkIndices } from "./chunkUtils";
+import { getChunkChildIndices, type ChunkIndices } from "./chunkIndices";
 import { type FaceIndex } from "./faceIndex";
+import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
 import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
+
+const splitScreenSpaceErrorThreshold = 16;
+const mergeScreenSpaceErrorThreshold = 8;
 
 /**
  * Represents a face of a cube-sphere terrain.
@@ -111,10 +112,10 @@ export class TerrainFaceQuadTree implements Cullable {
 
     /**
      * Update tree to create matching LOD relative to the observer's position
-     * @param observerPosition The observer position
+     * @param lodContext Shared LOD state computed once for the terrain update
      * @param chunkForge
      */
-    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
+    public updateLOD(lodContext: LodUpdateContext, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
         this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
         if (this.root === null) {
             this.root = this.createNode(
@@ -128,7 +129,7 @@ export class TerrainFaceQuadTree implements Cullable {
             );
         }
 
-        this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem, this.root);
+        this.updateLODRecursively(lodContext, chunkForge, scatteringSystem, this.root);
         this.root.updateVisibility();
 
         for (const chunk of this.root.getChunks()) {
@@ -138,12 +139,12 @@ export class TerrainFaceQuadTree implements Cullable {
 
     /**
      * Recursive function used internally to update LOD
-     * @param observerPositionW The observer position in world space
+     * @param lodContext Shared LOD state computed once for the terrain update
      * @param chunkForge
      * @param node The node to update recursively
      */
     private updateLODRecursively(
-        observerPositionW: Vector3,
+        lodContext: LodUpdateContext,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
         node: TerrainQuadTreeNode,
@@ -160,18 +161,16 @@ export class TerrainFaceQuadTree implements Cullable {
             return;
         }
 
-        const targetLOD = this.computeTargetLOD(observerPositionW, node.chunk.indices);
         const children = node.getChildren();
+        const screenSpaceError = node.chunk.computeScreenSpaceError(lodContext);
 
-        if (targetLOD <= node.chunk.indices.lod) {
-            if (children !== null) {
-                node.disposeChildren();
-                node.chunk.setActiveForLOD(true);
-            }
+        if (children !== null && screenSpaceError <= mergeScreenSpaceErrorThreshold) {
+            node.disposeChildren();
+            node.chunk.setActiveForLOD(true);
             return;
         }
 
-        if (children === null) {
+        if (children === null && screenSpaceError >= splitScreenSpaceErrorThreshold) {
             if (!node.canBeSubdivided()) {
                 return;
             }
@@ -185,46 +184,8 @@ export class TerrainFaceQuadTree implements Cullable {
         }
 
         for (const child of updatedChildren) {
-            this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, child);
+            this.updateLODRecursively(lodContext, chunkForge, scatteringSystem, child);
         }
-    }
-
-    private computeTargetLOD(observerPositionW: Vector3, chunkIndices: ChunkIndices): number {
-        const nodeRelativePosition = getChunkSphereSpacePosition(
-            chunkIndices,
-            this.faceIndex,
-            this.rootChunkLength / 2,
-            getRotationQuaternion(this.parentTransform),
-        );
-
-        const nodePositionSphere = nodeRelativePosition.normalizeToNew();
-        const observerPositionSphere = observerPositionW
-            .subtract(this.parentTransform.getAbsolutePosition())
-            .normalize();
-
-        const totalRadius =
-            this.planetModel.radius +
-            0.5 * this.planetModel.terrainSettings.max_mountain_height +
-            this.planetModel.terrainSettings.continent_base_height +
-            0.5 * this.planetModel.terrainSettings.max_bump_height;
-
-        const observerRelativePosition = observerPositionW.subtract(this.parentTransform.getAbsolutePosition());
-        const observerDistanceToCenter = observerRelativePosition.length();
-
-        const nodeGreatCircleDistance = Math.acos(Vector3.Dot(nodePositionSphere, observerPositionSphere));
-        const nodeLength = this.rootChunkLength / 2 ** chunkIndices.lod;
-
-        const chunkGreatDistanceFactor = Math.max(
-            0.0,
-            nodeGreatCircleDistance - (8 * nodeLength) / (2 * Math.PI * this.planetModel.radius),
-        );
-        const observerDistanceFactor = Math.max(0.0, observerDistanceToCenter - totalRadius) / this.planetModel.radius;
-
-        let kernel = this.maxDepth;
-        kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
-        kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
-
-        return clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
     }
 
     private createChildren(

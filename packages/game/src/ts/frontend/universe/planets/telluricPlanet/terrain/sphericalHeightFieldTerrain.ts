@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Camera } from "@babylonjs/core/Cameras/camera";
+import { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Material } from "@babylonjs/core/Materials/material";
-import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly, TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
@@ -26,6 +26,7 @@ import type { Cullable } from "@/frontend/helpers/cullable";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import type { ChunkForge } from "./chunks/chunkForge";
+import type { LodUpdateContext } from "./chunks/lodUpdateContext";
 import type { IScatteringSystem } from "./chunks/scatteringSystem";
 import { TerrainFaceQuadTree } from "./chunks/terrainFaceQuadTree";
 
@@ -57,10 +58,31 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         ];
     }
 
-    public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
+    public updateLOD(camera: Camera, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
+        const lodContext = this.createLodUpdateContext(camera);
         for (const face of this.faces) {
-            face.updateLOD(observerPosition, chunkForge, scatteringSystem);
+            face.updateLOD(lodContext, chunkForge, scatteringSystem);
         }
+    }
+
+    private createLodUpdateContext(camera: Camera): LodUpdateContext {
+        const fovY =
+            camera.fovMode === Camera.FOVMODE_VERTICAL_FIXED
+                ? camera.fov
+                : (camera.fov * camera.viewport.height) / camera.viewport.width;
+        const viewportHeight = camera.viewport.height * camera.getEngine().getRenderHeight();
+        const projectionScale = viewportHeight / (2 * Math.tan(fovY * 0.5));
+
+        const terrainInverseWorldMatrix = this.transform.getWorldMatrix().clone().invert();
+        const cameraPositionPlanetSpace = Vector3.TransformCoordinates(
+            camera.globalPosition,
+            terrainInverseWorldMatrix,
+        );
+
+        return {
+            cameraPositionPlanetSpace,
+            projectionScale,
+        };
     }
 
     isIdle(): boolean {
