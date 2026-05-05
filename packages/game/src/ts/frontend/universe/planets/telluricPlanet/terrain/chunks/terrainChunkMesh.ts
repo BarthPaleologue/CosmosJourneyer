@@ -23,8 +23,9 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData, type TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
@@ -62,7 +63,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     private readonly parent: TransformNode;
 
-    private aggregate: PhysicsAggregate | null = null;
+    private physicsShape: PhysicsShape | null = null;
+    private physicsBody: PhysicsBody | null = null;
 
     private lodMetrics: ChunkLodMetrics | null = null;
 
@@ -141,16 +143,15 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.lodMetrics = this.computeLodMetrics(forgeOutput.positions);
 
         if (this.sideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
-            this.aggregate = new PhysicsAggregate(
-                this.mesh,
-                PhysicsShapeType.MESH,
-                { mass: 0, restitution: 0, friction: 2 },
-                this.mesh.getScene(),
-            );
-            this.aggregate.body.setMotionType(PhysicsMotionType.STATIC);
-            this.aggregate.body.disablePreStep = false;
-            this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
-            this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+            const scene = this.mesh.getScene();
+
+            this.physicsShape = new PhysicsShapeMesh(this.mesh, scene);
+            this.physicsShape.material.friction = 2;
+            this.physicsShape.material.restitution = 0;
+            this.physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            this.physicsShape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+
+            this.physicsBody = TerrainChunkMesh.CreatePhysicsBody(this.mesh, this.physicsShape, scene);
         }
 
         this.mesh.receiveShadows = true;
@@ -211,7 +212,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * If the chunk has no Havok body, this method does nothing
      */
     public updatePosition() {
-        if (this.aggregate === null) return;
+        if (this.physicsBody === null) return;
         this.getTransform().setAbsolutePosition(
             Vector3.TransformCoordinates(this.positionOnSphere, this.parent.getWorldMatrix()),
         );
@@ -257,6 +258,24 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     private updateEnabledState(): void {
         this.mesh.setEnabled(this.loaded && this.activeForLOD && this.activeForCulling);
+
+        if (!this.mesh.isEnabled() && this.physicsBody !== null) {
+            this.physicsBody.dispose();
+            this.physicsBody = null;
+        } else if (this.mesh.isEnabled() && this.physicsShape !== null && this.physicsBody === null) {
+            const scene = this.mesh.getScene();
+
+            this.physicsBody = TerrainChunkMesh.CreatePhysicsBody(this.mesh, this.physicsShape, scene);
+        }
+    }
+
+    private static CreatePhysicsBody(transform: TransformNode, shape: PhysicsShape, scene: Scene): PhysicsBody {
+        const physicsBody = new PhysicsBody(transform, PhysicsMotionType.STATIC, false, scene);
+        physicsBody.shape = shape;
+        physicsBody.setMassProperties({ mass: 0 });
+        physicsBody.disablePreStep = false;
+
+        return physicsBody;
     }
 
     public hasBeenDisposed() {
@@ -265,7 +284,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     public dispose() {
         this.scatteringSystem.clearChunk(this.mesh.name);
-        this.aggregate?.dispose();
+        this.physicsBody?.dispose();
+        this.physicsShape?.dispose();
         this.mesh.dispose();
         this.disposed = true;
     }
