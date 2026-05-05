@@ -38,8 +38,8 @@ import { type DeepReadonly } from "@/utils/types";
 import { CollisionMask, Settings } from "@/settings";
 
 import type { ChunkForgeCompletedOutput, ChunkId } from "./chunkForge";
-import { chunkIndicesToString, getChunkPlaneSpacePosition, type ChunkIndices } from "./chunkUtils";
-import { getQuaternionFromDirection, type Direction } from "./direction";
+import { getChunkPlaneSpacePosition, type ChunkIndices } from "./chunkUtils";
+import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 import type { IScatteringSystem } from "./scatteringSystem";
 
 export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Cullable {
@@ -68,14 +68,14 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     constructor(
         indices: ChunkIndices,
-        direction: Direction,
+        faceIndex: FaceIndex,
         parentTransform: TransformNode,
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
-        this.id = `${parentTransform.name}->d${direction}-${chunkIndicesToString(indices)}`;
+        this.id = `${parentTransform.name}->f${faceIndex}->l${indices.lod}-x${indices.x}-y${indices.y}`;
 
         this.indices = structuredClone(indices);
 
@@ -91,7 +91,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         // computing the position of the chunk on the side of the planet
         const position = getChunkPlaneSpacePosition(2 * planetModel.radius, indices);
 
-        const faceRotation = getQuaternionFromDirection(direction);
+        const faceRotation = getQuaternionFromFaceIndex(faceIndex);
         position.applyRotationQuaternionInPlace(faceRotation);
 
         this.cubePosition = position.clone();

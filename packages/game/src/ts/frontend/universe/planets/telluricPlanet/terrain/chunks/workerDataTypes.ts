@@ -21,7 +21,7 @@ import {
     type TelluricSatelliteModel,
 } from "@cosmos-journeyer/universe-model";
 
-import { type Direction } from "./direction";
+import { type FaceIndex } from "./faceIndex";
 
 export type TransferBuildData = {
     chunkId: string;
@@ -29,5 +29,5 @@ export type TransferBuildData = {
     position: [number, number, number];
     nbVerticesPerSide: number;
     depth: number;
-    direction: Direction;
+    faceIndex: FaceIndex;
 };

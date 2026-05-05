@@ -123,7 +123,7 @@ export class ChunkForgeWorkers implements ChunkForge {
             planetModel: task.planetModel,
             nbVerticesPerSide: this.nbVerticesPerRow,
             depth: task.depth,
-            direction: task.direction,
+            faceIndex: task.faceIndex,
             position: [task.position.x, task.position.y, task.position.z],
         };
     }

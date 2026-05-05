@@ -19,21 +19,13 @@ import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 import { assertUnreachable } from "@/utils/types";
 
-import { getQuaternionFromDirection, type Direction } from "./direction";
+import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 
 export type ChunkIndices = {
     readonly lod: number;
     readonly x: number;
     readonly y: number;
 };
-
-/**
- * Returns a stable human-readable identifier for a chunk on one cube face.
- * The x/y coordinates are integer tile coordinates in a 2^depth by 2^depth grid.
- */
-export function chunkIndicesToString(index: ChunkIndices): string {
-    return `l${index.lod}-x${index.x}-y${index.y}`;
-}
 
 export function getChunkChildIndices(parent: ChunkIndices, childIndex: 0 | 1 | 2 | 3): ChunkIndices {
     /*
@@ -68,13 +60,13 @@ export function getChunkPlaneSpacePosition(rootChunkLength: number, index: Chunk
 
 export function getChunkSphereSpacePosition(
     chunkIndices: ChunkIndices,
-    direction: Direction,
+    faceIndex: FaceIndex,
     planetRadius: number,
     planetRotationQuaternion: Quaternion,
 ): Vector3 {
     const position = getChunkPlaneSpacePosition(2 * planetRadius, chunkIndices);
 
-    const rotationQuaternion = getQuaternionFromDirection(direction);
+    const rotationQuaternion = getQuaternionFromFaceIndex(faceIndex);
     position.applyRotationQuaternionInPlace(rotationQuaternion);
     position.normalize().scaleInPlace(planetRadius);
 

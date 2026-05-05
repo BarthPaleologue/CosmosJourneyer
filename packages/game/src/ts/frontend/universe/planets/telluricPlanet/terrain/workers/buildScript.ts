@@ -25,7 +25,6 @@ import { Settings } from "@/settings";
 
 import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "../../../../../helpers/instancing";
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
-import { getFaceIndexFromDirection } from "../chunks/direction";
 import type { ScatteredInstances } from "../chunks/scatteringSystem";
 import { type ReturnedChunkData } from "../chunks/taskTypes";
 import { type TransferBuildData } from "../chunks/workerDataTypes";
@@ -71,7 +70,7 @@ function handle_build(data: TransferBuildData): void {
     const buildData: BuildData = new BuildData(
         planetDiameter,
         data.depth,
-        getFaceIndexFromDirection(data.direction),
+        data.faceIndex,
         data.position[0],
         data.position[1],
         data.position[2],

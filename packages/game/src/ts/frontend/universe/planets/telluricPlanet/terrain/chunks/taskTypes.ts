@@ -24,14 +24,14 @@ import {
 import { z } from "zod";
 
 import type { ChunkId } from "./chunkForge";
-import { type Direction } from "./direction";
+import { type FaceIndex } from "./faceIndex";
 import { ScatteredInstancesSchema } from "./scatteringSystem";
 
 export type BuildTask = {
     chunkId: ChunkId;
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     depth: number;
-    direction: Direction;
+    faceIndex: FaceIndex;
     position: Vector3;
 };
 

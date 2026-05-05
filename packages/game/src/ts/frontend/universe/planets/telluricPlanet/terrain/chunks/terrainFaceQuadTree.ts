@@ -36,7 +36,7 @@ import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
 import { getChunkChildIndices, getChunkSphereSpacePosition, type ChunkIndices } from "./chunkUtils";
-import { type Direction } from "./direction";
+import { type FaceIndex } from "./faceIndex";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
@@ -54,7 +54,7 @@ export class TerrainFaceQuadTree implements Cullable {
 
     private readonly rootChunkLength: number;
 
-    private readonly direction: Direction;
+    private readonly faceIndex: FaceIndex;
 
     private readonly scene: Scene;
 
@@ -73,14 +73,14 @@ export class TerrainFaceQuadTree implements Cullable {
 
     /**
      *
-     * @param direction
+     * @param faceIndex
      * @param planetModel
      * @param parentTransform
      * @param material
      * @param scene
      */
     constructor(
-        direction: Direction,
+        faceIndex: FaceIndex,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
         parentTransform: TransformNode,
         material: Material,
@@ -102,7 +102,7 @@ export class TerrainFaceQuadTree implements Cullable {
 
         this.scene = scene;
 
-        this.direction = direction;
+        this.faceIndex = faceIndex;
 
         this.parentTransform = parentTransform;
 
@@ -192,7 +192,7 @@ export class TerrainFaceQuadTree implements Cullable {
     private computeTargetLOD(observerPositionW: Vector3, chunkIndices: ChunkIndices): number {
         const nodeRelativePosition = getChunkSphereSpacePosition(
             chunkIndices,
-            this.direction,
+            this.faceIndex,
             this.rootChunkLength / 2,
             getRotationQuaternion(this.parentTransform),
         );
@@ -247,7 +247,7 @@ export class TerrainFaceQuadTree implements Cullable {
     ): TerrainQuadTreeNode {
         const chunk = new TerrainChunkMesh(
             indices,
-            this.direction,
+            this.faceIndex,
             this.parentTransform,
             this.material,
             this.planetModel,
@@ -262,7 +262,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 planetModel: this.planetModel,
                 position: chunk.cubePosition,
                 depth: chunk.indices.lod,
-                direction: this.direction,
+                faceIndex: this.faceIndex,
             };
 
             chunkForge.addTask(buildTask);
