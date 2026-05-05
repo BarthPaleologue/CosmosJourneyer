@@ -36,34 +36,27 @@ import { Settings } from "@/settings";
 
 import { type ChunkForge } from "./chunkForge";
 import { getChunkSphereSpacePositionFromPath } from "./chunkUtils";
-import { DeleteSemaphore } from "./deleteSemaphore";
 import { type Direction } from "./direction";
-import { PlanetChunk } from "./planetChunk";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
+import { TerrainChunkMesh } from "./terrainChunkMesh";
+import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
 
 /**
- * A quadTree is defined recursively
- */
-type QuadTreeNode = [QuadTree, QuadTree, QuadTree, QuadTree];
-type QuadTree = QuadTreeNode | PlanetChunk;
-
-/**
- * A ChunkTree is a structure designed to manage LOD using a quadtree
+ * Represents a face of a cube-sphere terrain.
+ * It owns the quad-tree for the face and is responsible for handling LOD updates and culling
  */
 export class TerrainFaceQuadTree implements Cullable {
     readonly minDepth: number;
     readonly maxDepth: number;
 
-    private tree: QuadTree | null = null;
+    private root: TerrainQuadTreeNode | null = null;
 
     private readonly rootChunkLength: number;
 
     private readonly direction: Direction;
 
     private readonly scene: Scene;
-
-    private deleteSemaphores: Array<DeleteSemaphore> = [];
 
     readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
 
@@ -116,47 +109,21 @@ export class TerrainFaceQuadTree implements Cullable {
         this.material = material;
     }
 
-    public *getChunks(tree: QuadTree | null = this.tree): Generator<PlanetChunk, void, unknown> {
-        if (tree === null) {
-            return;
-        }
-
-        if (tree instanceof PlanetChunk) {
-            yield tree;
-        } else {
-            for (const stem of tree) {
-                yield* this.getChunks(stem);
-            }
-        }
-    }
-
-    /**
-     * Creates deletion semaphores for the tree (we will delete the chunks only when the new ones are ready)
-     * @param tree The tree to delete
-     * @param newChunks
-     */
-    private requestDeletion(tree: QuadTree, newChunks: PlanetChunk[]): void {
-        const chunksToDelete = Array.from(this.getChunks(tree));
-        this.deleteSemaphores.push(new DeleteSemaphore(newChunks, chunksToDelete));
-    }
-
     /**
      * Update tree to create matching LOD relative to the observer's position
      * @param observerPosition The observer position
      * @param chunkForge
      */
     public updateLOD(observerPosition: Vector3, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
-        for (const semaphore of this.deleteSemaphores) {
-            semaphore.update();
+        this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
+        if (this.root === null) {
+            this.root = this.createNode([], chunkForge, scatteringSystem);
         }
 
-        // remove delete semaphores that have been resolved
-        this.deleteSemaphores = this.deleteSemaphores.filter((semaphore) => !semaphore.isResolved());
+        this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem, this.root);
+        this.root.updateVisibility();
 
-        this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
-        this.tree = this.updateLODRecursively(observerPosition, chunkForge, scatteringSystem);
-
-        for (const chunk of this.getChunks()) {
+        for (const chunk of this.root.getChunks()) {
             chunk.updatePosition();
         }
     }
@@ -165,31 +132,64 @@ export class TerrainFaceQuadTree implements Cullable {
      * Recursive function used internally to update LOD
      * @param observerPositionW The observer position in world space
      * @param chunkForge
-     * @param tree The tree to update recursively
+     * @param node The node to update recursively
      * @param walked The position of the current root relative to the absolute root
-     * @returns The updated tree
      */
     private updateLODRecursively(
         observerPositionW: Vector3,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
-        tree: QuadTree | null = this.tree,
+        node: TerrainQuadTreeNode,
         walked: number[] = [],
-    ): QuadTree {
-        if (tree === null) {
-            return this.createChunk(walked, chunkForge, scatteringSystem);
-        }
-
-        if (tree instanceof PlanetChunk && !tree.isLoaded()) {
-            const chunkOutput = chunkForge.getOutput(tree.id);
+    ): void {
+        if (!node.chunk.isLoaded()) {
+            const chunkOutput = chunkForge.getOutput(node.chunk.id);
             if (chunkOutput !== undefined && chunkOutput.status === "completed" && this.remainingGpuUploads > 0) {
-                tree.init(chunkOutput);
+                node.chunk.init(chunkOutput);
                 this.remainingGpuUploads -= 1;
             }
         }
 
-        if (walked.length === this.maxDepth) return tree;
+        if (walked.length === this.maxDepth) {
+            return;
+        }
 
+        const targetLOD = this.computeTargetLOD(observerPositionW, walked);
+        const children = node.getChildren();
+
+        if (targetLOD <= walked.length) {
+            if (children !== null) {
+                node.disposeChildren();
+                node.chunk.setActiveForLOD(true);
+            }
+            return;
+        }
+
+        if (children === null) {
+            if (!node.canBeSubdivided()) {
+                return;
+            }
+
+            node.setChildren(this.createChildren(walked, chunkForge, scatteringSystem));
+        }
+
+        const updatedChildren = node.getChildren();
+        if (updatedChildren === null) {
+            return;
+        }
+
+        for (const [childIndex, child] of updatedChildren.entries()) {
+            this.updateLODRecursively(
+                observerPositionW,
+                chunkForge,
+                scatteringSystem,
+                child,
+                walked.concat(childIndex),
+            );
+        }
+    }
+
+    private computeTargetLOD(observerPositionW: Vector3, walked: number[]): number {
         const nodeRelativePosition = getChunkSphereSpacePositionFromPath(
             walked,
             this.direction,
@@ -224,60 +224,33 @@ export class TerrainFaceQuadTree implements Cullable {
         kernel -= Math.log2(1.0 + chunkGreatDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
         kernel -= Math.log2(1.0 + observerDistanceFactor * 2 ** (this.maxDepth - this.minDepth)) * 0.8;
 
-        const targetLOD = clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
-
-        if (tree instanceof PlanetChunk && targetLOD > walked.length) {
-            if (!tree.isLoaded()) return tree;
-            if (!tree.getTransform().isVisible) return tree;
-            if (!tree.getTransform().isEnabled()) return tree;
-
-            const newTree: [PlanetChunk, PlanetChunk, PlanetChunk, PlanetChunk] = [
-                this.createChunk(walked.concat([0]), chunkForge, scatteringSystem),
-                this.createChunk(walked.concat([1]), chunkForge, scatteringSystem),
-                this.createChunk(walked.concat([2]), chunkForge, scatteringSystem),
-                this.createChunk(walked.concat([3]), chunkForge, scatteringSystem),
-            ];
-            this.requestDeletion(tree, newTree);
-            return newTree;
-        }
-
-        if (tree instanceof Array) {
-            if (targetLOD <= walked.length) {
-                const newChunk = this.createChunk(walked, chunkForge, scatteringSystem);
-                this.requestDeletion(tree, [newChunk]);
-                return newChunk;
-            }
-
-            return [
-                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[0], walked.concat([0])),
-                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[1], walked.concat([1])),
-                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[2], walked.concat([2])),
-                this.updateLODRecursively(observerPositionW, chunkForge, scatteringSystem, tree[3], walked.concat([3])),
-            ];
-        }
-
-        return tree;
+        return clamp(Math.floor(kernel), this.minDepth, this.maxDepth);
     }
 
-    /**
-     * Create new chunk of terrain at the specified location
-     * @param path The path leading to the location where to add the new chunk
-     * @param chunkForge
-     * @param scatteringSystem
-     * @returns The new Chunk
-     */
-    private createChunk(
+    private createChildren(
         path: ReadonlyArray<number>,
         chunkForge: ChunkForge,
         scatteringSystem: IScatteringSystem,
-    ): PlanetChunk {
-        const chunk = new PlanetChunk(
+    ): TerrainQuadTreeChildren {
+        return [
+            this.createNode(path.concat(0), chunkForge, scatteringSystem),
+            this.createNode(path.concat(1), chunkForge, scatteringSystem),
+            this.createNode(path.concat(2), chunkForge, scatteringSystem),
+            this.createNode(path.concat(3), chunkForge, scatteringSystem),
+        ];
+    }
+
+    private createNode(
+        path: ReadonlyArray<number>,
+        chunkForge: ChunkForge,
+        scatteringSystem: IScatteringSystem,
+    ): TerrainQuadTreeNode {
+        const chunk = new TerrainChunkMesh(
             path,
             this.direction,
             this.parentTransform,
             this.material,
             this.planetModel,
-            this.rootChunkLength,
             scatteringSystem,
             this.scene,
         );
@@ -295,36 +268,31 @@ export class TerrainFaceQuadTree implements Cullable {
             chunkForge.addTask(buildTask);
         }
 
-        return chunk;
+        return new TerrainQuadTreeNode(chunk);
     }
 
     public isIdle(): boolean {
-        if (this.tree === null) {
+        if (this.root === null) {
             return false;
         }
 
-        if (this.deleteSemaphores.length > 0) {
-            return false;
-        }
-
-        return this.getChunks().every((chunk) => chunk.isLoaded());
+        return this.root.isIdle();
     }
 
     public computeCulling(camera: Camera): void {
-        for (const chunk of this.getChunks()) {
+        if (this.root === null) {
+            return;
+        }
+
+        for (const chunk of this.root.getChunks()) {
             chunk.computeCulling(camera);
         }
     }
 
     public dispose(): void {
-        for (const chunk of this.getChunks()) {
-            chunk.dispose();
+        if (this.root !== null) {
+            this.root.dispose();
         }
-        this.tree = null;
-
-        for (const deleteSemaphore of this.deleteSemaphores) {
-            deleteSemaphore.dispose();
-        }
-        this.deleteSemaphores.length = 0;
+        this.root = null;
     }
 }

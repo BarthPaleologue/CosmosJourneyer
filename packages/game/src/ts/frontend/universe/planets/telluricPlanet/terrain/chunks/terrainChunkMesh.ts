@@ -42,7 +42,7 @@ import { getChunkPlaneSpacePositionFromPath } from "./chunkUtils";
 import { getQuaternionFromDirection, type Direction } from "./direction";
 import type { IScatteringSystem } from "./scatteringSystem";
 
-export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
+export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Cullable {
     readonly id: ChunkId;
     private readonly mesh: Mesh;
     private readonly depth: number;
@@ -61,6 +61,9 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
     private disposed = false;
 
+    private activeForLOD = true;
+    private activeForCulling = true;
+
     private readonly scatteringSystem: IScatteringSystem;
 
     constructor(
@@ -69,7 +72,6 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         parentTransform: TransformNode,
         material: Material,
         planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
-        rootLength: number,
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
@@ -77,7 +79,7 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
 
         this.depth = path.length;
 
-        this.chunkSideLength = rootLength / 2 ** this.depth;
+        this.chunkSideLength = (2 * planetModel.radius) / 2 ** this.depth;
 
         this.mesh = new Mesh(`${planetModel.name}_Chunk${this.id}`, scene);
         this.mesh.setEnabled(false);
@@ -87,15 +89,15 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         this.parent = parentTransform;
 
         // computing the position of the chunk on the side of the planet
-        const position = getChunkPlaneSpacePositionFromPath(rootLength, path);
+        const position = getChunkPlaneSpacePositionFromPath(2 * planetModel.radius, path);
 
         // offseting from planet center to position on the side (default side then rotation for all sides)
-        position.z -= rootLength / 2;
+        position.z -= planetModel.radius;
         position.applyRotationQuaternionInPlace(getQuaternionFromDirection(direction));
 
         this.cubePosition = position.clone();
 
-        position.normalize().scaleInPlace(rootLength / 2);
+        position.normalize().scaleInPlace(planetModel.radius);
 
         this.planetLocalPosition = position.clone();
         this.getTransform().position = position;
@@ -147,8 +149,8 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         }
 
         this.mesh.receiveShadows = true;
-        this.mesh.setEnabled(true);
         this.loaded = true;
+        this.updateEnabledState();
 
         this.averageHeight = forgeOutput.averageHeight;
         this.mesh.computeWorldMatrix(true);
@@ -183,6 +185,24 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
         return this.loaded;
     }
 
+    public canBeSubdivided(): boolean {
+        return this.loaded && this.activeForLOD && this.activeForCulling;
+    }
+
+    public setActiveForLOD(active: boolean): void {
+        this.activeForLOD = active;
+        this.updateEnabledState();
+    }
+
+    private setActiveForCulling(active: boolean): void {
+        this.activeForCulling = active;
+        this.updateEnabledState();
+    }
+
+    private updateEnabledState(): void {
+        this.mesh.setEnabled(this.loaded && this.activeForLOD && this.activeForCulling);
+    }
+
     public hasBeenDisposed() {
         return this.disposed;
     }
@@ -215,6 +235,6 @@ export class PlanetChunk implements Transformable, HasBoundingSphere, Cullable {
             Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
             isSizeOnScreenEnough(this, camera, 0.002 / 5);
 
-        this.mesh.setEnabled(isEnabled);
+        this.setActiveForCulling(isEnabled);
     }
 }
