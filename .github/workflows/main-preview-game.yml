@@ -16,15 +16,15 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
               with:
                   lfs: true
 
             - name: Setup Node.js with pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
 
             - name: Use Node.js 24
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: 24
                   cache: pnpm
@@ -38,7 +38,9 @@ jobs:
                   targets: wasm32-unknown-unknown
 
             - name: Setup wasm-pack
-              uses: jetli/wasm-pack-action@v0.4.0
+              uses: taiki-e/install-action@v2
+              with:
+                  tool: wasm-pack
 
             - name: Check formatting
               run: pnpm run format:check

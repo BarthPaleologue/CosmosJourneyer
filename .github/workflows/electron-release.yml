@@ -19,15 +19,15 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
               with:
                   lfs: true
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4
+              uses: pnpm/action-setup@v6
 
             - name: Use Node.js 24
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
                   node-version: 24
                   cache: pnpm
@@ -48,7 +48,7 @@ jobs:
               run: pnpm --filter @cosmos-journeyer/desktop-electron package
 
             - name: Upload desktop artifacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: electron-${{ matrix.os }}
                   path: packages/desktop-electron/release/*
@@ -60,7 +60,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Download desktop artifacts
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v7
               with:
                   pattern: electron-*
                   merge-multiple: true
