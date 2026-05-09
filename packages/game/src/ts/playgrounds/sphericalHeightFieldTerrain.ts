@@ -81,17 +81,17 @@ export async function createSphericalHeightFieldTerrainScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
         terrain.updateLOD(camera, chunkForge, scatteringSystem);
         chunkForge.update();
-
         terrain.computeCulling(camera);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
+            controls.update(0);
             terrain.updateLOD(camera, chunkForge, scatteringSystem);
             chunkForge.update();
+            terrain.computeCulling(camera);
 
             if (chunkForge.isIdle() && terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);

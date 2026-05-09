@@ -174,18 +174,19 @@ export async function createTelluricPlanetScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
         planet.updateLOD(camera, chunkForge, scatteringSystem);
         chunkForge.update();
-        stellarLightSystem.update(camera, planet);
-
         planet.computeCulling(camera);
+
+        stellarLightSystem.update(camera, planet);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
+            controls.update(0);
             planet.updateLOD(camera, chunkForge, scatteringSystem);
             chunkForge.update();
+            planet.computeCulling(camera);
 
             if (chunkForge.isIdle() && planet.terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
