@@ -96,7 +96,7 @@ function handle_build(data: TransferBuildData): void {
     if (scattered_point_buffer.length !== 0) {
         const rockLayer: ScatteringLayer = () => ({
             density: 1 / 15 ** 2,
-            scalingOverride: Vector3.One().scaleInPlace(0.2 + Math.random() * 4),
+            scalingOverride: Vector3.One().scaleInPlace(0.2 + 4 * Math.random() ** 2),
             rotationOverride: Quaternion.FromEulerAngles(
                 Math.random() * Math.PI,
                 Math.random() * Math.PI,
@@ -150,7 +150,7 @@ function handle_build(data: TransferBuildData): void {
                         gravityUp,
                         Quaternion.Identity(),
                     ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
-                    scalingOverride: Vector3.One().scaleInPlace(0.5 + Math.random() * 2),
+                    scalingOverride: Vector3.One().scaleInPlace(0.5 + 2 * Math.random() ** 1.5),
                 };
             };
 
