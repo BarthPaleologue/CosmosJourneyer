@@ -16,6 +16,6 @@ test("The spherical height field terrain playground physics are correct", async 
         shotName: "physics-baseline",
         scene: "sphericalHeightFieldTerrain",
         flagToWait: "frozen",
-        urlParams: { seed: "261", freeze: 1, physicsViewer: "", startingDistance: 1136.5e3 },
+        urlParams: { seed: "261", freeze: 10, physicsViewer: "", startingDistance: 1136.5e3 },
     });
 });
