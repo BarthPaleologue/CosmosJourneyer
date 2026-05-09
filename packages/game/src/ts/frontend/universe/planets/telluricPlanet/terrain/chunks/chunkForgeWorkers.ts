@@ -37,7 +37,6 @@ export class ChunkForgeWorkers implements ChunkForge {
         this.workerPool = new WorkerPool(
             workers,
             (task) => {
-                this.output.set(task.chunkId, { status: "pending" });
                 return this.serializeBuildTask(task);
             },
             (event) => {
@@ -110,6 +109,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     }
 
     public addTask(task: BuildTask) {
+        this.output.set(task.chunkId, { status: "pending" });
         this.workerPool.submitTask(task);
     }
 
