@@ -46,19 +46,6 @@ export class WorkerPool<TTask, TWorkerInput> {
                 this.finishedWorkers.add(worker);
             };
 
-            worker.onmessage = (event: MessageEvent<unknown>) => {
-                this.handleWorkerResult(event);
-
-                const nextTask = this.nextTask();
-
-                if (nextTask !== undefined) {
-                    this.dispatchTask(worker, nextTask);
-                } else {
-                    this.busyWorkers.delete(worker);
-                    this.finishedWorkers.add(worker);
-                }
-            };
-
             this.availableWorkers.add(worker);
         }
 
@@ -91,6 +78,19 @@ export class WorkerPool<TTask, TWorkerInput> {
         this.busyWorkers.add(worker);
 
         const serializedTask = this.serializeTask(task);
+
+        worker.onmessage = (event: MessageEvent<unknown>) => {
+            this.handleWorkerResult(event);
+
+            const nextTask = this.nextTask();
+
+            if (nextTask !== undefined) {
+                this.dispatchTask(worker, nextTask);
+            } else {
+                this.busyWorkers.delete(worker);
+                this.finishedWorkers.add(worker);
+            }
+        };
         worker.postMessage(serializedTask);
     }
 
@@ -103,9 +103,13 @@ export class WorkerPool<TTask, TWorkerInput> {
     }
 
     public reset() {
-        for (const worker of this.busyWorkers) {
-            this.availableWorkers.add(worker);
-            this.busyWorkers.delete(worker);
+        this.taskQueue.clear();
+
+        for (const busyWorker of this.busyWorkers) {
+            busyWorker.onmessage = () => {
+                this.busyWorkers.delete(busyWorker);
+                this.finishedWorkers.add(busyWorker);
+            };
         }
 
         for (const worker of this.finishedWorkers) {
@@ -114,8 +118,5 @@ export class WorkerPool<TTask, TWorkerInput> {
         }
 
         this.finishedWorkers.clear();
-        this.busyWorkers.clear();
-
-        this.taskQueue.clear();
     }
 }
