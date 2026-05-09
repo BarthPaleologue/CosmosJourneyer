@@ -51,7 +51,11 @@ export async function createTelluricPlanetScene(
 
     await enablePhysics(scene);
 
-    const chunkForge = new ChunkForgeWorkers(Settings.VERTEX_RESOLUTION);
+    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
+    if (!chunkForgeResult.success) {
+        throw chunkForgeResult.error;
+    }
+    const chunkForge = chunkForgeResult.value;
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -170,20 +174,21 @@ export async function createTelluricPlanetScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-
-        planet.updateLOD(camera.globalPosition, chunkForge, scatteringSystem);
+        planet.updateLOD(camera, chunkForge, scatteringSystem);
         chunkForge.update();
-        stellarLightSystem.update(camera, planet);
-
         planet.computeCulling(camera);
+
+        stellarLightSystem.update(camera, planet);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
-            planet.updateLOD(camera.getWorldMatrix().getTranslation(), chunkForge, scatteringSystem);
+            controls.update(0);
+            planet.updateLOD(camera, chunkForge, scatteringSystem);
             chunkForge.update();
+            planet.computeCulling(camera);
 
-            if (chunkForge.applyTaskQueue.length === 0 && chunkForge.workerPool.busyWorkers.length === 0) {
+            if (chunkForge.isIdle() && planet.terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

@@ -51,7 +51,7 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

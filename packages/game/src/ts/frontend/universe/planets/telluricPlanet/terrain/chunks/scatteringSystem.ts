@@ -34,7 +34,15 @@ export const ScatteredInstancesSchema = z.partialRecord(AssetTypeSchema, z.insta
 
 export type ScatteredInstances = z.infer<typeof ScatteredInstancesSchema>;
 
-export class ScatteringSystem {
+export interface IScatteringSystem {
+    scatterInChunk(chunkTransform: TransformNode, scattering: ScatteredInstances): void;
+
+    clearChunk(chunkId: string): void;
+
+    dispose(): void;
+}
+
+export class ScatteringSystem implements IScatteringSystem {
     private readonly assets: Objects;
 
     private readonly chunkToScatteredAssets = new Map<string, Partial<Record<AssetType, Mesh>>>();
@@ -117,5 +125,19 @@ export class ScatteringSystem {
             }
         }
         this.chunkToScatteredAssets.clear();
+    }
+}
+
+export class ScatteringSystemMock implements IScatteringSystem {
+    scatterInChunk(): void {
+        // do nothing
+    }
+
+    clearChunk(): void {
+        // do nothing
+    }
+
+    dispose(): void {
+        // do nothing
     }
 }

@@ -54,6 +54,7 @@ import { createSpaceDotsScene } from "./spaceDots";
 import { createSpaceElevatorScene } from "./spaceElevator";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSphericalHeightFieldTerrainScene } from "./sphericalHeightFieldTerrain";
 import { createSpotLightsScene } from "./spotLights";
 import { createStarMapScene } from "./starMap";
 import { createStarMapViewScene } from "./starMapView";
@@ -120,6 +121,7 @@ export class PlaygroundRegistry {
         ["rover", createRoverScene],
         ["triPlanarNormal", createTriPlanarNormalScene],
         ["forest", createForestScene],
+        ["sphericalHeightFieldTerrain", createSphericalHeightFieldTerrainScene],
     ]);
 
     register(

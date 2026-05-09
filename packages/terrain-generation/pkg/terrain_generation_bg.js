@@ -298,19 +298,6 @@ export class ReturnData {
     set nb_instances_created(arg0) {
         wasm.__wbg_set_returndata_nb_instances_created(this.__wbg_ptr, arg0);
     }
-    /**
-     * @returns {number}
-     */
-    get average_height() {
-        const ret = wasm.__wbg_get_returndata_average_height(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set average_height(arg0) {
-        wasm.__wbg_set_returndata_average_height(this.__wbg_ptr, arg0);
-    }
 }
 if (Symbol.dispose) ReturnData.prototype[Symbol.dispose] = ReturnData.prototype.free;
 

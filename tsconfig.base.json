@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "target": "ES2024",
-        "module": "ES2022",
+        "target": "ES2025",
+        "module": "esnext",
         "moduleResolution": "bundler",
         "rootDir": ".",
         "outDir": "./dist",
@@ -24,6 +24,6 @@
         "verbatimModuleSyntax": true,
         "erasableSyntaxOnly": true,
         "moduleDetection": "force",
-        "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"]
+        "lib": ["ES2025", "DOM", "WebWorker"]
     }
 }

@@ -20,42 +20,23 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 import { assertUnreachable } from "@/utils/types";
 
-export type Direction = "up" | "down" | "left" | "right" | "forward" | "backward";
+export type FaceIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
-export function getQuaternionFromDirection(direction: Direction): Quaternion {
-    switch (direction) {
-        case "up":
+export function getQuaternionFromFaceIndex(faceIndex: FaceIndex): Quaternion {
+    switch (faceIndex) {
+        case 0:
             return Quaternion.RotationAxis(Axis.X, Math.PI / 2);
-        case "down":
+        case 1:
             return Quaternion.RotationAxis(Axis.X, -Math.PI / 2);
-        case "forward":
-            return Quaternion.Identity();
-        case "backward":
-            return Quaternion.RotationAxis(Axis.Y, Math.PI);
-        case "left":
+        case 2:
             return Quaternion.RotationAxis(Axis.Y, Math.PI / 2);
-        case "right":
+        case 3:
             return Quaternion.RotationAxis(Axis.Y, -Math.PI / 2);
+        case 4:
+            return Quaternion.Identity();
+        case 5:
+            return Quaternion.RotationAxis(Axis.Y, Math.PI);
         default:
-            return assertUnreachable(direction);
-    }
-}
-
-export function getFaceIndexFromDirection(direction: Direction): number {
-    switch (direction) {
-        case "up":
-            return 0;
-        case "down":
-            return 1;
-        case "left":
-            return 2;
-        case "right":
-            return 3;
-        case "forward":
-            return 4;
-        case "backward":
-            return 5;
-        default:
-            return assertUnreachable(direction);
+            return assertUnreachable(faceIndex);
     }
 }

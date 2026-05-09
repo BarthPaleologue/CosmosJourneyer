@@ -137,7 +137,7 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
             this.asteroidField = null;
         }
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     updateMaterial(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {

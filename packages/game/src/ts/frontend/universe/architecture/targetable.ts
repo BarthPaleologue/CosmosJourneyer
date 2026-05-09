@@ -16,6 +16,8 @@ export type ObjectTargetCursorType = (typeof ObjectTargetCursorType)[keyof typeo
 export type TargetInfo = {
     type: ObjectTargetCursorType;
 
+    name: string;
+
     /**
      * if distance < minDistance, the target cursor is hidden
      */
@@ -31,9 +33,10 @@ export interface Targetable extends Transformable, HasBoundingSphere, TypedObjec
     readonly targetInfo: TargetInfo;
 }
 
-export function defaultTargetInfoCelestialBody(boundingRadius: number): TargetInfo {
+export function defaultTargetInfoCelestialBody(name: string, boundingRadius: number): TargetInfo {
     return {
         type: ObjectTargetCursorType.CELESTIAL_BODY,
+        name,
         minDistance: boundingRadius * 10.0,
         maxDistance: 0.0,
     };

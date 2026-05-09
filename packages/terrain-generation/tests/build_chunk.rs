@@ -89,7 +89,6 @@ pub fn build_chunk_data() {
         nb_instances.nb_instances_created,
         max_nb_instances
     );
-    assert!(nb_instances.average_height.is_finite());
     assert_eq!(
         positions.len(),
         ((build_data.resolution * build_data.resolution + skirt_vertex_count) * 3) as usize
@@ -164,7 +163,7 @@ pub fn build_chunk_data_without_skirt_buffers() {
     let mut indices: Vec<u16> = vec![0; (nb_subdivisions * nb_subdivisions * 2 * 3) as usize];
     let mut scattered_points_buffer: Vec<f32> = Vec::new();
 
-    let result = build_chunk_vertex_data(
+    build_chunk_vertex_data(
         &build_data,
         &mut positions,
         &mut indices,
@@ -173,7 +172,6 @@ pub fn build_chunk_data_without_skirt_buffers() {
         0.0,
     );
 
-    assert!(result.average_height.is_finite());
     assert_eq!(
         positions.len(),
         (build_data.resolution * build_data.resolution * 3) as usize

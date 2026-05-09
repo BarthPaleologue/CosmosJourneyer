@@ -15,28 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ScatteredInstances } from "./scatteringSystem";
-import { type BuildTask } from "./taskTypes";
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-export type ChunkId = string;
-
-type ChunkForgePendingOutput = {
-    status: "pending";
+export type LodUpdateContext = {
+    readonly cameraPositionPlanetSpace: Vector3;
+    readonly projectionScale: number;
 };
-
-export type ChunkForgeCompletedOutput = {
-    status: "completed";
-    positions: Float32Array;
-    normals: Float32Array;
-    indices: Uint16Array;
-    scatteredInstances: ScatteredInstances;
-};
-
-export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;
-
-export interface ChunkForge {
-    addTask(task: BuildTask): void;
-    getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined;
-    update(): void;
-    reset(): void;
-}

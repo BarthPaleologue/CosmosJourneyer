@@ -96,8 +96,6 @@ pub fn build_chunk_vertex_data(
     let mut chunk_sphere_position = chunk_cube_position.clone();
     chunk_sphere_position.set_magnitude_in_place(planet_radius);
 
-    let mut height_acc = 0.0;
-
     TERRAIN_CACHE.with(|cache| {
         let mut cache_mut = cache.borrow_mut();
         if cache_mut
@@ -173,8 +171,6 @@ pub fn build_chunk_vertex_data(
                     &mut vertex_gradient,
                 );
                 vertex_gradient /= planet_radius;
-
-                height_acc += vertex_position.length() - planet_radius;
 
                 // Resource: https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
                 // project the gradient onto the tangent plane to the sphere at the current vertex
@@ -259,6 +255,5 @@ pub fn build_chunk_vertex_data(
 
     ReturnData {
         nb_instances_created: instance_index,
-        average_height: height_acc / (nb_vertices_per_row * nb_vertices_per_row) as f32,
     }
 }

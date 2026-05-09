@@ -15,28 +15,30 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ScatteredInstances } from "./scatteringSystem";
-import { type BuildTask } from "./taskTypes";
+import { assertUnreachable } from "@/utils/types";
 
-export type ChunkId = string;
-
-type ChunkForgePendingOutput = {
-    status: "pending";
+export type ChunkIndices = {
+    readonly lod: number;
+    readonly x: number;
+    readonly y: number;
 };
 
-export type ChunkForgeCompletedOutput = {
-    status: "completed";
-    positions: Float32Array;
-    normals: Float32Array;
-    indices: Uint16Array;
-    scatteredInstances: ScatteredInstances;
-};
-
-export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;
-
-export interface ChunkForge {
-    addTask(task: BuildTask): void;
-    getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined;
-    update(): void;
-    reset(): void;
+export function getChunkChildIndices(parent: ChunkIndices, childIndex: 0 | 1 | 2 | 3): ChunkIndices {
+    /*
+        3   2
+          +
+        0   1
+    */
+    switch (childIndex) {
+        case 0:
+            return { lod: parent.lod + 1, x: parent.x * 2, y: parent.y * 2 };
+        case 1:
+            return { lod: parent.lod + 1, x: parent.x * 2 + 1, y: parent.y * 2 };
+        case 2:
+            return { lod: parent.lod + 1, x: parent.x * 2 + 1, y: parent.y * 2 + 1 };
+        case 3:
+            return { lod: parent.lod + 1, x: parent.x * 2, y: parent.y * 2 + 1 };
+        default:
+            return assertUnreachable(childIndex);
+    }
 }

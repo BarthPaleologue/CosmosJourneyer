@@ -59,6 +59,7 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
 
         this.targetInfo = {
             type: ObjectTargetCursorType.ANOMALY,
+            name: this.model.name,
             minDistance: this.model.radius * 5,
             maxDistance: this.model.radius * 100,
         };

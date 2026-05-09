@@ -126,7 +126,7 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
             this.asteroidField = null;
         }
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {

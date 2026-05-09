@@ -111,6 +111,7 @@ export class LandingPad implements ILandingPad {
 
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_PAD,
+            name,
             minDistance: this.getBoundingRadius() * 4.0,
             maxDistance: this.getBoundingRadius() * 6.0,
         };

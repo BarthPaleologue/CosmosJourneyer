@@ -21,19 +21,13 @@ import {
     type TelluricSatelliteModel,
 } from "@cosmos-journeyer/universe-model";
 
-import { type Direction } from "./direction";
-import { type TaskType } from "./taskTypes";
+import { type FaceIndex } from "./faceIndex";
 
-export type WorkerData = {
-    taskType: TaskType;
+export type TransferBuildData = {
+    chunkId: string;
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     position: [number, number, number];
-};
-
-export type TransferBuildData = WorkerData & {
     nbVerticesPerSide: number;
     depth: number;
-    direction: Direction;
+    faceIndex: FaceIndex;
 };
-
-export type TransferCollisionData = WorkerData;

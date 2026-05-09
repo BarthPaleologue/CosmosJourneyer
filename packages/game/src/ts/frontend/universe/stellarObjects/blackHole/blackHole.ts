@@ -62,7 +62,7 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
 
         this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundTexture);
 
-        this.targetInfo = defaultTargetInfoCelestialBody(this.getBoundingRadius());
+        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {
