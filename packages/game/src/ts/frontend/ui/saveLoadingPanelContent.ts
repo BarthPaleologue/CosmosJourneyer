@@ -4,9 +4,11 @@ import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
 import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
+import { type RelativeCoordinates } from "@/backend/save/universeCoordinates";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { readScreenshotMetadata } from "@/frontend/helpers/screenshot";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 
 import { type DeepReadonly, type Result } from "@/utils/types";
@@ -28,6 +30,7 @@ export class SaveLoadingPanelContent {
     readonly cmdrList: HTMLElement;
 
     readonly onLoadSaveObservable: Observable<DeepReadonly<Save>> = new Observable<DeepReadonly<Save>>();
+    readonly onLoadLocationObservable: Observable<RelativeCoordinates> = new Observable<RelativeCoordinates>();
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
@@ -87,14 +90,14 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            await this.loadSaveFile(file, universeBackend);
+            await this.loadDroppedFile(file, universeBackend);
         });
 
         dropFileZone.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
             const fileInput = document.createElement("input");
             fileInput.type = "file";
-            fileInput.accept = "application/json";
+            fileInput.accept = "application/json,.json,image/png,.png";
             fileInput.onchange = async () => {
                 const file = fileInput.files?.[0];
                 if (file === undefined) {
@@ -102,7 +105,7 @@ export class SaveLoadingPanelContent {
                     return;
                 }
 
-                await this.loadSaveFile(file, universeBackend);
+                await this.loadDroppedFile(file, universeBackend);
             };
             fileInput.click();
         });
@@ -405,6 +408,32 @@ export class SaveLoadingPanelContent {
         return saveDiv;
     }
 
+    private async loadDroppedFile(file: File, universeBackend: UniverseBackend): Promise<void> {
+        if (isPngFile(file)) {
+            await this.loadScreenshotFile(file);
+            return;
+        }
+
+        await this.loadSaveFile(file, universeBackend);
+    }
+
+    private async loadScreenshotFile(file: File): Promise<void> {
+        const png = new Uint8Array(await file.arrayBuffer());
+        const metadataResult = readScreenshotMetadata(png);
+
+        if (!metadataResult.success) {
+            await alertModal(`Could not read screenshot metadata: ${metadataResult.error}`, this.soundPlayer);
+            return;
+        }
+
+        if (metadataResult.value === null) {
+            await alertModal("This PNG does not contain Cosmos Journeyer screenshot metadata.", this.soundPlayer);
+            return;
+        }
+
+        this.onLoadLocationObservable.notifyObservers(metadataResult.value.location);
+    }
+
     private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {
         const saveFileDataResult = await parseSaveFile(file, universeBackend);
         if (!saveFileDataResult.success) {
@@ -416,4 +445,8 @@ export class SaveLoadingPanelContent {
         this.onLoadSaveObservable.notifyObservers(saveFileDataResult.value);
         return saveFileDataResult;
     }
+}
+
+function isPngFile(file: File): boolean {
+    return file.type === "image/png" || file.name.toLowerCase().endsWith(".png");
 }

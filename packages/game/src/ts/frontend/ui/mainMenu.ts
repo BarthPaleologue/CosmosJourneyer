@@ -275,6 +275,10 @@ export class MainMenu {
             this.hide();
         });
 
+        this.sidePanels.loadSavePanel.content.onLoadLocationObservable.add(() => {
+            this.hide();
+        });
+
         this.settingsButton.addEventListener("click", async () => {
             await this.sidePanels.toggleActivePanel("settings");
         });
