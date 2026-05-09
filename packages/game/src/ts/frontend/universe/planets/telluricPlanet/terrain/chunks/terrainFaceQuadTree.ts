@@ -70,7 +70,6 @@ export class TerrainFaceQuadTree implements Cullable {
     readonly material: Material;
 
     private readonly maxGpuUploadsPerFrame = 1;
-    private remainingGpuUploads = this.maxGpuUploadsPerFrame;
 
     /**
      *
@@ -116,7 +115,6 @@ export class TerrainFaceQuadTree implements Cullable {
      * @param chunkForge
      */
     public updateLOD(lodContext: LodUpdateContext, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
-        this.remainingGpuUploads = this.maxGpuUploadsPerFrame;
         if (this.root === null) {
             this.root = this.createNode(
                 {
@@ -129,11 +127,41 @@ export class TerrainFaceQuadTree implements Cullable {
             );
         }
 
+        this.uploadCompletedChunks(chunkForge);
+
         this.updateLODRecursively(lodContext, chunkForge, scatteringSystem, this.root);
         this.root.updateVisibility();
 
         for (const chunk of this.root.getChunks()) {
             chunk.updatePosition();
+        }
+    }
+
+    private uploadCompletedChunks(chunkForge: ChunkForge): void {
+        if (this.root === null) {
+            return;
+        }
+
+        let remainingGpuUploads = this.maxGpuUploadsPerFrame;
+
+        const unloadedChunks = this.root
+            .getChunks()
+            .filter((chunk) => !chunk.isLoaded())
+            .toArray()
+            .sort(sortLodAscending);
+
+        for (const chunk of unloadedChunks) {
+            if (remainingGpuUploads === 0) {
+                break;
+            }
+
+            const chunkOutput = chunkForge.getOutput(chunk.id);
+            if (chunkOutput === undefined || chunkOutput.status !== "completed") {
+                continue;
+            }
+
+            chunk.init(chunkOutput);
+            remainingGpuUploads--;
         }
     }
 
@@ -149,14 +177,6 @@ export class TerrainFaceQuadTree implements Cullable {
         scatteringSystem: IScatteringSystem,
         node: TerrainQuadTreeNode,
     ): void {
-        if (!node.chunk.isLoaded()) {
-            const chunkOutput = chunkForge.getOutput(node.chunk.id);
-            if (chunkOutput !== undefined && chunkOutput.status === "completed" && this.remainingGpuUploads > 0) {
-                node.chunk.init(chunkOutput);
-                this.remainingGpuUploads -= 1;
-            }
-        }
-
         if (node.chunk.indices.lod === this.maxDepth) {
             return;
         }
@@ -256,4 +276,8 @@ export class TerrainFaceQuadTree implements Cullable {
         }
         this.root = null;
     }
+}
+
+function sortLodAscending(a: TerrainChunkMesh, b: TerrainChunkMesh): number {
+    return a.indices.lod - b.indices.lod;
 }
