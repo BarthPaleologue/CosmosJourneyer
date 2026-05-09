@@ -207,6 +207,7 @@ function handle_build(data: TransferBuildData): void {
     );
 
     buildData.free();
+    result.free();
 }
 
 self.onmessage = (e: MessageEvent<TransferBuildData>) => {
