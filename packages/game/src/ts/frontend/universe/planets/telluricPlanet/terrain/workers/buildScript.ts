@@ -124,7 +124,7 @@ function handle_build(data: TransferBuildData): void {
                     density: MaxScatterDensity * flatnessMask * heightMask,
                     rotationOverride: Quaternion.FromUnitVectorsToRef(
                         Vector3.UpReadOnly,
-                        normal,
+                        gravityUp,
                         Quaternion.Identity(),
                     ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
                 };
