@@ -18,6 +18,7 @@
 export interface ILoadingProgressMonitor {
     startTask(): void;
     completeTask(): void;
+    reset(): void;
     addProgressCallback(callback: (startedTaskCount: number, completedTaskCount: number) => void): void;
 }
 
@@ -41,6 +42,12 @@ export class LoadingProgressMonitor implements ILoadingProgressMonitor {
         this.notifyProgress();
     }
 
+    public reset(): void {
+        this.startedTaskCount = 0;
+        this.completedTaskCount = 0;
+        this.notifyProgress();
+    }
+
     private notifyProgress(): void {
         for (const callback of this.progressCallbacks) {
             callback(this.startedTaskCount, this.completedTaskCount);
@@ -54,6 +61,10 @@ export class LoadingProgressMonitorMock implements ILoadingProgressMonitor {
     }
 
     public completeTask(): void {
+        // No operation for mock
+    }
+
+    public reset(): void {
         // No operation for mock
     }
 

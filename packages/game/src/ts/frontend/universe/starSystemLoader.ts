@@ -25,6 +25,7 @@ import {
     type StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
@@ -42,26 +43,21 @@ import { SpaceElevator } from "./orbitalFacility/spaceElevator";
 import { SpaceStation } from "./orbitalFacility/spaceStation";
 
 export class StarSystemLoader {
-    private loadingIndex: number;
-    private maxLoadingIndex: number;
+    private loadingIndex = 0;
 
     private readonly offset = 1e10;
     private readonly timeOut = 16 * 10;
-
-    constructor() {
-        this.loadingIndex = 0;
-        this.maxLoadingIndex = 1;
-    }
-
-    public getLoadingProgress(): number {
-        return this.loadingIndex / this.maxLoadingIndex;
-    }
 
     /**
      * Loads the star system from the underlying data model.
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
      */
-    public async load(systemModel: DeepReadonly<StarSystemModel>, assets: RenderingAssets, scene: Scene) {
+    public async load(
+        systemModel: DeepReadonly<StarSystemModel>,
+        assets: RenderingAssets,
+        scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
+    ) {
         const numberOfObjects =
             systemModel.stellarObjects.length +
             systemModel.planets.length +
@@ -70,15 +66,23 @@ export class StarSystemLoader {
             systemModel.orbitalFacilities.length;
 
         this.loadingIndex = 0;
-        this.maxLoadingIndex = numberOfObjects;
+
+        for (let index = 0; index < numberOfObjects; index++) {
+            progressMonitor.startTask();
+        }
 
         await wait(1000);
 
-        const stellarObjects = await this.loadStellarObjects(systemModel.stellarObjects, assets, scene);
-        const planets = await this.loadPlanets(systemModel.planets, assets, scene);
-        const satellites = await this.loadSatellites(systemModel.satellites, assets, scene);
-        const anomalies = await this.loadAnomalies(systemModel.anomalies, scene);
-        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, assets, scene);
+        const stellarObjects = await this.loadStellarObjects(
+            systemModel.stellarObjects,
+            assets,
+            scene,
+            progressMonitor,
+        );
+        const planets = await this.loadPlanets(systemModel.planets, assets, scene, progressMonitor);
+        const satellites = await this.loadSatellites(systemModel.satellites, assets, scene, progressMonitor);
+        const anomalies = await this.loadAnomalies(systemModel.anomalies, scene, progressMonitor);
+        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, assets, scene, progressMonitor);
 
         await wait(1000);
 
@@ -95,6 +99,7 @@ export class StarSystemLoader {
         stellarObjectModels: DeepReadonly<Array<StellarObjectModel>>,
         assets: RenderingAssets,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of stellarObjectModels) {
@@ -116,6 +121,7 @@ export class StarSystemLoader {
             stellarObjects.push(stellarObject);
 
             stellarObject.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+            progressMonitor.completeTask();
 
             await wait(this.timeOut);
         }
@@ -130,6 +136,7 @@ export class StarSystemLoader {
     private async loadAnomalies(
         anomalyModels: DeepReadonly<Array<AnomalyModel>>,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<ReadonlyArray<Anomaly>> {
         const anomalies: Anomaly[] = [];
         for (const anomalyModel of anomalyModels) {
@@ -160,6 +167,7 @@ export class StarSystemLoader {
             anomalies.push(anomaly);
 
             anomaly.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+            progressMonitor.completeTask();
 
             await wait(this.timeOut);
         }
@@ -171,6 +179,7 @@ export class StarSystemLoader {
         systemModel: DeepReadonly<StarSystemModel>,
         assets: RenderingAssets,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<ReadonlyArray<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
         for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
@@ -187,6 +196,7 @@ export class StarSystemLoader {
             }
             orbitalFacilities.push(orbitalFacility);
             orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
+            progressMonitor.completeTask();
 
             await wait(this.timeOut);
         }
@@ -198,6 +208,7 @@ export class StarSystemLoader {
         planetModels: DeepReadonly<Array<PlanetModel>>,
         assets: RenderingAssets,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<ReadonlyArray<Planet>> {
         const planets: Planet[] = [];
         for (const planetModel of planetModels) {
@@ -216,8 +227,8 @@ export class StarSystemLoader {
             }
 
             planet.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
-
             planets.push(planet);
+            progressMonitor.completeTask();
 
             await wait(this.timeOut);
         }
@@ -229,6 +240,7 @@ export class StarSystemLoader {
         satelliteModels: DeepReadonly<Array<TelluricSatelliteModel>>,
         assets: RenderingAssets,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<ReadonlyArray<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {
@@ -236,6 +248,7 @@ export class StarSystemLoader {
             const satellite = new TelluricPlanet(satelliteModel, assets, scene);
             satellite.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
             satellites.push(satellite);
+            progressMonitor.completeTask();
 
             await wait(this.timeOut);
         }

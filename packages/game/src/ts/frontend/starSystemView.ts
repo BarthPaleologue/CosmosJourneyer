@@ -40,6 +40,7 @@ import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/ency
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -235,6 +236,8 @@ export class StarSystemView implements View {
 
     private readonly assets: RenderingAssets;
 
+    private readonly progressMonitor: ILoadingProgressMonitor;
+
     private readonly depthRendererManager: DepthRendererManager;
 
     /**
@@ -251,6 +254,7 @@ export class StarSystemView implements View {
      * @param notificationManager The notification manager
      * @param assets The rendering assets
      * @param chunkForge The chunk forge used to generate surface chunks for telluric planets
+     * @param progressMonitor The loading progress monitor to report star system loading progress
      */
     constructor(
         scene: Scene,
@@ -264,6 +268,7 @@ export class StarSystemView implements View {
         notificationManager: INotificationManager,
         assets: RenderingAssets,
         chunkForge: ChunkForge,
+        progressMonitor: ILoadingProgressMonitor,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -283,6 +288,7 @@ export class StarSystemView implements View {
         this.notificationManager = notificationManager;
         this.assets = assets;
         this.chunkForge = chunkForge;
+        this.progressMonitor = progressMonitor;
 
         this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, [], async (interactions) => {
             if (interactions.length === 0) {
@@ -591,7 +597,13 @@ export class StarSystemView implements View {
             this.spaceStationLayer.reset();
         }
 
-        this.starSystem = await StarSystemController.CreateAsync(starSystemModel, this.loader, this.assets, this.scene);
+        this.starSystem = await StarSystemController.CreateAsync(
+            starSystemModel,
+            this.loader,
+            this.assets,
+            this.scene,
+            this.progressMonitor,
+        );
 
         const shipMesh = this.spaceshipControls?.getSpaceship();
         if (shipMesh !== undefined) {

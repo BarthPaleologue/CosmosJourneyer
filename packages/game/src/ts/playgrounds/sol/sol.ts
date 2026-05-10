@@ -69,6 +69,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         starSystemLoader,
         assets,
         scene,
+        progressMonitor,
     );
     starSystemController.initPositions(2, chunkForge, Date.now() / 1000);
 

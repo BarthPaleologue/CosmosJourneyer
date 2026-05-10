@@ -70,7 +70,7 @@ import type { DeepReadonly } from "@/utils/types";
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
-import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { LoadingProgressMonitor, type ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { loadStarMapTextures } from "./assets/textures/starMap";
 import { lookAt } from "./helpers/transform";
 import { NotificationManager, type INotificationManager } from "./ui/notificationManager";
@@ -106,6 +106,7 @@ export class CosmosJourneyer {
     readonly soundPlayer: ISoundPlayer;
     readonly tts: Tts;
     readonly notificationManager: INotificationManager;
+    private readonly loadingProgressMonitor: ILoadingProgressMonitor;
 
     readonly mainMenu: MainMenu;
     readonly pauseMenu: PauseMenu;
@@ -148,6 +149,7 @@ export class CosmosJourneyer {
         soundPlayer: ISoundPlayer,
         tts: Tts,
         notificationManager: INotificationManager,
+        loadingProgressMonitor: ILoadingProgressMonitor,
     ) {
         this.engine = engine;
 
@@ -185,6 +187,7 @@ export class CosmosJourneyer {
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;
+        this.loadingProgressMonitor = loadingProgressMonitor;
 
         this.starMap = starMapView;
         this.starMap.onTargetSetObservable.add((systemCoordinates: StarSystemCoordinates) => {
@@ -476,6 +479,7 @@ export class CosmosJourneyer {
             notificationManager,
             starSystemViewAssets.rendering,
             chunkForge,
+            loadingProgressMonitor,
         );
 
         const starMapView = new StarMapView(
@@ -507,6 +511,7 @@ export class CosmosJourneyer {
             soundPlayer,
             tts,
             notificationManager,
+            loadingProgressMonitor,
         );
     }
 
@@ -892,6 +897,7 @@ export class CosmosJourneyer {
         });
         await this.starSystemView.resetPlayer();
 
+        this.loadingProgressMonitor.reset();
         this.engine.loadingScreen.displayLoadingUI();
 
         await this.starSystemView.loadStarSystem(systemModel);
