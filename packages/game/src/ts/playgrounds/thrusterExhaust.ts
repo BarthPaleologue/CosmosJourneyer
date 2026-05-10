@@ -118,7 +118,7 @@ function createControlPanel(exhaust: ThrusterExhaust): HTMLDivElement {
 export function createThrusterExhaustScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

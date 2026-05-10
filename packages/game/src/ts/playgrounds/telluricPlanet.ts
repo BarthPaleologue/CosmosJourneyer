@@ -43,7 +43,7 @@ import { addToWindow, enablePhysics } from "./utils";
 
 export async function createTelluricPlanetScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;

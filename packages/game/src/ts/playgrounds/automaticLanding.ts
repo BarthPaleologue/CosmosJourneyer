@@ -44,7 +44,7 @@ import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./ut
 
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

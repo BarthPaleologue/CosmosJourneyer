@@ -39,7 +39,7 @@ import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     await initI18n();
 

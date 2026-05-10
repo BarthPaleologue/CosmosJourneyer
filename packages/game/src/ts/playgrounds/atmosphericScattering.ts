@@ -29,7 +29,7 @@ import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmos
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;

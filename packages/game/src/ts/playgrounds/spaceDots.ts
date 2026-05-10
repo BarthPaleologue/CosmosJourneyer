@@ -30,7 +30,7 @@ const DEFAULT_ROLL = 0;
 export function createSpaceDotsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

@@ -35,7 +35,7 @@ import { initI18n } from "@/i18n";
 export async function createSaveLoadingPanelContentScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
 

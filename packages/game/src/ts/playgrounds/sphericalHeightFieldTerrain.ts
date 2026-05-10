@@ -34,7 +34,7 @@ import { enablePhysics } from "./utils";
 export async function createSphericalHeightFieldTerrainScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;

@@ -42,7 +42,7 @@ import { enablePhysics } from "./utils";
 
 export async function createLandingPadScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.clearColor.set(0.1, 0.1, 0.1, 1);

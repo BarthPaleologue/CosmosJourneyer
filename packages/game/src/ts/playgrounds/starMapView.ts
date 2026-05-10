@@ -36,7 +36,7 @@ import { initI18n } from "@/i18n";
 
 export async function createStarMapViewScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     await initI18n();
 
