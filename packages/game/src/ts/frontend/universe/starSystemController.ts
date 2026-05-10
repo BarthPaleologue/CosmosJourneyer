@@ -185,10 +185,7 @@ export class StarSystemController {
         const orbitalObjects = this.getOrbitalObjects();
 
         let greatestInfluence = Number.NEGATIVE_INFINITY;
-        let bestObject = orbitalObjects[0];
-        if (bestObject === undefined) {
-            throw new Error("There are no orbital objects in the solar system");
-        }
+        let bestObject: OrbitalObject = this.stellarObjects[0];
         for (const object of orbitalObjects) {
             const distanceSquared = Vector3.DistanceSquared(object.getTransform().position, position);
             const influence = object.getBoundingRadius() / distanceSquared;
@@ -209,10 +206,7 @@ export class StarSystemController {
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
         const orbitalObjects = this.getOrbitalObjects();
 
-        let nearest = orbitalObjects[0];
-        if (nearest === undefined) {
-            throw new Error("There are no orbital objects in the solar system");
-        }
+        let nearest: OrbitalObject = this.stellarObjects[0];
         let smallerDistance = Number.POSITIVE_INFINITY;
         for (const body of orbitalObjects) {
             const distance =
@@ -288,18 +282,16 @@ export class StarSystemController {
      */
     public getNearestCelestialBody(position: Vector3): CelestialBody {
         const celestialBodies = this.getCelestialBodies();
-        if (celestialBodies.length === 0) throw new Error("There are no bodies or spacestation in the solar system");
-        let nearest = null;
-        let smallerDistance = -1;
+        let nearest: CelestialBody = this.stellarObjects[0];
+        let smallerDistance = Number.POSITIVE_INFINITY;
         for (const body of celestialBodies) {
             const distance = body.getTransform().getAbsolutePosition().subtract(position).length() - body.getRadius();
-            if (nearest === null || distance < smallerDistance) {
+            if (distance < smallerDistance) {
                 nearest = body;
                 smallerDistance = distance;
             }
         }
 
-        if (nearest === null) throw new Error("There are no bodies in the solar system");
         return nearest;
     }
 
