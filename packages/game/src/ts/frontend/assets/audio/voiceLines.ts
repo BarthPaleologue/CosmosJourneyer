@@ -58,7 +58,7 @@ export type SpeakerVoiceLines = {
 
 export async function loadVoiceLines(
     audioEngine: AudioEngineV2,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<SpeakerVoiceLines> {
     const loadSoundAsync = async (
         name: string,
@@ -66,9 +66,9 @@ export async function loadVoiceLines(
         audioEngine: AudioEngineV2,
         options?: Partial<IStaticSoundOptions>,
     ) => {
-        progressMonitor?.startTask();
+        progressMonitor.startTask();
         const sound = await CreateSoundAsync(name, url, options, audioEngine);
-        progressMonitor?.completeTask();
+        progressMonitor.completeTask();
         return sound;
     };
 

@@ -30,7 +30,7 @@ export type RenderingAssets = {
 
 export async function loadRenderingAssets(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<RenderingAssets> {
     const texturesPromise = loadTextures(scene, progressMonitor);
 

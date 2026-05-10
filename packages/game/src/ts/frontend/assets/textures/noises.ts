@@ -29,7 +29,7 @@ export type NoiseTextures = {
 
 export async function loadNoiseTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<NoiseTextures> {
     const seamlessPerlin = loadTextureAsync("SeamlessPerlinNoise", seamlessPerlinPath, scene, progressMonitor);
 

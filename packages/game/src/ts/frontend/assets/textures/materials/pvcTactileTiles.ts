@@ -35,7 +35,7 @@ export type PvcTactileTilesTextures = {
 
 export async function loadPvcTactileTilesTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<PvcTactileTilesTextures> {
     const albedoPromise = loadTextureAsync("PvcTactileTilesAlbedo", albedoPath, scene, progressMonitor);
     const normalPromise = loadTextureAsync("PvcTactileTilesNormal", normalPath, scene, progressMonitor);

@@ -25,10 +25,10 @@ export async function loadAssetInContainerAsync(
     name: string,
     url: string,
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<AssetContainer> {
-    progressMonitor?.startTask();
+    progressMonitor.startTask();
     const container = await LoadAssetContainerAsync(url, scene);
-    progressMonitor?.completeTask();
+    progressMonitor.completeTask();
     return container;
 }

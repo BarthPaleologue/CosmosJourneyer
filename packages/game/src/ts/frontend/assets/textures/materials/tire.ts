@@ -33,10 +33,7 @@ export type TireTextures = {
     ambientOcclusion: Texture;
 };
 
-export async function loadTireTextures(
-    scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
-): Promise<TireTextures> {
+export async function loadTireTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<TireTextures> {
     const albedoPromise = loadTextureAsync("TireAlbedo", tireAlbedoPath, scene, progressMonitor);
     const normalHeightPromise = loadTextureAsync("TireNormalHeight", tireNormalHeightPath, scene, progressMonitor);
     const roughnessPromise = loadTextureAsync("TireRoughness", tireRoughnessPath, scene, progressMonitor);

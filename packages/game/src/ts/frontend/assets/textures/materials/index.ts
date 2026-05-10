@@ -56,7 +56,7 @@ export type AllMaterialTextures = {
 
 export async function loadMaterialTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<AllMaterialTextures> {
     // Space Station
     const spaceStationAlbedoPromise = loadTextureAsync(

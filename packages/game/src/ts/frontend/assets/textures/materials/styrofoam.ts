@@ -35,7 +35,7 @@ export type StyroFoamTextures = {
 
 export async function loadStyroFoamTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<StyroFoamTextures> {
     const albedoPromise = loadTextureAsync("StyroFoamAlbedo", albedoPath, scene, progressMonitor);
     const normalPromise = loadTextureAsync("StyroFoamNormal", normalPath, scene, progressMonitor);

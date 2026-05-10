@@ -59,7 +59,7 @@ export type Objects = {
 export async function loadObjects(
     materials: Materials,
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Objects> {
     // Start loading all mesh assets
     const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);

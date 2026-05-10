@@ -31,7 +31,7 @@ export type StarMapTextures = {
 
 export async function loadStarMapTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<StarMapTextures> {
     const starSprite = loadTextureAsync("StarSprite", starTexturePath, scene, progressMonitor);
 

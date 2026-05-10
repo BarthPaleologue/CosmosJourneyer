@@ -56,7 +56,7 @@ export type Sounds = {
 
 export async function loadSounds(
     audioEngine: AudioEngineV2,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Sounds> {
     const loadSoundAsync = async (
         name: string,
@@ -64,9 +64,9 @@ export async function loadSounds(
         engine: AudioEngineV2,
         options?: Partial<IStaticSoundOptions>,
     ) => {
-        progressMonitor?.startTask();
+        progressMonitor.startTask();
         const sound = await CreateSoundAsync(name, url, options, engine);
-        progressMonitor?.completeTask();
+        progressMonitor.completeTask();
         return sound;
     };
 

@@ -28,7 +28,7 @@ import concreteNormal from "@assets/degraded-concrete-ue/degraded-concrete_norma
 
 export async function loadConcreteTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<PBRTextures> {
     const albedo = loadTextureAsync("ConcreteAlbedo", concreteAlbedo, scene, progressMonitor);
     const normal = loadTextureAsync("ConcreteNormal", concreteNormal, scene, progressMonitor);

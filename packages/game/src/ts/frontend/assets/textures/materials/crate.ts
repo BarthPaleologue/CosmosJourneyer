@@ -35,7 +35,7 @@ export type CrateTextures = {
 
 export async function loadCrateTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<CrateTextures> {
     const albedoPromise = loadTextureAsync("crateAlbedo", albedoPath, scene, progressMonitor);
     const normalHeightPromise = loadTextureAsync("crateNormalHeight", normalHeightPath, scene, progressMonitor);

@@ -44,7 +44,7 @@ export type AllTerrainTextures = {
 
 export async function loadTerrainTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<AllTerrainTextures> {
     const rockNormalAmbientOcclusionPromise = loadTextureAsync(
         "RockNormalAmbientOcclusionMap",
