@@ -99,7 +99,7 @@ describe("KeplerianOrbitalSimulation", () => {
         const simulation = new KeplerianOrbitalSimulation([reference]);
         simulation.update(1);
 
-        const relativeTransform = simulation.getRelativeTransform("reference", "reference");
+        const relativeTransform = simulation.getRelativeTransform("reference", "reference", "reference");
 
         expect(relativeTransform).toBeDefined();
         if (relativeTransform === undefined) {
@@ -113,10 +113,39 @@ describe("KeplerianOrbitalSimulation", () => {
         expect(relativeTransform.orientation.w).toBeCloseTo(1);
     });
 
+    it("can keep relative positions in the inertial frame when reference rotation is not compensated", () => {
+        const reference = createTestOrbitalObject({
+            id: "reference",
+            parentIds: [],
+            semiMajorAxis: 0,
+            siderealDaySeconds: 4,
+        });
+        const target = createTestOrbitalObject({
+            id: "target",
+            parentIds: [],
+            semiMajorAxis: 0,
+            position: new Vector3(1, 0, 0),
+        });
+
+        const simulation = new KeplerianOrbitalSimulation([reference, target]);
+        simulation.update(1);
+
+        const relativeTransform = simulation.getRelativeTransform("target", "reference", "inertial");
+
+        expect(relativeTransform).toBeDefined();
+        if (relativeTransform === undefined) {
+            return;
+        }
+
+        expect(relativeTransform.position.x).toBeCloseTo(1);
+        expect(relativeTransform.position.y).toBeCloseTo(0);
+        expect(relativeTransform.position.z).toBeCloseTo(0);
+    });
+
     it("returns undefined for missing objects", () => {
         const simulation = new KeplerianOrbitalSimulation([]);
 
         expect(simulation.getTransform("missing")).toBeUndefined();
-        expect(simulation.getRelativeTransform("missing", "missing")).toBeUndefined();
+        expect(simulation.getRelativeTransform("missing", "missing", "reference")).toBeUndefined();
     });
 });

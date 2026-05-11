@@ -28,6 +28,8 @@ export type OrbitalTransform = {
     readonly orientation: Quaternion;
 };
 
+export type RelativeTransformFrame = "reference" | "inertial";
+
 /**
  * Responsible for computing orbital positions and orientations of objects based on Kepler's laws of planetary motion.
  */
@@ -75,15 +77,29 @@ export class KeplerianOrbitalSimulation {
         return this.getTransformFromObject(object);
     }
 
+    /**
+     * Computes the transform of an object relative to another object.
+     * @param objectId The object whose transform is returned.
+     * @param referenceObjectId The object used as the local origin.
+     * @param frame "reference" expresses the result in the reference object's rotating frame; "inertial" only subtracts the reference position.
+     */
     public getRelativeTransform(
         objectId: OrbitalObjectId,
         referenceObjectId: OrbitalObjectId,
+        frame: RelativeTransformFrame,
     ): OrbitalTransform | undefined {
         const transform = this.getTransform(objectId);
         const referenceTransform = this.getTransform(referenceObjectId);
 
         if (transform === undefined || referenceTransform === undefined) {
             return undefined;
+        }
+
+        if (frame === "inertial") {
+            return {
+                position: transform.position.subtract(referenceTransform.position),
+                orientation: transform.orientation,
+            };
         }
 
         const inverseReferenceOrientation = referenceTransform.orientation.conjugate();

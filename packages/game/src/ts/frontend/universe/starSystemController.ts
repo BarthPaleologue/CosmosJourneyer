@@ -342,7 +342,12 @@ export class StarSystemController {
             return;
         }
 
-        const localFrameOrientation = referenceAnchorOrientation.multiply(referenceTransform.orientation.conjugate());
+        const relativeTransformFrame =
+            referenceObject.type === "blackHole" || referenceObject.type === "neutronStar" ? "inertial" : "reference";
+        const localFrameOrientation =
+            relativeTransformFrame === "reference"
+                ? referenceAnchorOrientation.multiply(referenceTransform.orientation.conjugate())
+                : Quaternion.FromRotationMatrix(this.referencePlaneRotation);
         localFrameOrientation.toRotationMatrix(this.referencePlaneRotation);
 
         this.starFieldBox.setRotationMatrix(this.referencePlaneRotation.transpose());
@@ -351,6 +356,7 @@ export class StarSystemController {
             const relativeTransform = this.orbitalSimulation.getRelativeTransform(
                 object.model.id,
                 referenceObject.model.id,
+                relativeTransformFrame,
             );
             if (relativeTransform === undefined) {
                 console.warn(`Could not compute orbital transform for ${object.model.name}`);
@@ -361,7 +367,7 @@ export class StarSystemController {
                 object,
                 relativeTransform,
                 this.referenceAnchorPosition,
-                referenceAnchorOrientation,
+                relativeTransformFrame === "reference" ? referenceAnchorOrientation : localFrameOrientation,
             );
         }
     }
