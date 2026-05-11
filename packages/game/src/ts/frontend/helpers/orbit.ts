@@ -47,24 +47,3 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 
     return point;
 }
-
-/**
- * Returns the point on the orbit of the body at time t. The orbit are circular for the p-norm.
- * @param centerOfMass
- * @param orbit
- * @param t
- * @returns
- */
-export function getPointOnOrbit(
-    centerOfMass: Vector3,
-    parentMass: number,
-    orbit: DeepReadonly<Orbit>,
-    t: number,
-    referencePlaneRotation: Matrix,
-): Vector3 {
-    const point = getPointOnOrbitLocal(orbit, parentMass, t);
-
-    Vector3.TransformCoordinatesToRef(point, referencePlaneRotation, point);
-
-    return point.addInPlace(centerOfMass);
-}

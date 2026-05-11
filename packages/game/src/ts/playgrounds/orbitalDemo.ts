@@ -25,10 +25,9 @@ import { Scene } from "@babylonjs/core/scene";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
 import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 
@@ -107,10 +106,7 @@ export function createOrbitalDemoScene(
     });
 
     const bodies = [sun, earth, moon];
-
-    const bodyToParents = new Map<OrbitalObject, OrbitalObject[]>();
-    bodyToParents.set(earth, [sun]);
-    bodyToParents.set(moon, [earth]);
+    const orbitalSimulation = new KeplerianOrbitalSimulation(bodies);
 
     const orbitRenderer = new OrbitRenderer(CreateGreasedLineHelper);
     orbitRenderer.setOrbitalObjects(bodies, scene);
@@ -133,9 +129,16 @@ export function createOrbitalDemoScene(
         elapsedSeconds += deltaSeconds;
         defaultControls.update(deltaSeconds);
 
+        orbitalSimulation.update(elapsedSeconds);
         bodies.forEach((body) => {
-            setOrbitalPosition(body, bodyToParents.get(body) ?? [], referencePlaneRotation, elapsedSeconds);
-            setRotation(body, referencePlaneRotation, elapsedSeconds);
+            const orbitalTransform = orbitalSimulation.getTransform(body.model.id);
+            if (orbitalTransform === undefined) {
+                return;
+            }
+            const transform = body.getTransform();
+            transform.position.copyFrom(orbitalTransform.position);
+            transform.rotationQuaternion = orbitalTransform.orientation.clone();
+            transform.computeWorldMatrix(true);
         });
 
         orbitRenderer.update(referencePlaneRotation);

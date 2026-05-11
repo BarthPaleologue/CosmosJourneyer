@@ -36,6 +36,8 @@ Make sure you read and understand the root level `.md` files. Other `.md` files 
 
 - **Git LFS for large assets**: use Git LFS for large binary assets (e.g., textures, models). (Rationale: Git LFS helps keep the repo size manageable and improves performance.)
 
+- **Treat error as values**: prefer returning `Result<T, E>` or `T | undefined` instead of throwing exceptions. (Rationale: treating errors as values makes error handling more explicit and avoids crashing the game.)
+
 ## Development Workflow
 
 - Review relevant docs above; confirm assumptions with existing implementations.
