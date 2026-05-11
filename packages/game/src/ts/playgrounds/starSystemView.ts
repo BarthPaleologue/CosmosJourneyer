@@ -39,7 +39,7 @@ import { enablePhysics } from "./utils";
 
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     await initI18n();
 
@@ -79,6 +79,7 @@ export async function createStarSystemViewScene(
         notificationManager,
         assets,
         chunkForge,
+        progressMonitor,
     );
 
     await starSystemView.resetPlayer();

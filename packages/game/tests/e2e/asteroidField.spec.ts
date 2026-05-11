@@ -7,7 +7,7 @@ test("The asteroid field playground renders correctly", async ({ page }) => {
         scene: "asteroidField",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 3 },
+        urlParams: { freeze: 5 },
     });
 });
 

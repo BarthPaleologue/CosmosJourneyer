@@ -31,7 +31,7 @@ export type ParticleTextures = {
     butterfly: Texture;
 };
 
-export async function loadParticleTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null) {
+export async function loadParticleTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor) {
     const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, scene, progressMonitor);
     const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, scene, progressMonitor);
     const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, scene, progressMonitor);

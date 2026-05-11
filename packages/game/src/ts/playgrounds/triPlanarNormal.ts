@@ -53,7 +53,7 @@ import normalMapPath from "@assets/testNormal.webp";
 
 export async function createTriPlanarNormalScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;

@@ -31,10 +31,7 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { enablePhysics } from "../utils";
 
-export async function createSunScene(
-    engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
-): Promise<Scene> {
+export async function createSunScene(engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);

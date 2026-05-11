@@ -30,7 +30,7 @@ export type Assets = {
 export async function loadAssets(
     scene: Scene,
     audioEngine: AudioEngineV2,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Assets> {
     const audioAssetsPromise = loadAudioAssets(audioEngine, progressMonitor);
     const renderingAssetsPromise = loadRenderingAssets(scene, progressMonitor);

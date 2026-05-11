@@ -72,7 +72,7 @@ import { createXrScene } from "./xr";
 export class PlaygroundRegistry {
     private readonly map: Map<
         string,
-        (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>
+        (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) => Promise<Scene>
     > = new Map([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
@@ -126,12 +126,12 @@ export class PlaygroundRegistry {
 
     register(
         name: string,
-        createScene: (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene>,
+        createScene: (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) => Promise<Scene>,
     ) {
         this.map.set(name, createScene);
     }
 
-    get(name: string): (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor | null) => Promise<Scene> {
+    get(name: string): (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) => Promise<Scene> {
         return this.map.get(name) ?? createDefaultScene;
     }
 }

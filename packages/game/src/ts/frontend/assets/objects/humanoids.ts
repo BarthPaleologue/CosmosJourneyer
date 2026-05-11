@@ -68,7 +68,7 @@ export interface HumanoidPrefab {
 
 export async function loadHumanoidPrefabs(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<HumanoidPrefabs> {
     const defaultHumanoid = await loadAssetInContainerAsync(
         "DefaultHumanoid",

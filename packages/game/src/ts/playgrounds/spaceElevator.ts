@@ -40,7 +40,7 @@ import { enablePhysics } from "./utils";
 
 export async function createSpaceElevatorScene(
     engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
     const scene = new Scene(engine, {
         useFloatingOrigin: true,

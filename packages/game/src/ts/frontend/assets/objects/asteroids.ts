@@ -30,10 +30,7 @@ import asteroid2Path from "@assets/asteroid/asteroid2.glb";
 
 export type Asteroid = { mesh: Mesh; physicsShape: PhysicsShape };
 
-export async function loadAsteroids(
-    scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
-): Promise<Array<Asteroid>> {
+export async function loadAsteroids(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<Array<Asteroid>> {
     const assetContainers = await loadAsteroidModels(scene, progressMonitor);
     const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1] as const;
 
@@ -50,7 +47,7 @@ export async function loadAsteroids(
 
 export async function loadAsteroidModels(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<AssetContainer[]> {
     const asteroidPromises = [
         loadAssetInContainerAsync("Asteroid1", asteroidPath, scene, progressMonitor),

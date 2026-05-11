@@ -69,7 +69,7 @@ export type Textures = {
  * @param progressMonitor - The progress monitor to report loading progress
  * @returns A promise resolving to the Textures object
  */
-export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor | null): Promise<Textures> {
+export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<Textures> {
     // Water textures
     const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
     const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);

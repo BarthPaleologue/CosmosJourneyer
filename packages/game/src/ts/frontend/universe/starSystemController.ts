@@ -27,6 +27,7 @@ import {
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { translate } from "@/frontend/helpers/transform";
@@ -174,8 +175,9 @@ export class StarSystemController {
         loader: StarSystemLoader,
         assets: RenderingAssets,
         scene: Scene,
+        progressMonitor: ILoadingProgressMonitor,
     ): Promise<StarSystemController> {
-        const result = await loader.load(model, assets, scene);
+        const result = await loader.load(model, assets, scene, progressMonitor);
         return new StarSystemController(model, result, assets, scene);
     }
 

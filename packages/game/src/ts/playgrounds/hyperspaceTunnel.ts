@@ -26,10 +26,7 @@ import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel"
 import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
-export async function createHyperspaceTunnelDemo(
-    engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
-) {
+export async function createHyperspaceTunnelDemo(engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) {
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 

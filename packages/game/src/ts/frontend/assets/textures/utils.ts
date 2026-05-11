@@ -25,9 +25,9 @@ export async function loadTextureAsync(
     name: string,
     url: string,
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<Texture> {
-    progressMonitor?.startTask();
+    progressMonitor.startTask();
     const texture = await new Promise<Texture>((resolve) => {
         const texture = new Texture(url, scene, false, false, undefined, () => {
             resolve(texture);
@@ -35,7 +35,7 @@ export async function loadTextureAsync(
         texture.name = name;
     });
 
-    progressMonitor?.completeTask();
+    progressMonitor.completeTask();
     return texture;
 }
 
@@ -43,9 +43,9 @@ export async function loadCubeTextureAsync(
     name: string,
     url: string,
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<CubeTexture> {
-    progressMonitor?.startTask();
+    progressMonitor.startTask();
     const texture = await new Promise<CubeTexture>((resolve) => {
         const texture = CubeTexture.CreateFromPrefilteredData(url, scene);
         texture.onLoadObservable.add(() => {
@@ -54,6 +54,6 @@ export async function loadCubeTextureAsync(
         texture.name = name;
     });
 
-    progressMonitor?.completeTask();
+    progressMonitor.completeTask();
     return texture;
 }

@@ -35,10 +35,7 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "../utils";
 
-export async function createSolScene(
-    engine: AbstractEngine,
-    progressMonitor: ILoadingProgressMonitor | null,
-): Promise<Scene> {
+export async function createSolScene(engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
@@ -72,6 +69,7 @@ export async function createSolScene(
         starSystemLoader,
         assets,
         scene,
+        progressMonitor,
     );
     starSystemController.initPositions(2, chunkForge, Date.now() / 1000);
 

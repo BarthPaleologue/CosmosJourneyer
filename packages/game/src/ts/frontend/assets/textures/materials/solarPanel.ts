@@ -37,7 +37,7 @@ export type SolarPanelTextures = {
 
 export async function loadSolarPanelTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<SolarPanelTextures> {
     const albedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedoPath, scene, progressMonitor);
     const normalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormalPath, scene, progressMonitor);

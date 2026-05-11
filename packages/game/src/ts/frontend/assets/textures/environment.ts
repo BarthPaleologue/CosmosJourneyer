@@ -29,7 +29,7 @@ export type EnvironmentTextures = {
 
 export async function loadEnvironmentTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<EnvironmentTextures> {
     const milkyWayPromise = loadCubeTextureAsync("SkyBox", milkyWay, scene, progressMonitor);
     const milkyWayTexture = await milkyWayPromise;

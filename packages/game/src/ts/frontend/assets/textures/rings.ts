@@ -31,7 +31,7 @@ export type RingsTextures = {
 
 export async function loadRingsTextures(
     scene: Scene,
-    progressMonitor: ILoadingProgressMonitor | null,
+    progressMonitor: ILoadingProgressMonitor,
 ): Promise<RingsTextures> {
     const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, scene, progressMonitor);
     const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, scene, progressMonitor);
