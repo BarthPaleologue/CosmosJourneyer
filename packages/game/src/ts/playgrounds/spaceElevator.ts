@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CreateSphere, DirectionalLight, GlowLayer, Matrix, PBRMaterial } from "@babylonjs/core";
+import { CreateSphere, DirectionalLight, GlowLayer, PBRMaterial } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
@@ -30,8 +30,8 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { setOrbitalPosition, setRotation } from "@/frontend/universe/architecture/orbitalObjectUtils";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
+import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
 import { SpaceElevator } from "@/frontend/universe/orbitalFacility/spaceElevator";
 
 import { Settings } from "@/settings";
@@ -101,7 +101,15 @@ export async function createSpaceElevatorScene(
     }
 
     const planetMesh = CreateSphere("planetMesh", { diameter: 2 * planet.radius, segments: 64 }, scene);
-    const planetImpostor = new CustomOrbitalObject(planetMesh, { ...planet, type: "custom" });
+    const planetImpostor = new CustomOrbitalObject(planetMesh, {
+        ...planet,
+        type: "custom",
+        orbit: {
+            ...planet.orbit,
+            parentIds: [],
+            semiMajorAxis: 0,
+        },
+    });
 
     const planetMaterial = new PBRMaterial("planetMaterial", scene);
     planetMaterial.roughness = 0.7;
@@ -112,11 +120,20 @@ export async function createSpaceElevatorScene(
 
     new GlowLayer("glow", scene);
 
-    const referencePlaneRotation = Matrix.Identity();
     let elapsedSeconds = 0;
+    const orbitalSimulation = new KeplerianOrbitalSimulation([planetImpostor, spaceElevator]);
 
-    setOrbitalPosition(spaceElevator, [planetImpostor], referencePlaneRotation, elapsedSeconds);
-    setRotation(spaceElevator, referencePlaneRotation, elapsedSeconds);
+    orbitalSimulation.update(elapsedSeconds);
+    for (const object of [planetImpostor, spaceElevator]) {
+        const orbitalTransform = orbitalSimulation.getTransform(object.model.id);
+        if (orbitalTransform === undefined) {
+            continue;
+        }
+        const transform = object.getTransform();
+        transform.position.copyFrom(orbitalTransform.position);
+        transform.rotationQuaternion = orbitalTransform.orientation.clone();
+        transform.computeWorldMatrix(true);
+    }
     spaceElevator.update([planetImpostor], Vector3.Zero(), elapsedSeconds);
 
     landingBay.getTransform().computeWorldMatrix(true);
@@ -136,9 +153,17 @@ export async function createSpaceElevatorScene(
 
         const cameraWorldPosition = camera.globalPosition;
 
-        setRotation(planetImpostor, referencePlaneRotation, elapsedSeconds);
-
-        setOrbitalPosition(spaceElevator, [planetImpostor], referencePlaneRotation, elapsedSeconds);
+        orbitalSimulation.update(elapsedSeconds);
+        for (const object of [planetImpostor, spaceElevator]) {
+            const orbitalTransform = orbitalSimulation.getTransform(object.model.id);
+            if (orbitalTransform === undefined) {
+                continue;
+            }
+            const transform = object.getTransform();
+            transform.position.copyFrom(orbitalTransform.position);
+            transform.rotationQuaternion = orbitalTransform.orientation.clone();
+            transform.computeWorldMatrix(true);
+        }
         spaceElevator.update([planetImpostor], cameraWorldPosition, deltaSeconds);
     });
 
