@@ -85,7 +85,7 @@ export default defineConfig(({ mode }) => {
         build: {
             outDir: "dist",
             emptyOutDir: true,
-            sourcemap: !isProduction,
+            sourcemap: true,
             target: "es2025",
             rollupOptions: {
                 input: {
