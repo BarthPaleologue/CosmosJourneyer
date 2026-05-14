@@ -2,3 +2,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 #include<__decl__meshVertex>
 attribute vec3 position;varying vec4 vWorldPos;void main(void) {vec4 worldPos=world*vec4(position,1.0);vWorldPos=worldPos;gl_Position=viewProjection*worldPos;}
 `,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}))();export{l as volumetricLightingRenderVolumeVertexShader};
+//# sourceMappingURL=volumetricLightingRenderVolume.vertex-IK1DAlmw.js.map

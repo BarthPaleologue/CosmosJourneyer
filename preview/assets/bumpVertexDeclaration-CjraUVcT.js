@@ -4,3 +4,4 @@ varying vTBN0: vec3f;varying vTBN1: vec3f;varying vTBN2: vec3f;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=bumpVertexDeclaration-CjraUVcT.js.map

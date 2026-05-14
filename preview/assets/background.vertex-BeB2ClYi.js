@@ -110,3 +110,4 @@ gl_PointSize=pointSize;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStore[C]||(n.ShadersStore[C]=w),T={name:C,shader:w}}));export{E as n,T as t};
+//# sourceMappingURL=background.vertex-BeB2ClYi.js.map

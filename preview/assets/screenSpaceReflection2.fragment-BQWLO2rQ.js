@@ -155,3 +155,4 @@ fragmentOutputs.color=textureSampleLevel(textureSampler,textureSamplerSampler,in
 #endif
 }
 `,n.ShadersStoreWGSL[o]||(n.ShadersStoreWGSL[o]=s),c={name:o,shader:s}}));export{c as n,l as t};
+//# sourceMappingURL=screenSpaceReflection2.fragment-BQWLO2rQ.js.map

@@ -10,3 +10,4 @@ let depth=textureLoad(depthSampler,vec2u(fragmentInputs.position.xy),0).r;let nd
 #endif
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}))();export{a as volumetricLightingBlendVolumePixelShaderWGSL};
+//# sourceMappingURL=volumetricLightingBlendVolume.fragment-CRSHU_HK.js.map

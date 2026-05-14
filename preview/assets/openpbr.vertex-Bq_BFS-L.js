@@ -215,3 +215,4 @@ vertexOutputs.vMainUV2=uv2Updated;
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[z]||(n.ShadersStoreWGSL[z]=B),V={name:z,shader:B}}));export{V as n,H as t};
+//# sourceMappingURL=openpbr.vertex-Bq_BFS-L.js.map

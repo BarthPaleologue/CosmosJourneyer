@@ -9,3 +9,4 @@ vertexOutputs.atlasUV=vec2<f32>(
 input.uvs.x+input.offsets.x*input.uvs.z,
 input.uvs.y+(1.0-input.offsets.y)*input.uvs.w
 );}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=msdf.vertex-o8z068IY.js.map

@@ -20,3 +20,4 @@ fragmentOutputs.color=textureSampleLevel(textureSampler,textureSamplerSampler,ve
 #endif
 if (uniforms.gamma==0) {fragmentOutputs.color=vec4f(pow(fragmentOutputs.color.rgb,vec3f(GammaEncodePowerApprox)),fragmentOutputs.color.a);}}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lodCube.fragment-zRbwZTEf.js.map

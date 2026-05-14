@@ -291,3 +291,4 @@ fn computeShadowWithCSMPCSS64(layer: i32,vPositionFromLight: vec4f,depthMetric: 
 {return computeShadowWithCSMPCSS(layer,vPositionFromLight,depthMetric,depthTexture,depthSampler,shadowTexture,shadowSampler,shadowMapSizeInverse,lightSizeUV,darkness,frustumEdgeFalloff,32,64,PoissonSamplers64,lightSizeUVCorrection,depthCorrection,penumbraDarkness);}
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=shadowsFragmentFunctions-OQUo3b4E.js.map

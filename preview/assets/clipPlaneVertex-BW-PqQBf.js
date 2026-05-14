@@ -17,3 +17,4 @@ fClipDistance5=dot(worldPos,vClipPlane5);
 fClipDistance6=dot(worldPos,vClipPlane6);
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=clipPlaneVertex-BW-PqQBf.js.map

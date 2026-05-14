@@ -10,3 +10,4 @@ let y=floor(vertexIndex/uniforms.morphTargetTextureInfo.y);let x=vertexIndex-y*u
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=morphTargetsVertexGlobalDeclaration-DqRlq5QZ.js.map

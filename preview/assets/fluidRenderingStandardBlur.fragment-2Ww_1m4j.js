@@ -2,3 +2,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 float sigma=float(filterSize)/3.0;float twoSigma2=2.0*sigma*sigma;vec4 sum=vec4(0.);float wsum=0.;for (int x=-filterSize; x<=filterSize; ++x) {vec2 coords=vec2(x);vec4 sampl=textureLod(textureSampler,vUV+coords*blurDir,0.);float w=exp(-coords.x*coords.x/twoSigma2);sum+=sampl*w;wsum+=w;}
 sum/=wsum;glFragColor=vec4(sum.rgb,1.);}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingStandardBlur.fragment-2Ww_1m4j.js.map

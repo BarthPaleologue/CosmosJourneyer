@@ -21,3 +21,4 @@ if (fragDepth==nearestDepth) {fragmentOutputs.frontColor=vec4f(fragmentOutputs.f
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=greasedLine.fragment-B9xV0GVY.js.map

@@ -17,3 +17,4 @@ uniform vClipPlane5: vec4<f32>;varying fClipDistance5: f32;
 uniform vClipPlane6: vec4<f32>;varying fClipDistance6: f32;
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=clipPlaneVertexDeclaration-DtMDQIyz.js.map

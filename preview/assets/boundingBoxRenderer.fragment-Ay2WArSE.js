@@ -6,3 +6,4 @@ void main(void) {
 gl_FragColor=color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=boundingBoxRenderer.fragment-Ay2WArSE.js.map

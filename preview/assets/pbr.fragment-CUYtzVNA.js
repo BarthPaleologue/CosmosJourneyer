@@ -2478,3 +2478,4 @@ if (fragDepth==nearestDepth) {fragmentOutputs.frontColor=vec4f(fragmentOutputs.f
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStoreWGSL[Z]||(n.ShadersStoreWGSL[Z]=Q),$={name:Z,shader:Q}}));export{$ as n,Ze as t};
+//# sourceMappingURL=pbr.fragment-CUYtzVNA.js.map

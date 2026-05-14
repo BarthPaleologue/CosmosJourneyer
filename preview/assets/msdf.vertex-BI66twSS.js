@@ -5,3 +5,4 @@ if (mode==BILLBOARDSCREENPROJECTED) {viewPos.x/=viewPos.z;viewPos.y/=viewPos.z;v
 gl_Position=projection*vec4(viewPos+worldPos.xyz,1.0); } else {vec3 viewPos=(view*parentWorld*worldPos).xyz; 
 gl_Position=projection*vec4(viewPos,1.0); }
 atlasUV=vec2(uvs.x+offsets.x*uvs.z,uvs.y+(1.0-offsets.y)*uvs.w);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=msdf.vertex-BI66twSS.js.map

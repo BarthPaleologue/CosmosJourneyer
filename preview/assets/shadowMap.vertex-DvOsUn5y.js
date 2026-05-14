@@ -87,3 +87,4 @@ vUV=vec2(diffuseMatrix*vec4(uv2Updated,1.0,0.0));
 #endif
 #include<clipPlaneVertex>
 }`,n.ShadersStore[M]||(n.ShadersStore[M]=N),P={name:M,shader:N}}));export{P as n,F as t};
+//# sourceMappingURL=shadowMap.vertex-DvOsUn5y.js.map

@@ -24,3 +24,4 @@ vertexOutputs.vMeshID=input.instanceMeshID;
 #endif
 }
 `,n.ShadersStoreWGSL[p]||(n.ShadersStoreWGSL[p]=m),h={name:p,shader:m}}));export{h as n,g as t};
+//# sourceMappingURL=picking.vertex-Cy53YBCn.js.map

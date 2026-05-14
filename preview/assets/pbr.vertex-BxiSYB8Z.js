@@ -355,3 +355,4 @@ gl_PointSize=pointSize;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStore[B]||(n.ShadersStore[B]=V),H={name:B,shader:V}}));export{H as n,U as t};
+//# sourceMappingURL=pbr.vertex-BxiSYB8Z.js.map

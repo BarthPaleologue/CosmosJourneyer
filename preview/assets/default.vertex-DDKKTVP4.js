@@ -179,3 +179,4 @@ vertexOutputs.vMainUV2=uv2Updated;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStoreWGSL[I]||(n.ShadersStoreWGSL[I]=L),R={name:I,shader:L}}));export{z as n,R as t};
+//# sourceMappingURL=default.vertex-DDKKTVP4.js.map

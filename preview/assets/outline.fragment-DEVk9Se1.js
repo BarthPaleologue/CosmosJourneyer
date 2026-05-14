@@ -19,3 +19,4 @@ discard;
 gl_FragColor=color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}));export{l as n,u as t};
+//# sourceMappingURL=outline.fragment-DEVk9Se1.js.map

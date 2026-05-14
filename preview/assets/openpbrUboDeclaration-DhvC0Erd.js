@@ -4,3 +4,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 #include<sceneUboDeclaration>
 #include<meshUboDeclaration>
 `,n.IncludesShadersStore[a]||(n.IncludesShadersStore[a]=o)}));export{s as t};
+//# sourceMappingURL=openpbrUboDeclaration-DhvC0Erd.js.map

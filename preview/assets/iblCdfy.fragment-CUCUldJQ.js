@@ -24,3 +24,4 @@ cdfy+=fetchPanoramic( vec2i(coords.x,y-1), f32(uniforms.iblHeight));
 #endif
 }
 fragmentOutputs.color= vec4f(cdfy,0.0,0.0,1.0);}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblCdfy.fragment-CUCUldJQ.js.map

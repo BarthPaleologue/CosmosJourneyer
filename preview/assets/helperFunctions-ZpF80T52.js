@@ -78,3 +78,4 @@ fn singleScatterToMultiScatterAlbedo(rho_ss: vec3f)->vec3f {let s: vec3f=sqrt(ma
 fn min3(v: vec3f)->f32 {return min(v.x,min(v.y,v.z));}
 fn max3(v: vec3f)->f32 {return max(v.x,max(v.y,v.z));}
 `);
+//# sourceMappingURL=helperFunctions-ZpF80T52.js.map

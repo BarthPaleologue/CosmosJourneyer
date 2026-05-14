@@ -30,3 +30,4 @@ var worldPos: vec4f=finalWorld* vec4f(input.position,1.0);vertexOutputs.position
 #include<vertexColorMixing>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[m]||(n.ShadersStoreWGSL[m]=h),g={name:m,shader:h}}));export{_ as n,g as t};
+//# sourceMappingURL=color.vertex-BSYXbI9A.js.map

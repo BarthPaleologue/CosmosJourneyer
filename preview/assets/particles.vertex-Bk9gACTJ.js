@@ -79,3 +79,4 @@ vertexOutputs.vPositionW=vPositionW;
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[l]||(n.ShadersStoreWGSL[l]=u),d={name:l,shader:u}}));export{d as n,f as t};
+//# sourceMappingURL=particles.vertex-Bk9gACTJ.js.map

@@ -25,3 +25,4 @@ fragmentOutputs.color=color;
 #include<imageProcessingCompatibility>
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[u]||(n.ShadersStoreWGSL[u]=d),f={name:u,shader:d}}));export{f as n,p as t};
+//# sourceMappingURL=sprites.fragment-D30DTfJ_.js.map

@@ -21,3 +21,4 @@ kernel[6] +
 kernel[7] +
 kernel[8];if (kernelWeight<=0.0) {kernelWeight=1.0;}
 gl_FragColor=vec4((colorSum/kernelWeight).rgb,1);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=convolution.fragment-Bdv0oojr.js.map

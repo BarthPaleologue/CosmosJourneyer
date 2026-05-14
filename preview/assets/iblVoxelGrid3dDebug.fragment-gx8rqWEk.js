@@ -11,3 +11,4 @@ var outBounds: bool=select(false,true,sampleIndex>size.z-1);sampleIndex=clamp(sa
 vec3i(i32(samplePosInt.x),i32(samplePosInt.y),i32(sampleIndex)),
 i32(uniforms.mipNumber)).rgb;if (uv.x<0.0 || uv.x>1.0 || uv.y<0.0 || uv.y>1.0) {fragmentOutputs.color=background;} else {if (outBounds) {voxel= vec3f(0.15,0.0,0.0);} else {voxel.r+=mip_separator;}
 fragmentOutputs.color=vec4f(mix(background.rgb,voxelSlab.rgb,voxelSlab.a)+voxel,1.0);}}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblVoxelGrid3dDebug.fragment-gx8rqWEk.js.map

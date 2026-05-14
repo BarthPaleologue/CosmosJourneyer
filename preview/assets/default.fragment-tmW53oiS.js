@@ -420,3 +420,4 @@ if (fragDepth==nearestDepth) {frontColor.rgb+=color.rgb*color.a*alphaMultiplier;
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStore[I]||(n.ShadersStore[I]=L),R={name:I,shader:L}}));export{z as n,M as r,R as t};
+//# sourceMappingURL=default.fragment-tmW53oiS.js.map

@@ -10,3 +10,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {
 fragmentOutputs.color=uniforms.color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{l as n,u as t};
+//# sourceMappingURL=line.fragment-B52lW4mE.js.map

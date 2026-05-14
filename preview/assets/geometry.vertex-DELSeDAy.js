@@ -169,3 +169,4 @@ vAlbedoUV=vec2(albedoMatrix*vec4(uv2Updated,1.0,0.0));
 #include<bumpVertex>
 }
 `,n.ShadersStore[C]||(n.ShadersStore[C]=w),T={name:C,shader:w}}));export{E as n,T as t};
+//# sourceMappingURL=geometry.vertex-DELSeDAy.js.map

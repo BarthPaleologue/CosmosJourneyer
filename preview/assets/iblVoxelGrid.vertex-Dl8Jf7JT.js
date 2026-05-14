@@ -15,3 +15,4 @@ vec4 worldPos=finalWorld*vec4(positionUpdated,1.0);gl_Position=viewMatrix*invWor
 gl_Position.z=gl_Position.z*0.5+0.5;
 #endif
 }`,n.ShadersStore[p]||(n.ShadersStore[p]=m),h={name:p,shader:m}}));export{g as n,h as t};
+//# sourceMappingURL=iblVoxelGrid.vertex-Dl8Jf7JT.js.map

@@ -16,3 +16,4 @@ result=applyImageProcessing(result);
 #endif
 #endif
 gl_FragColor=result;}`,n.ShadersStore[o]||(n.ShadersStore[o]=s),c={name:o,shader:s}}));export{l as n,c as t};
+//# sourceMappingURL=imageProcessing.fragment-C7cTBrgy.js.map

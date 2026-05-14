@@ -4,3 +4,4 @@ mat4 viewProjectionR;
 #endif 
 mat4 view;mat4 projection;vec4 vEyePosition;};
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=sceneUboDeclaration-gi2SMQ_g.js.map

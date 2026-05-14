@@ -19,3 +19,4 @@ fragmentOutputs.color=color;
 #endif
 }
 `,n.ShadersStoreWGSL[i]||(n.ShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=copyTextureToTexture.fragment-D5UIZSwt.js.map

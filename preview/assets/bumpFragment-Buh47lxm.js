@@ -51,3 +51,4 @@ normalW=perturbNormalBase(TBN,blendedNormal,vBumpInfos.y);
 detailNormal.xy*=vDetailInfos.z;normalW=perturbNormalBase(TBN,detailNormal,vDetailInfos.z);
 #endif
 `;e.IncludesShadersStore[t]||(e.IncludesShadersStore[t]=n);const r={name:t,shader:n};export{r as t};
+//# sourceMappingURL=bumpFragment-Buh47lxm.js.map

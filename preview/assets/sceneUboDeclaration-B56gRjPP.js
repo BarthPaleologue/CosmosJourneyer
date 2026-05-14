@@ -8,3 +8,4 @@ vEyePosition : vec4<f32>,};
 #define SCENE_UBO
 var<uniform> scene : Scene;
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=sceneUboDeclaration-B56gRjPP.js.map

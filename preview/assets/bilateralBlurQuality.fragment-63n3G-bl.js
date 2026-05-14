@@ -10,3 +10,4 @@ sampleNormal=sampleNormal*2.0-1.0;
 float r=dot(coords,coords);float w=exp(-r/two_sigma2);float rDepth=sampleDepth-depth;float wd=exp(-rDepth*rDepth/two_sigmaDepth2);float rNormal=abs(sampleNormal.x-normal.x)+abs(sampleNormal.y-normal.y)+abs(sampleNormal.z-normal.z);float wn=exp(-rNormal*rNormal/two_sigmaNormal2);sum+=sampleColor*w*wd*wn;wsum+=w*wd*wn;}}
 glFragColor=vec4(sum/wsum,1.);}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=bilateralBlurQuality.fragment-63n3G-bl.js.map

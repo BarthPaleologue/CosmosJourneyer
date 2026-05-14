@@ -17,3 +17,4 @@ varying v_VARYINGNAME_UV: vec2f;
 var _SAMPLERNAME_SamplerSampler: sampler;var _SAMPLERNAME_Sampler: texture_2d<f32>;
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=samplerFragmentDeclaration-DOvc0U6r.js.map

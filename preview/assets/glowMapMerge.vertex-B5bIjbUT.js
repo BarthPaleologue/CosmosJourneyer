@@ -6,3 +6,4 @@ fn main(input : VertexInputs)->FragmentInputs {const madd: vec2f= vec2f(0.5,0.5)
 vertexOutputs.vUV=input.position*madd+madd;vertexOutputs.position= vec4f(input.position,0.0,1.0);
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=glowMapMerge.vertex-B5bIjbUT.js.map

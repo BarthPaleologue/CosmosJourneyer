@@ -3,3 +3,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 #define CUSTOM_FRAGMENT_DEFINITIONS
 @fragment
 fn main(input: FragmentInputs)->FragmentOutputs {fragmentOutputs.color=toRGBD(textureSample(textureSampler,textureSamplerSampler,input.vUV).rgb);}`,n.ShadersStoreWGSL[i]||(n.ShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{o as n,s as t};
+//# sourceMappingURL=rgbdEncode.fragment-CwaCoiwo.js.map

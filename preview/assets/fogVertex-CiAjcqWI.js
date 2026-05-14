@@ -6,3 +6,4 @@ vertexOutputs.vFogDistance=(uniforms.view*worldPos).xyz;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=fogVertex-CiAjcqWI.js.map

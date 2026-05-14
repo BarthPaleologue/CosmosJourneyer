@@ -4487,3 +4487,4 @@ if (fragDepth==nearestDepth) {frontColor.rgb+=finalColor.rgb*finalColor.a*alphaM
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `;e.ShadersStore[$]||(e.ShadersStore[$]=re);const ie={name:$,shader:re};export{ie as pbrPixelShader};
+//# sourceMappingURL=pbr.fragment-DVB4WqbS.js.map

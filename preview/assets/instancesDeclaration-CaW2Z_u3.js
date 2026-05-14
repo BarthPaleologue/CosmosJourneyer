@@ -21,3 +21,4 @@ uniform mat4 previousWorld;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=instancesDeclaration-CaW2Z_u3.js.map

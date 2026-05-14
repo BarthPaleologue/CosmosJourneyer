@@ -74,3 +74,4 @@ let alphaSample: vec4f=sampleTexture(uniforms.alphaTextureIndex,uv);let a: f32=e
 let a: f32=uniforms.alphaConstantValue;
 #endif
 fragmentOutputs.color=vec4f(r,g,b,a);}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}))();export{a as textureMergerPixelShaderWGSL};
+//# sourceMappingURL=textureMerger.fragment-DYa9TZIH.js.map

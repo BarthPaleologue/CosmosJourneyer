@@ -23,3 +23,4 @@ vMeshID=instanceMeshID;
 #endif
 }
 `,n.ShadersStore[p]||(n.ShadersStore[p]=m),h={name:p,shader:m}}));export{h as n,g as t};
+//# sourceMappingURL=picking.vertex-FRALl5S7.js.map

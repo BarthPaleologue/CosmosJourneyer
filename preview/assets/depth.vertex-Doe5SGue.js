@@ -55,3 +55,4 @@ vertexOutputs.vUV= (uniforms.diffuseMatrix* vec4f(uv2Updated,1.0,0.0)).xy;
 #endif
 }
 `,n.ShadersStoreWGSL[h]||(n.ShadersStoreWGSL[h]=g),_={name:h,shader:g}}));export{v as n,_ as t};
+//# sourceMappingURL=depth.vertex-Doe5SGue.js.map

@@ -32,3 +32,4 @@ baseColor=vec4f(toLinearSpaceVec3(baseColor.rgb),baseColor.a);baseColor=applyIma
 fragmentOutputs.color=baseColor;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[f]||(n.ShadersStoreWGSL[f]=p),m={name:f,shader:p}}));export{m as n,h as t};
+//# sourceMappingURL=particles.fragment-BvhD13AI.js.map

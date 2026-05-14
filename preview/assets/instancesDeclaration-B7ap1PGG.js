@@ -21,3 +21,4 @@ uniform previousWorld : mat4x4<f32>;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=instancesDeclaration-B7ap1PGG.js.map

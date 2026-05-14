@@ -4,3 +4,4 @@ varying mat3 vTBN;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=bumpVertexDeclaration-zQePlvqZ.js.map

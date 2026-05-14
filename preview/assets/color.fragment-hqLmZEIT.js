@@ -18,3 +18,4 @@ gl_FragColor=color;
 #include<fogFragment>(color,gl_FragColor)
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=color.fragment-hqLmZEIT.js.map

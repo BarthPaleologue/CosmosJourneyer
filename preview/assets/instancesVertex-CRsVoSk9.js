@@ -26,3 +26,4 @@ var finalPreviousWorld=uniforms.previousWorld;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=instancesVertex-CRsVoSk9.js.map

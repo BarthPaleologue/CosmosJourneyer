@@ -34,3 +34,4 @@ baseColor.rgb=toLinearSpace(baseColor.rgb);baseColor=applyImageProcessing(baseCo
 gl_FragColor=baseColor;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[f]||(n.ShadersStore[f]=p),m={name:f,shader:p}}));export{m as n,h as t};
+//# sourceMappingURL=particles.fragment-QWhttSs2.js.map

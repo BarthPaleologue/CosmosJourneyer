@@ -12,3 +12,4 @@ vertexOutputs.vColor*=vertexInputs.instanceColor;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=vertexColorMixing-D0pNlsQe.js.map

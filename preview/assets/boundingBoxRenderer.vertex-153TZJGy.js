@@ -15,3 +15,4 @@ vertexOutputs.position=uniforms.viewProjection*worldPos;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=boundingBoxRenderer.vertex-153TZJGy.js.map

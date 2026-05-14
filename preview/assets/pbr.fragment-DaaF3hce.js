@@ -2655,3 +2655,4 @@ if (fragDepth==nearestDepth) {frontColor.rgb+=finalColor.rgb*finalColor.a*alphaM
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStore[Z]||(n.ShadersStore[Z]=Q),$={name:Z,shader:Q}}));export{$ as n,ct as t};
+//# sourceMappingURL=pbr.fragment-DaaF3hce.js.map

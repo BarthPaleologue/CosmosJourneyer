@@ -52,3 +52,4 @@ finalWorld=finalWorld*influence;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=bonesVertex-D2mbYmA_.js.map

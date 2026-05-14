@@ -55,3 +55,4 @@ fragmentOutputs.color=blend;
 fragmentOutputs.color/=sumOfWeights;
 #endif
 }`,n.ShadersStoreWGSL[d]||(n.ShadersStoreWGSL[d]=f),p={name:d,shader:f}}));export{p as n,m as t};
+//# sourceMappingURL=kernelBlur.fragment-Dwz3XWpu.js.map

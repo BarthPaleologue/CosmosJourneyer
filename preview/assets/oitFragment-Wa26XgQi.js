@@ -45,3 +45,4 @@ if (fragDepth>nearestDepth && fragDepth<furthestDepth) {
 fragmentOutputs.depth=vec2f(-fragDepth,fragDepth);return fragmentOutputs;}
 #endif
 `,n.IncludesShadersStoreWGSL[f]||(n.IncludesShadersStoreWGSL[f]=p)}));export{a as i,d as n,c as r,m as t};
+//# sourceMappingURL=oitFragment-Wa26XgQi.js.map

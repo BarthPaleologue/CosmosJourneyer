@@ -25,3 +25,4 @@ normalW=(uniforms.invView* vec4f(normalW,0.)).xyz;
 #endif
 fragmentOutputs.color=vec4f(computeIndirect(positionW,normalW),1.0);}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=rsmGlobalIllumination.fragment-D_Aq8__w.js.map

@@ -21,3 +21,4 @@ uniforms.kernel[6] +
 uniforms.kernel[7] +
 uniforms.kernel[8];if (kernelWeight<=0.0) {kernelWeight=1.0;}
 fragmentOutputs.color= vec4f((colorSum/kernelWeight).rgb,1);}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=convolution.fragment-DdEPyx-7.js.map

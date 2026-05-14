@@ -177,3 +177,4 @@ gl_FragColor=vec4(shadowAccum/float(sampleWeight),specShadowAccum/float(sampleWe
 #endif
 #endif
 }`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblShadowVoxelTracing.fragment-_j2gc1S2.js.map

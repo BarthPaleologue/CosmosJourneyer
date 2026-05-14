@@ -26,3 +26,4 @@ uniform vec4 vLightWidth{X};uniform vec4 vLightHeight{X};
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lightVxFragmentDeclaration-F_tMB8M2.js.map

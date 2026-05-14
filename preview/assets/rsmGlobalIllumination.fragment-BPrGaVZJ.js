@@ -23,3 +23,4 @@ normalW=(invView*vec4(normalW,0.)).xyz;
 #endif
 gl_FragColor.rgb=computeIndirect(positionW,normalW);gl_FragColor.a=1.0;}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=rsmGlobalIllumination.fragment-BPrGaVZJ.js.map

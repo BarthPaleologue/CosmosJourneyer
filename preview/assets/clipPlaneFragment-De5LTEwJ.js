@@ -26,3 +26,4 @@ else if (fClipDistance6>0.0)
 {discard;}
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=clipPlaneFragment-De5LTEwJ.js.map

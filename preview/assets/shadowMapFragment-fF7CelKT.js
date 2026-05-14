@@ -27,3 +27,4 @@ fragmentOutputs.color= vec4f(depthSM,1.0,1.0,1.0);
 fragmentOutputs.color=pack(depthSM);
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=shadowMapFragment-fF7CelKT.js.map

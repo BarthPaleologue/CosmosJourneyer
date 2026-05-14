@@ -12,3 +12,4 @@ vColor*=instanceColor;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=vertexColorMixing-COLpiv1D.js.map

@@ -28,3 +28,4 @@ gl_FragColor=color;
 #include<imageProcessingCompatibility>
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[u]||(n.ShadersStore[u]=d),f={name:u,shader:d}}));export{f as n,l as r,p as t};
+//# sourceMappingURL=sprites.fragment-CSAD3Ye-.js.map

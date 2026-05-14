@@ -13,3 +13,4 @@ return 2.0*curvature_soft_clamp(normal_diff,ridge);}
 fn main(input: FragmentInputs)->FragmentOutputs
 {let texel=vec2i(fragmentInputs.position.xy);let baseColor=textureSample(textureSampler,textureSamplerSampler,fragmentInputs.vUV);let curvature=calculate_curvature(texel,uniforms.curvature_ridge,uniforms.curvature_valley);fragmentOutputs.color=vec4f(baseColor.rgb*(curvature+1.0),baseColor.a);}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}))();export{a as screenSpaceCurvaturePixelShaderWGSL};
+//# sourceMappingURL=screenSpaceCurvature.fragment-0xnUcTCg.js.map

@@ -53,3 +53,4 @@ else
 fragmentOutputs.color=textureSampleLevel(textureSampler,textureSamplerSampler,posM,0.0);
 #endif
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fxaa.fragment-Clu1M2vw.js.map

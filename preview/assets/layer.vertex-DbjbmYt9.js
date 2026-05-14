@@ -5,3 +5,4 @@ void main(void) {
 vec2 shiftedPosition=position*scale+offset;vUV=vec2(textureMatrix*vec4(shiftedPosition*madd+madd,1.0,0.0));gl_Position=vec4(shiftedPosition,0.0,1.0);
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=layer.vertex-DbjbmYt9.js.map

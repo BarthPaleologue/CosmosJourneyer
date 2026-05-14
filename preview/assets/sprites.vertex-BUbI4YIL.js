@@ -14,3 +14,4 @@ vertexOutputs.vFogDistance=viewPos;
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[o]||(n.ShadersStoreWGSL[o]=s),c={name:o,shader:s}}));export{c as n,l as t};
+//# sourceMappingURL=sprites.vertex-BUbI4YIL.js.map

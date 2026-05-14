@@ -82,3 +82,4 @@ vec4 alphaSample=sampleTexture(alphaTextureIndex,uv);float a=extractChannel(alph
 float a=alphaConstantValue;
 #endif
 gl_FragColor=vec4(r,g,b,a);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}))();export{a as textureMergerPixelShader};
+//# sourceMappingURL=textureMerger.fragment-DPKNFhL_.js.map

@@ -15,3 +15,4 @@ distance(LP.xyz,PrevLP)<5e-2*sceneSize
 vec4(mix(PrevShadows.x,newShadows.x,PrevShadows.a),
 mix(PrevShadows.y,newShadows.y,PrevShadows.a),
 mix(PrevShadows.z,newShadows.z,PrevShadows.a),PrevShadows.a);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblShadowAccumulation.fragment-CxgTLFBJ.js.map

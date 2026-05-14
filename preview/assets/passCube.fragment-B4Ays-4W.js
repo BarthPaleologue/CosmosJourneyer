@@ -21,3 +21,4 @@ gl_FragColor=textureCube(textureSampler,vec3(uv,1.001));
 gl_FragColor=textureCube(textureSampler,vec3(uv,-1.001));
 #endif
 }`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=passCube.fragment-B4Ays-4W.js.map

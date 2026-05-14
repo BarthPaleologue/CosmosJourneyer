@@ -57,3 +57,4 @@ colorUpdated=colorUpdated+(vertexInputs.color{X}-vertexInputs.color)*uniforms.mo
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=morphTargetsVertex-Cnr9SjvW.js.map

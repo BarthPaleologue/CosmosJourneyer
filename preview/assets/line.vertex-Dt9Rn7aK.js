@@ -18,3 +18,4 @@ var worldPos: vec4f=finalWorld*vec4f(input.position,1.0);
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[d]||(n.ShadersStoreWGSL[d]=f),p={name:d,shader:f}}));export{p as n,m as t};
+//# sourceMappingURL=line.vertex-Dt9Rn7aK.js.map

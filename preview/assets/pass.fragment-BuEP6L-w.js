@@ -2,3 +2,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 #define CUSTOM_FRAGMENT_DEFINITIONS
 void main(void) 
 {gl_FragColor=texture2D(textureSampler,vUV);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=pass.fragment-BuEP6L-w.js.map

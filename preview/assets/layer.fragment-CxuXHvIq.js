@@ -16,3 +16,4 @@ if (baseColor.a<0.4) {discard;}
 fragmentOutputs.color=baseColor*uniforms.color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[i]||(n.ShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{o as n,s as t};
+//# sourceMappingURL=layer.fragment-CxuXHvIq.js.map

@@ -19,3 +19,4 @@ fragmentOutputs.color=vec4f(realViewPos.z,0.,0.,1.);
 #endif
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingParticleDepth.fragment-V1noGCQ-.js.map

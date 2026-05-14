@@ -66,3 +66,4 @@ result/=weightSum;
 gl_FragColor.rgb=vec3(result);gl_FragColor.a=1.0;}
 #endif
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=ssao2.fragment-DSjUJwHj.js.map

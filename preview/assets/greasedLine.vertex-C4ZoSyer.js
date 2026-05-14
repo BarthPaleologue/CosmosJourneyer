@@ -38,3 +38,4 @@ vertexOutputs.grlCounters=input.grl_counters;vertexOutputs.position=grlMatrix*ve
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=greasedLine.vertex-C4ZoSyer.js.map

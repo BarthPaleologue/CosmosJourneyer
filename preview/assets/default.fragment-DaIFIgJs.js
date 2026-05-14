@@ -365,3 +365,4 @@ if (fragDepth==nearestDepth) {fragmentOutputs.frontColor=vec4f(fragmentOutputs.f
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStoreWGSL[k]||(n.ShadersStoreWGSL[k]=A),j={name:k,shader:A}}));export{M as n,j as t};
+//# sourceMappingURL=default.fragment-DaIFIgJs.js.map

@@ -6,3 +6,4 @@ if (mask_p10>0.5) {col+=textureSample(textureSampler,textureSamplerSampler,uv_p1
 if (mask_p12>0.5) {col+=textureSample(textureSampler,textureSamplerSampler,uv_p12);total_weight+=1.0;}
 if (total_weight>0.0) {fragmentOutputs.color=col/total_weight;} else {fragmentOutputs.color=col;}}}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=meshUVSpaceRendererFinaliser.fragment-DtXyh7wg.js.map

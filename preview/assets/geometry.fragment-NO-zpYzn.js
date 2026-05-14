@@ -169,3 +169,4 @@ fragmentOutputs.fragData7=fragData[7];
 #endif
 }
 `,n.ShadersStoreWGSL[l]||(n.ShadersStoreWGSL[l]=u),d={name:l,shader:u}}));export{f as n,d as t};
+//# sourceMappingURL=geometry.fragment-NO-zpYzn.js.map

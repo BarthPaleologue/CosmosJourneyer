@@ -9,3 +9,4 @@ vertexOutputs.sampleCenter=(input.position*madd+madd);
 vertexOutputs.position= vec4f(input.position,0.0,1.0);
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{l as n,u as t};
+//# sourceMappingURL=kernelBlur.vertex-ofuLgqsW.js.map

@@ -147,3 +147,4 @@ z=projection[2].z+projection[3].z/depth;
 #endif
 var w=1.0;var ndc=vec4f(xy,z,w);var eyePos: vec4f=invProjectionMatrix*ndc;var result=eyePos.xyz/eyePos.w;return result;}
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=screenSpaceRayTrace-C4WTE_Td.js.map

@@ -5,3 +5,4 @@ void main(void) {
 vUV=position*madd+madd;gl_Position=vec4(position,0.0,1.0);
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=glowMapMerge.vertex-CuSFGv7j.js.map

@@ -91,3 +91,4 @@ float velocity=depthVel.g;finalColor=mix(finalColor,vec3(1.0),smoothstep(0.3,1.0
 #endif
 glFragColor=vec4(finalColor,transmitted.a);}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingRender.fragment-D8Xs5yDW.js.map

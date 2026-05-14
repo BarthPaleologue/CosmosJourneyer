@@ -22,3 +22,4 @@ glFragColor=vec4(realViewPos.z,0.,0.,1.);
 #endif
 }
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingParticleDepth.fragment-B_lsjLbX.js.map

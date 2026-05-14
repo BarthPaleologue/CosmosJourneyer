@@ -19,3 +19,4 @@ colour*=_ExposureAdjustment;vec3 X=max(vec3(0.0,0.0,0.0),colour-0.004);vec3 retC
 colour= vec3(1.0,1.0,1.0)-exp2(-_ExposureAdjustment*colour);
 #endif
 gl_FragColor=vec4(colour.rgb,1.0);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=tonemap.fragment-yTZ4hsA6.js.map

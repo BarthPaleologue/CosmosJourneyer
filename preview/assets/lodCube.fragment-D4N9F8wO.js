@@ -20,3 +20,4 @@ gl_FragColor=textureCube(textureSampler,vec3(uv,-1.001),lod);
 #endif
 if (gamma==0) {gl_FragColor.rgb=pow(gl_FragColor.rgb,vec3(GammaEncodePowerApprox));}}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lodCube.fragment-D4N9F8wO.js.map

@@ -45,3 +45,4 @@ vertexOutputs.vUV=(uniforms.diffuseMatrix*vec4f(uv2Updated,1.0,0.0)).xy;
 #include<logDepthVertex>
 }
 `,n.ShadersStoreWGSL[_]||(n.ShadersStoreWGSL[_]=v),y={name:_,shader:v}}));export{y as n,b as t};
+//# sourceMappingURL=outline.vertex-h9IaBEj7.js.map

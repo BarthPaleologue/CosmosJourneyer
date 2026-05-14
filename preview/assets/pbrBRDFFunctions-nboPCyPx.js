@@ -167,3 +167,4 @@ float computeWrappedDiffuseNdotL(float NdotL,float w) {float t=1.0+w;float invt2
 #endif
 #endif 
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=pbrBRDFFunctions-nboPCyPx.js.map

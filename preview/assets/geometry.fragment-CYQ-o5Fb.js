@@ -151,3 +151,4 @@ gl_FragData[REFLECTIVITY_INDEX]=reflectivity;
 #endif
 }
 `,n.ShadersStore[f]||(n.ShadersStore[f]=p),m={name:f,shader:p}}));export{h as n,m as t};
+//# sourceMappingURL=geometry.fragment-CYQ-o5Fb.js.map

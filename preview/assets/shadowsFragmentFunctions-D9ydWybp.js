@@ -342,3 +342,4 @@ float computeShadowWithCSMPCSS64(float layer,vec4 vPositionFromLight,float depth
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=shadowsFragmentFunctions-D9ydWybp.js.map

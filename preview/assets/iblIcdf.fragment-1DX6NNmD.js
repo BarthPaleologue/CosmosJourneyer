@@ -32,3 +32,4 @@ var size : vec2f=vec2f(textureDimensions(scaledLuminanceSampler,0));var highestM
 scaledLuminanceSamplerSampler,
 input.vUV,highestMip)
 .r;var pixelLuminance: f32=fetchLuminance(input.vUV);outputColor.z=pixelLuminance/(2.0*PI*normalization);fragmentOutputs.color=vec4( outputColor,1.0);}`,n.ShadersStoreWGSL[i]||(n.ShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=iblIcdf.fragment-1DX6NNmD.js.map

@@ -39,3 +39,4 @@ gl_FragColor=vec4(vDepthMetric,0.0,0.0,1.0);
 #endif
 #endif
 }`,n.ShadersStore[o]||(n.ShadersStore[o]=s),c={name:o,shader:s}}));export{l as n,c as t};
+//# sourceMappingURL=depth.fragment-DZgwkjoB.js.map

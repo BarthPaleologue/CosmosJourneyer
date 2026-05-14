@@ -71,3 +71,4 @@ uniform mat4 lightMatrix{X};
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lightUboDeclaration-Dpf1Ea3g.js.map

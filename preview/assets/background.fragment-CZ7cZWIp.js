@@ -202,3 +202,4 @@ fragmentOutputs.color=color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStoreWGSL[x]||(n.ShadersStoreWGSL[x]=S),C={name:x,shader:S}}));export{w as n,C as t};
+//# sourceMappingURL=background.fragment-CZ7cZWIp.js.map

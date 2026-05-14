@@ -14,3 +14,4 @@ vec3 computeEnvironmentIrradiance(vec3 normal) {float Nx=normal.x;float Ny=norma
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=harmonicsFunctions-CgiAo3u1.js.map

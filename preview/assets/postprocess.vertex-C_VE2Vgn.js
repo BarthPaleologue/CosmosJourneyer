@@ -7,3 +7,4 @@ vertexOutputs.vUV=(vertexInputs.position*madd+madd)*uniforms.scale;vertexOutputs
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=postprocess.vertex-C_VE2Vgn.js.map

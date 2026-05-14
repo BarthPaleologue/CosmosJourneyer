@@ -45,3 +45,4 @@ vUV=vec2(diffuseMatrix*vec4(uv2Updated,1.0,0.0));
 #include<logDepthVertex>
 }
 `,n.ShadersStore[_]||(n.ShadersStore[_]=v),y={name:_,shader:v}}));export{y as n,b as t};
+//# sourceMappingURL=outline.vertex-DbJK4BDQ.js.map

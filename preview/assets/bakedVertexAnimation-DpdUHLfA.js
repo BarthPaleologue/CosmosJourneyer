@@ -30,3 +30,4 @@ VATInfluence=VATInfluence+readMatrixFromRawSamplerVAT(bakedVertexAnimationTextur
 finalWorld=finalWorld*VATInfluence;}
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=bakedVertexAnimation-DpdUHLfA.js.map

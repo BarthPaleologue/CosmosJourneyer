@@ -96,3 +96,4 @@ batchOffset+=CLUSTLIGHT_BATCH;}
 return result;}
 #endif
 `,n.IncludesShadersStoreWGSL[a]||(n.IncludesShadersStoreWGSL[a]=o),s={name:a,shader:o}}));export{s as n,c as t};
+//# sourceMappingURL=lightsFragmentFunctions-CumOg3qD.js.map

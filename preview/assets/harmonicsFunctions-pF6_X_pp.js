@@ -14,3 +14,4 @@ fn computeEnvironmentIrradiance(normal: vec3f)->vec3f {var Nx: f32=normal.x;var 
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=harmonicsFunctions-pF6_X_pp.js.map

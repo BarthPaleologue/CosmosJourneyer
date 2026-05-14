@@ -6,3 +6,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {
 var baseColor: vec4f=textureSample(textureSampler,textureSamplerSampler,input.vUV);fragmentOutputs.color=baseColor*uniforms.color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lensFlare.fragment-3eQVQ4Ld.js.map

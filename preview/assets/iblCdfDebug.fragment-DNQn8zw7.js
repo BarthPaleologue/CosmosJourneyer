@@ -40,3 +40,4 @@ vec2(1.0,1.0/cdfxVSize))
 .r;if (uv.x<0.0 || uv.x>1.0 || uv.y<0.0 || uv.y>1.0) {colour=backgroundColour;} else if (uv.y>iblStart) {colour+=iblColour;} else if (uv.y>pdfStart) {colour+=pdfColour;} else if (uv.y>cdfyStart && uv.x<0.5) {colour.r+=cdfyColour/float(cdfyHeight);} else if (uv.y>cdfyStart && uv.x>0.5) {colour.r+=icdfyColour;} else if (uv.y>cdfxStart) {colour.r+=cdfxColour/float(cdfxWidth);} else if (uv.y>icdfxStart) {colour.r+=icdfxColour;}
 gl_FragColor=vec4(colour,1.0);glFragColor.rgb=mix(gl_FragColor.rgb,backgroundColour,0.5);}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblCdfDebug.fragment-DNQn8zw7.js.map

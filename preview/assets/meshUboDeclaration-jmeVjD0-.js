@@ -6,3 +6,4 @@ layout(std140,column_major) uniform;uniform Mesh
 #endif
 #define WORLD_UBO
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=meshUboDeclaration-jmeVjD0-.js.map

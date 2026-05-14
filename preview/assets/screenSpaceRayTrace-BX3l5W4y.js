@@ -144,3 +144,4 @@ ndc.z=projection[2].z+projection[3].z/depth;
 #endif
 ndc.w=1.0;vec4 eyePos=invProjectionMatrix*ndc;eyePos.xyz/=eyePos.w;return eyePos.xyz;}
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=screenSpaceRayTrace-BX3l5W4y.js.map

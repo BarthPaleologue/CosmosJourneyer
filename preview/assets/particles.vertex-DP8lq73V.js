@@ -79,3 +79,4 @@ vec4 worldPos=vec4(vPositionW,1.0);
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStore[l]||(n.ShadersStore[l]=u),d={name:l,shader:u}}));export{d as n,f as t};
+//# sourceMappingURL=particles.vertex-DP8lq73V.js.map

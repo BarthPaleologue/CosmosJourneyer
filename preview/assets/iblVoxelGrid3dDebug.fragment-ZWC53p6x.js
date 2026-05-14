@@ -12,3 +12,4 @@ int(mipNumber))
 .rgb;if (uv.x<0.0 || uv.x>1.0 || uv.y<0.0 || uv.y>1.0) {gl_FragColor.rgba=background;} else {if (outBounds) {voxel=vec3(0.15,0.0,0.0);} else {if (voxel.r>0.001) {voxel.g=1.0;}
 voxel.r+=mip_separator;}
 glFragColor.rgb=mix(background.rgb,voxelSlab.rgb,voxelSlab.a)+voxel;glFragColor.a=1.0;}}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblVoxelGrid3dDebug.fragment-ZWC53p6x.js.map

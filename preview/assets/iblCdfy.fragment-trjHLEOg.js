@@ -22,3 +22,4 @@ cdfy+=fetchPanoramic(ivec2(coords.x,y-1),float(iblHeight));
 #endif
 }
 gl_FragColor=vec4(cdfy,0.0,0.0,1.0);}`,n.ShadersStore[i]||(n.ShadersStore[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=iblCdfy.fragment-trjHLEOg.js.map

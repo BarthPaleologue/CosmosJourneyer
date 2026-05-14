@@ -20,3 +20,4 @@ normWorldSM=transposeMat3(inverseMat3(normWorldSM));
 vNormalW=normalize(normWorldSM*normalUpdated);
 #endif
 vec3 normalView=normalize((projMatrix*vec4(vNormalW,0.0)).xyz);vec3 decalTC=(projMatrix*worldPos).xyz;vDecalTC=decalTC.xy;gl_Position=vec4(uv*2.0-1.0,normalView.z>0.0 ? 2. : decalTC.z,1.0);}`,n.ShadersStore[p]||(n.ShadersStore[p]=m),h={name:p,shader:m}}));export{h as n,g as t};
+//# sourceMappingURL=meshUVSpaceRenderer.vertex-C3HjYXAT.js.map

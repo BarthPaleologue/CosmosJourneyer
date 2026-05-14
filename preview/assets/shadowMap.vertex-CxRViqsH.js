@@ -83,3 +83,4 @@ vertexOutputs.vUV= (uniforms.diffuseMatrix* vec4f(uv2Updated,1.0,0.0)).xy;
 #endif
 #include<clipPlaneVertex>
 }`,n.ShadersStoreWGSL[w]||(n.ShadersStoreWGSL[w]=T),E={name:w,shader:T}}));export{E as n,D as t};
+//# sourceMappingURL=shadowMap.vertex-CxRViqsH.js.map

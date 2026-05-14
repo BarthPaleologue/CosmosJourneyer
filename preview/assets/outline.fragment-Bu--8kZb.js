@@ -16,3 +16,4 @@ if (textureSample(diffuseSampler,diffuseSamplerSampler,fragmentInputs.vUV).a<0.4
 fragmentOutputs.color=uniforms.color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{l as n,u as t};
+//# sourceMappingURL=outline.fragment-Bu--8kZb.js.map

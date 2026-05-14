@@ -60,3 +60,4 @@ vUV=vec2(diffuseMatrix*vec4(uv2Updated,1.0,0.0));
 #include<pointCloudVertex>
 }
 `,n.ShadersStore[y]||(n.ShadersStore[y]=b),x={name:y,shader:b}}));export{S as n,x as t};
+//# sourceMappingURL=depth.vertex-X68Jb7ck.js.map

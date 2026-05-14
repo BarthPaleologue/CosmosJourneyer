@@ -11,3 +11,4 @@ exp2(max(-1000.0/(worldScale*worldScale),-0.5) *
 (ddepth*ddepth) -
 1e1*dot(dN,dN));X+=vec4(w*T.x,w*T.y,w*T.z,w);}}
 gl_FragColor=vec4(X.x/X.w,X.y/X.w,X.z/X.w,1.0);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblShadowSpatialBlur.fragment-DIRqLsKR.js.map

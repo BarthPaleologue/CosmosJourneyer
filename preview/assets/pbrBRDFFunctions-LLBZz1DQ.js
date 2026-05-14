@@ -171,3 +171,4 @@ fn computeWrappedDiffuseNdotL(NdotL: f32,w: f32)->f32 {var t: f32=1.0+w;var invt
 #endif
 #endif 
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=pbrBRDFFunctions-LLBZz1DQ.js.map

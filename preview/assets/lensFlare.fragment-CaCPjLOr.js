@@ -5,3 +5,4 @@ void main(void) {
 vec4 baseColor=texture2D(textureSampler,vUV);gl_FragColor=baseColor*color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lensFlare.fragment-CaCPjLOr.js.map

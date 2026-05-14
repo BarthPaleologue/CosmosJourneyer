@@ -12,3 +12,4 @@ textureLoad(lightDataTexture,vec2u(4,index),0)
 );}
 fn getClusteredSliceIndex(sliceData: vec2f,viewDepth: f32)->i32 {return i32(log(viewDepth)*sliceData.x+sliceData.y);}
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=clusteredLightingFunctions-ogOR3DNH.js.map

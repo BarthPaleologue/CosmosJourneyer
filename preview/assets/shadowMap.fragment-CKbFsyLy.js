@@ -48,3 +48,4 @@ if ((bayerDither8(floor(((fragmentInputs.position.xy)%(8.0)))))/64.0>=uniforms.s
 #endif
 #include<shadowMapFragment>
 }`,n.ShadersStoreWGSL[p]||(n.ShadersStoreWGSL[p]=m),h={name:p,shader:m}}));export{h as n,g as t};
+//# sourceMappingURL=shadowMap.fragment-CKbFsyLy.js.map

@@ -9,3 +9,4 @@ decalTempAlpha=decalColor.a*decalColor.a;
 surfaceAlbedo=mix(surfaceAlbedo.rgb,decalTempColor,decalTempAlpha);
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=decalFragment-kICYgouY.js.map

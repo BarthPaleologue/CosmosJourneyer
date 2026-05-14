@@ -15,3 +15,4 @@ void main () {
 #include<clipPlaneFragment>
 gl_FragColor=gaussianColor(vColor);}
 `,n.ShadersStore[f]||(n.ShadersStore[f]=p),m={name:f,shader:p}}));export{h as n,m as t};
+//# sourceMappingURL=gaussianSplatting.fragment-7WgMUfjq.js.map

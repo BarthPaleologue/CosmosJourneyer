@@ -6,3 +6,4 @@ texture2D(textureSampler,vUV+onePixel*vec2(-1,0)) +
 texture2D(textureSampler,vUV+onePixel*vec2(1,0)) +
 texture2D(textureSampler,vUV+onePixel*vec2(0,1)) -
 color*4.0;gl_FragColor=max(vec4(color.rgb*sharpnessAmounts.y,color.a)-(sharpnessAmounts.x*vec4(edgeDetection.rgb,0)),0.);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=sharpen.fragment-D1yxMUpj.js.map

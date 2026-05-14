@@ -4,3 +4,4 @@ vec2f(input.offset.x-0.5,input.offset.y-0.5)*uniforms.size,
 0.0
 );var viewPos: vec3f=(uniforms.view*vec4f(input.position,1.0)).xyz+cornerPos;vertexOutputs.position=uniforms.projection*vec4f(viewPos,1.0);vertexOutputs.uv=input.offset;}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingParticleThickness.vertex-BiAsXmV3.js.map

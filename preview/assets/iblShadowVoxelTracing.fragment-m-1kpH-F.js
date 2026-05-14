@@ -183,3 +183,4 @@ fragmentOutputs.color=vec4f(shadowAccum/sampleWeight,specShadowAccum/sampleWeigh
 #endif
 #endif
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblShadowVoxelTracing.fragment-m-1kpH-F.js.map

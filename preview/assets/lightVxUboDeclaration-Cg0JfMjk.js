@@ -24,3 +24,4 @@ varying vec4 vPositionFromLight{X};varying float vDepthMetric{X};uniform mat4 li
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lightVxUboDeclaration-Cg0JfMjk.js.map

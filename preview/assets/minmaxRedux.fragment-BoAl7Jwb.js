@@ -28,3 +28,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {fragmentOutputs.color=vec4f(0.)
 discard;}}
 #endif
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=minmaxRedux.fragment-BoAl7Jwb.js.map

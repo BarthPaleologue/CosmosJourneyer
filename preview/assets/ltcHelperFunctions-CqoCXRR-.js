@@ -37,3 +37,4 @@ vec3( t1.z,0,t1.w )
 );result.Specular=LTCEvaluateWithEmission( normal,viewDir,position,mInv,rectCoords,texFilteredMap );result.Fresnel=t2;
 #endif
 result.Diffuse=LTCEvaluateWithEmission( normal,viewDir,position,mat3( 1.0 ),rectCoords,texFilteredMap );return result;}`,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=ltcHelperFunctions-CqoCXRR-.js.map

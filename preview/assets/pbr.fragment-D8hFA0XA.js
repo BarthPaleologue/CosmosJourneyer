@@ -4301,3 +4301,4 @@ if (fragDepth==nearestDepth) {fragmentOutputs.frontColor=vec4f(fragmentOutputs.f
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `;e.ShadersStoreWGSL[Q]||(e.ShadersStoreWGSL[Q]=$);const ee={name:Q,shader:$};export{ee as pbrPixelShaderWGSL};
+//# sourceMappingURL=pbr.fragment-D8hFA0XA.js.map

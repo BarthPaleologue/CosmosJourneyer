@@ -9,3 +9,4 @@ float zSlice0=min(floor(uv.z*width),width-1.0);float zSlice1=min(zSlice0+1.0,wid
 #define CUSTOM_FRAGMENT_DEFINITIONS
 void main(void)
 {vec4 screen_color=texture2D(textureSampler,vUV);gl_FragColor=sampleAs3DTexture(colorTable,screen_color.rgb,SLICE_COUNT);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=colorCorrection.fragment-BLie4mkG.js.map

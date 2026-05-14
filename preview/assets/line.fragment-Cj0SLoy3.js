@@ -12,3 +12,4 @@ void main(void) {
 gl_FragColor=color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}));export{l as n,u as t};
+//# sourceMappingURL=line.fragment-Cj0SLoy3.js.map

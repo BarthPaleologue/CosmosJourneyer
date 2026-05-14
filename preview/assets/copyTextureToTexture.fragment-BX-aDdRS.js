@@ -15,3 +15,4 @@ gl_FragColor=color;
 #endif
 }
 `,n.ShadersStore[i]||(n.ShadersStore[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=copyTextureToTexture.fragment-BX-aDdRS.js.map

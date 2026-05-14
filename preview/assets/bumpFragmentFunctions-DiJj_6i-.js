@@ -29,3 +29,4 @@ return -texCoordOffset;
 }
 #endif
 `,n.IncludesShadersStoreWGSL[i]||(n.IncludesShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=bumpFragmentFunctions-DiJj_6i-.js.map

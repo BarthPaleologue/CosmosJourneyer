@@ -17,3 +17,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {
 #include<clipPlaneFragment>
 fragmentOutputs.color=gaussianColor(input.vColor,input.vPosition);}
 `,n.ShadersStoreWGSL[f]||(n.ShadersStoreWGSL[f]=p),m={name:f,shader:p}}));export{h as n,d as r,m as t};
+//# sourceMappingURL=gaussianSplatting.fragment-IccIg0aY.js.map

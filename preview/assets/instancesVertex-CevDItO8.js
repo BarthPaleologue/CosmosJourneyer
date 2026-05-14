@@ -17,3 +17,4 @@ mat4 finalPreviousWorld=previousWorld;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=instancesVertex-CevDItO8.js.map

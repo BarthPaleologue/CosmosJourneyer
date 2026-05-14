@@ -9,3 +9,4 @@ texelFetch(lightDataTexture,ivec2(4,index),0)
 );}
 int getClusteredSliceIndex(vec2 sliceData,float viewDepth) {return int(log(viewDepth)*sliceData.x+sliceData.y);}
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=clusteredLightingFunctions-D4zJMvkn.js.map

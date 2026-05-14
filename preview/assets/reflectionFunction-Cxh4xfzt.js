@@ -63,3 +63,4 @@ return vec3f(0,0,0);
 }
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=reflectionFunction-Cxh4xfzt.js.map

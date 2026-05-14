@@ -186,3 +186,4 @@ vertexOutputs.position=gaussianSplatting(input.position.xy,worldPos.xyz,vec2f(1.
 #include<logDepthVertex>
 }
 `,n.ShadersStoreWGSL[h]||(n.ShadersStoreWGSL[h]=g),_={name:h,shader:g}}));export{v as n,m as r,_ as t};
+//# sourceMappingURL=gaussianSplatting.vertex-DyqBAVtR.js.map

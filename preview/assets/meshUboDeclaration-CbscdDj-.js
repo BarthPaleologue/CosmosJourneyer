@@ -2,3 +2,4 @@ import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./shaderStore-
 visibility : f32,};var<uniform> mesh : Mesh;
 #define WORLD_UBO
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=meshUboDeclaration-CbscdDj-.js.map

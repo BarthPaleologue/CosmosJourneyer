@@ -61,3 +61,4 @@ fragmentOutputs.color=vec4f(fragmentOutputs.color.rgb,uniforms.glowColor.a);
 #endif
 }
 `,n.ShadersStoreWGSL[o]||(n.ShadersStoreWGSL[o]=s),c={name:o,shader:s}}));export{l as n,c as t};
+//# sourceMappingURL=glowMapGeneration.fragment-d0hPPk8g.js.map

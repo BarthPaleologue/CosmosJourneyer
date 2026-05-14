@@ -142,3 +142,4 @@ vColor.w*=alpha;gl_Position=gaussianSplatting(position.xy,worldPos.xyz,vec2(1.,1
 #include<logDepthVertex>
 }
 `,n.ShadersStore[S]||(n.ShadersStore[S]=C),w={name:S,shader:C}}));export{m as a,v as i,T as n,h as o,x as r,w as t};
+//# sourceMappingURL=gaussianSplatting.vertex-CFXmR8D4.js.map

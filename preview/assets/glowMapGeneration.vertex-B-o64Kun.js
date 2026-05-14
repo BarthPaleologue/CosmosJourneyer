@@ -73,3 +73,4 @@ vertexOutputs.vColor=vertexInputs.color;
 #endif
 #include<clipPlaneVertex>
 }`,n.ShadersStoreWGSL[h]||(n.ShadersStoreWGSL[h]=g),_={name:h,shader:g}}));export{v as n,_ as t};
+//# sourceMappingURL=glowMapGeneration.vertex-B-o64Kun.js.map

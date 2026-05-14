@@ -13,3 +13,4 @@ var color: vec3f=textureSampleLevel(iblSource,iblSourceSampler,coords,0.0).rgb;
 return dot(color,LuminanceEncodeApprox);}
 @fragment
 fn main(input: FragmentInputs)->FragmentOutputs {var deform: f32=sin(input.vUV.y*PI);var luminance: f32=fetchLuminance(input.vUV);fragmentOutputs.color=vec4f(vec3f(deform*luminance),1.0);}`,n.ShadersStoreWGSL[i]||(n.ShadersStoreWGSL[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=iblScaledLuminance.fragment-Dhto078b.js.map

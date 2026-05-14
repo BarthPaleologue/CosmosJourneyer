@@ -12,3 +12,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {var color: vec3f=irradiance(inp
 ,icdfTexture,icdfTextureSampler
 #endif
 );fragmentOutputs.color= vec4f(color*uniforms.hdrScale,1.0);}`,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=hdrIrradianceFiltering.fragment-VArlnZ56.js.map

@@ -235,3 +235,4 @@ gl_FragColor=color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStore[T]||(n.ShadersStore[T]=E),D={name:T,shader:E}}));export{O as n,D as t};
+//# sourceMappingURL=background.fragment-CDVvievK.js.map

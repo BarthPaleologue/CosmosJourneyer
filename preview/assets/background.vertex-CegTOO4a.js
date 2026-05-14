@@ -97,3 +97,4 @@ vertexOutputs.vColor=vertexInputs.color;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStoreWGSL[y]||(n.ShadersStoreWGSL[y]=b),x={name:y,shader:b}}));export{S as n,x as t};
+//# sourceMappingURL=background.vertex-CegTOO4a.js.map

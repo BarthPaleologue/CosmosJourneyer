@@ -4,3 +4,4 @@ var vertexID : f32;
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=morphTargetsVertexGlobal-CUgEnb8G.js.map

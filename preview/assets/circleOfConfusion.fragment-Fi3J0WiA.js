@@ -15,3 +15,4 @@ float pixelDistance=(cameraMinMaxZ.x+cameraMinMaxZ.y*depth)*1000.0;
 #define CUSTOM_COC_PIXELDISTANCE
 float coc=abs(cocPrecalculation*((focusDistance-pixelDistance)/pixelDistance));coc=clamp(coc,0.0,1.0);gl_FragColor=vec4(coc,coc,coc,1.0);}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=circleOfConfusion.fragment-Fi3J0WiA.js.map

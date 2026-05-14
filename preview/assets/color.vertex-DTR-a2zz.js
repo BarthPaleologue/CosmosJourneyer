@@ -37,3 +37,4 @@ gl_Position=viewProjection*worldPos;
 #include<vertexColorMixing>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStore[m]||(n.ShadersStore[m]=h),g={name:m,shader:h}}));export{_ as n,g as t};
+//# sourceMappingURL=color.vertex-DTR-a2zz.js.map

@@ -91,3 +91,4 @@ var velocity: f32=depthVel.g;finalColor=mix(finalColor,vec3f(1.0),smoothstep(0.3
 #endif
 fragmentOutputs.color=vec4f(finalColor,transmitted.a);}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingRender.fragment-DXrpLmv1.js.map

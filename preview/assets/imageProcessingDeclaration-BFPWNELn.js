@@ -25,3 +25,4 @@ uniform colorTransformSettings: vec4f;
 uniform ditherIntensity: f32;
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=imageProcessingDeclaration-BFPWNELn.js.map

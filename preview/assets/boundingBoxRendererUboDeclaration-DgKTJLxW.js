@@ -7,3 +7,4 @@ uniform mat4 viewProjectionR;
 layout(std140,column_major) uniform;uniform BoundingBoxRenderer {vec4 color;mat4 world;mat4 viewProjection;mat4 viewProjectionR;};
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=boundingBoxRendererUboDeclaration-DgKTJLxW.js.map

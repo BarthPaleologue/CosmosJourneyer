@@ -4,3 +4,4 @@ if (mask_p10>0.5) {col+=texture2D(textureSampler,uv_p10);total_weight+=1.0;}
 if (mask_p12>0.5) {col+=texture2D(textureSampler,uv_p12);total_weight+=1.0;}
 if (total_weight>0.0) {gl_FragColor=col/total_weight;} else {gl_FragColor=col;}}}
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=meshUVSpaceRendererFinaliser.fragment-h2xeiDLb.js.map

@@ -66,3 +66,4 @@ fragmentOutputs.color=vec4f(result,result,result,1.0);}
 #endif
 #endif
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=ssao2.fragment-DcXUfiBs.js.map

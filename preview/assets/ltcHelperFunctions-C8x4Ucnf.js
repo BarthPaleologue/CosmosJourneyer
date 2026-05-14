@@ -43,3 +43,4 @@ vec3f(0,1,0),
 vec3f(0,0,1)
 );result.Diffuse=LTCEvaluateWithEmission(normal,viewDir,position,mInvEmpty,rectCoords0,rectCoords1,rectCoords2,rectCoords3,emissionTexture,emissionTextureSampler);return result;}
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=ltcHelperFunctions-C8x4Ucnf.js.map

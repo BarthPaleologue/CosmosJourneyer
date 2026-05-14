@@ -5,3 +5,4 @@ void main(void) {
 vPosition=position;vUV=position*madd+madd;gl_Position=vec4(position,0.0,1.0);
 #define CUSTOM_VERTEX_MAIN_END
 }`;e.ShadersStore[t]||(e.ShadersStore[t]=n);const r={name:t,shader:n};export{r as proceduralVertexShader};
+//# sourceMappingURL=procedural.vertex-CjUsPGts.js.map

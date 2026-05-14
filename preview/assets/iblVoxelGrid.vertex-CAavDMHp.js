@@ -104,3 +104,4 @@ var N : vec3<f32>=calculateTriangleNormal(triPositions[0],triPositions[1],triPos
 vertexOutputs.vNormalizedPosition=vertexOutputs.position.xyz*0.5+0.5;vertexOutputs.position.z =
 vertexOutputs.vNormalizedPosition.z; }
 `,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=iblVoxelGrid.vertex-CAavDMHp.js.map

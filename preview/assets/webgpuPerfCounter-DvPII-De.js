@@ -1,1 +1,2 @@
 import{n as e}from"./chunk-Dy9vhvp_.js";import{n as t,t as n}from"./perfCounter-DuntYJ5Z.js";var r,i=e((()=>{t(),r=class{constructor(){this._gpuTimeInFrameId=-1,this.counter=new n}_addDuration(e,t){e<this._gpuTimeInFrameId||(this._gpuTimeInFrameId===e?this.counter.addCount(t,!1):(this.counter._fetchResult(),this.counter.fetchNewFrame(),this.counter.addCount(t,!1),this._gpuTimeInFrameId=e))}}}));export{i as n,r as t};
+//# sourceMappingURL=webgpuPerfCounter-DvPII-De.js.map

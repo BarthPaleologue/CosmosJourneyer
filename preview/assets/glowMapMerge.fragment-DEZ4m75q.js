@@ -23,3 +23,4 @@ fragmentOutputs.color=baseColor;
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=glowMapMerge.fragment-DEZ4m75q.js.map

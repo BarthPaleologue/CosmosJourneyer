@@ -17,3 +17,4 @@ uniform vec4 vClipPlane5;varying float fClipDistance5;
 uniform vec4 vClipPlane6;varying float fClipDistance6;
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=clipPlaneVertexDeclaration-CtNex3wB.js.map

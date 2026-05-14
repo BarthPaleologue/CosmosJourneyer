@@ -24,3 +24,4 @@ mod(castedId,256.0)
 #endif
 }
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=picking.fragment-BfFPmH6O.js.map

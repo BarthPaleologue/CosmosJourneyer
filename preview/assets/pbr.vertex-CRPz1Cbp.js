@@ -723,3 +723,4 @@ vertexOutputs.vMainUV2=uv2Updated;
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`;e.ShadersStoreWGSL[D]||(e.ShadersStoreWGSL[D]=O);const k={name:D,shader:O};export{k as pbrVertexShaderWGSL};
+//# sourceMappingURL=pbr.vertex-CRPz1Cbp.js.map

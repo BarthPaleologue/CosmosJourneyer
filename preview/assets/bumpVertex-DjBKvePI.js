@@ -4,3 +4,4 @@ var tbnNormal: vec3f=normalize(normalUpdated);var tbnTangent: vec3f=normalize(ta
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i)}));export{a as t};
+//# sourceMappingURL=bumpVertex-DjBKvePI.js.map

@@ -14,3 +14,4 @@ vec3 color=textureLod(iblSource,coords,0.0).rgb;
 #endif
 return dot(color,LuminanceEncodeApprox);}
 void main(void) {float deform=sin(vUV.y*PI);float luminance=fetchLuminance(vUV);gl_FragColor=vec4(vec3(deform*luminance),1.0);}`,n.ShadersStore[i]||(n.ShadersStore[i]=a),o={name:i,shader:a}}));export{s as n,o as t};
+//# sourceMappingURL=iblScaledLuminance.fragment-E4BVjvGG.js.map

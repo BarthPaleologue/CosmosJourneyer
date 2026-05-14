@@ -11,3 +11,4 @@ var velocityColor: vec2f=textureLoad(motionSampler,gbufferPixelCoord,0).xy;var p
 distance(LP.xyz,PrevLP)<5e-2*sceneSize);PrevShadows=max( vec4f(0.0),PrevShadows);fragmentOutputs.color= vec4f(mix(PrevShadows.x,newShadows.x,PrevShadows.a),
 mix(PrevShadows.y,newShadows.y,PrevShadows.a),
 mix(PrevShadows.z,newShadows.z,PrevShadows.a),PrevShadows.a);}`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=iblShadowAccumulation.fragment-DiNSB1WS.js.map

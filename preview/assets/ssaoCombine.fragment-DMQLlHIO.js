@@ -6,3 +6,4 @@ vec2 uv=viewport.xy+vUV*viewport.zw;vec4 ssaoColor=texture2D(textureSampler,uv);
 #define CUSTOM_FRAGMENT_MAIN_END
 }
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=ssaoCombine.fragment-DMQLlHIO.js.map

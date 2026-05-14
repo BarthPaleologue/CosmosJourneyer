@@ -30,3 +30,4 @@ varying vPositionFromLight{X}: vec4f;varying vDepthMetric{X}: f32;uniform lightM
 #endif
 #endif
 `,n.IncludesShadersStoreWGSL[r]||(n.IncludesShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lightVxUboDeclaration-DK22D-Cn.js.map

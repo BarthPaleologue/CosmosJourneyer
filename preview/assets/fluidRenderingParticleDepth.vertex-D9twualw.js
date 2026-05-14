@@ -12,3 +12,4 @@ vertexOutputs.velocityNorm=length(velocity);
 #endif
 }
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingParticleDepth.vertex-D9twualw.js.map

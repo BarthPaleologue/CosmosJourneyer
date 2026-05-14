@@ -191,3 +191,4 @@ vMainUV2=uv2Updated;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `,n.ShadersStore[z]||(n.ShadersStore[z]=B),V={name:z,shader:B}}));export{H as n,V as t};
+//# sourceMappingURL=default.vertex-Bdg8EAkm.js.map

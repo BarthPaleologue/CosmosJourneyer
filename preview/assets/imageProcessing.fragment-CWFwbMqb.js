@@ -16,3 +16,4 @@ result=applyImageProcessing(result);
 #endif
 #endif
 fragmentOutputs.color=result;}`,n.ShadersStoreWGSL[o]||(n.ShadersStoreWGSL[o]=s),c={name:o,shader:s}}));export{l as n,c as t};
+//# sourceMappingURL=imageProcessing.fragment-CWFwbMqb.js.map

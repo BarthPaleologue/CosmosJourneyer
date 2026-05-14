@@ -103,3 +103,4 @@ batchOffset+=CLUSTLIGHT_BATCH;}
 return result;}
 #endif
 `,n.IncludesShadersStore[a]||(n.IncludesShadersStore[a]=o),s={name:a,shader:o}}));export{s as n,c as t};
+//# sourceMappingURL=lightsFragmentFunctions-nybTVnSP.js.map

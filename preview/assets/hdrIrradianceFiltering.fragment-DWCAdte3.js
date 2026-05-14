@@ -11,3 +11,4 @@ uniform vec2 vFilteringInfo;uniform float hdrScale;varying vec3 direction;void m
 ,icdfTexture
 #endif
 );gl_FragColor=vec4(color*hdrScale,1.0);}`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=hdrIrradianceFiltering.fragment-DWCAdte3.js.map

@@ -8,3 +8,4 @@ velocityNorm=length(velocity);
 #endif
 }
 `,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fluidRenderingParticleDepth.vertex-Cwylwlme.js.map

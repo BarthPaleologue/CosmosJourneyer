@@ -4,3 +4,4 @@ float vertexID;
 #endif
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=morphTargetsVertexGlobal-B74u-a2A.js.map

@@ -16,3 +16,4 @@ f32((id>>8) & 0xFF),
 f32(id & 0xFF),
 )/255.0;fragmentOutputs.color=vec4f(color,1.0);}
 `,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=picking.fragment-Al2_TWpq.js.map

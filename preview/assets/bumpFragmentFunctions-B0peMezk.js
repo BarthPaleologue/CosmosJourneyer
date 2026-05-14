@@ -47,3 +47,4 @@ return -texCoordOffset;
 }
 #endif
 `;e.IncludesShadersStoreWGSL[n]||(e.IncludesShadersStoreWGSL[n]=r);const i={name:n,shader:r};export{i as t};
+//# sourceMappingURL=bumpFragmentFunctions-B0peMezk.js.map

@@ -167,3 +167,4 @@ vertexOutputs.vAlbedoUV=(uniforms.albedoMatrix* vec4f(uv2Updated,1.0,0.0)).xy;
 #include<bumpVertex>
 }
 `,n.ShadersStoreWGSL[_]||(n.ShadersStoreWGSL[_]=v),y={name:_,shader:v}}));export{b as n,y as t};
+//# sourceMappingURL=geometry.vertex-Ddu99B6P.js.map

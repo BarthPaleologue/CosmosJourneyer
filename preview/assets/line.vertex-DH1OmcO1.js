@@ -20,3 +20,4 @@ vec4 worldPos=finalWorld*vec4(position,1.0);
 #include<logDepthVertex>
 #define CUSTOM_VERTEX_MAIN_END
 }`,n.ShadersStore[_]||(n.ShadersStore[_]=v),y={name:_,shader:v}}));export{y as n,b as t};
+//# sourceMappingURL=line.vertex-DH1OmcO1.js.map

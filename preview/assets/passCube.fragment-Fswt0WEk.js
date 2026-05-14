@@ -21,3 +21,4 @@ fragmentOutputs.color=textureSample(textureSampler,textureSamplerSampler,vec3f(u
 fragmentOutputs.color=textureSample(textureSampler,textureSamplerSampler,vec3f(uv,-1.001));
 #endif
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=passCube.fragment-Fswt0WEk.js.map

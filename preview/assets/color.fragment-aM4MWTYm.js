@@ -19,3 +19,4 @@ fragmentOutputs.color=uniforms.color;
 #include<fogFragment>(color,fragmentOutputs.color)
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[s]||(n.ShadersStoreWGSL[s]=c),l={name:s,shader:c}}));export{u as n,l as t};
+//# sourceMappingURL=color.fragment-aM4MWTYm.js.map

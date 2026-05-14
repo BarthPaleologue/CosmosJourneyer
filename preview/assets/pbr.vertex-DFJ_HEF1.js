@@ -839,3 +839,4 @@ gl_PointSize=pointSize;
 #define CUSTOM_VERTEX_MAIN_END
 }
 `;e.ShadersStore[A]||(e.ShadersStore[A]=j);const M={name:A,shader:j};export{M as pbrVertexShader};
+//# sourceMappingURL=pbr.vertex-DFJ_HEF1.js.map

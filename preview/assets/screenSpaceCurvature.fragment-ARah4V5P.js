@@ -11,3 +11,4 @@ return -2.0*curvature_soft_clamp(-normal_diff,valley);return 2.0*curvature_soft_
 #define CUSTOM_FRAGMENT_DEFINITIONS
 void main(void) 
 {ivec2 texel=ivec2(gl_FragCoord.xy);vec4 baseColor=texture2D(textureSampler,vUV);float curvature=calculate_curvature(texel,curvature_ridge,curvature_valley);baseColor.rgb*=curvature+1.0;gl_FragColor=baseColor;}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=screenSpaceCurvature.fragment-ARah4V5P.js.map

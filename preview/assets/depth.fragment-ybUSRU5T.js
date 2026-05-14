@@ -38,3 +38,4 @@ fragmentOutputs.color= vec4f(input.vDepthMetric,0.0,0.0,1.0);
 #endif
 #endif
 }`,n.ShadersStoreWGSL[o]||(n.ShadersStoreWGSL[o]=s),c={name:o,shader:s}}));export{l as n,c as t};
+//# sourceMappingURL=depth.fragment-ybUSRU5T.js.map

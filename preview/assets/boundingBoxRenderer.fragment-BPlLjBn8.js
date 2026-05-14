@@ -6,3 +6,4 @@ fn main(input: FragmentInputs)->FragmentOutputs {
 fragmentOutputs.color=uniforms.color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStoreWGSL[r]||(n.ShadersStoreWGSL[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=boundingBoxRenderer.fragment-BPlLjBn8.js.map

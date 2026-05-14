@@ -14,3 +14,4 @@ else if (FOGMODE_EXP2==vFogInfos.x)
 return clamp(fogCoeff,0.0,1.0);}
 #endif
 `,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=fogFragmentDeclaration-vDS-NW1c.js.map

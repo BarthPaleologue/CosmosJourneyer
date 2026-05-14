@@ -16,3 +16,4 @@ discard;
 gl_FragColor=baseColor*color;
 #define CUSTOM_FRAGMENT_MAIN_END
 }`,n.ShadersStore[i]||(n.ShadersStore[i]=a),o={name:i,shader:a}}));export{o as n,s as t};
+//# sourceMappingURL=layer.fragment-CPBa0UCA.js.map
