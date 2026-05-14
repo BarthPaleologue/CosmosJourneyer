@@ -27,10 +27,18 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { decodeBase64 } from "@/utils/base64";
 import { jsonSafeParse } from "@/utils/json";
 
-import { createConsoleDumper } from "./utils/console";
-import { downloadTextFile } from "./utils/download";
+import { ConsoleDumper } from "./utils/consoleDumper";
+import { CrashReporter } from "./utils/crashReporter";
 
+const consoleDumper = new ConsoleDumper();
+const crashReporter = new CrashReporter(consoleDumper);
 const soundPlayerMock = new SoundPlayerMock();
+
+try {
+    await startCosmosJourneyer();
+} catch (error: unknown) {
+    await crashReporter.reportCrash({ type: "startup", value: error });
+}
 
 async function simpleInit(engine: CosmosJourneyer) {
     await engine.init(false);
@@ -78,26 +86,4 @@ async function startCosmosJourneyer() {
     }
 
     await simpleInit(engine);
-}
-
-const consoleDumper = createConsoleDumper();
-
-try {
-    await startCosmosJourneyer();
-} catch (e: unknown) {
-    const consoleDumpJsonArray = consoleDumper().map((entry) => JSON.stringify(entry));
-    let crashLog = `Console output:\n\n${consoleDumpJsonArray.join("\n")}`;
-    if (e instanceof Error) {
-        crashLog = `${crashLog}\n\n\nError:\n\n${e.message}`;
-    } else if (typeof e === "string") {
-        crashLog = `${crashLog}\n\n\nError:\n\n${e}`;
-    }
-
-    downloadTextFile(crashLog, "crashLog.txt");
-    await alertModal(
-        `An unexpected error has occurred!<br><br>
-        The crash log has been downloaded to your computer, please go to <a href="https://github.com/BarthPaleologue/CosmosJourneyer/issues">the issue tracker</a> and open a new bug issue with the crash log attached.
-        If you don't have a GitHub account, you can send an email to barth.paleologue@cosmosjourneyer.com instead.`,
-        soundPlayerMock,
-    );
 }
