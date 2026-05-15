@@ -65,7 +65,8 @@
         "lint-staged": "^16.4.0",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
-        "typescript-eslint": "catalog:"
+        "typescript-eslint": "catalog:",
+        "vite-plugin-checker": "^0.13.0"
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx,mjs,cjs,json,md,css,scss,html,yml,yaml}": "oxfmt --write"

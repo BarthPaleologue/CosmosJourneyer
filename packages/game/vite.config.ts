@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig, type PluginOption } from "vite";
+import checker from "vite-plugin-checker";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
 
@@ -73,6 +74,9 @@ export default defineConfig(({ mode }) => {
         plugins: [
             basicSsl({
                 name: "cosmos-journeyer",
+            }),
+            checker({
+                typescript: true,
             }),
             glsl(),
             wasm(),
