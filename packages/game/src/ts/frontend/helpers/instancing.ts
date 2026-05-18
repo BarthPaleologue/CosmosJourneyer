@@ -69,11 +69,19 @@ export type ScatteringLayer = (
 ) => {
     density: number;
     rotationOverride?: Quaternion;
-    scalingOverride?: Vector3;
+    scalingOverride?: number;
 };
 
-type ScatteringLayerBuffers<TLayers extends ReadonlyArray<ScatteringLayer>> = {
-    readonly [Index in keyof TLayers]: Float32Array<ArrayBuffer>;
+type ScatteringLayerBuffers = {
+    matrices: Float32Array<ArrayBuffer>;
+    positions: Float32Array<ArrayBuffer>;
+    rotations: Float32Array<ArrayBuffer>;
+    scales: Float32Array<ArrayBuffer>;
+    count: number;
+};
+
+type ScatteringLayersBuffers<TLayers extends ReadonlyArray<ScatteringLayer>> = {
+    readonly [Index in keyof TLayers]: ScatteringLayerBuffers;
 };
 
 export const MaxScatterDensity = 16;
@@ -86,12 +94,15 @@ export const MaxScatterDensity = 16;
 export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer>>(
     pointBuffer: Float32Array,
     layers: TLayers,
-): ScatteringLayerBuffers<TLayers> {
+): ScatteringLayersBuffers<TLayers> {
     const pointStride = 6;
 
     const instanceBuffers = layers.map(() => {
         return {
-            buffer: new Float32Array((pointBuffer.length * 16) / pointStride),
+            matrices: new Float32Array((pointBuffer.length * 16) / pointStride),
+            positions: new Float32Array((pointBuffer.length * 3) / pointStride),
+            rotations: new Float32Array((pointBuffer.length * 4) / pointStride),
+            scales: new Float32Array(pointBuffer.length / pointStride),
             count: 0,
         };
     });
@@ -101,6 +112,7 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
 
     const position = new Vector3();
     const normal = new Vector3();
+    const scaling = new Vector3();
 
     for (let i = 0; i < pointBuffer.length; i += pointStride) {
         Vector3.FromArrayToRef(pointBuffer, i, position);
@@ -120,19 +132,34 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
                 continue;
             }
 
-            Matrix.ComposeToRef(
-                scalingOverride ?? Vector3.OneReadOnly,
-                rotationOverride ?? Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, normal, instanceRotation),
-                position,
-                instanceMatrix,
-            );
+            scaling.setAll(scalingOverride ?? 1);
 
-            instanceBuffer.buffer.set(instanceMatrix.m, instanceBuffer.count * 16);
+            if (rotationOverride !== undefined) {
+                instanceRotation.copyFrom(rotationOverride);
+            } else {
+                Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, normal, instanceRotation);
+            }
+
+            Matrix.ComposeToRef(scaling, instanceRotation, position, instanceMatrix);
+
+            instanceBuffer.matrices.set(instanceMatrix.m, instanceBuffer.count * 16);
+            position.toArray(instanceBuffer.positions, instanceBuffer.count * 3);
+            instanceRotation.toArray(instanceBuffer.rotations, instanceBuffer.count * 4);
+            instanceBuffer.scales[instanceBuffer.count] = scalingOverride ?? 1;
             instanceBuffer.count++;
         }
     }
 
-    return instanceBuffers.map((b) => b.buffer.subarray(0, b.count * 16)) as ScatteringLayerBuffers<TLayers>;
+    return instanceBuffers.map(
+        (b) =>
+            ({
+                matrices: b.matrices.subarray(0, b.count * 16),
+                positions: b.positions.subarray(0, b.count * 3),
+                rotations: b.rotations.subarray(0, b.count * 4),
+                scales: b.scales.subarray(0, b.count),
+                count: b.count,
+            }) satisfies ScatteringLayerBuffers,
+    ) as ScatteringLayersBuffers<TLayers>;
 }
 
 export function createInstancePatch(baseMesh: Mesh, matrixBuffer: Float32Array): Mesh {

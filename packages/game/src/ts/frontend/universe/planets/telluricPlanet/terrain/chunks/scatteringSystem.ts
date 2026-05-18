@@ -29,7 +29,15 @@ export const AssetTypeSchema = z.enum(["grass", "rock", "tree", "butterfly"]);
 
 export type AssetType = z.infer<typeof AssetTypeSchema>;
 
-export const ScatteredInstancesSchema = z.partialRecord(AssetTypeSchema, z.instanceof(Float32Array));
+export const ScatteredInstancesSchema = z.partialRecord(
+    AssetTypeSchema,
+    z.object({
+        matrices: z.instanceof(Float32Array),
+        positions: z.instanceof(Float32Array),
+        rotations: z.instanceof(Float32Array),
+        scales: z.instanceof(Float32Array),
+    }),
+);
 
 export type ScatteredInstances = z.infer<typeof ScatteredInstancesSchema>;
 
@@ -57,7 +65,13 @@ export class ScatteringSystem implements IScatteringSystem {
         this.clearChunk(chunkTransform.name);
 
         const chunkPatches: Partial<Record<AssetType, Mesh>> = {};
-        for (const [assetType, matrixBuffer] of Object.entries(scattering) as Iterable<[AssetType, Float32Array]>) {
+        for (const [assetType, buffers] of Object.entries(scattering) as Iterable<
+            [AssetType, ScatteredInstances[AssetType]]
+        >) {
+            if (buffers === undefined) {
+                continue;
+            }
+
             let mesh: Mesh;
             switch (assetType) {
                 case "grass":
@@ -76,7 +90,7 @@ export class ScatteringSystem implements IScatteringSystem {
                     assertUnreachable(assetType);
             }
 
-            mesh = createInstancePatch(mesh, matrixBuffer);
+            mesh = createInstancePatch(mesh, buffers.matrices);
 
             const chunkAbsolutePosition = chunkTransform.getAbsolutePosition();
             const chunkRotationQuaternion = chunkTransform.absoluteRotationQuaternion;
