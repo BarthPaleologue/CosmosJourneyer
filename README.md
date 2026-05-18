@@ -54,8 +54,8 @@ If you want the cutting edge version, follow these steps:
 1. Install prerequisites:
 
 - [Git](https://git-scm.com/) (install with your package manager or from https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/) (version 20 or higher)
-- [Pnpm](https://pnpm.io/) (install with `npm install -g pnpm`)
+- [Node.js](https://nodejs.org/) (version 24 or higher)
+- [Pnpm](https://pnpm.io/) (use the version pinned in `package.json`, for example with `corepack enable`)
 
 2. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 3. Install the dependencies with `pnpm install`
@@ -162,14 +162,14 @@ Cosmos Journeyer is built using the following technologies:
 
 ### Setup
 
-1. Install [Node.js](https://nodejs.org/)
-2. Install [Pnpm](https://pnpm.io/installation)
+1. Install [Node.js](https://nodejs.org/) 24 or higher
+2. Enable [Corepack](https://nodejs.org/api/corepack.html) with `corepack enable` so Node uses the pnpm version pinned in `package.json`
 3. Clone the repository with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 4. Navigate to the project directory with `cd CosmosJourneyer`
 5. Install the dependencies with `pnpm install`
    (this also sets up Git hooks for formatting changed files before commit.
-   For pnpm 10 and later, hooks are installed because Husky is listed in
-   `onlyBuiltDependencies`.)
+   For pnpm 11 and later, hooks are installed because Husky is listed in
+   `allowBuilds`.)
 
 ### Repository layout
 
