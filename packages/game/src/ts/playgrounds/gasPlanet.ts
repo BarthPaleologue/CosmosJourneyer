@@ -17,8 +17,7 @@
 
 import { DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
 import { SolarTemperature } from "@cosmos-journeyer/physics";
-
-import { generateGasPlanetModel } from "@/backend/universe/proceduralGenerators/gasPlanet/gasPlanetModelGenerator";
+import { generateGasPlanetModel } from "@cosmos-journeyer/universe-generation";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextures } from "@/frontend/assets/textures";

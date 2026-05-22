@@ -1,0 +1,40 @@
+{
+    "name": "@cosmos-journeyer/universe-generation",
+    "version": "1.11.0-dev",
+    "private": true,
+    "description": "Pure procedural universe model generators shared across Cosmos Journeyer packages.",
+    "license": "AGPL-3.0-only",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/universe-generation"
+    },
+    "type": "module",
+    "sideEffects": false,
+    "types": "./src/index.ts",
+    "imports": {
+        "#/*": "./src/*.ts"
+    },
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "test:unit": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check"
+    },
+    "dependencies": {
+        "@cosmos-journeyer/physics": "workspace:^",
+        "@cosmos-journeyer/universe-model": "workspace:^",
+        "extended-random": "^1.2.2",
+        "fast-simplex-noise": "^4.0.0",
+        "squirrel-noise": "^1.0.0"
+    },
+    "devDependencies": {
+        "eslint": "catalog:",
+        "oxfmt": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:"
+    }
+}

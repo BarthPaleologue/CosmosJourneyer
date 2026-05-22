@@ -21,13 +21,14 @@ import {
     EarthSeaLevelPressure,
     getOrbitRadiusFromPeriod,
 } from "@cosmos-journeyer/physics";
+import {
+    generateGasPlanetModel,
+    generateSpaceStationModel,
+    generateStarModel,
+    generateTelluricPlanetModel,
+    generateTelluricSatelliteModel,
+} from "@cosmos-journeyer/universe-generation";
 import { type StarSystemCoordinates, type StarSystemModel } from "@cosmos-journeyer/universe-model";
-
-import { generateGasPlanetModel } from "../proceduralGenerators/gasPlanet/gasPlanetModelGenerator";
-import { generateSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
-import { generateStarModel } from "../proceduralGenerators/stellarObjects/starModelGenerator";
-import { generateTelluricPlanetModel } from "../proceduralGenerators/telluricPlanetModelGenerator";
-import { generateTelluricSatelliteModel } from "../proceduralGenerators/telluricSatelliteModelGenerator";
 
 export function getAlphaTestisSystemModel(): StarSystemModel {
     const systemName = "Alpha Testis";

@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera, DirectionalLight, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
-
-import { generateMandelboxModel } from "@/backend/universe/proceduralGenerators/anomalies/mandelboxModelGenerator";
+import { generateMandelboxModel } from "@cosmos-journeyer/universe-generation";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";

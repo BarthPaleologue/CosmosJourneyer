@@ -2,7 +2,7 @@
 
 If you are willing to contribute, this document will give you a good idea of where everything is and how it is organized.
 
-Most gameplay TypeScript modules live under `packages/game/src`. Shared pure physics utilities now live in the workspace package `packages/physics`, and shared star-system data models now live in `packages/universe-model` (see the root README for an overview).
+Most gameplay TypeScript modules live under `packages/game/src`. Shared pure physics utilities now live in the workspace package `packages/physics`, shared star-system data models live in `packages/universe-model`, and shared procedural universe model generators live in `packages/universe-generation` (see the root README for an overview).
 
 ## General architecture
 
@@ -45,7 +45,7 @@ On the other hand, the star system view is responsible for displaying, loading a
 
 The `StarSystemView` also holds the player's `ShipControls` that are used to control the spaceship.
 
-The `UniverseBackend` is responsible for generating `StarSystemModel` data on demand. These immutable data objects contain all the necessary information necessary to populate a `StarSystemController`.
+The `UniverseBackend` is responsible for serving `StarSystemModel` data on demand. The default game backend delegates procedural model creation to `packages/universe-generation`, but the backend boundary does not require procedural generation. These immutable data objects contain all the necessary information necessary to populate a `StarSystemController`.
 
 The `StarSystemModel` contains collections of `OrbitalObjectModel` that are in turn used to generate actual `OrbitalObject`. This decoupling of information and concrete 3d object is important to work on data of objects not shown on the screen (like for generating missions).
 

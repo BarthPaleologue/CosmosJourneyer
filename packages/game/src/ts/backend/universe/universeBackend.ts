@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { generateStarSystemModel } from "@cosmos-journeyer/universe-generation";
 import {
     starSystemCoordinatesEquals,
     type StarSystemCoordinates,
@@ -31,8 +32,6 @@ import { hashVec3 } from "@/utils/hash";
 import { type DeepReadonly, type Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
-
-import { generateStarSystemModel } from "./proceduralGenerators/starSystemModelGenerator";
 
 /**
  * The UniverseBackend defines the content of the universe.
