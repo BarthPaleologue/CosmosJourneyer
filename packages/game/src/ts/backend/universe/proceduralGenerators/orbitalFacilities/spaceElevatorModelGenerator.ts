@@ -17,6 +17,7 @@
 
 import {
     getOrbitRadiusFromPeriod,
+    getSolarPanelSurfaceFromEnergyRequirement,
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
@@ -35,7 +36,6 @@ import { CropTypes, getEdibleEnergyPerAreaPerDay, type CropType } from "@/utils/
 import { getDistancesToStellarObjects } from "@/utils/distanceToStellarObject";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { randomPieChart, wheelOfFortune } from "@/utils/random";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { generateSpaceElevatorName } from "@/utils/strings/spaceStationNameGenerator";
 import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 

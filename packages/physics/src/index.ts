@@ -19,6 +19,7 @@ export * from "./blackHole";
 export * from "./constants";
 export * from "./orbit";
 export * from "./physics";
+export * from "./solarPanels";
 export * from "./stellarTypes";
 export * from "./thermodynamics";
 export * from "./unitConversions";

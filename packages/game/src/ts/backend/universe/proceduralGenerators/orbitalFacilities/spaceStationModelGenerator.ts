@@ -15,7 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, getSphereIrradianceAtDistance, km2ToM2, kwhPerYearToWatts } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    getSolarPanelSurfaceFromEnergyRequirement,
+    getSphereIrradianceAtDistance,
+    km2ToM2,
+    kwhPerYearToWatts,
+} from "@cosmos-journeyer/physics";
 import {
     type CelestialBodyModel,
     type Orbit,
@@ -33,7 +39,6 @@ import { GenerationSteps } from "@/utils/generationSteps";
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { clamp } from "@/utils/math";
 import { randomPieChart, wheelOfFortune } from "@/utils/random";
-import { getSolarPanelSurfaceFromEnergyRequirement } from "@/utils/solarPanels";
 import { generateSpaceStationName } from "@/utils/strings/spaceStationNameGenerator";
 import { assertUnreachable, type DeepPartial, type DeepReadonly } from "@/utils/types";
 
