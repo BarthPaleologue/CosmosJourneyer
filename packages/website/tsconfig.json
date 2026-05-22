@@ -3,6 +3,7 @@
     "compilerOptions": {
         "noEmit": true,
         "jsx": "preserve",
+        "lib": ["ES2025", "DOM"],
         "tsBuildInfoFile": "./.tsbuildinfo",
         "plugins": [
             {

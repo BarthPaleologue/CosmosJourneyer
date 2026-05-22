@@ -7,6 +7,7 @@
             "@shaders/*": ["./src/shaders/*"],
             "@styles/*": ["./src/styles/*"]
         },
+        "lib": ["ES2025", "DOM", "WebWorker"],
         "types": ["vite/client", "vite-plugin-glsl/ext"]
     },
     "include": ["src/**/*.ts", "tests/**/*.ts", "vite.config.ts", "playwright.config.ts"],
