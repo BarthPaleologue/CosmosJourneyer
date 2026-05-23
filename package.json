@@ -68,7 +68,7 @@
         "typescript-eslint": "catalog:"
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx,mjs,cjs,json,md,css,scss,html,yml,yaml}": "oxfmt --write"
+        "*.{js,jsx,ts,tsx,mjs,cjs,json,md,css,html,yml,yaml}": "oxfmt --write"
     },
     "engines": {
         "node": ">=24.0.0"

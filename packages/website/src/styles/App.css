@@ -1,23 +1,25 @@
-//  This file is part of Cosmos Journeyer
-//
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * This file is part of Cosmos Journeyer
+ *
+ * Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
-@use "./roadmap.scss" as *;
-@use "./animatedText.scss" as *;
-@use "./about.scss" as *;
+@import "./roadmap.css";
+@import "./animatedText.css";
+@import "./about.css";
 
 @font-face {
     font-family: "Nasalization";
@@ -46,7 +48,7 @@ body {
     background-position: center;
 }
 
-// Screen reader only content
+/* Screen reader only content */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -59,7 +61,7 @@ body {
     border: 0;
 }
 
-// Focus styles for accessibility
+/* Focus styles for accessibility */
 button:focus,
 a:focus {
     outline: 2px solid #ffffff;
@@ -195,10 +197,10 @@ a:focus {
                 color: white;
                 padding: 15px;
 
-                $tileSize: 30px;
+                --tile-size: 30px;
 
-                width: $tileSize;
-                height: $tileSize;
+                width: var(--tile-size);
+                height: var(--tile-size);
 
                 background: #002b6a;
 
@@ -254,8 +256,8 @@ a:focus {
                 }
 
                 img {
-                    width: $tileSize;
-                    height: $tileSize;
+                    width: var(--tile-size);
+                    height: var(--tile-size);
                 }
 
                 &:hover {
@@ -300,7 +302,7 @@ a:focus {
         }
     }
 
-    // Ensure main button has correct blue background with maximum specificity
+    /* Ensure main button has correct blue background with maximum specificity */
     .fullView #buttonGrid button#mainButton {
         background: #002b6a !important;
         background-color: #002b6a !important;

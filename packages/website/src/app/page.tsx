@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import "@/styles/App.scss";
+import "@/styles/App.css";
 
 import { View1 } from "./View1";
 import { View2 } from "./View2";

@@ -36,7 +36,7 @@
             display: none;
         }
 
-        // first h3 only has no margin
+        /* first h3 only has no margin */
         h3:first-of-type {
             margin-top: 0;
         }
