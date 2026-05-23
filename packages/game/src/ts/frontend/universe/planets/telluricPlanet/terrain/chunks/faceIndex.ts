@@ -17,8 +17,7 @@
 
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-
-import { assertUnreachable } from "@/utils/types";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 export type FaceIndex = 0 | 1 | 2 | 3 | 4 | 5;
 

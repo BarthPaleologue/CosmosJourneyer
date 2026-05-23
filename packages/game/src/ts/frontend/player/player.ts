@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
@@ -32,7 +33,6 @@ import { Mission } from "@/frontend/missions/mission";
 import { type Spaceship } from "@/frontend/spaceship/spaceship";
 
 import { jsonSafeParse } from "@/utils/json";
-import { type DeepReadonly } from "@/utils/types";
 
 export class Player {
     uuid: string;

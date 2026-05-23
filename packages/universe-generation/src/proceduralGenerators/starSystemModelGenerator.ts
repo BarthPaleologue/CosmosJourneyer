@@ -21,7 +21,7 @@ import { wheelOfFortune } from "#/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "#/utils/strings/alphabets";
 import { romanNumeral } from "#/utils/strings/romanNumerals";
 import { generateStarName } from "#/utils/strings/starNameGenerator";
-import { assertUnreachable, isNonEmptyArray } from "#/utils/types";
+import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
 import {
     type StarSystemCoordinates,
     type AnomalyModel,

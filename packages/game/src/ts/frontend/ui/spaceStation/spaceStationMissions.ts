@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
@@ -28,7 +29,6 @@ import { type Player } from "@/frontend/player/player";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { parseDistance } from "@/utils/strings/parseToStrings";
-import { type DeepReadonly } from "@/utils/types";
 
 import { MissionContainer } from "./missionContainer";
 

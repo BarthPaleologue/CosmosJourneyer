@@ -15,14 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
 import { type OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
 import { ItinerarySchema, SerializedPlayerSchema, type Itinerary } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
-
-import { assertUnreachable, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type SaveLoadingError } from "../saveLoadingError";
 import { UniverseCoordinatesSchema, type UniverseCoordinates } from "../universeCoordinates";

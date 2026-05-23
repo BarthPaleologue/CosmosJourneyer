@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { perHaToPerM2 } from "@cosmos-journeyer/physics";
-
-import { assertUnreachable } from "./types";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 export const CropType = {
     POTATO: "potato",

@@ -21,10 +21,9 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { EarthG } from "@cosmos-journeyer/physics";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { assertUnreachable } from "@/utils/types";
 
 import { CollisionMask } from "@/settings";
 

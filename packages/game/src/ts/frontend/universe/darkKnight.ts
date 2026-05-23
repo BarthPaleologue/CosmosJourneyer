@@ -20,12 +20,11 @@ import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { type CelestialBodyBase } from "./architecture/celestialBody";
 import { ObjectTargetCursorType, type TargetInfo } from "./architecture/targetable";

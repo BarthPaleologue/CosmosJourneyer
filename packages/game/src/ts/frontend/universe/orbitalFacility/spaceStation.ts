@@ -22,6 +22,7 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SpaceStationModel, StationSectionModel } from "@cosmos-journeyer/universe-model";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
@@ -38,8 +39,6 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";

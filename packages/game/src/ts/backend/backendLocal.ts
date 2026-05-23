@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { err, ok, type Result } from "@cosmos-journeyer/typescript";
 import { generateDarkKnightModel } from "@cosmos-journeyer/universe-generation";
 
 import { hashArray } from "@/utils/hash";
-import { err, ok, type Result } from "@/utils/types";
 
 import type { ICosmosJourneyerBackend } from ".";
 import { EncyclopaediaGalacticaLocal } from "./encyclopaedia/encyclopaediaGalacticaLocal";

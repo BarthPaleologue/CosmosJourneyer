@@ -20,7 +20,8 @@ import type { Material } from "@babylonjs/core/Materials/material";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly, TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
 import type { Cullable } from "@/frontend/helpers/cullable";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";

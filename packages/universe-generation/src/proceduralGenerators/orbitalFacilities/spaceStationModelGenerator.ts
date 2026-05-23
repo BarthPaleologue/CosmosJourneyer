@@ -24,7 +24,6 @@ import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { randomPieChart, wheelOfFortune } from "#/utils/random";
 import { generateSpaceStationName } from "#/utils/strings/spaceStationNameGenerator";
-import { assertUnreachable, type DeepPartial, type DeepReadonly } from "#/utils/types";
 import {
     degreesToRadians,
     getSolarPanelSurfaceFromEnergyRequirement,
@@ -32,6 +31,7 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
+import { assertUnreachable, type DeepPartial, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type CelestialBodyModel,
     type Orbit,

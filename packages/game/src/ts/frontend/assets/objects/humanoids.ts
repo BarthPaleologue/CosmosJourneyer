@@ -21,8 +21,7 @@ import type { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
-
-import { err, ok, type Result } from "@/utils/types";
+import { err, ok, type Result } from "@cosmos-journeyer/typescript";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";

@@ -19,6 +19,7 @@ import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type Material } from "@babylonjs/core/Materials/material";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type TelluricPlanetModel,
     type TelluricSatelliteModel,
@@ -26,8 +27,6 @@ import {
 } from "@cosmos-journeyer/universe-model";
 
 import { type Cullable } from "@/frontend/helpers/cullable";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

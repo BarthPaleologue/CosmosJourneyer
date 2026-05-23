@@ -21,9 +21,8 @@ import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { Scene } from "@babylonjs/core/scene";
+import { err, ok, type Result } from "@cosmos-journeyer/typescript";
 import earcut from "earcut";
-
-import { err, ok, type Result } from "@/utils/types";
 
 import type { RenderingAssets } from "../assets/renderingAssets";
 import { bevelPolygon } from "../helpers/bevel";

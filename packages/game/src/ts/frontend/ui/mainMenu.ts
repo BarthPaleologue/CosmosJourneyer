@@ -18,6 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type StarSystemCoordinates,
     type StarSystemModel,
@@ -38,8 +39,6 @@ import {
     positionNearObjectWithStarVisible,
 } from "@/frontend/helpers/positionNearObject";
 import { type StarSystemView } from "@/frontend/starSystemView";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 

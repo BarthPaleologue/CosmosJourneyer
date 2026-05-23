@@ -1,9 +1,8 @@
+import type { DeepPartial } from "@cosmos-journeyer/typescript";
 import { expect, test } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
-
-import { type DeepPartial } from "@/utils/types";
 
 import { safeParseSave } from "../saveFileData";
 import { type SaveV2 } from "./saveV2";

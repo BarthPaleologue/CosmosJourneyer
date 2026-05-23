@@ -18,12 +18,12 @@
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { getAngularSize } from "@/frontend/helpers/isObjectVisibleOnScreen";
 
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
-import { assertUnreachable } from "@/utils/types";
 
 import { type HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";

@@ -19,8 +19,8 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { wheelOfFortune } from "#/utils/random";
-import { assertUnreachable, type DeepReadonly } from "#/utils/types";
 import { SolarRadius, type StellarType } from "@cosmos-journeyer/physics";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type OrbitalObjectModel, type Orbit, type StarModel } from "@cosmos-journeyer/universe-model";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 

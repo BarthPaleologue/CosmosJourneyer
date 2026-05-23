@@ -1,12 +1,12 @@
 {
-    "name": "@cosmos-journeyer/universe-model",
+    "name": "@cosmos-journeyer/typescript",
     "version": "1.11.0-dev",
     "private": true,
-    "description": "Pure universe data models and schemas shared across Cosmos Journeyer packages.",
+    "description": "Generic TypeScript helper types and functions shared across Cosmos Journeyer packages.",
     "license": "AGPL-3.0-only",
     "repository": {
         "type": "git",
-        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/universe-model"
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/typescript"
     },
     "type": "module",
     "sideEffects": false,
@@ -19,10 +19,6 @@
         "lint": "eslint .",
         "format": "oxfmt . --write",
         "format:check": "oxfmt . --check"
-    },
-    "dependencies": {
-        "@cosmos-journeyer/typescript": "workspace:^",
-        "zod": "catalog:"
     },
     "devDependencies": {
         "eslint": "catalog:",

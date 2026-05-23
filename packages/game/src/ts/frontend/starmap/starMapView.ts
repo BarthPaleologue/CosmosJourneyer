@@ -29,6 +29,7 @@ import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
@@ -45,8 +46,6 @@ import { type Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { type View } from "@/frontend/view";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { type StarMapTextures } from "../assets/textures/starMap";
 import { type INotificationManager } from "../ui/notificationManager";

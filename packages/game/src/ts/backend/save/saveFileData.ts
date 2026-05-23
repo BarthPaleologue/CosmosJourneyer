@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Assert, DeepMutable, DeepReadonly, Result, StrictEqual } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { encodeBase64 } from "@/utils/base64";
-import { type Assert, type DeepMutable, type DeepReadonly, type Result, type StrictEqual } from "@/utils/types";
 
 import { type SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";

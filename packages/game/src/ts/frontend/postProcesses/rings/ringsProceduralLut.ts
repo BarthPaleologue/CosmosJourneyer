@@ -19,9 +19,8 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type ProceduralRingsModel } from "@cosmos-journeyer/universe-model";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import ringsPatternLutCode from "@shaders/textures/ringsPatternLUT.glsl";
 

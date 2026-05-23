@@ -19,6 +19,7 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import {
     abs,
@@ -50,8 +51,6 @@ import {
 } from "babylonjs-shading-language";
 
 import { type PBRTextures } from "@/frontend/assets/textures/materials";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

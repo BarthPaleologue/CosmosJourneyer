@@ -15,14 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type OrbitalObjectModel,
     type StellarObjectModel,
     getObjectModelById,
     type StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
-
-import { type DeepReadonly } from "./types";
 
 export function getDistancesToStellarObjects(
     object: DeepReadonly<OrbitalObjectModel>,

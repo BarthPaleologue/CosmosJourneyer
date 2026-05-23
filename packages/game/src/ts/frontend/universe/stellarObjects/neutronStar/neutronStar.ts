@@ -25,6 +25,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type NeutronStarModel } from "@cosmos-journeyer/universe-model";
 
 import { type Textures } from "@/frontend/assets/textures";
@@ -39,7 +40,6 @@ import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField"
 
 import { type ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

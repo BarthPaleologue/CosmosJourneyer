@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { generateStarSystemModel } from "@cosmos-journeyer/universe-generation";
 import {
     starSystemCoordinatesEquals,
@@ -29,7 +30,7 @@ import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
-import { type DeepReadonly, type Vector3Like } from "@/utils/types";
+import type { Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

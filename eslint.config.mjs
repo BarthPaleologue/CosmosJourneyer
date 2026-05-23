@@ -10,6 +10,7 @@ const projectConfigs = [
     "./packages/desktop-electron/tsconfig.json",
     "./packages/game/tsconfig.json",
     "./packages/physics/tsconfig.json",
+    "./packages/typescript/tsconfig.json",
     "./packages/universe-generation/tsconfig.json",
     "./packages/universe-model/tsconfig.json",
     "./packages/website/tsconfig.json",

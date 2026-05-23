@@ -197,6 +197,9 @@ importers:
       '@cosmos-journeyer/physics':
         specifier: workspace:^
         version: link:../physics
+      '@cosmos-journeyer/typescript':
+        specifier: workspace:^
+        version: link:../typescript
       '@cosmos-journeyer/universe-generation':
         specifier: workspace:^
         version: link:../universe-generation
@@ -303,11 +306,26 @@ importers:
 
   packages/terrain-generation: {}
 
+  packages/typescript:
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 10.2.0(jiti@2.6.1)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.44.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+
   packages/universe-generation:
     dependencies:
       '@cosmos-journeyer/physics':
         specifier: workspace:^
         version: link:../physics
+      '@cosmos-journeyer/typescript':
+        specifier: workspace:^
+        version: link:../typescript
       '@cosmos-journeyer/universe-model':
         specifier: workspace:^
         version: link:../universe-model
@@ -336,6 +354,9 @@ importers:
 
   packages/universe-model:
     dependencies:
+      '@cosmos-journeyer/typescript':
+        specifier: workspace:^
+        version: link:../typescript
       zod:
         specifier: 'catalog:'
         version: 4.3.6

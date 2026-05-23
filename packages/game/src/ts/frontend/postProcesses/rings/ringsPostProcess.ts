@@ -23,6 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type CelestialBodyModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
@@ -33,8 +34,6 @@ import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { RingsSamplerNames, RingsUniformNames, type RingsUniforms } from "./ringsUniform";
 

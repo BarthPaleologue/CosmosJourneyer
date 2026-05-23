@@ -18,6 +18,12 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
 import {
+    assertUnreachable,
+    isNonEmptyArray,
+    type DeepReadonly,
+    type NonEmptyArray,
+} from "@cosmos-journeyer/typescript";
+import {
     type AnomalyModel,
     type PlanetModel,
     type StellarObjectModel,
@@ -33,7 +39,6 @@ import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHol
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import { assertUnreachable, isNonEmptyArray, type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 import { wait } from "@/utils/wait";
 
 import { type Anomaly, type OrbitalFacility, type Planet, type StellarObject } from "./architecture/orbitalObject";

@@ -1,9 +1,9 @@
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-
-import { assertUnreachable } from "@/utils/types";
 
 import { type MusicConductor } from "../audio/musicConductor";
 import { type INotificationManager } from "./notificationManager";

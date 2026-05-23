@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type DeepReadonly, type NonEmptyArray } from "./common";
+import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
+
 import {
     type AnomalyModel,
     type OrbitalFacilityModel,

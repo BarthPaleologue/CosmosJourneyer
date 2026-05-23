@@ -34,6 +34,7 @@ import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type StarSystemCoordinates, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
@@ -65,7 +66,6 @@ import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/te
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import type { DeepReadonly } from "@/utils/types";
 
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

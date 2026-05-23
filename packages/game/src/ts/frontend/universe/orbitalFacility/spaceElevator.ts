@@ -24,6 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type Scene } from "@babylonjs/core/scene";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { ElevatorSectionModel, SpaceElevatorModel } from "@cosmos-journeyer/universe-model";
 
 import { SpaceElevatorClimber } from "@/frontend/assets/procedural/spaceStation/climber/spaceElevatorClimber";
@@ -43,7 +44,6 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { clamp, remap, triangleWave } from "@/utils/math";
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { type OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";

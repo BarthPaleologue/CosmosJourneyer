@@ -27,14 +27,13 @@ import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlug
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
 import { type Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask, Settings } from "@/settings";
 

@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
-
-import { assertUnreachable } from "@/utils/types";
 
 export type Speaker = "Charlotte";
 

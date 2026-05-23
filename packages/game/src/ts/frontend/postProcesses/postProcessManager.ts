@@ -31,6 +31,7 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { type PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import type { Scene } from "@babylonjs/core/scene";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type JuliaSetModel,
     type MandelboxModel,
@@ -49,7 +50,6 @@ import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar
 import { type Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";

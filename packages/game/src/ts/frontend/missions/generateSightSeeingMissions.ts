@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type OrbitalFacilityModel,
     type StarSystemModel,
@@ -31,7 +32,6 @@ import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighbor
 import { type Player } from "@/frontend/player/player";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { type DeepReadonly } from "@/utils/types";
 
 import { type Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";

@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
+
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { jsonSafeParse } from "@/utils/json";
-import { err, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

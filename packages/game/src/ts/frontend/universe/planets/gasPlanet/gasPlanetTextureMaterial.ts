@@ -17,11 +17,10 @@
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { type Scene } from "@babylonjs/core/scene";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { type GasPlanetTextureId } from "@cosmos-journeyer/universe-model";
 
 import { type GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
-
-import { assertUnreachable } from "@/utils/types";
 
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,

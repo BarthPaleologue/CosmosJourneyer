@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "@cosmos-journeyer/physics": "workspace:^",
+        "@cosmos-journeyer/typescript": "workspace:^",
         "@cosmos-journeyer/universe-model": "workspace:^",
         "extended-random": "^1.2.2",
         "fast-simplex-noise": "^4.0.0",

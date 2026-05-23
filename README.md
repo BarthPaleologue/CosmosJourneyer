@@ -177,10 +177,11 @@ This project uses a pnpm workspace. Packages live under `packages/` and share to
 
 - `packages/game`: main Babylon.js game sources, assets, build config, and tests
 - `packages/desktop-electron`: Electron desktop shell that packages the game for desktop distribution
-- `packages/physics`: shared source-only physics formulas, constants, and unit conversions
-- `packages/universe-model`: shared source-only star system and orbital object data models
-- `packages/universe-generation`: shared source-only procedural generators for universe model data
-- `packages/babylonjs-shader-language`: shared source-only wrapper for BabylonJS Node Materials, to be used in the game and in the shader playgrounds
+- `packages/physics`: physics formulas, constants, and unit conversions
+- `packages/universe-model`: star system and orbital object data models
+- `packages/universe-generation`: procedural generators for universe model data
+- `packages/babylonjs-shader-language`: wrapper for BabylonJS Node Materials
+- `packages/typescript`: TypeScript types and utilities
 - `packages/channel-packer`: web-only tool to pack the game channels into a single file for easier distribution
 - `packages/website`: Next.js website sources and build config
 

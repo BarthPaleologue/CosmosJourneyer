@@ -19,8 +19,8 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
-import type { DeepReadonly } from "#/utils/types";
 import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type GasPlanetModel, type Orbit, type StellarObjectModel } from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 

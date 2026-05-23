@@ -17,6 +17,7 @@
 
 import type AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import type { Result } from "@cosmos-journeyer/typescript";
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
@@ -32,7 +33,6 @@ import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 

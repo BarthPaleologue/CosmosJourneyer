@@ -22,7 +22,6 @@ import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { randomPieChart, wheelOfFortune } from "#/utils/random";
 import { generateSpaceElevatorName } from "#/utils/strings/spaceStationNameGenerator";
-import { assertUnreachable, type DeepReadonly } from "#/utils/types";
 import {
     getOrbitRadiusFromPeriod,
     getSolarPanelSurfaceFromEnergyRequirement,
@@ -30,6 +29,7 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type PlanetModel,
     type Orbit,

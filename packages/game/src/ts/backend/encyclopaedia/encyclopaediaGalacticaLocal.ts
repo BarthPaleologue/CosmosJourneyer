@@ -1,3 +1,4 @@
+import { assertUnreachable, err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
 import {
     type GasPlanetModel,
     type TelluricPlanetModel,
@@ -6,8 +7,6 @@ import {
 } from "@cosmos-journeyer/universe-model";
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
-
-import { assertUnreachable, err, ok, type DeepReadonly, type Result } from "@/utils/types";
 
 import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
 

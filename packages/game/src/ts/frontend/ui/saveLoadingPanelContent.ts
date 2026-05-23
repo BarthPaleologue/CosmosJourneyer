@@ -1,4 +1,5 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
@@ -8,8 +9,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
-
-import { type DeepReadonly, type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 

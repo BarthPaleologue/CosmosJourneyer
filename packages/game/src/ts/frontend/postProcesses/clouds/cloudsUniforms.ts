@@ -18,13 +18,13 @@
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type CloudsModel } from "@cosmos-journeyer/universe-model";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
 import { type ItemPool } from "@/utils/itemPool";
 import { gcd } from "@/utils/math";
-import { type DeepReadonly } from "@/utils/types";
 
 import { type CloudsLut } from "./cloudsLut";
 

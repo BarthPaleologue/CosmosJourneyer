@@ -19,7 +19,6 @@ import { CloudLayerHeight, ScaledEarthRadius } from "#/constants";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
-import type { DeepReadonly, NonEmptyArray } from "#/utils/types";
 import {
     computeEffectiveTemperature,
     degreesToRadians,
@@ -30,6 +29,7 @@ import {
     hasLiquidWater,
     MoonMass,
 } from "@cosmos-journeyer/physics";
+import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import {
     type AtmosphereModel,
     type CloudsModel,

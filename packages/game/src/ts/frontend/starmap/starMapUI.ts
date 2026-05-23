@@ -19,6 +19,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { factionToString } from "@cosmos-journeyer/universe-generation";
 import {
     starSystemCoordinatesEquals,
@@ -33,7 +34,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
-import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 

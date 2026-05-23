@@ -1,7 +1,7 @@
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { Faction, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
-import { assertUnreachable } from "../utils/types";
 import { getPowerPlayData } from "./powerplay";
 
 export function factionToString(faction: Faction): string {
