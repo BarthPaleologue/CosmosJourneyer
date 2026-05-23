@@ -17,12 +17,11 @@
 
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
 import type { Objects } from "@/frontend/assets/objects";
 import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
-
-import { assertUnreachable } from "@/utils/types";
 
 import { createInstancePatch } from "../../../../../helpers/instancing";
 

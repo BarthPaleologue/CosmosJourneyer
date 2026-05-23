@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { err, ok, type Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -24,7 +25,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 
 import { PriorityQueue } from "@/utils/priorityQueue";
-import { err, ok, type Result } from "@/utils/types";
 
 type Node = {
     coordinates: StarSystemCoordinates;

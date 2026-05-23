@@ -21,6 +21,7 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { celsiusToKelvin } from "@cosmos-journeyer/physics";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 import {
     abs,
@@ -63,7 +64,6 @@ import {
     type TriPlanarMaterialSamples,
 } from "@/utils/bslExtensions";
 import { lerp } from "@/utils/math";
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 type WorldType =
     /** World with atmosphere and liquid water */

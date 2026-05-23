@@ -19,9 +19,8 @@ import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getKerrMetricA } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
-
-import { type DeepReadonly } from "@/utils/types";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",

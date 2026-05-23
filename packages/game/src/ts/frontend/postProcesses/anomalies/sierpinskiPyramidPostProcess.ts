@@ -23,6 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type SierpinskiPyramidModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
@@ -34,8 +35,6 @@ import {
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
 import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import sierpinskiFragment from "@shaders/sierpinski.glsl";
 

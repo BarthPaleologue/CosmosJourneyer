@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3, Scene, TransformNode, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";

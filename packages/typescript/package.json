@@ -1,0 +1,28 @@
+{
+    "name": "@cosmos-journeyer/typescript",
+    "version": "1.11.0-dev",
+    "private": true,
+    "description": "Generic TypeScript helper types and functions shared across Cosmos Journeyer packages.",
+    "license": "AGPL-3.0-only",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/typescript"
+    },
+    "type": "module",
+    "sideEffects": false,
+    "types": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check"
+    },
+    "devDependencies": {
+        "eslint": "catalog:",
+        "oxfmt": "catalog:",
+        "typescript": "catalog:"
+    }
+}

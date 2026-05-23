@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { AxisComposite } from "@brianchirls/game-input/browser";
+import type { Result } from "@cosmos-journeyer/typescript";
 
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
@@ -26,7 +27,6 @@ import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControls
 import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 

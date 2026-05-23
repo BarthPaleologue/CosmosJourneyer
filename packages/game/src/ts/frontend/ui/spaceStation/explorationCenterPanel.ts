@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -22,8 +24,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
-
-import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

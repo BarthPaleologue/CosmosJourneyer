@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { assertUnreachable } from "@/utils/types";
+import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import informationIcon from "@assets/icons/information.webp";
 import explorationIcon from "@assets/icons/space-exploration.webp";

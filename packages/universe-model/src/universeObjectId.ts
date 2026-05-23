@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import { type DeepReadonly } from "./common";
 import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjects/orbitalObjectId";
 import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";

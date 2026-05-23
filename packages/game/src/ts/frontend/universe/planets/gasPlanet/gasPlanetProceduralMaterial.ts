@@ -20,14 +20,13 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type GasPlanetProceduralColorPalette } from "@cosmos-journeyer/universe-model";
 
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";

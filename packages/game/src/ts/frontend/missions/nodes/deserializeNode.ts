@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+
 import { type MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
 import {
@@ -26,8 +28,6 @@ import {
 } from "@/backend/missions/missionNodeSerialized";
 import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
-
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";

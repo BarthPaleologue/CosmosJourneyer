@@ -28,6 +28,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     starSystemCoordinatesEquals,
     type StarSystemCoordinates,
@@ -78,7 +79,6 @@ import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { type View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { type DeepReadonly } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";

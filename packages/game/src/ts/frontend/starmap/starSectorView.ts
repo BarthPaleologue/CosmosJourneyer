@@ -18,13 +18,12 @@
 import { BoundingBox } from "@babylonjs/core/Culling/boundingBox";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type StarSystemCoordinates, type StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-
-import { type DeepReadonly } from "@/utils/types";
 
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;

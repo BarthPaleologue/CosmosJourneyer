@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+
 import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import {
     getDiscoveryScannerSpec,
@@ -25,8 +27,6 @@ import { getFuelTankSpecs, type SerializedFuelTank } from "@/backend/spaceship/s
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
 import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
-
-import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

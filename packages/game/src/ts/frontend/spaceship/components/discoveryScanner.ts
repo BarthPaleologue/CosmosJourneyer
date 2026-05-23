@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import {
     getDiscoveryScannerSpec,
@@ -23,8 +24,6 @@ import {
 } from "@/backend/spaceship/serializedComponents/discoveryScanner";
 
 import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
-
-import { assertUnreachable } from "@/utils/types";
 
 export class DiscoveryScanner {
     readonly type;

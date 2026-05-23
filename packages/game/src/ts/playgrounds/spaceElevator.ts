@@ -20,11 +20,10 @@ import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
+import { generateSpaceElevatorModel, generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
-import { generateSpaceElevatorModel } from "@/backend/universe/proceduralGenerators/orbitalFacilities/spaceElevatorModelGenerator";
-import { generateTelluricPlanetModel } from "@/backend/universe/proceduralGenerators/telluricPlanetModelGenerator";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";

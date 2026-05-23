@@ -19,11 +19,10 @@ import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstra
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { SoundState } from "@babylonjs/core/AudioV2/soundState";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { type Musics } from "@/frontend/assets/audio/musics";
 import { type StarSystemView } from "@/frontend/starSystemView";
-
-import { assertUnreachable } from "@/utils/types";
 
 export class MusicConductor {
     private currentMusic: AbstractSound | null = null;

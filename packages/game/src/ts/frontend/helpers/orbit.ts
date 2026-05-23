@@ -1,10 +1,10 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { computeLpFactor, getOrbitalPeriod, keplerEquation } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Orbit } from "@cosmos-journeyer/universe-model";
 
 import { findMinimumNewtonRaphson } from "@/utils/math";
-import type { DeepReadonly } from "@/utils/types";
 
 /**
  *

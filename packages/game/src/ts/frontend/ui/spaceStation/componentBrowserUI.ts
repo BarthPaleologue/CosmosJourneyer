@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-
-import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

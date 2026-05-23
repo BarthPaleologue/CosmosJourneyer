@@ -29,6 +29,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type OrbitalFacilityModel, type LandingBayModel } from "@cosmos-journeyer/universe-model";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
@@ -36,8 +37,6 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import { assertUnreachable, type DeepReadonly } from "@/utils/types";
 
 import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";

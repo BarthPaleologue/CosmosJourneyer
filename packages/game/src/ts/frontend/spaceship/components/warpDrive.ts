@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+
 import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
 import { clamp, lerpSmooth, remap } from "@/utils/math";
-import { assertUnreachable } from "@/utils/types";
 
 type WarpDriveState = "disabled" | "enabled" | "disengaging";
 

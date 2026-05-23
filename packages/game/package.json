@@ -54,6 +54,8 @@
         "@babylonjs/node-editor": "^8.48.0",
         "@brianchirls/game-input": "^0.1.1",
         "@cosmos-journeyer/physics": "workspace:^",
+        "@cosmos-journeyer/typescript": "workspace:^",
+        "@cosmos-journeyer/universe-generation": "workspace:^",
         "@cosmos-journeyer/universe-model": "workspace:^",
         "babylonjs-shading-language": "workspace:^",
         "d3": "^7.9.0",

@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type OrbitalObjectModel, type OrbitalObjectType } from "@cosmos-journeyer/universe-model";
-
-import { type DeepReadonly } from "@/utils/types";
 
 import { type Transformable } from "./transformable";
 

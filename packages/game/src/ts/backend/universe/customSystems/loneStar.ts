@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
+import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
 import { type StarSystemModel } from "@cosmos-journeyer/universe-model";
-
-import { generateSpaceStationModel } from "../proceduralGenerators/orbitalFacilities/spaceStationModelGenerator";
 
 export function getLoneStarSystem(): StarSystemModel {
     const systemModel: StarSystemModel = {

@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Result } from "@cosmos-journeyer/typescript";
+
 import { safeParseSave, type Save } from "@/backend/save/saveFileData";
 import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -24,7 +26,6 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { type Result } from "@/utils/types";
 
 import i18n from "@/i18n";
 

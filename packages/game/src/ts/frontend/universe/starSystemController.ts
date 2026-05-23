@@ -19,6 +19,7 @@ import { type Color3, Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import {
     type OrbitalObjectId,
     type StarSystemCoordinates,
@@ -31,8 +32,6 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { SystemTarget } from "@/frontend/universe/systemTarget";
-
-import { type DeepReadonly, type NonEmptyArray } from "@/utils/types";
 
 import { Settings } from "@/settings";
 

@@ -21,6 +21,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -36,7 +37,6 @@ import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/univ
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import { type ItemPool } from "@/utils/itemPool";
-import { type DeepReadonly } from "@/utils/types";
 
 import { CollisionMask, Settings } from "@/settings";
 

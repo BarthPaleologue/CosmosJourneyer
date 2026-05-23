@@ -18,6 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import {
     starSystemCoordinatesEquals,
     type StarSystemCoordinates,
@@ -34,7 +35,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { parseDistance } from "@/utils/strings/parseToStrings";
-import { assertUnreachable } from "@/utils/types";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";

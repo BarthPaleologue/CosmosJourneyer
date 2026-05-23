@@ -15,8 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { err, ok, type Result } from "@cosmos-journeyer/typescript";
+import { generateDarkKnightModel } from "@cosmos-journeyer/universe-generation";
+
 import { hashArray } from "@/utils/hash";
-import { err, ok, type Result } from "@/utils/types";
 
 import type { ICosmosJourneyerBackend } from ".";
 import { EncyclopaediaGalacticaLocal } from "./encyclopaedia/encyclopaediaGalacticaLocal";
@@ -28,7 +30,6 @@ import { SaveBackendSingleFile } from "./save/saveBackendSingleFile";
 import { SaveLocalStorage } from "./save/saveLocalStorage";
 import { getLoneStarSystem } from "./universe/customSystems/loneStar";
 import { registerCustomSystems } from "./universe/customSystems/registerCustomSystems";
-import { generateDarkKnightModel } from "./universe/proceduralGenerators/anomalies/darkKnightModelGenerator";
 import { UniverseBackend } from "./universe/universeBackend";
 
 export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {

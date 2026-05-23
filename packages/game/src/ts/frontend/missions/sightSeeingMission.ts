@@ -16,14 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { type UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-
-import { assertUnreachable } from "@/utils/types";
 
 import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";

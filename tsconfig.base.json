@@ -24,6 +24,6 @@
         "verbatimModuleSyntax": true,
         "erasableSyntaxOnly": true,
         "moduleDetection": "force",
-        "lib": ["ES2025", "DOM", "WebWorker"]
+        "lib": ["ES2025"]
     }
 }

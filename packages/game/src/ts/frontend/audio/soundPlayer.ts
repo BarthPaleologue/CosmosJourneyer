@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { type Sounds } from "@/frontend/assets/audio/sounds";
-
-import { assertUnreachable } from "@/utils/types";
 
 import { SoundInstance, SoundInstanceMock, type ISoundInstance, type SoundInstanceOptions } from "./soundInstance";
 
