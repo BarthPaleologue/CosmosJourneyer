@@ -153,10 +153,10 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
     return instanceBuffers.map(
         (b) =>
             ({
-                matrices: b.matrices.subarray(0, b.count * 16),
-                positions: b.positions.subarray(0, b.count * 3),
-                rotations: b.rotations.subarray(0, b.count * 4),
-                scales: b.scales.subarray(0, b.count),
+                matrices: b.matrices.slice(0, b.count * 16),
+                positions: b.positions.slice(0, b.count * 3),
+                rotations: b.rotations.slice(0, b.count * 4),
+                scales: b.scales.slice(0, b.count),
                 count: b.count,
             }) satisfies ScatteringLayerBuffers,
     ) as ScatteringLayersBuffers<TLayers>;
