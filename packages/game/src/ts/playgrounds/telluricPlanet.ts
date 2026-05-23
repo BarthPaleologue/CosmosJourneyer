@@ -61,7 +61,7 @@ export async function createTelluricPlanetScene(
 
     const stellarLightSystem = new StellarLightSystem(scene);
 
-    const scatteringSystem = new ScatteringSystem(assets.objects, stellarLightSystem);
+    const scatteringSystem = new ScatteringSystem(assets.objects, stellarLightSystem, scene);
 
     const scalingFactor = Settings.EARTH_RADIUS * 2;
 

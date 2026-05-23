@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ScatteredInstances } from "./scatteringSystem";
+import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
 
 export type ChunkId = string;
@@ -29,7 +29,7 @@ export type ChunkForgeCompletedOutput = {
     positions: Float32Array;
     normals: Float32Array;
     indices: Uint16Array;
-    scatteredInstances: ScatteredInstances;
+    scatteredInstances: ScatteredInstanceBuffers;
 };
 
 export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;

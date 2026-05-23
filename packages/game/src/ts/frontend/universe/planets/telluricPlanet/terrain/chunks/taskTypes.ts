@@ -22,7 +22,7 @@ import { z } from "zod";
 
 import type { ChunkId } from "./chunkForge";
 import { type FaceIndex } from "./faceIndex";
-import { ScatteredInstancesSchema } from "./scatteringSystem";
+import { ScatteredInstanceBuffersSchema } from "./scatteringSystem";
 
 export type BuildTask = {
     chunkId: ChunkId;
@@ -37,7 +37,7 @@ export const ReturnedChunkDataSchema = z.object({
     positions: z.instanceof(Float32Array),
     normals: z.instanceof(Float32Array),
     indices: z.instanceof(Uint16Array),
-    scatteredInstances: ScatteredInstancesSchema,
+    scatteredInstances: ScatteredInstanceBuffersSchema,
 });
 
 export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;
