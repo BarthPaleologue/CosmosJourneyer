@@ -21,9 +21,8 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
 import type { Objects } from "@/frontend/assets/objects";
+import { createInstancePatch } from "@/frontend/helpers/instancing";
 import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
-
-import { createInstancePatch } from "../../../../../helpers/instancing";
 
 export const AssetTypeSchema = z.enum(["grass", "rock", "tree", "butterfly"]);
 
