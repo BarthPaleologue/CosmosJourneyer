@@ -68,7 +68,7 @@ export async function loadObjects(
     const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);
     const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
     const humanoidsPromise = loadHumanoidPrefabs(scene, progressMonitor);
-    const rockPromise = loadRock(scene, progressMonitor);
+    const rockPromise = loadRock(materials.rock, scene, progressMonitor);
     const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
     const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath, scene, progressMonitor);

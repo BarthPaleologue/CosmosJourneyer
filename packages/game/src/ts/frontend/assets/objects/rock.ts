@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Mesh } from "@babylonjs/core/Meshes";
 import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
@@ -28,6 +29,7 @@ import { loadAssetInContainerAsync } from "./utils";
 import rockPath from "@assets/rock.glb";
 
 export async function loadRock(
+    material: Material,
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<{
@@ -46,6 +48,7 @@ export async function loadRock(
     mesh.bakeCurrentTransformIntoVertices();
     mesh.isVisible = false;
     mesh.receiveShadows = true;
+    mesh.material = material;
 
     rockContainer.addAllToScene();
 
