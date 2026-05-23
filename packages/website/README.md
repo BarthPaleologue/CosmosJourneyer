@@ -50,8 +50,8 @@ Run the following from `packages/website`:
 
 ## Tech Stack
 
-- **Next.js 14** - React framework with App Router
-- **React 18** - UI library with modern features
+- **Next.js 16** - React framework with App Router
+- **React 19** - UI library with modern features
 - **TypeScript** - Type-safe JavaScript
-- **Sass/SCSS** - CSS preprocessor
+- **CSS** - Styling with native CSS nesting
 - **ESLint + oxfmt** - Code quality tools

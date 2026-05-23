@@ -1,5 +1,5 @@
 @keyframes spin {
-    // show all the 4 faces of the cube that are not the right face or the left face
+    /* show all the 4 faces of the cube that are not the right face or the left face */
     0% {
         transform: rotateX(0deg);
     }
