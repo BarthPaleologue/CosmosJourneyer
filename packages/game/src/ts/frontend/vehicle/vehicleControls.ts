@@ -57,6 +57,7 @@ export class VehicleControls implements Controls {
             scene,
         );
         this.thirdPersonCamera.lowerRadiusLimit = 5;
+        this.thirdPersonCamera.upperRadiusLimit = 100;
         this.thirdPersonCamera.parent = this.thirdPersonTransform;
         this.thirdPersonCameraDefaultAlpha = this.thirdPersonCamera.alpha;
         this.thirdPersonCameraDefaultBeta = this.thirdPersonCamera.beta;
