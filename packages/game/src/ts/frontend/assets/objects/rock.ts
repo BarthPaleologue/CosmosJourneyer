@@ -17,7 +17,7 @@
 
 import type { Material } from "@babylonjs/core/Materials/material";
 import { Mesh } from "@babylonjs/core/Meshes";
-import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
@@ -59,7 +59,7 @@ export async function loadRock(
         clone.scaling.scaleInPlace(size);
         clone.bakeCurrentTransformIntoVertices();
 
-        const shape = new PhysicsShapeMesh(clone, scene);
+        const shape = new PhysicsShapeConvexHull(clone, scene);
         shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
         sizeToShape.set(size, shape);
