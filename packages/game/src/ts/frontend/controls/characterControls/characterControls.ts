@@ -60,7 +60,7 @@ export class CharacterControls implements Controls {
             scene,
         );
         this.thirdPersonCamera.lowerRadiusLimit = 2;
-        this.thirdPersonCamera.upperRadiusLimit = 500;
+        this.thirdPersonCamera.upperRadiusLimit = 100;
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;

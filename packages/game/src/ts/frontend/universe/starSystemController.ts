@@ -136,7 +136,7 @@ export class StarSystemController {
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
         this.stellarLightSystem = new StellarLightSystem(this.scene);
-        this.scatteringSystem = new ScatteringSystem(this.assets.objects, this.stellarLightSystem);
+        this.scatteringSystem = new ScatteringSystem(this.assets.objects, this.stellarLightSystem, this.scene);
 
         for (const orbitalFacility of this.orbitalFacilities) {
             this.orbitalFacilityToParents.set(

@@ -19,13 +19,15 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
 
+import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
+
 import { smoothstep } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
 import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "../../../../../helpers/instancing";
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
-import type { ScatteredInstances } from "../chunks/scatteringSystem";
+import type { ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
 import { type ReturnedChunkData } from "../chunks/taskTypes";
 import { type TransferBuildData } from "../chunks/workerDataTypes";
 
@@ -92,11 +94,11 @@ function handle_build(data: TransferBuildData): void {
 
     scattered_point_buffer = scattered_point_buffer.subarray(0, result.nb_instances_created * 6);
 
-    const scatteredInstances: ScatteredInstances = {};
+    const scatteredInstances: ScatteredInstanceBuffers = {};
     if (scattered_point_buffer.length !== 0) {
         const rockLayer: ScatteringLayer = () => ({
             density: 1 / 15 ** 2,
-            scalingOverride: Vector3.One().scaleInPlace(0.2 + 4 * Math.random() ** 2),
+            scalingOverride: AvailableRockSizes[Math.floor(AvailableRockSizes.length * Math.random() ** 2)] ?? 1,
             rotationOverride: Quaternion.FromEulerAngles(
                 Math.random() * Math.PI,
                 Math.random() * Math.PI,
@@ -150,7 +152,7 @@ function handle_build(data: TransferBuildData): void {
                         gravityUp,
                         Quaternion.Identity(),
                     ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
-                    scalingOverride: Vector3.One().scaleInPlace(0.5 + 2 * Math.random() ** 1.5),
+                    scalingOverride: 0.5 + 2 * Math.random() ** 1.5,
                 };
             };
 
@@ -187,11 +189,33 @@ function handle_build(data: TransferBuildData): void {
             scatteredInstances.grass = grassBuffer;
             scatteredInstances.tree = treeBuffer;
             scatteredInstances.butterfly = butterflyBuffer;
-            transfer.push(rockBuffer.buffer, grassBuffer.buffer, treeBuffer.buffer, butterflyBuffer.buffer);
+            transfer.push(
+                rockBuffer.matrices.buffer,
+                rockBuffer.positions.buffer,
+                rockBuffer.rotations.buffer,
+                rockBuffer.scales.buffer,
+                grassBuffer.matrices.buffer,
+                grassBuffer.positions.buffer,
+                grassBuffer.rotations.buffer,
+                grassBuffer.scales.buffer,
+                treeBuffer.matrices.buffer,
+                treeBuffer.positions.buffer,
+                treeBuffer.rotations.buffer,
+                treeBuffer.scales.buffer,
+                butterflyBuffer.matrices.buffer,
+                butterflyBuffer.positions.buffer,
+                butterflyBuffer.rotations.buffer,
+                butterflyBuffer.scales.buffer,
+            );
         } else {
             const [rockBuffer] = filterPoints(scattered_point_buffer, [rockLayer]);
             scatteredInstances.rock = rockBuffer;
-            transfer.push(rockBuffer.buffer);
+            transfer.push(
+                rockBuffer.matrices.buffer,
+                rockBuffer.positions.buffer,
+                rockBuffer.rotations.buffer,
+                rockBuffer.scales.buffer,
+            );
         }
     }
 

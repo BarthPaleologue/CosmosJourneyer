@@ -107,6 +107,15 @@ export async function createStarSystemViewScene(
             }
             break;
         }
+        case "aroundMoon": {
+            const moon = starSystemView.getStarSystem().getPlanetaryMassObjects()[3];
+            if (moon === undefined) {
+                console.warn("Moon not found, spawning near star instead");
+                break;
+            }
+            positionNearObjectBrightSide(shipControls, moon, starSystemView.getStarSystem());
+            break;
+        }
         case "aroundStar":
         case null:
         default:

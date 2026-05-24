@@ -21,7 +21,7 @@ import "@babylonjs/loaders";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
+import { type PhysicsShape, PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
@@ -32,10 +32,10 @@ import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
 import { loadAsteroids, type Asteroid } from "./asteroids";
 import { loadHumanoidPrefabs, type HumanoidPrefabs } from "./humanoids";
+import { loadRock } from "./rock";
 import { loadAssetInContainerAsync } from "./utils";
 
 import bananaPath from "@assets/banana/banana.glb";
-import rockPath from "@assets/rock.glb";
 import wandererPath from "@assets/spaceship/wanderer.glb";
 import stationEnginePath from "@assets/SpaceStationParts/engine.glb";
 import treePath from "@assets/tree/tree.babylon";
@@ -47,7 +47,10 @@ export type Objects = {
     butterfly: Mesh;
     banana: Mesh;
     humanoids: Readonly<HumanoidPrefabs>;
-    rock: Mesh;
+    rock: {
+        mesh: Mesh;
+        sizeToShape: Map<number, PhysicsShape>;
+    };
     asteroids: ReadonlyArray<Asteroid>;
     tree: Mesh;
     stationEngine: {
@@ -65,7 +68,7 @@ export async function loadObjects(
     const wandererPromise = loadAssetInContainerAsync("Wanderer", wandererPath, scene, progressMonitor);
     const bananaPromise = loadAssetInContainerAsync("Banana", bananaPath, scene, progressMonitor);
     const humanoidsPromise = loadHumanoidPrefabs(scene, progressMonitor);
-    const rockPromise = loadAssetInContainerAsync("Rock", rockPath, scene, progressMonitor);
+    const rockPromise = loadRock(materials.rock, scene, progressMonitor);
     const asteroidPromises = loadAsteroids(scene, progressMonitor);
     const treePromise = loadAssetInContainerAsync("Tree", treePath, scene, progressMonitor);
     const stationEnginePromise = loadAssetInContainerAsync("StationEngine", stationEnginePath, scene, progressMonitor);
@@ -106,21 +109,6 @@ export async function loadObjects(
     }
 
     bananaContainer.addAllToScene();
-
-    const rockContainer = await rockPromise;
-    const rock = rockContainer.meshes[1];
-    if (!(rock instanceof Mesh)) {
-        throw new Error("Rock root node is not a Mesh");
-    }
-
-    rock.setParent(null);
-    rock.position.y = 0.1;
-    rock.scaling.scaleInPlace(0.2);
-    rock.bakeCurrentTransformIntoVertices();
-    rock.isVisible = false;
-    rock.receiveShadows = true;
-
-    rockContainer.addAllToScene();
 
     const treeContainer = await treePromise;
     const tree = treeContainer.meshes[0];
@@ -164,7 +152,7 @@ export async function loadObjects(
         },
         tree,
         asteroids: await asteroidPromises,
-        rock,
+        rock: await rockPromise,
         humanoids: await humanoidsPromise,
         banana,
         butterfly,

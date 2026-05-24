@@ -26,6 +26,7 @@ import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
+import { RockMaterial } from "../procedural/rock/rockMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
 import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
@@ -35,6 +36,7 @@ import { CrateMaterial } from "./crate";
 export type Materials = {
     readonly butterfly: Material;
     readonly grass: Material;
+    readonly rock: Material;
     readonly crate: CrateMaterial;
     readonly solarPanel: SolarPanelMaterial;
     readonly tree: PBRMetallicRoughnessMaterial;
@@ -80,6 +82,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     return {
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
+        rock: new RockMaterial(textures.terrains.rock, scene).get(),
         crate: crateMaterial,
         solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,
