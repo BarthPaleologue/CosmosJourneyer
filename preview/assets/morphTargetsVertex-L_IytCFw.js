@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertex-Cb9ka-e6.js";t();export{e as morphTargetsVertex};

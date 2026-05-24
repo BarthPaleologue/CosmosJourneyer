@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.vertex-CoqO2xj9.js";e();export{t as backgroundVertexShader};

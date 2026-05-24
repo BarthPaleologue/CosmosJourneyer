@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertexDeclaration-jUPyytMr.js";t();export{e as morphTargetsVertexDeclaration};

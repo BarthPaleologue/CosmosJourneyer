@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex-DLNDR92H.js";e();export{t as defaultVertexShaderWGSL};

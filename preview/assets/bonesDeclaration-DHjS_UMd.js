@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesDeclaration-KbVj4Z08.js";e();export{t as bonesDeclaration};

@@ -1,0 +1,1 @@
+import{r as e,t}from"./openpbrMaterial-DIQp6g8N.js";e();export{t as OpenPBRMaterial};

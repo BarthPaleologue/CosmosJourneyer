@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblVoxelGrid.vertex-ZIlDyUlk.js";e();export{t as iblVoxelGridVertexShaderWGSL};
