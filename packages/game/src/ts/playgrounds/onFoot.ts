@@ -110,6 +110,7 @@ export async function createOnFootScene(
     };
 
     const grassPatch = createInstancePatch(
+        "grassPatch",
         grassBladeMesh,
         createSquareMatrixBuffer(Vector3.Zero(), 128, 128 * 6, wrappedRng),
     );
@@ -122,6 +123,7 @@ export async function createOnFootScene(
     butterflyMesh.material = butterflyMaterial.get();
 
     const butterflyPatch = createInstancePatch(
+        "butterflyPatch",
         butterflyMesh,
         createSquareMatrixBuffer(Vector3.Zero(), 128, 128, wrappedRng),
     );

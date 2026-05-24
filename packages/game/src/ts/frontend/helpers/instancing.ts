@@ -162,8 +162,8 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
     ) as ScatteringLayersBuffers<TLayers>;
 }
 
-export function createInstancePatch(baseMesh: Mesh, matrixBuffer: Float32Array): Mesh {
-    const mesh = baseMesh.clone();
+export function createInstancePatch(name: string, baseMesh: Mesh, matrixBuffer: Float32Array): Mesh {
+    const mesh = baseMesh.clone(name);
     mesh.makeGeometryUnique();
     mesh.isVisible = true;
     mesh.alwaysSelectAsActiveMesh = true;

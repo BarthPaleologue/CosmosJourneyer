@@ -106,7 +106,7 @@ export class ScatteringSystem implements IScatteringSystem {
                     assertUnreachable(assetType);
             }
 
-            mesh = createInstancePatch(mesh, buffers.matrices);
+            mesh = createInstancePatch(`${chunkTransform.name}_${assetType}`, mesh, buffers.matrices);
 
             const chunkAbsolutePosition = chunkTransform.getAbsolutePosition();
             const chunkRotationQuaternion = chunkTransform.absoluteRotationQuaternion;

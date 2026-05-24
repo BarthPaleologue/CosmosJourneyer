@@ -63,7 +63,7 @@ export async function createButterflyScene(
     };
 
     const matrixBuffer = createSquareMatrixBuffer(Vector3.Zero(), 32, 128, wrappedRng);
-    createInstancePatch(butterflyMesh, matrixBuffer);
+    createInstancePatch("butterflyPatch", butterflyMesh, matrixBuffer);
 
     return scene;
 }

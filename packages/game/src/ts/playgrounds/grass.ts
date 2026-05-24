@@ -87,6 +87,7 @@ export async function createGrassScene(
     };
 
     const grassPatch = createInstancePatch(
+        "grassPatch",
         grassBladeMesh,
         createSquareMatrixBuffer(Vector3.Zero(), 32, 256, wrappedRng),
     );
