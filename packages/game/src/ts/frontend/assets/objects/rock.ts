@@ -62,6 +62,8 @@ export async function loadRock(
         const shape = new PhysicsShapeConvexHull(clone, scene);
         shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+        shape.material.friction = 2;
+        shape.material.restitution = 0;
         sizeToShape.set(size, shape);
 
         clone.dispose();
