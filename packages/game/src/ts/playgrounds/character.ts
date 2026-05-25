@@ -71,7 +71,7 @@ export async function createCharacterDemoScene(
     groundMaterial.baseColor = new Color3(0.5, 0.5, 0.5);
     ground.material = groundMaterial;
 
-    const humanoidInstance = humanoids.placeholder.spawn();
+    const humanoidInstance = humanoids.astronaut.spawn();
     if (!humanoidInstance.success) {
         throw new Error(`Failed to instantiate character: ${humanoidInstance.error}`);
     }
