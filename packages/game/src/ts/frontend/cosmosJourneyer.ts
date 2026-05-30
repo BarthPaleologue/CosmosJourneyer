@@ -17,7 +17,6 @@
 
 import "@babylonjs/core/Engines/Extensions/";
 import "@babylonjs/core/Engines/WebGPU/Extensions/";
-import "@babylonjs/core/Misc/screenshotTools";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
@@ -28,7 +27,6 @@ import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { Tools } from "@babylonjs/core/Misc/tools";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
@@ -53,6 +51,7 @@ import { SoundPlayer, SoundPlayerMock, type ISoundPlayer } from "@/frontend/audi
 import { Tts } from "@/frontend/audio/tts";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
+import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
@@ -619,15 +618,36 @@ export class CosmosJourneyer {
     /**
      * Takes a screenshot of the current scene. By default, the screenshot is taken at a 4x the resolution of the canvas
      */
-    public async takeScreenshot(): Promise<boolean> {
+    public async takeScreenshot(): Promise<void> {
         const camera = this.activeView.getMainScene().activeCamera;
         if (camera === null) {
             await alertModal("Cannot take screenshot: camera is null", this.soundPlayer);
-            return false;
+            return;
         }
 
-        Tools.CreateScreenshot(this.engine, camera, { precision: 1 });
-        return true;
+        const currentDate = new Date();
+        const timestamp = currentDate.toLocaleString().replace(/[/:]/g, "-").replace(/,/g, "");
+        const screenshotName = `cosmos-journeyer-${timestamp}.png`;
+
+        if (this.activeView !== this.starSystemView) {
+            const screenshotPng = await makeScreenshotPng(this.engine, camera);
+            downloadPng(screenshotPng, screenshotName);
+            return;
+        }
+
+        const activeControls = this.starSystemView.getActiveControls();
+        if (activeControls === null) {
+            const screenshotPng = await makeScreenshotPng(this.engine, camera);
+            downloadPng(screenshotPng, screenshotName);
+            return;
+        }
+
+        const screenshotPng = await makeScreenshotPng(this.engine, camera, {
+            location: this.getCurrentUniverseCoordinates(activeControls.getTransform(), null),
+        });
+
+        downloadPng(screenshotPng, screenshotName);
+        return;
     }
 
     public async takeVideoCapture(): Promise<void> {
@@ -653,7 +673,10 @@ export class CosmosJourneyer {
         }
     }
 
-    public getCurrentUniverseCoordinates(transform: TransformNode): RelativeCoordinates {
+    public getCurrentUniverseCoordinates(
+        transform: TransformNode,
+        minimumDistanceRadiusRatio: number | null = 1.1,
+    ): RelativeCoordinates {
         const currentStarSystem = this.starSystemView.getStarSystem();
 
         const currentWorldPosition = transform.getAbsolutePosition();
@@ -674,9 +697,13 @@ export class CosmosJourneyer {
             nearestOrbitalObjectInverseWorld,
         );
 
-        const distanceToNearestOrbitalObject = currentLocalPosition.length();
-        if (distanceToNearestOrbitalObject < nearestOrbitalObject.getBoundingRadius() * 1.1) {
-            currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
+        if (minimumDistanceRadiusRatio !== null) {
+            const distanceToNearestOrbitalObject = currentLocalPosition.length();
+            const minimumDistanceToNearestOrbitalObject =
+                nearestOrbitalObject.getBoundingRadius() * minimumDistanceRadiusRatio;
+            if (distanceToNearestOrbitalObject < minimumDistanceToNearestOrbitalObject) {
+                currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
+            }
         }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
@@ -722,13 +749,15 @@ export class CosmosJourneyer {
             : shipUniverseCoordinates;
 
         const camera = this.activeView.getMainScene().activeCamera;
-        let thumbnail = "";
-        if (camera) {
-            thumbnail = await Tools.CreateScreenshotAsync(this.engine, camera, {
-                width: 320,
-                height: 180,
-                precision: 0.8,
+        let thumbnailDataUrl: string | undefined = undefined;
+        if (camera !== null) {
+            const thumbnailBytes = await makeScreenshotPng(this.engine, camera, {
+                size: {
+                    width: 256,
+                    height: 144,
+                },
             });
+            thumbnailDataUrl = bytesToDataUrl(thumbnailBytes, "image/png");
         }
 
         return {
@@ -742,7 +771,7 @@ export class CosmosJourneyer {
             shipLocations: {
                 [spaceship.id]: shipLocation,
             },
-            thumbnail: thumbnail,
+            thumbnail: thumbnailDataUrl,
         };
     }
 
