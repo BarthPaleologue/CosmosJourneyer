@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.fragment-CIffyvpY.js";t();export{e as particlesPixelShader};

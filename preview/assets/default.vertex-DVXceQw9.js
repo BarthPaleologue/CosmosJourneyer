@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex-Uk6xRbDF.js";e();export{t as defaultVertexShader};

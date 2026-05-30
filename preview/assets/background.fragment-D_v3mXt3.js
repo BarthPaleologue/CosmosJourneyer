@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.fragment-Cs_ZZ1T0.js";e();export{t as backgroundPixelShader};
