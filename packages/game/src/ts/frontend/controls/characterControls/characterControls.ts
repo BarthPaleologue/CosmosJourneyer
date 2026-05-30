@@ -24,6 +24,9 @@ import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { type Scene } from "@babylonjs/core/scene";
+import { degreesToRadians } from "@cosmos-journeyer/physics";
+
+import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
@@ -37,6 +40,8 @@ export class CharacterControls implements Controls {
     private activeCamera: Camera;
 
     private readonly characterRotationSpeed = 4;
+
+    private thirdPersonCameraScreenTargetOffsetX = 0;
 
     readonly avatar: HumanoidAvatar;
     private readonly headTransform: TransformNode;
@@ -54,8 +59,8 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
             Math.PI / 2,
-            Math.PI / 3,
-            10,
+            Math.PI / 2 - Math.PI / 12,
+            3,
             new Vector3(0, 1.5, 0),
             scene,
         );
@@ -168,7 +173,64 @@ export class CharacterControls implements Controls {
             );
         }
 
+        if (this.activeCamera === this.thirdPersonCamera) {
+            this.updateThirdPersonCameraFraming(deltaSeconds);
+        }
+
         this.getActiveCamera().getViewMatrix(true);
+    }
+
+    /**
+     * Adjusts the 3rd person camera framing to obey the rule of thirds.
+     */
+    private updateThirdPersonCameraFraming(deltaSeconds: number): void {
+        const cameraForward = this.thirdPersonCamera.getForwardRay().direction;
+        const characterForward = this.getTransform().forward;
+        const characterUp = this.getTransform().up;
+        const cameraCharacterCross = cameraForward.cross(characterForward);
+        const cosTheta = cameraForward.dot(characterForward);
+        const sinTheta = cameraCharacterCross.dot(characterUp);
+        const angle = Math.atan2(sinTheta, cosTheta);
+        const absAngle = Math.abs(angle);
+
+        const isLookingLeft = angle > 0;
+
+        const angularDeadZone = degreesToRadians(20);
+        const angleCorrectionHalfLife = 1.2;
+        if (absAngle > angularDeadZone && absAngle < Math.PI / 2) {
+            const correction = -angle;
+            const target = this.thirdPersonCamera.alpha + correction;
+            this.thirdPersonCamera.alpha = lerpSmooth(
+                this.thirdPersonCamera.alpha,
+                target,
+                angleCorrectionHalfLife,
+                deltaSeconds,
+            );
+        } else if (absAngle >= Math.PI / 2 && absAngle < Math.PI - angularDeadZone) {
+            const targetAngle = Math.sign(angle) * Math.PI;
+            const correction = targetAngle - angle;
+            const target = this.thirdPersonCamera.alpha + correction;
+            this.thirdPersonCamera.alpha = lerpSmooth(
+                this.thirdPersonCamera.alpha,
+                target,
+                angleCorrectionHalfLife,
+                deltaSeconds,
+            );
+        }
+
+        this.thirdPersonCameraScreenTargetOffsetX = lerpSmooth(
+            this.thirdPersonCameraScreenTargetOffsetX,
+            (isLookingLeft ? 0.33 : -0.33) * this.thirdPersonCamera.radius,
+            1.2,
+            deltaSeconds,
+        );
+
+        this.thirdPersonCamera.targetScreenOffset.x = lerpSmooth(
+            this.thirdPersonCamera.targetScreenOffset.x,
+            this.thirdPersonCameraScreenTargetOffsetX,
+            0.5,
+            deltaSeconds,
+        );
     }
 
     dispose() {

@@ -74,6 +74,21 @@ export class CreditsPanel {
             panel.appendChild(p);
         });
 
+        const charactersAndAnimationsHeader = document.createElement("h3");
+        charactersAndAnimationsHeader.textContent = i18n.t("sidePanel:charactersAndAnimations");
+        panel.appendChild(charactersAndAnimationsHeader);
+
+        const charactersAndAnimationsCredits = [
+            'Astronaut character model from <a target="_blank" href="https://sketchfab.com/3d-models/astronaut-d5a16f7ec11c4b1d876059cbf6adbf56">Sketchfab</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution 4.0</a>',
+            'Character animations from <a target="_blank" href="https://mixamo.com/">Mixamo</a>, licensed under <a href="https://www.adobe.com/legal/terms.html" target="_blank">Adobe Terms of Use</a>',
+        ];
+
+        charactersAndAnimationsCredits.forEach((credit) => {
+            const p = document.createElement("p");
+            p.innerHTML = credit;
+            panel.appendChild(p);
+        });
+
         // Materials & Textures section
         const materialsHeader = document.createElement("h3");
         materialsHeader.textContent = i18n.t("sidePanel:materials");

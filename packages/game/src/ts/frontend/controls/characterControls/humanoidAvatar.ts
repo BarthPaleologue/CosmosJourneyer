@@ -24,6 +24,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate, PhysicsShapeCapsule, type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
+import { degreesToRadians } from "@cosmos-journeyer/physics";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -69,6 +70,9 @@ export class HumanoidAvatar implements Transformable {
     readonly runSpeed = 3.6;
     readonly swimSpeed = 1.5;
     readonly swimVerticalSpeed = 1.0;
+
+    private readonly sittingOnGroundHeadTilt = degreesToRadians(30);
+    private readonly runningHeadTilt = degreesToRadians(30);
 
     private readonly idleAnim: AnimationGroup;
     private readonly walkAnim: AnimationGroup;
@@ -385,9 +389,19 @@ export class HumanoidAvatar implements Transformable {
         );
 
         if (!this.isLookingAtTarget) {
-            this.headLookController.target.copyFrom(
-                this.getHeadPositionToRef(new Vector3()).addInPlace(this.getTransform().forward),
+            const lookDirection = this.getTransform().forward;
+
+            const totalAngle =
+                this.sittingOnGroundHeadTilt * this.sittingOnGroundIdleAnim.weight +
+                this.runningHeadTilt * this.runningAnim.weight;
+
+            lookDirection.applyRotationQuaternionInPlace(
+                Quaternion.RotationAxis(this.getTransform().right, totalAngle),
             );
+
+            const headLookTarget = this.getHeadPositionToRef(new Vector3()).addInPlace(lookDirection);
+
+            this.headLookController.target.copyFrom(headLookTarget);
         }
         this.headLookController.update();
     }

@@ -838,7 +838,7 @@ export class StarSystemView implements View {
         }
 
         if (this.characterControls === null) {
-            const humanoidInstance = this.assets.objects.humanoids.placeholder.spawn();
+            const humanoidInstance = this.assets.objects.humanoids.astronaut.spawn();
             if (humanoidInstance.success) {
                 const humanoidAvatar = new HumanoidAvatar(humanoidInstance.value, this.physicsEngine, this.scene);
                 setCollisionsEnabled(humanoidAvatar.aggregate, false);
