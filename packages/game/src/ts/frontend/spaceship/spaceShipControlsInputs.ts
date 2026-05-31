@@ -85,13 +85,13 @@ const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 const previousMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad1")],
+        bindings: [keyboard.getControl("BracketLeft")],
     }),
 );
 
 const nextMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad2")],
+        bindings: [keyboard.getControl("BracketRight")],
     }),
 );
 
