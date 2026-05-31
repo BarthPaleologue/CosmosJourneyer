@@ -48,15 +48,15 @@ import { type INotificationManager } from "../ui/notificationManager";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
+import { type ThirdPersonCameraPresetNames, thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
+
+type CameraPresetInput = (typeof SpaceShipControlsInputs.map)["resetCamera"];
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
     private readonly spaceDotsYawResponse = 5.0;
     private readonly spaceDotsPitchResponse = 5.0;
 
-    readonly thirdPersonCameraDefaultRadius = 60;
-    readonly thirdPersonCameraDefaultAlpha = 3.14 / 2;
-    readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
 
     readonly thirdPersonCameraTransform: TransformNode;
@@ -79,7 +79,11 @@ export class ShipControls implements Controls {
     private readonly landingHandler: () => void;
     private readonly emitLandingRequestHandler: () => void;
     private readonly throttleToZeroHandler: () => void;
-    private readonly resetCameraHandler: () => void;
+    private readonly resetCameraHandler: (presetName: ThirdPersonCameraPresetNames) => void;
+    private readonly cameraPresetInputHandlers: Array<{
+        readonly input: CameraPresetInput;
+        readonly handler: () => void;
+    }> = [];
 
     private readonly tts: ITts;
     private readonly soundPlayer: ISoundPlayer;
@@ -107,9 +111,9 @@ export class ShipControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "shipThirdPersonCamera",
-            this.thirdPersonCameraDefaultAlpha,
-            this.thirdPersonCameraDefaultBeta,
-            this.thirdPersonCameraDefaultRadius,
+            thirdPersonCameraPresets.behindCentered.alpha,
+            thirdPersonCameraPresets.behindCentered.beta,
+            thirdPersonCameraPresets.behindCentered.radius,
             Vector3.Zero(),
             scene,
         );
@@ -251,34 +255,54 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
-        this.resetCameraHandler = () => {
+        this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames) => {
             quickAnimation(
                 this.thirdPersonCamera,
                 "alpha",
                 this.thirdPersonCamera.alpha,
-                this.thirdPersonCameraDefaultAlpha,
+                thirdPersonCameraPresets[presetName].alpha,
                 200,
             );
             quickAnimation(
                 this.thirdPersonCamera,
                 "beta",
                 this.thirdPersonCamera.beta,
-                this.thirdPersonCameraDefaultBeta,
+                thirdPersonCameraPresets[presetName].beta,
                 200,
             );
             quickAnimation(
                 this.thirdPersonCamera,
                 "radius",
                 this.thirdPersonCamera.radius,
-                this.thirdPersonCameraDefaultRadius,
+                thirdPersonCameraPresets[presetName].radius,
                 200,
             );
-            quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
+            quickAnimation(
+                this.thirdPersonCamera,
+                "target",
+                this.thirdPersonCamera.target,
+                thirdPersonCameraPresets[presetName].target,
+                200,
+            );
         };
 
-        SpaceShipControlsInputs.map.resetCamera.on("complete", this.resetCameraHandler);
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.resetCamera, "behindCentered");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset1, "frontCentered");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset2, "onRightWing");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset3, "onLeftWing");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset4, "underBelly");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset5, "cockpitSelfie");
 
         this.setSpaceship(spaceship);
+    }
+
+    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {
+        const handler = () => {
+            this.resetCameraHandler(presetName);
+        };
+
+        input.on("complete", handler);
+        this.cameraPresetInputHandlers.push({ input, handler });
     }
 
     public getTransform(): TransformNode {
@@ -413,7 +437,7 @@ export class ShipControls implements Controls {
     }
 
     reset() {
-        this.resetCameraHandler();
+        this.resetCameraHandler("behindCentered");
         this.cameraShakeAnimation.reset();
         this.closestLandableFacility = null;
     }
@@ -512,7 +536,9 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
         SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
-        SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
+        for (const { input, handler } of this.cameraPresetInputHandlers) {
+            input.off("complete", handler);
+        }
 
         this.spaceship.dispose(soundPlayer);
         this.thirdPersonCamera.dispose();

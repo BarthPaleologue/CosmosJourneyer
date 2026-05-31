@@ -101,6 +101,36 @@ const resetCameraInteraction = new PressInteraction(
     }),
 );
 
+const switchToCameraPreset1 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad1")],
+    }),
+);
+
+const switchToCameraPreset2 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad2")],
+    }),
+);
+
+const switchToCameraPreset3 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad3")],
+    }),
+);
+
+const switchToCameraPreset4 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad4")],
+    }),
+);
+
+const switchToCameraPreset5 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad5")],
+    }),
+);
+
 export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     landing: landingInteraction,
     emitLandingRequest: emitLandingRequest,
@@ -113,6 +143,11 @@ export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     previousMission: previousMissionInteraction,
     nextMission: nextMissionInteraction,
     resetCamera: resetCameraInteraction,
+    switchToCameraPreset1,
+    switchToCameraPreset2,
+    switchToCameraPreset3,
+    switchToCameraPreset4,
+    switchToCameraPreset5,
 });
 
 SpaceShipControlsInputs.setEnabled(false);

@@ -1,6 +1,7 @@
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { CubicEase, EasingFunction } from "@babylonjs/core/Animations/easing";
-import { type ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+
+type StringKeyOf<T> = Extract<keyof T, string>;
 
 /**
  * Quick and dirty way to set up an animation and play it immediately.
@@ -11,15 +12,16 @@ import { type ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
  * @param speed The speed of the animation.
  * @see https://forum.babylonjs.com/t/how-to-build-animation-for-arcrotatecamera-so-it-can-rotate-smoothly/25698/4
  */
-export function quickAnimation<T>(
-    targetObject: ArcRotateCamera,
-    whichProp: string,
-    initialValue: T,
-    targetValue: T,
+export function quickAnimation<TObject extends object, TProp extends StringKeyOf<TObject>>(
+    targetObject: TObject,
+    whichProp: TProp,
+    initialValue: TObject[TProp],
+    targetValue: TObject[TProp],
     speed: number,
 ) {
     const ease = new CubicEase();
     ease.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT);
+
     Animation.CreateAndStartAnimation(
         "quickAnimation",
         targetObject,
