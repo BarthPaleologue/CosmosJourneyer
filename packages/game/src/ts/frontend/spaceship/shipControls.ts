@@ -38,7 +38,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { lerp, lerpSmooth } from "@/utils/math";
+import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
 
 import i18n from "@/i18n";
 
@@ -269,8 +269,8 @@ export class ShipControls implements Controls {
                 },
                 thirdPersonCameraPresets[presetName],
                 (from, to, progress) => ({
-                    alpha: lerp(from.alpha, to.alpha, progress),
-                    beta: lerp(from.beta, to.beta, progress),
+                    alpha: lerpAngle(from.alpha, to.alpha, progress),
+                    beta: lerpAngle(from.beta, to.beta, progress),
                     radius: lerp(from.radius, to.radius, progress),
                     target: Vector3.Lerp(from.target, to.target, progress),
                 }),

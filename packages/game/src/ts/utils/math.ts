@@ -87,6 +87,23 @@ export function lerp(a: number, b: number, t: number): number {
     return a + (b - a) * t;
 }
 
+export function mod(value: number, modulus: number) {
+    return ((value % modulus) + modulus) % modulus;
+}
+
+export const Tau = 2 * Math.PI;
+
+/**
+ * @param a The start angle (in radians)
+ * @param b The target angle (in radians)
+ * @param t The interpolation factor (0 to 1)
+ * @returns The interpolated angle (in radians), taking the shortest path around the circle
+ */
+export function lerpAngle(a: number, b: number, t: number): number {
+    const shortestAngleDelta = mod(b - a + Math.PI, Tau) - Math.PI;
+    return a + shortestAngleDelta * t;
+}
+
 /**
  * Frame-rate independent lerp based on Freya Holmer's tweet.
  * @param a The start value

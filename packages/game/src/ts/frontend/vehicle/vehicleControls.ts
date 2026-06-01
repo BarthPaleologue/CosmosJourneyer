@@ -23,7 +23,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { EarthG } from "@cosmos-journeyer/physics";
 
-import { lerp, lerpSmooth } from "@/utils/math";
+import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
 
 import type { Controls } from "../controls";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
@@ -115,8 +115,8 @@ export class VehicleControls implements Controls {
             },
             thirdPersonCameraPresets[presetName],
             (from, to, progress) => ({
-                alpha: lerp(from.alpha, to.alpha, progress),
-                beta: lerp(from.beta, to.beta, progress),
+                alpha: lerpAngle(from.alpha, to.alpha, progress),
+                beta: lerpAngle(from.beta, to.beta, progress),
                 radius: lerp(from.radius, to.radius, progress),
                 target: Vector3.Lerp(from.target, to.target, progress),
             }),
