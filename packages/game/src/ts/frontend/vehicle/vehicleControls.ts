@@ -23,12 +23,17 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { EarthG } from "@cosmos-journeyer/physics";
 
-import { lerpSmooth } from "@/utils/math";
+import { lerp, lerpSmooth } from "@/utils/math";
 
 import type { Controls } from "../controls";
-import { quickAnimation } from "../helpers/animations/quickAnimation";
+import { CustomAnimation } from "../helpers/animations/customAnimation";
+import { easeInOutCubic } from "../helpers/animations/interpolations";
 import { toggleDoor } from "./door";
-import { type ThirdPersonCameraPresetNames, thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
+import {
+    type ThirdPersonCameraPreset,
+    type ThirdPersonCameraPresetNames,
+    thirdPersonCameraPresets,
+} from "./thirdPersonCameraPresets";
 import { type Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
 
@@ -41,6 +46,7 @@ export class VehicleControls implements Controls {
     private readonly thirdPersonCameraYOffset = 2;
 
     readonly thirdPersonCamera: ArcRotateCamera;
+    private thirdPersonCameraAnimation: CustomAnimation<ThirdPersonCameraPreset> | null = null;
 
     readonly firstPersonCamera: FreeCamera;
 
@@ -100,12 +106,25 @@ export class VehicleControls implements Controls {
     }
 
     private resetCamera(presetName: ThirdPersonCameraPresetNames) {
-        const preset = thirdPersonCameraPresets[presetName];
-
-        quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, preset.alpha, 200);
-        quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, preset.beta, 200);
-        quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, preset.radius, 200);
-        quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, preset.target.clone(), 200);
+        this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
+            {
+                alpha: this.thirdPersonCamera.alpha,
+                beta: this.thirdPersonCamera.beta,
+                radius: this.thirdPersonCamera.radius,
+                target: this.thirdPersonCamera.target.clone(),
+            },
+            thirdPersonCameraPresets[presetName],
+            (from, to, progress) => ({
+                alpha: lerp(from.alpha, to.alpha, progress),
+                beta: lerp(from.beta, to.beta, progress),
+                radius: lerp(from.radius, to.radius, progress),
+                target: Vector3.Lerp(from.target, to.target, progress),
+            }),
+            1.0,
+            {
+                easing: easeInOutCubic,
+            },
+        );
     }
 
     shouldLockPointer(): boolean {
@@ -213,6 +232,19 @@ export class VehicleControls implements Controls {
         }
 
         this.thirdPersonTransform.computeWorldMatrix(true);
+
+        if (this.thirdPersonCameraAnimation !== null) {
+            this.thirdPersonCameraAnimation.update(deltaSeconds);
+            const { radius, alpha, beta, target } = this.thirdPersonCameraAnimation.getCurrentValue();
+            this.thirdPersonCamera.target = target;
+            this.thirdPersonCamera.radius = radius;
+            this.thirdPersonCamera.alpha = alpha;
+            this.thirdPersonCamera.beta = beta;
+            if (this.thirdPersonCameraAnimation.isFinished()) {
+                this.thirdPersonCameraAnimation = null;
+            }
+        }
+
         this.thirdPersonCamera.getViewMatrix(true);
 
         const steeringSpeed = VehicleInputs.map.steer.value * 1.8;
