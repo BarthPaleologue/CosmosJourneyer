@@ -21,7 +21,7 @@ import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { clamp } from "@/utils/math";
 
 import { type CustomAnimation } from "./animation";
-import { easeInOutInterpolation } from "./interpolations";
+import { easeInOutQuadratic } from "./interpolations";
 
 export class CameraRadiusAnimation implements CustomAnimation {
     private elapsedSeconds = 0;
@@ -44,7 +44,7 @@ export class CameraRadiusAnimation implements CustomAnimation {
 
         const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
 
-        this.camera.radius = Lerp(this.startRadius, this.targetRadius, easeInOutInterpolation(t));
+        this.camera.radius = Lerp(this.startRadius, this.targetRadius, easeInOutQuadratic(t));
     }
 
     isFinished(): boolean {

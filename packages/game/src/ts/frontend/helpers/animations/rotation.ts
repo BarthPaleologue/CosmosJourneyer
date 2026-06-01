@@ -22,7 +22,7 @@ import { clamp } from "@/utils/math";
 
 import { rotate } from "../transform";
 import { type CustomAnimation } from "./animation";
-import { easeInOutInterpolation } from "./interpolations";
+import { easeInOutQuadratic } from "./interpolations";
 
 export class TransformRotationAnimation implements CustomAnimation {
     private clock = 0;
@@ -46,7 +46,7 @@ export class TransformRotationAnimation implements CustomAnimation {
 
         const t = clamp(this.clock / this.duration, 0, 1);
 
-        const dtheta = this.totalTheta * easeInOutInterpolation(t) - this.thetaAcc;
+        const dtheta = this.totalTheta * easeInOutQuadratic(t) - this.thetaAcc;
         this.thetaAcc += dtheta;
 
         rotate(this.transform, this.axis, dtheta);

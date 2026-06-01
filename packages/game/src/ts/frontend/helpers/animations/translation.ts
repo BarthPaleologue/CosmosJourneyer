@@ -22,7 +22,7 @@ import { clamp } from "@/utils/math";
 
 import { translate } from "../transform";
 import { type CustomAnimation } from "./animation";
-import { easeInOutInterpolation } from "./interpolations";
+import { easeInOutQuadratic } from "./interpolations";
 
 export class TransformTranslationAnimation implements CustomAnimation {
     private elapsedSeconds = 0;
@@ -48,7 +48,7 @@ export class TransformTranslationAnimation implements CustomAnimation {
 
         const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
 
-        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
+        const dDistance = this.totalDistance * easeInOutQuadratic(t) - this.distanceAcc;
         this.distanceAcc += dDistance;
 
         translate(this.transform, this.direction.scale(dDistance));
