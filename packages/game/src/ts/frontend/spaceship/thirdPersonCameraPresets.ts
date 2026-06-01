@@ -17,7 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-type ThirdPersonCameraPreset = {
+export type ThirdPersonCameraPreset = {
     radius: number;
     alpha: number;
     beta: number;
