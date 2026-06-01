@@ -28,8 +28,11 @@ import { lerpSmooth } from "@/utils/math";
 import type { Controls } from "../controls";
 import { quickAnimation } from "../helpers/animations/quickAnimation";
 import { toggleDoor } from "./door";
+import { type ThirdPersonCameraPresetNames, thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
 import { type Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
+
+type CameraPresetInput = (typeof VehicleInputs.map)["resetCamera"];
 
 export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
@@ -38,9 +41,6 @@ export class VehicleControls implements Controls {
     private readonly thirdPersonCameraYOffset = 2;
 
     readonly thirdPersonCamera: ArcRotateCamera;
-    private readonly thirdPersonCameraDefaultAlpha: number;
-    private readonly thirdPersonCameraDefaultBeta: number;
-    private readonly thirdPersonCameraDefaultRadius: number;
 
     readonly firstPersonCamera: FreeCamera;
 
@@ -50,18 +50,15 @@ export class VehicleControls implements Controls {
         this.thirdPersonTransform = new TransformNode("thirdPersonTransform", scene);
         this.thirdPersonCamera = new ArcRotateCamera(
             "thirdPersonCamera",
-            Math.PI / 2,
-            0.95 * (Math.PI / 2),
-            20,
-            Vector3.Zero(),
+            thirdPersonCameraPresets.behindCentered.alpha,
+            thirdPersonCameraPresets.behindCentered.beta,
+            thirdPersonCameraPresets.behindCentered.radius,
+            thirdPersonCameraPresets.behindCentered.target.clone(),
             scene,
         );
         this.thirdPersonCamera.lowerRadiusLimit = 5;
         this.thirdPersonCamera.upperRadiusLimit = 100;
         this.thirdPersonCamera.parent = this.thirdPersonTransform;
-        this.thirdPersonCameraDefaultAlpha = this.thirdPersonCamera.alpha;
-        this.thirdPersonCameraDefaultBeta = this.thirdPersonCamera.beta;
-        this.thirdPersonCameraDefaultRadius = this.thirdPersonCamera.radius;
 
         this.firstPersonCamera = new FreeCamera("firstPersonCamera", new Vector3(0.5, 1, 2), scene);
         this.firstPersonCamera.speed = 0;
@@ -87,30 +84,28 @@ export class VehicleControls implements Controls {
             }
         });
 
-        VehicleInputs.map.resetCamera.on("complete", () => {
-            quickAnimation(
-                this.thirdPersonCamera,
-                "alpha",
-                this.thirdPersonCamera.alpha,
-                this.thirdPersonCameraDefaultAlpha,
-                200,
-            );
-            quickAnimation(
-                this.thirdPersonCamera,
-                "beta",
-                this.thirdPersonCamera.beta,
-                this.thirdPersonCameraDefaultBeta,
-                200,
-            );
-            quickAnimation(
-                this.thirdPersonCamera,
-                "radius",
-                this.thirdPersonCamera.radius,
-                this.thirdPersonCameraDefaultRadius,
-                200,
-            );
-            quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
-        });
+        this.bindCameraPresetInput(VehicleInputs.map.resetCamera, "behindCentered");
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset1, "behindLeft");
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset2, "behindRight");
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset3, "frontLookingLeft");
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset4, "frontLookingRight");
+    }
+
+    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {
+        const handler = () => {
+            this.resetCamera(presetName);
+        };
+
+        input.on("complete", handler);
+    }
+
+    private resetCamera(presetName: ThirdPersonCameraPresetNames) {
+        const preset = thirdPersonCameraPresets[presetName];
+
+        quickAnimation(this.thirdPersonCamera, "alpha", this.thirdPersonCamera.alpha, preset.alpha, 200);
+        quickAnimation(this.thirdPersonCamera, "beta", this.thirdPersonCamera.beta, preset.beta, 200);
+        quickAnimation(this.thirdPersonCamera, "radius", this.thirdPersonCamera.radius, preset.radius, 200);
+        quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, preset.target.clone(), 200);
     }
 
     shouldLockPointer(): boolean {
