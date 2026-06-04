@@ -38,17 +38,17 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
-import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import { lookAt } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { type View } from "@/frontend/view";
 
+import { lerp } from "@/utils/math";
+
 import { type StarMapTextures } from "../assets/textures/starMap";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
-import { easeInOutCubic } from "../helpers/animations/interpolations";
+import { easeInOutQuadratic } from "../helpers/animations/interpolations";
 import { type INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
 import { StarMapControls } from "./starMapControls";
@@ -68,8 +68,8 @@ export class StarMapView implements View {
     private readonly controls: StarMapControls;
 
     private rotationAnimation: CustomAnimation<Quaternion> | null = null;
-    private translationAnimation: TransformTranslationAnimation | null = null;
-    private radiusAnimation: CameraRadiusAnimation | null = null;
+    private translationAnimation: CustomAnimation<Vector3> | null = null;
+    private radiusAnimation: CustomAnimation<number> | null = null;
 
     private readonly player: Player;
 
@@ -210,12 +210,18 @@ export class StarMapView implements View {
         this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
-            if (this.rotationAnimation !== null) {
+            if (this.rotationAnimation !== null && !this.rotationAnimation.isFinished()) {
                 this.rotationAnimation.update(deltaSeconds);
                 this.controls.getTransform().rotationQuaternion = this.rotationAnimation.getCurrentValue();
             }
-            if (this.translationAnimation !== null) this.translationAnimation.update(deltaSeconds);
-            if (this.radiusAnimation !== null) this.radiusAnimation.update(deltaSeconds);
+            if (this.translationAnimation !== null && !this.translationAnimation.isFinished()) {
+                this.translationAnimation.update(deltaSeconds);
+                this.controls.getTransform().position = this.translationAnimation.getCurrentValue();
+            }
+            if (this.radiusAnimation !== null && !this.radiusAnimation.isFinished()) {
+                this.radiusAnimation.update(deltaSeconds);
+                this.controls.thirdPersonCamera.radius = this.radiusAnimation.getCurrentValue();
+            }
 
             this.controls.update(deltaSeconds);
 
@@ -372,7 +378,7 @@ export class StarMapView implements View {
                 finalRotation,
                 (a, b, t) => Quaternion.Slerp(a, b, t),
                 animationDurationSeconds,
-                { easing: easeInOutCubic },
+                { easing: easeInOutQuadratic },
             );
         }
 
@@ -388,20 +394,24 @@ export class StarMapView implements View {
         // if the transform is already in the right position, do not animate
         if (skipAnimation) this.controls.getTransform().position = targetPosition;
         else if (targetPosition.subtract(this.controls.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
-            this.translationAnimation = new TransformTranslationAnimation(
-                this.controls.getTransform(),
+            this.translationAnimation = CustomAnimation.FromTo(
+                this.controls.getTransform().position.clone(),
                 targetPosition,
+                (a, b, t) => Vector3.Lerp(a, b, t),
                 animationDurationSeconds,
+                { easing: easeInOutQuadratic },
             );
         }
 
         const targetRadius = 10;
         if (skipAnimation) this.controls.thirdPersonCamera.radius = targetRadius;
         else {
-            this.radiusAnimation = new CameraRadiusAnimation(
-                this.controls.thirdPersonCamera,
+            this.radiusAnimation = CustomAnimation.FromTo(
+                this.controls.thirdPersonCamera.radius,
                 targetRadius,
+                lerp,
                 animationDurationSeconds,
+                { easing: easeInOutQuadratic },
             );
         }
 
