@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -32,7 +32,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import {
     positionNearObjectAsteroidField,
@@ -43,6 +42,8 @@ import { type StarSystemView } from "@/frontend/starSystemView";
 import i18n from "@/i18n";
 
 import packageInfo from "../../../../package.json";
+import { CustomAnimation } from "../helpers/animations/customAnimation";
+import { easeInOutCubic } from "../helpers/animations/interpolations";
 import { type SidePanels } from "./sidePanels";
 
 export class MainMenu {
@@ -346,16 +347,19 @@ export class MainMenu {
             .getAbsolutePosition()
             .subtract(this.controls.getTransform().getAbsolutePosition())
             .normalize();
-        const axis = Vector3.Cross(currentForward, newForward);
-        const angle = Vector3.GetAngleBetweenVectors(currentForward, newForward, axis);
+
+        const initialRotation = this.controls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
+        const deltaRotation = Quaternion.FromUnitVectorsToRef(currentForward, newForward, Quaternion.Identity());
+        const finalRotation = deltaRotation.multiply(initialRotation);
 
         const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController, 0.9);
 
-        const rotationAnimation = new TransformRotationAnimation(
-            this.controls.getTransform(),
-            axis,
-            angle,
+        const rotationAnimation = CustomAnimation.FromTo(
+            initialRotation,
+            finalRotation,
+            (a, b, t) => Quaternion.Slerp(a, b, t),
             this.startAnimationDurationSeconds,
+            { easing: easeInOutCubic },
         );
         const translationAnimation = new TransformTranslationAnimation(
             this.controls.getTransform(),
@@ -385,8 +389,10 @@ export class MainMenu {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
-            if (!rotationAnimation.isFinished()) rotationAnimation.update(deltaTime);
-            else {
+            if (!rotationAnimation.isFinished()) {
+                rotationAnimation.update(deltaTime);
+                this.controls.getTransform().rotationQuaternion = rotationAnimation.getCurrentValue();
+            } else {
                 this.scene.onBeforeRenderObservable.removeCallback(animationCallback);
                 this.htmlRoot.style.display = "none";
 

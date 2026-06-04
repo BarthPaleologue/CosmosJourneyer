@@ -22,7 +22,7 @@ import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import { ColorCurves } from "@babylonjs/core/Materials/colorCurves";
 import { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import type { GreasedLineBaseMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineBaseMesh";
 import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
@@ -39,7 +39,6 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { CameraRadiusAnimation } from "@/frontend/helpers/animations/radius";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import { lookAt } from "@/frontend/helpers/transform";
 import { type Player } from "@/frontend/player/player";
@@ -48,6 +47,8 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { type View } from "@/frontend/view";
 
 import { type StarMapTextures } from "../assets/textures/starMap";
+import { CustomAnimation } from "../helpers/animations/customAnimation";
+import { easeInOutCubic } from "../helpers/animations/interpolations";
 import { type INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
 import { StarMapControls } from "./starMapControls";
@@ -66,7 +67,7 @@ export class StarMapView implements View {
     readonly scene: Scene;
     private readonly controls: StarMapControls;
 
-    private rotationAnimation: TransformRotationAnimation | null = null;
+    private rotationAnimation: CustomAnimation<Quaternion> | null = null;
     private translationAnimation: TransformTranslationAnimation | null = null;
     private radiusAnimation: CameraRadiusAnimation | null = null;
 
@@ -209,7 +210,10 @@ export class StarMapView implements View {
         this.scene.onBeforeRenderObservable.add(async () => {
             const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
 
-            if (this.rotationAnimation !== null) this.rotationAnimation.update(deltaSeconds);
+            if (this.rotationAnimation !== null) {
+                this.rotationAnimation.update(deltaSeconds);
+                this.controls.getTransform().rotationQuaternion = this.rotationAnimation.getCurrentValue();
+            }
             if (this.translationAnimation !== null) this.translationAnimation.update(deltaSeconds);
             if (this.radiusAnimation !== null) this.radiusAnimation.update(deltaSeconds);
 
@@ -353,22 +357,22 @@ export class StarMapView implements View {
         );
 
         const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
-
-        const rotationAngle = Math.acos(Vector3.Dot(cameraDir, cameraToStarDir));
-
         const animationDurationSeconds = 1;
 
-        // if the rotation axis has a length different from 1, it means the cross product was made between very close vectors : no rotation is needed
         if (skipAnimation) {
             lookAt(this.controls.getTransform(), starSystemPosition, this.scene.useRightHandedSystem);
             this.controls.getTransform().computeWorldMatrix(true);
-        } else if (rotationAngle > 0.02) {
-            const rotationAxis = Vector3.Cross(cameraDir, cameraToStarDir).normalize();
-            this.rotationAnimation = new TransformRotationAnimation(
-                this.controls.getTransform(),
-                rotationAxis,
-                rotationAngle,
+        } else {
+            const initialRotation = this.controls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
+            const deltaRotation = Quaternion.FromUnitVectorsToRef(cameraDir, cameraToStarDir, Quaternion.Identity());
+            const finalRotation = deltaRotation.multiply(initialRotation);
+
+            this.rotationAnimation = CustomAnimation.FromTo(
+                initialRotation,
+                finalRotation,
+                (a, b, t) => Quaternion.Slerp(a, b, t),
                 animationDurationSeconds,
+                { easing: easeInOutCubic },
             );
         }
 
