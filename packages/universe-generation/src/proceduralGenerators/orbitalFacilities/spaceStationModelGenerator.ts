@@ -33,6 +33,7 @@ import {
 } from "@cosmos-journeyer/physics";
 import { assertUnreachable, type DeepPartial, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type CelestialBodyModel,
     type Orbit,
     type SpaceStationModel,
@@ -61,7 +62,7 @@ export function generateSpaceStationModel(
 
     const name = overrides?.name ?? generateSpaceStationName(rng, 2756);
 
-    let parentMaxRadius = parentBody.radius;
+    let parentMaxRadius = getCelestialBodyRadius(parentBody);
     if (parentBody.type === "blackHole") {
         parentMaxRadius += parentBody.accretionDiskRadius;
     }
@@ -126,14 +127,18 @@ export function generateSpaceStationModel(
     if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
         totalIrradiance = getSphereIrradianceAtDistance(
             parentBody.blackBodyTemperature,
-            parentBody.radius,
+            getCelestialBodyRadius(parentBody),
             orbit.semiMajorAxis,
         );
     } else {
         const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
 
         for (const [model, distance] of distancesToStellarObjects) {
-            totalIrradiance += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
+            totalIrradiance += getSphereIrradianceAtDistance(
+                model.blackBodyTemperature,
+                getCelestialBodyRadius(model),
+                distance,
+            );
         }
     }
 

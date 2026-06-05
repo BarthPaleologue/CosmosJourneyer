@@ -25,7 +25,6 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
         name: "Dark Knight",
         axialTilt: 0,
         siderealDaySeconds: 0,
-        radius: 100e3,
         mass: EarthMass,
         orbit: {
             parentIds: [...parentIds],

@@ -24,7 +24,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type CelestialBodyModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
@@ -47,7 +46,7 @@ export class RingsPostProcess extends PostProcess {
     constructor(
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
-        bodyModel: DeepReadonly<Pick<CelestialBodyModel, "radius" | "name">>,
+        bodyModel: DeepReadonly<{ name: string; radius: number }>,
         stellarObjects: ReadonlyArray<DirectionalLight>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,

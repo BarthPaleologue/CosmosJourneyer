@@ -58,10 +58,3 @@ export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
      */
     axialTilt: number;
 };
-
-export type CelestialBodyModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
-    /**
-     * The radius of the celestial body in meters
-     */
-    radius: number;
-};

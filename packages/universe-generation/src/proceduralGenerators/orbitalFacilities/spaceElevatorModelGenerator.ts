@@ -31,6 +31,7 @@ import {
 } from "@cosmos-journeyer/physics";
 import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type PlanetModel,
     type Orbit,
     type SpaceElevatorModel,
@@ -165,7 +166,11 @@ export function generateSpaceElevatorModel(
 
     let totalIrradiance = 0;
     for (const [model, distance] of distancesToStellarObjects) {
-        totalIrradiance += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
+        totalIrradiance += getSphereIrradianceAtDistance(
+            model.blackBodyTemperature,
+            getCelestialBodyRadius(model),
+            distance,
+        );
     }
 
     const totalEnergyRequirementKWhPerYear = population * annualEnergyPerCapitaKWh;

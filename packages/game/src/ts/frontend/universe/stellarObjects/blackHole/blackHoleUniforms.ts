@@ -18,7 +18,7 @@
 import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { getKerrMetricA } from "@cosmos-journeyer/physics";
+import { getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
@@ -51,7 +51,7 @@ export class BlackHoleUniforms {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;
-        this.schwarzschildRadius = blackHoleModel.radius;
+        this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
         const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.siderealDaySeconds);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;

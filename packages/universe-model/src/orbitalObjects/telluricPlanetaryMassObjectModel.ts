@@ -19,14 +19,15 @@ import { type AtmosphereModel } from "./atmosphereModel";
 import { type CloudsModel } from "./cloudsModel";
 import { type OrbitalObjectType } from "./index";
 import { type OceanModel } from "./oceanModel";
-import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
+import type { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import { type TerrainSettings } from "./terrainSettings";
 
 type Elements = "rock" | "h2o";
 
 export type TelluricPlanetaryMassObjectComposition = Partial<Record<Elements, number>>;
 
-export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = CelestialBodyModelBase<T> & {
+export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
+    radius: number;
     terrainSettings: TerrainSettings;
 
     composition: TelluricPlanetaryMassObjectComposition;

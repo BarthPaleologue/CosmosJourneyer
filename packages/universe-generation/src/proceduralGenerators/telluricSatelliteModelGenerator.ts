@@ -31,6 +31,7 @@ import {
 } from "@cosmos-journeyer/physics";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type AtmosphereModel,
     type CloudsModel,
     type PlanetModel,
@@ -101,7 +102,7 @@ export function generateTelluricSatelliteModel(
     const effectiveTemperature = computeEffectiveTemperature(
         stellarParents.map(({ stellarObject, distance }) => ({
             temperature: stellarObject.blackBodyTemperature,
-            radius: stellarObject.radius,
+            radius: getCelestialBodyRadius(stellarObject),
             distance: distance,
         })),
         0.3,

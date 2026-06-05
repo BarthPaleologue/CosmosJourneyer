@@ -16,11 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type HasSeed } from "../hasSeed";
-import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 import { type RingsModel } from "../ringsModel";
 
-export type NeutronStarModel = CelestialBodyModelBase<"neutronStar"> &
+export type NeutronStarModel = OrbitalObjectModelBase<"neutronStar"> &
     HasSeed & {
+        radius: number;
         readonly blackBodyTemperature: number;
 
         /**

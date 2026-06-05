@@ -21,7 +21,12 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type GasPlanetModel, type Orbit, type StellarObjectModel } from "@cosmos-journeyer/universe-model";
+import {
+    getCelestialBodyRadius,
+    type GasPlanetModel,
+    type Orbit,
+    type StellarObjectModel,
+} from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { getGasPlanetOrbitRadius, sampleGasPlanetMass } from "./gasPlanetModelHelpers";
@@ -40,7 +45,7 @@ export function generateGasPlanetModel(
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
-        const radius = getGasPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, rng);
+        const radius = getGasPlanetOrbitRadius(parent.blackBodyTemperature, getCelestialBodyRadius(parent), rng);
         orbitRadiuses.push(radius);
     }
 

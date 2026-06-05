@@ -29,6 +29,7 @@ import {
 } from "@cosmos-journeyer/physics";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type AtmosphereModel,
     type CloudsModel,
     type OceanModel,
@@ -60,8 +61,10 @@ export function generateTelluricPlanetModel(
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
-        const orbitRadius = getTelluricPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, () =>
-            rng(GenerationSteps.ORBIT + orbitRadiuses.length),
+        const orbitRadius = getTelluricPlanetOrbitRadius(
+            parent.blackBodyTemperature,
+            getCelestialBodyRadius(parent),
+            () => rng(GenerationSteps.ORBIT + orbitRadiuses.length),
         );
         orbitRadiuses.push(orbitRadius);
     }
@@ -107,7 +110,7 @@ export function generateTelluricPlanetModel(
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
             temperature: body.blackBodyTemperature,
-            radius: body.radius,
+            radius: getCelestialBodyRadius(body),
             distance: orbit.semiMajorAxis,
         })),
         0.3,

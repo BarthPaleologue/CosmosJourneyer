@@ -28,6 +28,7 @@ export * from "./orbitalObjects/anomalies/sierpinskiPyramidModel";
 export * from "./orbitalObjects/atmosphereModel";
 export * from "./orbitalObjects/cloudsModel";
 export * from "./orbitalObjects/gasPlanetModel";
+export * from "./orbitalObjects/getCelestialBodyRadius";
 export * from "./orbitalObjects/hasSeed";
 export * from "./orbitalObjects/index";
 export * from "./orbitalObjects/oceanModel";

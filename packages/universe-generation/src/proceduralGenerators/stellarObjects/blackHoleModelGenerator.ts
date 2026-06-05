@@ -19,7 +19,12 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type CelestialBodyModel, type Orbit, type BlackHoleModel } from "@cosmos-journeyer/universe-model";
+import {
+    getCelestialBodyRadius,
+    type CelestialBodyModel,
+    type Orbit,
+    type BlackHoleModel,
+} from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
 export function generateBlackHoleModel(
@@ -31,12 +36,12 @@ export function generateBlackHoleModel(
     const rng = getRngFromSeed(seed);
 
     //FIXME: do not hardcode
-    const radius = 1000e3;
+    const schwarzschildRadius = 1000e3;
 
-    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, body.radius), 0);
+    const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, getCelestialBodyRadius(body)), 0);
 
     // TODO: do not hardcode
-    const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + radius);
+    const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + schwarzschildRadius);
 
     const parentIds = parentBodies.map((body) => body.id);
 
@@ -51,17 +56,16 @@ export function generateBlackHoleModel(
         initialMeanAnomaly: 0,
     };
 
-    const blackHoleMass = getMassFromSchwarzschildRadius(radius);
+    const blackHoleMass = getMassFromSchwarzschildRadius(schwarzschildRadius);
     const blackHoleSiderealDaySeconds = 1.5e-19;
     const blackHoleAxialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
-    const blackHoleAccretionDiskRadius = radius * normalRandom(12, 3, rng, 7777);
+    const blackHoleAccretionDiskRadius = schwarzschildRadius * normalRandom(12, 3, rng, 7777);
     const blackHoleBlackBodyTemperature = 7_000;
 
     return {
         type: "blackHole",
         id: id,
         name,
-        radius,
         mass: blackHoleMass,
         blackBodyTemperature: blackHoleBlackBodyTemperature,
         siderealDaySeconds: blackHoleSiderealDaySeconds,

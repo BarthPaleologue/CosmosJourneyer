@@ -19,11 +19,6 @@ import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
 export type BlackHoleModel = OrbitalObjectModelBase<"blackHole"> & {
     /**
-     * The Schwarzschild radius of the black hole in meters
-     */
-    readonly radius: number;
-
-    /**
      * Black body temperature of the object in Kelvin
      */
     blackBodyTemperature: number;

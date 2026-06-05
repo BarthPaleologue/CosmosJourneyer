@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
-import { type OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import { getCelestialBodyRadius, type OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
 import { ItinerarySchema, SerializedPlayerSchema, type Itinerary } from "@/backend/player/serializedPlayer";
@@ -59,7 +59,7 @@ export function migrateV1ToV2(saveV1: SaveV1, universeBackend: UniverseBackend):
     switch (saveV1.universeCoordinates.universeObjectId.objectType) {
         case SystemObjectType.STELLAR_OBJECT:
             closestObject = systemModel.stellarObjects.at(saveV1.universeCoordinates.universeObjectId.objectIndex);
-            radius = closestObject?.radius;
+            radius = closestObject === undefined ? undefined : getCelestialBodyRadius(closestObject);
             break;
         case SystemObjectType.PLANETARY_MASS_OBJECT:
             closestObject = systemModel.planets.at(0);
@@ -67,7 +67,7 @@ export function migrateV1ToV2(saveV1: SaveV1, universeBackend: UniverseBackend):
             break;
         case SystemObjectType.ANOMALY:
             closestObject = systemModel.anomalies.at(saveV1.universeCoordinates.universeObjectId.objectIndex);
-            radius = closestObject?.radius;
+            radius = closestObject === undefined ? undefined : getCelestialBodyRadius(closestObject);
             break;
         case SystemObjectType.ORBITAL_FACILITY:
             closestObject = systemModel.orbitalFacilities.at(saveV1.universeCoordinates.universeObjectId.objectIndex);
@@ -78,7 +78,7 @@ export function migrateV1ToV2(saveV1: SaveV1, universeBackend: UniverseBackend):
     }
 
     closestObject ??= systemModel.stellarObjects[0];
-    radius ??= systemModel.stellarObjects[0].radius;
+    radius ??= getCelestialBodyRadius(systemModel.stellarObjects[0]);
 
     const spaceship = saveV1.player.spaceShips[0] ?? getDefaultSerializedSpaceship();
 
