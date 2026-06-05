@@ -30,6 +30,7 @@ import { createAutomaticLandingScene } from "./automaticLanding";
 import { createButterflyScene } from "./butterfly";
 import { createCharacterDemoScene } from "./character";
 import { createCryptographicSecretScene } from "./cryptographicSecret";
+import { createCustomSystemScene } from "./customSystem";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
@@ -124,6 +125,7 @@ export class PlaygroundRegistry {
         ["forest", createForestScene],
         ["sphericalHeightFieldTerrain", createSphericalHeightFieldTerrainScene],
         ["cryptographicSecret", createCryptographicSecretScene],
+        ["customSystem", createCustomSystemScene],
     ]);
 
     register(
