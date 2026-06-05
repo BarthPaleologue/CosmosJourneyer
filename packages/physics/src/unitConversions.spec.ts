@@ -17,16 +17,18 @@
 
 import { describe, expect, it, test } from "vitest";
 
-import { LightYearInMeters } from "./constants";
+import { LightYearInMeters, SolarMass } from "./constants";
 import {
     celsiusToKelvin,
     degreesToRadians,
+    durationToSeconds,
     haToM2,
     kelvinToCelsius,
     kmhToMetersPerSecond,
     kwhPerYearToWatts,
     metersToLightYears,
     perHaToPerM2,
+    solarMassToKg,
 } from "./unitConversions";
 
 test("celsiusToKelvin", () => {
@@ -39,6 +41,28 @@ test("kelvinToCelsius", () => {
     expect(kelvinToCelsius(0)).toBe(-273.15);
     expect(kelvinToCelsius(273.15)).toBe(0);
     expect(kelvinToCelsius(373.15)).toBe(100);
+});
+
+describe("durationToSeconds", () => {
+    it("converts an empty duration to 0 seconds", () => {
+        expect(durationToSeconds({})).toBe(0);
+    });
+
+    it("converts days to seconds", () => {
+        expect(durationToSeconds({ days: 2 })).toBe(172_800);
+    });
+
+    it("converts hours to seconds", () => {
+        expect(durationToSeconds({ hours: 3 })).toBe(10_800);
+    });
+
+    it("converts minutes to seconds", () => {
+        expect(durationToSeconds({ minutes: 4 })).toBe(240);
+    });
+
+    it("converts combined duration fields to seconds", () => {
+        expect(durationToSeconds({ days: 1, hours: 2, minutes: 3, seconds: 4 })).toBe(93_784);
+    });
 });
 
 describe("metersToLightYears", () => {
@@ -66,6 +90,20 @@ describe("metersToLightYears", () => {
 
     it("handles negative distances correctly", () => {
         expect(metersToLightYears(-LightYearInMeters)).toBe(-1);
+    });
+});
+
+describe("solarMassToKg", () => {
+    it("converts 0 solar masses to 0 kilograms", () => {
+        expect(solarMassToKg(0)).toBe(0);
+    });
+
+    it("converts 1 solar mass to kilograms", () => {
+        expect(solarMassToKg(1)).toBe(SolarMass);
+    });
+
+    it("converts fractional solar masses to kilograms", () => {
+        expect(solarMassToKg(0.5)).toBe(SolarMass / 2);
     });
 });
 
