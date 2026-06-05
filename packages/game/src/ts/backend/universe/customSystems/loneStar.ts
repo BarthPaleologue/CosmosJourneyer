@@ -28,7 +28,7 @@ export function getLoneStarSystem(): StarSystemModel {
             starSectorZ: 8,
             localX: 0.5,
             localY: 0.2,
-            localZ: 0.8,
+            localZ: 0.4,
         },
         stellarObjects: [
             {
