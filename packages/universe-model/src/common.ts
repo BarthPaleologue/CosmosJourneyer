@@ -21,6 +21,11 @@ export type RGBColor = {
     b: number;
 };
 
-export type Faction = "feynman_interstellar" | "church_of_awakening" | "human_commonwealth" | "satori_concord";
+export type Faction =
+    | "feynman_interstellar"
+    | "church_of_awakening"
+    | "human_commonwealth"
+    | "satori_concord"
+    | "dreamers_connection";
 
 export type CropType = "potato" | "yam" | "sweet_potato" | "rice" | "peanut" | "wheat" | "lentil" | "cassava";
