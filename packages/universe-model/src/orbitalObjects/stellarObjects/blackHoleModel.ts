@@ -29,7 +29,7 @@ export type BlackHoleModel = OrbitalObjectModelBase<"blackHole"> & {
     blackBodyTemperature: number;
 
     /**
-     * Radius of the event horizon in meters
+     * Maximum radius of the accretion disk in meters
      */
     accretionDiskRadius: number;
 };
