@@ -19,7 +19,7 @@ import { type Effect } from "@babylonjs/core/Materials/effect";
 import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
+import { G, getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
@@ -30,7 +30,7 @@ export const BlackHoleUniformNames = {
     FRAME_DRAGGING_FACTOR: "frameDraggingFactor",
     ACCRETION_DISK_RADIUS: "accretionDiskRadius",
     WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
-    ROTATION_PERIOD: "rotationPeriod",
+    STANDARD_GRAVITATIONAL_PARAMETER: "standardGravitationalParameter",
     WORLD_POSITION: "worldPosition",
     ROTATION: "rotation",
     INVERSE_ROTATION: "inverseRotation",
@@ -42,10 +42,10 @@ export const BlackHoleSamplerNames = {
 
 export class BlackHoleUniforms {
     accretionDiskRadius: number;
-    rotationPeriod: number;
     warpingMinkowskiFactor: number;
     schwarzschildRadius: number;
     frameDraggingFactor: number;
+    standardGravitationalParameter: number;
     elapsedSeconds = 0;
     backgroundTexture: CubeTexture;
 
@@ -55,11 +55,11 @@ export class BlackHoleUniforms {
 
     constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
-        this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
         const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.rotation.siderealPeriod);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
+        this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
     }
 
@@ -70,7 +70,7 @@ export class BlackHoleUniforms {
         effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);
         effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, this.accretionDiskRadius);
         effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
-        effect.setFloat(BlackHoleUniformNames.ROTATION_PERIOD, this.rotationPeriod);
+        effect.setFloat(BlackHoleUniformNames.STANDARD_GRAVITATIONAL_PARAMETER, this.standardGravitationalParameter);
 
         blackHoleTransform.getWorldMatrix().getRotationMatrixToRef(this.rotation);
         this.rotation.transposeToRef(this.inverseRotation);

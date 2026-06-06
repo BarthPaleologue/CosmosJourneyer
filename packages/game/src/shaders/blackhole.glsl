@@ -13,8 +13,8 @@ uniform float elapsedSeconds;
 #include "./utils/object.glsl";
 
 uniform float accretionDiskRadius;
-uniform float rotationPeriod;
 uniform float warpingMinkowskiFactor;
+uniform float standardGravitationalParameter;
 
 uniform float schwarzschildRadius;
 uniform float frameDraggingFactor;
@@ -62,6 +62,11 @@ vec3 blackHoleSpaceToWorld(vec3 position) {
 
 vec3 directionToWorldSpace(vec3 direction) {
     return mat3(rotation) * direction;
+}
+
+// Angular velocity for a circular orbit at a given radius
+float getKeplerianAngularVelocity(float orbitalRadius) {
+    return sqrt(standardGravitationalParameter / max(pow(orbitalRadius, 3.0), 1e-6));
 }
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
@@ -124,13 +129,14 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         diskMask *= smoothstep(1.5, 2.5, relativeDistance); // Fade the disk when too close to the event horizon. 1.5 is the IBCO (innermost bound circular orbit) for a Schwarzschild black hole. It is also called the photon sphere.
         diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
-        // rotation of the disk
-        float theta = -2.0 * 3.1415 * elapsedSeconds / rotationPeriod;
+        // The accretion disk orbits differentially: inner material moves faster than outer material.
+        float orbitalRadius = max(length(projectedSamplePoint.xz), schwarzschildRadius);
+        float theta = -elapsedSeconds * getKeplerianAngularVelocity(orbitalRadius);
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, localDiskNormal, theta);
 
         // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
         float angle = acos(clamp(rotatedProjectedSamplePoint.z / length(rotatedProjectedSamplePoint.xz), -1.0, 1.0));
-        float u = 0.5 * elapsedSeconds + intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
+        float u = intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
         const float noiseFrequency = 1.0;
         vec2 noiseSamplePoint = vec2(angle * 2.0, u);
         float noise = valueNoise(noiseSamplePoint, noiseFrequency); // 1st octave
