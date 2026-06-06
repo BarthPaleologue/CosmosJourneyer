@@ -87,7 +87,7 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, blackHoleTransform, blackHoleUniforms.schwarzschildRadius, floatingOriginOffset);
-            blackHoleUniforms.setUniforms(effect, blackHoleTransform);
+            blackHoleUniforms.setUniforms(effect, blackHoleTransform, floatingOriginOffset);
 
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
             blackHoleUniforms.setSamplers(effect);
@@ -95,7 +95,7 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
     }
 
     public update(deltaSeconds: number): void {
-        this.blackHoleUniforms.time += deltaSeconds;
-        this.blackHoleUniforms.time %= 60 * 60;
+        this.blackHoleUniforms.elapsedSeconds += deltaSeconds;
+        this.blackHoleUniforms.elapsedSeconds %= 60 * 60;
     }
 }

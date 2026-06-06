@@ -8,7 +8,7 @@ precision highp float;
 
 varying vec2 vUV;
 
-uniform float time;
+uniform float elapsedSeconds;
 
 #include "./utils/object.glsl";
 
@@ -18,6 +18,10 @@ uniform float warpingMinkowskiFactor;
 
 uniform float schwarzschildRadius;
 uniform float frameDraggingFactor;
+
+uniform vec3 worldPosition;
+uniform mat4 rotation;
+uniform mat4 inverseRotation;
 
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
@@ -42,13 +46,22 @@ uniform mat4 starfieldRotation;
 
 #include "./utils/rayIntersectSphere.glsl";
 
-vec3 projectOnPlane(vec3 vector, vec3 planeNormal) {
-    return vector - dot(vector, planeNormal) * planeNormal;
+const vec3 localDiskNormal = vec3(0.0, 1.0, 0.0);
+
+vec3 worldToBlackHoleSpace(vec3 position) {
+    return mat3(inverseRotation) * (position - worldPosition);
 }
 
-float angleBetweenVectors(vec3 a, vec3 b) {
-    // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
-    return acos(clamp(dot(normalize(a), normalize(b)), -1.0, 1.0));
+vec3 directionToBlackHoleSpace(vec3 direction) {
+    return mat3(inverseRotation) * direction;
+}
+
+vec3 blackHoleSpaceToWorld(vec3 position) {
+    return mat3(rotation) * position + worldPosition;
+}
+
+vec3 directionToWorldSpace(vec3 direction) {
+    return mat3(rotation) * direction;
 }
 
 float hash(float x) { return fract(sin(x) * 152754.742); }
@@ -75,20 +88,15 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     float relativeDistance = distanceToCenter / schwarzschildRadius;
     float relativeDiskRadius = accretionDiskRadius / schwarzschildRadius;
 
-    vec3 diskNormal = object_rotationAxis;
+    vec3 projectedRayDir = vec3(rayDir.x, 0.0, rayDir.z);
+    vec3 projectedInitialPosition = vec3(initialPosition.x, 0.0, initialPosition.z);
 
-    vec3 projectedRayDir = projectOnPlane(rayDir, diskNormal);
-    vec3 projectedInitialPosition = projectOnPlane(initialPosition, diskNormal);
-
-    float projectionDistance = length(projectedRayDir - rayDir);// if the vector is parallel to the disk the the projection distance is near 0. We use it to increase the step size.
-
+    float projectionDistance = max(abs(rayDir.y), 1e-6);// if the vector is parallel to the disk then the projection distance is near 0. We use it to increase the step size.
     float stepSize = 0.02 * distanceToCenter / projectionDistance;//FIXME: this is not correct, but it works
 
     samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no thickness
 
-    // elementary rotation around the hole
-    vec3 deltaPos = rotateAround(projectedInitialPosition, diskNormal, 0.01);
-    deltaPos = normalize(deltaPos - projectedInitialPosition);
+    vec3 deltaPos = normalize(cross(localDiskNormal, projectedInitialPosition));
 
     float parallel = dot(projectedRayDir, deltaPos);
 
@@ -106,7 +114,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
     for (float i = 0.0; i < DISK_STEPS; i++) {
         samplePoint -= stepSize * rayDir / DISK_STEPS;
 
-        vec3 projectedSamplePoint = projectOnPlane(samplePoint, diskNormal);
+        vec3 projectedSamplePoint = vec3(samplePoint.x, 0.0, samplePoint.z);
 
         float intensity = 1.0 - (i / DISK_STEPS);
         distanceToCenter = length(samplePoint);
@@ -117,11 +125,12 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
         // rotation of the disk
-        float theta = -2.0 * 3.1415 * time / rotationPeriod;
-        vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, diskNormal, theta);
+        float theta = -2.0 * 3.1415 * elapsedSeconds / rotationPeriod;
+        vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, localDiskNormal, theta);
 
-        float angle = angleBetweenVectors(rotatedProjectedSamplePoint, vec3(0.0, 0.0, 1.0));
-        float u = 0.5 * time + intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
+        // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
+        float angle = acos(clamp(rotatedProjectedSamplePoint.z / length(rotatedProjectedSamplePoint.xz), -1.0, 1.0));
+        float u = 0.5 * elapsedSeconds + intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
         const float noiseFrequency = 1.0;
         vec2 noiseSamplePoint = vec2(angle * 2.0, u);
         float noise = valueNoise(noiseSamplePoint, noiseFrequency); // 1st octave
@@ -158,7 +167,7 @@ void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
     vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDir = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
+    vec3 rayDirWorld = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
 
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
 
@@ -168,15 +177,14 @@ void main() {
     float maxBendDistance = max(accretionDiskRadius * 3.0, schwarzschildRadius * 15.0);
 
     float t0, t1;
-    if(!rayIntersectSphere(camera_position, rayDir, object_position, maxBendDistance, t0, t1)) {
+    if(!rayIntersectSphere(camera_position, rayDirWorld, worldPosition, maxBendDistance, t0, t1)) {
         // the light ray will not be affected by the black hole, we can skip the calculations
         gl_FragColor = screenColor;
         return;
     }
 
-    vec4 colOut = vec4(0.0);
-
-    vec3 rayPositionBlackHoleSpace = camera_position - object_position;// position of the camera in blackhole space
+    vec3 rayPositionBlackHoleSpace = worldToBlackHoleSpace(camera_position);// position of the camera in blackhole space
+    vec3 rayDir = normalize(directionToBlackHoleSpace(rayDirWorld));
 
     bool suckedInBH = false;
     bool escapedBH = false;
@@ -191,10 +199,8 @@ void main() {
         for (int disks = 0; disks < 15; disks++) {
             float distanceToCenter = 0.0;//distance to BH
 
-            vec3 projectedPosition = vec3(0.0);
             float projectedDistance = 0.0;
 
-            vec3 projectedRayDir = vec3(0.0);
             float rayDirProjectedDistance = 0.0;
 
             for (int h = 0; h < 6; h++) {
@@ -203,11 +209,8 @@ void main() {
                 vec3 dirToBlackHole = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
                 float distanceToCenter2 = distanceToCenter * distanceToCenter;
 
-                projectedPosition = projectOnPlane(rayPositionBlackHoleSpace, object_rotationAxis);
-                projectedDistance = length(projectedPosition - rayPositionBlackHoleSpace);
-
-                projectedRayDir = projectOnPlane(rayDir, object_rotationAxis);
-                rayDirProjectedDistance = length(projectedRayDir - rayDir);
+                projectedDistance = abs(rayPositionBlackHoleSpace.y);
+                rayDirProjectedDistance = max(abs(rayDir.y), 1e-6);
 
                 float stepSize = 0.92 * projectedDistance / rayDirProjectedDistance;//conservative distance to disk (y==0)
                 float farLimit = distanceToCenter * 0.5;//limit step size far from to BH
@@ -216,7 +219,7 @@ void main() {
 
                 // Frame dragging computation below: (see https://www.shadertoy.com/view/sdjcWm)
                 // Compute a vector in the direction of the BH's rotation
-                vec3 pos_cross_pole_axis = cross(object_rotationAxis, -dirToBlackHole);
+                vec3 pos_cross_pole_axis = cross(localDiskNormal, -dirToBlackHole);
                 // Compute sin^2(latitude) of the current ray position
                 float sin2_colatitude = length(pos_cross_pole_axis);
                 sin2_colatitude = sin2_colatitude * sin2_colatitude;
@@ -254,10 +257,10 @@ void main() {
     }
 
     // getting the screen coordinate of the end of the bended ray
-    vec2 uv = uvFromWorld(rayPositionBlackHoleSpace + object_position, camera_projection, camera_view);
+    vec3 rayEndWorldPosition = blackHoleSpaceToWorld(rayPositionBlackHoleSpace);
+    vec2 uv = uvFromWorld(rayEndWorldPosition, camera_projection, camera_view);
     // check if there is an object occlusion
     vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDirToEndRay = normalize(pixelWorldPositionEndRay - camera_position);// normalized direction of the ray
 
     float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
     for(int i = 0; i < 10; i++) {
@@ -266,20 +269,19 @@ void main() {
     }
     // closest physical point from the camera in the direction of the pixel (occlusion)
     vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
-    float maximumDistanceEndRay = length(closestPointEndRay);// the maxium ray length due to occlusion
-    float BHDistance = length(camera_position - object_position);
 
-    bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - object_position) >= 0.0;
+    bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - worldPosition) >= 0.0;
     // checking for alignment: camera, object, blackhole in this order
-    behindBH = behindBH && dot(closestPointEndRay - camera_position, object_position - camera_position) >= 0.0;
+    behindBH = behindBH && dot(closestPointEndRay - camera_position, worldPosition - camera_position) >= 0.0;
 
     vec4 bg = vec4(0.0);
     if(uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0 && behindBH) {
         bg = texture2D(textureSampler, uv);
     } else {
-        rayDir = vec3(starfieldRotation * vec4(rayDir, 1.0));
-        rayDir.z *= -1.0;
-        bg = texture(starfieldTexture, rayDir);
+        rayDirWorld = normalize(directionToWorldSpace(rayDir));
+        rayDirWorld = vec3(starfieldRotation * vec4(rayDirWorld, 1.0));
+        rayDirWorld.z *= -1.0;
+        bg = texture(starfieldTexture, rayDirWorld);
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
