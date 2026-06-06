@@ -39,6 +39,7 @@ import {
     type OceanModel,
     type Orbit,
     type TelluricSatelliteModel,
+    type Rotation,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
@@ -110,7 +111,6 @@ export function generateTelluricSatelliteModel(
 
     const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
 
-    const axialTilt = 0;
     const waterAmount = clamp(normalRandom(0.5, 0.1, rng, GenerationSteps.WATER_AMOUNT), 0, 1);
 
     const atmosphere: AtmosphereModel | null =
@@ -150,7 +150,7 @@ export function generateTelluricSatelliteModel(
     let parentAverageAxialTilt = 0;
     for (const parent of parentBodies) {
         parentAverageInclination += parent.orbit.inclination;
-        parentAverageAxialTilt += parent.axialTilt;
+        parentAverageAxialTilt += parent.rotation.axialTilt;
     }
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
@@ -171,7 +171,12 @@ export function generateTelluricSatelliteModel(
         initialMeanAnomaly: 0,
     };
 
-    const siderealDaySeconds = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum);
+    const rotation: Rotation = {
+        siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum),
+        axialTilt: 0,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =
@@ -193,22 +198,21 @@ export function generateTelluricSatelliteModel(
 
     return {
         type: "telluricSatellite",
-        id: id,
-        seed: seed,
+        id,
+        seed,
         name,
         mass,
-        radius: radius,
-        axialTilt: axialTilt,
-        siderealDaySeconds: siderealDaySeconds,
+        radius,
+        rotation,
         composition: {
             rock: 1 - waterAmount,
             h2o: waterAmount,
         },
-        orbit: orbit,
-        terrainSettings: terrainSettings,
+        orbit,
+        terrainSettings,
         temperature: temperatureRange,
-        atmosphere: atmosphere,
-        ocean: ocean,
-        clouds: clouds,
+        atmosphere,
+        ocean,
+        clouds,
     };
 }

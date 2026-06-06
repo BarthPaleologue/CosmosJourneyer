@@ -49,6 +49,7 @@ export * from "./orbitalObjects/orbitalFacilities/spacestationModel";
 export * from "./orbitalObjects/orbitalObjectId";
 export * from "./orbitalObjects/orbitalObjectModelBase";
 export * from "./orbitalObjects/ringsModel";
+export * from "./orbitalObjects/rotation";
 export * from "./orbitalObjects/stellarObjects/blackHoleModel";
 export * from "./orbitalObjects/stellarObjects/neutronStarModel";
 export * from "./orbitalObjects/stellarObjects/starModel";

@@ -39,6 +39,7 @@ import {
     type SpaceStationModel,
     type StationSectionModel,
     type StarSystemModel,
+    type Rotation,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
@@ -90,8 +91,13 @@ export function generateSpaceStationModel(
     };
 
     const mass = 1;
-    const siderealDaySeconds = 0;
-    const axialTilt = 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI;
+
+    const rotation: Rotation = {
+        siderealPeriod: 0,
+        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const faction = overrides?.faction ?? getFactionFromCoordinates(systemModel.coordinates, rng);
 
@@ -227,8 +233,7 @@ export function generateSpaceStationModel(
         name,
         orbit,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         population,
         annualEnergyPerCapitaKWh,
         populationDensity: targetPopulationDensity,

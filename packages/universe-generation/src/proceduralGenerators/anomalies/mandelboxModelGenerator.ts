@@ -20,7 +20,12 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
-import { type MandelboxModel, type OrbitalObjectModel, type Orbit } from "@cosmos-journeyer/universe-model";
+import {
+    type MandelboxModel,
+    type OrbitalObjectModel,
+    type Orbit,
+    type Rotation,
+} from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange } from "extended-random";
 
 export function generateMandelboxModel(
@@ -60,8 +65,13 @@ export function generateMandelboxModel(
     };
 
     const mass = 10;
-    const siderealDaySeconds = 0;
-    const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
+
+    const rotation: Rotation = {
+        siderealPeriod: 0,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     return {
         type: "mandelbox",
@@ -69,8 +79,7 @@ export function generateMandelboxModel(
         name,
         radius,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         mr2,
         spread,
         color: accentColor,

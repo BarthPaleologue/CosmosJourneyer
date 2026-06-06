@@ -19,7 +19,12 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
-import { type OrbitalObjectModel, type Orbit, type NeutronStarModel } from "@cosmos-journeyer/universe-model";
+import {
+    type OrbitalObjectModel,
+    type Orbit,
+    type NeutronStarModel,
+    type Rotation,
+} from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 /**
@@ -40,11 +45,15 @@ export function generateNeutronStarModel(
 
     const mass = 1.9885e30; //TODO: compute mass from physical properties
 
-    // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
-    const siderealDaySeconds = clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS));
+    const rotation: Rotation = {
+        axialTilt: 0,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+        // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
+        siderealPeriod: clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS)),
+    };
 
     const blackBodyTemperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
-    const axialTilt = 0;
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
 
@@ -74,14 +83,13 @@ export function generateNeutronStarModel(
 
     return {
         type: "neutronStar",
-        id: id,
+        id,
         name,
         seed,
         blackBodyTemperature,
         dipoleTilt,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         radius,
         orbit,
         rings,

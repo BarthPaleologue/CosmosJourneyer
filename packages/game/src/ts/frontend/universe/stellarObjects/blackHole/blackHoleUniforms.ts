@@ -52,7 +52,7 @@ export class BlackHoleUniforms {
         this.rotationPeriod = 1.5;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
-        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.siderealDaySeconds);
+        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.rotation.siderealPeriod);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
     }

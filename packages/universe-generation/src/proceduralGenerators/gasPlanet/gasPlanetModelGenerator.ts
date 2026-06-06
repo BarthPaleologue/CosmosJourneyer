@@ -25,6 +25,7 @@ import {
     getCelestialBodyRadius,
     type GasPlanetModel,
     type Orbit,
+    type Rotation,
     type StellarObjectModel,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
@@ -56,7 +57,7 @@ export function generateGasPlanetModel(
     if (parentBodies.length > 0) {
         for (const parent of parentBodies) {
             parentAverageInclination += parent.orbit.inclination;
-            parentAverageAxialTilt += parent.axialTilt;
+            parentAverageAxialTilt += parent.rotation.axialTilt;
         }
         parentAverageInclination /= parentBodies.length;
         parentAverageAxialTilt /= parentBodies.length;
@@ -78,8 +79,12 @@ export function generateGasPlanetModel(
         initialMeanAnomaly: 0,
     };
 
-    const axialTilt = normalRandom(0, degreesToRadians(25), rng, GenerationSteps.AXIAL_TILT);
-    const siderealDaySeconds = (24 * 60 * 60) / 10;
+    const rotation: Rotation = {
+        siderealPeriod: (24 * 60 * 60) / 10,
+        axialTilt: normalRandom(0, degreesToRadians(25), rng, GenerationSteps.AXIAL_TILT),
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? generateSeededRingsModel(radius, rng) : null;
 
@@ -101,19 +106,18 @@ export function generateGasPlanetModel(
 
     return {
         type: "gasPlanet",
-        id: id,
-        name: name,
-        seed: seed,
-        radius: radius,
-        orbit: orbit,
-        siderealDaySeconds,
-        axialTilt,
+        id,
+        name,
+        seed,
+        radius,
+        orbit,
+        rotation,
         mass,
         atmosphere: {
             pressure: EarthSeaLevelPressure,
             greenHouseEffectFactor: 0.5,
         },
-        rings: rings,
+        rings,
         colorPalette: {
             type: "procedural",
             color1: color1,

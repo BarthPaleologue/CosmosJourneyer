@@ -62,9 +62,13 @@ export function createOrbitalDemoScene(
             p: 2,
         },
         type: "custom",
-        axialTilt: 0,
+        rotation: {
+            siderealPeriod: 0,
+            axialTilt: 0,
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         mass: 1e12,
-        siderealDaySeconds: 0,
     });
 
     const earth = new CustomOrbitalObject(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
@@ -81,9 +85,13 @@ export function createOrbitalDemoScene(
             p: 2,
         },
         type: "custom",
-        axialTilt: Tools.ToRadians(23.5),
+        rotation: {
+            siderealPeriod: 0,
+            axialTilt: Tools.ToRadians(23.5),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         mass: 1e11,
-        siderealDaySeconds: 0,
     });
 
     const moon = new CustomOrbitalObject(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
@@ -95,14 +103,18 @@ export function createOrbitalDemoScene(
             semiMajorAxis: 3,
             initialMeanAnomaly: 0,
             longitudeOfAscendingNode: 0,
-            inclination: earth.model.orbit.inclination + earth.model.axialTilt, //Tools.ToRadians(45),
+            inclination: earth.model.orbit.inclination + earth.model.rotation.axialTilt,
             eccentricity: 0.7,
             p: 2,
         },
         type: "custom",
         mass: 1e10,
-        axialTilt: 0,
-        siderealDaySeconds: 0,
+        rotation: {
+            siderealPeriod: 0,
+            axialTilt: 0,
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
     });
 
     const bodies = [sun, earth, moon];

@@ -24,6 +24,7 @@ import {
     type CelestialBodyModel,
     type Orbit,
     type BlackHoleModel,
+    type Rotation,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
@@ -57,19 +58,24 @@ export function generateBlackHoleModel(
     };
 
     const blackHoleMass = getMassFromSchwarzschildRadius(schwarzschildRadius);
-    const blackHoleSiderealDaySeconds = 1.5e-19;
-    const blackHoleAxialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
+
+    const rotation: Rotation = {
+        siderealPeriod: 1.5e-19,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
+
     const blackHoleAccretionDiskRadius = schwarzschildRadius * normalRandom(12, 3, rng, 7777);
     const blackHoleBlackBodyTemperature = 7_000;
 
     return {
         type: "blackHole",
-        id: id,
+        id,
         name,
         mass: blackHoleMass,
         blackBodyTemperature: blackHoleBlackBodyTemperature,
-        siderealDaySeconds: blackHoleSiderealDaySeconds,
-        axialTilt: blackHoleAxialTilt,
+        rotation,
         accretionDiskRadius: blackHoleAccretionDiskRadius,
         orbit,
     };
