@@ -126,7 +126,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         relativeDistance = distanceToCenter / schwarzschildRadius;
 
         float diskMask = 1.0;
-        diskMask *= smoothstep(1.5, 2.5, relativeDistance); // Fade the disk when too close to the event horizon. 1.5 is the IBCO (innermost bound circular orbit) for a Schwarzschild black hole. It is also called the photon sphere.
+        float photonSphereRelativeRadius = 1.5;
+        diskMask *= smoothstep(photonSphereRelativeRadius, 2.5, relativeDistance); // Fade the disk when inside the photon sphere.
         diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
         // The accretion disk orbits differentially: inner material moves faster than outer material.
