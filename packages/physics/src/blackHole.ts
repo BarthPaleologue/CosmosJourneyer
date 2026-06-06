@@ -37,6 +37,15 @@ export function getMassFromSchwarzschildRadius(radius: number): number {
 }
 
 /**
+ * @param mass The mass of the black hole in kilograms
+ * @returns The radius of the shadow of the black hole in meters
+ * @see https://arxiv.org/pdf/2105.07101
+ */
+export function getShadowRadius(mass: number): number {
+    return (3 * Math.sqrt(3) * getSchwarzschildRadius(mass)) / 2;
+}
+
+/**
  * As the angular momentum is conserved, the black hole retains the original star's angular momentum.
  * As the original star's radius is only known approximately, the black hole's angular momentum can only be estimated.
  * The angular momentum is important in the Kerr metric to compute frame dragging.
