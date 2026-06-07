@@ -72,36 +72,59 @@ float getKeplerianAngularVelocity(float orbitalRadius) {
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
-float valueNoise(vec2 p, float f) {
-    float bl = hash(floor(p*f + vec2(0.0, 0.0)));
-    float br = hash(floor(p*f + vec2(1.0, 0.0)));
-    float tl = hash(floor(p*f + vec2(0.0, 1.0)));
-    float tr = hash(floor(p*f + vec2(1.0, 1.0)));
-
-    vec2 fr = fract(p*f);
+float valueNoisePeriodicX(vec2 p, float periodX) {
+    vec2 cell = floor(p);
+    vec2 fr = fract(p);
     fr = (3. - 2.*fr)*fr*fr;
+
+    float x0 = mod(cell.x, periodX);
+    float x1 = mod(cell.x + 1.0, periodX);
+    float y0 = cell.y;
+    float y1 = cell.y + 1.0;
+
+    float bl = hash(vec2(x0, y0));
+    float br = hash(vec2(x1, y0));
+    float tl = hash(vec2(x0, y1));
+    float tr = hash(vec2(x1, y1));
+
     float b = mix(bl, br, fr.x);
     float t = mix(tl, tr, fr.x);
     return mix(b, t, fr.y);
 }
 
-vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
+bool rayIntersectAccretionDiskSlab(vec3 rayOrigin, vec3 rayDir, out float tEnter, out float tExit) {
+    if (abs(rayDir.y) < 1e-6) {
+        if (abs(rayOrigin.y) > accretionDiskHeight) return false;
+
+        tEnter = 0.0;
+        tExit = accretionDiskHeight;
+        return true;
+    }
+
+    float tBottom = (-accretionDiskHeight - rayOrigin.y) / rayDir.y;
+    float tTop = (accretionDiskHeight - rayOrigin.y) / rayDir.y;
+
+    tEnter = max(min(tBottom, tTop), 0.0);
+    tExit = max(tBottom, tTop);
+
+    return tExit >= tEnter;
+}
+
+vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
     if (!hasAccretionDisk) return vec4(0.0);// no disk
 
-    vec3 samplePoint = initialPosition;
+    vec3 samplePoint = entryPoint;
     float distanceToCenter = length(samplePoint);// distance to the center of the disk
     float relativeDistance = distanceToCenter / schwarzschildRadius;
     float relativeDiskRadius = accretionDiskRadius / schwarzschildRadius;
 
     vec3 projectedRayDir = vec3(rayDir.x, 0.0, rayDir.z);
-    vec3 projectedInitialPosition = vec3(initialPosition.x, 0.0, initialPosition.z);
+    vec3 projectedEntryPoint = vec3(entryPoint.x, 0.0, entryPoint.z);
 
-    float projectionDistance = max(abs(rayDir.y), 1e-6);// if the vector is parallel to the disk then the projection distance is near 0. We use it to increase the step size.
-    float stepSize = 0.02 * distanceToCenter / projectionDistance;//FIXME: this is not correct, but it works
-
-    samplePoint += stepSize * rayDir;//FIXME: somehow when I remove this line, the disk has no thickness
-
-    vec3 deltaPos = normalize(cross(localDiskNormal, projectedInitialPosition));
+    vec3 deltaPos = vec3(1.0, 0.0, 0.0);
+    if (length(projectedEntryPoint.xz) > 1e-6) {
+        deltaPos = normalize(cross(localDiskNormal, projectedEntryPoint));
+    }
 
     float parallel = dot(projectedRayDir, deltaPos);
 
@@ -117,7 +140,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
 
     vec4 diskColor = vec4(0.0);
     for (float i = 0.0; i < DISK_STEPS; i++) {
-        samplePoint -= stepSize * rayDir / DISK_STEPS;
+        float raymarchFraction = (i + 0.5) / DISK_STEPS;
+        samplePoint = mix(entryPoint, exitPoint, raymarchFraction);
 
         vec3 projectedSamplePoint = vec3(samplePoint.x, 0.0, samplePoint.z);
 
@@ -135,13 +159,11 @@ vec4 raymarchDisk(vec3 rayDir, vec3 initialPosition) {
         float theta = -elapsedSeconds * getKeplerianAngularVelocity(orbitalRadius);
         vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, localDiskNormal, theta);
 
-        // the clamping is necessary to prevent undefined values when acos(x) has |x| > 1
-        float angle = acos(clamp(rotatedProjectedSamplePoint.z / length(rotatedProjectedSamplePoint.xz), -1.0, 1.0));
+        float angle = atan(rotatedProjectedSamplePoint.x, rotatedProjectedSamplePoint.z);
+        float angle01 = fract(angle / 6.28318530718 + 0.5);
         float u = intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
-        const float noiseFrequency = 1.0;
-        vec2 noiseSamplePoint = vec2(angle * 2.0, u);
-        float noise = valueNoise(noiseSamplePoint, noiseFrequency); // 1st octave
-        noise = noise * 0.66 + 0.33 * valueNoise(noiseSamplePoint, noiseFrequency * 2.0); // 2nd octave
+        float noise = valueNoisePeriodicX(vec2(angle01 * 12.0, u), 12.0); // 1st octave
+        noise = noise * 0.66 + 0.33 * valueNoisePeriodicX(vec2(angle01 * 24.0, u * 2.0), 24.0); // 2nd octave
         noise = pow(noise, 0.8);
         noise = max(0.2, noise);
 
@@ -253,10 +275,17 @@ void main() {
                 escapedBH = true;
                 break;
             } else if (projectedDistance <= accretionDiskHeight) {
-                //ray hit accretion disk //FIXME: Break when rotate around edge of disk
-                vec4 diskCol = raymarchDisk(rayDir, rayPositionBlackHoleSpace);//render disk
-                rayPositionBlackHoleSpace += accretionDiskHeight * rayDir / rayDirProjectedDistance;// we get out of the disk
-                col += diskCol * (1.0 - col.a);
+                float diskEnter = 0.0;
+                float diskExit = 0.0;
+                if (rayIntersectAccretionDiskSlab(rayPositionBlackHoleSpace, rayDir, diskEnter, diskExit)) {
+                    vec3 diskEntryPoint = rayPositionBlackHoleSpace + diskEnter * rayDir;
+                    vec3 diskExitPoint = rayPositionBlackHoleSpace + diskExit * rayDir;
+                    vec4 diskCol = raymarchDisk(rayDir, diskEntryPoint, diskExitPoint);//render disk
+                    rayPositionBlackHoleSpace = diskExitPoint;
+                    col += diskCol * (1.0 - col.a);
+                } else {
+                    rayPositionBlackHoleSpace += accretionDiskHeight * rayDir / rayDirProjectedDistance;// fallback to avoid being stuck in the disk band
+                }
             }
 
             if (suckedInBH || escapedBH) break;
