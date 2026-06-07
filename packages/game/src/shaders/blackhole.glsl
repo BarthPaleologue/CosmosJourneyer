@@ -325,11 +325,11 @@ void main() {
     if (occluded) {
         finalColor = screenColor;
     } else if (suckedInBH) {
-        finalColor = vec4(col.rgb * col.a, 1.0);
+        finalColor = vec4(col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
     } else if (escapedBH) {
-        finalColor = vec4(mix(bg.rgb, col.rgb + glow.rgb *(col.a +  glow.a), col.a), 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - col.a) + col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
     } else {
-        finalColor = vec4(col.rgb + glow.rgb *(col.a +  glow.a), 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - col.a) + col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
     }
 
     gl_FragColor = finalColor;
