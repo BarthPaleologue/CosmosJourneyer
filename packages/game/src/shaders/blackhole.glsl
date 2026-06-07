@@ -221,18 +221,17 @@ void main() {
 
     if (maximumDistance < length(rayPositionBlackHoleSpace)) occluded = true;
 
-    vec4 col = vec4(0.0);
-    vec4 glow = vec4(0.0);
+    vec4 accumulatedColor = vec4(0.0);
 
     if (!occluded) {
-        for (int disks = 0; disks < 15; disks++) {
+        for (int diskCrossingIndex = 0; diskCrossingIndex < 15; diskCrossingIndex++) {
             float distanceToCenter = 0.0;//distance to BH
 
             float projectedDistance = 0.0;
 
             float rayDirProjectedDistance = 0.0;
 
-            for (int h = 0; h < 6; h++) {
+            for (int subStepIndex = 0; subStepIndex < 6; subStepIndex++) {
                 //reduces tests for exit conditions (to minimise branching)
                 distanceToCenter = customLength(rayPositionBlackHoleSpace);//distance to BH
                 vec3 dirToBlackHole = -rayPositionBlackHoleSpace / distanceToCenter;//direction to BH
@@ -262,9 +261,9 @@ void main() {
                 if(hasAccretionDisk) {
                     // the distance in the unit of the schwarzschild radius
                     float relativeDistance = distanceToCenter / schwarzschildRadius;
-                    // the glow mask fades the glow when to close to the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.0 is slightly below for artistic reasons: bloom leaks at the camera level)
+                    // Fade disk emission near the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.0 is slightly below for artistic reasons: bloom leaks at the camera level)
                     float glowMask = smoothstep(1.0, 2.5, relativeDistance);
-                    col += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
+                    accumulatedColor += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
                 }
             }
 
@@ -282,7 +281,7 @@ void main() {
                     vec3 diskExitPoint = rayPositionBlackHoleSpace + diskExit * rayDir;
                     vec4 diskCol = raymarchDisk(rayDir, diskEntryPoint, diskExitPoint);//render disk
                     rayPositionBlackHoleSpace = diskExitPoint;
-                    col += diskCol * (1.0 - col.a);
+                    accumulatedColor += diskCol * (1.0 - accumulatedColor.a);
                 } else {
                     rayPositionBlackHoleSpace += accretionDiskHeight * rayDir / rayDirProjectedDistance;// fallback to avoid being stuck in the disk band
                 }
@@ -325,11 +324,11 @@ void main() {
     if (occluded) {
         finalColor = screenColor;
     } else if (suckedInBH) {
-        finalColor = vec4(col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
+        finalColor = vec4(accumulatedColor.rgb * accumulatedColor.a, 1.0);
     } else if (escapedBH) {
-        finalColor = vec4(bg.rgb * (1.0 - col.a) + col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a, 1.0);
     } else {
-        finalColor = vec4(bg.rgb * (1.0 - col.a) + col.rgb * col.a + glow.rgb * (1.0 - col.a), 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a, 1.0);
     }
 
     gl_FragColor = finalColor;
