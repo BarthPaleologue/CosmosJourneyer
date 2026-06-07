@@ -20,7 +20,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Rotation } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
 
-import { computeAbsoluteOrientation } from "./orbit";
+import { computeAbsoluteOrientation, computeSpinAxisOrientation } from "./orbit";
 
 const baseRotation = {
     axialTilt: 0,
@@ -87,5 +87,18 @@ describe("computeAbsoluteOrientation", () => {
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
+    });
+});
+
+describe("computeSpinAxisOrientation", () => {
+    it("returns only the spin-axis orientation without the sidereal rotation phase", () => {
+        const spinAxisOrientation = computeSpinAxisOrientation(Math.PI / 2, {
+            ...baseRotation,
+            spinAxisAzimuth: Math.PI / 2,
+            siderealPeriod: 8,
+            initialRotationAngle: Math.PI / 2,
+        });
+
+        expectVectorCloseTo(Axis.X.applyRotationQuaternion(spinAxisOrientation), new Vector3(0, 0, -1));
     });
 });

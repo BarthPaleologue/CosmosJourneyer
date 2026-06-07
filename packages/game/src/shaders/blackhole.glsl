@@ -20,8 +20,8 @@ uniform float schwarzschildRadius;
 uniform float frameDraggingFactor;
 
 uniform vec3 worldPosition;
-uniform mat4 rotation;
-uniform mat4 inverseRotation;
+uniform mat4 diskRotation;
+uniform mat4 inverseDiskRotation;
 
 //TODO: make these uniforms
 const float accretionDiskHeight = 100.0;
@@ -49,19 +49,19 @@ uniform mat4 starfieldRotation;
 const vec3 localDiskNormal = vec3(0.0, 1.0, 0.0);
 
 vec3 worldToBlackHoleSpace(vec3 position) {
-    return mat3(inverseRotation) * (position - worldPosition);
+    return mat3(inverseDiskRotation) * (position - worldPosition);
 }
 
 vec3 directionToBlackHoleSpace(vec3 direction) {
-    return mat3(inverseRotation) * direction;
+    return mat3(inverseDiskRotation) * direction;
 }
 
 vec3 blackHoleSpaceToWorld(vec3 position) {
-    return mat3(rotation) * position + worldPosition;
+    return mat3(diskRotation) * position + worldPosition;
 }
 
 vec3 directionToWorldSpace(vec3 direction) {
-    return mat3(rotation) * direction;
+    return mat3(diskRotation) * direction;
 }
 
 // Angular velocity for a circular orbit at a given radius

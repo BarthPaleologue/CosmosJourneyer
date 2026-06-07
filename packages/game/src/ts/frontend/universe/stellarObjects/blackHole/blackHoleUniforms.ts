@@ -23,6 +23,8 @@ import { G, getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/phy
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
+import { computeSpinAxisOrientation } from "@/frontend/helpers/orbit";
+
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",
     ELAPSED_SECONDS: "elapsedSeconds",
@@ -32,8 +34,8 @@ export const BlackHoleUniformNames = {
     WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
     STANDARD_GRAVITATIONAL_PARAMETER: "standardGravitationalParameter",
     WORLD_POSITION: "worldPosition",
-    ROTATION: "rotation",
-    INVERSE_ROTATION: "inverseRotation",
+    DISK_ROTATION: "diskRotation",
+    INVERSE_DISK_ROTATION: "inverseDiskRotation",
 };
 
 export const BlackHoleSamplerNames = {
@@ -50,8 +52,8 @@ export class BlackHoleUniforms {
     backgroundTexture: CubeTexture;
 
     private readonly worldPosition = new Vector3();
-    private readonly rotation = new Matrix();
-    private readonly inverseRotation = new Matrix();
+    private readonly diskRotation = new Matrix();
+    private readonly inverseDiskRotation = new Matrix();
 
     constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
@@ -61,6 +63,11 @@ export class BlackHoleUniforms {
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
+
+        computeSpinAxisOrientation(blackHoleModel.orbit.inclination, blackHoleModel.rotation).toRotationMatrix(
+            this.diskRotation,
+        );
+        this.diskRotation.transposeToRef(this.inverseDiskRotation);
     }
 
     public setUniforms(effect: Effect, blackHoleTransform: TransformNode, floatingOriginOffset: Vector3) {
@@ -72,13 +79,11 @@ export class BlackHoleUniforms {
         effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
         effect.setFloat(BlackHoleUniformNames.STANDARD_GRAVITATIONAL_PARAMETER, this.standardGravitationalParameter);
 
-        blackHoleTransform.getWorldMatrix().getRotationMatrixToRef(this.rotation);
-        this.rotation.transposeToRef(this.inverseRotation);
         blackHoleTransform.getAbsolutePosition().subtractToRef(floatingOriginOffset, this.worldPosition);
 
         effect.setVector3(BlackHoleUniformNames.WORLD_POSITION, this.worldPosition);
-        effect.setMatrix(BlackHoleUniformNames.ROTATION, this.rotation);
-        effect.setMatrix(BlackHoleUniformNames.INVERSE_ROTATION, this.inverseRotation);
+        effect.setMatrix(BlackHoleUniformNames.DISK_ROTATION, this.diskRotation);
+        effect.setMatrix(BlackHoleUniformNames.INVERSE_DISK_ROTATION, this.inverseDiskRotation);
     }
 
     public setSamplers(effect: Effect) {

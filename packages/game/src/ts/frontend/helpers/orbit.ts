@@ -53,13 +53,7 @@ export function computeAbsoluteOrientation(
     rotation: DeepReadonly<Rotation>,
     elapsedSeconds: number,
 ): Quaternion {
-    const orbitOrientation = Quaternion.RotationAxis(Axis.Z, orbitalInclination);
-
-    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Z, rotation.axialTilt).multiply(
-        Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth),
-    );
-
-    const spinAxisOrientation = orbitOrientation.multiply(spinAxisLocalOrientation);
+    const spinAxisOrientation = computeSpinAxisOrientation(orbitalInclination, rotation);
 
     let rotationAngle = rotation.initialRotationAngle;
     if (rotation.siderealPeriod !== 0) {
@@ -67,4 +61,14 @@ export function computeAbsoluteOrientation(
     }
 
     return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
+}
+
+export function computeSpinAxisOrientation(orbitalInclination: number, rotation: DeepReadonly<Rotation>): Quaternion {
+    const orbitOrientation = Quaternion.RotationAxis(Axis.Z, orbitalInclination);
+
+    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Z, rotation.axialTilt).multiply(
+        Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth),
+    );
+
+    return orbitOrientation.multiply(spinAxisLocalOrientation);
 }
