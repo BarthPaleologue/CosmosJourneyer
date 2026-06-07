@@ -178,7 +178,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix) * 1.25;
 
-    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 3.0, vec3(0.4, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 4.0, vec3(0.8, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
@@ -255,6 +255,7 @@ void main() {
     if (maximumDistance < length(rayPositionBlackHoleSpace)) occluded = true;
 
     vec4 accumulatedColor = vec4(0.0);
+    vec3 accumulatedGlow = vec3(0.0);
 
     if (!occluded) {
         for (int diskCrossingIndex = 0; diskCrossingIndex < 15; diskCrossingIndex++) {
@@ -294,9 +295,12 @@ void main() {
                 if(hasAccretionDisk) {
                     // the distance in the unit of the schwarzschild radius
                     float relativeDistance = distanceToCenter / schwarzschildRadius;
-                    // Fade disk emission near the horizon (the photon sphere has a radius of 1.5 * schwarzschild, so 1.0 is slightly below for artistic reasons: bloom leaks at the camera level)
-                    float glowMask = smoothstep(1.0, 2.5, relativeDistance);
-                    accumulatedColor += 0.5 * vec4(1.0, 0.9, 0.6, 1.0) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
+                    // Fade disk emission between the shadow (~2.6*radius) and the photon sphere (~1.5*radius)
+                    float glowInnerMask = smoothstep(1.5, 2.6, relativeDistance);
+                    float glowOuterRadius = maxBendDistance / schwarzschildRadius;
+                    float glowOuterMask = 1.0 - smoothstep(glowOuterRadius * 0.65, glowOuterRadius * 0.95, relativeDistance);
+                    float glowMask = glowInnerMask * glowOuterMask;
+                    accumulatedGlow += 0.2 * vec3(1.0, 0.9, 0.6) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
                 }
             }
 
@@ -357,11 +361,11 @@ void main() {
     if (occluded) {
         finalColor = screenColor;
     } else if (suckedInBH) {
-        finalColor = vec4(accumulatedColor.rgb * accumulatedColor.a, 1.0);
+        finalColor = vec4(accumulatedColor.rgb * accumulatedColor.a + accumulatedGlow, 1.0);
     } else if (escapedBH) {
-        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a, 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a + accumulatedGlow, 1.0);
     } else {
-        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a, 1.0);
+        finalColor = vec4(bg.rgb * (1.0 - accumulatedColor.a) + accumulatedColor.rgb * accumulatedColor.a + accumulatedGlow, 1.0);
     }
 
     gl_FragColor = finalColor;
