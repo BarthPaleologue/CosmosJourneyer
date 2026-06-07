@@ -6,6 +6,8 @@ precision highp float;
 
 #define DISK_STEPS 12.0//disk texture layers
 
+const float TAU = 6.28318530718;
+
 varying vec2 vUV;
 
 uniform float elapsedSeconds;
@@ -24,8 +26,9 @@ uniform mat4 diskRotation;
 uniform mat4 inverseDiskRotation;
 
 //TODO: make these uniforms
-const float accretionDiskHeight = 100.0;
+const float accretionDiskHeight = 1000.0;
 const bool hasAccretionDisk = true;
+const float maxDiskNoiseShearRadians = 2.0 * TAU;
 
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
@@ -69,6 +72,13 @@ float getKeplerianAngularVelocity(float orbitalRadius) {
     return sqrt(standardGravitationalParameter / max(pow(orbitalRadius, 3.0), 1e-6));
 }
 
+float getDiskNoiseShearCycleDuration() {
+    float innerDiskNoiseRadius = schwarzschildRadius * 2.5;
+    float outerDiskNoiseRadius = max(accretionDiskRadius, innerDiskNoiseRadius);
+    float maxAngularShear = getKeplerianAngularVelocity(innerDiskNoiseRadius) - getKeplerianAngularVelocity(outerDiskNoiseRadius);
+    return maxDiskNoiseShearRadians / max(maxAngularShear, 1e-6);
+}
+
 float hash(float x) { return fract(sin(x) * 152754.742); }
 float hash(vec2 x) { return hash(x.x + hash(x.y)); }
 
@@ -90,6 +100,39 @@ float valueNoisePeriodicX(vec2 p, float periodX) {
     float b = mix(bl, br, fr.x);
     float t = mix(tl, tr, fr.x);
     return mix(b, t, fr.y);
+}
+
+float sampleDiskNoise(vec3 projectedSamplePoint, float relativeDistance, float intensity, float shearAgeSeconds) {
+    float orbitalRadius = max(length(projectedSamplePoint.xz), schwarzschildRadius);
+    float theta = -shearAgeSeconds * getKeplerianAngularVelocity(orbitalRadius);
+    vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, localDiskNormal, theta);
+
+    float angle = atan(rotatedProjectedSamplePoint.x, rotatedProjectedSamplePoint.z);
+    float angle01 = fract(angle / TAU + 0.5);
+    float u = intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
+
+    float noise = valueNoisePeriodicX(vec2(angle01 * 12.0, u), 12.0); // 1st octave
+    noise = noise * 0.66 + 0.33 * valueNoisePeriodicX(vec2(angle01 * 24.0, u * 2.0), 24.0); // 2nd octave
+    noise = pow(noise, 0.8);
+    return max(0.2, noise);
+}
+
+float getDiskNoiseBlendWeight(float cycleFraction) {
+    float fadeIn = smoothstep(0.0, 0.25, cycleFraction);
+    float fadeOut = 1.0 - smoothstep(0.75, 1.0, cycleFraction);
+    return fadeIn * fadeOut;
+}
+
+float sampleDiskNoiseWithBoundedShear(vec3 projectedSamplePoint, float relativeDistance, float intensity) {
+    float cycleDuration = getDiskNoiseShearCycleDuration();
+    float cycleFraction = fract(elapsedSeconds / cycleDuration);
+    float primaryShearAge = cycleFraction * cycleDuration;
+    float secondaryShearAge = fract(cycleFraction + 0.5) * cycleDuration;
+
+    float primaryNoise = sampleDiskNoise(projectedSamplePoint, relativeDistance, intensity, primaryShearAge);
+    float secondaryNoise = sampleDiskNoise(projectedSamplePoint, relativeDistance, intensity, secondaryShearAge);
+
+    return mix(secondaryNoise, primaryNoise, getDiskNoiseBlendWeight(cycleFraction));
 }
 
 bool rayIntersectAccretionDiskSlab(vec3 rayOrigin, vec3 rayDir, out float tEnter, out float tExit) {
@@ -154,18 +197,8 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
         diskMask *= smoothstep(photonSphereRelativeRadius, 2.5, relativeDistance); // Fade the disk when inside the photon sphere.
         diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
-        // The accretion disk orbits differentially: inner material moves faster than outer material.
-        float orbitalRadius = max(length(projectedSamplePoint.xz), schwarzschildRadius);
-        float theta = -elapsedSeconds * getKeplerianAngularVelocity(orbitalRadius);
-        vec3 rotatedProjectedSamplePoint = rotateAround(projectedSamplePoint, localDiskNormal, theta);
-
-        float angle = atan(rotatedProjectedSamplePoint.x, rotatedProjectedSamplePoint.z);
-        float angle01 = fract(angle / 6.28318530718 + 0.5);
-        float u = intensity * 0.2 + 4.0 * relativeDistance;// some kind of disk coordinate (spiral)
-        float noise = valueNoisePeriodicX(vec2(angle01 * 12.0, u), 12.0); // 1st octave
-        noise = noise * 0.66 + 0.33 * valueNoisePeriodicX(vec2(angle01 * 24.0, u * 2.0), 24.0); // 2nd octave
-        noise = pow(noise, 0.8);
-        noise = max(0.2, noise);
+        // Inner disk material moves faster than outer material, but the sheared noise is recycled before it degenerates into radial high frequency noise.
+        float noise = sampleDiskNoiseWithBoundedShear(projectedSamplePoint, relativeDistance, intensity);
 
         float alpha = diskMask * noise * intensity;
 
