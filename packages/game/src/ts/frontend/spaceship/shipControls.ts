@@ -18,7 +18,7 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, type Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -28,7 +28,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type ITts } from "@/frontend/audio/tts";
 import { type Controls } from "@/frontend/controls";
-import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
+import { createCameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -67,7 +67,7 @@ export class ShipControls implements Controls {
 
     readonly firstPersonCamera: FreeCamera;
 
-    private readonly cameraShakeAnimation: CameraShakeAnimation;
+    private cameraShakeAnimation: CustomAnimation<Vector2> | null = null;
 
     private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
 
@@ -132,7 +132,7 @@ export class ShipControls implements Controls {
             2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
-        this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
+        this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
@@ -156,11 +156,11 @@ export class ShipControls implements Controls {
             spaceship.toggleWarpDrive();
             if (warpDrive.isEnabled()) {
                 tts.sayNow("Charlotte", "engaging_warp_drive");
-                this.cameraShakeAnimation.reset();
                 spaceship.setMainEngineThrottle(0);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
             } else {
                 tts.sayNow("Charlotte", "warp_drive_disengaged");
-                this.cameraShakeAnimation.reset();
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 0.5);
 
                 if (this.closestLandableFacility !== null) {
                     const distanceToLandingFacility = Vector3.Distance(
@@ -346,7 +346,12 @@ export class ShipControls implements Controls {
         spaceship.spaceDots.setSteering(spaceDotsYawIntent, spaceDotsPitchIntent);
         spaceship.update(deltaSeconds);
 
-        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
+        if (this.cameraShakeAnimation !== null && !this.cameraShakeAnimation.isFinished()) {
+            this.cameraShakeAnimation.update(deltaSeconds);
+            const { x: alpha, y: beta } = this.cameraShakeAnimation.getCurrentValue();
+            this.thirdPersonCamera.alpha = alpha;
+            this.thirdPersonCamera.beta = beta;
+        }
 
         if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
@@ -445,7 +450,6 @@ export class ShipControls implements Controls {
 
     reset() {
         this.resetCameraHandler("behindCentered");
-        this.cameraShakeAnimation.reset();
         this.closestLandableFacility = null;
     }
 
