@@ -183,7 +183,7 @@ export class StarSystemController {
         let bestObject: OrbitalObject = this.stellarObjects[0];
         for (const object of orbitalObjects) {
             const distanceSquared = Vector3.DistanceSquared(object.getTransform().position, position);
-            const influence = object.getBoundingRadius() / distanceSquared;
+            const influence = object.getBoundingRadius() / distanceSquared ** 2;
 
             if (influence > greatestInfluence) {
                 greatestInfluence = influence;
