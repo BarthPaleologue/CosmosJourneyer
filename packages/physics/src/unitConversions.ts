@@ -15,7 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AU, C, LightYearInMeters } from "./constants";
+import { AU, C, LightYearInMeters, SolarMass } from "./constants";
+
+export type Duration = Partial<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+}>;
 
 export function metersToLightYears(meters: number): number {
     return meters / LightYearInMeters;
@@ -27,6 +34,20 @@ export function lightYearsToMeters(lightYears: number): number {
 
 export function metersToLightSeconds(meters: number): number {
     return meters / C;
+}
+
+/**
+ * Converts a duration to seconds.
+ * @param duration The duration expressed in days, hours, minutes, and/or seconds.
+ * @returns The duration in seconds.
+ */
+export function durationToSeconds(duration: Duration): number {
+    const days = duration.days ?? 0;
+    const hours = duration.hours ?? 0;
+    const minutes = duration.minutes ?? 0;
+    const seconds = duration.seconds ?? 0;
+
+    return days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60 + seconds;
 }
 
 /**
@@ -53,6 +74,14 @@ export function kelvinToCelsius(kelvin: number) {
  */
 export function astronomicalUnitToMeters(distanceAU: number): number {
     return distanceAU * AU;
+}
+
+/**
+ * @param solarMasses The mass in solar masses.
+ * @returns The mass in kilograms.
+ */
+export function solarMassToKg(solarMasses: number): number {
+    return solarMasses * SolarMass;
 }
 
 /**

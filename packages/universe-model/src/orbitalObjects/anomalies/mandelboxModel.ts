@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { RGBColor } from "../../common";
-import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
-export type MandelboxModel = CelestialBodyModelBase<"mandelbox"> & {
+export type MandelboxModel = OrbitalObjectModelBase<"mandelbox"> & {
+    radius: number;
     /**
      * The albedo color of the mandelbox
      */

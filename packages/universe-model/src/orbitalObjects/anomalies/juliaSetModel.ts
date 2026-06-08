@@ -16,8 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { RGBColor } from "../../common";
-import { type CelestialBodyModelBase } from "../orbitalObjectModelBase";
+import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
-export type JuliaSetModel = CelestialBodyModelBase<"juliaSet"> & {
+export type JuliaSetModel = OrbitalObjectModelBase<"juliaSet"> & {
+    radius: number;
     readonly accentColor: RGBColor;
 };

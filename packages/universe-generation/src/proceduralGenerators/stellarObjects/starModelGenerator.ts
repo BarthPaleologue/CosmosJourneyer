@@ -21,7 +21,7 @@ import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { wheelOfFortune } from "#/utils/random";
 import { SolarRadius, type StellarType } from "@cosmos-journeyer/physics";
 import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalObjectModel, type Orbit, type StarModel } from "@cosmos-journeyer/universe-model";
+import { type OrbitalObjectModel, type Orbit, type StarModel, type Rotation } from "@cosmos-journeyer/universe-model";
 import { randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 export function generateStarModel(
@@ -38,8 +38,13 @@ export function generateStarModel(
 
     const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
     const mass = 1.9885e30; //TODO: compute mass from physical properties
-    const siderealDaySeconds = 24 * 60 * 60;
-    const axialTilt = 0;
+
+    const rotation: Rotation = {
+        siderealPeriod: 24 * 60 * 60,
+        axialTilt: 0,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const radius = getRandomRadiusFromStellarType(stellarType, rng);
 
@@ -65,16 +70,15 @@ export function generateStarModel(
 
     return {
         type: "star",
-        id: id,
-        name: name,
-        seed: seed,
-        radius: radius,
-        orbit: orbit,
+        id,
+        name,
+        seed,
+        radius,
+        orbit,
         blackBodyTemperature: temperature,
-        mass: mass,
-        siderealDaySeconds: siderealDaySeconds,
-        axialTilt: axialTilt,
-        rings: rings,
+        mass,
+        rotation,
+        rings,
     };
 }
 

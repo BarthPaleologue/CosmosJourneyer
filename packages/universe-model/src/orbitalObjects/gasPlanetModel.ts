@@ -18,7 +18,7 @@
 import { type RGBColor } from "../common";
 import { type AtmosphereModel } from "./atmosphereModel";
 import { type HasSeed } from "./hasSeed";
-import { type CelestialBodyModelBase } from "./orbitalObjectModelBase";
+import { type OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import { type RingsModel } from "./ringsModel";
 
 export type GasPlanetProceduralColorPalette = {
@@ -38,8 +38,9 @@ export type GasPlanetTexturedColorPalette = {
 
 export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetTexturedColorPalette;
 
-export type GasPlanetModel = CelestialBodyModelBase<"gasPlanet"> &
+export type GasPlanetModel = OrbitalObjectModelBase<"gasPlanet"> &
     HasSeed & {
+        radius: number;
         atmosphere: AtmosphereModel;
         rings: RingsModel | null;
         colorPalette: GasPlanetColorPalette;

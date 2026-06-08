@@ -29,11 +29,13 @@ import {
 } from "@cosmos-journeyer/physics";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type AtmosphereModel,
     type CloudsModel,
     type OceanModel,
     type Orbit,
     type RingsModel,
+    type Rotation,
     type StellarObjectModel,
     type TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
@@ -60,8 +62,10 @@ export function generateTelluricPlanetModel(
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
-        const orbitRadius = getTelluricPlanetOrbitRadius(parent.blackBodyTemperature, parent.radius, () =>
-            rng(GenerationSteps.ORBIT + orbitRadiuses.length),
+        const orbitRadius = getTelluricPlanetOrbitRadius(
+            parent.blackBodyTemperature,
+            getCelestialBodyRadius(parent),
+            () => rng(GenerationSteps.ORBIT + orbitRadiuses.length),
         );
         orbitRadiuses.push(orbitRadius);
     }
@@ -72,7 +76,7 @@ export function generateTelluricPlanetModel(
     let parentAverageAxialTilt = 0;
     for (const parent of parentBodies) {
         parentAverageInclination += parent.orbit.inclination;
-        parentAverageAxialTilt += parent.axialTilt;
+        parentAverageAxialTilt += parent.rotation.axialTilt;
     }
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
@@ -107,7 +111,7 @@ export function generateTelluricPlanetModel(
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
             temperature: body.blackBodyTemperature,
-            radius: body.radius,
+            radius: getCelestialBodyRadius(body),
             distance: orbit.semiMajorAxis,
         })),
         0.3,
@@ -115,8 +119,13 @@ export function generateTelluricPlanetModel(
 
     const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
 
-    const axialTilt = normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT);
-    const siderealDaySeconds = (60 * 60 * 24) / 10;
+    const rotation: Rotation = {
+        siderealPeriod: (60 * 60 * 24) / 10,
+        axialTilt: normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT),
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
+
     const waterAmount = clamp(normalRandom(0.02, 0.01, rng, GenerationSteps.WATER_AMOUNT), 0, 0.2);
     const canHaveLiquidWater = hasLiquidWater(pressure, temperatureRange.min, temperatureRange.max);
 
@@ -160,22 +169,21 @@ export function generateTelluricPlanetModel(
 
     return {
         type: "telluricPlanet",
-        id: id,
-        seed: seed,
+        id,
+        seed,
         name,
         mass,
-        axialTilt,
-        siderealDaySeconds,
+        rotation,
         composition: {
             rock: 1 - waterAmount,
             h2o: waterAmount,
         },
-        radius: radius,
+        radius,
         temperature: temperatureRange,
-        orbit: orbit,
-        terrainSettings: terrainSettings,
-        rings: rings,
-        clouds: clouds,
+        orbit,
+        terrainSettings,
+        rings,
+        clouds,
         ocean,
         atmosphere,
     };

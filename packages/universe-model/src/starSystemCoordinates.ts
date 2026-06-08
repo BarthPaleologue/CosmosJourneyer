@@ -21,27 +21,27 @@ export const StarSystemCoordinatesSchema = z.object({
     /**
      * Integer coordinates of the star sector along the universe X axis
      */
-    starSectorX: z.number(),
+    starSectorX: z.int(),
     /**
      * Integer coordinates of the star sector along the universe Y axis
      */
-    starSectorY: z.number(),
+    starSectorY: z.int(),
     /**
      * Integer coordinates of the star sector along the universe Z axis
      */
-    starSectorZ: z.number(),
+    starSectorZ: z.int(),
     /**
      * Floating point X coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
      */
-    localX: z.number(),
+    localX: z.number().min(-0.5).max(0.5),
     /**
      * Floating point Y coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
      */
-    localY: z.number(),
+    localY: z.number().min(-0.5).max(0.5),
     /**
      * Floating point Z coordinate of the star system inside the star sector. Must be between -0.5 and 0.5.
      */
-    localZ: z.number(),
+    localZ: z.number().min(-0.5).max(0.5),
 });
 
 /**

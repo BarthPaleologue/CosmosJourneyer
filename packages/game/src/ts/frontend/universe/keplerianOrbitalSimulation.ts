@@ -15,11 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { type Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
-import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
+import { computeAbsoluteOrientation, getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
 
 import { type OrbitalObject } from "./architecture/orbitalObject";
 
@@ -162,13 +161,6 @@ export class KeplerianOrbitalSimulation {
     }
 
     private computeAbsoluteOrientation(object: OrbitalObject): Quaternion {
-        const orientation = Quaternion.RotationAxis(Axis.Z, object.model.orbit.inclination + object.model.axialTilt);
-
-        if (object.model.siderealDaySeconds === 0) {
-            return orientation;
-        }
-
-        const rotationAroundAxis = (2 * Math.PI * this.elapsedSeconds) / object.model.siderealDaySeconds;
-        return orientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAroundAxis));
+        return computeAbsoluteOrientation(object.model.orbit.inclination, object.model.rotation, this.elapsedSeconds);
     }
 }

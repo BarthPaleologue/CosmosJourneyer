@@ -52,7 +52,7 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
 
     const manaleth = generateTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate], [weierstrass]);
     manaleth.orbit.inclination = degreesToRadians(45);
-    manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.siderealDaySeconds, hecate.mass);
+    manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.rotation.siderealPeriod, hecate.mass);
 
     const ares = generateTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
     ares.ocean = null;

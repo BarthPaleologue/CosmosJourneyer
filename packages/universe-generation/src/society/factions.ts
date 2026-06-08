@@ -14,6 +14,8 @@ export function factionToString(faction: Faction): string {
             return "Human Commonwealth";
         case "satori_concord":
             return "Satori Concord";
+        case "dreamers_connection":
+            return "Dreamers Connection";
         default:
             return assertUnreachable(faction);
     }

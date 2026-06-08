@@ -18,6 +18,7 @@
 import { type OrbitalObjectType } from "./index";
 import { type Orbit } from "./orbit";
 import { type OrbitalObjectId } from "./orbitalObjectId";
+import type { Rotation } from "./rotation";
 
 /**
  * Describes the model of an orbital object
@@ -45,23 +46,6 @@ export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
      */
     mass: number;
 
-    /**
-     * Time needed for the object to rotate 360° on its axis in seconds.
-     * It is slightly different from the duration of solar day which is the time it takes for the sun to be at the same position in the sky.
-     * @see https://en.wikipedia.org/wiki/Sidereal_time
-     */
-    siderealDaySeconds: number;
-
-    /**
-     * the angle between an object's rotational axis and its orbital axis, which is the line perpendicular to its orbital plane
-     * @see https://en.wikipedia.org/wiki/Axial_tilt
-     */
-    axialTilt: number;
-};
-
-export type CelestialBodyModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
-    /**
-     * The radius of the celestial body in meters
-     */
-    radius: number;
+    /** Rotational elements of the object */
+    rotation: Rotation;
 };

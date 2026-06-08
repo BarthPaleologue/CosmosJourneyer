@@ -2,7 +2,7 @@
     "name": "@cosmos-journeyer/universe-model",
     "version": "1.11.0-dev",
     "private": true,
-    "description": "Pure universe data models and schemas shared across Cosmos Journeyer packages.",
+    "description": "Universe data models, schemas, and canonical derived accessors shared across Cosmos Journeyer packages.",
     "license": "AGPL-3.0-only",
     "repository": {
         "type": "git",
@@ -21,6 +21,7 @@
         "format:check": "oxfmt . --check"
     },
     "dependencies": {
+        "@cosmos-journeyer/physics": "workspace:^",
         "@cosmos-journeyer/typescript": "workspace:^",
         "zod": "catalog:"
     },

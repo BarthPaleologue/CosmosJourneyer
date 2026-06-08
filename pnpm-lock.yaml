@@ -354,6 +354,9 @@ importers:
 
   packages/universe-model:
     dependencies:
+      '@cosmos-journeyer/physics':
+        specifier: workspace:^
+        version: link:../physics
       '@cosmos-journeyer/typescript':
         specifier: workspace:^
         version: link:../typescript

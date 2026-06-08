@@ -31,11 +31,13 @@ import {
 } from "@cosmos-journeyer/physics";
 import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type PlanetModel,
     type Orbit,
     type SpaceElevatorModel,
     type ElevatorSectionModel,
     type StarSystemModel,
+    type Rotation,
 } from "@cosmos-journeyer/universe-model";
 
 import { generateFusionSectionModel } from "./sections/fusion";
@@ -56,7 +58,7 @@ export function generateSpaceElevatorModel(
 
     const name = generateSpaceElevatorName(rng, 2756);
 
-    const parentSiderealDayDuration = parentBody.siderealDaySeconds;
+    const parentSiderealDayDuration = parentBody.rotation.siderealPeriod;
 
     const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
 
@@ -64,7 +66,7 @@ export function generateSpaceElevatorModel(
         parentIds: [parentBody.id],
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: parentBody.orbit.inclination + parentBody.axialTilt,
+        inclination: parentBody.orbit.inclination + parentBody.rotation.axialTilt,
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
@@ -74,8 +76,13 @@ export function generateSpaceElevatorModel(
     const tetherLength = orbitRadius - parentBody.radius;
 
     const mass = 1;
-    const siderealDaySeconds = parentSiderealDayDuration;
-    const axialTilt = Math.PI / 2;
+
+    const rotation: Rotation = {
+        siderealPeriod: parentSiderealDayDuration,
+        axialTilt: Math.PI / 2,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const faction = getFactionFromCoordinates(systemModel.coordinates, rng);
 
@@ -165,7 +172,11 @@ export function generateSpaceElevatorModel(
 
     let totalIrradiance = 0;
     for (const [model, distance] of distancesToStellarObjects) {
-        totalIrradiance += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
+        totalIrradiance += getSphereIrradianceAtDistance(
+            model.blackBodyTemperature,
+            getCelestialBodyRadius(model),
+            distance,
+        );
     }
 
     const totalEnergyRequirementKWhPerYear = population * annualEnergyPerCapitaKWh;
@@ -198,8 +209,7 @@ export function generateSpaceElevatorModel(
         name,
         orbit,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         tetherLength,
         population,
         annualEnergyPerCapitaKWh,

@@ -23,6 +23,7 @@ import {
     getKerrMetricA,
     getMassFromSchwarzschildRadius,
     getSchwarzschildRadius,
+    getShadowRadius,
     hasNakedSingularity,
 } from "./blackHole";
 import { C, G, SolarMass, SolarRadius } from "./constants";
@@ -69,6 +70,22 @@ describe("getMassFromSchwarzschildRadius", () => {
         const radius = 1_000;
         const expectedMass = (radius * C ** 2) / (2 * G);
         expect(getMassFromSchwarzschildRadius(radius)).toBeCloseTo(expectedMass, 6);
+    });
+});
+
+describe("getShadowRadius", () => {
+    it("returns 3sqrt(3)/2 times the Schwarzschild radius", () => {
+        const mass = 400 * SolarMass;
+        const expectedShadowRadius = (3 * Math.sqrt(3) * getSchwarzschildRadius(mass)) / 2;
+
+        expect(getShadowRadius(mass)).toBeCloseTo(expectedShadowRadius, 12);
+    });
+
+    it("is about 7.7km for the mass of our sun", () => {
+        const shadowRadius = getShadowRadius(SolarMass);
+
+        expect(shadowRadius).toBeGreaterThan(7.65e3);
+        expect(shadowRadius).toBeLessThan(7.7e3);
     });
 });
 

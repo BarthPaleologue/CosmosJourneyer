@@ -21,7 +21,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { type Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type DarkKnightModel } from "@cosmos-journeyer/universe-model";
+import { getCelestialBodyRadius, type DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
@@ -35,6 +35,8 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
 
     readonly model: DeepReadonly<DarkKnightModel>;
 
+    private readonly radius: number;
+
     private readonly mesh: Mesh;
 
     private readonly material: PBRMetallicRoughnessMaterial;
@@ -47,7 +49,9 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
         this.type = model.type;
         this.model = model;
 
-        this.mesh = MeshBuilder.CreateSphere("DarkKnight", { diameter: this.model.radius, segments: 256 }, scene);
+        this.radius = getCelestialBodyRadius(model);
+
+        this.mesh = MeshBuilder.CreateSphere("DarkKnight", { diameter: this.radius * 2, segments: 256 }, scene);
 
         this.material = new PBRMetallicRoughnessMaterial("DarkKnightMaterial", scene);
         this.material.metallic = 1;
@@ -59,17 +63,17 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
         this.targetInfo = {
             type: ObjectTargetCursorType.ANOMALY,
             name: this.model.name,
-            minDistance: this.model.radius * 5,
-            maxDistance: this.model.radius * 100,
+            minDistance: this.radius * 5,
+            maxDistance: this.radius * 100,
         };
     }
 
     getRadius(): number {
-        return this.model.radius;
+        return this.radius;
     }
 
     getBoundingRadius(): number {
-        return this.model.radius;
+        return this.radius;
     }
 
     getTypeName(): string {

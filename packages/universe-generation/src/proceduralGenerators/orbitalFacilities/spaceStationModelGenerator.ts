@@ -33,11 +33,13 @@ import {
 } from "@cosmos-journeyer/physics";
 import { assertUnreachable, type DeepPartial, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
+    getCelestialBodyRadius,
     type CelestialBodyModel,
     type Orbit,
     type SpaceStationModel,
     type StationSectionModel,
     type StarSystemModel,
+    type Rotation,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
@@ -61,7 +63,7 @@ export function generateSpaceStationModel(
 
     const name = overrides?.name ?? generateSpaceStationName(rng, 2756);
 
-    let parentMaxRadius = parentBody.radius;
+    let parentMaxRadius = getCelestialBodyRadius(parentBody);
     if (parentBody.type === "blackHole") {
         parentMaxRadius += parentBody.accretionDiskRadius;
     }
@@ -89,8 +91,13 @@ export function generateSpaceStationModel(
     };
 
     const mass = 1;
-    const siderealDaySeconds = 0;
-    const axialTilt = 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI;
+
+    const rotation: Rotation = {
+        siderealPeriod: 0,
+        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     const faction = overrides?.faction ?? getFactionFromCoordinates(systemModel.coordinates, rng);
 
@@ -126,14 +133,18 @@ export function generateSpaceStationModel(
     if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
         totalIrradiance = getSphereIrradianceAtDistance(
             parentBody.blackBodyTemperature,
-            parentBody.radius,
+            getCelestialBodyRadius(parentBody),
             orbit.semiMajorAxis,
         );
     } else {
         const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
 
         for (const [model, distance] of distancesToStellarObjects) {
-            totalIrradiance += getSphereIrradianceAtDistance(model.blackBodyTemperature, model.radius, distance);
+            totalIrradiance += getSphereIrradianceAtDistance(
+                model.blackBodyTemperature,
+                getCelestialBodyRadius(model),
+                distance,
+            );
         }
     }
 
@@ -222,8 +233,7 @@ export function generateSpaceStationModel(
         name,
         orbit,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         population,
         annualEnergyPerCapitaKWh,
         populationDensity: targetPopulationDensity,

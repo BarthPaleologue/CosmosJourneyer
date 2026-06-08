@@ -26,13 +26,13 @@ function createTestOrbitalObject({
     parentIds,
     semiMajorAxis,
     position = Vector3.Zero(),
-    siderealDaySeconds = 0,
+    siderealPeriod = 0,
 }: {
     readonly id: string;
     readonly parentIds: ReadonlyArray<string>;
     readonly semiMajorAxis: number;
     readonly position?: Vector3;
-    readonly siderealDaySeconds?: number;
+    readonly siderealPeriod?: number;
 }): OrbitalObject {
     return {
         type: "custom",
@@ -50,9 +50,13 @@ function createTestOrbitalObject({
                 eccentricity: 0,
                 p: 2,
             },
-            axialTilt: 0,
             mass: 1,
-            siderealDaySeconds,
+            rotation: {
+                axialTilt: 0,
+                spinAxisAzimuth: 0,
+                siderealPeriod,
+                initialRotationAngle: 0,
+            },
         },
         getTransform: () => ({
             position,
@@ -93,7 +97,7 @@ describe("KeplerianOrbitalSimulation", () => {
             id: "reference",
             parentIds: [],
             semiMajorAxis: 0,
-            siderealDaySeconds: 4,
+            siderealPeriod: 4,
         });
 
         const simulation = new KeplerianOrbitalSimulation([reference]);
@@ -118,7 +122,7 @@ describe("KeplerianOrbitalSimulation", () => {
             id: "reference",
             parentIds: [],
             semiMajorAxis: 0,
-            siderealDaySeconds: 4,
+            siderealPeriod: 4,
         });
         const target = createTestOrbitalObject({
             id: "target",

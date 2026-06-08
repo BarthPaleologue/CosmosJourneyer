@@ -15,7 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, barToPascal, celsiusToKelvin, degreesToRadians } from "@cosmos-journeyer/physics";
+import {
+    astronomicalUnitToMeters,
+    barToPascal,
+    celsiusToKelvin,
+    degreesToRadians,
+    durationToSeconds,
+} from "@cosmos-journeyer/physics";
 import {
     type GasPlanetModel,
     type TelluricPlanetModel,
@@ -36,8 +42,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "telluricPlanet",
         radius: 2_439.7e3,
         mass: 3.301e23,
-        axialTilt: degreesToRadians(0.034),
-        siderealDaySeconds: 60 * 60 * 24 * 58.646,
+        rotation: {
+            siderealPeriod: durationToSeconds({ days: 58.646 }),
+            axialTilt: degreesToRadians(0.034),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         composition: {
             rock: 1,
         },
@@ -80,8 +90,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "telluricPlanet",
         radius: 6_051.8e3,
         mass: 4.8e20,
-        axialTilt: degreesToRadians(177.36),
-        siderealDaySeconds: 60 * 60 * 24 * 243.025,
+        rotation: {
+            siderealPeriod: durationToSeconds({ days: 243.0226 }),
+            axialTilt: degreesToRadians(177.36),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         composition: {
             rock: 1,
         },
@@ -138,8 +152,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "telluricPlanet",
         radius: 6_371e3,
         mass: 5.972e24,
-        axialTilt: degreesToRadians(23.44),
-        siderealDaySeconds: 60 * 60 * 24,
+        rotation: {
+            siderealPeriod: durationToSeconds({ hours: 23, minutes: 56, seconds: 4 }),
+            axialTilt: degreesToRadians(23.44),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         composition: {
             rock: 0.9998,
             h2o: 0.0002,
@@ -199,8 +217,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "telluricSatellite",
         radius: 1_737.1e3,
         mass: 7.342e22,
-        axialTilt: degreesToRadians(6.68),
-        siderealDaySeconds: 60 * 60 * 24 * 27.322,
+        rotation: {
+            siderealPeriod: durationToSeconds({ days: 27.321_661 }),
+            axialTilt: degreesToRadians(6.687),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         composition: {
             rock: 1,
         },
@@ -242,8 +264,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "telluricPlanet",
         radius: 3_389.5e3,
         mass: 6.4171e23,
-        axialTilt: degreesToRadians(25.19),
-        siderealDaySeconds: 60 * 60 * 24 * 1.027,
+        rotation: {
+            siderealPeriod: durationToSeconds({ hours: 24, minutes: 37, seconds: 23 }),
+            axialTilt: degreesToRadians(25.19),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         composition: {
             rock: 1,
         },
@@ -293,8 +319,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "gasPlanet",
         radius: 25_362e3,
         mass: 8.681e25,
-        axialTilt: degreesToRadians(97.77),
-        siderealDaySeconds: 60 * 60 * 17.24,
+        rotation: {
+            siderealPeriod: durationToSeconds({ hours: 17, minutes: 14, seconds: 52 }),
+            axialTilt: degreesToRadians(97.77),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         orbit: {
             parentIds: [sun.id],
             semiMajorAxis: 2_872_463_270e3,
@@ -328,8 +358,12 @@ export function getSolSystemModel(): StarSystemModel {
         type: "gasPlanet",
         radius: 24_622e3,
         mass: 1.024e26,
-        axialTilt: degreesToRadians(28.32),
-        siderealDaySeconds: 60 * 60 * 16.11,
+        rotation: {
+            siderealPeriod: durationToSeconds({ hours: 16, minutes: 6, seconds: 36 }),
+            axialTilt: degreesToRadians(28.32),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         orbit: {
             parentIds: [sun.id],
             semiMajorAxis: 4_495_060_000e3,

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
+import { degreesToRadians, durationToSeconds, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
 import { type GasPlanetModel, type OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
@@ -25,8 +25,12 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         type: "gasPlanet",
         radius: 58_232e3,
         mass: 5.683e26,
-        axialTilt: degreesToRadians(26.73),
-        siderealDaySeconds: 60 * 60 * 10.656,
+        rotation: {
+            siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
+            axialTilt: degreesToRadians(26.73),
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
+        },
         orbit: {
             parentIds: [...parentIds],
             semiMajorAxis: 1_433_449_370e3,

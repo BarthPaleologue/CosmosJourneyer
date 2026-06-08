@@ -1,8 +1,8 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { computeLpFactor, getOrbitalPeriod, keplerEquation } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { Orbit } from "@cosmos-journeyer/universe-model";
+import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
 
 import { findMinimumNewtonRaphson } from "@/utils/math";
 
@@ -46,4 +46,29 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
     Vector3.TransformCoordinatesToRef(point, longitudeOfAscendingNodeTransform, point);
 
     return point;
+}
+
+export function computeAbsoluteOrientation(
+    orbitalInclination: number,
+    rotation: DeepReadonly<Rotation>,
+    elapsedSeconds: number,
+): Quaternion {
+    const spinAxisOrientation = computeSpinAxisOrientation(orbitalInclination, rotation);
+
+    let rotationAngle = rotation.initialRotationAngle;
+    if (rotation.siderealPeriod !== 0) {
+        rotationAngle += (2 * Math.PI * elapsedSeconds) / rotation.siderealPeriod;
+    }
+
+    return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
+}
+
+export function computeSpinAxisOrientation(orbitalInclination: number, rotation: DeepReadonly<Rotation>): Quaternion {
+    const orbitOrientation = Quaternion.RotationAxis(Axis.Z, orbitalInclination);
+
+    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Z, rotation.axialTilt).multiply(
+        Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth),
+    );
+
+    return orbitOrientation.multiply(spinAxisLocalOrientation);
 }

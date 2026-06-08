@@ -159,7 +159,7 @@ export class DiscoveryDetails {
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: parseSecondsPrecise(objectModel.siderealDaySeconds),
+            value: parseSecondsPrecise(objectModel.rotation.siderealPeriod),
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 

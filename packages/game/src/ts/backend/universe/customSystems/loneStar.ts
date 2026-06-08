@@ -28,7 +28,7 @@ export function getLoneStarSystem(): StarSystemModel {
             starSectorZ: 8,
             localX: 0.5,
             localY: 0.2,
-            localZ: 0.8,
+            localZ: 0.4,
         },
         stellarObjects: [
             {
@@ -38,7 +38,12 @@ export function getLoneStarSystem(): StarSystemModel {
                 mass: SolarMass,
                 radius: SolarRadius,
                 blackBodyTemperature: 5778,
-                axialTilt: 0,
+                rotation: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    spinAxisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
                 orbit: {
                     parentIds: [],
                     semiMajorAxis: 0,
@@ -50,7 +55,6 @@ export function getLoneStarSystem(): StarSystemModel {
                     p: 2,
                 },
                 rings: null,
-                siderealDaySeconds: 0,
                 seed: 0,
             },
         ],

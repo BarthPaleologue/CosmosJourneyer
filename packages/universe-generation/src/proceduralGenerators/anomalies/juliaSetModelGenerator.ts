@@ -20,7 +20,12 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
-import { type JuliaSetModel, type OrbitalObjectModel, type Orbit } from "@cosmos-journeyer/universe-model";
+import {
+    type JuliaSetModel,
+    type OrbitalObjectModel,
+    type Orbit,
+    type Rotation,
+} from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange } from "extended-random";
 
 export function generateJuliaSetModel(
@@ -56,9 +61,15 @@ export function generateJuliaSetModel(
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
+
     const mass = 10;
-    const siderealDaySeconds = 0;
-    const axialTilt = normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT);
+
+    const rotation: Rotation = {
+        siderealPeriod: 0,
+        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
+        spinAxisAzimuth: 0,
+        initialRotationAngle: 0,
+    };
 
     return {
         type: "juliaSet",
@@ -67,8 +78,7 @@ export function generateJuliaSetModel(
         radius,
         orbit,
         mass,
-        siderealDaySeconds,
-        axialTilt,
+        rotation,
         accentColor,
     };
 }

@@ -87,7 +87,9 @@ export async function createNeutronStarScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         defaultControls.update(deltaSeconds);
-        neutronStar.getTransform().rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.siderealDaySeconds);
+        neutronStar
+            .getTransform()
+            .rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.rotation.siderealPeriod);
         matterJets.update(deltaSeconds);
     });
 

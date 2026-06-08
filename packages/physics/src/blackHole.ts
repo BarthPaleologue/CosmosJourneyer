@@ -37,6 +37,15 @@ export function getMassFromSchwarzschildRadius(radius: number): number {
 }
 
 /**
+ * @param mass The mass of the black hole in kilograms
+ * @returns The radius of the shadow of the black hole in meters
+ * @see https://arxiv.org/pdf/2105.07101
+ */
+export function getShadowRadius(mass: number): number {
+    return (3 * Math.sqrt(3) * getSchwarzschildRadius(mass)) / 2;
+}
+
+/**
  * As the angular momentum is conserved, the black hole retains the original star's angular momentum.
  * As the original star's radius is only known approximately, the black hole's angular momentum can only be estimated.
  * The angular momentum is important in the Kerr metric to compute frame dragging.
@@ -47,7 +56,7 @@ export function estimateBlackHoleAngularMomentum(mass: number, rotationPeriod: n
     const estimatedOriginalStarRadius = estimateStarRadiusFromMass(mass);
 
     // The inertia tensor for a sphere is a diagonal scaling matrix, we can express it as a simple number
-    const inertiaTensor = (2 / 5) * mass * estimatedOriginalStarRadius * estimatedOriginalStarRadius;
+    const inertiaTensor = (2 / 5) * mass * estimatedOriginalStarRadius ** 2;
 
     const omega = (2 * Math.PI) / rotationPeriod;
 
@@ -63,8 +72,13 @@ export function getKerrMetricA(mass: number, rotationPeriod: number): number {
     return estimateBlackHoleAngularMomentum(mass, rotationPeriod) / (mass * C);
 }
 
+export function getDimensionlessSpin(mass: number, rotationPeriod: number): number {
+    const a = getKerrMetricA(mass, rotationPeriod);
+    return (a * C ** 2) / (G * mass);
+}
+
 export function hasNakedSingularity(mass: number, rotationPeriod: number): boolean {
-    return getKerrMetricA(mass, rotationPeriod) > mass;
+    return Math.abs(getDimensionlessSpin(mass, rotationPeriod)) > 1;
 }
 
 /**
