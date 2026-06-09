@@ -570,6 +570,23 @@ describe("SaveBackendMultiFile", () => {
                 expect(uuids).toContain(cmdrUuid2);
             }
         });
+
+        it("should ignore commanders without valid saves", async () => {
+            await fileSystem.createDirectory(`/saves/${cmdrUuid1}/manual`);
+            await fileSystem.createDirectory(`/saves/${cmdrUuid1}/auto`);
+
+            const result = await SaveBackendMultiFile.CreateAsync(fileSystem, universeBackend);
+            expect(result.success).toBe(true);
+
+            if (result.success) {
+                const backend = result.value;
+
+                await backend.addManualSave(cmdrUuid2, createTestSave(1000));
+
+                const uuids = await backend.getCmdrUuids();
+                expect(uuids).toEqual([cmdrUuid2]);
+            }
+        });
     });
 
     describe("importSaves", () => {

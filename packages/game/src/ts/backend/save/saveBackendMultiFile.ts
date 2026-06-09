@@ -299,8 +299,24 @@ export class SaveBackendMultiFile implements ISaveBackend {
             return [];
         }
 
-        const directories = await this.fileSystem.listDirectory(savesDir);
-        return directories ?? [];
+        const entries = await this.fileSystem.listDirectory(savesDir);
+        if (entries === null) {
+            return [];
+        }
+
+        const cmdrUuids: string[] = [];
+        for (const entry of entries) {
+            const cmdrSaves = await this.getSavesForCmdr(entry);
+            if (cmdrSaves === undefined) {
+                continue;
+            }
+
+            if (cmdrSaves.manual.length > 0 || cmdrSaves.auto.length > 0) {
+                cmdrUuids.push(entry);
+            }
+        }
+
+        return cmdrUuids;
     }
 
     /**

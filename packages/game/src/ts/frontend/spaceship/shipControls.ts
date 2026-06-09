@@ -18,7 +18,7 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, type Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
@@ -28,8 +28,7 @@ import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type ITts } from "@/frontend/audio/tts";
 import { type Controls } from "@/frontend/controls";
-import { CameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
-import { quickAnimation } from "@/frontend/helpers/animations/quickAnimation";
+import { createCameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -39,31 +38,36 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-import { lerpSmooth } from "@/utils/math";
+import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
 
 import i18n from "@/i18n";
 
-import { slerpSmoothToRef } from "../helpers/animations/interpolations";
+import { CustomAnimation } from "../helpers/animations/customAnimation";
+import { easeInOutCubic, slerpSmoothToRef } from "../helpers/animations/interpolations";
 import { type INotificationManager } from "../ui/notificationManager";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
+import {
+    type ThirdPersonCameraPreset,
+    type ThirdPersonCameraPresetNames,
+    thirdPersonCameraPresets,
+} from "./thirdPersonCameraPresets";
+
+type CameraPresetInput = (typeof SpaceShipControlsInputs.map)["resetCamera"];
 
 export class ShipControls implements Controls {
     private spaceship: Spaceship;
     private readonly spaceDotsYawResponse = 5.0;
     private readonly spaceDotsPitchResponse = 5.0;
 
-    readonly thirdPersonCameraDefaultRadius = 60;
-    readonly thirdPersonCameraDefaultAlpha = 3.14 / 2;
-    readonly thirdPersonCameraDefaultBeta = 3.14 / 2.2;
     readonly thirdPersonCamera: ArcRotateCamera;
-
+    private thirdPersonCameraAnimation: CustomAnimation<ThirdPersonCameraPreset> | null = null;
     readonly thirdPersonCameraTransform: TransformNode;
 
     readonly firstPersonCamera: FreeCamera;
 
-    private readonly cameraShakeAnimation: CameraShakeAnimation;
+    private cameraShakeAnimation: CustomAnimation<Vector2> | null = null;
 
     private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
 
@@ -79,7 +83,11 @@ export class ShipControls implements Controls {
     private readonly landingHandler: () => void;
     private readonly emitLandingRequestHandler: () => void;
     private readonly throttleToZeroHandler: () => void;
-    private readonly resetCameraHandler: () => void;
+    private readonly resetCameraHandler: (presetName: ThirdPersonCameraPresetNames) => void;
+    private readonly cameraPresetInputHandlers: Array<{
+        readonly input: CameraPresetInput;
+        readonly handler: () => void;
+    }> = [];
 
     private readonly tts: ITts;
     private readonly soundPlayer: ISoundPlayer;
@@ -107,9 +115,9 @@ export class ShipControls implements Controls {
 
         this.thirdPersonCamera = new ArcRotateCamera(
             "shipThirdPersonCamera",
-            this.thirdPersonCameraDefaultAlpha,
-            this.thirdPersonCameraDefaultBeta,
-            this.thirdPersonCameraDefaultRadius,
+            thirdPersonCameraPresets.behindCentered.alpha,
+            thirdPersonCameraPresets.behindCentered.beta,
+            thirdPersonCameraPresets.behindCentered.radius,
             Vector3.Zero(),
             scene,
         );
@@ -124,7 +132,7 @@ export class ShipControls implements Controls {
             2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
-        this.cameraShakeAnimation = new CameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
+        this.cameraShakeAnimation = null;
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
@@ -148,11 +156,11 @@ export class ShipControls implements Controls {
             spaceship.toggleWarpDrive();
             if (warpDrive.isEnabled()) {
                 tts.sayNow("Charlotte", "engaging_warp_drive");
-                this.cameraShakeAnimation.reset();
                 spaceship.setMainEngineThrottle(0);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
             } else {
                 tts.sayNow("Charlotte", "warp_drive_disengaged");
-                this.cameraShakeAnimation.reset();
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 0.5);
 
                 if (this.closestLandableFacility !== null) {
                     const distanceToLandingFacility = Vector3.Distance(
@@ -251,34 +259,46 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
-        this.resetCameraHandler = () => {
-            quickAnimation(
-                this.thirdPersonCamera,
-                "alpha",
-                this.thirdPersonCamera.alpha,
-                this.thirdPersonCameraDefaultAlpha,
-                200,
+        this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames) => {
+            this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
+                {
+                    alpha: this.thirdPersonCamera.alpha,
+                    beta: this.thirdPersonCamera.beta,
+                    radius: this.thirdPersonCamera.radius,
+                    target: this.thirdPersonCamera.target.clone(),
+                },
+                thirdPersonCameraPresets[presetName],
+                (from, to, progress) => ({
+                    alpha: lerpAngle(from.alpha, to.alpha, progress),
+                    beta: lerpAngle(from.beta, to.beta, progress),
+                    radius: lerp(from.radius, to.radius, progress),
+                    target: Vector3.Lerp(from.target, to.target, progress),
+                }),
+                1.0,
+                {
+                    easing: easeInOutCubic,
+                },
             );
-            quickAnimation(
-                this.thirdPersonCamera,
-                "beta",
-                this.thirdPersonCamera.beta,
-                this.thirdPersonCameraDefaultBeta,
-                200,
-            );
-            quickAnimation(
-                this.thirdPersonCamera,
-                "radius",
-                this.thirdPersonCamera.radius,
-                this.thirdPersonCameraDefaultRadius,
-                200,
-            );
-            quickAnimation(this.thirdPersonCamera, "target", this.thirdPersonCamera.target, Vector3.Zero(), 200);
         };
 
-        SpaceShipControlsInputs.map.resetCamera.on("complete", this.resetCameraHandler);
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.resetCamera, "behindCentered");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset1, "frontCentered");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset2, "onRightWing");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset3, "onLeftWing");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset4, "underBelly");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset5, "cockpitSelfie");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset6, "rearBelow");
 
         this.setSpaceship(spaceship);
+    }
+
+    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {
+        const handler = () => {
+            this.resetCameraHandler(presetName);
+        };
+
+        input.on("complete", handler);
+        this.cameraPresetInputHandlers.push({ input, handler });
     }
 
     public getTransform(): TransformNode {
@@ -327,7 +347,12 @@ export class ShipControls implements Controls {
         spaceship.spaceDots.setSteering(spaceDotsYawIntent, spaceDotsPitchIntent);
         spaceship.update(deltaSeconds);
 
-        if (!this.cameraShakeAnimation.isFinished()) this.cameraShakeAnimation.update(deltaSeconds);
+        if (this.cameraShakeAnimation !== null && !this.cameraShakeAnimation.isFinished()) {
+            this.cameraShakeAnimation.update(deltaSeconds);
+            const { x: alpha, y: beta } = this.cameraShakeAnimation.getCurrentValue();
+            this.thirdPersonCamera.alpha = alpha;
+            this.thirdPersonCamera.beta = beta;
+        }
 
         if (warpDrive === null || warpDrive.isDisabled()) {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
@@ -404,6 +429,18 @@ export class ShipControls implements Controls {
         this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
         this.thirdPersonCamera.fov = lerpSmooth(this.thirdPersonCamera.fov, this.targetFov, 0.08, deltaSeconds);
 
+        if (this.thirdPersonCameraAnimation !== null) {
+            this.thirdPersonCameraAnimation.update(deltaSeconds);
+            const { radius, alpha, beta, target } = this.thirdPersonCameraAnimation.getCurrentValue();
+            this.thirdPersonCamera.target = target;
+            this.thirdPersonCamera.radius = radius;
+            this.thirdPersonCamera.alpha = alpha;
+            this.thirdPersonCamera.beta = beta;
+            if (this.thirdPersonCameraAnimation.isFinished()) {
+                this.thirdPersonCameraAnimation = null;
+            }
+        }
+
         this.getActiveCamera().getViewMatrix(true);
     }
 
@@ -413,8 +450,7 @@ export class ShipControls implements Controls {
     }
 
     reset() {
-        this.resetCameraHandler();
-        this.cameraShakeAnimation.reset();
+        this.resetCameraHandler("behindCentered");
         this.closestLandableFacility = null;
     }
 
@@ -512,7 +548,9 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
         SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
-        SpaceShipControlsInputs.map.resetCamera.off("complete", this.resetCameraHandler);
+        for (const { input, handler } of this.cameraPresetInputHandlers) {
+            input.off("complete", handler);
+        }
 
         this.spaceship.dispose(soundPlayer);
         this.thirdPersonCamera.dispose();

@@ -58,6 +58,30 @@ const resetCameraAction = new Action({
     bindings: [keyboard.getControl("Numpad0")],
 });
 
+const switchToCameraPreset1 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad1")],
+    }),
+);
+
+const switchToCameraPreset2 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad2")],
+    }),
+);
+
+const switchToCameraPreset3 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad3")],
+    }),
+);
+
+const switchToCameraPreset4 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad4")],
+    }),
+);
+
 export const VehicleInputs = new InputMap("VehicleInputs", {
     accelerate: accelerateAction,
     steer: steerAction,
@@ -65,6 +89,10 @@ export const VehicleInputs = new InputMap("VehicleInputs", {
     toggleCamera: new PressInteraction(toggleCameraAction),
     toggleDoors: new PressInteraction(toggleDoorsAction),
     resetCamera: new PressInteraction(resetCameraAction),
+    switchToCameraPreset1,
+    switchToCameraPreset2,
+    switchToCameraPreset3,
+    switchToCameraPreset4,
 });
 
 VehicleInputs.setEnabled(false);

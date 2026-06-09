@@ -16,55 +16,42 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { type ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
-import { clamp } from "@/utils/math";
+import { CustomAnimation } from "./customAnimation";
 
-import { type CustomAnimation } from "./animation";
+function sumOfSines(elapsedSeconds: number, baseFrequency: number, phase: number): number {
+    let sum = 0;
+    let normalization = 0;
 
-export class CameraShakeAnimation implements CustomAnimation {
-    private elapsedSeconds = 0;
-    private readonly duration: number;
-    private readonly intensity: number;
+    for (let i = 0; i < 4; i++) {
+        const octave = 2 ** i;
+        const amplitude = 1 / octave;
+        const frequency = baseFrequency * octave;
 
-    private readonly camera: ArcRotateCamera;
-
-    constructor(camera: ArcRotateCamera, intensity: number, duration: number) {
-        this.camera = camera;
-        this.intensity = intensity;
-        this.duration = duration;
-        this.elapsedSeconds = duration; // TODO: Temporary fix for startup shake until proper logic (see issue #559).
+        sum += amplitude * Math.sin(2 * Math.PI * frequency * elapsedSeconds + phase);
+        normalization += amplitude;
     }
 
-    private sumOfSines(t: number, frequency: number, phase: number): number {
-        let sum = 0;
-        for (let i = 0; i < 5; i++) {
-            sum += Math.sin(2 * Math.PI * frequency * t * 2 ** i + phase) / 2 ** i;
-        }
-        return sum;
-    }
+    return sum / normalization;
+}
 
-    update(deltaSeconds: number) {
-        if (this.isFinished()) return;
+function burstEnvelope(progress: number): number {
+    return Math.sin(Math.PI * progress);
+}
 
-        this.elapsedSeconds += deltaSeconds;
-
-        const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
-
-        const frequency = 10;
-
-        this.camera.alpha += this.sumOfSines(t, frequency, 0) * this.intensity;
-        this.camera.beta += this.sumOfSines(t, frequency, 0.38) * this.intensity;
-    }
-
-    reset() {
-        this.elapsedSeconds = 0;
-    }
-
-    isFinished(): boolean {
-        return this.elapsedSeconds >= this.duration;
-    }
-
-    getProgress(): number {
-        return this.elapsedSeconds / this.duration;
-    }
+export function createCameraShakeAnimation(
+    camera: ArcRotateCamera,
+    baseIntensity: number,
+    durationSeconds: number,
+): CustomAnimation<Vector2> {
+    const baseAlpha = camera.alpha;
+    const baseBeta = camera.beta;
+    return new CustomAnimation((progress) => {
+        const intensity = burstEnvelope(progress) * baseIntensity;
+        return new Vector2(
+            baseAlpha + sumOfSines(progress, 10, 0) * intensity,
+            baseBeta + sumOfSines(progress, 10, 0.38) * intensity,
+        );
+    }, durationSeconds);
 }

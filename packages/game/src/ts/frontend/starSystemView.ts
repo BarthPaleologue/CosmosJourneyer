@@ -51,7 +51,6 @@ import { CharacterInputs } from "@/frontend/controls/characterControls/character
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { TransformRotationAnimation } from "@/frontend/helpers/animations/rotation";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
@@ -85,6 +84,8 @@ import { CollisionMask, Settings } from "@/settings";
 
 import type { Controls } from "./controls";
 import { HumanoidAvatar } from "./controls/characterControls/humanoidAvatar";
+import { CustomAnimation } from "./helpers/animations/customAnimation";
+import { easeInOutCubic } from "./helpers/animations/interpolations";
 import { DepthRendererManager } from "./helpers/depthRendererManager";
 import { setCollisionsEnabled } from "./helpers/havok";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
@@ -380,7 +381,6 @@ export class StarSystemView implements View {
                 return;
             }
 
-            // first, align spaceship with target
             const currentForward = shipControls.getTransform().forward;
             const targetForward = target
                 .getTransform()
@@ -388,18 +388,28 @@ export class StarSystemView implements View {
                 .subtract(shipControls.getTransform().getAbsolutePosition())
                 .normalize();
 
-            const rotationAxis = Vector3.Cross(currentForward, targetForward);
-            const rotationAngle = Vector3.GetAngleBetweenVectors(currentForward, targetForward, rotationAxis);
+            const initialRotation = shipControls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
 
-            const rotationAnimation = new TransformRotationAnimation(
-                shipControls.getTransform(),
-                rotationAxis,
-                rotationAngle,
-                rotationAngle * 2,
+            const deltaRotation = Quaternion.Identity();
+            Quaternion.FromUnitVectorsToRef(currentForward, targetForward, deltaRotation);
+            const { angle: rotationAngle } = deltaRotation.toAxisAngle();
+
+            const finalRotation = deltaRotation.multiply(initialRotation);
+
+            const rotationSpeed = Math.PI / 8;
+
+            const rotationAnimation = CustomAnimation.FromTo(
+                initialRotation,
+                finalRotation,
+                (from, to, progress) => Quaternion.Slerp(from, to, progress),
+                rotationAngle / rotationSpeed,
+                { easing: easeInOutCubic },
             );
+
             await new Promise<void>((resolve) => {
                 const observer = this.scene.onBeforeRenderObservable.add(() => {
                     rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
+                    shipControls.getTransform().rotationQuaternion = rotationAnimation.getCurrentValue();
                     if (rotationAnimation.isFinished()) {
                         observer.remove();
                         resolve();

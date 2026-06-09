@@ -19,10 +19,6 @@ export function clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
 }
 
-export function sigmoid(x: number): number {
-    return 1 / (1 + Math.exp(-x));
-}
-
 export function moveTowards(x: number, target: number, rate: number): number {
     if (x > target) {
         return Math.max(target, x - rate);
@@ -85,6 +81,23 @@ export function findMinimumNewtonRaphson(f: (x: number) => number, startingPoint
  */
 export function lerp(a: number, b: number, t: number): number {
     return a + (b - a) * t;
+}
+
+export function mod(value: number, modulus: number) {
+    return ((value % modulus) + modulus) % modulus;
+}
+
+export const Tau = 2 * Math.PI;
+
+/**
+ * @param a The start angle (in radians)
+ * @param b The target angle (in radians)
+ * @param t The interpolation factor (0 to 1)
+ * @returns The interpolated angle (in radians), taking the shortest path around the circle
+ */
+export function lerpAngle(a: number, b: number, t: number): number {
+    const shortestAngleDelta = mod(b - a + Math.PI, Tau) - Math.PI;
+    return a + shortestAngleDelta * t;
 }
 
 /**

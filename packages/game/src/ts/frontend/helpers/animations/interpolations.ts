@@ -17,8 +17,12 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
-export function easeInOutInterpolation(t: number): number {
+export function easeInOutQuadratic(t: number): number {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
+export function easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 }
 
 /**

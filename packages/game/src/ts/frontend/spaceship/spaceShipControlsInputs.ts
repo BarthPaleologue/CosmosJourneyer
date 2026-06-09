@@ -85,19 +85,55 @@ const throttleToZeroInteraction = new PressInteraction(throttleToZero);
 
 const previousMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad1")],
+        bindings: [keyboard.getControl("BracketLeft")],
     }),
 );
 
 const nextMissionInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad2")],
+        bindings: [keyboard.getControl("BracketRight")],
     }),
 );
 
 const resetCameraInteraction = new PressInteraction(
     new Action({
         bindings: [keyboard.getControl("Numpad0")],
+    }),
+);
+
+const switchToCameraPreset1 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad1")],
+    }),
+);
+
+const switchToCameraPreset2 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad2")],
+    }),
+);
+
+const switchToCameraPreset3 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad3")],
+    }),
+);
+
+const switchToCameraPreset4 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad4")],
+    }),
+);
+
+const switchToCameraPreset5 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad5")],
+    }),
+);
+
+const switchToCameraPreset6 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad6")],
     }),
 );
 
@@ -113,6 +149,12 @@ export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     previousMission: previousMissionInteraction,
     nextMission: nextMissionInteraction,
     resetCamera: resetCameraInteraction,
+    switchToCameraPreset1,
+    switchToCameraPreset2,
+    switchToCameraPreset3,
+    switchToCameraPreset4,
+    switchToCameraPreset5,
+    switchToCameraPreset6,
 });
 
 SpaceShipControlsInputs.setEnabled(false);

@@ -340,7 +340,7 @@ void main() {
         depthEndRay = min(depthEndRay, texture2D(depthSampler, uv + offset).r);
     }
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPointEndRay = (pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
+    vec3 closestPointEndRay = camera_position + normalize(pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
 
     bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - worldPosition) >= 0.0;
     // checking for alignment: camera, object, blackhole in this order

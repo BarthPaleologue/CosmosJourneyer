@@ -18,56 +18,40 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 
-import { clamp } from "@/utils/math";
-
 import { translate } from "../transform";
-import { type CustomAnimation } from "./animation";
-import { easeInOutInterpolation } from "./interpolations";
+import { CustomAnimation } from "./customAnimation";
+import { easeInOutQuadratic } from "./interpolations";
 
-export class TransformTranslationAnimation implements CustomAnimation {
-    private elapsedSeconds = 0;
-    private readonly duration: number;
-    private distanceAcc = 0;
-    private readonly totalDistance;
-    private readonly direction: Vector3;
+export class TransformTranslationAnimation {
     private readonly transform: TransformNode;
-    private finished = false;
+    private lastValue: Vector3;
+    private readonly animation: CustomAnimation<Vector3>;
 
     constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
         this.transform = transform;
-        this.duration = duration;
-        const deltaToTarget = targetPosition.subtract(transform.getAbsolutePosition());
-        this.totalDistance = deltaToTarget.length();
-        this.direction = this.totalDistance > 0 ? deltaToTarget.normalizeToNew() : Vector3.Zero();
+        this.lastValue = transform.getAbsolutePosition().clone();
+        this.animation = CustomAnimation.FromTo(
+            this.lastValue,
+            targetPosition,
+            (a, b, t) => Vector3.Lerp(a, b, t),
+            duration,
+            { easing: easeInOutQuadratic },
+        );
     }
 
     update(deltaSeconds: number) {
-        if (this.finished) return;
-
-        this.elapsedSeconds += deltaSeconds;
-
-        const t = clamp(this.elapsedSeconds / this.duration, 0, 1);
-
-        const dDistance = this.totalDistance * easeInOutInterpolation(t) - this.distanceAcc;
-        this.distanceAcc += dDistance;
-
-        translate(this.transform, this.direction.scale(dDistance));
-
-        if (this.elapsedSeconds >= this.duration) {
-            const remainingDistance = this.totalDistance - this.distanceAcc;
-            if (remainingDistance !== 0) {
-                translate(this.transform, this.direction.scale(remainingDistance));
-                this.distanceAcc = this.totalDistance;
-            }
-            this.finished = true;
+        if (this.animation.isFinished()) {
+            return;
         }
+
+        this.animation.update(deltaSeconds);
+        const currentPosition = this.animation.getCurrentValue();
+        const offset = currentPosition.subtract(this.lastValue);
+        translate(this.transform, offset);
+        this.lastValue = currentPosition;
     }
 
     isFinished(): boolean {
-        return this.finished;
-    }
-
-    getProgress(): number {
-        return this.elapsedSeconds / this.duration;
+        return this.animation.isFinished();
     }
 }
