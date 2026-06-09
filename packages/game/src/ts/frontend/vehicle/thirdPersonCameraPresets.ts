@@ -35,25 +35,25 @@ export const thirdPersonCameraPresets = {
         radius: 12.889298902636686,
         alpha: 1.750116937499197,
         beta: 1.4840003658100764,
-        target: new Vector3(-5.316114307854391, 2.5934036212956297e-17, -0.8288236509902596),
+        target: new Vector3(-5.316114307854391, 0, -0.8288236509902596),
     },
     behindRight: {
         radius: 12.889298902636686,
         alpha: Math.PI - 1.750116937499197,
         beta: 1.4840003658100764,
-        target: new Vector3(5.316114307854391, 2.5934036212956297e-17, -0.8288236509902596),
+        target: new Vector3(5.316114307854391, 0, -0.8288236509902596),
     },
     frontLookingRight: {
         radius: 20.148901461353812,
-        alpha: 4.090392965705246,
+        alpha: Math.PI + 0.9488003121154529,
         beta: 1.5921606144494687,
-        target: new Vector3(6.382027891198554, 5.3310309216028406e-18, -3.1248896402381923),
+        target: new Vector3(6.382027891198554, 0, -3.1248896402381923),
     },
     frontLookingLeft: {
         radius: 20.148901461353812,
         alpha: -0.9488003121154529,
         beta: 1.5921606144494687,
-        target: new Vector3(-6.382027891198554, 5.3310309216028406e-18, -3.1248896402381923),
+        target: new Vector3(-6.382027891198554, 0, -3.1248896402381923),
     },
 } as const satisfies Record<string, ThirdPersonCameraPreset>;
 
