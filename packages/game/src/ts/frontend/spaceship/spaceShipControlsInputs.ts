@@ -131,6 +131,12 @@ const switchToCameraPreset5 = new PressInteraction(
     }),
 );
 
+const switchToCameraPreset6 = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("Numpad6")],
+    }),
+);
+
 export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     landing: landingInteraction,
     emitLandingRequest: emitLandingRequest,
@@ -148,6 +154,7 @@ export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     switchToCameraPreset3,
     switchToCameraPreset4,
     switchToCameraPreset5,
+    switchToCameraPreset6,
 });
 
 SpaceShipControlsInputs.setEnabled(false);

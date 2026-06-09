@@ -27,14 +27,14 @@ export type ThirdPersonCameraPreset = {
 export const thirdPersonCameraPresets = {
     behindCentered: {
         radius: 60,
-        alpha: 3.14 / 2,
-        beta: 3.14 / 2.2,
+        alpha: Math.PI / 2,
+        beta: Math.PI / 2.2,
         target: Vector3.Zero(),
     },
     frontCentered: {
         radius: 60,
-        alpha: -3.14 / 2,
-        beta: 3.14 / 2.2,
+        alpha: -Math.PI / 2,
+        beta: Math.PI / 2.2,
         target: Vector3.Zero(),
     },
     onRightWing: {
@@ -60,6 +60,12 @@ export const thirdPersonCameraPresets = {
         alpha: -1.5998467158450924,
         beta: 1.1911982911165055,
         target: new Vector3(0.9415595170643695, -5.6552997142865005, 14.77185995314097),
+    },
+    rearBelow: {
+        radius: 23.764277458190918,
+        alpha: Math.PI / 2,
+        beta: 1.7225208911739405,
+        target: new Vector3(-0.12075920328015212, -0.8323935529838505, -11.079838477701394),
     },
 } as const satisfies Record<string, ThirdPersonCameraPreset>;
 

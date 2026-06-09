@@ -287,6 +287,7 @@ export class ShipControls implements Controls {
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset3, "onLeftWing");
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset4, "underBelly");
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset5, "cockpitSelfie");
+        this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset6, "rearBelow");
 
         this.setSpaceship(spaceship);
     }
