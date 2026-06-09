@@ -43,7 +43,7 @@ import i18n from "@/i18n";
 
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
-import { easeInOutCubic } from "../helpers/animations/interpolations";
+import { easeInOutQuadratic } from "../helpers/animations/interpolations";
 import { type SidePanels } from "./sidePanels";
 
 export class MainMenu {
@@ -359,7 +359,7 @@ export class MainMenu {
             finalRotation,
             (a, b, t) => Quaternion.Slerp(a, b, t),
             this.startAnimationDurationSeconds,
-            { easing: easeInOutCubic },
+            { easing: easeInOutQuadratic },
         );
         const translationAnimation = new TransformTranslationAnimation(
             this.controls.getTransform(),
