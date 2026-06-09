@@ -132,7 +132,7 @@ export class ShipControls implements Controls {
             2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
 
-        this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
+        this.cameraShakeAnimation = null;
 
         this.toggleWarpDriveHandler = async () => {
             const spaceship = this.getSpaceship();
