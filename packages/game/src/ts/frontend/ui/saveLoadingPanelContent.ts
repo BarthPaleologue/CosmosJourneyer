@@ -143,20 +143,20 @@ export class SaveLoadingPanelContent {
         for (const cmdrUuid of cmdrUuids) {
             const cmdrSaves = await saveManager.getSavesForCmdr(cmdrUuid);
             if (cmdrSaves === undefined) {
-                return;
+                continue;
             }
-
-            const cmdrDiv = document.createElement("div");
-            cmdrDiv.classList.add("cmdr");
-            this.cmdrList.appendChild(cmdrDiv);
 
             const allCmdrSaves = cmdrSaves.auto.concat(cmdrSaves.manual);
             allCmdrSaves.sort((a, b) => b.timestamp - a.timestamp);
 
             const latestSave = allCmdrSaves[0];
             if (latestSave === undefined) {
-                return;
+                continue;
             }
+
+            const cmdrDiv = document.createElement("div");
+            cmdrDiv.classList.add("cmdr");
+            this.cmdrList.appendChild(cmdrDiv);
 
             const cmdrHeader = document.createElement("div");
             cmdrHeader.classList.add("cmdrHeader");
