@@ -8,12 +8,25 @@
     justify-items: center;
     align-items: center;
     z-index: 100;
-    background-image: url(../asset/loadingScreens/loadingScreen2.webp) !important;
-    background-size: cover;
+    overflow: hidden;
+
+    .loadingScreenImageLayer {
+        position: absolute;
+        inset: 0;
+        background-position: center;
+        background-size: cover;
+        opacity: 0;
+        transition: opacity 2s ease-in-out;
+
+        &.visible {
+            opacity: 1;
+        }
+    }
 
     h1 {
         position: absolute;
         top: 0;
+        z-index: 1;
     }
 
     --column-gap: 1vw;
@@ -28,6 +41,7 @@
         align-items: center;
         column-gap: var(--column-gap);
         margin-left: calc(var(--logoSize) + var(--logoSize));
+        z-index: 1;
     }
 
     .progressBar {

@@ -3,9 +3,19 @@ import { type Nullable } from "@babylonjs/core/types";
 
 import i18next from "@/i18n";
 
+import loadingScreen1Url from "@assets/loadingScreens/loadingScreen1.webp";
+import loadingScreen2Url from "@assets/loadingScreens/loadingScreen2.webp";
+import loadingScreen3Url from "@assets/loadingScreens/loadingScreen3.webp";
+import loadingScreen4Url from "@assets/loadingScreens/loadingScreen4.webp";
+
+const LOADING_SCREEN_IMAGE_URLS = [loadingScreen1Url, loadingScreen2Url, loadingScreen3Url, loadingScreen4Url] as const;
+
+const LOADING_SCREEN_IMAGE_DISPLAY_DURATION_MS = 5_000;
+
 export class LoadingScreen implements ILoadingScreen {
     private loadingDiv: Nullable<HTMLDivElement> = null;
     private loadingTextDiv: Nullable<HTMLDivElement> = null;
+    private loadingScreenImageLayers: Nullable<readonly [HTMLDivElement, HTMLDivElement]> = null;
 
     private title: Nullable<HTMLElement> = null;
 
@@ -14,6 +24,9 @@ export class LoadingScreen implements ILoadingScreen {
     private loadingText = "";
 
     private loadingDivBackgroundColor = "black";
+    private loadingScreenImageIntervalId: Nullable<number> = null;
+    private activeLoadingScreenImageIndex = 0;
+    private activeLoadingScreenImageLayerIndex = 0;
 
     private canvas: HTMLCanvasElement;
 
@@ -36,6 +49,7 @@ export class LoadingScreen implements ILoadingScreen {
 
         this.loadingDiv = document.createElement("div");
         this.loadingDiv.id = "babylonjsLoadingDiv";
+        this.createLoadingScreenImageLayers();
 
         this.title = document.createElement("h1");
         this.title.innerText = "Cosmos Journeyer";
@@ -105,6 +119,8 @@ export class LoadingScreen implements ILoadingScreen {
                 this.loadingTextDiv.remove();
                 this.loadingTextDiv = null;
             }
+            this.stopLoadingScreenImageRotation();
+            this.loadingScreenImageLayers = null;
             if (this.loadingDiv) {
                 this.loadingDiv.remove();
                 this.loadingDiv = null;
@@ -172,4 +188,74 @@ export class LoadingScreen implements ILoadingScreen {
         this.loadingDiv.style.width = `${canvasRect.width}px`;
         this.loadingDiv.style.height = `${canvasRect.height}px`;
     };
+
+    private createLoadingScreenImageLayers(): void {
+        if (this.loadingDiv === null) {
+            return;
+        }
+
+        this.activeLoadingScreenImageIndex = 0;
+        this.activeLoadingScreenImageLayerIndex = 0;
+
+        const firstLayer = this.createLoadingScreenImageLayer(LOADING_SCREEN_IMAGE_URLS[0], true);
+        const secondLayer = this.createLoadingScreenImageLayer(LOADING_SCREEN_IMAGE_URLS[1], false);
+
+        this.loadingScreenImageLayers = [firstLayer, secondLayer];
+        this.loadingDiv.appendChild(firstLayer);
+        this.loadingDiv.appendChild(secondLayer);
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return;
+        }
+
+        this.loadingScreenImageIntervalId = window.setInterval(
+            this.showNextLoadingScreenImage,
+            LOADING_SCREEN_IMAGE_DISPLAY_DURATION_MS,
+        );
+    }
+
+    private createLoadingScreenImageLayer(imageUrl: string, isVisible: boolean): HTMLDivElement {
+        const layer = document.createElement("div");
+        layer.classList.add("loadingScreenImageLayer");
+        layer.style.backgroundImage = `url("${imageUrl}")`;
+
+        if (isVisible) {
+            layer.classList.add("visible");
+        }
+
+        return layer;
+    }
+
+    private showNextLoadingScreenImage = (): void => {
+        if (!this.loadingScreenImageLayers) {
+            return;
+        }
+
+        const nextImageIndex = (this.activeLoadingScreenImageIndex + 1) % LOADING_SCREEN_IMAGE_URLS.length;
+        const nextLayerIndex = this.activeLoadingScreenImageLayerIndex === 0 ? 1 : 0;
+        const [firstLayer, secondLayer] = this.loadingScreenImageLayers;
+        const activeLayer = this.activeLoadingScreenImageLayerIndex === 0 ? firstLayer : secondLayer;
+        const nextLayer = nextLayerIndex === 0 ? firstLayer : secondLayer;
+        const nextImageUrl = LOADING_SCREEN_IMAGE_URLS[nextImageIndex];
+
+        if (nextImageUrl === undefined) {
+            return;
+        }
+
+        nextLayer.style.backgroundImage = `url("${nextImageUrl}")`;
+        nextLayer.classList.add("visible");
+        activeLayer.classList.remove("visible");
+
+        this.activeLoadingScreenImageIndex = nextImageIndex;
+        this.activeLoadingScreenImageLayerIndex = nextLayerIndex;
+    };
+
+    private stopLoadingScreenImageRotation(): void {
+        if (this.loadingScreenImageIntervalId === null) {
+            return;
+        }
+
+        window.clearInterval(this.loadingScreenImageIntervalId);
+        this.loadingScreenImageIntervalId = null;
+    }
 }
