@@ -14,15 +14,25 @@ The goal is to evoke the following feelings in the player, in this order:
 - The vastness of the universe: This sense of wonder should be tinged with a subtle awareness of the universe’s overwhelming scale (enough to inspire awe, but not fear).
 - A sense of purpose: The game's narrative should give direction to the player’s journey, infusing it with meaning.
 
-## The narrative
+## Pitch
 
-The story is a personal journey: you are a young pilot embarking on your first mission as part of an exploration initiative, following in your father's footsteps.
+En l'an 2068, l'humanité reçut un signal venu des étoiles. Sa nature artificielle ne faisait aucun doute.
 
-Early in the game, you intercept a mysterious, disturbing message originating from the event horizon of a black hole. As if that weren’t strange enough, you soon realize that the message is from your father, who disappeared years ago during a mission.
+Pendant trois longues années, les esprits et machines du monde entier furent mobilisés autour d'une unique question : pourquoi les étoiles nous avaient-elles parlé ?
 
-This discovery sets you on a path through the strangest realms of the universe, where you’ll experience the sublime vastness of the cosmos, meet fascinating characters, and confront profound questions about the nature of reality.
+Le Signal révéla des coordonnées ainsi que les plans d'une machine capable de plier le tissu de l'espace-temps. L'humanité allait enfin pouvoir s'élancer vers les étoiles, et remonter jusqu'à l'origine du Signal.
 
-“Everything that could be, is.”
+Deux siècles plus tard, le Signal a transformé l'espèce humaine. Le voisinage de Sol est parsemé de cités spatiales, l'abondance énergétique a rendu la guerre obsolète et la médecine a vaincu la maladie et le vieillissement.
+
+Une question capitale demeure : qui a envoyé le Signal, et pourquoi ?
+
+Lorsque les premières expéditions atteignirent les coordonnées indiquées, elles découvrirent un trou noir qui fut nommé Chronos. Pourtant, ce n'est pas Chronos qui bouleversa l'humanité mais ce qui orbitait autour : un orbe métallique parfait de plusieurs kilomètres de diamètre sombrant petit à petit vers l'horizon des évènements. On l'appela Ananke.
+
+La découverte provoqua un émoi comparable à celui du Signal lui-même. De grandes stations de recherche furent établies dans tout le système dans l'espoir de reproduire les exploits du premier déchiffrage. En vain.
+
+Ananke resta sourde aux interrogations de l'humanité et nul ne parvint à y entrer. L'obsession se mua en lassitude et beaucoup se détournèrent pour chercher du sens dans les rêves façonnés, les plaisirs sans fin ou la transcendance numérique.
+
+En 2271, vous avez grandi dans une cité spatiale, au sein d’un monde de confort et d'abondance. Vous avez même reçu un vaisseau spatial en cadeau d’anniversaire. Irez-vous à la rencontre du mystère d'Ananke, ou vous perdrez-vous comme bien d’autres avant vous ?
 
 ## Gameplay
 
