@@ -1,51 +1,76 @@
-# My vision for the project
+# My vision for the game
 
-_Disclaimer: This vision for Cosmos Journeyer is a long-term guiding light and may not reflect the game’s current state. Development is ongoing, and there’s still a long way to go!_
-
-## Themes and atmosphere
-
-Cosmos Journeyer is a game centered on exploration: gazing at breathtaking cosmic landscapes, uncovering strange dimensional anomalies, encountering unexpected friends, and, of course, taking plenty of screenshots!
-
-Unlike many space games where politics and combat dominate, here, the Universe itself takes center stage.
-
-The goal is to evoke the following feelings in the player, in this order:
-
-- The beauty of the cosmos: I want players’ hearts to be filled with wonder at the breathtaking creations of the universe.
-- The vastness of the universe: This sense of wonder should be tinged with a subtle awareness of the universe’s overwhelming scale (enough to inspire awe, but not fear).
-- A sense of purpose: The game's narrative should give direction to the player’s journey, infusing it with meaning.
+_Disclaimer: This document presents the intent for the game, but does not reflect its current state. Development is ongoing and there is still much to do!_
 
 ## Pitch
 
-En l'an 2068, l'humanité reçut un signal venu des étoiles. Sa nature artificielle ne faisait aucun doute.
+In the year 2068, humanity received a signal from the stars. Its artificial nature left no room for doubt.
 
-Pendant trois longues années, les esprits et machines du monde entier furent mobilisés autour d'une unique question : pourquoi les étoiles nous avaient-elles parlé ?
+For three years, the best minds and machines from around the world came together to answer that single question: why had the stars called to us?
 
-Le Signal révéla des coordonnées ainsi que les plans d'une machine capable de plier le tissu de l'espace-temps. L'humanité allait enfin pouvoir s'élancer vers les étoiles, et remonter jusqu'à l'origine du Signal.
+The Signal revealed coordinates as well as the blueprints for a machine able to fold the fabric of space and time. Humankind would finally reach for the stars, and trace the Signal back to its origin.
 
-Deux siècles plus tard, le Signal a transformé l'espèce humaine. Le voisinage de Sol est parsemé de cités spatiales, l'abondance énergétique a rendu la guerre obsolète et la médecine a vaincu la maladie et le vieillissement.
+Two centuries later, the Signal reshaped humankind. Star cities are scattered in the neighborhood of Sol, the abundance of energy made war as absurd as it is uncommon and medicine banished illness and aging.
 
-Une question capitale demeure : qui a envoyé le Signal, et pourquoi ?
+One paramount question remains: who sent the Signal, and why?
 
-Lorsque les premières expéditions atteignirent les coordonnées indiquées, elles découvrirent un trou noir qui fut nommé Chronos. Pourtant, ce n'est pas Chronos qui bouleversa l'humanité mais ce qui orbitait autour : un orbe métallique parfait de plusieurs kilomètres de diamètre sombrant petit à petit vers l'horizon des évènements. On l'appela Ananke.
+When the first expeditions reached the given coordinates, they stumbled upon a black hole they named Chronos. Yet, it was not Chronos that would turn humanity upside down, but what orbited it: a perfect metallic orb of several kilometers in diameter, falling inexorably toward the event horizon. It would be called Ananke.
 
-La découverte provoqua un émoi comparable à celui du Signal lui-même. De grandes stations de recherche furent établies dans tout le système dans l'espoir de reproduire les exploits du premier déchiffrage. En vain.
+This discovery caused a shock comparable to that of the Signal itself. Large research stations were established throughout the entire system in the hope of rekindling the achievements of the first deciphering. In vain.
 
-Ananke resta sourde aux interrogations de l'humanité et nul ne parvint à y entrer. L'obsession se mua en lassitude et beaucoup se détournèrent pour chercher du sens dans les rêves façonnés, les plaisirs sans fin ou la transcendance numérique.
+Ananke remained silent in the face of humanity’s questions and attempts to enter it all failed. Obsession gave way to weariness, and many turned tails to seek meaning in controlled dreams, endless pleasure or digital transcendence.
 
-En 2271, vous avez grandi dans une cité spatiale, au sein d’un monde de confort et d'abondance. Vous avez même reçu un vaisseau spatial en cadeau d’anniversaire. Irez-vous à la rencontre du mystère d'Ananke, ou vous perdrez-vous comme bien d’autres avant vous ?
+In 2271, you were raised in a star city in a world of comfort and abundance. You even received a spaceship as a birthday gift recently. Will you seek out Ananke's mystery, or will you lose yourself like many others before?
+
+## Themes and atmosphere
+
+Cosmos Journeyer's main focus is on exploration, contemplation and curiosity. Combat, military conflict and power struggles are not integral to the experience.
+
+The aim is to move the player along different axes, in that order:
+
+- Amaze the player by showing beautiful cosmic landscapes (astronomical phenomena, alien worlds, megastructures, dimensional anomalies)
+- Make the player feel small with highly contrasting scales (from the size of a butterfly to a giant star)
+- Intellectual vertigo through encounters and situations that question the player's intuitions (by exploring the interaction of humankind with the dreamers or the transcended ones for example)
+- Fuel the player's curiosity by hinting at trails leading to the resolution of the Ananke mystery
+- Reinforce the previous points by providing an immersive experience grounded in credible speculative science fiction
+
+## Exploration through curiosity
+
+The player is not alone in exploring the universe. Amid the solitude of the stars, a quiet fellowship emerges with other explorers through journey notes and annotated photographs scattered around remarkable places, left behind along their own journey.
+
+These traces hint at possible destinations and hypotheses the player can pick up and make their own, to carve their path in the universe.
+
+The player stays in control of their progression by collecting clues and choosing which trails to follow.
 
 ## Gameplay
 
-Players primarily pilot spaceships but can also explore the interiors of their ships on foot. The transition between piloting in space and walking on a planet’s surface is seamless, creating an immersive experience.
+### Loop
 
-Spaceships can be upgraded and repaired at space stations in exchange for credits, which players earn by completing various exploration or trade missions as well as through free exploration. Since the game’s focus is not on grinding, mission rewards are intentionally generous.
+The gameplay loop I want to implement in the game is as follows:
 
-The gameplay experience is also designed to be relaxing. I plan to incorporate unconventional, calming activities on planet surfaces, such as horseback riding, boat rides, and fishing, to add depth to the sense of exploration and relaxation.
+1. The player enters a new system, guided by their own understanding of the main quest
+2. They explore the worlds, stations and anomalies, looking for clues
+3. Along the way, they take pictures of interesting places and collect exploration data
+4. They meet NPCs, find fragments of stories and compare different worldviews
+5. They go to a station to exchange exploration data for ship upgrades to make exploration more comfortable
+6. They piece the clues together, come up with hypotheses and choose their next destination
 
-## Main tutorial
+### Game modes
 
-Following the example set by the Great Plateau in _Zelda: Breath of the Wild_, the game begins in a self-contained star cluster that players cannot leave until they reach a specific milestone. This could be achieved by designing a star cluster that forms a disconnected graph, isolated from the rest of the universe through carefully chosen distances and a limited initial jump range.
+The gameplay can be split into two modes depending on the player controlling their character or a vehicle.
 
-This introductory star cluster would be fully handcrafted to make the best possible first impression on players. The story would guide them through significant locations in a logical sequence—such as space stations, a black hole, and a planet terminator—to introduce the narrative while also presenting mini-tutorials along the way.
+The aim is to make the split as transparent as possible by letting the player control their character inside vehicles.
 
-Upon reaching the milestone, the player gains an extended jump range, granting access to the rest of the universe and opening up the game’s full scope.
+While piloting a spaceship, the player can travel inside a star system without any loading screen between planets and stations. That way the player can reach points of interest, collect exploration data or simply enjoy the view.
+
+The spaceship can also be used to change star systems. In the long term there should be no difference between traveling inside a star system and traveling to a new star system.
+
+On planet surfaces, the player can explore on foot or with a ground vehicle. Surface exploration consists mainly in roaming around to find views to capture. In the future, points of interest, random encounters and a fishing mini-game (of course) will also be present.
+
+Space stations allow the player to refuel and exchange exploration data for ship upgrades. They will make exploration more comfortable without being mandatory as it should be possible to finish the game without any upgrade.
+
+In the long term, the cities inside the stations will be explorable as well.
+
+All in all, the gameplay aims to be calm and relaxing. The player should not be worried about pirate attacks, or grinding missions to reach their objective.
+
+The goal is to reward curiosity, not repetition or stress.

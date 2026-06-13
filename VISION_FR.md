@@ -73,4 +73,4 @@ A long terme il sera aussi possible de visiter à pied l'intérieur des stations
 
 De manière générale, le gameplay du jeu est voulu pour être calme et relaxant. Le joueur ne doit pas passer son temps sur ses gardes, craindre des attaques de pirates, ou grinder des missions pour atteindre son objectif.
 
-La progression doit récompenser la curiosité, pas la répétition.
+La progression doit récompenser la curiosité, pas la répétition ou le stress.
