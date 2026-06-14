@@ -26,6 +26,8 @@ import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 export class CloudsLut {
     private readonly lut: ProceduralTexture;
 
+    private hasGeneratedTexture = false;
+
     constructor(scene: Scene) {
         if (Effect.ShadersStore[`flatCloudsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
@@ -33,15 +35,23 @@ export class CloudsLut {
 
         this.lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, undefined, true, false);
         this.lut.refreshRate = 0;
+        this.lut.onGeneratedObservable.add(() => {
+            this.hasGeneratedTexture = true;
+        });
     }
 
     isReady(): boolean {
         return this.lut.isReady();
     }
 
+    canBeSampled(): boolean {
+        return this.hasGeneratedTexture;
+    }
+
     setModel(model: DeepReadonly<CloudsModel>) {
         this.lut.setFloat("worleyFrequency", model.frequency);
         this.lut.setFloat("detailFrequency", model.detailFrequency);
+        this.hasGeneratedTexture = false;
         this.lut.resetRefreshCounter();
     }
 

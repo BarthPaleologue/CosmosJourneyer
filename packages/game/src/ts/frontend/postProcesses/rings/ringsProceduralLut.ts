@@ -27,6 +27,8 @@ import ringsPatternLutCode from "@shaders/textures/ringsPatternLUT.glsl";
 export class RingsProceduralPatternLut {
     private readonly lut: ProceduralTexture;
 
+    private hasGeneratedTexture = false;
+
     constructor(scene: Scene) {
         if (Effect.ShadersStore[`ringsLUTFragmentShader`] === undefined) {
             Effect.ShadersStore[`ringsLUTFragmentShader`] = ringsPatternLutCode;
@@ -46,6 +48,9 @@ export class RingsProceduralPatternLut {
         );
 
         this.lut.refreshRate = 0;
+        this.lut.onGeneratedObservable.add(() => {
+            this.hasGeneratedTexture = true;
+        });
     }
 
     setModel(model: DeepReadonly<ProceduralRingsModel>): void {
@@ -59,11 +64,16 @@ export class RingsProceduralPatternLut {
         this.lut.setFloat("innerRadius", model.innerRadius);
         this.lut.setFloat("outerRadius", model.outerRadius);
 
+        this.hasGeneratedTexture = false;
         this.lut.resetRefreshCounter();
     }
 
     isReady(): boolean {
         return this.lut.isReady();
+    }
+
+    canBeSampled(): boolean {
+        return this.hasGeneratedTexture;
     }
 
     getTexture(): ProceduralTexture {

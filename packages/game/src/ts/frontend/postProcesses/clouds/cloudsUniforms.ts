@@ -88,7 +88,7 @@ export class CloudsUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        if (this.lut.isReady()) {
+        if (this.lut.canBeSampled()) {
             effect.setTexture(CloudsSamplerNames.LUT, this.lut.getTexture());
         } else {
             effect.setTexture(CloudsSamplerNames.LUT, this.fallbackTexture);

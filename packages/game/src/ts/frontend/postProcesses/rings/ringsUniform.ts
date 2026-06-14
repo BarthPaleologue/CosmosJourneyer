@@ -130,7 +130,7 @@ export class RingsUniforms {
     }
 
     public setSamplers(effect: Effect) {
-        if (this.patternLut.type === "procedural" && this.patternLut.lut.isReady()) {
+        if (this.patternLut.type === "procedural" && this.patternLut.lut.canBeSampled()) {
             effect.setTexture(RingsSamplerNames.RING_PATTERN_LUT, this.patternLut.lut.getTexture());
         } else if (this.patternLut.type === "textured") {
             effect.setTexture(RingsSamplerNames.RING_PATTERN_LUT, this.patternLut.texture);
