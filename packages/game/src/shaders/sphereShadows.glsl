@@ -62,7 +62,7 @@ void main() {
 
     vec4 finalColor = screenColor;
 
-    if (maximumDistance < camera_far) {
+    if (maximumDistance < camera_far && nbStars > 0) {
         // There is a solid object in front of the camera
         float totalIntensity = 0.0;
         vec3 scenePoint = camera_position + rayDir * maximumDistance;
