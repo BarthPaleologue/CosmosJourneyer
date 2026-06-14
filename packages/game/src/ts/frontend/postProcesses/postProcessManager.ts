@@ -65,7 +65,7 @@ import { MatterJetPostProcess } from "./matterJetPostProcess";
 import { OceanPostProcess } from "./ocean/oceanPostProcess";
 import { type PostProcessType } from "./postProcessTypes";
 import { RingsPostProcess } from "./rings/ringsPostProcess";
-import { ShadowPostProcess } from "./shadowPostProcess";
+import { SphereShadowsPostProcess } from "./sphereShadowsPostProcess";
 import { type UpdatablePostProcess } from "./updatablePostProcess";
 import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
@@ -151,7 +151,6 @@ export class PostProcessManager {
     readonly juliaSets: JuliaSetPostProcess[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
     readonly matterJets: MatterJetPostProcess[] = [];
-    readonly shadows: ShadowPostProcess[] = [];
     readonly lensFlares: LensFlarePostProcess[] = [];
 
     private readonly objectPostProcesses: PostProcess[][] = [
@@ -167,7 +166,6 @@ export class PostProcessManager {
         this.mengerSponges,
         this.blackHoles,
         this.matterJets,
-        this.shadows,
         this.lensFlares,
     ];
 
@@ -208,6 +206,10 @@ export class PostProcessManager {
     readonly fxaaRenderEffect: PostProcessRenderEffect;
 
     readonly bloomRenderEffect: BloomEffect;
+
+    private readonly sphereShadows: SphereShadowsPostProcess;
+
+    private readonly sphereShadowsRenderEffect: PostProcessRenderEffect;
 
     private readonly textures: Textures;
 
@@ -253,6 +255,13 @@ export class PostProcessManager {
 
         this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 32, Constants.TEXTURETYPE_HALF_FLOAT);
         this.bloomRenderEffect.threshold = 0.0;
+
+        this.sphereShadows = new SphereShadowsPostProcess(depthRendererManager, scene);
+        this.sphereShadowsRenderEffect = new PostProcessRenderEffect(
+            scene.getEngine(),
+            "sphereShadowsRenderEffect",
+            () => [this.sphereShadows],
+        );
     }
 
     private makeSplitRenderEffects(
@@ -306,7 +315,9 @@ export class PostProcessManager {
                 star.getTransform(),
                 star.ringsUniforms,
                 star.model,
+                true,
                 lightSources,
+                [],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -357,7 +368,9 @@ export class PostProcessManager {
                 neutronStar.getTransform(),
                 neutronStar.ringsUniforms,
                 neutronStar.model,
+                true,
                 lightSources,
+                [],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -432,26 +445,16 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
+                false,
                 stellarObjects,
+                [planet],
                 this.depthRendererManager,
                 this.scene,
             );
             this.rings.push(rings);
             postProcesses.push(rings);
         }
-
-        const shadow = new ShadowPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.ringsUniforms,
-            planet.cloudsUniforms,
-            planet.model.ocean !== null,
-            stellarObjects,
-            this.depthRendererManager,
-            this.scene,
-        );
-        this.shadows.push(shadow);
-        postProcesses.push(shadow);
+        this.sphereShadows.addShadowCaster(planet);
 
         this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
@@ -475,7 +478,9 @@ export class PostProcessManager {
                 planet.getTransform(),
                 planet.ringsUniforms,
                 planet.model,
+                false,
                 stellarObjects,
+                [planet],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -483,18 +488,7 @@ export class PostProcessManager {
             postProcesses.push(rings);
         }
 
-        const shadow = new ShadowPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.ringsUniforms,
-            null,
-            false,
-            stellarObjects,
-            this.depthRendererManager,
-            this.scene,
-        );
-        this.shadows.push(shadow);
-        postProcesses.push(shadow);
+        this.sphereShadows.addShadowCaster(planet);
 
         this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
     }
@@ -655,6 +649,8 @@ export class PostProcessManager {
             }
         }
 
+        this.sphereShadows.addStellarLights(lightSources);
+
         const newCurrentBody = bodies[0];
         if (newCurrentBody === undefined) {
             throw new Error("No arguments provided to addCelestialBodies");
@@ -785,14 +781,13 @@ export class PostProcessManager {
             this.matterJets,
             this.engine,
         );
-        const shadowRenderEffect = new PostProcessRenderEffect(this.engine, "ShadowRenderEffect", () => this.shadows);
         const lensFlareRenderEffect = new PostProcessRenderEffect(
             this.engine,
             "LensFlareRenderEffect",
             () => this.lensFlares,
         );
 
-        this.renderingPipeline.addEffect(shadowRenderEffect);
+        this.renderingPipeline.addEffect(this.sphereShadowsRenderEffect);
 
         // other objects are viewed in their space configuration
         for (const postProcessType of spaceRenderingOrder) {
@@ -941,6 +936,8 @@ export class PostProcessManager {
         this.objectPostProcesses.forEach((postProcessList) => {
             postProcessList.length = 0;
         });
+
+        this.sphereShadows.reset();
 
         this.celestialBodyToPostProcesses.clear();
     }

@@ -27,7 +27,6 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
@@ -79,18 +78,6 @@ export async function createGasPlanetScene(
     const lightColor = getRgbFromTemperature(SolarTemperature);
     light.diffuse.set(lightColor.r, lightColor.g, lightColor.b);
 
-    const shadow = new ShadowPostProcess(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        planet.ringsUniforms,
-        null,
-        false,
-        [light],
-        depthRendererManager,
-        scene,
-    );
-    camera.attachPostProcess(shadow);
-
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
         planet.getBoundingRadius(),
@@ -106,7 +93,9 @@ export async function createGasPlanetScene(
             planet.getTransform(),
             planet.ringsUniforms,
             gasPlanetModel,
+            false,
             [light],
+            [planet],
             depthRendererManager,
             scene,
         );

@@ -27,7 +27,6 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
@@ -82,18 +81,6 @@ export async function createSaturnScene(
         );
     }
 
-    const shadow = new ShadowPostProcess(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        planet.ringsUniforms,
-        null,
-        false,
-        [light],
-        depthRendererManager,
-        scene,
-    );
-    camera.attachPostProcess(shadow);
-
     const atmosphere = new AtmosphericScatteringPostProcess(
         planet.getTransform(),
         planet.getBoundingRadius(),
@@ -109,7 +96,9 @@ export async function createSaturnScene(
             planet.getTransform(),
             planet.ringsUniforms,
             planet.model,
+            false,
             [light],
+            [planet],
             depthRendererManager,
             scene,
         );

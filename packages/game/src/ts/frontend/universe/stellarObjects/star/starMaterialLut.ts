@@ -23,6 +23,9 @@ import lutFragment from "@shaders/starMaterial/utils/lut.glsl";
 
 export class StarMaterialLut {
     private readonly lut: ProceduralTexture;
+
+    private hasGeneratedTexture = false;
+
     constructor(scene: Scene) {
         if (Effect.ShadersStore["starLutFragmentShader"] === undefined) {
             Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
@@ -30,6 +33,13 @@ export class StarMaterialLut {
 
         this.lut = new ProceduralTexture(`StarMaterialLut`, 256, "starLut", scene, null, true, false);
         this.lut.refreshRate = 0;
+        this.lut.onGeneratedObservable.addOnce(() => {
+            this.hasGeneratedTexture = true;
+        });
+    }
+
+    canBeSampled(): boolean {
+        return this.hasGeneratedTexture;
     }
 
     getTexture(): ProceduralTexture {

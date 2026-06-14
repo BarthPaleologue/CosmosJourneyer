@@ -64,10 +64,15 @@ export class StarMaterial extends ShaderMaterial {
 
         this.setTexture("lut", emptyTexture);
         const lut = starLutPool.get();
-        lut.getTexture().executeWhenReady(() => {
+        if (lut.canBeSampled()) {
             this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
             emptyTexture.dispose();
-        });
+        } else {
+            lut.getTexture().onGeneratedObservable.addOnce(() => {
+                this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
+                emptyTexture.dispose();
+            });
+        }
 
         this.starSeed = seed;
 

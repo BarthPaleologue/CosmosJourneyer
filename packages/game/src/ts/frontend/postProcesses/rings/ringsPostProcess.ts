@@ -30,6 +30,11 @@ import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
 import {
+    SphereShadowCasterUniformNames,
+    setSphereShadowCasterUniforms,
+    type SphereShadowCaster,
+} from "@/frontend/postProcesses/uniforms/sphereShadowCasterUniforms";
+import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
@@ -47,7 +52,9 @@ export class RingsPostProcess extends PostProcess {
         bodyTransform: TransformNode,
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<{ name: string; radius: number }>,
+        bodyEmitsLight: boolean,
         stellarObjects: ReadonlyArray<DirectionalLight>,
+        shadowCasters: ReadonlyArray<SphereShadowCaster>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {
@@ -56,11 +63,17 @@ export class RingsPostProcess extends PostProcess {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = ringsFragment;
         }
 
+        const RingPostProcessUniformNames = {
+            BODY_EMITS_LIGHT: "bodyEmitsLight",
+        };
+
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
+            ...Object.values(SphereShadowCasterUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(RingsUniformNames),
+            ...Object.values(RingPostProcessUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
@@ -96,7 +109,9 @@ export class RingsPostProcess extends PostProcess {
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setStellarObjectUniforms(effect, stellarObjects);
+            setSphereShadowCasterUniforms(effect, shadowCasters, floatingOriginOffset);
             setObjectUniforms(effect, bodyTransform, bodyModel.radius, floatingOriginOffset);
+            effect.setBool(RingPostProcessUniformNames.BODY_EMITS_LIGHT, bodyEmitsLight);
 
             this.ringsUniforms.setUniforms(effect);
             this.ringsUniforms.setSamplers(effect);

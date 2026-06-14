@@ -23,6 +23,7 @@ varying vec2 vUV; // screen coordinates
 
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
+uniform bool bodyEmitsLight;
 
 // ─── HG multi-lobe parameters (Cassini match) ───────────────────────────────────
 // Weights must sum to 1.0
@@ -40,6 +41,8 @@ const float rings_w           = 0.90;   // single-scattering albedo (ice)
 #include "./utils/pi.glsl";
 
 #include "./utils/stars.glsl";
+
+#include "./utils/sphereShadowCasters.glsl";
 
 #include "./utils/camera.glsl";
 
@@ -83,13 +86,18 @@ float tanHalfFromCos(float cosA) {
 vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 viewDir, vec3 ringAlbedo, vec3 starDir, vec3 starColor) {
     float cosA = dot(starDir, -viewDir);
 
-    // soft shadow from planet
+    // soft shadows from ring shadow casters
     float softShadowFactor = 1.0;
     float t2, t3;
-    if (rayIntersectSphere(samplePoint, starDir, object_position, object_radius, t2, t3)) {
-        vec3 cp = samplePoint + starDir * (t2 + t3) * 0.5;
-        float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
-        softShadowFactor = smoothstep(0.98, 1.0, r01);
+    for (int i = 0; i < shadowCastingSphereCount; i++) {
+        vec4 shadowCastingSphere = shadowCastingSpheres[i];
+        vec3 shadowCasterPosition = shadowCastingSphere.xyz;
+        float shadowCasterRadius = shadowCastingSphere.w;
+        if (rayIntersectSphere(samplePoint, starDir, shadowCasterPosition, shadowCasterRadius, t2, t3)) {
+            vec3 cp = samplePoint + starDir * (t2 + t3) * 0.5;
+            float r01 = remap(length(cp - shadowCasterPosition), 0.0, shadowCasterRadius, 0.0, 1.0);
+            softShadowFactor *= smoothstep(0.98, 1.0, r01);
+        }
     }
 
     // single-scatter, triple-lobe HG
@@ -124,6 +132,26 @@ void main() {
     vec3 viewDir = normalize(pixelWorldPosition - camera_position); // normalized direction of the ray
 
     vec4 finalColor = screenColor;
+
+    // shadows when the view ray hits something
+    if (maximumDistance < camera_far) {
+        float accDensity = 0.0;
+        vec3 scenePoint = camera_position + viewDir * maximumDistance;
+        bool scenePointIsOnCentralBody = length(scenePoint - object_position) <= object_radius * 1.01;
+        if (!bodyEmitsLight || !scenePointIsOnCentralBody) {
+            for (int i = 0; i < nbStars; i++) {
+                vec3 towardLight = star_directions[i];
+                float t2;
+                if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
+                    vec3 shadowSamplePoint = scenePoint + t2 * towardLight;
+                    float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
+                    accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
+                }
+            }
+        }
+
+        finalColor.rgb *= remap(pow(1.0 - accDensity, 4.0), 0.0, 1.0, 0.15, 1.0);
+    }
 
     float impactPoint;
     if (rayIntersectsPlane(camera_position, viewDir, object_position, object_rotationAxis, 0.001, impactPoint)) {

@@ -87,7 +87,14 @@ export async function createRingsScene(
         sphere,
         ringsUniforms,
         { name: "Sphere", radius: 1 * scalingFactor },
+        false,
         [light],
+        [
+            {
+                getTransform: () => sphere,
+                getBoundingRadius: () => scalingFactor,
+            },
+        ],
         depthRendererManager,
         scene,
     );
