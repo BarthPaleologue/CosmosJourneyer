@@ -24,9 +24,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
-import { type CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
-
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
@@ -35,23 +32,12 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/
 
 import shadowFragment from "@shaders/shadowFragment.glsl";
 
-export type ShadowUniforms = {
-    hasClouds: boolean;
-    hasOcean: boolean;
-};
-
 export class ShadowPostProcess extends PostProcess {
-    readonly shadowUniforms: ShadowUniforms;
-
     private activeCamera: Camera | null = null;
-
-    private readonly emptyTexture: Texture;
 
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        cloudsUniforms: CloudsUniforms | null,
-        hasOcean: boolean,
         stellarObjects: ReadonlyArray<DirectionalLight>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
@@ -61,15 +47,8 @@ export class ShadowPostProcess extends PostProcess {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
         }
 
-        const shadowUniforms: ShadowUniforms = {
-            hasClouds: cloudsUniforms !== null,
-            hasOcean: hasOcean,
-        };
-
         const ShadowUniformNames = {
             STAR_RADIUSES: "star_radiuses",
-            HAS_CLOUDS: "shadowUniforms_hasClouds",
-            HAS_OCEAN: "shadowUniforms_hasOcean",
         };
 
         const uniforms: string[] = [
@@ -95,10 +74,6 @@ export class ShadowPostProcess extends PostProcess {
             Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
-        this.shadowUniforms = shadowUniforms;
-
-        this.emptyTexture = createEmptyTexture(scene);
-
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
@@ -116,15 +91,11 @@ export class ShadowPostProcess extends PostProcess {
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
-            effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);
-            effect.setBool(ShadowUniformNames.HAS_OCEAN, shadowUniforms.hasOcean);
-
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
         });
     }
 
     override dispose(camera?: Camera): void {
         super.dispose(camera);
-        this.emptyTexture.dispose();
     }
 }

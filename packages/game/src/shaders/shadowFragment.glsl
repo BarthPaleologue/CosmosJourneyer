@@ -34,14 +34,9 @@ float star_radiuses[MAX_STARS];
 
 #include "./utils/remap.glsl";
 
-uniform bool shadowUniforms_hasClouds;
-uniform bool shadowUniforms_hasOcean;
-
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/lineIntersectSphere.glsl";
-
-#include "./utils/rayIntersectsPlane.glsl";
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
     vec3 towardLight = star_directions[0];

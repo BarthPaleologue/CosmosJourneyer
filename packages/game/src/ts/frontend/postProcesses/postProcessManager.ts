@@ -443,8 +443,6 @@ export class PostProcessManager {
         const shadow = new ShadowPostProcess(
             planet.getTransform(),
             planet.getBoundingRadius(),
-            planet.cloudsUniforms,
-            planet.model.ocean !== null,
             stellarObjects,
             this.depthRendererManager,
             this.scene,
@@ -485,8 +483,6 @@ export class PostProcessManager {
         const shadow = new ShadowPostProcess(
             planet.getTransform(),
             planet.getBoundingRadius(),
-            null,
-            false,
             stellarObjects,
             this.depthRendererManager,
             this.scene,

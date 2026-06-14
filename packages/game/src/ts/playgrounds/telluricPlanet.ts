@@ -97,8 +97,6 @@ export async function createTelluricPlanetScene(
     const shadow = new ShadowPostProcess(
         planet.getTransform(),
         planet.getBoundingRadius(),
-        null,
-        false,
         stellarLightSystem.getLights(),
         depthRendererManager,
         scene,
