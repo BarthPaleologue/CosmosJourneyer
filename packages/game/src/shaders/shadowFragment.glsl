@@ -32,19 +32,16 @@ float star_radiuses[MAX_STARS];
 
 #include "./utils/object.glsl";
 
-uniform bool shadowUniforms_hasRings;
+#include "./utils/remap.glsl";
+
 uniform bool shadowUniforms_hasClouds;
 uniform bool shadowUniforms_hasOcean;
-
-#include "./rings/rings.glsl";
 
 #include "./utils/worldFromUV.glsl";
 
 #include "./utils/lineIntersectSphere.glsl";
 
 #include "./utils/rayIntersectsPlane.glsl";
-
-#include "./rings/ringsPatternLookup.glsl";
 
 float sphereOccultation(vec3 rayDir, float maximumDistance) {
     vec3 towardLight = star_directions[0];
@@ -61,23 +58,6 @@ float sphereOccultation(vec3 rayDir, float maximumDistance) {
     return 1.0;
 }
 
-float ringOccultation(vec3 rayDir, float maximumDistance) {
-    if (!shadowUniforms_hasRings) {
-        return 1.0;
-    }
-
-    float accDensity = 0.0;
-    for (int i = 0; i < nbStars; i++) {
-        vec3 towardLight = star_directions[i];
-        float t2;
-        if (rayIntersectsPlane(camera_position + rayDir * maximumDistance, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
-            vec3 shadowSamplePoint = camera_position + rayDir * maximumDistance + t2 * towardLight;
-            float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
-            accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
-        }
-    }
-    return pow(1.0 - accDensity, 4.0) * 0.99 + 0.01;
-}
 
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
@@ -97,11 +77,7 @@ void main() {
         // There is a solid object in front of the camera
         // maybe it is in this planet's shadow
         float sphereShadow = sphereOccultation(rayDir, maximumDistance);
-
-        // maybe it is in the shadow of the rings
-        float ringShadow = ringOccultation(rayDir, maximumDistance);
-
-        finalColor.rgb *= min(sphereShadow, ringShadow);
+        finalColor.rgb *= sphereShadow;
     }
 
     gl_FragColor = finalColor;// displaying the final color

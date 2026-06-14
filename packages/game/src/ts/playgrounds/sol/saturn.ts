@@ -85,7 +85,6 @@ export async function createSaturnScene(
     const shadow = new ShadowPostProcess(
         planet.getTransform(),
         planet.getBoundingRadius(),
-        planet.ringsUniforms,
         null,
         false,
         [light],

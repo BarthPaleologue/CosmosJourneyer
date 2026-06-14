@@ -125,6 +125,23 @@ void main() {
 
     vec4 finalColor = screenColor;
 
+    // shadows when the view ray hits something
+    if (maximumDistance < camera_far) {
+        float accDensity = 0.0;
+        vec3 scenePoint = camera_position + viewDir * maximumDistance;
+        for (int i = 0; i < nbStars; i++) {
+            vec3 towardLight = star_directions[i];
+            float t2;
+            if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
+                vec3 shadowSamplePoint = scenePoint + t2 * towardLight;
+                float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
+                accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
+            }
+        }
+
+        finalColor.rgb *= remap(pow(1.0 - accDensity, 4.0), 0.0, 1.0, 0.15, 1.0);
+    }
+
     float impactPoint;
     if (rayIntersectsPlane(camera_position, viewDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
         // if the ray intersect the ring plane

@@ -26,7 +26,6 @@ import { type Scene } from "@babylonjs/core/scene";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 import { type CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
-import { RingsSamplerNames, RingsUniformNames, RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
@@ -37,14 +36,12 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/
 import shadowFragment from "@shaders/shadowFragment.glsl";
 
 export type ShadowUniforms = {
-    hasRings: boolean;
     hasClouds: boolean;
     hasOcean: boolean;
 };
 
 export class ShadowPostProcess extends PostProcess {
     readonly shadowUniforms: ShadowUniforms;
-    readonly ringsUniforms: RingsUniforms | null;
 
     private activeCamera: Camera | null = null;
 
@@ -53,7 +50,6 @@ export class ShadowPostProcess extends PostProcess {
     constructor(
         transform: TransformNode,
         boundingRadius: number,
-        ringsUniforms: RingsUniforms | null,
         cloudsUniforms: CloudsUniforms | null,
         hasOcean: boolean,
         stellarObjects: ReadonlyArray<DirectionalLight>,
@@ -66,14 +62,12 @@ export class ShadowPostProcess extends PostProcess {
         }
 
         const shadowUniforms: ShadowUniforms = {
-            hasRings: ringsUniforms !== null,
             hasClouds: cloudsUniforms !== null,
             hasOcean: hasOcean,
         };
 
         const ShadowUniformNames = {
             STAR_RADIUSES: "star_radiuses",
-            HAS_RINGS: "shadowUniforms_hasRings",
             HAS_CLOUDS: "shadowUniforms_hasClouds",
             HAS_OCEAN: "shadowUniforms_hasOcean",
         };
@@ -82,11 +76,10 @@ export class ShadowPostProcess extends PostProcess {
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(RingsUniformNames),
             ...Object.values(ShadowUniformNames),
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(RingsSamplerNames)];
+        const samplers: string[] = [...Object.values(SamplerUniformNames)];
 
         super(
             `${transform.name}ShadowPostProcess`,
@@ -103,7 +96,6 @@ export class ShadowPostProcess extends PostProcess {
         );
 
         this.shadowUniforms = shadowUniforms;
-        this.ringsUniforms = ringsUniforms;
 
         this.emptyTexture = createEmptyTexture(scene);
 
@@ -124,17 +116,9 @@ export class ShadowPostProcess extends PostProcess {
             setStellarObjectUniforms(effect, stellarObjects);
             setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
 
-            effect.setBool(ShadowUniformNames.HAS_RINGS, shadowUniforms.hasRings);
             effect.setBool(ShadowUniformNames.HAS_CLOUDS, shadowUniforms.hasClouds);
             effect.setBool(ShadowUniformNames.HAS_OCEAN, shadowUniforms.hasOcean);
 
-            if (this.ringsUniforms === null) {
-                RingsUniforms.SetEmptyUniforms(effect);
-                RingsUniforms.SetEmptySamplers(effect, this.emptyTexture);
-            } else {
-                this.ringsUniforms.setUniforms(effect);
-                this.ringsUniforms.setSamplers(effect);
-            }
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
         });
     }
