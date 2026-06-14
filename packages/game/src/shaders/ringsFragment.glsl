@@ -23,6 +23,7 @@ varying vec2 vUV; // screen coordinates
 
 uniform sampler2D textureSampler; // the original screen texture
 uniform sampler2D depthSampler; // the depth map of the camera
+uniform bool bodyEmitsLight;
 
 // ─── HG multi-lobe parameters (Cassini match) ───────────────────────────────────
 // Weights must sum to 1.0
@@ -136,13 +137,16 @@ void main() {
     if (maximumDistance < camera_far) {
         float accDensity = 0.0;
         vec3 scenePoint = camera_position + viewDir * maximumDistance;
-        for (int i = 0; i < nbStars; i++) {
-            vec3 towardLight = star_directions[i];
-            float t2;
-            if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
-                vec3 shadowSamplePoint = scenePoint + t2 * towardLight;
-                float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
-                accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
+        bool scenePointIsOnCentralBody = length(scenePoint - object_position) <= object_radius * 1.01;
+        if (!bodyEmitsLight || !scenePointIsOnCentralBody) {
+            for (int i = 0; i < nbStars; i++) {
+                vec3 towardLight = star_directions[i];
+                float t2;
+                if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
+                    vec3 shadowSamplePoint = scenePoint + t2 * towardLight;
+                    float nearOccultationFactor = smoothstep(100e3, 150e3, t2); // fade ring shadow when close to the rings
+                    accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
+                }
             }
         }
 

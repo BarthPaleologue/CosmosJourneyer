@@ -103,6 +103,7 @@ export async function createGasPlanetScene(
             planet.getTransform(),
             planet.ringsUniforms,
             gasPlanetModel,
+            false,
             [light],
             [planet],
             depthRendererManager,

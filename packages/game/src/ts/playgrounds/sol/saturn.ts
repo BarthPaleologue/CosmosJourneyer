@@ -106,6 +106,7 @@ export async function createSaturnScene(
             planet.getTransform(),
             planet.ringsUniforms,
             planet.model,
+            false,
             [light],
             [planet],
             depthRendererManager,
