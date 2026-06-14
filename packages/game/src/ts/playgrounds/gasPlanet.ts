@@ -104,6 +104,7 @@ export async function createGasPlanetScene(
             planet.ringsUniforms,
             gasPlanetModel,
             [light],
+            [planet],
             depthRendererManager,
             scene,
         );

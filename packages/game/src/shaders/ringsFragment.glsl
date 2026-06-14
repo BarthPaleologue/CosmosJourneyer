@@ -41,6 +41,8 @@ const float rings_w           = 0.90;   // single-scattering albedo (ice)
 
 #include "./utils/stars.glsl";
 
+#include "./utils/sphereShadowCasters.glsl";
+
 #include "./utils/camera.glsl";
 
 #include "./utils/object.glsl";
@@ -83,13 +85,18 @@ float tanHalfFromCos(float cosA) {
 vec3 calculateStarLightingForRings(vec3 samplePoint, vec3 viewDir, vec3 ringAlbedo, vec3 starDir, vec3 starColor) {
     float cosA = dot(starDir, -viewDir);
 
-    // soft shadow from planet
+    // soft shadows from ring shadow casters
     float softShadowFactor = 1.0;
     float t2, t3;
-    if (rayIntersectSphere(samplePoint, starDir, object_position, object_radius, t2, t3)) {
-        vec3 cp = samplePoint + starDir * (t2 + t3) * 0.5;
-        float r01 = remap(length(cp - object_position), 0.0, object_radius, 0.0, 1.0);
-        softShadowFactor = smoothstep(0.98, 1.0, r01);
+    for (int i = 0; i < shadowCastingSphereCount; i++) {
+        vec4 shadowCastingSphere = shadowCastingSpheres[i];
+        vec3 shadowCasterPosition = shadowCastingSphere.xyz;
+        float shadowCasterRadius = shadowCastingSphere.w;
+        if (rayIntersectSphere(samplePoint, starDir, shadowCasterPosition, shadowCasterRadius, t2, t3)) {
+            vec3 cp = samplePoint + starDir * (t2 + t3) * 0.5;
+            float r01 = remap(length(cp - shadowCasterPosition), 0.0, shadowCasterRadius, 0.0, 1.0);
+            softShadowFactor *= smoothstep(0.98, 1.0, r01);
+        }
     }
 
     // single-scatter, triple-lobe HG

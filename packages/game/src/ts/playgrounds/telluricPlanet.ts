@@ -152,6 +152,7 @@ export async function createTelluricPlanetScene(
             planet.ringsUniforms,
             telluricPlanetModel,
             stellarLightSystem.getLights(),
+            [planet],
             depthRendererManager,
             scene,
         );

@@ -30,6 +30,11 @@ import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
 import {
+    SphereShadowCasterUniformNames,
+    setSphereShadowCasterUniforms,
+    type SphereShadowCaster,
+} from "@/frontend/postProcesses/uniforms/sphereShadowCasterUniforms";
+import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
@@ -48,6 +53,7 @@ export class RingsPostProcess extends PostProcess {
         ringsUniforms: RingsUniforms,
         bodyModel: DeepReadonly<{ name: string; radius: number }>,
         stellarObjects: ReadonlyArray<DirectionalLight>,
+        shadowCasters: ReadonlyArray<SphereShadowCaster>,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {
@@ -59,6 +65,7 @@ export class RingsPostProcess extends PostProcess {
         const uniforms: string[] = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
+            ...Object.values(SphereShadowCasterUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(RingsUniformNames),
         ];
@@ -96,6 +103,7 @@ export class RingsPostProcess extends PostProcess {
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setStellarObjectUniforms(effect, stellarObjects);
+            setSphereShadowCasterUniforms(effect, shadowCasters, floatingOriginOffset);
             setObjectUniforms(effect, bodyTransform, bodyModel.radius, floatingOriginOffset);
 
             this.ringsUniforms.setUniforms(effect);

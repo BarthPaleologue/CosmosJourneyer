@@ -307,6 +307,7 @@ export class PostProcessManager {
                 star.ringsUniforms,
                 star.model,
                 lightSources,
+                [],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -358,6 +359,7 @@ export class PostProcessManager {
                 neutronStar.ringsUniforms,
                 neutronStar.model,
                 lightSources,
+                [],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -433,6 +435,7 @@ export class PostProcessManager {
                 planet.ringsUniforms,
                 planet.model,
                 stellarObjects,
+                [planet],
                 this.depthRendererManager,
                 this.scene,
             );
@@ -473,6 +476,7 @@ export class PostProcessManager {
                 planet.ringsUniforms,
                 planet.model,
                 stellarObjects,
+                [planet],
                 this.depthRendererManager,
                 this.scene,
             );
