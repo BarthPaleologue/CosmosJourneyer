@@ -24,31 +24,25 @@ varying vec2 vUV;// screen coordinates
 uniform sampler2D textureSampler;// the original screen texture
 uniform sampler2D depthSampler;// the depth map of the camera
 
-
 #include "./utils/stars.glsl";
-float star_radiuses[MAX_STARS];
 
 #include "./utils/camera.glsl";
-
-#include "./utils/object.glsl";
 
 #include "./utils/remap.glsl";
 
 #include "./utils/worldFromUV.glsl";
 
-#include "./utils/lineIntersectSphere.glsl";
+#include "./utils/rayIntersectSphere.glsl";
 
-float sphereOccultation(vec3 rayDir, float maximumDistance) {
-    vec3 towardLight = star_directions[0];
+#include "./utils/sphereShadowCasters.glsl";
+
+float sphereOccultation(vec3 rayOrigin, vec3 rayToLight, vec3 spherePosition, float sphereRadius) {
     float t0, t1;
-    if (lineIntersectSphere(camera_position + rayDir * maximumDistance, towardLight, object_position, object_radius, t0, t1)) {
-        if (t0 > object_radius) {
-            // there is occultation
-            vec3 closestPointToPlanetCenter = camera_position + rayDir * maximumDistance + towardLight * (t0 + t1) * 0.5;
-            float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - object_position);
-            float r01 = remap(closestDistanceToPlanetCenter, 0.0, object_radius, 0.0, 1.0);
-            return 0.01 + 0.99 * smoothstep(0.85, 1.0, r01);
-        }
+    if (rayIntersectSphere(rayOrigin, rayToLight, spherePosition, sphereRadius, t0, t1) && t0 > sphereRadius) {
+        vec3 closestPointToPlanetCenter = rayOrigin + rayToLight * (t0 + t1) * 0.5;
+        float closestDistanceToPlanetCenter = length(closestPointToPlanetCenter - spherePosition);
+        float r01 = remap(closestDistanceToPlanetCenter, 0.0, sphereRadius, 0.0, 1.0);
+        return 0.01 + 0.99 * smoothstep(0.85, 1.0, r01);
     }
     return 1.0;
 }
@@ -70,10 +64,23 @@ void main() {
 
     if (maximumDistance < camera_far) {
         // There is a solid object in front of the camera
-        // maybe it is in this planet's shadow
-        float sphereShadow = sphereOccultation(rayDir, maximumDistance);
-        finalColor.rgb *= sphereShadow;
+        float totalIntensity = 0.0;
+        vec3 scenePoint = camera_position + rayDir * maximumDistance;
+        for(int j = 0; j < nbStars; j++) {
+            vec3 starDirection = star_directions[j];
+            float shadowMultiplier = 1.0;
+            for (int i = 0; i < shadowCastingSphereCount; i++) {
+                vec4 shadowCastingSphere = shadowCastingSpheres[i];
+                vec3 shadowCasterPosition = shadowCastingSphere.xyz;
+                float shadowCasterRadius = shadowCastingSphere.w;
+
+                shadowMultiplier = min(shadowMultiplier, sphereOccultation(scenePoint, starDirection, shadowCasterPosition, shadowCasterRadius));
+            }
+            totalIntensity += shadowMultiplier;
+        }
+        totalIntensity /= float(nbStars);
+        finalColor.rgb *= totalIntensity;
     }
 
-    gl_FragColor = finalColor;// displaying the final color
+    gl_FragColor = finalColor;
 }

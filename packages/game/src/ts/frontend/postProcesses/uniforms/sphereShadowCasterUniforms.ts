@@ -38,22 +38,24 @@ export function setSphereShadowCasterUniforms(
     shadowCasters: ReadonlyArray<SphereShadowCaster>,
     floatingOriginOffset: Vector3,
 ): void {
-    const shadowCasterCount = Math.min(shadowCasters.length, maxShadowCastingSpheres);
-    effect.setInt(SphereShadowCasterUniformNames.SHADOW_CASTING_SPHERE_COUNT, shadowCasterCount);
-
-    for (let index = 0; index < shadowCasterCount; index++) {
-        const shadowCaster = shadowCasters[index];
-        if (shadowCaster === undefined) {
+    let shadowCasterCount = 0;
+    for (const shadowCaster of shadowCasters) {
+        shadowCaster.getTransform().getAbsolutePosition().subtractToRef(floatingOriginOffset, tempPosition);
+        if (tempPosition.lengthSquared() > 5_000_000e3 ** 2) {
             continue;
         }
 
-        shadowCaster.getTransform().getAbsolutePosition().subtractToRef(floatingOriginOffset, tempPosition);
+        shadowCastingSpheres[shadowCasterCount * 4] = tempPosition.x;
+        shadowCastingSpheres[shadowCasterCount * 4 + 1] = tempPosition.y;
+        shadowCastingSpheres[shadowCasterCount * 4 + 2] = tempPosition.z;
+        shadowCastingSpheres[shadowCasterCount * 4 + 3] = shadowCaster.getBoundingRadius();
 
-        shadowCastingSpheres[index * 4] = tempPosition.x;
-        shadowCastingSpheres[index * 4 + 1] = tempPosition.y;
-        shadowCastingSpheres[index * 4 + 2] = tempPosition.z;
-        shadowCastingSpheres[index * 4 + 3] = shadowCaster.getBoundingRadius();
+        shadowCasterCount++;
+        if (shadowCasterCount >= maxShadowCastingSpheres) {
+            break;
+        }
     }
 
+    effect.setInt(SphereShadowCasterUniformNames.SHADOW_CASTING_SPHERE_COUNT, shadowCasterCount);
     effect.setFloatArray4(SphereShadowCasterUniformNames.SHADOW_CASTING_SPHERES, shadowCastingSpheres);
 }

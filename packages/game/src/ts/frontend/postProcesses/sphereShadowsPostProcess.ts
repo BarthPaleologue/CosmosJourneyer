@@ -20,48 +20,41 @@ import { Constants } from "@babylonjs/core/Engines/constants";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
+import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import type { Transformable } from "../universe/architecture/transformable";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
-import { ObjectUniformNames, setObjectUniforms } from "./uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
+import { setSphereShadowCasterUniforms, SphereShadowCasterUniformNames } from "./uniforms/sphereShadowCasterUniforms";
 import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/stellarObjectUniforms";
 
-import shadowFragment from "@shaders/shadowFragment.glsl";
+import sphereShadowsFragment from "@shaders/sphereShadows.glsl";
 
-export class ShadowPostProcess extends PostProcess {
+export class SphereShadowsPostProcess extends PostProcess {
     private activeCamera: Camera | null = null;
 
-    constructor(
-        transform: TransformNode,
-        boundingRadius: number,
-        stellarObjects: ReadonlyArray<DirectionalLight>,
-        depthRendererManager: DepthRendererManager,
-        scene: Scene,
-    ) {
-        const shaderName = "shadow";
+    private readonly sphereShadowCasters: Array<Transformable & HasBoundingSphere> = [];
+    private readonly stellarLights: Array<DirectionalLight> = [];
+
+    constructor(depthRendererManager: DepthRendererManager, scene: Scene) {
+        const shaderName = "sphereShadows";
         if (Effect.ShadersStore[`${shaderName}FragmentShader`] === undefined) {
-            Effect.ShadersStore[`${shaderName}FragmentShader`] = shadowFragment;
+            Effect.ShadersStore[`${shaderName}FragmentShader`] = sphereShadowsFragment;
         }
 
-        const ShadowUniformNames = {
-            STAR_RADIUSES: "star_radiuses",
-        };
-
         const uniforms: string[] = [
-            ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
-            ...Object.values(ShadowUniformNames),
+            ...Object.values(SphereShadowCasterUniformNames),
         ];
 
         const samplers: string[] = [...Object.values(SamplerUniformNames)];
 
         super(
-            `${transform.name}ShadowPostProcess`,
+            "SphereShadowsPostProcess",
             shaderName,
             uniforms,
             samplers,
@@ -88,14 +81,23 @@ export class ShadowPostProcess extends PostProcess {
             const floatingOriginEnabled = scene.floatingOriginMode;
 
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
-            setStellarObjectUniforms(effect, stellarObjects);
-            setObjectUniforms(effect, transform, boundingRadius, floatingOriginOffset);
+            setStellarObjectUniforms(effect, this.stellarLights);
+            setSphereShadowCasterUniforms(effect, this.sphereShadowCasters, floatingOriginOffset);
 
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
         });
     }
 
-    override dispose(camera?: Camera): void {
-        super.dispose(camera);
+    public addShadowCaster(shadowCaster: Transformable & HasBoundingSphere) {
+        this.sphereShadowCasters.push(shadowCaster);
+    }
+
+    public addStellarLights(light: ReadonlyArray<DirectionalLight>) {
+        this.stellarLights.push(...light);
+    }
+
+    public reset() {
+        this.sphereShadowCasters.length = 0;
+        this.stellarLights.length = 0;
     }
 }

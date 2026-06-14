@@ -21,6 +21,7 @@ import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getChronosSystemModel } from "@/backend/universe/customSystems/chronos";
+import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/eclipseTest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -51,6 +52,8 @@ export async function createCustomSystemScene(
     let systemModel: StarSystemModel;
     if (systemKey === "chronos") {
         systemModel = getChronosSystemModel();
+    } else if (systemKey === "eclipseTest") {
+        systemModel = getEclipseTestSystemModel();
     } else {
         systemModel = getLoneStarSystem();
     }
