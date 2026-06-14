@@ -86,6 +86,7 @@ export class StarMaterial extends ShaderMaterial {
 
         this.onDisposeObservable.addOnce(() => {
             starLutPool.release(lut);
+            emptyTexture.dispose();
         });
     }
 
