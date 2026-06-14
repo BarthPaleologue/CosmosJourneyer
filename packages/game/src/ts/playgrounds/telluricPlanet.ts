@@ -30,7 +30,6 @@ import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmos
 import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloudsPostProcess";
 import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
 import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
-import { ShadowPostProcess } from "@/frontend/postProcesses/shadowPostProcess";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
@@ -93,15 +92,6 @@ export async function createTelluricPlanetScene(
     const telluricPlanetModel = generateTelluricPlanetModel("telluricPlanet", seed, "Telluric Planet", [sunModel]);
 
     const planet = new TelluricPlanet(telluricPlanetModel, assets, scene);
-
-    const shadow = new ShadowPostProcess(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        stellarLightSystem.getLights(),
-        depthRendererManager,
-        scene,
-    );
-    camera.attachPostProcess(shadow);
 
     if (planet.oceanUniforms !== null) {
         const ocean = new OceanPostProcess(
