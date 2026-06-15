@@ -65,6 +65,9 @@ export class AxisRenderer {
             scene,
         );
 
+        rotationAxisHelper.ignoreCameraMaxZ = true;
+        rotationAxisHelper.alwaysSelectAsActiveMesh = true;
+
         rotationAxisHelper.parent = orbitalObject.getTransform();
         this.axisMeshes.push(rotationAxisHelper);
     }
