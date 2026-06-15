@@ -24,7 +24,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 
 export function createAtmosphericScatteringScene(
     engine: AbstractEngine,
@@ -56,11 +56,19 @@ export function createAtmosphericScatteringScene(
 
     const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
 
-    const atmosphere = new AtmosphericScatteringPostProcess(
+    const atmosphere = new CelestialBodyUberShaderPass(
         sphere,
         scalingFactor,
-        atmosphereUniforms,
+        false,
+        {
+            atmosphere: atmosphereUniforms,
+            clouds: null,
+            ocean: null,
+            rings: null,
+        },
         [light],
+        [],
+        null,
         depthRendererManager,
         scene,
     );

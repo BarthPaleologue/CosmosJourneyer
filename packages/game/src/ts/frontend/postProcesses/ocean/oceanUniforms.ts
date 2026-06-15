@@ -28,7 +28,6 @@ const OceanUniformNames = {
     OCEAN_DEPTH_MODIFIER: "ocean_depthModifier",
     OCEAN_WAVE_BLENDING_SHARPNESS: "ocean_waveBlendingSharpness",
     PLANET_INVERSE_ROTATION_MATRIX: "planetInverseRotationMatrix",
-    TIME: "time",
 };
 
 const OceanSamplerNames = {
@@ -43,7 +42,6 @@ export class OceanUniforms {
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
-    time: number;
 
     readonly waterTextures: WaterTextures;
 
@@ -54,7 +52,6 @@ export class OceanUniforms {
         this.specularPower = 1.0;
         this.smoothness = 0.8;
         this.waveBlendingSharpness = 0.5;
-        this.time = 0;
         this.waterTextures = waterTextures;
     }
 
@@ -73,7 +70,6 @@ export class OceanUniforms {
             OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX,
             planetTransform.getWorldMatrix().getRotationMatrix().transpose(),
         );
-        effect.setFloat(OceanUniformNames.TIME, this.time % 100000); //FIXME: do not hardcode the 100000
     }
 
     getSamplerNames(): string[] {

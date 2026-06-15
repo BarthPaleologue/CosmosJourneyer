@@ -26,6 +26,20 @@ export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<
     return arr.length > 0;
 }
 
+export function arraysEqual<T>(a: ReadonlyArray<T>, b: ReadonlyArray<T>): boolean {
+    if (a.length !== b.length) {
+        return false;
+    }
+
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function assertUnreachable(value: never): never {
     throw new Error(`Unexpected value: ${String(value)}`);
 }

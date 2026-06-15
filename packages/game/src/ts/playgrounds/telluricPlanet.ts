@@ -26,10 +26,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { FlatCloudsPostProcess } from "@/frontend/postProcesses/clouds/flatCloudsPostProcess";
-import { OceanPostProcess } from "@/frontend/postProcesses/ocean/oceanPostProcess";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
@@ -93,30 +90,34 @@ export async function createTelluricPlanetScene(
 
     const planet = new TelluricPlanet(telluricPlanetModel, assets, scene);
 
-    if (planet.oceanUniforms !== null) {
-        const ocean = new OceanPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.oceanUniforms,
-            stellarLightSystem.getLights(),
-            assets.textures.water,
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(ocean);
+    const celestialBodyUberShader =
+        planet.atmosphereUniforms !== null ||
+        planet.cloudsUniforms !== null ||
+        planet.oceanUniforms !== null ||
+        planet.ringsUniforms !== null
+            ? new CelestialBodyUberShaderPass(
+                  planet.getTransform(),
+                  planet.getBoundingRadius(),
+                  false,
+                  {
+                      atmosphere: planet.atmosphereUniforms,
+                      clouds: planet.cloudsUniforms,
+                      ocean: planet.oceanUniforms,
+                      rings: planet.ringsUniforms,
+                  },
+                  stellarLightSystem.getLights(),
+                  [planet],
+                  assets.textures.water,
+                  depthRendererManager,
+                  scene,
+              )
+            : null;
+
+    if (celestialBodyUberShader !== null) {
+        camera.attachPostProcess(celestialBodyUberShader);
     }
 
     if (planet.cloudsUniforms !== null) {
-        const clouds = new FlatCloudsPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.cloudsUniforms,
-            stellarLightSystem.getLights(),
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(clouds);
-
         await new Promise<void>((resolve) => {
             planet.cloudsUniforms?.lut.getTexture().executeWhenReady(() => {
                 resolve();
@@ -124,31 +125,7 @@ export async function createTelluricPlanetScene(
         });
     }
 
-    if (planet.atmosphereUniforms !== null) {
-        const atmosphere = new AtmosphericScatteringPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.atmosphereUniforms,
-            stellarLightSystem.getLights(),
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(atmosphere);
-    }
-
     if (planet.ringsUniforms) {
-        const rings = new RingsPostProcess(
-            planet.getTransform(),
-            planet.ringsUniforms,
-            telluricPlanetModel,
-            false,
-            stellarLightSystem.getLights(),
-            [planet],
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(rings);
-
         await new Promise<void>((resolve) => {
             if (planet.ringsUniforms?.patternLut.type === "procedural") {
                 planet.ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {
@@ -163,6 +140,7 @@ export async function createTelluricPlanetScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
+        celestialBodyUberShader?.update(deltaSeconds);
         planet.updateLOD(camera, chunkForge, scatteringSystem);
         chunkForge.update();
         planet.computeCulling(camera);

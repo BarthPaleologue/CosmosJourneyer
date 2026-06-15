@@ -24,8 +24,7 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
@@ -78,29 +77,25 @@ export async function createGasPlanetScene(
     const lightColor = getRgbFromTemperature(SolarTemperature);
     light.diffuse.set(lightColor.r, lightColor.g, lightColor.b);
 
-    const atmosphere = new AtmosphericScatteringPostProcess(
+    const celestialBodyUberShader = new CelestialBodyUberShaderPass(
         planet.getTransform(),
         planet.getBoundingRadius(),
-        planet.atmosphereUniforms,
+        false,
+        {
+            atmosphere: planet.atmosphereUniforms,
+            clouds: null,
+            ocean: null,
+            rings: planet.ringsUniforms,
+        },
         [light],
+        [planet],
+        null,
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(atmosphere);
+    camera.attachPostProcess(celestialBodyUberShader);
 
     if (planet.ringsUniforms) {
-        const rings = new RingsPostProcess(
-            planet.getTransform(),
-            planet.ringsUniforms,
-            gasPlanetModel,
-            false,
-            [light],
-            [planet],
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(rings);
-
         await new Promise<void>((resolve) => {
             if (planet.ringsUniforms?.patternLut.type === "procedural") {
                 planet.ringsUniforms.patternLut.lut.getTexture().executeWhenReady(() => {

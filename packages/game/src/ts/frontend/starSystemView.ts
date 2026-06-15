@@ -919,7 +919,6 @@ export class StarSystemView implements View {
             activeControls.getTransform().getAbsolutePosition(),
         );
 
-        this.postProcessManager.setCelestialBody(nearestCelestialBody);
         this.postProcessManager.update(deltaSeconds);
 
         const spaceship = this.spaceshipControls.getSpaceship();

@@ -17,13 +17,13 @@
 
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 
+import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
 import { type PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
@@ -31,7 +31,7 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import { type PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import type { Scene } from "@babylonjs/core/scene";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { arraysEqual, assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type JuliaSetModel,
     type MandelboxModel,
@@ -40,7 +40,9 @@ import {
     type SierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-model";
 
+import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
+import { type Transformable } from "@/frontend/universe/architecture/transformable";
 import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -51,63 +53,24 @@ import { type Star } from "@/frontend/universe/stellarObjects/star/star";
 import { getRgbFromTemperature } from "@/utils/specrend";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
-import { JuliaSetPostProcess } from "./anomalies/juliaSetPostProcess";
-import { MandelboxPostProcess } from "./anomalies/mandelboxPostProcess";
-import { MandelbulbPostProcess } from "./anomalies/mandelbulbPostProcess";
-import { MengerSpongePostProcess } from "./anomalies/mengerSpongePostProcess";
-import { SierpinskiPyramidPostProcess } from "./anomalies/sierpinskiPyramidPostProcess";
-import { AtmosphericScatteringPostProcess } from "./atmosphere/atmosphericScatteringPostProcess";
-import { FlatCloudsPostProcess } from "./clouds/flatCloudsPostProcess";
+import { getProjectedDiameter01 } from "../helpers/isObjectVisibleOnScreen";
+import { CelestialBodyUberShaderPass } from "./celestialBodyUberShader/celestialBodyUberShaderPass";
 import { ColorCorrection } from "./colorCorrection";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { MatterJetPostProcess } from "./matterJetPostProcess";
-import { OceanPostProcess } from "./ocean/oceanPostProcess";
-import { type PostProcessType } from "./postProcessTypes";
-import { RingsPostProcess } from "./rings/ringsPostProcess";
+import { type RingsUniforms } from "./rings/ringsUniform";
 import { SphereShadowsPostProcess } from "./sphereShadowsPostProcess";
 import { type UpdatablePostProcess } from "./updatablePostProcess";
 import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
-/**
- * The order in which the post processes are rendered when away from a planet
- */
-const spaceRenderingOrder: PostProcessType[] = [
-    "volumetric_light",
-    "matter_jets",
-    "ocean",
-    "clouds",
-    "atmosphere",
-    "mandelbulb",
-    "julia_set",
-    "mandelbox",
-    "sierpinski_pyramid",
-    "menger_sponge",
-    "ring",
-    "black_hole",
-];
-
-/**
- * The order in which the post processes are rendered when close to a planet
- */
-const surfaceRenderingOrder: PostProcessType[] = [
-    "volumetric_light",
-    "matter_jets",
-    "black_hole",
-    "mandelbulb",
-    "julia_set",
-    "mandelbox",
-    "sierpinski_pyramid",
-    "menger_sponge",
-    "ring",
-    "ocean",
-    "clouds",
-    "atmosphere",
-];
+type RenderableBodyEntry = {
+    readonly body: Transformable & HasBoundingSphere;
+    readonly postProcessRadius: number;
+};
 
 /**
  * Manages all post processes in the scene.
- * The manager dynamically creates the rendering pipeline depending on the current body.
- * This is necessary so the effects are rendered in the correct order. (other objects -> body -> overlays)
+ * The manager dynamically creates the rendering pipeline depending on the distance of every body to the active camera.
+ * This is necessary so post-processes tied to celestial bodies are rendered from farthest to nearest.
  */
 export class PostProcessManager {
     /**
@@ -126,45 +89,25 @@ export class PostProcessManager {
     readonly renderingPipelineManager: PostProcessRenderPipelineManager;
 
     /**
-     * The current rendering pipeline. It is destroyed and recreated every time the closest orbital object changes or when the camera changes.
-     * @private
+     * The current rendering pipeline. It is destroyed and recreated every time the camera-relative body order changes.
      */
     private renderingPipeline: PostProcessRenderPipeline;
 
-    /**
-     * The order in which to add the post-processes to the rendering pipeline. This is important as this order determines the rendering order.
-     * For now, there are 2 different orders: one when in space, and one when close to a planet.
-     * @private
-     */
-    private currentRenderingOrder: PostProcessType[] = spaceRenderingOrder;
+    private readonly bodyEntries: RenderableBodyEntry[] = [];
+
+    private sortedBodies: RenderableBodyEntry[] = [];
+
+    private readonly bodyPostProcessesInRenderOrder: Array<PostProcess> = [];
 
     readonly volumetricLights: VolumetricLight[] = [];
-    readonly oceans: OceanPostProcess[] = [];
-    readonly clouds: FlatCloudsPostProcess[] = [];
-    readonly atmospheres: AtmosphericScatteringPostProcess[] = [];
-    readonly rings: RingsPostProcess[] = [];
-    readonly mandelbulbs: MandelbulbPostProcess[] = [];
-    readonly mandelboxes: MandelboxPostProcess[] = [];
-    readonly sierpinskiPyramids: SierpinskiPyramidPostProcess[] = [];
-    readonly mengerSponges: MengerSpongePostProcess[] = [];
-    readonly juliaSets: JuliaSetPostProcess[] = [];
+    readonly celestialBodyUberShaders: CelestialBodyUberShaderPass[] = [];
     readonly blackHoles: BlackHolePostProcess[] = [];
-    readonly matterJets: MatterJetPostProcess[] = [];
     readonly lensFlares: LensFlarePostProcess[] = [];
 
     private readonly objectPostProcesses: PostProcess[][] = [
         this.volumetricLights,
-        this.oceans,
-        this.clouds,
-        this.atmospheres,
-        this.rings,
-        this.mandelbulbs,
-        this.juliaSets,
-        this.mandelboxes,
-        this.sierpinskiPyramids,
-        this.mengerSponges,
+        this.celestialBodyUberShaders,
         this.blackHoles,
-        this.matterJets,
         this.lensFlares,
     ];
 
@@ -172,17 +115,11 @@ export class PostProcessManager {
      * All post processes that are updated every frame.
      */
     private readonly updatablePostProcesses: UpdatablePostProcess[][] = [
-        this.oceans,
-        this.clouds,
+        this.celestialBodyUberShaders,
         this.blackHoles,
-        this.matterJets,
-        this.mandelbulbs,
-        this.juliaSets,
-        this.mandelboxes,
-        this.sierpinskiPyramids,
     ];
 
-    readonly celestialBodyToPostProcesses: Map<TransformNode, PostProcess[]> = new Map();
+    private readonly celestialBodyToPostProcesses: Map<Transformable, PostProcess[]> = new Map();
 
     /**
      * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
@@ -205,6 +142,10 @@ export class PostProcessManager {
     readonly fxaaRenderEffect: PostProcessRenderEffect;
 
     readonly bloomRenderEffect: BloomEffect;
+
+    private readonly bodyRenderEffect: PostProcessRenderEffect;
+
+    private readonly lensFlareRenderEffect: PostProcessRenderEffect;
 
     private readonly sphereShadows: SphereShadowsPostProcess;
 
@@ -258,27 +199,76 @@ export class PostProcessManager {
             "sphereShadowsRenderEffect",
             () => [this.sphereShadows],
         );
+
+        this.bodyRenderEffect = new PostProcessRenderEffect(
+            scene.getEngine(),
+            "bodyRenderEffect",
+            () => this.bodyPostProcessesInRenderOrder,
+        );
+
+        this.lensFlareRenderEffect = new PostProcessRenderEffect(
+            scene.getEngine(),
+            "lensFlareRenderEffect",
+            () => this.lensFlares,
+        );
     }
 
-    private makeSplitRenderEffects(
-        name: string,
-        body: CelestialBody,
-        postProcesses: ReadonlyArray<PostProcess>,
-        engine: AbstractEngine,
-    ): [PostProcessRenderEffect, PostProcessRenderEffect] {
-        const bodyPostProcesses = this.celestialBodyToPostProcesses.get(body.getTransform()) ?? [];
-        const relevantPostProcesses = postProcesses.filter((postProcess) => bodyPostProcesses.includes(postProcess));
+    private getRenderSortedBodies(): RenderableBodyEntry[] {
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            return [...this.bodyEntries];
+        }
 
-        const otherPostProcesses = postProcesses.filter((postProcess) => !relevantPostProcesses.includes(postProcess));
+        return this.bodyEntries
+            .filter((bodyEntry) => this.isBodyPostProcessVisible(bodyEntry, camera))
+            .sort((a, b) => {
+                const aDistance2 = Vector3.DistanceSquared(
+                    a.body.getTransform().getAbsolutePosition(),
+                    camera.globalPosition,
+                );
+                const bDistance2 = Vector3.DistanceSquared(
+                    b.body.getTransform().getAbsolutePosition(),
+                    camera.globalPosition,
+                );
+                return bDistance2 - aDistance2;
+            });
+    }
 
-        const otherRenderEffect = new PostProcessRenderEffect(engine, `other${name}RenderEffect`, () => {
-            return otherPostProcesses;
-        });
-        const relevantRenderEffect = new PostProcessRenderEffect(engine, `body${name}RenderEffect`, () => {
-            return relevantPostProcesses;
-        });
+    private getBodyRenderPostProcesses(body: Transformable): PostProcess[] {
+        const postProcesses = this.celestialBodyToPostProcesses.get(body) ?? [];
+        return postProcesses.filter((postProcess) => !(postProcess instanceof LensFlarePostProcess));
+    }
 
-        return [otherRenderEffect, relevantRenderEffect];
+    private updateBodyPostProcessesInRenderOrder(): void {
+        this.bodyPostProcessesInRenderOrder.length = 0;
+
+        for (const { body } of this.sortedBodies) {
+            this.bodyPostProcessesInRenderOrder.push(...this.getBodyRenderPostProcesses(body));
+        }
+    }
+
+    private isBodyPostProcessVisible(bodyEntry: RenderableBodyEntry, camera: Camera): boolean {
+        const screenSizePixels =
+            getProjectedDiameter01(
+                bodyEntry.body.getTransform().getAbsolutePosition(),
+                bodyEntry.postProcessRadius,
+                camera.globalPosition,
+                camera.fov,
+            ) * this.engine.getRenderHeight();
+        return screenSizePixels >= 2;
+    }
+
+    private getRingsPostProcessRadius(ringsUniforms: RingsUniforms | null): number {
+        return ringsUniforms === null ? 0 : ringsUniforms.model.outerRadius;
+    }
+
+    private registerBodyPostProcesses(
+        body: Transformable & HasBoundingSphere,
+        postProcesses: PostProcess[],
+        postProcessRadius: number,
+    ): void {
+        this.bodyEntries.push({ body, postProcessRadius });
+        this.celestialBodyToPostProcesses.set(body, postProcesses);
     }
 
     public addStar(
@@ -307,21 +297,26 @@ export class PostProcessManager {
         postProcesses.push(lensFlare);
 
         if (star.ringsUniforms !== null) {
-            const rings = new RingsPostProcess(
-                star.getTransform(),
-                star.ringsUniforms,
-                star.model,
-                true,
-                lightSources,
-                [],
+            const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+                {
+                    transform: star.getTransform(),
+                    boundingRadius: star.getBoundingRadius(),
+                    emitsLight: true,
+                },
+                { rings: star.ringsUniforms },
+                { stellarObjects: lightSources, shadowCasters: [] },
                 this.depthRendererManager,
                 this.scene,
             );
-            this.rings.push(rings);
-            postProcesses.push(rings);
+            this.celestialBodyUberShaders.push(celestialBodyUberShader);
+            postProcesses.push(celestialBodyUberShader);
         }
 
-        this.celestialBodyToPostProcesses.set(star.getTransform(), postProcesses);
+        this.registerBodyPostProcesses(
+            star,
+            postProcesses,
+            Math.max(star.getBoundingRadius(), this.getRingsPostProcessRadius(star.ringsUniforms)),
+        );
     }
 
     public addNeutronStar(
@@ -349,32 +344,28 @@ export class PostProcessManager {
         this.lensFlares.push(lensFlare);
         postProcesses.push(lensFlare);
 
-        const matterJets = new MatterJetPostProcess(
-            neutronStar.getTransform(),
-            neutronStar.getBoundingRadius(),
-            neutronStar.model.dipoleTilt,
+        const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+            {
+                transform: neutronStar.getTransform(),
+                boundingRadius: neutronStar.getBoundingRadius(),
+                emitsLight: true,
+            },
+            {
+                matterJets: { dipoleTilt: neutronStar.model.dipoleTilt },
+                rings: neutronStar.ringsUniforms,
+            },
+            { stellarObjects: lightSources, shadowCasters: [] },
             this.depthRendererManager,
             this.scene,
         );
-        this.matterJets.push(matterJets);
-        postProcesses.push(matterJets);
+        this.celestialBodyUberShaders.push(celestialBodyUberShader);
+        postProcesses.push(celestialBodyUberShader);
 
-        if (neutronStar.ringsUniforms !== null) {
-            const rings = new RingsPostProcess(
-                neutronStar.getTransform(),
-                neutronStar.ringsUniforms,
-                neutronStar.model,
-                true,
-                lightSources,
-                [],
-                this.depthRendererManager,
-                this.scene,
-            );
-            this.rings.push(rings);
-            postProcesses.push(rings);
-        }
-
-        this.celestialBodyToPostProcesses.set(neutronStar.getTransform(), postProcesses);
+        this.registerBodyPostProcesses(
+            neutronStar,
+            postProcesses,
+            Math.max(neutronStar.getBoundingRadius(), this.getRingsPostProcessRadius(neutronStar.ringsUniforms)),
+        );
     }
 
     /**
@@ -390,210 +381,114 @@ export class PostProcessManager {
         );
         this.blackHoles.push(blackHolePostProcess);
 
-        this.celestialBodyToPostProcesses.set(blackHole.getTransform(), [blackHolePostProcess]);
+        this.registerBodyPostProcesses(blackHole, [blackHolePostProcess], blackHole.getBoundingRadius());
     }
 
     public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
         const postProcesses: PostProcess[] = [];
 
-        if (planet.atmosphereUniforms !== null) {
-            const atmosphere = new AtmosphericScatteringPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.atmosphereUniforms,
-                stellarObjects,
+        if (
+            planet.atmosphereUniforms !== null ||
+            planet.cloudsUniforms !== null ||
+            planet.oceanUniforms !== null ||
+            planet.ringsUniforms !== null
+        ) {
+            const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+                {
+                    transform: planet.getTransform(),
+                    boundingRadius: planet.getBoundingRadius(),
+                    emitsLight: false,
+                },
+                {
+                    atmosphere: planet.atmosphereUniforms,
+                    clouds: planet.cloudsUniforms,
+                    ocean: planet.oceanUniforms,
+                    rings: planet.ringsUniforms,
+                },
+                { stellarObjects, shadowCasters: [planet] },
                 this.depthRendererManager,
                 this.scene,
             );
-            this.atmospheres.push(atmosphere);
-            postProcesses.push(atmosphere);
-        }
-
-        if (planet.oceanUniforms !== null) {
-            const ocean = new OceanPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.oceanUniforms,
-                stellarObjects,
-                this.depthRendererManager,
-                this.scene,
-            );
-            this.oceans.push(ocean);
-            postProcesses.push(ocean);
-        }
-
-        if (planet.cloudsUniforms !== null) {
-            const clouds = new FlatCloudsPostProcess(
-                planet.getTransform(),
-                planet.getBoundingRadius(),
-                planet.cloudsUniforms,
-                stellarObjects,
-                this.depthRendererManager,
-                this.scene,
-            );
-            this.clouds.push(clouds);
-            postProcesses.push(clouds);
-        }
-
-        if (planet.ringsUniforms !== null) {
-            const rings = new RingsPostProcess(
-                planet.getTransform(),
-                planet.ringsUniforms,
-                planet.model,
-                false,
-                stellarObjects,
-                [planet],
-                this.depthRendererManager,
-                this.scene,
-            );
-            this.rings.push(rings);
-            postProcesses.push(rings);
+            this.celestialBodyUberShaders.push(celestialBodyUberShader);
+            postProcesses.push(celestialBodyUberShader);
         }
         this.sphereShadows.addShadowCaster(planet);
 
-        this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
+        this.registerBodyPostProcesses(
+            planet,
+            postProcesses,
+            Math.max(
+                planet.getBoundingRadius(),
+                planet.atmosphereUniforms?.atmosphereRadius ?? 0,
+                planet.cloudsUniforms?.model.layerRadius ?? 0,
+                planet.oceanUniforms?.oceanRadius ?? 0,
+                this.getRingsPostProcessRadius(planet.ringsUniforms),
+            ),
+        );
     }
 
     public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
         const postProcesses: PostProcess[] = [];
 
-        const atmosphere = new AtmosphericScatteringPostProcess(
-            planet.getTransform(),
-            planet.getBoundingRadius(),
-            planet.atmosphereUniforms,
-            stellarObjects,
+        const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+            {
+                transform: planet.getTransform(),
+                boundingRadius: planet.getBoundingRadius(),
+                emitsLight: false,
+            },
+            {
+                atmosphere: planet.atmosphereUniforms,
+                rings: planet.ringsUniforms,
+            },
+            { stellarObjects, shadowCasters: [planet] },
             this.depthRendererManager,
             this.scene,
         );
-        this.atmospheres.push(atmosphere);
-        postProcesses.push(atmosphere);
-
-        if (planet.ringsUniforms !== null) {
-            const rings = new RingsPostProcess(
-                planet.getTransform(),
-                planet.ringsUniforms,
-                planet.model,
-                false,
-                stellarObjects,
-                [planet],
-                this.depthRendererManager,
-                this.scene,
-            );
-            this.rings.push(rings);
-            postProcesses.push(rings);
-        }
+        this.celestialBodyUberShaders.push(celestialBodyUberShader);
+        postProcesses.push(celestialBodyUberShader);
 
         this.sphereShadows.addShadowCaster(planet);
 
-        this.celestialBodyToPostProcesses.set(planet.getTransform(), postProcesses);
-    }
-    /**
-     * Creates a new Mandelbulb postprocess for the given body and adds it to the manager.
-     * @param transform The transform of the body
-     * @param radius The bounding radius of the body
-     * @param model The model of the Mandelbulb
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addMandelbulb(
-        transform: TransformNode,
-        radius: number,
-        model: DeepReadonly<MandelbulbModel>,
-        stellarObjects: ReadonlyArray<DirectionalLight>,
-    ) {
-        const mandelbulb = new MandelbulbPostProcess(
-            transform,
-            radius,
-            model,
-            this.depthRendererManager,
-            this.scene,
-            stellarObjects,
+        this.registerBodyPostProcesses(
+            planet,
+            postProcesses,
+            Math.max(
+                planet.getBoundingRadius(),
+                planet.atmosphereUniforms.atmosphereRadius,
+                this.getRingsPostProcessRadius(planet.ringsUniforms),
+            ),
         );
-        this.mandelbulbs.push(mandelbulb);
-
-        this.celestialBodyToPostProcesses.set(transform, [mandelbulb]);
     }
 
-    /**
-     * Creates a new Julia set postprocess for the given julia set and adds it to the manager.
-     * @param transform The transform of the Julia set
-     * @param radius The bounding radius of the Julia set
-     * @param model The model of the Julia set
-     * @param stellarObjects An array of stars or black holes
-     */
-    public addJuliaSet(
-        transform: TransformNode,
-        radius: number,
-        model: DeepReadonly<JuliaSetModel>,
+    private addRaymarchedBody(
+        body: Transformable & HasBoundingSphere,
+        model: DeepReadonly<
+            MandelbulbModel | JuliaSetModel | MandelboxModel | SierpinskiPyramidModel | MengerSpongeModel
+        >,
         stellarObjects: ReadonlyArray<DirectionalLight>,
+        ringsUniforms: RingsUniforms | null,
     ) {
-        const juliaSetPostProcess = new JuliaSetPostProcess(
-            transform,
-            radius,
-            model.accentColor,
+        const raymarchedBodyPass = new CelestialBodyUberShaderPass(
+            {
+                transform: body.getTransform(),
+                boundingRadius: body.getBoundingRadius(),
+                emitsLight: false,
+            },
+            {
+                raymarchedBody: model,
+                rings: ringsUniforms,
+            },
+            { stellarObjects, shadowCasters: [] },
             this.depthRendererManager,
             this.scene,
-            stellarObjects,
         );
-        this.juliaSets.push(juliaSetPostProcess);
+        this.celestialBodyUberShaders.push(raymarchedBodyPass);
 
-        this.celestialBodyToPostProcesses.set(transform, [juliaSetPostProcess]);
-    }
-
-    public addMandelbox(
-        transform: TransformNode,
-        radius: number,
-        model: DeepReadonly<MandelboxModel>,
-        stellarObjects: ReadonlyArray<DirectionalLight>,
-    ) {
-        const mandelbox = new MandelboxPostProcess(
-            transform,
-            radius,
-            model,
-            this.depthRendererManager,
-            this.scene,
-            stellarObjects,
+        this.registerBodyPostProcesses(
+            body,
+            [raymarchedBodyPass],
+            Math.max(body.getBoundingRadius(), this.getRingsPostProcessRadius(ringsUniforms)),
         );
-        this.mandelboxes.push(mandelbox);
-
-        this.celestialBodyToPostProcesses.set(transform, [mandelbox]);
-    }
-
-    public addSierpinskiPyramid(
-        transform: TransformNode,
-        radius: number,
-        model: DeepReadonly<SierpinskiPyramidModel>,
-        stellarObjects: ReadonlyArray<DirectionalLight>,
-    ) {
-        const sierpinskiPyramid = new SierpinskiPyramidPostProcess(
-            transform,
-            radius,
-            model,
-            this.depthRendererManager,
-            this.scene,
-            stellarObjects,
-        );
-        this.sierpinskiPyramids.push(sierpinskiPyramid);
-
-        this.celestialBodyToPostProcesses.set(transform, [sierpinskiPyramid]);
-    }
-
-    public addMengerSponge(
-        transform: TransformNode,
-        radius: number,
-        model: DeepReadonly<MengerSpongeModel>,
-        stellarObjects: ReadonlyArray<DirectionalLight>,
-    ) {
-        const mengerSponge = new MengerSpongePostProcess(
-            transform,
-            radius,
-            model,
-            this.depthRendererManager,
-            this.scene,
-            stellarObjects,
-        );
-        this.mengerSponges.push(mengerSponge);
-
-        this.celestialBodyToPostProcesses.set(transform, [mengerSponge]);
     }
 
     public addCelestialBodies(
@@ -622,19 +517,19 @@ export class PostProcessManager {
                     this.addGasPlanet(object, lightSources);
                     break;
                 case "mandelbulb":
-                    this.addMandelbulb(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
                 case "juliaSet":
-                    this.addJuliaSet(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
                 case "mandelbox":
-                    this.addMandelbox(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
                 case "sierpinskiPyramid":
-                    this.addSierpinskiPyramid(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
                 case "mengerSponge":
-                    this.addMengerSponge(object.getTransform(), object.getRadius(), object.model, lightSources);
+                    this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
                 case "darkKnight":
                     // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
@@ -646,248 +541,27 @@ export class PostProcessManager {
 
         this.sphereShadows.addStellarLights(lightSources);
 
-        const newCurrentBody = bodies[0];
-        if (newCurrentBody === undefined) {
-            throw new Error("No arguments provided to addCelestialBodies");
-        }
-
-        this.rebuild(newCurrentBody);
+        this.sortedBodies = this.getRenderSortedBodies();
+        this.rebuild();
     }
 
     /**
-     * Sets the current celestial body of the post process manager.
-     * It should be the closest body to the active camera, in order to split the post processes that are specific to this body from the others.
-     * This method will also choose the appropriate rendering order and rebuild the pipeline.
-     * @param body The closest celestial body to the active camera
+     * Rebuilds the rendering pipeline with body post-processes ordered from farthest to nearest.
      */
-    public setCelestialBody(body: CelestialBody) {
-        const rings = this.celestialBodyToPostProcesses
-            .get(body.getTransform())
-            ?.find((pp) => pp instanceof RingsPostProcess);
-        const switchLimit = rings !== undefined ? rings.ringsUniforms.model.innerRadius : 2 * body.getBoundingRadius();
-        const camera = this.scene.activeCamera;
-        if (camera === null) {
-            console.warn("no camera!");
-            return;
-        }
-
-        const distance2 = Vector3.DistanceSquared(body.getTransform().getAbsolutePosition(), camera.globalPosition);
-        if (distance2 < switchLimit ** 2) this.setSurfaceOrder(body);
-        else this.setSpaceOrder(body);
-    }
-
-    /**
-     * Sets the rendering order to the space rendering order and rebuilds the pipeline.
-     */
-    private setSpaceOrder(currentBody: CelestialBody) {
-        if (this.currentRenderingOrder === spaceRenderingOrder) return;
-        this.currentRenderingOrder = spaceRenderingOrder;
-        this.rebuild(currentBody);
-    }
-
-    /**
-     * Sets the rendering order to the surface rendering order and rebuilds the pipeline.
-     */
-    private setSurfaceOrder(currentBody: CelestialBody) {
-        if (this.currentRenderingOrder === surfaceRenderingOrder) return;
-        this.currentRenderingOrder = surfaceRenderingOrder;
-        this.rebuild(currentBody);
-    }
-
-    /**
-     * Rebuilds the rendering pipeline with the current rendering order.
-     */
-    private rebuild(currentBody: CelestialBody) {
+    private rebuild() {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
         this.renderingPipeline.dispose();
 
+        this.updateBodyPostProcessesInRenderOrder();
+
         this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
 
-        const [otherVolumetricLightsRenderEffect, bodyVolumetricLightsRenderEffect] = this.makeSplitRenderEffects(
-            "VolumetricLights",
-            currentBody,
-            this.volumetricLights,
-            this.engine,
-        );
-        const [otherBlackHolesRenderEffect, bodyBlackHolesRenderEffect] = this.makeSplitRenderEffects(
-            "BlackHoles",
-            currentBody,
-            this.blackHoles,
-            this.engine,
-        );
-        const [otherOceansRenderEffect, bodyOceansRenderEffect] = this.makeSplitRenderEffects(
-            "Oceans",
-            currentBody,
-            this.oceans,
-            this.engine,
-        );
-        const [otherCloudsRenderEffect, bodyCloudsRenderEffect] = this.makeSplitRenderEffects(
-            "Clouds",
-            currentBody,
-            this.clouds,
-            this.engine,
-        );
-        const [otherAtmospheresRenderEffect, bodyAtmospheresRenderEffect] = this.makeSplitRenderEffects(
-            "Atmospheres",
-            currentBody,
-            this.atmospheres,
-            this.engine,
-        );
-        const [otherRingsRenderEffect, bodyRingsRenderEffect] = this.makeSplitRenderEffects(
-            "Rings",
-            currentBody,
-            this.rings,
-            this.engine,
-        );
-        const [otherMandelbulbsRenderEffect, bodyMandelbulbsRenderEffect] = this.makeSplitRenderEffects(
-            "Mandelbulbs",
-            currentBody,
-            this.mandelbulbs,
-            this.engine,
-        );
-        const [otherJuliaSetsRenderEffect, bodyJuliaSetRenderEffect] = this.makeSplitRenderEffects(
-            "JuliaSets",
-            currentBody,
-            this.juliaSets,
-            this.engine,
-        );
-        const [otherMandelboxesRenderEffect, bodyMandelboxRenderEffect] = this.makeSplitRenderEffects(
-            "Mandelboxes",
-            currentBody,
-            this.mandelboxes,
-            this.engine,
-        );
-        const [otherSierpinskiPyramidsRenderEffect, bodySierpinskiPyramidsRenderEffect] = this.makeSplitRenderEffects(
-            "SierpinskiPyramids",
-            currentBody,
-            this.sierpinskiPyramids,
-            this.engine,
-        );
-        const [otherMengerSpongesRenderEffect, bodyMengerSpongesRenderEffect] = this.makeSplitRenderEffects(
-            "MengerSponges",
-            currentBody,
-            this.mengerSponges,
-            this.engine,
-        );
-        const [otherMatterJetsRenderEffect, bodyMatterJetsRenderEffect] = this.makeSplitRenderEffects(
-            "MatterJets",
-            currentBody,
-            this.matterJets,
-            this.engine,
-        );
-        const lensFlareRenderEffect = new PostProcessRenderEffect(
-            this.engine,
-            "LensFlareRenderEffect",
-            () => this.lensFlares,
-        );
-
         this.renderingPipeline.addEffect(this.sphereShadowsRenderEffect);
-
-        // other objects are viewed in their space configuration
-        for (const postProcessType of spaceRenderingOrder) {
-            switch (postProcessType) {
-                case "volumetric_light":
-                    this.renderingPipeline.addEffect(otherVolumetricLightsRenderEffect);
-                    break;
-                case "black_hole":
-                    this.renderingPipeline.addEffect(otherBlackHolesRenderEffect);
-                    break;
-                case "ocean":
-                    this.renderingPipeline.addEffect(otherOceansRenderEffect);
-                    break;
-                case "clouds":
-                    this.renderingPipeline.addEffect(otherCloudsRenderEffect);
-                    break;
-                case "atmosphere":
-                    this.renderingPipeline.addEffect(otherAtmospheresRenderEffect);
-                    break;
-                case "ring":
-                    this.renderingPipeline.addEffect(otherRingsRenderEffect);
-                    break;
-                case "matter_jets":
-                    this.renderingPipeline.addEffect(otherMatterJetsRenderEffect);
-                    break;
-                case "mandelbulb":
-                    this.renderingPipeline.addEffect(otherMandelbulbsRenderEffect);
-                    break;
-                case "julia_set":
-                    this.renderingPipeline.addEffect(otherJuliaSetsRenderEffect);
-                    break;
-                case "mandelbox":
-                    this.renderingPipeline.addEffect(otherMandelboxesRenderEffect);
-                    break;
-                case "sierpinski_pyramid":
-                    this.renderingPipeline.addEffect(otherSierpinskiPyramidsRenderEffect);
-                    break;
-                case "menger_sponge":
-                    this.renderingPipeline.addEffect(otherMengerSpongesRenderEffect);
-                    break;
-                case "shadow":
-                    //this.renderingPipeline.addEffect(otherShadowRenderEffect);
-                    break;
-                case "lens_flare":
-                    //this.renderingPipeline.addEffect(otherLensFlaresRenderEffect);
-                    break;
-                default:
-                    assertUnreachable(postProcessType);
-            }
-        }
-
-        // closest object is either in surface or space configuration depending on distance to camera
-        for (const postProcessType of this.currentRenderingOrder) {
-            switch (postProcessType) {
-                case "volumetric_light":
-                    this.renderingPipeline.addEffect(bodyVolumetricLightsRenderEffect);
-                    break;
-                case "black_hole":
-                    this.renderingPipeline.addEffect(bodyBlackHolesRenderEffect);
-                    break;
-                case "ocean":
-                    this.renderingPipeline.addEffect(bodyOceansRenderEffect);
-                    break;
-                case "clouds":
-                    this.renderingPipeline.addEffect(bodyCloudsRenderEffect);
-                    break;
-                case "atmosphere":
-                    this.renderingPipeline.addEffect(bodyAtmospheresRenderEffect);
-                    break;
-                case "ring":
-                    this.renderingPipeline.addEffect(bodyRingsRenderEffect);
-                    break;
-                case "matter_jets":
-                    this.renderingPipeline.addEffect(bodyMatterJetsRenderEffect);
-                    break;
-                case "mandelbulb":
-                    this.renderingPipeline.addEffect(bodyMandelbulbsRenderEffect);
-                    break;
-                case "julia_set":
-                    this.renderingPipeline.addEffect(bodyJuliaSetRenderEffect);
-                    break;
-                case "mandelbox":
-                    this.renderingPipeline.addEffect(bodyMandelboxRenderEffect);
-                    break;
-                case "sierpinski_pyramid":
-                    this.renderingPipeline.addEffect(bodySierpinskiPyramidsRenderEffect);
-                    break;
-                case "menger_sponge":
-                    this.renderingPipeline.addEffect(bodyMengerSpongesRenderEffect);
-                    break;
-                case "lens_flare":
-                    //this.renderingPipeline.addEffect(bodyLensFlaresRenderEffect);
-                    break;
-                case "shadow":
-                    //this.renderingPipeline.addEffect(bodyShadowRenderEffect);
-                    break;
-                default:
-                    assertUnreachable(postProcessType);
-            }
-        }
-
+        this.renderingPipeline.addEffect(this.bodyRenderEffect);
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
-        this.renderingPipeline.addEffect(lensFlareRenderEffect);
+        this.renderingPipeline.addEffect(this.lensFlareRenderEffect);
         this.renderingPipeline.addEffect(this.fxaaRenderEffect);
-        //this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
@@ -895,16 +569,28 @@ export class PostProcessManager {
     }
 
     /**
-     * Updates all updatable post processes with the given delta time.
-     * @param deltaTime The time in seconds since the last frame
+     * Updates time-dependent post-processes and rebuilds the pipeline if necessary
+     * @param deltaSeconds The time in seconds since the last frame
      */
-    public update(deltaTime: number) {
-        for (const postProcess of this.updatablePostProcesses.flat()) postProcess.update(deltaTime);
+    public update(deltaSeconds: number) {
+        for (const postProcesses of this.updatablePostProcesses) {
+            for (const postProcess of postProcesses) {
+                postProcess.update(deltaSeconds);
+            }
+        }
+
+        const sortedBodies = this.getRenderSortedBodies();
+        if (arraysEqual(this.sortedBodies, sortedBodies)) {
+            return;
+        }
+
+        this.sortedBodies = sortedBodies;
+        this.rebuild();
     }
 
     /**
      * Disposes of all post-processes tied to a star system (everything except color correction and FXAA).
-     * The pipeline is not destroyed as it is always destroyed and recreated when the closest orbital object changes.
+     * Recreates the rendering pipeline in a minimal state.
      */
     public reset() {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
@@ -931,9 +617,12 @@ export class PostProcessManager {
         this.objectPostProcesses.forEach((postProcessList) => {
             postProcessList.length = 0;
         });
+        this.bodyPostProcessesInRenderOrder.length = 0;
 
         this.sphereShadows.reset();
 
         this.celestialBodyToPostProcesses.clear();
+        this.bodyEntries.length = 0;
+        this.sortedBodies = [];
     }
 }
