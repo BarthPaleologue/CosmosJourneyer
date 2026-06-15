@@ -81,7 +81,7 @@ For general discussion and sharing screenshots, visit the [official subreddit](h
 
 ## My vision for the project
 
-For my detailed vision for the project, please refer to the [VISION.md](./VISION.md) file.
+For my detailed vision for the project, please refer to the [VISION_EN.md](./VISION_EN.md) file.
 
 ## Why Cosmos Journeyer?
 
