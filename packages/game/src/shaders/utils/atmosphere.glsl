@@ -15,6 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifndef ATMOSPHERE_UNIFORMS
+#define ATMOSPHERE_UNIFORMS
+
 uniform float atmosphere_radius;
 
 uniform float atmosphere_rayleighHeight; // height falloff of rayleigh scattering (in meters)
@@ -29,3 +32,5 @@ uniform vec3 atmosphere_ozoneCoeffs; // ozone absorption coefficients
 uniform float atmosphere_ozoneFalloff; // ozone falloff around the ozone layer in meters
 
 uniform float atmosphere_sunIntensity; // controls atmosphere overall brightness
+
+#endif
