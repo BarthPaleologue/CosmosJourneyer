@@ -137,8 +137,12 @@ bool celestialBodyUberShaderSampleVisibleRing(
     float impactPoint;
     if (rayIntersectsPlane(camera_position, viewDir, object_position, object_rotationAxis, 0.001, impactPoint)) {
         if (impactPoint >= 0.0 && impactPoint < maximumDistance) {
+            bool ringIsOccludedByCentralBody = false;
+#if !defined(HAS_RAYMARCHED_BODY)
             float t0, t1;
-            if (!rayIntersectSphere(camera_position, viewDir, object_position, object_radius, t0, t1) || t0 > impactPoint) {
+            ringIsOccludedByCentralBody = rayIntersectSphere(camera_position, viewDir, object_position, object_radius, t0, t1) && t0 <= impactPoint;
+#endif
+            if (!ringIsOccludedByCentralBody) {
                 vec3 samplePoint = camera_position + impactPoint * viewDir;
                 vec4 pattern = ringPatternAtPoint(samplePoint);
 

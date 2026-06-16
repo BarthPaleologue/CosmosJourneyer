@@ -61,6 +61,7 @@ export function createAtmosphericScatteringScene(
         scalingFactor,
         false,
         {
+            raymarchedBody: null,
             atmosphere: atmosphereUniforms,
             clouds: null,
             ocean: null,

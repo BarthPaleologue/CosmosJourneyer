@@ -100,6 +100,7 @@ export async function createTelluricPlanetScene(
                   planet.getBoundingRadius(),
                   false,
                   {
+                      raymarchedBody: null,
                       atmosphere: planet.atmosphereUniforms,
                       clouds: planet.cloudsUniforms,
                       ocean: planet.oceanUniforms,

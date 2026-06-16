@@ -82,6 +82,7 @@ export async function createGasPlanetScene(
         planet.getBoundingRadius(),
         false,
         {
+            raymarchedBody: null,
             atmosphere: planet.atmosphereUniforms,
             clouds: null,
             ocean: null,

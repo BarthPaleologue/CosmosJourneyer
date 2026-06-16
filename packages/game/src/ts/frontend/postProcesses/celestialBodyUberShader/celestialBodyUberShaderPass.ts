@@ -23,6 +23,8 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { type AnomalyModel, type DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { type AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
@@ -54,7 +56,18 @@ const CelestialBodyUberShaderUniformNames = {
     ELAPSED_SECONDS: "elapsedSeconds",
 } as const;
 
+const CelestialBodyUberShaderRaymarchedBodyUniformNames = {
+    ACCENT_COLOR: "accent_color",
+    AVERAGE_SCREEN_SIZE: "average_screen_size",
+    MANDELBULB_POWER: "mandelbulb_power",
+    MANDELBOX_MR2: "mandelbox_mr2",
+    MANDELBOX_SPREAD: "mandelbox_spread",
+} as const;
+
+type RaymarchedBodyModel = Exclude<AnomalyModel, DarkKnightModel>;
+
 export type CelestialBodyUberShaderFeatures = {
+    readonly raymarchedBody: DeepReadonly<RaymarchedBodyModel> | null;
     readonly atmosphere: AtmosphereUniforms | null;
     readonly clouds: CloudsUniforms | null;
     readonly ocean: OceanUniforms | null;
@@ -93,6 +106,14 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
         ];
         const samplers: string[] = [...Object.values(SamplerUniformNames)];
         const defines: string[] = [];
+
+        if (features.raymarchedBody !== null) {
+            uniforms.push(...Object.values(CelestialBodyUberShaderRaymarchedBodyUniformNames));
+            defines.push(
+                "#define HAS_RAYMARCHED_BODY",
+                `#define ${CelestialBodyUberShaderPass.GetRaymarchedBodyDefine(features.raymarchedBody)}`,
+            );
+        }
 
         if (features.atmosphere !== null) {
             uniforms.push(...features.atmosphere.getUniformNames());
@@ -157,6 +178,14 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
 
             features.atmosphere?.setUniforms(effect);
 
+            if (features.raymarchedBody !== null) {
+                CelestialBodyUberShaderPass.SetRaymarchedBodyUniforms(
+                    effect,
+                    features.raymarchedBody,
+                    (scene.getEngine().getRenderWidth() + scene.getEngine().getRenderHeight()) / 2,
+                );
+            }
+
             if (features.ocean !== null) {
                 features.ocean.setUniforms(effect, bodyTransform);
                 features.ocean.setSamplers(effect);
@@ -181,5 +210,68 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
         this.elapsedSeconds %= 24 * 60 * 60;
+    }
+
+    private static GetRaymarchedBodyDefine(raymarchedBody: DeepReadonly<RaymarchedBodyModel>): string {
+        switch (raymarchedBody.type) {
+            case "mandelbulb":
+                return "HAS_MANDELBULB";
+            case "juliaSet":
+                return "HAS_JULIA_SET";
+            case "mandelbox":
+                return "HAS_MANDELBOX";
+            case "sierpinskiPyramid":
+                return "HAS_SIERPINSKI_PYRAMID";
+            case "mengerSponge":
+                return "HAS_MENGER_SPONGE";
+            default:
+                return assertUnreachable(raymarchedBody);
+        }
+    }
+
+    private static SetRaymarchedBodyUniforms(
+        effect: Effect,
+        raymarchedBody: DeepReadonly<RaymarchedBodyModel>,
+        averageScreenSize: number,
+    ): void {
+        effect.setFloat(CelestialBodyUberShaderRaymarchedBodyUniformNames.AVERAGE_SCREEN_SIZE, averageScreenSize);
+
+        switch (raymarchedBody.type) {
+            case "mandelbulb":
+                effect.setColor3(
+                    CelestialBodyUberShaderRaymarchedBodyUniformNames.ACCENT_COLOR,
+                    raymarchedBody.accentColor,
+                );
+                effect.setFloat(
+                    CelestialBodyUberShaderRaymarchedBodyUniformNames.MANDELBULB_POWER,
+                    raymarchedBody.power,
+                );
+                break;
+            case "juliaSet":
+                effect.setColor3(
+                    CelestialBodyUberShaderRaymarchedBodyUniformNames.ACCENT_COLOR,
+                    raymarchedBody.accentColor,
+                );
+                break;
+            case "mandelbox":
+                effect.setColor3(CelestialBodyUberShaderRaymarchedBodyUniformNames.ACCENT_COLOR, raymarchedBody.color);
+                effect.setFloat(CelestialBodyUberShaderRaymarchedBodyUniformNames.MANDELBOX_MR2, raymarchedBody.mr2);
+                effect.setFloat(
+                    CelestialBodyUberShaderRaymarchedBodyUniformNames.MANDELBOX_SPREAD,
+                    raymarchedBody.spread,
+                );
+                break;
+            case "sierpinskiPyramid":
+                effect.setColor3(
+                    CelestialBodyUberShaderRaymarchedBodyUniformNames.ACCENT_COLOR,
+                    raymarchedBody.accentColor,
+                );
+                break;
+            case "mengerSponge":
+                effect.setColor3(CelestialBodyUberShaderRaymarchedBodyUniformNames.ACCENT_COLOR, raymarchedBody.color);
+                break;
+            default:
+                return assertUnreachable(raymarchedBody);
+        }
     }
 }

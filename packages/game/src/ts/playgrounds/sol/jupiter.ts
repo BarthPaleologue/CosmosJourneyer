@@ -72,6 +72,7 @@ export async function createJupiterScene(
         planet.getBoundingRadius(),
         false,
         {
+            raymarchedBody: null,
             atmosphere: planet.atmosphereUniforms,
             clouds: null,
             ocean: null,

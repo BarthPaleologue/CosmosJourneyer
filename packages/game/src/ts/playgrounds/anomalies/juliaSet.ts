@@ -20,7 +20,7 @@ import { generateJuliaSetModel } from "@cosmos-journeyer/universe-generation";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { JuliaSetPostProcess } from "@/frontend/postProcesses/anomalies/juliaSetPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createJuliaSetScene(
@@ -51,13 +51,22 @@ export function createJuliaSetScene(
 
     const anomaly = new EmptyCelestialBody(model, scene);
 
-    const pp = new JuliaSetPostProcess(
+    const pp = new CelestialBodyUberShaderPass(
         anomaly.getTransform(),
         anomaly.getBoundingRadius(),
-        model.accentColor,
+        false,
+        {
+            raymarchedBody: model,
+            atmosphere: null,
+            clouds: null,
+            ocean: null,
+            rings: null,
+        },
+        [light],
+        [],
+        null,
         depthRendererManager,
         scene,
-        [light],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

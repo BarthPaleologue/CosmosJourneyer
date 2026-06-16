@@ -20,7 +20,7 @@ import { generateMandelboxModel } from "@cosmos-journeyer/universe-generation";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { MandelboxPostProcess } from "@/frontend/postProcesses/anomalies/mandelboxPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createMandelboxScene(
@@ -51,13 +51,22 @@ export function createMandelboxScene(
 
     const anomaly = new EmptyCelestialBody(model, scene);
 
-    const pp = new MandelboxPostProcess(
+    const pp = new CelestialBodyUberShaderPass(
         anomaly.getTransform(),
         anomaly.getBoundingRadius(),
-        model,
+        false,
+        {
+            raymarchedBody: model,
+            atmosphere: null,
+            clouds: null,
+            ocean: null,
+            rings: null,
+        },
+        [light],
+        [],
+        null,
         depthRendererManager,
         scene,
-        [light],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

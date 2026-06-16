@@ -88,6 +88,7 @@ export async function createRingsScene(
         scalingFactor,
         false,
         {
+            raymarchedBody: null,
             atmosphere: null,
             clouds: null,
             ocean: null,

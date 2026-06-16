@@ -85,6 +85,7 @@ export async function createSaturnScene(
         planet.getBoundingRadius(),
         false,
         {
+            raymarchedBody: null,
             atmosphere: planet.atmosphereUniforms,
             clouds: null,
             ocean: null,
