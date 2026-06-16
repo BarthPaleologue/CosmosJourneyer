@@ -1,0 +1,1 @@
+import{n as e,t}from"./ssao2.fragment-CRWTHJo1.js";t();export{e as ssao2PixelShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./openpbr.vertex-DLxPncLu.js";t();export{e as openpbrVertexShaderWGSL};

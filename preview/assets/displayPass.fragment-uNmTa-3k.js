@@ -1,0 +1,5 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";var r,i,a,o=e((()=>{t(),r=`displayPassPixelShader`,i=`varying vec2 vUV;uniform sampler2D textureSampler;uniform sampler2D passSampler;
+#define CUSTOM_FRAGMENT_DEFINITIONS
+void main(void)
+{gl_FragColor=texture2D(passSampler,vUV);}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=displayPass.fragment-uNmTa-3k.js.map

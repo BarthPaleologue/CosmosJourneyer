@@ -1,0 +1,1 @@
+import{n as e,t}from"./procedural.vertex-DwgUdm1c.js";t();export{e as proceduralVertexShader};

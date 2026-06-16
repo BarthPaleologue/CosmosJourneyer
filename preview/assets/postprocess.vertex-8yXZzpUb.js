@@ -1,0 +1,1 @@
+import{n as e,t}from"./postprocess.vertex-B0eOgf1F.js";t();export{e as postprocessVertexShaderWGSL};

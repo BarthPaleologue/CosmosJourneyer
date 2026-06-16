@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{i as t,r as n}from"./typeStore-B2wKKE0Y.js";import{n as r,t as i}from"./flowGraphEventBlock-Dz5p79zy.js";var a,o=e((()=>{r(),t(),a=class extends i{constructor(){super(...arguments),this.initPriority=-1,this.type=`SceneReady`}_executeEvent(e,t){return this._execute(e),!0}_preparePendingTasks(e){}_cancelPendingTasks(e){}getClassName(){return`FlowGraphSceneReadyEventBlock`}},n(`FlowGraphSceneReadyEventBlock`,a)}));export{o as n,a as t};
+//# sourceMappingURL=flowGraphSceneReadyEventBlock-B2YKM5j8.js.map

@@ -1,0 +1,1 @@
+import{n as e,t}from"./layer.vertex-Cz0oioI5.js";t();export{e as layerVertexShaderWGSL};

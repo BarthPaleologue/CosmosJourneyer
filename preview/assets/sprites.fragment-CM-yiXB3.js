@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.fragment-CUlVOA9O.js";t();export{e as spritesPixelShader};

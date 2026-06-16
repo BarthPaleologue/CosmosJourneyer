@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";var r,i,a,o=e((()=>{t(),r=`meshUVSpaceRendererMaskerVertexShader`,i=`attribute vec2 uv;varying vec2 vUV;void main(void) {gl_Position=vec4(vec2(uv.x,uv.y)*2.0-1.0,0.,1.0);vUV=uv;}`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=meshUVSpaceRendererMasker.vertex-CZ7FmJY2.js.map

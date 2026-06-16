@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesDeclaration-BSYLOweg.js";e();export{t as bonesDeclaration};

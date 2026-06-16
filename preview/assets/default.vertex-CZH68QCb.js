@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex-Beknq-uo.js";e();export{t as defaultVertexShader};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblShadowVoxelTracing.fragment-CtfmZ2aI.js";e();export{t as iblShadowVoxelTracingPixelShaderWGSL};

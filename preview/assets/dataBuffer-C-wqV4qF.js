@@ -1,0 +1,2 @@
+var e=class e{get underlyingResource(){return null}constructor(){this.references=0,this.capacity=0,this.is32Bits=!1,this.uniqueId=e._Counter++}};e._Counter=0;export{e as t};
+//# sourceMappingURL=dataBuffer-C-wqV4qF.js.map

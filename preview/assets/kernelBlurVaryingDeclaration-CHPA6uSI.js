@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";var r,i,a=e((()=>{t(),r=`kernelBlurVaryingDeclaration`,i=`varying vec2 sampleCoord{X};`,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i)}));export{a as t};
+//# sourceMappingURL=kernelBlurVaryingDeclaration-CHPA6uSI.js.map

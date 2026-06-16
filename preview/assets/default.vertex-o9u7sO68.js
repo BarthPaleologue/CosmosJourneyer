@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex--nq17AVZ.js";e();export{t as defaultVertexShaderWGSL};

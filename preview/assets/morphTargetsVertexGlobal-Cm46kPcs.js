@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertexGlobal-DBMPhAZf.js";t();export{e as morphTargetsVertexGlobalWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertex-DDTTJve4.js";t();export{e as morphTargetsVertex};

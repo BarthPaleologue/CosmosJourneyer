@@ -1,0 +1,1 @@
+import{n as e,t}from"./outline.vertex-DCGyS5yW.js";t();export{e as outlineVertexShaderWGSL};

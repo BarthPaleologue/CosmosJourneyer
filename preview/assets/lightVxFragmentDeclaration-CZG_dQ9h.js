@@ -1,0 +1,29 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";var r,i,a,o=e((()=>{t(),r=`lightVxFragmentDeclaration`,i=`#ifdef LIGHT{X}
+uniform vec4 vLightData{X};uniform vec4 vLightDiffuse{X};
+#ifdef SPECULARTERM
+uniform vec4 vLightSpecular{X};
+#else
+vec4 vLightSpecular{X}=vec4(0.);
+#endif
+#ifdef SHADOW{X}
+#ifdef SHADOWCSM{X}
+uniform mat4 lightMatrix{X}[SHADOWCSMNUM_CASCADES{X}];varying vec4 vPositionFromLight{X}[SHADOWCSMNUM_CASCADES{X}];varying float vDepthMetric{X}[SHADOWCSMNUM_CASCADES{X}];varying vec4 vPositionFromCamera{X};
+#elif defined(SHADOWCUBE{X})
+#else
+varying vec4 vPositionFromLight{X};varying float vDepthMetric{X};uniform mat4 lightMatrix{X};
+#endif
+uniform vec4 shadowsInfo{X};uniform vec2 depthValues{X};
+#endif
+#ifdef SPOTLIGHT{X}
+uniform vec4 vLightDirection{X};uniform vec4 vLightFalloff{X};
+#elif defined(POINTLIGHT{X})
+uniform vec4 vLightFalloff{X};
+#elif defined(HEMILIGHT{X})
+uniform vec3 vLightGround{X};
+#endif
+#if defined(AREALIGHT{X}) && defined(AREALIGHTUSED) && defined(AREALIGHTSUPPORTED)
+uniform vec4 vLightWidth{X};uniform vec4 vLightHeight{X};
+#endif
+#endif
+`,n.IncludesShadersStore[r]||(n.IncludesShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=lightVxFragmentDeclaration-CZG_dQ9h.js.map

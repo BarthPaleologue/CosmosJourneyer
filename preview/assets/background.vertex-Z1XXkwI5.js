@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.vertex-BJ2UpEkp.js";e();export{t as backgroundVertexShaderWGSL};

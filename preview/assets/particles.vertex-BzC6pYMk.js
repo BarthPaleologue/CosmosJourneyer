@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.vertex-BLo_vmVY.js";t();export{e as particlesVertexShader};

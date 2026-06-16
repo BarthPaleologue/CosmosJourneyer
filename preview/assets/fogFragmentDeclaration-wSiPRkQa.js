@@ -1,0 +1,1 @@
+import{n as e,t}from"./fogFragmentDeclaration-CTXnVo1a.js";e();export{t as fogFragmentDeclarationWGSL};

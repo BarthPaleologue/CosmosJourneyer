@@ -1,0 +1,3 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";var r,i,a,o=e((()=>{t(),r=`copyTexture3DLayerToTexturePixelShader`,i=`precision highp sampler3D;uniform sampler3D textureSampler;uniform int layerNum;varying vec2 vUV;void main(void) {vec3 coord=vec3(0.0,0.0,float(layerNum));coord.xy=vec2(vUV.x,vUV.y)*vec2(textureSize(textureSampler,0).xy);vec3 color=texelFetch(textureSampler,ivec3(coord),0).rgb;gl_FragColor=vec4(color,1);}
+`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{o as n,a as t};
+//# sourceMappingURL=copyTexture3DLayerToTexture.fragment-DtzszYAu.js.map

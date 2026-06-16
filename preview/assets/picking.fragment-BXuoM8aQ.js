@@ -1,0 +1,1 @@
+import{n as e,t}from"./picking.fragment-DpKm8ik-.js";t();export{e as pickingPixelShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./procedural.vertex-BSct0kut.js";t();export{e as proceduralVertexShaderWGSL};

@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./flowGraphAsyncExecutionBlock-DPbj2bLe.js";var r,i=e((()=>{t(),r=class extends n{constructor(){super(...arguments),this.initPriority=0,this.type=`NoTrigger`}_execute(e){e._notifyExecuteNode(this),this.done._activateSignal(e)}}}));export{i as n,r as t};
+//# sourceMappingURL=flowGraphEventBlock-Dz5p79zy.js.map

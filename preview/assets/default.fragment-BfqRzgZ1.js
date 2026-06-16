@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.fragment-izIth6eS.js";e();export{t as defaultPixelShader};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesVertex-CerndIZ3.js";e();export{t as bonesVertexWGSL};

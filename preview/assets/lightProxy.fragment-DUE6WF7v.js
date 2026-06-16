@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightProxy.fragment-Dfmpl2pT.js";t();export{e as lightProxyPixelShader};

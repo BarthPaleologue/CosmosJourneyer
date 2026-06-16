@@ -1,0 +1,1 @@
+import{n as e,t}from"./pass.fragment-BMuBByRH.js";t();export{e as passPixelShaderWGSL};

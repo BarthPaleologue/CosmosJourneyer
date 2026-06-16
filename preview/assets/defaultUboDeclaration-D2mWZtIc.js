@@ -1,0 +1,8 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";import{t as r}from"./sceneUboDeclaration-nXZNzR28.js";import{t as i}from"./meshUboDeclaration-DI7Yc_b7.js";var a,o,s=e((()=>{t(),r(),i(),a=`defaultUboDeclaration`,o=`layout(std140,column_major) uniform;uniform Material
+{vec4 diffuseLeftColor;vec4 diffuseRightColor;vec4 opacityParts;vec4 reflectionLeftColor;vec4 reflectionRightColor;vec4 refractionLeftColor;vec4 refractionRightColor;vec4 emissiveLeftColor;vec4 emissiveRightColor;vec2 vDiffuseInfos;vec2 vAmbientInfos;vec2 vOpacityInfos;vec2 vEmissiveInfos;vec2 vLightmapInfos;vec2 vSpecularInfos;vec3 vBumpInfos;mat4 diffuseMatrix;mat4 ambientMatrix;mat4 opacityMatrix;mat4 emissiveMatrix;mat4 lightmapMatrix;mat4 specularMatrix;mat4 bumpMatrix;vec2 vTangentSpaceParams;float pointSize;float alphaCutOff;mat4 refractionMatrix;vec4 vRefractionInfos;vec3 vRefractionPosition;vec3 vRefractionSize;vec4 vSpecularColor;vec3 vEmissiveColor;vec4 vDiffuseColor;vec3 vAmbientColor;vec4 cameraInfo;vec2 vReflectionInfos;mat4 reflectionMatrix;vec3 vReflectionPosition;vec3 vReflectionSize;
+#define ADDITIONAL_UBO_DECLARATION
+};
+#include<sceneUboDeclaration>
+#include<meshUboDeclaration>
+`,n.IncludesShadersStore[a]||(n.IncludesShadersStore[a]=o)}));export{s as t};
+//# sourceMappingURL=defaultUboDeclaration-D2mWZtIc.js.map

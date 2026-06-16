@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesVertex-DOdlsEEE.js";e();export{t as bonesVertex};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./picking.vertex-ufDspfIa.js";t();export{e as pickingVertexShader};

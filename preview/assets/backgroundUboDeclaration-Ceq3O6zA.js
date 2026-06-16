@@ -1,0 +1,5 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./shaderStore-DR7YeKlK.js";import{t as r}from"./sceneUboDeclaration-nXZNzR28.js";var i,a,o=e((()=>{t(),r(),i=`backgroundUboDeclaration`,a=`layout(std140,column_major) uniform;uniform Material
+{uniform vec4 vPrimaryColor;uniform vec4 vPrimaryColorShadow;uniform vec2 vDiffuseInfos;uniform mat4 diffuseMatrix;uniform float fFovMultiplier;uniform float pointSize;uniform float shadowLevel;uniform float alpha;uniform vec3 vBackgroundCenter;uniform vec4 vReflectionControl;uniform vec2 projectedGroundInfos;uniform vec2 vReflectionInfos;uniform mat4 reflectionMatrix;uniform vec3 vReflectionMicrosurfaceInfos;};
+#include<sceneUboDeclaration>
+`,n.IncludesShadersStore[i]||(n.IncludesShadersStore[i]=a)}));export{o as t};
+//# sourceMappingURL=backgroundUboDeclaration-Ceq3O6zA.js.map

@@ -1,0 +1,1 @@
+import{n as e,t}from"./clipPlaneFragmentDeclaration-Das-drhD.js";e();export{t as clipPlaneFragmentDeclarationWGSL};

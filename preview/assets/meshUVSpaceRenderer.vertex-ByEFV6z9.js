@@ -1,0 +1,1 @@
+import{n as e,t}from"./meshUVSpaceRenderer.vertex-CCTnsNai.js";t();export{e as meshUVSpaceRendererVertexShaderWGSL};

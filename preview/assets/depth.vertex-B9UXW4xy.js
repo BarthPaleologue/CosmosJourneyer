@@ -1,0 +1,1 @@
+import{n as e,t}from"./depth.vertex-_OwYJ2XC.js";e();export{t as depthVertexShaderWGSL};

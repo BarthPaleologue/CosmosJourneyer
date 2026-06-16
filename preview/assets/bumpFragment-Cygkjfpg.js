@@ -1,0 +1,1 @@
+import{n as e,t}from"./bumpFragment-BE0my69A.js";e();export{t as bumpFragmentWGSL};

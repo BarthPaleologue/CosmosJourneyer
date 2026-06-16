@@ -1,0 +1,1 @@
+import{n as e,t}from"./msdf.vertex-DkId_1yN.js";t();export{e as msdfVertexShaderWGSL};

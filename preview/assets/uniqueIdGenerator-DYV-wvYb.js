@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";var t,n=e((()=>{t=class{static get UniqueId(){let e=this._UniqueIdCounter;return this._UniqueIdCounter++,e}},t._UniqueIdCounter=1}));export{n,t};
+//# sourceMappingURL=uniqueIdGenerator-DYV-wvYb.js.map

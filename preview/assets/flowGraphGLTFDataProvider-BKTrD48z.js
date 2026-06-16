@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{M as t,m as n,n as r,t as i}from"./flowGraphBlock-B9U094qb.js";var a,o=e((()=>{r(),t(),a=class extends i{constructor(e){super();let t=e.glTF,r=t.animations?.map(e=>e._babylonAnimationGroup)||[];this.animationGroups=this.registerDataOutput(`animationGroups`,n,r);let i=t.nodes?.map(e=>e._babylonTransformNode)||[];this.nodes=this.registerDataOutput(`nodes`,n,i)}getClassName(){return`FlowGraphGLTFDataProvider`}}}));export{o as n,a as t};
+//# sourceMappingURL=flowGraphGLTFDataProvider-BKTrD48z.js.map

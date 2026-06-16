@@ -1,0 +1,1 @@
+import{n as e,t}from"./basisTextureLoader-BGg1jB_E.js";e();export{t as _BasisTextureLoader};

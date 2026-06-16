@@ -1,0 +1,1 @@
+import{n as e,t}from"./passCube.fragment-ZWm7Tepm.js";t();export{e as passCubePixelShaderWGSL};

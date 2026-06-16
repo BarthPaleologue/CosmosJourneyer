@@ -1,0 +1,2 @@
+import{n as e}from"./chunk-Cyuzqnbw.js";import{n as t,t as n}from"./flowGraphCachedOperationBlock-BlP3yxtM.js";var r,i=e((()=>{t(),r=class extends n{constructor(e,t,n,r,i){super(t,i),this._operation=n,this._className=r,this.a=this.registerDataInput(`a`,e)}_doOperation(e){return this._operation(this.a.getValue(e))}getClassName(){return this._className}}}));export{i as n,r as t};
+//# sourceMappingURL=flowGraphUnaryOperationBlock-B3R6X_v1.js.map

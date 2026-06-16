@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.vertex-DJtbS22S.js";t();export{e as particlesVertexShaderWGSL};

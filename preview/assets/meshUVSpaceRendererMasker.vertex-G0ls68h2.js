@@ -1,0 +1,1 @@
+import{n as e,t}from"./meshUVSpaceRendererMasker.vertex-yS6R5a6g.js";t();export{e as meshUVSpaceRendererMaskerVertexShaderWGSL};

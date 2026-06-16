@@ -1,0 +1,1 @@
+import{n as e,t}from"./ktxTextureLoader-DxY8gRrE.js";e();export{t as _KTXTextureLoader};

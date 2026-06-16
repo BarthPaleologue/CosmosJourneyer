@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.fragment-pgjJP664.js";e();export{t as backgroundPixelShader};

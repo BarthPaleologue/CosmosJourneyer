@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblGenerateVoxelMip.fragment-Bk7Ri1XS.js";e();export{t as iblGenerateVoxelMipPixelShaderWGSL};

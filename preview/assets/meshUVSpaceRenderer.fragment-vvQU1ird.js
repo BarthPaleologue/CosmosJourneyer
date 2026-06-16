@@ -1,0 +1,1 @@
+import{n as e,t}from"./meshUVSpaceRenderer.fragment-7pJN6L7W.js";t();export{e as meshUVSpaceRendererPixelShaderWGSL};

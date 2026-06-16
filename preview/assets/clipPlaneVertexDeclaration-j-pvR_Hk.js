@@ -1,0 +1,1 @@
+import{n as e,t}from"./clipPlaneVertexDeclaration-D-0qbzQ-.js";e();export{t as clipPlaneVertexDeclarationWGSL};

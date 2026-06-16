@@ -1,0 +1,1 @@
+import{n as e,t}from"./msdf.fragment-C1tt8z7R.js";t();export{e as msdfPixelShader};
