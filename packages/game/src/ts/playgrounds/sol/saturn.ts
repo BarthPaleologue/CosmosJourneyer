@@ -81,19 +81,16 @@ export async function createSaturnScene(
     }
 
     const celestialBodyUberShader = new CelestialBodyUberShaderPass(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        false,
         {
-            raymarchedBody: null,
+            transform: planet.getTransform(),
+            boundingRadius: planet.getBoundingRadius(),
+            emitsLight: false,
+        },
+        {
             atmosphere: planet.atmosphereUniforms,
-            clouds: null,
-            ocean: null,
             rings: planet.ringsUniforms,
         },
-        [light],
-        [planet],
-        null,
+        { stellarObjects: [light], shadowCasters: [planet] },
         depthRendererManager,
         scene,
     );

@@ -57,19 +57,16 @@ export function createAtmosphericScatteringScene(
     const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
 
     const atmosphere = new CelestialBodyUberShaderPass(
-        sphere,
-        scalingFactor,
-        false,
         {
-            raymarchedBody: null,
+            transform: sphere,
+            boundingRadius: scalingFactor,
+            emitsLight: false,
+        },
+        {
             atmosphere: atmosphereUniforms,
-            clouds: null,
-            ocean: null,
             rings: null,
         },
-        [light],
-        [],
-        null,
+        { stellarObjects: [light], shadowCasters: [] },
         depthRendererManager,
         scene,
     );

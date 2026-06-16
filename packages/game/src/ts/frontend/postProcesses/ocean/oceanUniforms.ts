@@ -36,6 +36,8 @@ const OceanSamplerNames = {
 };
 
 export class OceanUniforms {
+    private readonly textures: Readonly<WaterTextures>;
+
     oceanRadius: number;
     smoothness: number;
     specularPower: number;
@@ -43,16 +45,14 @@ export class OceanUniforms {
     alphaModifier: number;
     waveBlendingSharpness: number;
 
-    readonly waterTextures: WaterTextures;
-
-    constructor(planetRadius: number, oceanLevel: number, waterTextures: WaterTextures) {
+    constructor(planetRadius: number, oceanLevel: number, textures: Readonly<WaterTextures>) {
+        this.textures = textures;
         this.oceanRadius = planetRadius + oceanLevel;
         this.depthModifier = 0.0015;
         this.alphaModifier = 0.0025;
         this.specularPower = 1.0;
         this.smoothness = 0.8;
         this.waveBlendingSharpness = 0.5;
-        this.waterTextures = waterTextures;
     }
 
     getUniformNames(): string[] {
@@ -77,7 +77,7 @@ export class OceanUniforms {
     }
 
     setSamplers(effect: Effect) {
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, this.waterTextures.normalMap1);
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, this.waterTextures.normalMap2);
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, this.textures.normalMap1);
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, this.textures.normalMap2);
     }
 }

@@ -84,24 +84,24 @@ export async function createRingsScene(
     });
 
     const rings = new CelestialBodyUberShaderPass(
-        sphere,
-        scalingFactor,
-        false,
         {
-            raymarchedBody: null,
+            transform: sphere,
+            boundingRadius: scalingFactor,
+            emitsLight: false,
+        },
+        {
             atmosphere: null,
-            clouds: null,
-            ocean: null,
             rings: ringsUniforms,
         },
-        [light],
-        [
-            {
-                getTransform: () => sphere,
-                getBoundingRadius: () => scalingFactor,
-            },
-        ],
-        null,
+        {
+            stellarObjects: [light],
+            shadowCasters: [
+                {
+                    getTransform: () => sphere,
+                    getBoundingRadius: () => scalingFactor,
+                },
+            ],
+        },
         depthRendererManager,
         scene,
     );

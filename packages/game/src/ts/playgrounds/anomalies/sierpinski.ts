@@ -52,19 +52,13 @@ export function createSierpinskiScene(
     const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
 
     const pp = new CelestialBodyUberShaderPass(
-        sierpinskiPyramid.getTransform(),
-        sierpinskiPyramid.getBoundingRadius(),
-        false,
         {
-            raymarchedBody: sierpinskiPyramidModel,
-            atmosphere: null,
-            clouds: null,
-            ocean: null,
-            rings: null,
+            transform: sierpinskiPyramid.getTransform(),
+            boundingRadius: sierpinskiPyramid.getBoundingRadius(),
+            emitsLight: false,
         },
-        [light],
-        [],
-        null,
+        { raymarchedBody: sierpinskiPyramidModel },
+        { stellarObjects: [light], shadowCasters: [] },
         depthRendererManager,
         scene,
     );

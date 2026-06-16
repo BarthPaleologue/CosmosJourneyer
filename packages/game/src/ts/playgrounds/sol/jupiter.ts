@@ -68,19 +68,16 @@ export async function createJupiterScene(
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
 
     const atmosphere = new CelestialBodyUberShaderPass(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        false,
         {
-            raymarchedBody: null,
+            transform: planet.getTransform(),
+            boundingRadius: planet.getBoundingRadius(),
+            emitsLight: false,
+        },
+        {
             atmosphere: planet.atmosphereUniforms,
-            clouds: null,
-            ocean: null,
             rings: planet.ringsUniforms,
         },
-        [light],
-        [planet],
-        null,
+        { stellarObjects: [light], shadowCasters: [planet] },
         depthRendererManager,
         scene,
     );

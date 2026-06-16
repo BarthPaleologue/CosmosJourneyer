@@ -26,8 +26,8 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
-import { MatterJetPostProcess } from "@/frontend/postProcesses/matterJetPostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
@@ -63,14 +63,21 @@ export async function createNeutronStarScene(
     const volumetricLight = new VolumetricLight(neutronStar.mesh, neutronStar.volumetricLightUniforms, [], scene);
     camera.attachPostProcess(volumetricLight);
 
-    const matterJets = new MatterJetPostProcess(
-        neutronStar.getTransform(),
-        neutronStar.getRadius(),
-        neutronStar.model.dipoleTilt,
+    const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+        {
+            transform: neutronStar.getTransform(),
+            boundingRadius: neutronStar.getRadius(),
+            emitsLight: true,
+        },
+        {
+            matterJets: { dipoleTilt: neutronStar.model.dipoleTilt },
+            rings: neutronStar.ringsUniforms,
+        },
+        { stellarObjects: [], shadowCasters: [] },
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(matterJets);
+    camera.attachPostProcess(celestialBodyUberShader);
 
     const lensFlare = new LensFlarePostProcess(
         neutronStar.getTransform(),
@@ -90,7 +97,7 @@ export async function createNeutronStarScene(
         neutronStar
             .getTransform()
             .rotate(Axis.Y, (2 * Math.PI * deltaSeconds) / neutronStarModel.rotation.siderealPeriod);
-        matterJets.update(deltaSeconds);
+        celestialBodyUberShader.update(deltaSeconds);
     });
 
     return scene;

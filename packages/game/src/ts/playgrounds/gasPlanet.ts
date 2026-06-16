@@ -78,19 +78,16 @@ export async function createGasPlanetScene(
     light.diffuse.set(lightColor.r, lightColor.g, lightColor.b);
 
     const celestialBodyUberShader = new CelestialBodyUberShaderPass(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        false,
         {
-            raymarchedBody: null,
+            transform: planet.getTransform(),
+            boundingRadius: planet.getBoundingRadius(),
+            emitsLight: false,
+        },
+        {
             atmosphere: planet.atmosphereUniforms,
-            clouds: null,
-            ocean: null,
             rings: planet.ringsUniforms,
         },
-        [light],
-        [planet],
-        null,
+        { stellarObjects: [light], shadowCasters: [planet] },
         depthRendererManager,
         scene,
     );

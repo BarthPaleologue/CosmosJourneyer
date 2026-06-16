@@ -96,19 +96,18 @@ export async function createTelluricPlanetScene(
         planet.oceanUniforms !== null ||
         planet.ringsUniforms !== null
             ? new CelestialBodyUberShaderPass(
-                  planet.getTransform(),
-                  planet.getBoundingRadius(),
-                  false,
                   {
-                      raymarchedBody: null,
+                      transform: planet.getTransform(),
+                      boundingRadius: planet.getBoundingRadius(),
+                      emitsLight: false,
+                  },
+                  {
                       atmosphere: planet.atmosphereUniforms,
                       clouds: planet.cloudsUniforms,
                       ocean: planet.oceanUniforms,
                       rings: planet.ringsUniforms,
                   },
-                  stellarLightSystem.getLights(),
-                  [planet],
-                  assets.textures.water,
+                  { stellarObjects: stellarLightSystem.getLights(), shadowCasters: [planet] },
                   depthRendererManager,
                   scene,
               )

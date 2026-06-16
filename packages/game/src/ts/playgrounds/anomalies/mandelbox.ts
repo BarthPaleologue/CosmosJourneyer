@@ -52,19 +52,13 @@ export function createMandelboxScene(
     const anomaly = new EmptyCelestialBody(model, scene);
 
     const pp = new CelestialBodyUberShaderPass(
-        anomaly.getTransform(),
-        anomaly.getBoundingRadius(),
-        false,
         {
-            raymarchedBody: model,
-            atmosphere: null,
-            clouds: null,
-            ocean: null,
-            rings: null,
+            transform: anomaly.getTransform(),
+            boundingRadius: anomaly.getBoundingRadius(),
+            emitsLight: false,
         },
-        [light],
-        [],
-        null,
+        { raymarchedBody: model },
+        { stellarObjects: [light], shadowCasters: [] },
         depthRendererManager,
         scene,
     );
