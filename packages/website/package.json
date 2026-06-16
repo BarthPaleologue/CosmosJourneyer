@@ -16,14 +16,14 @@
         "serve:prod": "http-server out"
     },
     "dependencies": {
-        "next": "^16.2.6",
-        "react": "^19.2.5",
-        "react-dom": "^19.2.5",
-        "sharp": "^0.34.5"
+        "next": "^16.2.9",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "sharp": "^0.35.1"
     },
     "devDependencies": {
-        "@types/node": "^25.5.2",
-        "@types/react": "^19.2.14",
+        "@types/node": "^25.9.3",
+        "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "eslint": "catalog:",
         "http-server": "catalog:",

@@ -62,7 +62,7 @@
         "earcut": "^3.0.2",
         "extended-random": "^1.2.2",
         "fast-simplex-noise": "^4.0.0",
-        "i18next": "^26.0.4",
+        "i18next": "^26.3.1",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
         "terrain-generation": "workspace:^",
