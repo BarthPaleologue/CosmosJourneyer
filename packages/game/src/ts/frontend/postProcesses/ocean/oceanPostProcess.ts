@@ -24,7 +24,6 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { type Scene } from "@babylonjs/core/scene";
 
-import { type WaterTextures } from "@/frontend/assets/textures";
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 
 import { CameraUniformNames, setCameraUniforms } from "../uniforms/cameraUniforms";
@@ -48,7 +47,6 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
         boundingRadius: number,
         oceanUniforms: OceanUniforms,
         stellarObjects: ReadonlyArray<DirectionalLight>,
-        oceanTextures: WaterTextures,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {
@@ -101,7 +99,7 @@ export class OceanPostProcess extends PostProcess implements UpdatablePostProces
             oceanUniforms.setUniforms(effect, planetTransform);
 
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
-            oceanUniforms.setSamplers(effect, oceanTextures);
+            oceanUniforms.setSamplers(effect);
         });
     }
 

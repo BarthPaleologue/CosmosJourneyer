@@ -40,7 +40,6 @@ import {
     type SierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-model";
 
-import { type Textures } from "@/frontend/assets/textures";
 import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
@@ -211,15 +210,12 @@ export class PostProcessManager {
 
     private readonly sphereShadowsRenderEffect: PostProcessRenderEffect;
 
-    private readonly textures: Textures;
-
     private readonly depthRendererManager: DepthRendererManager;
 
-    constructor(textures: Textures, depthRendererManager: DepthRendererManager, scene: Scene) {
+    constructor(depthRendererManager: DepthRendererManager, scene: Scene) {
         this.scene = scene;
         this.engine = scene.getEngine();
 
-        this.textures = textures;
         this.depthRendererManager = depthRendererManager;
 
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
@@ -419,7 +415,6 @@ export class PostProcessManager {
                 planet.getBoundingRadius(),
                 planet.oceanUniforms,
                 stellarObjects,
-                this.textures.water,
                 this.depthRendererManager,
                 this.scene,
             );
