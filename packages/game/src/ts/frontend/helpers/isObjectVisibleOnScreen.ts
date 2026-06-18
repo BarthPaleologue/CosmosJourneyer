@@ -21,16 +21,19 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
 
-/**
- * Computes the angular size in radians of an object viewed by a camera
- * @param objectPosition
- * @param objectRadius
- * @param cameraPosition The position of the observer camera
- * @see https://en.wikipedia.org/wiki/Angular_diameter
- */
-export function getAngularSize(objectPosition: Vector3, objectRadius: number, cameraPosition: Vector3) {
-    const distance = Vector3.Distance(cameraPosition, objectPosition);
-    return 2 * Math.atan(objectRadius / distance);
+export function getProjectedDiameter01(
+    position: Vector3,
+    radius: number,
+    cameraPosition: Vector3,
+    fov: number,
+): number {
+    const distance = Vector3.Distance(position, cameraPosition);
+    if (distance <= radius) {
+        return Number.POSITIVE_INFINITY;
+    }
+
+    const angularDiameter = 2 * Math.atan(radius / distance);
+    return angularDiameter / fov;
 }
 
 /**
@@ -41,11 +44,12 @@ export function getAngularSize(objectPosition: Vector3, objectRadius: number, ca
  * @returns Whether the object is bigger than the threshold
  */
 export function isSizeOnScreenEnough(object: HasBoundingSphere & Transformable, camera: Camera, threshold = 0.005) {
-    const angularSize = getAngularSize(
+    const angularSize = getProjectedDiameter01(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),
         camera.globalPosition,
+        camera.fov,
     );
 
-    return angularSize / camera.fov > threshold;
+    return angularSize > threshold;
 }
