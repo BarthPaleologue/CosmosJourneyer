@@ -40,7 +40,9 @@ bool celestialBodyUberShaderSampleOceanLayer(
         return false;
     }
 
-    if (impactPoint < 0.0 || impactPoint > maximumDistance + 1.0) {
+    impactPoint = max(0.0, impactPoint);
+
+    if (impactPoint > maximumDistance + 1.0) {
         return false;
     }
 
