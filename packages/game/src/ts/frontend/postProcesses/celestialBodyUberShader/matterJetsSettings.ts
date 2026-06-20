@@ -18,3 +18,10 @@
 export type MatterJetsSettings = {
     readonly dipoleTilt: number;
 };
+
+export const matterJetsScalingFactor = 10000;
+export const matterJetsConeHeight = 100;
+
+export function getMatterJetsVisibilityRadius(bodyRadius: number): number {
+    return bodyRadius * matterJetsScalingFactor * matterJetsConeHeight;
+}

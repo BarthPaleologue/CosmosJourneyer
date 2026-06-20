@@ -55,6 +55,7 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { getProjectedDiameter01 } from "../helpers/isObjectVisibleOnScreen";
 import { CelestialBodyUberShaderPass } from "./celestialBodyUberShader/celestialBodyUberShaderPass";
+import { getMatterJetsVisibilityRadius } from "./celestialBodyUberShader/matterJetsSettings";
 import { ColorCorrection } from "./colorCorrection";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
 import { type RingsUniforms } from "./rings/ringsUniform";
@@ -64,7 +65,7 @@ import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
 type RenderableBodyEntry = {
     readonly body: Transformable & HasBoundingSphere;
-    readonly postProcessRadius: number;
+    readonly visibilityRadius: number;
 };
 
 /**
@@ -251,7 +252,7 @@ export class PostProcessManager {
         const screenSizePixels =
             getProjectedDiameter01(
                 bodyEntry.body.getTransform().getAbsolutePosition(),
-                bodyEntry.postProcessRadius,
+                bodyEntry.visibilityRadius,
                 camera.globalPosition,
                 camera.fov,
             ) * this.engine.getRenderHeight();
@@ -265,9 +266,9 @@ export class PostProcessManager {
     private registerBodyPostProcesses(
         body: Transformable & HasBoundingSphere,
         postProcesses: PostProcess[],
-        postProcessRadius: number,
+        visibilityRadius: number,
     ): void {
-        this.bodyEntries.push({ body, postProcessRadius });
+        this.bodyEntries.push({ body, visibilityRadius });
         this.celestialBodyToPostProcesses.set(body, postProcesses);
     }
 
@@ -364,7 +365,11 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             neutronStar,
             postProcesses,
-            Math.max(neutronStar.getBoundingRadius(), this.getRingsPostProcessRadius(neutronStar.ringsUniforms)),
+            Math.max(
+                neutronStar.getBoundingRadius(),
+                this.getRingsPostProcessRadius(neutronStar.ringsUniforms),
+                getMatterJetsVisibilityRadius(neutronStar.getBoundingRadius()),
+            ),
         );
     }
 

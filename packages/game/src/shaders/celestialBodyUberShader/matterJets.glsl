@@ -18,6 +18,7 @@
 uniform mat4 inverse_rotation;
 uniform float dipole_tilt;
 
+const float MATTER_JETS_SCALING_FACTOR = 10000.0;
 const float MATTER_JETS_CONE_HEIGHT = 100.0;
 const int MATTER_JETS_RAY_MARCH_STEPS = 100;
 
@@ -224,7 +225,7 @@ vec3 celestialBodyUberShaderComposeMatterJetsSegment(
         return baseColor;
     }
 
-    float scalingFactor = object_radius * 10000.0;
+    float scalingFactor = object_radius * MATTER_JETS_SCALING_FACTOR;
 
     vec3 rayOriginLocalSpace = mat3(inverse_rotation) * (camera_position - object_position) / scalingFactor;
     vec3 rayDirLocalSpace = mat3(inverse_rotation) * viewDir;
