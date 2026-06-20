@@ -36,6 +36,10 @@ export function metersToLightSeconds(meters: number): number {
     return meters / C;
 }
 
+export function metersToLightMinutes(meters: number): number {
+    return meters / (C * 60);
+}
+
 /**
  * Converts a duration to seconds.
  * @param duration The duration expressed in days, hours, minutes, and/or seconds.
