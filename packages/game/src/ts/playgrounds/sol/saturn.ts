@@ -24,8 +24,7 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
@@ -81,29 +80,21 @@ export async function createSaturnScene(
         );
     }
 
-    const atmosphere = new AtmosphericScatteringPostProcess(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        planet.atmosphereUniforms,
-        [light],
+    const celestialBodyUberShader = new CelestialBodyUberShaderPass(
+        {
+            transform: planet.getTransform(),
+            boundingRadius: planet.getBoundingRadius(),
+            emitsLight: false,
+        },
+        {
+            atmosphere: planet.atmosphereUniforms,
+            rings: planet.ringsUniforms,
+        },
+        { stellarObjects: [light], shadowCasters: [planet] },
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(atmosphere);
-
-    if (planet.ringsUniforms !== null) {
-        const rings = new RingsPostProcess(
-            planet.getTransform(),
-            planet.ringsUniforms,
-            planet.model,
-            false,
-            [light],
-            [planet],
-            depthRendererManager,
-            scene,
-        );
-        camera.attachPostProcess(rings);
-    }
+    camera.attachPostProcess(celestialBodyUberShader);
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

@@ -24,7 +24,7 @@ import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { RingsPostProcess } from "@/frontend/postProcesses/rings/ringsPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
@@ -83,18 +83,25 @@ export async function createRingsScene(
         }
     });
 
-    const rings = new RingsPostProcess(
-        sphere,
-        ringsUniforms,
-        { name: "Sphere", radius: 1 * scalingFactor },
-        false,
-        [light],
-        [
-            {
-                getTransform: () => sphere,
-                getBoundingRadius: () => scalingFactor,
-            },
-        ],
+    const rings = new CelestialBodyUberShaderPass(
+        {
+            transform: sphere,
+            boundingRadius: scalingFactor,
+            emitsLight: false,
+        },
+        {
+            atmosphere: null,
+            rings: ringsUniforms,
+        },
+        {
+            stellarObjects: [light],
+            shadowCasters: [
+                {
+                    getTransform: () => sphere,
+                    getBoundingRadius: () => scalingFactor,
+                },
+            ],
+        },
         depthRendererManager,
         scene,
     );

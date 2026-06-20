@@ -20,7 +20,7 @@ import { generateMengerSpongeModel } from "@cosmos-journeyer/universe-generation
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { MengerSpongePostProcess } from "@/frontend/postProcesses/anomalies/mengerSpongePostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createMengerSpongeScene(
@@ -51,13 +51,16 @@ export function createMengerSpongeScene(
 
     const anomaly = new EmptyCelestialBody(model, scene);
 
-    const pp = new MengerSpongePostProcess(
-        anomaly.getTransform(),
-        anomaly.getBoundingRadius(),
-        model,
+    const pp = new CelestialBodyUberShaderPass(
+        {
+            transform: anomaly.getTransform(),
+            boundingRadius: anomaly.getBoundingRadius(),
+            emitsLight: false,
+        },
+        { raymarchedBody: model },
+        { stellarObjects: [light], shadowCasters: [] },
         depthRendererManager,
         scene,
-        [light],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

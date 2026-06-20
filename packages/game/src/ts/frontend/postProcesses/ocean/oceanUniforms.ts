@@ -28,7 +28,6 @@ const OceanUniformNames = {
     OCEAN_DEPTH_MODIFIER: "ocean_depthModifier",
     OCEAN_WAVE_BLENDING_SHARPNESS: "ocean_waveBlendingSharpness",
     PLANET_INVERSE_ROTATION_MATRIX: "planetInverseRotationMatrix",
-    TIME: "time",
 };
 
 const OceanSamplerNames = {
@@ -37,22 +36,23 @@ const OceanSamplerNames = {
 };
 
 export class OceanUniforms {
+    private readonly textures: Readonly<WaterTextures>;
+
     oceanRadius: number;
     smoothness: number;
     specularPower: number;
     depthModifier: number;
     alphaModifier: number;
     waveBlendingSharpness: number;
-    time: number;
 
-    constructor(planetRadius: number, oceanLevel: number) {
+    constructor(planetRadius: number, oceanLevel: number, textures: Readonly<WaterTextures>) {
+        this.textures = textures;
         this.oceanRadius = planetRadius + oceanLevel;
         this.depthModifier = 0.0015;
         this.alphaModifier = 0.0025;
         this.specularPower = 1.0;
         this.smoothness = 0.8;
         this.waveBlendingSharpness = 0.5;
-        this.time = 0;
     }
 
     getUniformNames(): string[] {
@@ -70,15 +70,14 @@ export class OceanUniforms {
             OceanUniformNames.PLANET_INVERSE_ROTATION_MATRIX,
             planetTransform.getWorldMatrix().getRotationMatrix().transpose(),
         );
-        effect.setFloat(OceanUniformNames.TIME, this.time % 100000); //FIXME: do not hardcode the 100000
     }
 
     getSamplerNames(): string[] {
         return Object.values(OceanSamplerNames);
     }
 
-    setSamplers(effect: Effect, textures: WaterTextures) {
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, textures.normalMap1);
-        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, textures.normalMap2);
+    setSamplers(effect: Effect) {
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, this.textures.normalMap1);
+        effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, this.textures.normalMap2);
     }
 }

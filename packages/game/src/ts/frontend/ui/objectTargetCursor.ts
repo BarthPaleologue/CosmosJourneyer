@@ -20,7 +20,7 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { getAngularSize } from "@/frontend/helpers/isObjectVisibleOnScreen";
+import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
 
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
@@ -176,14 +176,14 @@ export class ObjectTargetCursor {
         const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
         objectRay.scaleInPlace(1 / distance);
 
-        const angularSize = getAngularSize(
+        const screenSize = getProjectedDiameter01(
             this.object.getTransform().getAbsolutePosition(),
             this.object.getBoundingRadius(),
             camera.globalPosition,
+            camera.fov,
         );
-        const screenRatio = angularSize / camera.fov;
 
-        let size = 100 * (screenRatio * 1.3);
+        let size = 100 * (screenSize * 1.3);
         if (this.minSize > 0) size = Math.max(size, this.minSize);
         if (this.maxSize > 0) size = Math.min(size, this.maxSize);
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);

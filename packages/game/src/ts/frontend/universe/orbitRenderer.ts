@@ -78,6 +78,8 @@ export class OrbitRenderer {
             { r: 0.4, g: 0.4, b: 0.4 },
             scene,
         );
+        orbitMesh.ignoreCameraMaxZ = true;
+        orbitMesh.alwaysSelectAsActiveMesh = true;
         this.orbitMeshes.set(orbitalObject, orbitMesh);
     }
 

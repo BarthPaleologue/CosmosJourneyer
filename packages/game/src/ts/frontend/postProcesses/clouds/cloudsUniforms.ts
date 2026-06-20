@@ -24,7 +24,6 @@ import { type CloudsModel } from "@cosmos-journeyer/universe-model";
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
 import { type ItemPool } from "@/utils/itemPool";
-import { gcd } from "@/utils/math";
 
 import { type CloudsLut } from "./cloudsLut";
 
@@ -39,7 +38,6 @@ export const CloudsUniformNames = {
     COLOR: "clouds_color",
     WORLEY_SPEED: "clouds_worleySpeed",
     DETAIL_SPEED: "clouds_detailSpeed",
-    TIME: "time",
 };
 
 export const CloudsSamplerNames = {
@@ -51,8 +49,6 @@ export class CloudsUniforms {
 
     readonly lut: CloudsLut;
 
-    private elapsedSeconds = 0;
-
     private readonly fallbackTexture: Texture;
 
     constructor(model: DeepReadonly<CloudsModel>, cloudsLutPool: ItemPool<CloudsLut>, scene: Scene) {
@@ -62,10 +58,6 @@ export class CloudsUniforms {
         this.lut.setModel(model);
 
         this.fallbackTexture = createEmptyTexture(scene);
-    }
-
-    public update(deltaSeconds: number) {
-        this.elapsedSeconds += deltaSeconds;
     }
 
     public setUniforms(effect: Effect) {
@@ -79,12 +71,6 @@ export class CloudsUniforms {
         effect.setFloat(CloudsUniformNames.DETAIL_SPEED, this.model.detailSpeed);
         effect.setFloat(CloudsUniformNames.SMOOTHNESS, this.model.smoothness);
         effect.setFloat(CloudsUniformNames.SPECULAR_POWER, this.model.specularPower);
-        effect.setFloat(
-            CloudsUniformNames.TIME,
-            -this.elapsedSeconds %
-                ((2 * Math.PI * gcd(this.model.worleySpeed * 10000, this.model.detailSpeed * 10000)) /
-                    this.model.worleySpeed),
-        );
     }
 
     public setSamplers(effect: Effect) {

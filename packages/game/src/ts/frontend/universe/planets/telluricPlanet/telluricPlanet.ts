@@ -116,7 +116,7 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
         }
 
         if (this.model.ocean !== null) {
-            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.ocean.depth);
+            this.oceanUniforms = new OceanUniforms(this.getRadius(), this.model.ocean.depth, assets.textures.water);
         } else {
             this.oceanUniforms = null;
         }

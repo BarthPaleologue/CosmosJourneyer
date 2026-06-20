@@ -24,7 +24,7 @@ import { loadTextures } from "@/frontend/assets/textures";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphericScatteringPostProcess } from "@/frontend/postProcesses/atmosphere/atmosphericScatteringPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 
@@ -67,11 +67,17 @@ export async function createJupiterScene(
 
     const planet = new GasPlanet(gasPlanetModel, textures, ringsLutPool, scene);
 
-    const atmosphere = new AtmosphericScatteringPostProcess(
-        planet.getTransform(),
-        planet.getBoundingRadius(),
-        planet.atmosphereUniforms,
-        [light],
+    const atmosphere = new CelestialBodyUberShaderPass(
+        {
+            transform: planet.getTransform(),
+            boundingRadius: planet.getBoundingRadius(),
+            emitsLight: false,
+        },
+        {
+            atmosphere: planet.atmosphereUniforms,
+            rings: planet.ringsUniforms,
+        },
+        { stellarObjects: [light], shadowCasters: [planet] },
         depthRendererManager,
         scene,
     );

@@ -53,7 +53,7 @@ export function generateNeutronStarModel(
         siderealPeriod: clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS)),
     };
 
-    const blackBodyTemperature = randRangeInt(200_000, 5_000_000_000, rng, GenerationSteps.TEMPERATURE);
+    const blackBodyTemperature = randRangeInt(200_000, 5_000_000, rng, GenerationSteps.TEMPERATURE);
 
     const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
 

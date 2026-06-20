@@ -20,7 +20,7 @@ import { generateSierpinskiPyramidModel } from "@cosmos-journeyer/universe-gener
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { SierpinskiPyramidPostProcess } from "@/frontend/postProcesses/anomalies/sierpinskiPyramidPostProcess";
+import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 export function createSierpinskiScene(
@@ -51,13 +51,16 @@ export function createSierpinskiScene(
 
     const sierpinskiPyramid = new EmptyCelestialBody(sierpinskiPyramidModel, scene);
 
-    const pp = new SierpinskiPyramidPostProcess(
-        sierpinskiPyramid.getTransform(),
-        sierpinskiPyramid.getBoundingRadius(),
-        sierpinskiPyramidModel,
+    const pp = new CelestialBodyUberShaderPass(
+        {
+            transform: sierpinskiPyramid.getTransform(),
+            boundingRadius: sierpinskiPyramid.getBoundingRadius(),
+            emitsLight: false,
+        },
+        { raymarchedBody: sierpinskiPyramidModel },
+        { stellarObjects: [light], shadowCasters: [] },
         depthRendererManager,
         scene,
-        [light],
     );
 
     scene.cameras.forEach((camera) => camera.attachPostProcess(pp));

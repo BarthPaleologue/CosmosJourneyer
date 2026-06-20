@@ -558,7 +558,7 @@ export class StarSystemView implements View {
         });
 
         this.depthRendererManager = new DepthRendererManager(this.scene);
-        this.postProcessManager = new PostProcessManager(assets.textures, this.depthRendererManager, this.scene);
+        this.postProcessManager = new PostProcessManager(this.depthRendererManager, this.scene);
 
         this.scene.onBeforeRenderObservable.add(() => {
             const deltaSeconds = (engine.getDeltaTime() * Settings.TIME_MULTIPLIER) / 1000;
@@ -919,7 +919,6 @@ export class StarSystemView implements View {
             activeControls.getTransform().getAbsolutePosition(),
         );
 
-        this.postProcessManager.setCelestialBody(nearestCelestialBody);
         this.postProcessManager.update(deltaSeconds);
 
         const spaceship = this.spaceshipControls.getSpaceship();

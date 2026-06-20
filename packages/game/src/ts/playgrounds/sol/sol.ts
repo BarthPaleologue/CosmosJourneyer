@@ -80,7 +80,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         .position.add(new Vector3(0, 1, -2).scaleInPlace(sun.getBoundingRadius() * 7));
     lookAt(controls.getTransform(), sun.getTransform().position, scene.useRightHandedSystem);
 
-    const postProcessManager = new PostProcessManager(assets.textures, depthRendererManager, scene);
+    const postProcessManager = new PostProcessManager(depthRendererManager, scene);
     postProcessManager.addCelestialBodies(
         starSystemController.getCelestialBodies(),
         starSystemController.stellarLightSystem.getLights(),

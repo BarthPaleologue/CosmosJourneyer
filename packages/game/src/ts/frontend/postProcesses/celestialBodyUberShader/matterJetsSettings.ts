@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,18 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type PostProcessType =
-    | "volumetric_light"
-    | "ocean"
-    | "clouds"
-    | "atmosphere"
-    | "ring"
-    | "matter_jets"
-    | "mandelbulb"
-    | "julia_set"
-    | "mandelbox"
-    | "sierpinski_pyramid"
-    | "menger_sponge"
-    | "black_hole"
-    | "shadow"
-    | "lens_flare";
+export type MatterJetsSettings = {
+    readonly dipoleTilt: number;
+};
+
+export const matterJetsScalingFactor = 10000;
+export const matterJetsConeHeight = 100;
+
+export function getMatterJetsVisibilityRadius(bodyRadius: number): number {
+    return bodyRadius * matterJetsScalingFactor * matterJetsConeHeight;
+}
