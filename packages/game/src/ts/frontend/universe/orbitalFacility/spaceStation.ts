@@ -128,7 +128,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     getSubTargets(): ReadonlyArray<Targetable> {
-        return this.getLandingPadManager().getLandingPads();
+        return [...this.landingBays, ...this.getLandingPadManager().getLandingPads()];
     }
 
     public getBoundingRadius(): number {

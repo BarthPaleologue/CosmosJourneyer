@@ -83,6 +83,11 @@ export class ObjectTargetCursor {
                 this.minSize = 2;
                 this.maxSize = 0;
                 break;
+            case ObjectTargetCursorType.LANDING_BAY:
+                this.cursor.classList.add("rotated");
+                this.minSize = 2;
+                this.maxSize = 0;
+                break;
             case ObjectTargetCursorType.LANDING_PAD:
                 this.cursor.classList.add("rotated");
                 this.minSize = 1.5;

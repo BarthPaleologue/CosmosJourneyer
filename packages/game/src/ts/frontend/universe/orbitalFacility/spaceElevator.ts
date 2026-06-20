@@ -175,7 +175,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     }
 
     getSubTargets(): ReadonlyArray<Targetable> {
-        return [this.climber, ...this.getLandingPadManager().getLandingPads()];
+        return [this.climber, ...this.landingBays, ...this.getLandingPadManager().getLandingPads()];
     }
 
     public getBoundingRadius(): number {

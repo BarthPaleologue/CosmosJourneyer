@@ -659,8 +659,8 @@ export class StarSystemView implements View {
         for (const spaceStation of spaceStations) {
             this.targetCursorLayer.addObject(spaceStation);
 
-            spaceStation.getSubTargets().forEach((landingPad) => {
-                this.targetCursorLayer.addObject(landingPad);
+            spaceStation.getSubTargets().forEach((subTarget) => {
+                this.targetCursorLayer.addObject(subTarget);
             });
         }
 
