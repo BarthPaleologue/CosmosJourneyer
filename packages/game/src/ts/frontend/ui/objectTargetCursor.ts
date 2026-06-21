@@ -25,10 +25,7 @@ import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScre
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { type HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";
-import { type Transformable } from "../universe/architecture/transformable";
-import { type TypedObject } from "../universe/architecture/typedObject";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -41,7 +38,7 @@ export class ObjectTargetCursor {
     readonly distanceText: HTMLParagraphElement;
     readonly etaText: HTMLParagraphElement;
 
-    readonly object: Transformable & HasBoundingSphere & TypedObject;
+    readonly object: Targetable;
 
     private lastDistance = 0;
 
@@ -56,6 +53,8 @@ export class ObjectTargetCursor {
     readonly screenCoordinates: Vector3 = Vector3.Zero();
 
     private isTarget = false;
+
+    private isPinned = false;
 
     private isInformationEnabled = false;
 
@@ -148,6 +147,10 @@ export class ObjectTargetCursor {
         this.cursor.classList.toggle("target", isTarget);
     }
 
+    setPinned(isPinned: boolean) {
+        this.isPinned = isPinned;
+    }
+
     setInformationEnabled(enabled: boolean) {
         this.isInformationEnabled = enabled;
     }
@@ -195,7 +198,7 @@ export class ObjectTargetCursor {
 
         this.alpha = 1.0;
         if (this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if (this.maxDistance > 0 && !this.isTarget)
+        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned)
             this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
 
         this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;

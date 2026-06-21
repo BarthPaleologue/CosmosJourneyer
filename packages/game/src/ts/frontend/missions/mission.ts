@@ -102,6 +102,13 @@ export class Mission {
     }
 
     /**
+     * Returns mission targets that should guide the player in the current system.
+     */
+    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+        return this.tree.getGuidanceTargetObjectIds();
+    }
+
+    /**
      * Returns the localized string for the mission type
      */
     getTypeString(): string {

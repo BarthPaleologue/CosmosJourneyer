@@ -67,6 +67,7 @@ import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import { type Targetable } from "@/frontend/universe/architecture/targetable";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
@@ -1004,6 +1005,7 @@ export class StarSystemView implements View {
 
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
+        this.targetCursorLayer.setAdditionalPinnedTargets(this.getGuidanceMissionTargetObjects());
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);
@@ -1271,6 +1273,15 @@ export class StarSystemView implements View {
     public getStarSystem() {
         if (this.starSystem === null) throw new Error("Star system not initialized");
         return this.starSystem;
+    }
+
+    private getGuidanceMissionTargetObjects(): Targetable[] {
+        const starSystem = this.getStarSystem();
+        return this.player.currentMissions
+            .flatMap((mission) => mission.getGuidanceTargetObjectIds())
+            .filter((objectId) => starSystemCoordinatesEquals(objectId.systemCoordinates, starSystem.model.coordinates))
+            .map((objectId) => starSystem.getOrbitalObjectById(objectId.idInSystem))
+            .filter((object) => object !== undefined);
     }
 
     public hideHtmlUI() {
