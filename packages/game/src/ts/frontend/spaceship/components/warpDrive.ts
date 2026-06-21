@@ -64,7 +64,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * The default throttle value for the warp drive.
      */
-    public readonly defaultThrottle: number = 0.5;
+    public readonly defaultThrottle = 0.7;
 
     /**
      * The throttle of the warp drive (target speed is modulated by this value).

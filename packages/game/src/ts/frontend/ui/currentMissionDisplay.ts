@@ -44,6 +44,7 @@ export class CurrentMissionDisplay {
     private readonly nextMissionButton: HTMLElement;
 
     private activeMission: Mission | null = null;
+    private knownCurrentMissionCount = 0;
 
     private readonly player: Player;
 
@@ -109,6 +110,7 @@ export class CurrentMissionDisplay {
         } else {
             this.setMission(firstMission, universeBackend);
         }
+        this.knownCurrentMissionCount = this.player.currentMissions.length;
 
         SpaceShipControlsInputs.map.previousMission.on("complete", () => {
             this.setPreviousMission(universeBackend);
@@ -136,7 +138,14 @@ export class CurrentMissionDisplay {
     }
 
     public update(context: MissionContext, keyboardLayout: Map<string, string>, universeBackend: UniverseBackend) {
-        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const currentMissionCount = this.player.currentMissions.length;
+        const newestCurrentMission = this.player.currentMissions.at(-1);
+        if (currentMissionCount > this.knownCurrentMissionCount && newestCurrentMission !== undefined) {
+            this.setMission(newestCurrentMission, universeBackend);
+        }
+        this.knownCurrentMissionCount = currentMissionCount;
+
+        const allMissions = this.getAllMissions();
         this.buttonContainer.hidden = allMissions.length <= 1;
 
         if (this.activeMission === null && this.player.currentMissions[0] !== undefined) {
@@ -156,6 +165,7 @@ export class CurrentMissionDisplay {
             return;
         }
 
+        this.updateMissionCounter();
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
         const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
@@ -168,7 +178,7 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const allMissions = this.getAllMissions();
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
@@ -190,7 +200,7 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        const allMissions = this.getAllMissions();
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
@@ -214,7 +224,20 @@ export class CurrentMissionDisplay {
         this.missionPanelTitle.innerText = mission.getTypeString();
         this.missionPanelDescription.innerText = mission.describe(universeBackend);
 
-        const allMissions = this.player.completedMissions.concat(this.player.currentMissions);
+        this.updateMissionCounter();
+    }
+
+    private getAllMissions(): Mission[] {
+        return this.player.completedMissions.concat(this.player.currentMissions);
+    }
+
+    private updateMissionCounter() {
+        if (this.activeMission === null) {
+            this.missionCounter.innerText = "0/0";
+            return;
+        }
+
+        const allMissions = this.getAllMissions();
         const missionIndex = allMissions.indexOf(this.activeMission);
         this.missionCounter.innerText = `${missionIndex + 1}/${allMissions.length}`;
     }

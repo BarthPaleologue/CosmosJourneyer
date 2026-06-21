@@ -32,7 +32,9 @@ export class TargetCursorLayer implements IDisposable {
 
     private target: (Transformable & HasBoundingSphere & TypedObject) | null = null;
 
-    private closestToScreenCenterOrbitalObject: (Transformable & HasBoundingSphere & TypedObject) | null = null;
+    private readonly additionalPinnedTargets: Set<Targetable> = new Set();
+
+    private closestToScreenCenterOrbitalObject: Targetable | null = null;
 
     constructor() {
         this.layerRoot = document.createElement("div");
@@ -100,11 +102,19 @@ export class TargetCursorLayer implements IDisposable {
         return this.target;
     }
 
+    public setAdditionalPinnedTargets(objects: ReadonlyArray<Targetable>) {
+        this.additionalPinnedTargets.clear();
+        for (const object of objects) {
+            this.additionalPinnedTargets.add(object);
+        }
+    }
+
     public update(camera: Camera) {
         if (!this.isEnabled()) {
             return;
         }
         for (const targetCursor of this.targetCursors) {
+            targetCursor.setPinned(this.additionalPinnedTargets.has(targetCursor.object));
             targetCursor.update(camera);
             const distanceToCenterSquared =
                 (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;

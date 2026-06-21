@@ -3,6 +3,7 @@
     "shortKm": "{{value}} km",
     "shortMm": "{{value}} Mm",
     "shortLy": "{{value}} ly",
+    "shortLm": "{{value}} lm",
     "shortLs": "{{value}} ls",
     "years_one": "{{count}} year",
     "years_other": "{{count}} years",

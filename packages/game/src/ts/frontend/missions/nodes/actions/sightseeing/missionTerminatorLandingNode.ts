@@ -203,6 +203,10 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         return [this.targetSystemCoordinates];
     }
 
+    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+        return [];
+    }
+
     serialize(): MissionTerminatorLandingNodeSerialized {
         return {
             type: "terminator_landing",

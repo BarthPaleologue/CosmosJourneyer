@@ -240,7 +240,7 @@ export class ShipControls implements Controls {
                 "space-station",
                 "success",
                 `Landing request granted. Proceed to ${landingPad.getTransform().name}`,
-                30000,
+                10_000,
             );
             spaceship.engageLandingOnPad(landingPad);
         };
@@ -503,7 +503,7 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onAutoPilotEngaged.add(() => {
-            this.notificationManager.create("spaceship", "info", i18n.t("notifications:autoPilotEngaged"), 30_000);
+            this.notificationManager.create("spaceship", "info", i18n.t("notifications:autoPilotEngaged"), 10_000);
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {

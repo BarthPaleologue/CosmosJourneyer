@@ -4,6 +4,7 @@ import {
     type TelluricPlanetModel,
     type TelluricSatelliteModel,
     type UniverseObjectId,
+    serializeUniverseObjectId,
 } from "@cosmos-journeyer/universe-model";
 
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -29,7 +30,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     }
 
     public contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
-        const key = JSON.stringify(data.objectId);
+        const key = serializeUniverseObjectId(data.objectId);
 
         const previousData = this.spaceExplorationData.get(key);
         if (previousData !== undefined && previousData.discoveryTimestamp >= data.discoveryTimestamp) {
@@ -41,7 +42,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     }
 
     public hasObjectBeenDiscovered(objectId: UniverseObjectId): Promise<boolean> {
-        return Promise.resolve(this.spaceExplorationData.has(JSON.stringify(objectId)));
+        return Promise.resolve(this.spaceExplorationData.has(serializeUniverseObjectId(objectId)));
     }
 
     private evaluateTelluricPlanetMultiplier(model: DeepReadonly<TelluricPlanetModel>) {

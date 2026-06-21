@@ -17,7 +17,11 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import {
+    type StarSystemCoordinates,
+    type UniverseObjectId,
+    serializeUniverseObjectId,
+} from "@cosmos-journeyer/universe-model";
 
 import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { type CompletedTutorials, type Itinerary, type SerializedPlayer } from "@/backend/player/serializedPlayer";
@@ -86,12 +90,9 @@ export class Player {
             uploaded: serializedPlayer.discoveries.uploaded.map((discovery) => structuredClone(discovery)),
         };
 
-        this.discoveries.local.forEach((discovery) => {
-            this.visitedObjects.add(JSON.stringify(discovery.objectId));
-        });
-        this.discoveries.uploaded.forEach((discovery) => {
-            this.visitedObjects.add(JSON.stringify(discovery.objectId));
-        });
+        for (const discovery of this.discoveries.local.concat(this.discoveries.uploaded)) {
+            this.visitedObjects.add(serializeUniverseObjectId(discovery.objectId));
+        }
 
         this.currentItinerary = structuredClone(serializedPlayer.currentItinerary);
         this.systemBookmarks = serializedPlayer.systemBookmarks.map((coords) => structuredClone(coords));
@@ -115,7 +116,7 @@ export class Player {
      * @returns True if the player has visited the object, false otherwise.
      */
     hasVisitedObject(objectId: UniverseObjectId): boolean {
-        return this.visitedObjects.has(JSON.stringify(objectId));
+        return this.visitedObjects.has(serializeUniverseObjectId(objectId));
     }
 
     /**
@@ -127,7 +128,7 @@ export class Player {
         if (this.hasVisitedObject(objectId)) {
             return false;
         }
-        this.visitedObjects.add(JSON.stringify(objectId));
+        this.visitedObjects.add(serializeUniverseObjectId(objectId));
         this.discoveries.local.push({
             objectId,
             discoveryTimestamp: Date.now(),
@@ -217,9 +218,9 @@ export class Player {
             uploaded: player.discoveries.uploaded.map((objectId) => structuredClone(objectId)),
         };
         this.visitedObjects.clear();
-        player.visitedObjects.forEach((objectId) => {
+        for (const objectId of player.visitedObjects) {
             this.visitedObjects.add(objectId);
-        });
+        }
 
         this.currentItinerary = player.currentItinerary !== null ? [...player.currentItinerary] : null;
         this.systemBookmarks = player.systemBookmarks.map((system) => structuredClone(system));

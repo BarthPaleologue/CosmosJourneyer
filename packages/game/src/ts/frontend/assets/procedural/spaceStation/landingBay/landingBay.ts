@@ -36,7 +36,10 @@ import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
+import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
+
+import i18n from "@/i18n";
 
 import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
@@ -44,6 +47,9 @@ import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
 
 export class LandingBay {
+    private static readonly TARGET_CURSOR_MIN_DISTANCE = 8e3;
+    private static readonly TARGET_CURSOR_MAX_DISTANCE = 30e3;
+
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -63,6 +69,8 @@ export class LandingBay {
 
     private readonly lights: Array<Light> = [];
 
+    readonly targetInfo: TargetInfo;
+
     constructor(
         model: LandingBayModel,
         stationModel: DeepReadonly<OrbitalFacilityModel>,
@@ -72,6 +80,12 @@ export class LandingBay {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.radius = 500;
+        this.targetInfo = {
+            type: ObjectTargetCursorType.LANDING_BAY,
+            name: this.getTypeName(),
+            minDistance: LandingBay.TARGET_CURSOR_MIN_DISTANCE,
+            maxDistance: LandingBay.TARGET_CURSOR_MAX_DISTANCE,
+        };
 
         const deltaRadius = this.radius / 3;
 
@@ -335,6 +349,14 @@ export class LandingBay {
 
     getTransform(): TransformNode {
         return this.root;
+    }
+
+    getBoundingRadius(): number {
+        return this.radius;
+    }
+
+    getTypeName(): string {
+        return i18n.t("objectTypes:landingBay");
     }
 
     dispose() {

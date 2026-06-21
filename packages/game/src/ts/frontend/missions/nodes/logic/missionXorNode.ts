@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { type MissionXorNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
@@ -79,6 +79,10 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
 
     getTargetSystems(): StarSystemCoordinates[] {
         return this.children.flatMap((child) => child.getTargetSystems());
+    }
+
+    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+        return this.children.flatMap((child) => child.getGuidanceTargetObjectIds());
     }
 
     serialize(): MissionXorNodeSerialized {

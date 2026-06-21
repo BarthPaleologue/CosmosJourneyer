@@ -203,6 +203,10 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         return [this.targetSystemCoordinates];
     }
 
+    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+        return [];
+    }
+
     serialize(): MissionAsteroidFieldNodeSerialized {
         return {
             type: "asteroid_field",

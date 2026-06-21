@@ -15,7 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { C, lightYearsToMeters, metersToLightSeconds, metersToLightYears } from "@cosmos-journeyer/physics";
+import {
+    C,
+    lightYearsToMeters,
+    metersToLightMinutes,
+    metersToLightSeconds,
+    metersToLightYears,
+} from "@cosmos-journeyer/physics";
 
 import i18n from "@/i18n";
 
@@ -42,8 +48,10 @@ export function parseDistance(distance: number): string {
         return i18n.t("units:shortKm", { value: (distance / 1_000).toFixed(2) });
     } else if (distance < 300_000_000) {
         return i18n.t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
-    } else if (distance < lightYearsToMeters(0.1)) {
+    } else if (distance < C * 120) {
         return i18n.t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
+    } else if (distance < lightYearsToMeters(0.1)) {
+        return i18n.t("units:shortLm", { value: metersToLightMinutes(distance).toFixed(2) });
     } else {
         return i18n.t("units:shortLy", {
             value: metersToLightYears(distance).toFixed(2),

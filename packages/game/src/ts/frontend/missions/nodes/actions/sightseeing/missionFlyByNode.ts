@@ -183,6 +183,10 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         return [this.targetSystemCoordinates];
     }
 
+    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+        return [this.objectId];
+    }
+
     serialize(): MissionFlyByNodeSerialized {
         return {
             type: "fly_by",
