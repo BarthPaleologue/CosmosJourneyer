@@ -53,6 +53,7 @@ import { type INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
+import { getGreasedLinePathFromSystemSegments } from "./starMapPath";
 import { StarMapUI } from "./starMapUI";
 import { StellarPathfinder } from "./stellarPathfinder";
 
@@ -321,12 +322,19 @@ export class StarMapView implements View {
     private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
         if (this.visitedSystemsLines !== null) {
             this.visitedSystemsLines.dispose(undefined, true);
+            this.visitedSystemsLines = null;
         }
-        const points = this.getGreasedLinePointsFromSystems(path);
+        const { points, widths } = getGreasedLinePathFromSystemSegments(path, (system) =>
+            this.universeBackend.getSystemGalacticPosition(system),
+        );
         const totalLength = GreasedLineTools.GetLineLength(points);
+        if (totalLength <= 0) {
+            return;
+        }
+
         this.visitedSystemsLines = CreateGreasedLine(
             "VisitedSystemsLines",
-            { points },
+            { points, widths },
             {
                 useDash: true,
                 dashCount: 2 * totalLength,
