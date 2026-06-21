@@ -20,7 +20,11 @@ import { z } from "zod";
 
 import { type OrbitalObjectModel } from "./orbitalObjects/index";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjects/orbitalObjectId";
-import { starSystemCoordinatesEquals, StarSystemCoordinatesSchema } from "./starSystemCoordinates";
+import {
+    serializeStarSystemCoordinates,
+    starSystemCoordinatesEquals,
+    StarSystemCoordinatesSchema,
+} from "./starSystemCoordinates";
 import { type StarSystemModel } from "./starSystemModel";
 
 export const UniverseObjectIdSchema = z.object({
@@ -55,4 +59,8 @@ export function getUniverseObjectId(
         systemCoordinates: starSystem.coordinates,
         idInSystem: orbitalObject.id,
     };
+}
+
+export function serializeUniverseObjectId(id: UniverseObjectId): string {
+    return `${serializeStarSystemCoordinates(id.systemCoordinates)}:${id.idInSystem}`;
 }

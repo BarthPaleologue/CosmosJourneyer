@@ -59,3 +59,7 @@ export function starSystemCoordinatesEquals(a: StarSystemCoordinates, b: StarSys
         a.localZ === b.localZ
     );
 }
+
+export function serializeStarSystemCoordinates(coordinates: StarSystemCoordinates): string {
+    return `${coordinates.starSectorX}:${coordinates.starSectorY}:${coordinates.starSectorZ}:${coordinates.localX}:${coordinates.localY}:${coordinates.localZ}`;
+}
