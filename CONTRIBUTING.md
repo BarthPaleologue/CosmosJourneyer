@@ -34,6 +34,30 @@ Pull request are tested against the linter and the unit tests, make sure you run
 
 Code that does not pass the linter or the unit tests will not be merged, but I will help you fix it don't worry.
 
+## AI Policy
+
+Cosmos Journeyer is a game about what it means to be a small human being confronted to the existential questions raised by space exploration.
+
+As such the making of the game should stay human at its core: a story told by humans, for humans.
+
+However, not every contribution for the game is about telling the story and building its world. Here are some examples were AI can help without threatening the core of the game:
+
+- code review: humans reviewers can and will miss issues, no one is perfect. Having an _additional_ set of artificial eyes helps a lot to catch sneaky issues.
+- bug investigations: tracking nasty bugs can take hours to days. Having an AI investigator frees time to focus on the best way to solve the bug, leading to more robust fixes.
+- internal tooling: _narrow_ internal tools are time consuming to make and not exposed to players. Having an AI building the tools helps us get to the fun part: using the tool itself for the game.
+
+**For the sake of transparency, always disclose how you used AI when making a PR, using the given template.**
+
+In general, please keep in mind this quote from IBM:
+
+```
+A computer can never be held accountable
+
+Therefore a computer must never make a management decision
+```
+
+This can be extended to any decision really. The human contributor is responsible for the code submitted, independently of how the code was made.
+
 ## Translation
 
 Cosmos Journeyer is available in multiple languages, but you can add more or improve existing translations.
