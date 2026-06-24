@@ -23,6 +23,7 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { getChronosSystemModel } from "@/backend/universe/customSystems/chronos";
 import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/eclipseTest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
+import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -52,6 +53,8 @@ export async function createCustomSystemScene(
     let systemModel: StarSystemModel;
     if (systemKey === "chronos") {
         systemModel = getChronosSystemModel();
+    } else if (systemKey === "vesta") {
+        systemModel = getVestaSystemModel();
     } else if (systemKey === "eclipseTest") {
         systemModel = getEclipseTestSystemModel();
     } else {

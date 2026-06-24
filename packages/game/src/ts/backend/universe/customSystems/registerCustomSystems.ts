@@ -18,10 +18,12 @@
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { getChronosSystemModel } from "./chronos";
+import { getVestaSystemModel } from "./vesta";
 
 // import { getSolSystemModel } from "./sol";
 
 export function registerCustomSystems(universeBackend: UniverseBackend) {
+    universeBackend.registerCustomSystem(getVestaSystemModel());
     universeBackend.registerCustomSystem(getChronosSystemModel());
     // universeBackend.registerCustomSystem(getSolSystemModel());
 }
