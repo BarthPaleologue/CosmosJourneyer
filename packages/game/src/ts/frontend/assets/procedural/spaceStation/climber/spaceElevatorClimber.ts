@@ -167,7 +167,6 @@ export class SpaceElevatorClimber implements Targetable {
     }
 
     dispose() {
-        this.solarPanelMaterial.dispose();
         this.metalSectionMaterial.dispose();
         this.transform.dispose();
     }
