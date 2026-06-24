@@ -53,6 +53,7 @@ const GenerationSteps = {
     NAME: 0,
     NB_STARS: 20,
     STARS: 21,
+    STELLAR_OBJECT_SEED: 100,
     NB_PLANETS: 30,
     PLANETS: 200,
     PLANET_TYPE: 400,
@@ -80,7 +81,7 @@ export function generateStarSystemModel(
     const stellarObjects: Array<StellarObjectModel> = [];
 
     const stellarObjectType = getBodyTypeOfStellarObject(systemRng, 0);
-    const seed = centeredRand(systemRng, GenerationSteps.STARS + 0) * SeedHalfRange;
+    const seed = centeredRand(systemRng, GenerationSteps.STELLAR_OBJECT_SEED + 0) * SeedHalfRange;
     const stellarObjectName = `${systemName} ${Alphabet.charAt(0).toUpperCase()}`;
     switch (stellarObjectType) {
         case "star":
@@ -323,8 +324,9 @@ export function generateStarSystemModel(
  */
 function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {
     // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
-    if (uniformRandBool(0.0006, rng, GenerationSteps.STARS + index)) return "blackHole";
-    if (uniformRandBool(0.0026, rng, GenerationSteps.STARS + index)) return "neutronStar";
+    const sample = rng(GenerationSteps.STARS + index);
+    if (sample < 0.0006) return "blackHole";
+    if (sample < 0.0026) return "neutronStar";
 
     return "star";
 }
