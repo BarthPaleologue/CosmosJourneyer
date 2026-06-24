@@ -32,7 +32,7 @@ export function canEngageWarpDrive(
         return false;
     }
 
-    const nbSecondsPrediction = 0.5;
+    const nbSecondsPrediction = 0.3;
     const predictedPosition = shipPosition.add(shipTransform.forward.scale(currentVelocity * nbSecondsPrediction));
     const predictedDistanceToObject = Vector3.Distance(
         predictedPosition,
