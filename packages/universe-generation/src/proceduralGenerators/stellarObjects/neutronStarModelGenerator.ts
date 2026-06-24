@@ -50,7 +50,7 @@ export function generateNeutronStarModel(
         spinAxisAzimuth: 0,
         initialRotationAngle: 0,
         // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
-        siderealPeriod: clamp(1.4e-3, 30, normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS)),
+        siderealPeriod: clamp(normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS), 1.4e-3, 30),
     };
 
     const blackBodyTemperature = randRangeInt(200_000, 5_000_000, rng, GenerationSteps.TEMPERATURE);
