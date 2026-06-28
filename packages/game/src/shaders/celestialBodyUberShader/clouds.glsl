@@ -123,21 +123,27 @@ bool celestialBodyUberShaderSampleCloudLayer(
         return false;
     }
 
+    vec3 scenePoint = camera_position + cloudDistance * rayDir;
     float ndl = 0.0;
     float specularHighlight = 0.0;
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = star_directions[i];
+        float directLightVisibility = 1.0;
 
-        ndl += max(dot(planetSpacePoint, sunDir), -0.3) + 0.3;
+#if defined(HAS_RINGS)
+        directLightVisibility *= celestialBodyUberShaderRingShadowAtPoint(scenePoint, sunDir);
+#endif
 
-        if (length(camera_position - object_position) > clouds_layerRadius) {
+        ndl += (max(dot(planetSpacePoint, sunDir), -0.3) + 0.3) * directLightVisibility;
+
+        if (distance(camera_position, object_position) > clouds_layerRadius) {
             specularHighlight += computeSpecularHighlight(
                 sunDir,
                 rayDir,
                 planetSpacePoint,
                 clouds_smoothness,
                 clouds_specularPower
-            );
+            ) * directLightVisibility;
         }
     }
     ndl = saturate(ndl);
