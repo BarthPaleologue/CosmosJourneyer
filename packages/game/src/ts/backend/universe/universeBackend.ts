@@ -24,6 +24,7 @@ import {
     type OrbitalObjectModel,
     getObjectModelById,
     type StarSystemModel,
+    serializeStarSystemCoordinates,
 } from "@cosmos-journeyer/universe-model";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";
@@ -124,7 +125,7 @@ export class UniverseBackend {
             systems.push(system);
         }
 
-        this.coordinatesToCustomSystems.set(JSON.stringify(system.coordinates), system);
+        this.coordinatesToCustomSystems.set(serializeStarSystemCoordinates(system.coordinates), system);
     }
 
     /**
@@ -143,7 +144,7 @@ export class UniverseBackend {
     }
 
     private getCustomSystemFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | undefined {
-        return this.coordinatesToCustomSystems.get(JSON.stringify(coordinates));
+        return this.coordinatesToCustomSystems.get(serializeStarSystemCoordinates(coordinates));
     }
 
     /**
@@ -155,7 +156,7 @@ export class UniverseBackend {
         coordinates: StarSystemCoordinates,
         plugin: (systemModel: StarSystemModel) => StarSystemModel,
     ) {
-        this.coordinatesToSinglePlugins.set(JSON.stringify(coordinates), plugin);
+        this.coordinatesToSinglePlugins.set(serializeStarSystemCoordinates(coordinates), plugin);
     }
 
     /**
@@ -469,7 +470,7 @@ export class UniverseBackend {
      */
     private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
         let newModel = model;
-        const singlePlugin = this.coordinatesToSinglePlugins.get(JSON.stringify(model.coordinates));
+        const singlePlugin = this.coordinatesToSinglePlugins.get(serializeStarSystemCoordinates(model.coordinates));
         if (singlePlugin !== undefined) {
             newModel = singlePlugin(model);
         }

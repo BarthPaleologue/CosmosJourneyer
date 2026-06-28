@@ -19,15 +19,11 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type StarSystemCoordinates,
-    type StarSystemModel,
-    getUniverseObjectId,
-    type UniverseObjectId,
-} from "@cosmos-journeyer/universe-model";
+import { type StarSystemModel, getUniverseObjectId, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
+import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
 import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -181,16 +177,11 @@ export class MainMenu {
 
         this.starSystemView.setUIEnabled(false);
 
+        const vestaModel = getVestaSystemModel();
+
         const mainMenuStartingPlanet = {
-            systemCoordinates: {
-                starSectorX: -1,
-                starSectorY: 3,
-                starSectorZ: -2,
-                localX: -0.04744866888385668,
-                localY: -0.16910514825447703,
-                localZ: -0.11438665660768127,
-            } satisfies StarSystemCoordinates,
-            planetId: "[[]->star0]->telluricPlanet1",
+            systemCoordinates: vestaModel.coordinates,
+            planetId: "aphrodite",
         };
 
         const system = universeBackend.getSystemModelFromCoordinates(mainMenuStartingPlanet.systemCoordinates);
