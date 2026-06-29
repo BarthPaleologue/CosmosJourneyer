@@ -20,6 +20,8 @@ import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
+import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
+
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
     currentVelocity: number,
@@ -32,7 +34,7 @@ export function canEngageWarpDrive(
         return false;
     }
 
-    const nbSecondsPrediction = 0.5;
+    const nbSecondsPrediction = 0.3;
     const predictedPosition = shipPosition.add(shipTransform.forward.scale(currentVelocity * nbSecondsPrediction));
     const predictedDistanceToObject = Vector3.Distance(
         predictedPosition,
@@ -57,30 +59,15 @@ export function canEngageWarpDrive(
         return true;
     }
 
-    const inverseWorld = nearestOrbitalObject.getTransform().getWorldMatrix().clone().invert();
-    const relativePosition = Vector3.TransformCoordinates(shipPosition, inverseWorld);
-    const relativeForward = Vector3.TransformNormal(
-        shipTransform.getDirection(Vector3.Forward(shipTransform.getScene().useRightHandedSystem)),
-        inverseWorld,
-    );
-    const distanceAboveRings = relativePosition.y;
-    const planarDistance = Math.sqrt(relativePosition.x * relativePosition.x + relativePosition.z * relativePosition.z);
-
-    const nextRelativePosition = relativePosition.add(relativeForward.scale(currentVelocity * nbSecondsPrediction));
-    const nextDistanceAboveRings = nextRelativePosition.y;
-    const nextPlanarDistance = Math.sqrt(
-        nextRelativePosition.x * nextRelativePosition.x + nextRelativePosition.z * nextRelativePosition.z,
-    );
-
-    const ringsMinDistance = asteroidField.innerRadius;
-    const ringsMaxDistance = asteroidField.outerRadius;
-
-    const isAboveRing = planarDistance > ringsMinDistance && planarDistance < ringsMaxDistance;
-    const willBeAboveRing = nextPlanarDistance > ringsMinDistance && nextPlanarDistance < ringsMaxDistance;
-
-    const isInRing = Math.abs(distanceAboveRings) < asteroidField.patchThickness / 2 && isAboveRing;
+    const ringVolume = asteroidField.getRingVolume();
+    const ringProjection = projectPositionOnRingPlane(shipPosition, ringVolume);
+    const nextRingProjection = projectPositionOnRingPlane(predictedPosition, ringVolume);
+    const isAboveRing = isInsideRingRadialBounds(ringProjection.planarDistance, ringVolume);
+    const willBeAboveRing = isInsideRingRadialBounds(nextRingProjection.planarDistance, ringVolume);
+    const isInRing = isPositionInsideRingVolume(shipPosition, ringVolume);
     const willCrossRing =
-        Math.sign(distanceAboveRings) !== Math.sign(nextDistanceAboveRings) && (willBeAboveRing || isAboveRing);
+        Math.sign(ringProjection.signedHeight) !== Math.sign(nextRingProjection.signedHeight) &&
+        (willBeAboveRing || isAboveRing);
 
     if (isInRing || willCrossRing) {
         return false;

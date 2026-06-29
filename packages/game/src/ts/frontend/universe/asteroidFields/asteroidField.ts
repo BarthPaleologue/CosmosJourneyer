@@ -22,6 +22,7 @@ import { type IDisposable, type Scene } from "@babylonjs/core/scene";
 import { type Asteroid } from "@/frontend/assets/objects/asteroids";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
+import { type RingVolume } from "@/utils/ringVolume";
 
 import { AsteroidPatch } from "./asteroidPatch";
 
@@ -73,6 +74,16 @@ export class AsteroidField implements IDisposable {
         this.spread = outerRadius - innerRadius;
 
         this.scene = scene;
+    }
+
+    public getRingVolume(): RingVolume {
+        return {
+            center: this.parent.position,
+            normal: this.parent.up,
+            innerRadius: this.innerRadius,
+            outerRadius: this.outerRadius,
+            halfThickness: this.patchThickness / 2,
+        };
     }
 
     /**

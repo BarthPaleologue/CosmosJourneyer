@@ -47,7 +47,6 @@ import { translate } from "@/frontend/helpers/transform";
 import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { distanceToAsteroidField } from "@/frontend/universe/asteroidFields/helpers/distance";
 import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
@@ -56,6 +55,7 @@ import { CollisionMask } from "@/settings";
 import { SpaceDots } from "../assets/procedural/spaceDots";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
+import { type WarpInfluence } from "./components/warpInfluence";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";
@@ -563,8 +563,9 @@ export class Spaceship implements Transformable, Targetable {
         const warpSpeed = this.aggregate.transformNode.forward.scale(warpDrive.getWarpSpeed());
         this.spaceDots.update(deltaSeconds);
 
-        let closestDistance = Number.POSITIVE_INFINITY;
-        let objectHalfThickness = 0;
+        const warpInfluences: WarpInfluence[] = [];
+        const shipPosition = this.getTransform().getAbsolutePosition();
+        const shipForward = this.aggregate.transformNode.forward;
 
         if (warpDrive.isEnabled()) {
             if (this.nearestOrbitalObject !== null) {
@@ -573,14 +574,13 @@ export class Spaceship implements Transformable, Targetable {
                     return;
                 }
 
-                const distanceToClosestOrbitalObject = Vector3.Distance(
-                    this.getTransform().getAbsolutePosition(),
-                    this.nearestOrbitalObject.getTransform().getAbsolutePosition(),
-                );
-                const orbitalObjectRadius = this.nearestOrbitalObject.getBoundingRadius();
-
-                closestDistance = Math.min(closestDistance, distanceToClosestOrbitalObject);
-                objectHalfThickness = Math.max(orbitalObjectRadius, objectHalfThickness);
+                warpInfluences.push({
+                    type: "solid",
+                    volume: {
+                        center: this.nearestOrbitalObject.getTransform().getAbsolutePosition(),
+                        radius: this.nearestOrbitalObject.getBoundingRadius(),
+                    },
+                });
             }
 
             if (this.nearestCelestialBody !== null) {
@@ -588,15 +588,10 @@ export class Spaceship implements Transformable, Targetable {
                 const asteroidField = this.nearestCelestialBody.asteroidField;
 
                 if (asteroidField !== null) {
-                    const distanceToRings = distanceToAsteroidField(
-                        this.getTransform().getAbsolutePosition(),
-                        asteroidField,
-                    );
-
-                    if (distanceToRings < closestDistance) {
-                        closestDistance = distanceToRings;
-                        objectHalfThickness = asteroidField.patchThickness / 2;
-                    }
+                    warpInfluences.push({
+                        type: "ring",
+                        volume: asteroidField.getRingVolume(),
+                    });
                 }
             }
 
@@ -617,7 +612,7 @@ export class Spaceship implements Transformable, Targetable {
             }
         }
 
-        warpDrive.update(closestDistance, objectHalfThickness, deltaSeconds);
+        warpDrive.update(warpInfluences, shipPosition, shipForward, deltaSeconds);
 
         if (warpDrive.isEnabled())
             this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));

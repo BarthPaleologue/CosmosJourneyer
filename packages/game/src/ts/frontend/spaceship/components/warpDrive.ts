@@ -15,11 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
 import { clamp, lerpSmooth, remap } from "@/utils/math";
+
+import { computeMaxTargetSpeedFromWarpInfluences, type WarpInfluence } from "./warpInfluence";
 
 type WarpDriveState = "disabled" | "enabled" | "disengaging";
 
@@ -168,19 +171,24 @@ export class WarpDrive implements ReadonlyWarpDrive {
     }
 
     /**
-     * Computes the target speed of the warp drive based on the distance to the closest body and the user throttle.
-     * @param closestObjectDistance The distance to the closest body in m.
-     * @param closestObjectRadius
+     * Computes the target speed of the warp drive based on nearby safety influences and the ship trajectory.
+     * @param influences Nearby bodies or fields that can limit warp speed.
+     * @param shipPosition The current position of the ship in world space.
+     * @param shipForward The current forward direction of the ship in world space.
      * @returns The computed target speed in m/s.
      */
-    public updateMaxTargetSpeed(closestObjectDistance: number, closestObjectRadius: number): number {
-        const speedThreshold = 10e3;
-
-        const collisionDistance = Math.max(0, closestObjectDistance - closestObjectRadius);
-
-        const closeSpeed = (speedThreshold * 0.1 * collisionDistance) / speedThreshold;
-        const deepSpaceSpeed = speedThreshold * ((0.1 * collisionDistance) / speedThreshold) ** 1.2;
-        this.maxTargetSpeed = clamp(Math.max(closeSpeed, deepSpaceSpeed), WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed);
+    public updateMaxTargetSpeed(
+        influences: ReadonlyArray<WarpInfluence>,
+        shipPosition: Vector3,
+        shipForward: Vector3,
+    ): number {
+        this.maxTargetSpeed = computeMaxTargetSpeedFromWarpInfluences(
+            influences,
+            shipPosition,
+            shipForward,
+            WarpDrive.MIN_WARP_SPEED,
+            this.maxWarpSpeed,
+        );
         return this.maxTargetSpeed;
     }
 
@@ -225,11 +233,17 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
     /**
      * Updates the warp drive based on the current speed of the ship, the distance to the closest body and the time elapsed since the last update.
-     * @param closestObjectDistance
-     * @param closestObjectRadius
+     * @param influences Nearby bodies or fields that can limit warp speed.
+     * @param shipPosition The current position of the ship in world space.
+     * @param shipForward The current forward direction of the ship in world space.
      * @param deltaSeconds The time elapsed since the last update in seconds.
      */
-    public update(closestObjectDistance: number, closestObjectRadius: number, deltaSeconds: number): void {
+    public update(
+        influences: ReadonlyArray<WarpInfluence>,
+        shipPosition: Vector3,
+        shipForward: Vector3,
+        deltaSeconds: number,
+    ): void {
         switch (this.state) {
             case "disengaging":
                 this.maxTargetSpeed *= 0.9;
@@ -238,7 +252,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
                     this.disable();
                 break;
             case "enabled":
-                this.updateMaxTargetSpeed(closestObjectDistance, closestObjectRadius);
+                this.updateMaxTargetSpeed(influences, shipPosition, shipForward);
                 this.updateWarpDriveSpeed(deltaSeconds);
                 break;
             case "disabled":
