@@ -19,10 +19,10 @@
         "next": "^16.2.9",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
-        "sharp": "^0.35.1"
+        "sharp": "^0.35.2"
     },
     "devDependencies": {
-        "@types/node": "^25.9.3",
+        "@types/node": "^26.0.1",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "eslint": "catalog:",
