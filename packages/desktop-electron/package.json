@@ -34,10 +34,10 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
-        "@types/node": "^25.9.3",
+        "@types/node": "^26.0.1",
         "concurrently": "^10.0.3",
         "cross-env": "^10.1.0",
-        "electron": "^42.4.0",
+        "electron": "^42.5.0",
         "electron-builder": "^26.15.3",
         "eslint": "catalog:",
         "oxfmt": "catalog:",

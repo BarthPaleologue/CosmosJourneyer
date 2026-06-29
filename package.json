@@ -62,7 +62,7 @@
         "eslint-plugin-import-x": "catalog:",
         "http-server": "catalog:",
         "husky": "^9.1.7",
-        "lint-staged": "^17.0.7",
+        "lint-staged": "^17.0.8",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
         "typescript-eslint": "catalog:"

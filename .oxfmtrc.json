@@ -56,6 +56,7 @@
     "ignorePatterns": [
         "packages/game/src/ts/utils/TWGSL",
         "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
         "packages/game/dist",
         "node_modules",
         "packages/game/src-tauri",
