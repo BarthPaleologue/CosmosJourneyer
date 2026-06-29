@@ -18,6 +18,7 @@
 import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
+import type { TextureSize } from "@babylonjs/core/Materials/Textures/textureCreationOptions";
 import type { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import type { Scene } from "@babylonjs/core/scene";
 
@@ -36,6 +37,16 @@ export class DepthRendererManager {
             if (depthRenderer !== undefined) {
                 depthRenderer.dispose();
                 this.cameraToDepthRenderer.delete(camera);
+            }
+        });
+
+        this.scene.getEngine().onResizeObservable.add((engine) => {
+            const newSize = {
+                width: engine.getRenderWidth(),
+                height: engine.getRenderHeight(),
+            } satisfies TextureSize;
+            for (const depthRenderer of this.cameraToDepthRenderer.values()) {
+                depthRenderer.getDepthMap().resize(newSize);
             }
         });
 
