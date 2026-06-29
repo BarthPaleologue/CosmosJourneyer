@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.fragment-m5ZqL-K0.js";t();export{e as particlesPixelShader};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.fragment-DuoCZcN2.js";e();export{t as defaultPixelShader};

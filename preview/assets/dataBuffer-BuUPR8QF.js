@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";var t,n=e((()=>{t=class e{get underlyingResource(){return null}constructor(){this.references=0,this.capacity=0,this.is32Bits=!1,this.uniqueId=e._Counter++}},t._Counter=0}));export{n,t};
+//# sourceMappingURL=dataBuffer-BuUPR8QF.js.map

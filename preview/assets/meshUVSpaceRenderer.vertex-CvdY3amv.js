@@ -1,0 +1,1 @@
+import{n as e,t}from"./meshUVSpaceRenderer.vertex-BNSezj5_.js";t();export{e as meshUVSpaceRendererVertexShaderWGSL};

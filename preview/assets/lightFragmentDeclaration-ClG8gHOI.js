@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightFragmentDeclaration-BeoTAh2T.js";t();export{e as lightFragmentDeclaration};

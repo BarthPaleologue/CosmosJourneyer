@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.fragment-D1Aakte6.js";t();export{e as spritesPixelShaderWGSL};

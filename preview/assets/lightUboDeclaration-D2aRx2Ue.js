@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightUboDeclaration-C-EPeEMf.js";t();export{e as lightUboDeclaration};

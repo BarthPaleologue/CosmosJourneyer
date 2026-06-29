@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";var t,n=e((()=>{t=class e{static GetShadersRepository(t=0){return t===0?e.ShadersRepository:e.ShadersRepositoryWGSL}static GetShadersStore(t=0){return t===0?e.ShadersStore:e.ShadersStoreWGSL}static GetIncludesShadersStore(t=0){return t===0?e.IncludesShadersStore:e.IncludesShadersStoreWGSL}},t.ShadersRepository=`src/Shaders/`,t.ShadersStore={},t.IncludesShadersStore={},t.ShadersRepositoryWGSL=`src/ShadersWGSL/`,t.ShadersStoreWGSL={},t.IncludesShadersStoreWGSL={}}));export{n,t};
+//# sourceMappingURL=shaderStore-C5hmi3ce.js.map

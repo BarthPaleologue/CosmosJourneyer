@@ -1,0 +1,1 @@
+import{n as e,t}from"./openpbr.fragment-D5JPFNZY.js";t();export{e as openpbrPixelShader};

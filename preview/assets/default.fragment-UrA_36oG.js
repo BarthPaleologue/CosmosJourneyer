@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.fragment-v6VxmuOW.js";e();export{t as defaultPixelShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex-CXpXvkmK.js";e();export{t as defaultVertexShader};

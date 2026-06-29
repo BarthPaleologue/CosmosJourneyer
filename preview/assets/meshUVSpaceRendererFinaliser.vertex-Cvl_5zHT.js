@@ -1,0 +1,3 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";import{n as t,t as n}from"./shaderStore-C5hmi3ce.js";var r,i,a,o=e((()=>{t(),r=`meshUVSpaceRendererFinaliserVertexShader`,i=`precision highp float;attribute vec3 position;attribute vec2 uv;uniform mat4 worldViewProjection;varying vec2 vUV;void main() {gl_Position=worldViewProjection*vec4(position,1.0);vUV=uv;}
+`,n.ShadersStore[r]||(n.ShadersStore[r]=i),a={name:r,shader:i}}));export{a as n,o as t};
+//# sourceMappingURL=meshUVSpaceRendererFinaliser.vertex-Cvl_5zHT.js.map

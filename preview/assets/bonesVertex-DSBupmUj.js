@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesVertex-TJAdIMxB.js";e();export{t as bonesVertexWGSL};

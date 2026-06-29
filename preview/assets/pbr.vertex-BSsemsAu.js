@@ -1,0 +1,1 @@
+import{n as e,t}from"./pbr.vertex-CvNDGpr0.js";t();export{e as pbrVertexShader};

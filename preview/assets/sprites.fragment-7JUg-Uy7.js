@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.fragment-ZncKJ-CI.js";t();export{e as spritesPixelShader};

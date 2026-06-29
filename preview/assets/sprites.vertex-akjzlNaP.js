@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.vertex-D8EQtaWI.js";t();export{e as spritesVertexShaderWGSL};

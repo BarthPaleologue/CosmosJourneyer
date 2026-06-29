@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";import{n as t,t as n}from"./flowGraphAsyncExecutionBlock-2gaRzqUc.js";var r,i=e((()=>{t(),r=class extends n{constructor(){super(...arguments),this.initPriority=0,this.type=`NoTrigger`}_execute(e){e._notifyExecuteNode(this),this.done._activateSignal(e)}}}));export{i as n,r as t};
+//# sourceMappingURL=flowGraphEventBlock-Cr3rpRbw.js.map

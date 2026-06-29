@@ -1,0 +1,1 @@
+import{n as e,t}from"./particles.vertex-CGgODKF2.js";t();export{e as particlesVertexShaderWGSL};

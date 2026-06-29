@@ -1,0 +1,1 @@
+import{n as e,t}from"./fxaa.fragment-DotOtk72.js";e();export{t as fxaaPixelShaderWGSL};

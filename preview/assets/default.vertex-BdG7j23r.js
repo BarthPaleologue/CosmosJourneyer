@@ -1,0 +1,1 @@
+import{n as e,t}from"./default.vertex-C_l-Ud0y.js";e();export{t as defaultVertexShaderWGSL};

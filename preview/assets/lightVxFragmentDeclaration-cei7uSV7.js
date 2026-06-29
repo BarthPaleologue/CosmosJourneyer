@@ -1,0 +1,1 @@
+import{n as e,t}from"./lightVxFragmentDeclaration-DVn7Hd4a.js";t();export{e as lightVxFragmentDeclaration};

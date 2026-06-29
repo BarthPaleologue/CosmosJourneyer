@@ -1,0 +1,1 @@
+import{n as e,t}from"./picking.vertex-BtqXG7vI.js";t();export{e as pickingVertexShader};

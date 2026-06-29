@@ -1,0 +1,1 @@
+import{n as e,t}from"./background.vertex-CobzYLNM.js";e();export{t as backgroundVertexShaderWGSL};

@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblDominantDirection.fragment-YuhV9mAO.js";e();export{t as iblDominantDirectionPixelShader};

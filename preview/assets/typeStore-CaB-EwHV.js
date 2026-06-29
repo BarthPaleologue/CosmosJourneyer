@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";function t(e,t){i[e]=t}function n(e){return i[e]}function r(e){for(let t in i)if(e instanceof i[t]&&!t.includes(`Abstract`))return t;return`Unknown`}var i,a=e((()=>{i={}}));export{a as i,r as n,t as r,n as t};
+//# sourceMappingURL=typeStore-CaB-EwHV.js.map

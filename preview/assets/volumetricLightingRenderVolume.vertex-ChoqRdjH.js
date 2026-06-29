@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";import{n as t,t as n}from"./shaderStore-C5hmi3ce.js";import{t as r}from"./sceneUboDeclaration-G7ksVXA6.js";import{t as i}from"./meshUboDeclaration-Chr_G_wf.js";import{t as a}from"./sceneVertexDeclaration-BTHJr8ez.js";import{t as o}from"./meshVertexDeclaration-D-YxxJ4E.js";var s,c,l;e((()=>{t(),a(),r(),o(),i(),s=`volumetricLightingRenderVolumeVertexShader`,c=`#include<__decl__sceneVertex>
+#include<__decl__meshVertex>
+attribute vec3 position;varying vec4 vWorldPos;void main(void) {vec4 worldPos=world*vec4(position,1.0);vWorldPos=worldPos;gl_Position=viewProjection*worldPos;}
+`,n.ShadersStore[s]||(n.ShadersStore[s]=c),l={name:s,shader:c}}))();export{l as volumetricLightingRenderVolumeVertexShader};
+//# sourceMappingURL=volumetricLightingRenderVolume.vertex-ChoqRdjH.js.map

@@ -1,0 +1,1 @@
+import{n as e,t}from"./msdf.vertex-DbD0-Enr.js";t();export{e as msdfVertexShader};

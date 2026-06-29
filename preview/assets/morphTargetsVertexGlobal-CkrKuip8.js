@@ -1,0 +1,1 @@
+import{n as e,t}from"./morphTargetsVertexGlobal-BaVQRa_0.js";t();export{e as morphTargetsVertexGlobal};

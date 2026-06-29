@@ -1,0 +1,1 @@
+import{n as e,t}from"./iblShadowAccumulation.fragment-BfaftdSg.js";e();export{t as iblShadowAccumulationPixelShaderWGSL};

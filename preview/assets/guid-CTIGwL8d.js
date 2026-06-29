@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";function t(){return`xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g,e=>{let t=Math.random()*16|0;return(e===`x`?t:t&3|8).toString(16)})}var n,r=e((()=>{n={RandomId:t}}));export{t as n,r,n as t};
+//# sourceMappingURL=guid-CTIGwL8d.js.map

@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesDeclaration-DxY5l0BS.js";e();export{t as bonesDeclarationWGSL};

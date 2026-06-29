@@ -1,0 +1,1 @@
+import{n as e,t}from"./bonesVertex-DR8TkFil.js";e();export{t as bonesVertex};

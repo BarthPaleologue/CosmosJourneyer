@@ -1,0 +1,2 @@
+import{n as e}from"./rolldown-runtime-CNC7AqOf.js";import{n as t,t as n}from"./perfCounter-BuPd9IT8.js";var r,i=e((()=>{t(),r=class{constructor(){this._gpuTimeInFrameId=-1,this.counter=new n}_addDuration(e,t){e<this._gpuTimeInFrameId||(this._gpuTimeInFrameId===e?this.counter.addCount(t,!1):(this.counter._fetchResult(),this.counter.fetchNewFrame(),this.counter.addCount(t,!1),this._gpuTimeInFrameId=e))}}}));export{i as n,r as t};
+//# sourceMappingURL=webgpuPerfCounter-BnNXi4PF.js.map

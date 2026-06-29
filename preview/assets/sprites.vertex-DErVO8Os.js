@@ -1,0 +1,1 @@
+import{n as e,t}from"./sprites.vertex-KPqhns9p.js";t();export{e as spritesVertexShader};
