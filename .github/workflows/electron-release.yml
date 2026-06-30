@@ -2,6 +2,11 @@ name: Electron Build And Release
 
 on:
     workflow_dispatch:
+        inputs:
+            version:
+                description: "Release version, e.g. 1.11.0"
+                required: true
+                type: string
 
 jobs:
     build-electron:
@@ -70,9 +75,10 @@ jobs:
               uses: softprops/action-gh-release@v2
               with:
                   draft: true
-                  tag_name: v${{ github.run_number }}
-                  name: Cosmos Journeyer v${{ github.run_number }}
+                  tag_name: v${{ inputs.version }}
+                  name: Cosmos Journeyer v${{ inputs.version }}
                   body: |
                       The new version of Cosmos Journeyer is online at https://cosmosjourneyer.com/
                       This draft release contains Electron desktop builds.
                   files: release-assets/*
+                  fail_on_unmatched_files: true
