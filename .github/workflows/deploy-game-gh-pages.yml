@@ -61,5 +61,7 @@ jobs:
               with:
                   folder: packages/game/dist
                   branch: gh-pages
-                  clean-exclude: pr-preview
+                  clean-exclude: |
+                      preview
+                      pr-preview
                   force: false
