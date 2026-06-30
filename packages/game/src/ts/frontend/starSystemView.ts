@@ -464,7 +464,6 @@ export class StarSystemView implements View {
             const spaceship = shipControls.getSpaceship();
 
             if (this.activeControls === shipControls) {
-                setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
 
@@ -479,25 +478,11 @@ export class StarSystemView implements View {
 
                 const desiredSpawnPosition = shipPosition.add(shipForward.scale(20)).add(left.scale(10));
 
-                // make sure character spawns above ground
-                const raycastResult = new PhysicsRaycastResult();
-                this.physicsEngine.raycastToRef(
-                    desiredSpawnPosition.add(up.scale(200)),
-                    desiredSpawnPosition.add(up.scale(-200)),
-                    raycastResult,
-                    {
-                        collideWith: CollisionMask.ENVIRONMENT & ~CollisionMask.AVATARS,
-                    },
-                );
-
-                if (raycastResult.hasHit) {
-                    desiredSpawnPosition.copyFrom(
-                        raycastResult.hitPointWorld.add(raycastResult.hitNormalWorld.scale(1.0)),
-                    );
-                }
-
-                characterControls.getTransform().setAbsolutePosition(desiredSpawnPosition);
+                characterControls
+                    .getTransform()
+                    .setAbsolutePosition(this.getGroundedAvatarSpawnPosition(desiredSpawnPosition, up));
                 characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
 
                 lookAt(characterControls.getTransform(), shipPosition, scene.useRightHandedSystem);
                 characterControls.getTransform().rotate(Vector3.Up(), Math.PI, Space.LOCAL);
@@ -540,17 +525,26 @@ export class StarSystemView implements View {
                     this.interactionSystem.register(door);
                 }
             } else if (this.getActiveControls() === this.vehicleControls) {
-                setCollisionsEnabled(characterControls.avatar.aggregate, true);
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
                 this.vehicleControls.getVehicle()?.brake();
                 VehicleInputs.setEnabled(false);
 
-                const vehiclePosition = this.vehicleControls.getTransform().getAbsolutePosition();
+                const vehicleTransform = this.vehicleControls.getTransform();
+                const vehiclePosition = vehicleTransform.getAbsolutePosition();
+                const nearestPlanet = this.getStarSystem().getNearestCelestialBody(vehiclePosition);
+                const up = vehiclePosition.subtract(nearestPlanet.getTransform().getAbsolutePosition()).normalize();
 
                 characterControls
                     .getTransform()
-                    .setAbsolutePosition(vehiclePosition.add(this.vehicleControls.getTransform().forward.scale(10)));
+                    .setAbsolutePosition(
+                        this.getGroundedAvatarSpawnPosition(
+                            vehiclePosition.add(vehicleTransform.forward.scale(10)),
+                            up,
+                        ),
+                    );
+                characterControls.avatar.aggregate.body.setLinearVelocity(Vector3.Zero());
+                setCollisionsEnabled(characterControls.avatar.aggregate, true);
 
                 await this.setActiveControls(characterControls);
             }
@@ -1231,6 +1225,24 @@ export class StarSystemView implements View {
 
     public getActiveControls() {
         return this.activeControls;
+    }
+
+    private getGroundedAvatarSpawnPosition(desiredSpawnPosition: Vector3, up: Vector3): Vector3 {
+        const raycastResult = new PhysicsRaycastResult();
+        this.physicsEngine.raycastToRef(
+            desiredSpawnPosition.add(up.scale(200)),
+            desiredSpawnPosition.add(up.scale(-200)),
+            raycastResult,
+            {
+                collideWith: CollisionMask.ENVIRONMENT,
+            },
+        );
+
+        if (!raycastResult.hasHit) {
+            return desiredSpawnPosition;
+        }
+
+        return raycastResult.hitPointWorld.add(raycastResult.hitNormalWorld.scale(1.0));
     }
 
     private async setActiveControls(controls: Controls) {
