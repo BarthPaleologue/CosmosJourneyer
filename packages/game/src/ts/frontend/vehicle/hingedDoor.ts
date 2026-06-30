@@ -102,7 +102,8 @@ export class HingedDoor implements Door {
     }
 
     dispose() {
-        this.doorAggregate.dispose();
         this.hinge.dispose();
+        this.doorAggregate.dispose();
+        this.doorAggregate.transformNode.dispose();
     }
 }

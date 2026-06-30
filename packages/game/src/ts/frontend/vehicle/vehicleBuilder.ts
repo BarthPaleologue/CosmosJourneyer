@@ -29,7 +29,7 @@ import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Door } from "./door";
 import { filterVehicleShape } from "./filterVehicleShape";
 import { HingedDoor } from "./hingedDoor";
-import { Vehicle } from "./vehicle";
+import { Vehicle, type FixedVehiclePart } from "./vehicle";
 import { CreateAxle, CreateWheel, Wheel, type WheelModel } from "./wheel";
 
 type FixationModel = {
@@ -176,6 +176,7 @@ export class VehicleBuilder {
         });
         filterVehicleShape(frameAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
+        const fixedVehicleParts: Array<FixedVehiclePart> = [];
         for (const { mesh, mass, connection } of this.fixedParts) {
             const positionInFrameSpace = mesh.position.clone();
             mesh.setParent(null);
@@ -213,6 +214,7 @@ export class VehicleBuilder {
             );
 
             frameAggregate.body.addConstraint(partAggregate.body, joint);
+            fixedVehicleParts.push({ aggregate: partAggregate, constraint: joint, mesh });
         }
 
         const doors: Array<Door> = [];
@@ -270,6 +272,6 @@ export class VehicleBuilder {
             physicWheels.push(physicWheel);
         }
 
-        return new Vehicle(frameAggregate, doors, physicWheels, allMeshes);
+        return new Vehicle(frameAggregate, doors, physicWheels, fixedVehicleParts, allMeshes);
     }
 }

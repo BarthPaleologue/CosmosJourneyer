@@ -801,12 +801,14 @@ export class StarSystemView implements View {
                             characterControls.getTransform().setEnabled(false);
                             CharacterInputs.setEnabled(false);
 
-                            this.vehicleControls.getVehicle()?.dispose();
-                            this.vehicleControls.setVehicle(null);
-
                             await this.setActiveControls(shipControls);
+
                             SpaceShipControlsInputs.setEnabled(true);
                             this.spaceShipLayer.setVisibility(true);
+
+                            const vehicle = this.vehicleControls.getVehicle();
+                            this.vehicleControls.setVehicle(null);
+                            vehicle?.dispose();
 
                             if (spaceship.isLanded()) {
                                 const bindings = SpaceShipControlsInputs.map.upDown.bindings;

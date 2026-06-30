@@ -19,6 +19,7 @@ import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
@@ -29,12 +30,20 @@ import type { Wheel } from "./wheel";
 
 export type SteeringMode = "counterPhase" | "inPhase";
 
+export type FixedVehiclePart = {
+    readonly aggregate: PhysicsAggregate;
+    readonly constraint: Physics6DoFConstraint;
+    readonly mesh: AbstractMesh;
+};
+
 export class Vehicle implements Transformable {
     readonly frame: PhysicsAggregate;
 
     readonly doors: ReadonlyArray<Door>;
 
     readonly wheels: ReadonlyArray<Wheel>;
+
+    private readonly fixedParts: ReadonlyArray<FixedVehiclePart>;
 
     private steeringMode: SteeringMode = "counterPhase";
 
@@ -52,11 +61,13 @@ export class Vehicle implements Transformable {
         frame: PhysicsAggregate,
         doors: ReadonlyArray<Door>,
         wheels: ReadonlyArray<Wheel>,
+        fixedParts: ReadonlyArray<FixedVehiclePart>,
         allMeshes: ReadonlyArray<AbstractMesh>,
     ) {
         this.frame = frame;
         this.doors = [...doors];
         this.wheels = [...wheels];
+        this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
     }
 
@@ -149,6 +160,13 @@ export class Vehicle implements Transformable {
             wheel.dispose();
         }
 
+        for (const fixedPart of this.fixedParts) {
+            fixedPart.constraint.dispose();
+            fixedPart.aggregate.dispose();
+            fixedPart.mesh.dispose();
+        }
+
         this.frame.dispose();
+        this.frame.transformNode.dispose();
     }
 }

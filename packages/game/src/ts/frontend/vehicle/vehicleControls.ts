@@ -150,6 +150,7 @@ export class VehicleControls implements Controls {
     setVehicle(vehicle: Vehicle | null) {
         this.vehicle = vehicle;
         if (vehicle === null) {
+            this.firstPersonCamera.parent = null;
             return;
         }
 
