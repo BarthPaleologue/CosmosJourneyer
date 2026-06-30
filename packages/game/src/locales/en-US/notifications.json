@@ -17,5 +17,6 @@
     "cantSaveTutorial": "Cannot save during a tutorial",
     "newDiscovery": "Discovered {{objectName}}. Data recorded.",
     "unknownKeyboardLayout": "Could not detect your keyboard layout. QWERTY layout will be used by default.",
-    "lowFuelWarning": "Warning: Low Fuel! Please refuel soon to avoid being stranded in space."
+    "lowFuelWarning": "Warning: Low Fuel! Please refuel soon to avoid being stranded in space.",
+    "mustBeLanded": "You must land before exiting the ship."
 }

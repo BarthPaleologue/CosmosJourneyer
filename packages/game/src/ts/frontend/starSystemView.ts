@@ -464,6 +464,11 @@ export class StarSystemView implements View {
             const spaceship = shipControls.getSpaceship();
 
             if (this.activeControls === shipControls) {
+                if (!spaceship.isLanded()) {
+                    this.notificationManager.create("spaceship", "error", i18n.t("notifications:mustBeLanded"), 3000);
+                    return;
+                }
+
                 characterControls.getTransform().setEnabled(true);
                 CharacterInputs.setEnabled(true);
 
