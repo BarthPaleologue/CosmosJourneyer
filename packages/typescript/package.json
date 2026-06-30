@@ -1,6 +1,6 @@
 {
     "name": "@cosmos-journeyer/typescript",
-    "version": "1.11.0-dev",
+    "version": "1.11.0",
     "private": true,
     "description": "Generic TypeScript helper types and functions shared across Cosmos Journeyer packages.",
     "license": "AGPL-3.0-only",

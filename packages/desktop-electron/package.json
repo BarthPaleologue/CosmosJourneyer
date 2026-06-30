@@ -1,6 +1,6 @@
 {
     "name": "@cosmos-journeyer/desktop-electron",
-    "version": "1.11.0-dev",
+    "version": "1.11.0",
     "private": true,
     "description": "Electron desktop shell for Cosmos Journeyer.",
     "homepage": "https://cosmosjourneyer.com",

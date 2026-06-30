@@ -1,6 +1,6 @@
 {
     "name": "@cosmos-journeyer/universe-model",
-    "version": "1.11.0-dev",
+    "version": "1.11.0",
     "private": true,
     "description": "Universe data models, schemas, and canonical derived accessors shared across Cosmos Journeyer packages.",
     "license": "AGPL-3.0-only",
