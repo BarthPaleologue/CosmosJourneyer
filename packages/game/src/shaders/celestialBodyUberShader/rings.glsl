@@ -98,6 +98,7 @@ vec3 celestialBodyUberShaderCalculateStarLightingForRings(
     return starColor * ringAlbedo * phase * softShadowFactor;
 }
 
+const float RING_MAX_SHADOW_DISTANCE = 1e9;
 vec4 celestialBodyUberShaderApplyRingShadows(vec4 screenColor, vec3 viewDir, float maximumDistance) {
     vec4 finalColor = screenColor;
 
@@ -109,7 +110,7 @@ vec4 celestialBodyUberShaderApplyRingShadows(vec4 screenColor, vec3 viewDir, flo
             for (int i = 0; i < nbStars; i++) {
                 vec3 towardLight = star_directions[i];
                 float t2;
-                if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2)) {
+                if (rayIntersectsPlane(scenePoint, towardLight, object_position, object_rotationAxis, 0.001, t2) && t2 < RING_MAX_SHADOW_DISTANCE) {
                     vec3 shadowSamplePoint = scenePoint + t2 * towardLight;
                     float nearOccultationFactor = smoothstep(100e3, 150e3, t2);
                     accDensity += pow(ringPatternAtPoint(shadowSamplePoint).a, 0.5) * nearOccultationFactor;
