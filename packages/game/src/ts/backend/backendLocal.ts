@@ -49,6 +49,10 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
 
         universeBackend.registerGeneralPlugin(
             (system) => {
+                if (system.anomalies.some((anomaly) => anomaly.type === "darkKnight")) {
+                    return false;
+                }
+
                 return (
                     hashArray([
                         system.coordinates.starSectorX,
@@ -57,14 +61,15 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
                         system.coordinates.localX,
                         system.coordinates.localY,
                         system.coordinates.localZ,
-                    ]) > 0.5
+                    ]) > 0.05
                 );
             },
             (system) => {
                 const stellarIds = system.stellarObjects.map((stellarObject) => stellarObject.id);
-                system.anomalies.push(generateDarkKnightModel(stellarIds));
-
-                return system;
+                return {
+                    ...system,
+                    anomalies: [...system.anomalies, generateDarkKnightModel(stellarIds)],
+                };
             },
         );
 
