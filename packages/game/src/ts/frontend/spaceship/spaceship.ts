@@ -353,6 +353,20 @@ export class Spaceship implements Transformable, Targetable {
         this.onWarpDriveDisabled.notifyObservers(true);
     }
 
+    /**
+     * Sets the warp drive state to idle throttle and minimum speed after an hyperspace jump
+     */
+    public completeHyperspaceJump() {
+        this.idleThrottle();
+
+        const warpDrive = this.getInternals().getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        warpDrive.completeHyperspaceJump();
+    }
+
     public toggleWarpDrive() {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {

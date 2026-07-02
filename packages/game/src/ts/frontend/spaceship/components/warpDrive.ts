@@ -280,4 +280,12 @@ export class WarpDrive implements ReadonlyWarpDrive {
     public getHyperJumpFuelConsumption(distanceLy: number): number {
         return 2 * distanceLy;
     }
+
+    /**
+     * Sets idle throttle and minimum speed after a hyperspace jump
+     */
+    public completeHyperspaceJump() {
+        this.idleThrottle();
+        this.currentSpeed = WarpDrive.MIN_WARP_SPEED;
+    }
 }

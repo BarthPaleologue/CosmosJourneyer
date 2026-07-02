@@ -448,7 +448,7 @@ export class StarSystemView implements View {
                 spaceship.spaceDots.getTransform().setEnabled(true);
                 spaceship.soundInstances.hyperSpace.setVolume(0);
 
-                spaceship.idleThrottle();
+                spaceship.completeHyperspaceJump();
 
                 soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
                 observer.remove();
