@@ -223,7 +223,7 @@ export class VehicleControls implements Controls {
             const targetRotation = deltaRotation.multiply(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
             );
-            const rotationHalfLife = 0.5;
+            const rotationHalfLife = 0.05;
             const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
             this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
