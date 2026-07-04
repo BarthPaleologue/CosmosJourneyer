@@ -422,8 +422,6 @@ export class StarSystemController {
 
         this.floatingOriginSystem.update(cameraPosition);
 
-        this.stellarLightSystem.update(camera, this.getNearestCelestialBody(cameraPosition));
-
         this.updateShaders(deltaSeconds);
     }
 
@@ -432,6 +430,16 @@ export class StarSystemController {
      * @param deltaSeconds The time elapsed in seconds since the last update
      */
     private updateShaders(deltaSeconds: number) {
+        const camera = this.scene.activeCamera;
+        if (camera === null) {
+            console.warn("No camera!");
+            return;
+        }
+
+        camera.getViewMatrix(true);
+        const cameraPosition = camera.globalPosition;
+
+        this.stellarLightSystem.update(camera, this.getNearestCelestialBody(cameraPosition));
         const lightSources = this.stellarLightSystem.getLights();
         for (const planet of this.getGasPlanets()) {
             planet.updateMaterial(lightSources, deltaSeconds);
