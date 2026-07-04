@@ -58,6 +58,8 @@ export class ObjectTargetCursor {
 
     private isInformationEnabled = false;
 
+    private isOnScreen = false;
+
     constructor(object: Targetable) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
@@ -162,9 +164,9 @@ export class ObjectTargetCursor {
         const cameraToObject = objectRay.scale(1 / distance);
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
-        const isOnScreen = Vector3.Dot(cameraToObject, cameraForward) > 0;
+        this.isOnScreen = Vector3.Dot(cameraToObject, cameraForward) > 0;
 
-        if (isOnScreen && this.alpha > 0) {
+        if (this.isOnScreen && this.alpha > 0) {
             Vector3.ProjectToRef(
                 this.object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
@@ -204,7 +206,7 @@ export class ObjectTargetCursor {
         this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
         this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
 
-        const isTextVisible = isOnScreen && this.isInformationEnabled && this.alpha > 0;
+        const isTextVisible = this.isOnScreen && this.isInformationEnabled && this.alpha > 0;
         if (isTextVisible) {
             this.distanceText.textContent = parseDistance(distance);
 
@@ -216,7 +218,7 @@ export class ObjectTargetCursor {
     }
 
     isVisible() {
-        return this.alpha > 0; // && this.screenCoordinates.z > 0;
+        return this.alpha > 0 && this.isOnScreen;
     }
 
     dispose() {
