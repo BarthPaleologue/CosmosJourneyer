@@ -193,7 +193,7 @@ export function generateTelluricSatelliteModel(
         max_mountain_height: 10e3,
         continent_base_height: 5e3 + (ocean?.depth ?? 0),
 
-        mountains_frequency: (60 * radius) / 1000e3,
+        mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };
 
     return {

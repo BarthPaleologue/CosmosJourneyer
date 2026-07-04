@@ -201,6 +201,52 @@ export function getVestaSystemModel(): StarSystemModel {
         },
     } satisfies TelluricPlanetModel;
 
+    const adonisOrbitRadius = aphrodite.rings.outerRadius * 2;
+    const adonis = {
+        type: "telluricSatellite",
+        name: "Adonis",
+        id: "adonis",
+        radius: EarthRadius * 0.02,
+        mass: EarthMass * 0.02 ** 3,
+        seed: 74,
+        orbit: {
+            parentIds: ["aphrodite"],
+            semiMajorAxis: adonisOrbitRadius,
+            eccentricity: 0,
+            inclination: degreesToRadians(-4),
+            initialMeanAnomaly: degreesToRadians(248),
+            argumentOfPeriapsis: degreesToRadians(21),
+            p: 2,
+            longitudeOfAscendingNode: degreesToRadians(175),
+        },
+        rotation: {
+            axialTilt: degreesToRadians(0.2),
+            spinAxisAzimuth: degreesToRadians(22),
+            siderealPeriod: getOrbitalPeriod(adonisOrbitRadius, aphrodite.mass),
+            initialRotationAngle: degreesToRadians(18),
+        },
+        terrainSettings: {
+            continents_fragmentation: 0.0,
+            continent_base_height: 0,
+            continents_frequency: 0.2,
+            max_bump_height: 1e3,
+            max_mountain_height: 2e3,
+            mountains_frequency: 60 * 0.2,
+            bumps_frequency: 30 * 0.2,
+        },
+        clouds: null,
+        atmosphere: null,
+        ocean: null,
+        composition: {
+            h2o: 0.01,
+            rock: 0.99,
+        },
+        temperature: {
+            min: 50,
+            max: 350,
+        },
+    } satisfies TelluricSatelliteModel;
+
     const phileasOrbitRadius = getOrbitRadiusFromPeriod(durationToSeconds({ days: 80 }), aphrodite.mass);
     const phileas = {
         type: "telluricSatellite",
@@ -228,11 +274,11 @@ export function getVestaSystemModel(): StarSystemModel {
         terrainSettings: {
             continents_fragmentation: 0.0,
             continent_base_height: 0,
-            continents_frequency: 1.0,
+            continents_frequency: 0.6,
             max_bump_height: 1e3,
             max_mountain_height: 10e3,
-            mountains_frequency: 60,
-            bumps_frequency: 30,
+            mountains_frequency: 60 * 0.6,
+            bumps_frequency: 30 * 0.6,
         },
         clouds: null,
         atmosphere: null,
@@ -345,7 +391,7 @@ export function getVestaSystemModel(): StarSystemModel {
         coordinates,
         stellarObjects: [vesta],
         planets: [janus, aphrodite, melpomene],
-        satellites: [phileas],
+        satellites: [adonis, phileas],
         anomalies: [],
         orbitalFacilities: [newJulesVerne],
     };
