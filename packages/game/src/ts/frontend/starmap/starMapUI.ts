@@ -147,6 +147,7 @@ export class StarMapUI {
 
         this.infoPanel = document.createElement("div");
         this.infoPanel.classList.add("starMapInfoPanel");
+        this.infoPanel.setAttribute("hidden", "true");
         this.htmlRoot.appendChild(this.infoPanel);
 
         this.infoPanelStarPreview = document.createElement("div");

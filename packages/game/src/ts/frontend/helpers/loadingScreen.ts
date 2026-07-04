@@ -7,8 +7,15 @@ import loadingScreen1Url from "@assets/loadingScreens/loadingScreen1.webp";
 import loadingScreen2Url from "@assets/loadingScreens/loadingScreen2.webp";
 import loadingScreen3Url from "@assets/loadingScreens/loadingScreen3.webp";
 import loadingScreen4Url from "@assets/loadingScreens/loadingScreen4.webp";
+import loadingScreen5Url from "@assets/loadingScreens/loadingScreen5.webp";
 
-const LOADING_SCREEN_IMAGE_URLS = [loadingScreen1Url, loadingScreen2Url, loadingScreen3Url, loadingScreen4Url] as const;
+const LOADING_SCREEN_IMAGE_URLS = [
+    loadingScreen1Url,
+    loadingScreen2Url,
+    loadingScreen3Url,
+    loadingScreen4Url,
+    loadingScreen5Url,
+] as const;
 
 const LOADING_SCREEN_IMAGE_DISPLAY_DURATION_MS = 5_000;
 

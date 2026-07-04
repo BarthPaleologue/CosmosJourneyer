@@ -70,7 +70,7 @@ export class VehicleControls implements Controls {
         this.firstPersonCamera.speed = 0;
         this.firstPersonCamera.minZ = 0.2;
 
-        this.activeCamera = this.firstPersonCamera;
+        this.activeCamera = this.thirdPersonCamera;
 
         VehicleInputs.map.toggleCamera.on("complete", () => {
             if (this.activeCamera === this.firstPersonCamera) {
@@ -150,6 +150,7 @@ export class VehicleControls implements Controls {
     setVehicle(vehicle: Vehicle | null) {
         this.vehicle = vehicle;
         if (vehicle === null) {
+            this.firstPersonCamera.parent = null;
             return;
         }
 
@@ -222,7 +223,7 @@ export class VehicleControls implements Controls {
             const targetRotation = deltaRotation.multiply(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
             );
-            const rotationHalfLife = 0.5;
+            const rotationHalfLife = 0.05;
             const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
             this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),

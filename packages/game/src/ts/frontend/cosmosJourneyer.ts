@@ -680,6 +680,8 @@ export class CosmosJourneyer {
         const currentStarSystem = this.starSystemView.getStarSystem();
 
         const currentWorldPosition = transform.getAbsolutePosition();
+        const currentWorldRotation = transform.absoluteRotationQuaternion;
+        let isTooCloseToNearestObject = false;
 
         // Finding the index of the nearest orbital object
         const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
@@ -703,17 +705,36 @@ export class CosmosJourneyer {
                 nearestOrbitalObject.getBoundingRadius() * minimumDistanceRadiusRatio;
             if (distanceToNearestOrbitalObject < minimumDistanceToNearestOrbitalObject) {
                 currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
+                isTooCloseToNearestObject = true;
             }
         }
 
         // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const currentWorldRotation = transform.absoluteRotationQuaternion;
         const nearestOrbitalObjectInverseRotation = nearestOrbitalObject
             .getTransform()
             .absoluteRotationQuaternion.clone()
             .invert();
 
-        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+        let currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+        if (isTooCloseToNearestObject) {
+            const recoveryWorldPosition = Vector3.TransformCoordinates(
+                currentLocalPosition,
+                nearestOrbitalObject.getTransform().getWorldMatrix(),
+            );
+            const targetForward = nearestOrbitalObject
+                .getTransform()
+                .getAbsolutePosition()
+                .subtract(recoveryWorldPosition)
+                .normalize();
+            const deltaRotation = Quaternion.FromUnitVectorsToRef(
+                transform.forward,
+                targetForward,
+                Quaternion.Identity(),
+            );
+            currentLocalRotation = deltaRotation
+                .multiply(currentWorldRotation)
+                .multiply(nearestOrbitalObjectInverseRotation);
+        }
 
         return {
             type: "relative",

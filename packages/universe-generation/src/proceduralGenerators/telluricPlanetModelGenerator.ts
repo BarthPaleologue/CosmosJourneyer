@@ -160,7 +160,7 @@ export function generateTelluricPlanetModel(
         max_mountain_height: 10e3,
         continent_base_height: ocean !== null ? ocean.depth : 0,
 
-        mountains_frequency: (60 * radius) / 1000e3,
+        mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };
 
     const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS)

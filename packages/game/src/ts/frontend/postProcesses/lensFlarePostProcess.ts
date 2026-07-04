@@ -48,6 +48,8 @@ export class LensFlarePostProcess extends PostProcess {
 
     private readonly cameraToStellarObject = Vector3.Zero();
 
+    private readonly color: RGBColor;
+
     constructor(
         stellarTransform: TransformNode,
         boundingRadius: number,
@@ -91,7 +93,7 @@ export class LensFlarePostProcess extends PostProcess {
             Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
-        const flareColor = color;
+        this.color = color;
 
         this.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
@@ -119,7 +121,7 @@ export class LensFlarePostProcess extends PostProcess {
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);
             setObjectUniforms(effect, stellarTransform, boundingRadius, floatingOriginOffset);
 
-            effect.setColor3(LensFlareUniformNames.FLARE_COLOR, flareColor);
+            effect.setColor3(LensFlareUniformNames.FLARE_COLOR, this.color);
 
             const viewProjection = OffsetViewProjectionToRef(
                 this.activeCamera.getViewMatrix(),

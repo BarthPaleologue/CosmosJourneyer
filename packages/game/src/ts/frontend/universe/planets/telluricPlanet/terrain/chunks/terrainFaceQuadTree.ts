@@ -39,8 +39,8 @@ import { type BuildTask } from "./taskTypes";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
 import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
 
-const splitScreenSpaceErrorThreshold = 16;
-const mergeScreenSpaceErrorThreshold = 8;
+const splitScreenSpaceErrorThreshold = 32;
+const mergeScreenSpaceErrorThreshold = 16;
 
 /**
  * Represents a face of a cube-sphere terrain.
