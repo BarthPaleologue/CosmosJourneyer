@@ -164,7 +164,7 @@ export class VehicleBuilder {
         return [this.frame];
     }
 
-    build(): Vehicle {
+    build(name: string): Vehicle {
         const allMeshes = this.frame.getChildMeshes();
         allMeshes.push(this.frame);
 
@@ -272,6 +272,6 @@ export class VehicleBuilder {
             physicWheels.push(physicWheel);
         }
 
-        return new Vehicle(frameAggregate, doors, physicWheels, fixedVehicleParts, allMeshes);
+        return new Vehicle(name, frameAggregate, doors, physicWheels, fixedVehicleParts, allMeshes);
     }
 }

@@ -331,7 +331,7 @@ export function createWolfMk2(
         )
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation)
-        .build();
+        .build("Wolf Mk2");
 
     return ok(vehicle);
 }

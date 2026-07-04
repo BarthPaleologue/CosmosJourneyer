@@ -57,6 +57,25 @@ export class TargetCursorLayer implements IDisposable {
         this.layerRoot.appendChild(overlay.htmlRoot);
     }
 
+    public removeObject(object: Targetable) {
+        const targetCursor = this.targetCursors.find((targetCursor) => targetCursor.object === object);
+        if (targetCursor === undefined) {
+            return;
+        }
+
+        this.targetCursors = this.targetCursors.filter((targetCursor) => targetCursor.object !== object);
+        this.additionalPinnedTargets.delete(object);
+        targetCursor.dispose();
+
+        if (this.target === object) {
+            this.target = null;
+        }
+
+        if (this.closestToScreenCenterOrbitalObject === object) {
+            this.closestToScreenCenterOrbitalObject = null;
+        }
+    }
+
     private computeClosestToScreenCenterOrbitalObject() {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
