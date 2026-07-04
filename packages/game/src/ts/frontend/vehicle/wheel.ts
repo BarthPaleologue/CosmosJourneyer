@@ -247,10 +247,10 @@ function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, 
             {
                 // Suspension
                 axis: PhysicsConstraintAxis.LINEAR_Y,
-                minLimit: -0.15,
-                maxLimit: 0.15,
-                stiffness: 50_000,
-                damping: 1_000,
+                minLimit: -0.35,
+                maxLimit: 0.35,
+                stiffness: 45_000,
+                damping: 5_000,
             },
             {
                 axis: PhysicsConstraintAxis.LINEAR_Z,
