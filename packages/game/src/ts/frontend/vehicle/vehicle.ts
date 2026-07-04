@@ -28,6 +28,8 @@ import type { Transformable } from "../universe/architecture/transformable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
 
+const SteeringMotorMaxForce = 10_000;
+
 export type SteeringMode = "counterPhase" | "inPhase";
 
 export type FixedVehiclePart = {
@@ -99,14 +101,14 @@ export class Vehicle implements Transformable {
                     : this.getSteeringMode() === "counterPhase"
                       ? -this.targetSteeringAngle
                       : this.targetSteeringAngle;
-            steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 60_000_000);
+            steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, SteeringMotorMaxForce);
             steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelAngle);
         }
     }
 
     setTargetSpeed(speed: number) {
         this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
-        const motorTorque = 330000 / 50;
+        const motorTorque = 5_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
@@ -125,7 +127,7 @@ export class Vehicle implements Transformable {
     }
 
     brake() {
-        const brakeTorque = 1e6;
+        const brakeTorque = 20_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
