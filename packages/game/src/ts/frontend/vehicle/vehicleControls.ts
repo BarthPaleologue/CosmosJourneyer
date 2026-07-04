@@ -246,7 +246,7 @@ export class VehicleControls implements Controls {
             }
         }
 
-        this.thirdPersonCamera.getViewMatrix(true);
+        this.getActiveCamera().getViewMatrix(true);
 
         const steeringSpeed = VehicleInputs.map.steer.value * 1.8;
         vehicle.turn(steeringSpeed, deltaSeconds);
