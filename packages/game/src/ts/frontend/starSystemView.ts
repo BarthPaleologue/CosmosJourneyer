@@ -510,6 +510,7 @@ export class StarSystemView implements View {
                 }
 
                 const rover = roverResult.value;
+                rover.brake();
                 this.vehicleControls.setVehicle(rover);
 
                 this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
