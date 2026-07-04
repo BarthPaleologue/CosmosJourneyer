@@ -50,8 +50,8 @@ export class Vehicle implements Transformable {
     private targetSpeed = 0;
     private targetSteeringAngle = 0;
 
-    readonly maxForwardSpeed = kmhToMetersPerSecond(90);
-    readonly maxReverseSpeed = kmhToMetersPerSecond(50);
+    readonly maxForwardSpeed = kmhToMetersPerSecond(40);
+    readonly maxReverseSpeed = kmhToMetersPerSecond(20);
     readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
     readonly maxSteeringAngleHighSpeed = degreesToRadians(7);
 
