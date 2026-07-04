@@ -70,7 +70,7 @@ export class VehicleControls implements Controls {
         this.firstPersonCamera.speed = 0;
         this.firstPersonCamera.minZ = 0.2;
 
-        this.activeCamera = this.firstPersonCamera;
+        this.activeCamera = this.thirdPersonCamera;
 
         VehicleInputs.map.toggleCamera.on("complete", () => {
             if (this.activeCamera === this.firstPersonCamera) {
