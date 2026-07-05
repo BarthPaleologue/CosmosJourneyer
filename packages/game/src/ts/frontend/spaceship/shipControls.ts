@@ -371,10 +371,12 @@ export class ShipControls implements Controls {
                     }
                     spaceship.cancelLanding();
                 }
-                spaceship.aggregate.body.applyForce(
-                    this.getTransform().up.scale(9.8 * 10_000 * SpaceShipControlsInputs.map.upDown.value),
-                    spaceship.aggregate.body.getObjectCenterWorld(),
-                );
+                if (!spaceship.isAutoPiloted()) {
+                    spaceship.aggregate.body.applyForce(
+                        this.getTransform().up.scale(9.8 * 10_000 * SpaceShipControlsInputs.map.upDown.value),
+                        spaceship.aggregate.body.getObjectCenterWorld(),
+                    );
+                }
             }
 
             if (!spaceship.isLanded()) {
