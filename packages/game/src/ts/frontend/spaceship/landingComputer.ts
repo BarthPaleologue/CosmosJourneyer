@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -95,13 +95,18 @@ type LandingPlanStep = {
 
 export const LandingComputerStatusBit = {
     PROGRESS: 1,
-    COMPLETE: 2,
+    LANDING_COMPLETE: 2,
     TIMEOUT: 4,
     IDLE: 8,
     NO_LANDING_SPOT: 16,
+    LIFTOFF_COMPLETE: 32,
 } as const;
 
 export type LandingComputerStatusBit = (typeof LandingComputerStatusBit)[keyof typeof LandingComputerStatusBit];
+
+type LandingComputerCompleteStatus =
+    | typeof LandingComputerStatusBit.LANDING_COMPLETE
+    | typeof LandingComputerStatusBit.LIFTOFF_COMPLETE;
 
 export class LandingComputer {
     private readonly physicsEngine: PhysicsEngineV2;
@@ -109,6 +114,7 @@ export class LandingComputer {
     private target: LandingTarget | null = null;
 
     private actionPlan: ReadonlyArray<LandingPlanStep> | null = null;
+    private completeStatus: LandingComputerCompleteStatus = LandingComputerStatusBit.LANDING_COMPLETE;
 
     private currentActionIndex = 0;
 
@@ -144,6 +150,10 @@ export class LandingComputer {
         return this.target;
     }
 
+    isActive() {
+        return this.actionPlan !== null;
+    }
+
     setTarget(target: LandingTarget | null) {
         this.target = target;
         this.currentActionIndex = 0;
@@ -153,6 +163,8 @@ export class LandingComputer {
             this.actionPlan = null;
             return;
         }
+
+        this.completeStatus = LandingComputerStatusBit.LANDING_COMPLETE;
 
         switch (this.target.kind) {
             case "landing_pad":
@@ -164,6 +176,14 @@ export class LandingComputer {
             default:
                 return assertUnreachable(this.target);
         }
+    }
+
+    liftOff() {
+        this.target = null;
+        this.currentActionIndex = 0;
+        this.elapsedSeconds = 0;
+        this.completeStatus = LandingComputerStatusBit.LIFTOFF_COMPLETE;
+        this.actionPlan = this.createLiftOffActionPlan();
     }
 
     private createLandingPadActionPlan(landingPad: ILandingPad): ReadonlyArray<LandingPlanStep> {
@@ -216,6 +236,46 @@ export class LandingComputer {
                 tolerance: {
                     position: 0.5,
                     rotation: 0.1,
+                },
+            },
+        ];
+    }
+
+    private createLiftOffActionPlan(): ReadonlyArray<LandingPlanStep> {
+        const currentPosition = this.transform.getAbsolutePosition();
+        const currentRotation = this.transform.absoluteRotationQuaternion.clone();
+        const currentUp = this.transform.up;
+        const currentForward = this.transform.forward;
+        const currentRight = this.transform.right;
+
+        const targetPosition = currentPosition.add(currentUp.scale(15));
+        const targetForward = Vector3.TransformCoordinates(
+            currentForward,
+            Matrix.RotationAxis(currentRight, -Math.PI / 6),
+        );
+
+        const deltaRotation = Quaternion.FromUnitVectorsToRef(currentForward, targetForward, Quaternion.Identity());
+        const targetRotation = deltaRotation.multiply(currentRotation);
+
+        return [
+            {
+                getTargetTransform: () => {
+                    return {
+                        position: targetPosition,
+                        rotation: targetRotation,
+                    };
+                },
+                maxVelocityAtTarget: {
+                    linear: 5,
+                    rotation: 0.7,
+                },
+                maxVelocity: {
+                    linear: 10,
+                    rotation: 1,
+                },
+                tolerance: {
+                    position: 1,
+                    rotation: 0.2,
                 },
             },
         ];
@@ -282,13 +342,13 @@ export class LandingComputer {
     }
 
     update(deltaSeconds: number): LandingComputerStatusBit {
-        if (this.target === null || this.actionPlan === null) {
+        if (this.actionPlan === null) {
             return LandingComputerStatusBit.IDLE;
         }
 
         const currentAction = this.actionPlan.at(this.currentActionIndex);
         if (currentAction === undefined) {
-            return LandingComputerStatusBit.COMPLETE;
+            return this.completeStatus;
         }
 
         this.elapsedSeconds += deltaSeconds;
@@ -316,8 +376,9 @@ export class LandingComputer {
             currentAngularVelocity.length() < maxRotationSpeedAtTarget
         ) {
             if (this.currentActionIndex === this.actionPlan.length - 1) {
+                const completeStatus = this.completeStatus;
                 this.setTarget(null);
-                return LandingComputerStatusBit.COMPLETE;
+                return completeStatus;
             }
 
             this.currentActionIndex++;

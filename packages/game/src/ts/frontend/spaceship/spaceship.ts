@@ -60,7 +60,7 @@ import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";
 
-type ShipState = "flying" | "landing" | "landed";
+type ShipState = "flying" | "landing" | "landed" | "taking_off";
 
 type SoundInstances = {
     enableWarpDrive: ISoundInstance;
@@ -435,7 +435,7 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     public isAutoPiloted() {
-        return this.landingComputer?.getTarget() !== null;
+        return this.landingComputer?.isActive() ?? false;
     }
 
     public engageLandingOnPad(landingPad: ILandingPad) {
@@ -497,14 +497,17 @@ export class Spaceship implements Transformable, Targetable {
 
         this.getTransform().setParent(null);
 
-        translate(this.getTransform(), this.getTransform().up.scale(5));
+        this.mainEngineThrottle = 0;
 
-        this.state = "flying";
+        this.state = this.landingComputer === null ? "flying" : "taking_off";
 
-        this.aggregate.body.applyImpulse(
-            this.getTransform().up.scale(200_000),
-            this.getTransform().getAbsolutePosition(),
-        );
+        this.updatePhysicsState();
+
+        if (this.landingComputer === null) {
+            this.mainEngineThrottle = 0.2;
+        } else {
+            this.landingComputer.liftOff();
+        }
 
         this.onTakeOff.notifyObservers();
     }
@@ -648,6 +651,7 @@ export class Spaceship implements Transformable, Targetable {
                 break;
             case "flying":
             case "landing":
+            case "taking_off":
                 if (warpDrive !== null && warpDrive.isEnabled()) {
                     if (currentMotionType !== PhysicsMotionType.ANIMATED) {
                         this.aggregate.body.setMotionType(PhysicsMotionType.ANIMATED);
@@ -770,11 +774,19 @@ export class Spaceship implements Transformable, Targetable {
             switch (landingComputerStatus) {
                 case LandingComputerStatusBit.PROGRESS:
                     break;
-                case LandingComputerStatusBit.COMPLETE:
+                case LandingComputerStatusBit.LANDING_COMPLETE:
                     this.completeLanding();
                     break;
+                case LandingComputerStatusBit.LIFTOFF_COMPLETE:
+                    this.state = "flying";
+                    this.mainEngineThrottle = 0.2;
+                    break;
                 case LandingComputerStatusBit.TIMEOUT:
-                    this.cancelLanding();
+                    if (this.state === "taking_off") {
+                        this.state = "flying";
+                    } else {
+                        this.cancelLanding();
+                    }
                     break;
                 case LandingComputerStatusBit.IDLE:
                     break;

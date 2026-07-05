@@ -74,7 +74,7 @@ describe("LandingComputer", () => {
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2,
+            getPadHeight: () => 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
@@ -112,7 +112,7 @@ describe("LandingComputer", () => {
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2,
+            getPadHeight: () => 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
@@ -133,7 +133,7 @@ describe("LandingComputer", () => {
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),
-            padHeight: 2,
+            getPadHeight: () => 2,
         } as unknown as LandingPad;
 
         landingComputer.setTarget({
@@ -143,5 +143,24 @@ describe("LandingComputer", () => {
 
         const status = landingComputer.update(0.016);
         expect(status).toBe(LandingComputerStatusBit.PROGRESS);
+    });
+
+    it("should run liftoff without a landing target", () => {
+        landingComputer.liftOff();
+
+        expect(landingComputer.getTarget()).toBeNull();
+        expect(landingComputer.isActive()).toBe(true);
+
+        const status = landingComputer.update(0.016);
+        expect(status).toBe(LandingComputerStatusBit.PROGRESS);
+    });
+
+    it("should timeout liftoff without a landing target", () => {
+        landingComputer.liftOff();
+
+        const status = landingComputer.update(91);
+        expect(status).toBe(LandingComputerStatusBit.TIMEOUT);
+        expect(landingComputer.getTarget()).toBeNull();
+        expect(landingComputer.isActive()).toBe(false);
     });
 });
