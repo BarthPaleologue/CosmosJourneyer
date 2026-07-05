@@ -36,6 +36,8 @@ import { CollisionMask } from "@/settings";
 import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
 import { filterVehicleShape } from "./filterVehicleShape";
 
+const SteerableAxleAngleLimit = Math.PI / 3;
+
 export type WheelModel = {
     position: Vector3;
     geometry: {
@@ -99,7 +101,7 @@ export class Wheel {
             thickness,
             150,
             0.2,
-            1.3,
+            3,
             scene,
         );
         filterVehicleShape(wheelShape, CollisionMask.VEHICLE_PARTS);
@@ -245,10 +247,10 @@ function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, 
             {
                 // Suspension
                 axis: PhysicsConstraintAxis.LINEAR_Y,
-                minLimit: -0.15,
-                maxLimit: 0.15,
-                stiffness: 50_000,
-                damping: 1_000,
+                minLimit: -0.35,
+                maxLimit: 0.35,
+                stiffness: 45_000,
+                damping: 5_000,
             },
             {
                 axis: PhysicsConstraintAxis.LINEAR_Z,
@@ -264,7 +266,8 @@ function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, 
             {
                 // Steering
                 axis: PhysicsConstraintAxis.ANGULAR_Y,
-                ...(steerable ? {} : { minLimit: 0, maxLimit: 0 }),
+                minLimit: steerable ? -SteerableAxleAngleLimit : 0,
+                maxLimit: steerable ? SteerableAxleAngleLimit : 0,
             },
             {
                 // Angular leeway Z

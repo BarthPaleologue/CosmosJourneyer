@@ -10,6 +10,7 @@ export const ObjectTargetCursorType = {
     LANDING_PAD: "LANDING_PAD",
     STAR_SYSTEM: "STAR_SYSTEM",
     SPACESHIP: "SPACESHIP",
+    VEHICLE: "VEHICLE",
 } as const;
 
 export type ObjectTargetCursorType = (typeof ObjectTargetCursorType)[keyof typeof ObjectTargetCursorType];

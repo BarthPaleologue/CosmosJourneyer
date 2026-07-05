@@ -24,9 +24,13 @@ import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physic
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
-import type { Transformable } from "../universe/architecture/transformable";
+import i18n from "@/i18n";
+
+import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
+
+const SteeringMotorMaxForce = 10_000;
 
 export type SteeringMode = "counterPhase" | "inPhase";
 
@@ -36,7 +40,7 @@ export type FixedVehiclePart = {
     readonly mesh: AbstractMesh;
 };
 
-export class Vehicle implements Transformable {
+export class Vehicle implements Targetable {
     readonly frame: PhysicsAggregate;
 
     readonly doors: ReadonlyArray<Door>;
@@ -57,7 +61,12 @@ export class Vehicle implements Transformable {
 
     readonly allMeshes: ReadonlyArray<AbstractMesh>;
 
+    readonly targetInfo: TargetInfo;
+
+    private readonly boundingRadius: number;
+
     constructor(
+        name: string,
         frame: PhysicsAggregate,
         doors: ReadonlyArray<Door>,
         wheels: ReadonlyArray<Wheel>,
@@ -69,6 +78,16 @@ export class Vehicle implements Transformable {
         this.wheels = [...wheels];
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
+
+        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
+        this.boundingRadius = boundingMax.subtract(boundingMin).length() / 2;
+
+        this.targetInfo = {
+            name,
+            type: ObjectTargetCursorType.VEHICLE,
+            minDistance: this.boundingRadius * 10,
+            maxDistance: 0,
+        };
     }
 
     getSteeringMode() {
@@ -99,14 +118,14 @@ export class Vehicle implements Transformable {
                     : this.getSteeringMode() === "counterPhase"
                       ? -this.targetSteeringAngle
                       : this.targetSteeringAngle;
-            steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, 60_000_000);
+            steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, SteeringMotorMaxForce);
             steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelAngle);
         }
     }
 
     setTargetSpeed(speed: number) {
         this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
-        const motorTorque = 330000 / 50;
+        const motorTorque = 5_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
@@ -125,7 +144,7 @@ export class Vehicle implements Transformable {
     }
 
     brake() {
-        const brakeTorque = 1e6;
+        const brakeTorque = 20_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
@@ -145,6 +164,14 @@ export class Vehicle implements Transformable {
 
     getTransform(): TransformNode {
         return this.frame.transformNode;
+    }
+
+    getBoundingRadius(): number {
+        return this.boundingRadius;
+    }
+
+    getTypeName(): string {
+        return i18n.t("objectTypes:vehicle");
     }
 
     getFrameAggregate() {

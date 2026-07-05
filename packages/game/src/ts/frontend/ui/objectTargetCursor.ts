@@ -100,6 +100,7 @@ export class ObjectTargetCursor {
                 this.maxSize = 1.5;
                 break;
             case ObjectTargetCursorType.SPACESHIP:
+            case ObjectTargetCursorType.VEHICLE:
                 this.cursor.classList.add("rotated");
                 this.minSize = 1.5;
                 this.maxSize = 1.5;

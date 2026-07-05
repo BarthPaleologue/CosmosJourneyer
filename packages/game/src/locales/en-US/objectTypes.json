@@ -13,5 +13,6 @@
     "anomaly": "Anomaly",
     "landingBay": "Landing Bay",
     "landingPad": "Landing Pad",
-    "spaceship": "Spaceship"
+    "spaceship": "Spaceship",
+    "vehicle": "Vehicle"
 }

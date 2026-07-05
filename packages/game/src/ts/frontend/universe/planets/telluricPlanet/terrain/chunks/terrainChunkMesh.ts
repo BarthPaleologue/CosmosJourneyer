@@ -145,7 +145,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
             const scene = this.mesh.getScene();
 
             this.physicsShape = new PhysicsShapeMesh(this.mesh, scene);
-            this.physicsShape.material.friction = 2;
+            this.physicsShape.material.friction = 3;
             this.physicsShape.material.restitution = 0;
             this.physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;
             this.physicsShape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;

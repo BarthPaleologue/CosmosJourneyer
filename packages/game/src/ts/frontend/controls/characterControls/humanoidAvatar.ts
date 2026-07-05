@@ -127,7 +127,7 @@ export class HumanoidAvatar implements Transformable {
             scene,
         );
         shape.material.restitution = 0.0;
-        shape.material.friction = 0.0;
+        shape.material.friction = 1.0;
         shape.filterMembershipMask = CollisionMask.AVATARS;
         shape.filterCollideMask = CollisionMask.ENVIRONMENT | CollisionMask.DYNAMIC_OBJECTS | CollisionMask.AVATARS;
 

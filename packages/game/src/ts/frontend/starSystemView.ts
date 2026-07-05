@@ -512,6 +512,7 @@ export class StarSystemView implements View {
                 const rover = roverResult.value;
                 rover.brake();
                 this.vehicleControls.setVehicle(rover);
+                this.targetCursorLayer.addObject(rover);
 
                 this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
 
@@ -814,7 +815,13 @@ export class StarSystemView implements View {
 
                             const vehicle = this.vehicleControls.getVehicle();
                             this.vehicleControls.setVehicle(null);
-                            vehicle?.dispose();
+                            if (vehicle !== null) {
+                                if (this.targetCursorLayer.getTarget() === vehicle) {
+                                    this.spaceShipLayer.setTarget(null);
+                                }
+                                this.targetCursorLayer.removeObject(vehicle);
+                                vehicle.dispose();
+                            }
 
                             if (spaceship.isLanded()) {
                                 const bindings = SpaceShipControlsInputs.map.upDown.bindings;

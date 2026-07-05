@@ -13,5 +13,6 @@
     "anomaly": "Anomalie",
     "landingBay": "Baie d'Atterrissage",
     "landingPad": "Plateforme d'Atterrissage",
-    "spaceship": "Vaisseau Spatial"
+    "spaceship": "Vaisseau Spatial",
+    "vehicle": "Véhicule"
 }

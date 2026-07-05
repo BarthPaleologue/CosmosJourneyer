@@ -250,7 +250,7 @@ export function createWolfMk2(
     const wheelDistanceFromCenter = frameHalfWidth + 1.0;
 
     const wheelSpread = 0.4;
-    const wheelYOffset = -0.5;
+    const wheelYOffset = -0.65;
 
     const forwardLeftWheelPosition = new Vector3(wheelDistanceFromCenter, wheelYOffset, frameLength * wheelSpread);
     const forwardRightWheelPosition = new Vector3(-wheelDistanceFromCenter, wheelYOffset, frameLength * wheelSpread);
@@ -331,7 +331,7 @@ export function createWolfMk2(
         )
         .translateSpawn(spawnPosition)
         .rotateSpawn(spawnRotation)
-        .build();
+        .build("Wolf Mk2");
 
     return ok(vehicle);
 }
