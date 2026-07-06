@@ -75,6 +75,7 @@ import { lookAt } from "./helpers/transform";
 import { NotificationManager, type INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
+import { PlanetaryLandingTutorial } from "./ui/tutorial/tutorials/planetaryLandingTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
 import { type Tutorial } from "./ui/tutorial/tutorials/tutorial";
@@ -94,6 +95,8 @@ declare global {
  * It also handles the pause menu.
  */
 export class CosmosJourneyer {
+    private static readonly PLANETARY_LANDING_TUTORIAL_ALTITUDE_THRESHOLD = 300e3;
+
     readonly engine: AbstractEngine;
 
     readonly assets: Assets;
@@ -576,6 +579,7 @@ export class CosmosJourneyer {
                 this.mainMenu.isVisible(),
                 deltaSeconds,
             );
+            this.maybeStartPlanetaryLandingTutorial();
             this.soundPlayer.update();
             this.tts.update();
 
@@ -583,6 +587,39 @@ export class CosmosJourneyer {
             this.activeView.render();
         });
         this.state = "running";
+    }
+
+    private maybeStartPlanetaryLandingTutorial(): void {
+        if (!this.canStartPlanetaryLandingTutorial()) return;
+
+        const shipControls = this.starSystemView.getSpaceshipControls();
+        if (this.starSystemView.getActiveControls() !== shipControls) return;
+
+        const shipPosition = shipControls.getTransform().getAbsolutePosition();
+        const nearestCelestialBody = this.starSystemView.getStarSystem().getNearestCelestialBody(shipPosition);
+        if (nearestCelestialBody.type !== "telluricPlanet" && nearestCelestialBody.type !== "telluricSatellite") {
+            return;
+        }
+
+        const altitudeAboveSurface =
+            Vector3.Distance(shipPosition, nearestCelestialBody.getTransform().getAbsolutePosition()) -
+            nearestCelestialBody.getBoundingRadius();
+        if (altitudeAboveSurface > CosmosJourneyer.PLANETARY_LANDING_TUTORIAL_ALTITUDE_THRESHOLD) return;
+
+        void this.tutorialLayer.setTutorial(new PlanetaryLandingTutorial());
+        this.tutorialLayer.onQuitTutorial.addOnce(() => {
+            this.player.tutorials.planetaryLandingCompleted = true;
+        });
+    }
+
+    private canStartPlanetaryLandingTutorial(): boolean {
+        return (
+            !this.player.tutorials.planetaryLandingCompleted &&
+            this.player.uuid !== Settings.TUTORIAL_SAVE_UUID &&
+            this.activeView === this.starSystemView &&
+            !this.tutorialLayer.isEnabled() &&
+            !this.starSystemView.isJumpingBetweenSystems()
+        );
     }
 
     /**

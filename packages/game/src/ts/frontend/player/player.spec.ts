@@ -59,6 +59,7 @@ describe("Player", () => {
             expect(player.tutorials).toEqual({
                 flightCompleted: false,
                 stationLandingCompleted: false,
+                planetaryLandingCompleted: false,
                 starMapCompleted: false,
                 fuelScoopingCompleted: false,
             });
@@ -96,6 +97,19 @@ describe("Player", () => {
             } finally {
                 vi.useRealTimers();
             }
+        });
+
+        it("should backfill missing tutorial completion flags", () => {
+            const parsedPlayer = SerializedPlayerSchema.parse({
+                tutorials: {
+                    flightCompleted: true,
+                    stationLandingCompleted: true,
+                    starMapCompleted: false,
+                    fuelScoopingCompleted: false,
+                },
+            });
+
+            expect(parsedPlayer.tutorials.planetaryLandingCompleted).toBe(false);
         });
     });
 
@@ -588,6 +602,7 @@ describe("Player", () => {
                 tutorials: {
                     flightCompleted: false,
                     stationLandingCompleted: false,
+                    planetaryLandingCompleted: false,
                     starMapCompleted: false,
                     fuelScoopingCompleted: false,
                 },

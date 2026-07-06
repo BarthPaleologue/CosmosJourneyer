@@ -157,6 +157,7 @@ export class Player {
                 tutorials: {
                     flightCompleted: false,
                     stationLandingCompleted: false,
+                    planetaryLandingCompleted: false,
                     starMapCompleted: false,
                     fuelScoopingCompleted: false,
                 },
