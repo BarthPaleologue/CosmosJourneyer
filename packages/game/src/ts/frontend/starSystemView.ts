@@ -974,8 +974,6 @@ export class StarSystemView implements View {
             }
         }
 
-        this.spaceShipLayer.displaySpeed(spaceship.getThrottle(), spaceship.getSpeed());
-
         const target = this.targetCursorLayer.getTarget();
 
         const distanceLY =
@@ -991,10 +989,7 @@ export class StarSystemView implements View {
         const warpDrive = spaceship.getInternals().getWarpDrive();
         const fuelRequiredForJump = warpDrive?.getHyperJumpFuelConsumption(distanceLY) ?? 0;
 
-        this.spaceShipLayer.displayFuel(
-            spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity(),
-            fuelRequiredForJump / spaceship.getTotalFuelCapacity(),
-        );
+        this.spaceShipLayer.displayShipHud(spaceship, fuelRequiredForJump / spaceship.getTotalFuelCapacity());
 
         const cameraPosition = activeControls.getActiveCamera().getWorldMatrix().getTranslation();
         const upDirection = cameraPosition

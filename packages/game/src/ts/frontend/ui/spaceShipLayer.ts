@@ -24,9 +24,10 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { type MissionContext } from "@/frontend/missions/missionContext";
 import { type Player } from "@/frontend/player/player";
+import { type Spaceship } from "@/frontend/spaceship/spaceship";
 
 import { smoothstep } from "@/utils/math";
-import { parseSpeed } from "@/utils/strings/parseToStrings";
+import { parseDistance, parseSpeed } from "@/utils/strings/parseToStrings";
 
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
 
@@ -40,6 +41,8 @@ export class SpaceShipLayer {
     private readonly throttleStripes: HTMLElement;
 
     private readonly speedIndicator: HTMLElement;
+
+    private readonly altimeterIndicator: HTMLElement;
 
     private readonly cursor: HTMLElement;
 
@@ -63,10 +66,19 @@ export class SpaceShipLayer {
         this.throttleStripes.id = "throttleStripes";
         this.throttleContainer.appendChild(this.throttleStripes);
 
+        const bottomHud = document.createElement("div");
+        bottomHud.id = "bottomHud";
+
+        this.altimeterIndicator = document.createElement("div");
+        this.altimeterIndicator.id = "altimeter";
+        bottomHud.appendChild(this.altimeterIndicator);
+
         this.speedIndicator = document.createElement("div");
         this.speedIndicator.id = "speed";
         this.speedIndicator.innerText = "0 km/h";
-        this.root.appendChild(this.speedIndicator);
+        bottomHud.appendChild(this.speedIndicator);
+
+        this.root.appendChild(bottomHud);
 
         this.targetHelper = document.createElement("div");
         this.targetHelper.id = "targetHelper";
@@ -160,20 +172,24 @@ export class SpaceShipLayer {
         this.currentMissionDisplay.update(missionContext, keyboardLayout, universeBackend);
     }
 
-    displaySpeed(shipThrottle: number, speed: number) {
+    displayShipHud(spaceship: Spaceship, nextJumpFuelFraction: number) {
         if (!this.isVisible()) {
             return;
         }
+
+        const shipThrottle = spaceship.getThrottle();
 
         this.throttleContainer.style.alignItems = shipThrottle < 0 ? "flex-start" : "flex-end";
 
         this.throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
         this.throttleStripes.classList.toggle("reversed", shipThrottle < 0);
 
-        this.speedIndicator.textContent = parseSpeed(speed);
-    }
+        this.speedIndicator.textContent = parseSpeed(spaceship.getSpeed());
 
-    displayFuel(fuelRemainingFraction: number, nextJumpFuelFraction: number) {
+        const altitude = spaceship.getAltimeter().getAltitude();
+        this.altimeterIndicator.textContent = altitude !== null ? parseDistance(altitude) : "";
+
+        const fuelRemainingFraction = spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity();
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
         this.fuelIndicator.style.setProperty(
             "--fuelLevelAfterJump",
