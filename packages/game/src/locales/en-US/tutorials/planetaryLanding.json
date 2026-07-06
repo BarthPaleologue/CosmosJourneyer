@@ -1,0 +1,8 @@
+{
+    "title": "Planetary Landing",
+    "description": "Learn how to land on planetary surfaces.",
+    "welcome": "Welcome to the planetary landing tutorial. You will learn how to set your ship down gently so you can start exploring the worlds of Cosmos Journeyer.",
+    "gettingCloseToSurface": "The first step is to get close to the planet surface. From space, you can use the warp drive, then switch back to conventional propulsion for the last few kilometers. Slow down during the final descent to avoid becoming an unstructured cloud of atoms.",
+    "howToLand": "Once you are close to the surface, press {{keyLand}} to start assisted landing. When the maneuver is complete, you can leave the ship with {{keyExit}}.",
+    "howToLiftoff": "To start assisted liftoff, use {{keyLiftoff}}."
+}

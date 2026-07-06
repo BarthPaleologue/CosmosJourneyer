@@ -21,6 +21,7 @@ import i18n from "@/i18n";
 
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
+import { PlanetaryLandingTutorial } from "./tutorials/planetaryLandingTutorial";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
 import { type Tutorial } from "./tutorials/tutorial";
@@ -38,6 +39,7 @@ export class TutorialsPanelContent {
         this.availableTutorials = [
             new FlightTutorial(),
             new StationLandingTutorial(),
+            new PlanetaryLandingTutorial(),
             new StarMapTutorial(),
             new FuelScoopTutorial(),
         ];
