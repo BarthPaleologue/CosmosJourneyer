@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "@babylonjs/core/Rendering/edgesRenderer";
+import "@babylonjs/core/Rendering/outlineRenderer";
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
