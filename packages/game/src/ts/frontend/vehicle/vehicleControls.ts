@@ -23,7 +23,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { EarthG } from "@cosmos-journeyer/physics";
 
-import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
+import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 
 import type { Controls } from "../controls";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
@@ -223,8 +223,8 @@ export class VehicleControls implements Controls {
             const targetRotation = deltaRotation.multiply(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
             );
-            const rotationHalfLife = 0.05;
-            const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * Math.min(horizontalSpeed / 20, 1) ** 2;
+            const rotationHalfLife = 0.1;
+            const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * smoothstep(2, 4, horizontalSpeed);
             this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
                 this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
                 targetRotation,
