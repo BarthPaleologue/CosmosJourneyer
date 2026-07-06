@@ -379,13 +379,16 @@ export class Spaceship implements Transformable, Targetable {
 
     public setMainEngineThrottle(throttle: number) {
         this.mainEngineThrottle = throttle;
+        for (const thruster of this.mainThrusters) {
+            thruster.setThrottle(this.mainEngineThrottle);
+        }
     }
 
     /**
      * Sets both main engine and warp drive throttles to idle (0%)
      */
     public idleThrottle(): void {
-        this.mainEngineThrottle = 0;
+        this.setMainEngineThrottle(0);
 
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive !== null) {
@@ -447,6 +450,8 @@ export class Spaceship implements Transformable, Targetable {
     }
 
     private completeLanding() {
+        this.setMainEngineThrottle(0);
+
         this.state = "landed";
 
         if (this.targetLandingPad !== null) {
@@ -497,14 +502,12 @@ export class Spaceship implements Transformable, Targetable {
 
         this.getTransform().setParent(null);
 
-        this.mainEngineThrottle = 0;
-
         this.state = this.landingComputer === null ? "flying" : "taking_off";
 
         this.updatePhysicsState();
 
         if (this.landingComputer === null) {
-            this.mainEngineThrottle = 0.2;
+            this.setMainEngineThrottle(0.2);
         } else {
             this.landingComputer.liftOff();
         }
@@ -684,7 +687,7 @@ export class Spaceship implements Transformable, Targetable {
             this.burnFuel(fuelToBurn);
         } else {
             this.emergencyStopWarpDrive();
-            this.mainEngineThrottle = 0;
+            this.setMainEngineThrottle(0);
         }
 
         this.updateWarpDrive(deltaSeconds);
@@ -765,10 +768,6 @@ export class Spaceship implements Transformable, Targetable {
             }
         }
 
-        this.mainThrusters.forEach((thruster) => {
-            thruster.update(deltaSeconds);
-        });
-
         if (this.landingComputer !== null) {
             const landingComputerStatus = this.landingComputer.update(deltaSeconds);
             switch (landingComputerStatus) {
@@ -779,7 +778,7 @@ export class Spaceship implements Transformable, Targetable {
                     break;
                 case LandingComputerStatusBit.LIFTOFF_COMPLETE:
                     this.state = "flying";
-                    this.mainEngineThrottle = 0.2;
+                    this.setMainEngineThrottle(0.2);
                     break;
                 case LandingComputerStatusBit.TIMEOUT:
                     if (this.state === "taking_off") {
@@ -800,6 +799,10 @@ export class Spaceship implements Transformable, Targetable {
 
         if (this.isAutoPiloted()) {
             this.setMainEngineThrottle(0);
+        }
+
+        for (const thruster of this.mainThrusters) {
+            thruster.update(deltaSeconds);
         }
     }
 
