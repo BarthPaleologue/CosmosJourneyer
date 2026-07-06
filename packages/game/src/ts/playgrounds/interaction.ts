@@ -106,23 +106,20 @@ export async function createInteractionDemo(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactionSystem = new InteractionSystem(
-        CollisionMask.INTERACTIVE,
-        scene,
-        [characterControls.firstPersonCamera],
-        async (interactions) => {
-            if (interactions.length === 0) {
-                return null;
-            }
+    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
+        if (interactions.length === 0) {
+            return null;
+        }
 
-            scene.activeCamera?.detachControl();
-            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
-                useVirtualCursor: engine.isPointerLock,
-            });
-            scene.activeCamera?.attachControl(true);
-            return choice;
-        },
-    );
+        scene.activeCamera?.detachControl();
+        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
+            useVirtualCursor: engine.isPointerLock,
+        });
+        scene.activeCamera?.attachControl(true);
+        return choice;
+    });
+    interactionSystem.enableForCamera(characterControls.firstPersonCamera, 5);
+    interactionSystem.enableForCamera(characterControls.thirdPersonCamera, 10);
 
     const interactionLayer = new InteractionLayer(interactionSystem, await getGlobalKeyboardLayoutMap());
     document.body.appendChild(interactionLayer.root);

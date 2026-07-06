@@ -292,7 +292,7 @@ export class StarSystemView implements View {
         this.chunkForge = chunkForge;
         this.progressMonitor = progressMonitor;
 
-        this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, [], async (interactions) => {
+        this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
             if (interactions.length === 0) {
                 return null;
             }
@@ -868,7 +868,14 @@ export class StarSystemView implements View {
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
-                this.interactionSystem.setEnabledForCamera(this.characterControls.firstPersonCamera, true);
+                this.interactionSystem.enableForCamera(
+                    this.characterControls.firstPersonCamera,
+                    Settings.CHARACTER_FIRST_PERSON_INTERACTION_RANGE,
+                );
+                this.interactionSystem.enableForCamera(
+                    this.characterControls.thirdPersonCamera,
+                    Settings.CHARACTER_THIRD_PERSON_INTERACTION_RANGE,
+                );
             } else {
                 await alertModal(humanoidInstance.error, this.soundPlayer);
             }
