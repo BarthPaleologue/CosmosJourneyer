@@ -790,6 +790,7 @@ export class StarSystemView implements View {
             this.scene,
             this.assets,
             this.soundPlayer,
+            this.physicsEngine,
         );
         this.player.instancedSpaceships.push(spaceship);
 

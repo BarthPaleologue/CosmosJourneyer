@@ -149,6 +149,7 @@ export class Spaceship implements Transformable, Targetable {
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
+        physicsEngine: PhysicsEngineV2,
     ) {
         const enableWarpDriveSound = await soundPlayer.createInstance("enable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
@@ -191,7 +192,7 @@ export class Spaceship implements Transformable, Targetable {
             thruster: thrusterSound,
         };
 
-        return new Spaceship(serializedSpaceShip, unfitComponents, scene, assets, soundInstances);
+        return new Spaceship(serializedSpaceShip, unfitComponents, scene, assets, soundInstances, physicsEngine);
     }
 
     private constructor(
@@ -200,6 +201,7 @@ export class Spaceship implements Transformable, Targetable {
         scene: Scene,
         assets: RenderingAssets,
         soundInstances: SoundInstances,
+        physicsEngine: PhysicsEngineV2,
     ) {
         this.id = serializedSpaceShip.id;
 
@@ -248,7 +250,7 @@ export class Spaceship implements Transformable, Targetable {
             }
         }
 
-        this.landingComputer = new LandingComputer(this.aggregate, scene.getPhysicsEngine() as PhysicsEngineV2);
+        this.landingComputer = new LandingComputer(this.aggregate, physicsEngine);
 
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
         this.boundingExtent = boundingMax.subtract(boundingMin);
@@ -850,8 +852,20 @@ export class Spaceship implements Transformable, Targetable {
         return this.mainThrusters;
     }
 
-    public static CreateDefault(scene: Scene, assets: RenderingAssets, soundPlayer: ISoundPlayer): Promise<Spaceship> {
-        return Spaceship.Deserialize(getDefaultSerializedSpaceship(), new Set(), scene, assets, soundPlayer);
+    public static CreateDefault(
+        scene: Scene,
+        assets: RenderingAssets,
+        soundPlayer: ISoundPlayer,
+        physicsEngine: PhysicsEngineV2,
+    ): Promise<Spaceship> {
+        return Spaceship.Deserialize(
+            getDefaultSerializedSpaceship(),
+            new Set(),
+            scene,
+            assets,
+            soundPlayer,
+            physicsEngine,
+        );
     }
 
     public static Deserialize(
@@ -860,8 +874,9 @@ export class Spaceship implements Transformable, Targetable {
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
+        physicsEngine: PhysicsEngineV2,
     ): Promise<Spaceship> {
-        return Spaceship.New(serializedSpaceship, unfitComponents, scene, assets, soundPlayer);
+        return Spaceship.New(serializedSpaceship, unfitComponents, scene, assets, soundPlayer, physicsEngine);
     }
 
     public serialize(): SerializedSpaceship {

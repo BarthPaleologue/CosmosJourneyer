@@ -26,6 +26,8 @@ import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import ReleaseInteraction from "@brianchirls/game-input/interactions/ReleaseInteraction";
 
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
+
 import { InputDevices } from "../devices";
 
 export type Interaction = {
@@ -73,7 +75,7 @@ export class InteractionSystem {
         choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>,
     ) {
         this.scene = scene;
-        this.physicsEngine = scene.getPhysicsEngine() as PhysicsEngineV2;
+        this.physicsEngine = getPhysicsEngineV2(scene);
         this.mask = mask;
         this.choiceHandler = choiceHandler;
 

@@ -24,6 +24,8 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { AiSpaceshipControls } from "@/frontend/spaceship/aiSpaceshipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
+
 import { Player } from "./player";
 
 export class AiPlayerControls {
@@ -50,6 +52,7 @@ export class AiPlayerControls {
             scene,
             assets,
             soundPlayer,
+            getPhysicsEngineV2(scene),
         );
 
         return new AiPlayerControls(player, spaceship, scene);
