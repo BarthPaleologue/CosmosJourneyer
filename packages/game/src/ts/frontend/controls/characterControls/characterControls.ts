@@ -46,6 +46,13 @@ export class CharacterControls implements Controls {
     readonly avatar: HumanoidAvatar;
     private readonly headTransform: TransformNode;
 
+    private lastUserCameraChangeTime = 0;
+    private elapsedSeconds = 0;
+    private readonly autoFramingCooldown = 5;
+    private expectedCameraAlpha: number;
+    private expectedCameraBeta: number;
+    private expectedCameraRadius: number;
+
     constructor(avatar: HumanoidAvatar, scene: Scene) {
         this.avatar = avatar;
         this.headTransform = new TransformNode("characterHeadTransform", scene);
@@ -93,6 +100,10 @@ export class CharacterControls implements Controls {
         CharacterInputs.map.sitOnGround.on("complete", () => {
             this.avatar.sitOnGround();
         });
+
+        this.expectedCameraAlpha = this.thirdPersonCamera.alpha;
+        this.expectedCameraBeta = this.thirdPersonCamera.beta;
+        this.expectedCameraRadius = this.thirdPersonCamera.radius;
     }
 
     public setFirstPersonCameraActive() {
@@ -127,6 +138,8 @@ export class CharacterControls implements Controls {
     }
 
     public update(deltaSeconds: number): void {
+        this.elapsedSeconds += deltaSeconds;
+
         const inverseTransform = this.getTransform().getWorldMatrix().clone().invert();
         this.headTransform.computeWorldMatrix(true);
         this.firstPersonCamera.position = Vector3.TransformCoordinates(this.getEyesPosition(), inverseTransform);
@@ -157,6 +170,10 @@ export class CharacterControls implements Controls {
 
         const isMoving = xMove !== 0 || yMove !== 0;
 
+        if (this.activeCamera === this.thirdPersonCamera) {
+            this.detectUserCameraChange();
+        }
+
         // Rotation
         if (this.activeCamera === this.thirdPersonCamera && isMoving) {
             const dtheta = -Math.sign(xMove) * this.characterRotationSpeed * deltaSeconds;
@@ -175,15 +192,37 @@ export class CharacterControls implements Controls {
 
         if (this.activeCamera === this.thirdPersonCamera) {
             this.updateThirdPersonCameraFraming(deltaSeconds);
+            this.expectedCameraAlpha = this.thirdPersonCamera.alpha;
+            this.expectedCameraBeta = this.thirdPersonCamera.beta;
+            this.expectedCameraRadius = this.thirdPersonCamera.radius;
         }
 
         this.getActiveCamera().getViewMatrix(true);
     }
 
     /**
+     * Detects if the user has manually changed the camera (alpha, beta or radius)
+     * since the last frame, and updates the cooldown timer accordingly.
+     */
+    private detectUserCameraChange(): void {
+        const eps = 1e-4;
+        if (
+            Math.abs(this.thirdPersonCamera.alpha - this.expectedCameraAlpha) > eps ||
+            Math.abs(this.thirdPersonCamera.beta - this.expectedCameraBeta) > eps ||
+            Math.abs(this.thirdPersonCamera.radius - this.expectedCameraRadius) > eps
+        ) {
+            this.lastUserCameraChangeTime = this.elapsedSeconds;
+        }
+    }
+
+    /**
      * Adjusts the 3rd person camera framing to obey the rule of thirds.
      */
     private updateThirdPersonCameraFraming(deltaSeconds: number): void {
+        if (this.elapsedSeconds - this.lastUserCameraChangeTime < this.autoFramingCooldown) {
+            return;
+        }
+
         const cameraForward = this.thirdPersonCamera.getForwardRay().direction;
         const characterForward = this.getTransform().forward;
         const characterUp = this.getTransform().up;
