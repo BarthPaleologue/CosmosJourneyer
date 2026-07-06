@@ -54,6 +54,7 @@ import { CollisionMask } from "@/settings";
 
 import { SpaceDots } from "../assets/procedural/spaceDots";
 import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
+import { Altimeter } from "./altimeter";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { type WarpInfluence } from "./components/warpInfluence";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
@@ -86,6 +87,8 @@ export class Spaceship implements Transformable, Targetable {
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
     private landingComputer: LandingComputer | null;
+
+    private readonly altimeter: Altimeter;
 
     private mainEngineThrottle = 0;
     private mainEngineTargetSpeed = 0;
@@ -252,6 +255,8 @@ export class Spaceship implements Transformable, Targetable {
 
         this.landingComputer = new LandingComputer(this.aggregate, physicsEngine);
 
+        this.altimeter = new Altimeter(physicsEngine);
+
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
         this.boundingExtent = boundingMax.subtract(boundingMin);
 
@@ -304,6 +309,10 @@ export class Spaceship implements Transformable, Targetable {
 
     public getTypeName(): string {
         return i18n.t("objectTypes:spaceship");
+    }
+
+    public getAltimeter(): Altimeter {
+        return this.altimeter;
     }
 
     public setNearestOrbitalObject(orbitalObject: OrbitalObject) {
@@ -693,6 +702,13 @@ export class Spaceship implements Transformable, Targetable {
         }
 
         this.updateWarpDrive(deltaSeconds);
+
+        if (this.nearestCelestialBody !== null) {
+            const shipPosition = this.getTransform().getAbsolutePosition();
+            const planetCenter = this.nearestCelestialBody.getTransform().getAbsolutePosition();
+            const gravityDir = planetCenter.subtract(shipPosition).normalize();
+            this.altimeter.update(shipPosition, gravityDir);
+        }
 
         this.handleFuelScoop(deltaSeconds);
 
