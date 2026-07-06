@@ -876,6 +876,9 @@ export class CosmosJourneyer {
             this.player.uuid = Settings.TUTORIAL_SAVE_UUID;
             await this.resume();
             await this.tutorialLayer.setTutorial(tutorial);
+            this.tutorialLayer.onQuitTutorial.addOnce(async () => {
+                await this.promptReturnToMainMenuAfterMenuTutorial();
+            });
             this.starSystemView.setUIEnabled(true);
 
             const activeControls = this.starSystemView.getActiveControls();
@@ -894,6 +897,29 @@ export class CosmosJourneyer {
                 this.starSystemView.scene.useRightHandedSystem,
             );
         });
+    }
+
+    private async promptReturnToMainMenuAfterMenuTutorial(): Promise<void> {
+        if (this.player.uuid !== Settings.TUTORIAL_SAVE_UUID) {
+            return;
+        }
+
+        const shouldReturnToMainMenu = await promptModalBoolean(
+            i18n.t("tutorials:common:returnToMainMenuAfterTutorial"),
+            this.soundPlayer,
+        );
+        if (!shouldReturnToMainMenu) {
+            return;
+        }
+
+        this.loadingProgressMonitor.reset();
+        this.engine.loadingScreen.displayLoadingUI();
+
+        this.player.copyFrom(Player.Default(this.backend.universe), this.backend.universe);
+        await this.starSystemView.resetPlayer();
+        this.starSystemView.setUIEnabled(false);
+        await this.mainMenu.init();
+        this.starSystemView.initStarSystem(Date.now() / 1000);
     }
 
     /**

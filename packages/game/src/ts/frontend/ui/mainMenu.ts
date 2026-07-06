@@ -313,7 +313,7 @@ export class MainMenu {
 
         this.starSystemView.targetCursorLayer.setEnabled(false);
 
-        this.htmlRoot.style.display = "block";
+        this.show();
     }
 
     private async syncContinueButton(): Promise<void> {
@@ -404,8 +404,23 @@ export class MainMenu {
         this.version.style.transform = "translateY(100%)";
     }
 
+    private showVersion() {
+        this.version.style.transform = "";
+    }
+
     private hideMenu() {
         this.menuItems.style.left = "-20%";
+    }
+
+    private showMenu() {
+        this.menuItems.style.left = "";
+    }
+
+    public show() {
+        this.showVersion();
+        this.showMenu();
+        this.htmlRoot.style.display = "block";
+        this.starSystemView.setUIEnabled(false);
     }
 
     public hide() {
