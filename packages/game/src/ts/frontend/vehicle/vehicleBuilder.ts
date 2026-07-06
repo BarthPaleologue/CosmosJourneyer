@@ -48,7 +48,7 @@ export class VehicleBuilder {
     private readonly wheels: Array<{
         model: WheelModel;
         mesh: Mesh;
-        axleMesh: Mesh;
+        axleMesh: TransformNode;
     }> = [];
 
     private readonly fixedParts: Array<{
