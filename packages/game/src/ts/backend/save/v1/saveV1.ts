@@ -118,6 +118,7 @@ export const SaveSchemaV1 = z.object({
         tutorials: CompletedTutorialsSchema.default({
             flightCompleted: false,
             stationLandingCompleted: false,
+            planetaryLandingCompleted: false,
             starMapCompleted: false,
             fuelScoopingCompleted: false,
         }),

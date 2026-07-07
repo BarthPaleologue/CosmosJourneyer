@@ -1,0 +1,98 @@
+{
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "timestamp": 1783351929353,
+    "player": {
+        "uuid": "00000000-0000-0000-0000-000000000000",
+        "name": "Tutorial",
+        "balance": 10000,
+        "creationDate": "2026-07-06T15:32:09.353Z",
+        "timePlayedSeconds": 0,
+        "visitedSystemHistory": [],
+        "discoveries": {
+            "local": [],
+            "uploaded": []
+        },
+        "currentItinerary": null,
+        "systemBookmarks": [],
+        "currentMissions": [],
+        "completedMissions": [],
+        "spaceShips": [
+            {
+                "id": "109e8fd9-7582-44f2-ba31-4019996849a6",
+                "name": "Wanderer",
+                "type": "WANDERER",
+                "components": {
+                    "primary": {
+                        "warpDrive": {
+                            "type": "warpDrive",
+                            "size": 3,
+                            "quality": 1
+                        },
+                        "thrusters": {
+                            "type": "thrusters",
+                            "size": 3,
+                            "quality": 1
+                        },
+                        "fuelTank": {
+                            "type": "fuelTank",
+                            "size": 2,
+                            "quality": 1,
+                            "currentFuel01": 1
+                        }
+                    },
+                    "optional": [
+                        null,
+                        {
+                            "type": "fuelScoop",
+                            "size": 2,
+                            "quality": 1
+                        },
+                        {
+                            "type": "discoveryScanner",
+                            "size": 2,
+                            "quality": 1
+                        }
+                    ]
+                }
+            }
+        ],
+        "spareSpaceshipComponents": [],
+        "tutorials": {
+            "flightCompleted": false,
+            "stationLandingCompleted": false,
+            "starMapCompleted": false,
+            "fuelScoopingCompleted": false
+        }
+    },
+    "playerLocation": {
+        "type": "inSpaceship",
+        "shipId": "109e8fd9-7582-44f2-ba31-4019996849a6"
+    },
+    "shipLocations": {
+        "109e8fd9-7582-44f2-ba31-4019996849a6": {
+            "type": "relative",
+            "universeObjectId": {
+                "idInSystem": "[[]->star0]->telluricPlanet0",
+                "systemCoordinates": {
+                    "starSectorX": 0,
+                    "starSectorY": 0,
+                    "starSectorZ": 0,
+                    "localX": -0.018867114800432294,
+                    "localY": 0.29323458149714143,
+                    "localZ": 0.2991197266611828
+                }
+            },
+            "position": {
+                "x": 197695.90265438988,
+                "y": 3625254.6210351624,
+                "z": -234467.77258031108
+            },
+            "rotation": {
+                "x": -0.6191762039829724,
+                "y": 0.712466346602082,
+                "z": 0.13903002433872833,
+                "w": 0.29947143642077323
+            }
+        }
+    }
+}

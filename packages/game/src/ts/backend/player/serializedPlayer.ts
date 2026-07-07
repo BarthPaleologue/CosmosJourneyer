@@ -9,6 +9,7 @@ import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "@/back
 export const CompletedTutorialsSchema = z.object({
     flightCompleted: z.boolean().default(false),
     stationLandingCompleted: z.boolean().default(false),
+    planetaryLandingCompleted: z.boolean().default(false),
     starMapCompleted: z.boolean().default(false),
     fuelScoopingCompleted: z.boolean().default(false),
 });
@@ -46,6 +47,7 @@ export const SerializedPlayerSchema = z.object({
     tutorials: CompletedTutorialsSchema.default(() => ({
         flightCompleted: false,
         stationLandingCompleted: false,
+        planetaryLandingCompleted: false,
         starMapCompleted: false,
         fuelScoopingCompleted: false,
     })),

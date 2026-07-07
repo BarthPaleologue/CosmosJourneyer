@@ -135,10 +135,12 @@ export class TutorialLayer implements IDisposable {
     public async setTutorial(tutorial: Tutorial) {
         if (this.isEnabled()) this.quitTutorial();
         this.title.innerText = tutorial.getTitle();
-        this.tutorialPanelsHtml = await tutorial.getContentPanelsHtml();
+        this.tutorialPanelsHtml = [];
         this.currentPanelIndex = 0;
-        this.updatePanelState();
+        this.contentContainer.replaceChildren();
         this.setEnabled(true);
+        this.tutorialPanelsHtml = await tutorial.getContentPanelsHtml();
+        this.updatePanelState();
     }
 
     public quitTutorial() {
@@ -153,7 +155,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     public isEnabled() {
-        return this.root.style.display === "block";
+        return !this.panel.classList.contains("hidden");
     }
 
     private updatePanelState() {

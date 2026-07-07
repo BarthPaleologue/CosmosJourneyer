@@ -6,5 +6,6 @@
     "previous": "Previous",
     "tutorialEnding": "<p>This tutorial and others are available at any time from the main menu and the pause menu.</p><p>Press {{keyQuit}} to leave the tutorial.</p>",
     "loadTutorialWillLeaveGame": "Loading this tutorial will leave your current game. An autosave has just been made. Continue loading the tutorial?",
-    "quitConfirm": "You are about to quit the tutorial. Are you sure?"
+    "quitConfirm": "You are about to quit the tutorial. Are you sure?",
+    "returnToMainMenuAfterTutorial": "You are currently in a tutorial save. No progress will be saved. Return to the main menu?"
 }

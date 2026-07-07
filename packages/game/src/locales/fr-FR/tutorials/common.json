@@ -6,5 +6,6 @@
     "previous": "Précédent",
     "tutorialEnding": "<p>Ce tutoriel et d'autres sont disponibles à tout moment depuis le menu principal et le menu de pause.</p><p>Appuyez sur {{keyQuit}} pour quitter le tutoriel.</p>",
     "loadTutorialWillLeaveGame": "Charger ce tutoriel quittera votre partie actuelle. Une sauvegarde automatique vient d'être effectuée. Continuer de charger le tutoriel ?",
-    "quitConfirm": "Vous êtes sur le point de quitter le tutoriel. Êtes-vous sûr ?"
+    "quitConfirm": "Vous êtes sur le point de quitter le tutoriel. Êtes-vous sûr ?",
+    "returnToMainMenuAfterTutorial": "Vous êtes actuellement dans une sauvegarde de tutoriel. Aucune progression ne sera enregistrée. Revenir au menu principal ?"
 }

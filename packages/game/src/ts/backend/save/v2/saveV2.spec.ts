@@ -314,6 +314,7 @@ test("Loading a save file with a corrupted itinerary", () => {
             tutorials: {
                 flightCompleted: true,
                 stationLandingCompleted: false,
+                planetaryLandingCompleted: false,
                 starMapCompleted: true,
                 fuelScoopingCompleted: true,
             },

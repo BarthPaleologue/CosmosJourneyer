@@ -1,0 +1,8 @@
+{
+    "title": "Atterrissage planétaire",
+    "description": "Apprenez à atterrir à la surface d'une planète.",
+    "welcome": "Bienvenue dans le tutoriel d'atterrissage planétaire. Vous allez apprendre à poser votre vaisseau tout en douceur pour pouvoir partir à l'exploration des mondes de Cosmos Journeyer.",
+    "gettingCloseToSurface": "La première étape consiste à se rapprocher de la surface de la planète. Depuis l'espace, vous pouvez utiliser le moteur à distorsion, puis utiliser la propulsion classique pour les derniers kilomètres. Il est conseillé de ralentir dans les dernières phases de descente afin de ne pas être transformé en nuage d'atomes informe.",
+    "howToLand": "Une fois proche de la surface, appuyez sur {{keyLand}} pour déclencher l'atterrissage assisté. Une fois la manoeuvre terminée, vous pourrez sortir du vaisseau avec {{keyExit}}.",
+    "howToLiftoff": "Pour lancer la procédure de décollage assistée, utilisez {{keyLiftoff}}."
+}

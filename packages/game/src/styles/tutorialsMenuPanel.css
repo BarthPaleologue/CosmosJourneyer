@@ -2,21 +2,17 @@
     overflow-x: hidden;
 
     .tutorialsMenuContainer {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 0 20px 20px 20px;
-        align-items: stretch;
-        column-gap: 20px;
-        row-gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--tile-width), 1fr));
+        padding: 12px 24px 24px;
+        gap: 20px;
 
         --tile-width: 300px;
 
         & > * {
-            width: var(--tile-width);
             background: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) inset;
-
+            box-sizing: border-box;
             transition: 0.2s;
 
             &:hover {
@@ -44,18 +40,28 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            row-gap: 10px;
-            padding: 10px;
+            row-gap: 16px;
+            min-height: 450px;
+            padding: 28px 0;
 
             h2 {
                 color: white;
                 font-family: Nasalization, sans-serif;
-                font-size: 3em;
-                margin-block: 0.6em;
+                font-size: 2.5em;
+                line-height: 1.2em;
+                margin-block: 0;
+                min-height: 2.4em;
+                width: calc(100% - 56px);
+                text-align: center;
+                overflow-wrap: normal;
+                text-wrap: balance;
+                word-break: normal;
             }
 
             img {
-                width: 100%;
+                width: calc(100% - 32px);
+                aspect-ratio: 16 / 9;
+                object-fit: cover;
             }
 
             p {
@@ -63,7 +69,8 @@
                 font-family: Nasalization, sans-serif;
                 line-height: 1.5em;
                 font-size: 1.25em;
-                padding: 0 20px;
+                margin-block: 0;
+                width: calc(100% - 32px);
             }
         }
     }

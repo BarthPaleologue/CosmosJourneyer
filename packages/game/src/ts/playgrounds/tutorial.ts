@@ -24,6 +24,7 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 import { FlightTutorial } from "@/frontend/ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "@/frontend/ui/tutorial/tutorials/fuelScoopTutorial";
+import { PlanetaryLandingTutorial } from "@/frontend/ui/tutorial/tutorials/planetaryLandingTutorial";
 import { StarMapTutorial } from "@/frontend/ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "@/frontend/ui/tutorial/tutorials/stationLandingTutorial";
 
@@ -62,6 +63,9 @@ export async function createTutorialScene(
             break;
         case "stationLanding":
             await tutorialLayer.setTutorial(new StationLandingTutorial());
+            break;
+        case "planetaryLanding":
+            await tutorialLayer.setTutorial(new PlanetaryLandingTutorial());
             break;
         case "starMap":
             await tutorialLayer.setTutorial(new StarMapTutorial());
