@@ -65,12 +65,11 @@ export class InteractionSystem {
 
     private isMakingChoiceFlag = false;
 
-    private readonly cameras: Set<Camera>;
+    private readonly cameraInteractionRanges: Map<Camera, number>;
 
     constructor(
         mask: number,
         scene: Scene,
-        cameras: ReadonlyArray<Camera>,
         choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>,
     ) {
         this.scene = scene;
@@ -78,7 +77,7 @@ export class InteractionSystem {
         this.mask = mask;
         this.choiceHandler = choiceHandler;
 
-        this.cameras = new Set(cameras);
+        this.cameraInteractionRanges = new Map();
 
         const interactAction = new Action({
             bindings: [InputDevices.KEYBOARD.getControl("KeyE")],
@@ -104,15 +103,11 @@ export class InteractionSystem {
     }
 
     public isEnabledForCamera(camera: Camera): boolean {
-        return this.cameras.has(camera);
+        return this.cameraInteractionRanges.has(camera);
     }
 
-    public setEnabledForCamera(camera: Camera, enabled: boolean): void {
-        if (enabled) {
-            this.cameras.add(camera);
-        } else {
-            this.cameras.delete(camera);
-        }
+    public enableForCamera(camera: Camera, interactionRange: number): void {
+        this.cameraInteractionRanges.set(camera, interactionRange);
     }
 
     private async performFirstAction() {
@@ -213,14 +208,14 @@ export class InteractionSystem {
             return;
         }
 
-        if (!this.isEnabledForCamera(activeCamera)) {
+        const rayLength = this.cameraInteractionRanges.get(activeCamera);
+        if (rayLength === undefined) {
             this.currentTarget = null;
             return;
         }
 
         this.updateLongPressTimer(deltaSeconds);
 
-        const rayLength = 5;
         const cameraRay = activeCamera.getForwardRay(
             rayLength,
             activeCamera.getWorldMatrix(),
