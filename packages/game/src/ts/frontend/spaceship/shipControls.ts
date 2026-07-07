@@ -39,6 +39,7 @@ import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/man
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import i18n from "@/i18n";
 
@@ -534,7 +535,7 @@ export class ShipControls implements Controls {
         notificationManager: INotificationManager,
     ) {
         return new ShipControls(
-            await Spaceship.CreateDefault(scene, assets, soundPlayer),
+            await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene)),
             scene,
             soundPlayer,
             tts,

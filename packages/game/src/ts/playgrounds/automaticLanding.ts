@@ -38,6 +38,8 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
+
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
@@ -57,7 +59,7 @@ export async function createAutomaticLandingScene(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
+    const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene));
 
     const initShipTransform = () => {
         ship.getTransform().position.copyFromFloats(

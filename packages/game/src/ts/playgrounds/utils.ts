@@ -36,6 +36,8 @@ import * as QRCode from "qrcode";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
+
 export async function enablePhysics(
     scene: Scene,
     gravity = Vector3.Zero(),
@@ -44,7 +46,7 @@ export async function enablePhysics(
     const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));
     havokPlugin.setVelocityLimits(10_000, 10_000);
     scene.enablePhysics(gravity, havokPlugin);
-    return scene.getPhysicsEngine() as PhysicsEngineV2;
+    return getPhysicsEngineV2(scene);
 }
 
 export function enablePointerLock(engine: AbstractEngine) {

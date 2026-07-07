@@ -105,13 +105,31 @@
         }
     }
 
-    #speed {
+    #bottomHud {
         position: absolute;
         bottom: 5px;
         right: 5px;
+        display: flex;
+        gap: 0;
+        align-items: baseline;
+    }
+
+    #altimeter {
         color: white;
         font-family: Nasalization, sans-serif;
         font-size: 2em;
+        width: 170px;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    #speed {
+        color: white;
+        font-family: Nasalization, sans-serif;
+        font-size: 2em;
+        width: 220px;
+        text-align: right;
+        white-space: nowrap;
     }
 
     #fuelIndicator {

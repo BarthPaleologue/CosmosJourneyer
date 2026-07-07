@@ -32,6 +32,8 @@ import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
+
 import { initI18n } from "@/i18n";
 
 import { enablePhysics } from "./utils";
@@ -68,6 +70,7 @@ export async function createSpaceStationUIScene(
         scene,
         assets,
         soundPlayer,
+        getPhysicsEngineV2(scene),
     );
     player.instancedSpaceships.push(spaceship);
 

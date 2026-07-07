@@ -56,6 +56,7 @@ import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { CollisionMask } from "@/settings";
 
@@ -151,7 +152,7 @@ export async function createOnFootScene(
     CharacterInputs.setEnabled(true);
 
     const soundPlayer = new SoundPlayerMock();
-    const spaceship = await Spaceship.CreateDefault(scene, assets, soundPlayer);
+    const spaceship = await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene));
     spaceship.getTransform().position.copyFromFloats(16, 5, 16);
 
     const tts = new TtsMock();
