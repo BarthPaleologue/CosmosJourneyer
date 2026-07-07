@@ -1,24 +1,14 @@
 {
     "uuid": "00000000-0000-0000-0000-000000000000",
-    "timestamp": 1783351929353,
+    "timestamp": 1783446940245,
     "player": {
         "uuid": "00000000-0000-0000-0000-000000000000",
         "name": "Tutorial",
-        "balance": 10000,
-        "creationDate": "2026-07-06T15:32:09.353Z",
-        "timePlayedSeconds": 0,
-        "visitedSystemHistory": [],
-        "discoveries": {
-            "local": [],
-            "uploaded": []
-        },
         "currentItinerary": null,
-        "systemBookmarks": [],
         "currentMissions": [],
-        "completedMissions": [],
         "spaceShips": [
             {
-                "id": "109e8fd9-7582-44f2-ba31-4019996849a6",
+                "id": "00000000-0000-0000-0000-000000000000",
                 "name": "Wanderer",
                 "type": "WANDERER",
                 "components": {
@@ -55,43 +45,36 @@
                     ]
                 }
             }
-        ],
-        "spareSpaceshipComponents": [],
-        "tutorials": {
-            "flightCompleted": false,
-            "stationLandingCompleted": false,
-            "starMapCompleted": false,
-            "fuelScoopingCompleted": false
-        }
+        ]
     },
     "playerLocation": {
         "type": "inSpaceship",
-        "shipId": "109e8fd9-7582-44f2-ba31-4019996849a6"
+        "shipId": "00000000-0000-0000-0000-000000000000"
     },
     "shipLocations": {
-        "109e8fd9-7582-44f2-ba31-4019996849a6": {
+        "00000000-0000-0000-0000-000000000000": {
             "type": "relative",
             "universeObjectId": {
-                "idInSystem": "[[]->star0]->telluricPlanet0",
+                "idInSystem": "[[]->star0]->telluricPlanet1",
                 "systemCoordinates": {
-                    "starSectorX": 0,
-                    "starSectorY": 0,
-                    "starSectorZ": 0,
-                    "localX": -0.018867114800432294,
-                    "localY": 0.29323458149714143,
-                    "localZ": 0.2991197266611828
+                    "starSectorX": -1,
+                    "starSectorY": 1,
+                    "starSectorZ": -2,
+                    "localX": 0.16410029989858177,
+                    "localY": 0.4016626718927466,
+                    "localZ": -0.020077824369109154
                 }
             },
             "position": {
-                "x": 197695.90265438988,
-                "y": 3625254.6210351624,
-                "z": -234467.77258031108
+                "x": 1076027.3165076403,
+                "y": 2660456.8963590944,
+                "z": -669299.9936766336
             },
             "rotation": {
-                "x": -0.6191762039829724,
-                "y": 0.712466346602082,
-                "z": 0.13903002433872833,
-                "w": 0.29947143642077323
+                "x": -0.5164831632803065,
+                "y": 0.32731531475547393,
+                "z": 0.5705640596208275,
+                "w": -0.5482394366984089
             }
         }
     }

@@ -133,7 +133,7 @@ export class TutorialLayer implements IDisposable {
     }
 
     public async setTutorial(tutorial: Tutorial) {
-        if (this.isEnabled()) this.quitTutorial();
+        if (this.isEnabled()) this.setEnabled(false);
         this.title.innerText = tutorial.getTitle();
         this.tutorialPanelsHtml = [];
         this.currentPanelIndex = 0;
