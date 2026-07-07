@@ -250,6 +250,7 @@ export class VehicleControls implements Controls {
 
         const steeringSpeed = VehicleInputs.map.steer.value * 1.8;
         vehicle.turn(steeringSpeed, deltaSeconds);
+        vehicle.setBoostEnabled(VehicleInputs.map.boost.value > 0);
 
         if (VehicleInputs.map.brake.value > 0) {
             vehicle.brake();

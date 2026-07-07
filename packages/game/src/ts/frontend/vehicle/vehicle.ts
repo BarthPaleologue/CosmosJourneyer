@@ -54,10 +54,18 @@ export class Vehicle implements Targetable {
     private targetSpeed = 0;
     private targetSteeringAngle = 0;
 
-    readonly maxForwardSpeed = kmhToMetersPerSecond(40);
-    readonly maxReverseSpeed = kmhToMetersPerSecond(20);
-    readonly maxSteeringAngleLowSpeed = degreesToRadians(45);
-    readonly maxSteeringAngleHighSpeed = degreesToRadians(7);
+    readonly maxSpeed = {
+        forward: kmhToMetersPerSecond(40),
+        forwardBoost: kmhToMetersPerSecond(80),
+        reverse: kmhToMetersPerSecond(20),
+    } as const;
+
+    readonly maxSteeringAngle = {
+        lowSpeed: degreesToRadians(45),
+        highSpeed: degreesToRadians(7),
+    } as const;
+
+    private boostEnabled = false;
 
     readonly allMeshes: ReadonlyArray<AbstractMesh>;
 
@@ -101,9 +109,9 @@ export class Vehicle implements Targetable {
     setTargetSteeringAngle(angle: number) {
         const linearVelocity = this.frame.body.getLinearVelocity().length();
         const maxSteeringAngle = lerp(
-            this.maxSteeringAngleHighSpeed,
-            this.maxSteeringAngleLowSpeed,
-            2 ** (-linearVelocity / kmhToMetersPerSecond(20)),
+            this.maxSteeringAngle.highSpeed,
+            this.maxSteeringAngle.lowSpeed,
+            2 ** (-linearVelocity / kmhToMetersPerSecond(10)),
         );
         this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
         for (const wheel of this.wheels) {
@@ -124,8 +132,9 @@ export class Vehicle implements Targetable {
     }
 
     setTargetSpeed(speed: number) {
-        this.targetSpeed = clamp(speed, -this.maxReverseSpeed, this.maxForwardSpeed);
-        const motorTorque = 5_000;
+        const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
+        this.targetSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
+        const motorTorque = this.boostEnabled ? 15_000 : 5_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
@@ -160,6 +169,10 @@ export class Vehicle implements Targetable {
     turn(steeringSpeed: number, deltaSeconds: number) {
         this.setTargetSteeringAngle(this.targetSteeringAngle + steeringSpeed * deltaSeconds);
         this.targetSteeringAngle = lerpSmooth(this.targetSteeringAngle, 0, 0.225, deltaSeconds);
+    }
+
+    setBoostEnabled(enabled: boolean) {
+        this.boostEnabled = enabled;
     }
 
     getTransform(): TransformNode {
