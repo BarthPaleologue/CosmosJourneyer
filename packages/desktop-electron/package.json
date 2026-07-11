@@ -46,6 +46,7 @@
     "build": {
         "appId": "com.cosmosjourneyer",
         "productName": "Cosmos Journeyer",
+        "executableName": "cosmos-journeyer",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
         "directories": {
             "output": "release"
@@ -73,10 +74,12 @@
         "linux": {
             "category": "Game",
             "icon": "assets/icons",
+            "syncDesktopName": true,
             "target": [
                 "AppImage",
                 "deb"
             ]
         }
-    }
+    },
+    "desktopName": "cosmos-journeyer.desktop"
 }
