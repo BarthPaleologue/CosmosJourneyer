@@ -5,20 +5,38 @@ on:
         branches: [main]
     workflow_dispatch:
 
+permissions:
+    contents: read
+    pull-requests: read
+
 concurrency:
     group: ci-${{ github.head_ref || github.ref_name || github.run_id }}
     cancel-in-progress: true
 
 jobs:
-    ci:
-        name: ci
+    checks:
+        name: Checks
         runs-on: ubuntu-latest
         timeout-minutes: 40
+        outputs:
+            desktop-packaging-changed: ${{ steps.desktop-packaging-changes.outputs.desktop-packaging }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v6
               with:
                   lfs: false
+
+            - name: Detect desktop packaging changes
+              id: desktop-packaging-changes
+              uses: dorny/paths-filter@v3
+              with:
+                  filters: |
+                      desktop-packaging:
+                          - ".github/workflows/ci.yml"
+                          - "package.json"
+                          - "pnpm-lock.yaml"
+                          - "pnpm-workspace.yaml"
+                          - "packages/desktop-electron/**"
 
             - name: Compute Git LFS cache key
               id: git-lfs-cache-key
@@ -94,3 +112,74 @@ jobs:
                   path: |
                       packages/game/artifacts
                       packages/game/playwright-report
+
+    package-desktop:
+        name: Package desktop (${{ matrix.os }})
+        if: github.event_name == 'workflow_dispatch' || needs.checks.outputs.desktop-packaging-changed == 'true'
+        needs: checks
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 30
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - macos-latest
+                    - ubuntu-latest
+                    - windows-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Setup Rust toolchain
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: wasm32-unknown-unknown
+
+            - name: Setup wasm-pack
+              uses: taiki-e/install-action@v2
+              with:
+                  tool: wasm-pack
+
+            - name: Install Electron runtime
+              shell: bash
+              run: node "$(echo node_modules/.pnpm/electron@*/node_modules/electron/install.js)"
+
+            - name: Package desktop application
+              run: pnpm package:desktop
+
+    ci:
+        name: ci
+        if: always()
+        needs:
+            - checks
+            - package-desktop
+        runs-on: ubuntu-latest
+        steps:
+            - name: Verify required jobs
+              env:
+                  CHECKS_RESULT: ${{ needs.checks.result }}
+                  PACKAGE_DESKTOP_RESULT: ${{ needs.package-desktop.result }}
+              run: |
+                  if [[ "$CHECKS_RESULT" != "success" ]]; then
+                      echo "Checks job did not succeed: $CHECKS_RESULT" >&2
+                      exit 1
+                  fi
+
+                  if [[ "$PACKAGE_DESKTOP_RESULT" != "success" && "$PACKAGE_DESKTOP_RESULT" != "skipped" ]]; then
+                      echo "Desktop packaging job did not succeed: $PACKAGE_DESKTOP_RESULT" >&2
+                      exit 1
+                  fi

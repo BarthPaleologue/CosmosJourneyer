@@ -121,11 +121,6 @@ jobs:
               shell: bash
               run: node "$(echo node_modules/.pnpm/electron@*/node_modules/electron/install.js)"
 
-            - name: Prepare electron-winstaller
-              if: runner.os == 'Windows'
-              shell: bash
-              run: node "$(echo node_modules/.pnpm/electron-winstaller@*/node_modules/electron-winstaller/script/select-7z-arch.js)"
-
             - name: Build desktop packages
               run: pnpm --filter @cosmos-journeyer/desktop-electron package
 
