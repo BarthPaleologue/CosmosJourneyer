@@ -62,7 +62,8 @@
             "category": "public.app-category.games",
             "icon": "assets/icons/icon.icns",
             "target": [
-                "dmg"
+                "dmg",
+                "zip"
             ]
         },
         "win": {
