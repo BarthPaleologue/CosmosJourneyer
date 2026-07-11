@@ -1,0 +1,225 @@
+name: Deploy Game Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Release version, e.g. 1.11.0"
+                required: true
+                type: string
+            dry_run:
+                description: "Run deployment rsync commands without changing the VPS"
+                required: true
+                type: boolean
+                default: true
+
+concurrency:
+    group: production-game-release
+    cancel-in-progress: false
+
+jobs:
+    build-game:
+        name: Build game artifact
+        if: github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Setup Rust toolchain
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: wasm32-unknown-unknown
+
+            - name: Setup wasm-pack
+              uses: taiki-e/install-action@v2
+              with:
+                  tool: wasm-pack
+
+            - name: Validate release version
+              env:
+                  INPUT_VERSION: ${{ inputs.version }}
+              run: |
+                  if [[ ! "$INPUT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+                      echo "Invalid release version: $INPUT_VERSION" >&2
+                      exit 1
+                  fi
+                  GAME_VERSION=$(node -p "require('./packages/game/package.json').version")
+                  ELECTRON_VERSION=$(node -p "require('./packages/desktop-electron/package.json').version")
+                  if [ "$GAME_VERSION" != "$INPUT_VERSION" ]; then
+                      echo "Game package.json version ($GAME_VERSION) does not match release version ($INPUT_VERSION)" >&2
+                      exit 1
+                  fi
+                  if [ "$ELECTRON_VERSION" != "$INPUT_VERSION" ]; then
+                      echo "Electron package.json version ($ELECTRON_VERSION) does not match release version ($INPUT_VERSION)" >&2
+                      exit 1
+                  fi
+                  echo "Version validation passed: $INPUT_VERSION"
+
+            - name: Build game artifact
+              run: pnpm --filter @cosmos-journeyer/game... build
+
+            - name: Upload game artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: game-dist
+                  path: packages/game/dist
+
+    build-electron:
+        name: Build Electron (${{ matrix.os }})
+        if: github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+        timeout-minutes: 30
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - os: macos-latest
+                    - os: ubuntu-latest
+                    - os: windows-latest
+
+        runs-on: ${{ matrix.os }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Install Electron runtime
+              shell: bash
+              run: node "$(echo node_modules/.pnpm/electron@*/node_modules/electron/install.js)"
+
+            - name: Prepare electron-winstaller
+              if: runner.os == 'Windows'
+              shell: bash
+              run: node "$(echo node_modules/.pnpm/electron-winstaller@*/node_modules/electron-winstaller/script/select-7z-arch.js)"
+
+            - name: Build desktop packages
+              run: pnpm --filter @cosmos-journeyer/desktop-electron package
+
+            - name: Upload desktop artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: electron-${{ matrix.os }}
+                  path: packages/desktop-electron/release/*
+
+    deploy-game:
+        name: Deploy game to VPS
+        if: github.ref == 'refs/heads/main'
+        needs:
+            - build-game
+            - build-electron
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        environment:
+            name: production
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: false
+
+            - name: Download game artifact
+              uses: actions/download-artifact@v7
+              with:
+                  name: game-dist
+                  path: packages/game/dist
+
+            - name: Configure known hosts
+              env:
+                  VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "$VPS_SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+
+            - name: Configure SSH agent
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+            - name: Deploy game artifact to VPS
+              env:
+                  DEPLOY_DRY_RUN: ${{ inputs.dry_run }}
+                  GITHUB_SHA: ${{ github.sha }}
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  VPS_GAME_PATH: ${{ secrets.VPS_GAME_PATH }}
+              run: bash ./scripts/deploy-game-vps.sh
+
+            - name: Smoke test
+              if: ${{ !inputs.dry_run }}
+              env:
+                  SMOKE_TEST_BASE_URL: ${{ secrets.SMOKE_TEST_BASE_URL || 'https://cosmosjourneyer.com' }}
+              run: |
+                  sleep 5
+                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/" || { echo "Smoke test failed: GET /" >&2; exit 1; }
+                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/play/" || { echo "Smoke test failed: GET /play/" >&2; exit 1; }
+                  echo "Smoke tests passed."
+
+    publish-electron:
+        name: Create draft GitHub release
+        if: ${{ !inputs.dry_run }}
+        needs:
+            - build-electron
+            - deploy-game
+        permissions:
+            contents: write
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download desktop artifacts
+              uses: actions/download-artifact@v7
+              with:
+                  pattern: electron-*
+                  merge-multiple: true
+                  path: release-assets
+
+            - name: Create draft release
+              uses: softprops/action-gh-release@v2
+              with:
+                  draft: true
+                  tag_name: v${{ inputs.version }}
+                  target_commitish: ${{ github.sha }}
+                  name: Cosmos Journeyer v${{ inputs.version }}
+                  body: |
+                      The new version of Cosmos Journeyer is online at https://cosmosjourneyer.com/
+                      This draft release contains Electron desktop builds.
+
+                      **Deployed commit:** ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+                  files: release-assets/*
+                  fail_on_unmatched_files: true

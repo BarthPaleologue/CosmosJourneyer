@@ -204,6 +204,6 @@ export const SiteConfig = {
     description:
         "Cosmos Journeyer is a free and open-source space exploration game that lets you discover the wonders of the universe.",
     url: "https://cosmosjourneyer.com",
-    gameUrl: "https://barthpaleologue.github.io/CosmosJourneyer/",
+    gameUrl: "https://cosmosjourneyer.com/play/",
     email: "barth.paleologue@cosmosjourneyer.com",
 } as const;

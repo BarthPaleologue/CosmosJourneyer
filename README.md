@@ -10,8 +10,9 @@
 
 - [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)
 - [How to play](#how-to-play)
-    - [Online](#online)
-    - [Locally](#locally)
+    - [Official website](#official-website)
+    - [Desktop application](#desktop-application)
+    - [Self-hosting](#self-hosting)
 - [Community and support](#community-and-support)
 - [My vision for the project](#my-vision-for-the-project)
 - [Why Cosmos Journeyer?](#why-cosmos-journeyer)
@@ -41,15 +42,17 @@ From stellar black holes and fully explorable planets down to single grass blade
 
 ## How to play
 
-### Online
+### Official website
 
-You can play freely from the main website of the project at [cosmosjourneyer.com](https://cosmosjourneyer.com/)
+You can play freely from the official website of the project at [cosmosjourneyer.com](https://cosmosjourneyer.com/)
 
-### Locally
+### Desktop application
 
-You can also play locally! You can get an installer for your system by going to [the latest release](https://github.com/BarthPaleologue/CosmosJourneyer/releases).
+You can also play locally! Get an installer for your system by going to [the latest release](https://github.com/BarthPaleologue/CosmosJourneyer/releases).
 
-If you want the cutting edge version, follow these steps:
+### Self-hosting
+
+You can serve the game using your own local server as well:
 
 1. Install prerequisites:
 
@@ -59,11 +62,9 @@ If you want the cutting edge version, follow these steps:
 
 2. Clone the repo with `git clone https://github.com/BarthPaleologue/CosmosJourneyer.git`
 3. Install the dependencies with `pnpm install`
-4. Build the project with `pnpm build`
-5. Serve the project with `pnpm serve:prod`
-6. Play at http://localhost:8080
-
-To update your local version, either download the latest installer or run `git pull` in your local install.
+4. Build the game with `pnpm build:game`
+5. Serve the game with `pnpm --filter game serve:prod`
+6. Play at http://localhost:8080/
 
 ### Gameplay
 
@@ -227,12 +228,10 @@ Cosmos Journeyer uses [ESLint](https://eslint.org/) for linting. You can lint th
 
 ### Documentation
 
-The documentation is online at https://barthpaleologue.github.io/CosmosJourneyer/doc/
-
-Additionally, the [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
+The [ARCHITECTURE.md](./ARCHITECTURE.md) file contains a big picture explanation of the architecture of
 the project.
 
-To build it locally, run `pnpm doc` (outputs to `packages/game/doc`) and then `pnpm serve:doc` to serve it at `localhost:8081`.
+To build the documentation locally, run `pnpm doc` (outputs to each package's `doc` folder).
 
 ## License
 
