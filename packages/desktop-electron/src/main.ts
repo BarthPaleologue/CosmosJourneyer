@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import type * as ElectronModule from "electron";
 
+import { startAutoUpdatePolling } from "./autoUpdate.js";
 import { createDevWatcher, type DevWatcher } from "./devWatcher.js";
 import { appHost, appScheme, createHandleAppProtocol } from "./protocol.js";
 
@@ -17,6 +18,7 @@ const packagedRendererDir = join(currentDir, "renderer");
 const developmentRendererDir = resolve(currentDir, "..", "..", "game", "dist");
 const rendererDir = isDevelopment ? developmentRendererDir : packagedRendererDir;
 
+let stopAutoUpdatePolling: (() => void) | null = null;
 let devWatcher: DevWatcher | null = null;
 
 protocol.registerSchemesAsPrivileged([
@@ -50,10 +52,13 @@ function createMainWindow(): ElectronModule.BrowserWindow {
     return window;
 }
 
-void app.whenReady().then(() => {
+void app.whenReady().then(async () => {
     devWatcher = createDevWatcher(rendererDir);
     protocol.handle(appScheme, createHandleAppProtocol(rendererDir));
     createMainWindow();
+    if (app.isPackaged) {
+        stopAutoUpdatePolling = await startAutoUpdatePolling();
+    }
 
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
@@ -63,6 +68,8 @@ void app.whenReady().then(() => {
 });
 
 app.on("before-quit", () => {
+    stopAutoUpdatePolling?.();
+    stopAutoUpdatePolling = null;
     devWatcher?.close();
     devWatcher = null;
 });
