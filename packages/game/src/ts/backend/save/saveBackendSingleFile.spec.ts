@@ -408,4 +408,30 @@ describe("SaveManager", () => {
             }
         });
     });
+
+    describe("importSaves", () => {
+        it("should preserve all saves imported for a new cmdr", async () => {
+            const universeBackend = new UniverseBackend(getLoneStarSystem());
+            const backend = new MockSaveBackend();
+            const backupBackend = new MockSaveBackend();
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+
+            expect(result.success).toBe(true);
+            if (result.success) {
+                const manualSaves = [createTestSave(1), createTestSave(2)];
+                const autoSaves = [createTestSave(3), createTestSave(4)];
+
+                const success = await result.value.importSaves({
+                    [cmdrUuid1]: { manual: manualSaves, auto: autoSaves },
+                });
+
+                expect(success).toBe(true);
+                const importedSaves = await result.value.getSavesForCmdr(cmdrUuid1);
+                expect(importedSaves?.manual).toHaveLength(manualSaves.length);
+                expect(importedSaves?.auto).toHaveLength(autoSaves.length);
+                expect(importedSaves?.manual).toEqual(expect.arrayContaining(manualSaves));
+                expect(importedSaves?.auto).toEqual(expect.arrayContaining(autoSaves));
+            }
+        });
+    });
 });

@@ -49,10 +49,6 @@ export async function createSaveLoadingPanelContentScene(
     const soundPlayer = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();
 
-    const saveLoadingPanelContent = new SaveLoadingPanelContent(universeBackend, soundPlayer, notificationManager);
-    saveLoadingPanelContent.htmlRoot.style.position = "absolute";
-    document.body.appendChild(saveLoadingPanelContent.htmlRoot);
-
     const saveManager = await SaveBackendSingleFile.CreateAsync(
         new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
         new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
@@ -62,6 +58,15 @@ export async function createSaveLoadingPanelContentScene(
         await alertModal("Could not load saves", soundPlayer);
         return scene;
     }
+
+    const saveLoadingPanelContent = new SaveLoadingPanelContent(
+        universeBackend,
+        saveManager.value,
+        soundPlayer,
+        notificationManager,
+    );
+    saveLoadingPanelContent.htmlRoot.style.position = "absolute";
+    document.body.appendChild(saveLoadingPanelContent.htmlRoot);
 
     await saveLoadingPanelContent.populateCmdrList(universeBackend, saveManager.value);
 

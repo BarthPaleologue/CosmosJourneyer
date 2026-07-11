@@ -8,6 +8,22 @@
     row-gap: 10px;
 }
 
+.saveMigrationNotice {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 12px 16px;
+    color: white;
+    background: var(--accent-color);
+    border-left: 4px solid var(--accent-color-light);
+    font-family: var(--main-font);
+    line-height: 1.5;
+
+    a {
+        color: white;
+        font-weight: bold;
+    }
+}
+
 .cmdrList {
     display: flex;
     flex-direction: column;

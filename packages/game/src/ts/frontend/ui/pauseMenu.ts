@@ -21,6 +21,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
+import { createOfficialOriginNotice } from "./officialOriginNotice";
 import { type SidePanels } from "./sidePanels";
 
 export class PauseMenu {
@@ -52,6 +53,11 @@ export class PauseMenu {
         this.rootNode = document.createElement("ul");
         this.rootNode.id = "pauseMenu";
         this.rootNode.classList.add("leftSideMenu");
+
+        const officialOriginNotice = createOfficialOriginNotice();
+        if (officialOriginNotice !== null) {
+            this.mask.appendChild(officialOriginNotice);
+        }
 
         const createButton = (id: string, i18nKey: string): HTMLElement => {
             const button = document.createElement("li");

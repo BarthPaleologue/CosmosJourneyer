@@ -40,7 +40,7 @@ export class SidePanels {
         this.saveBackend = saveManager;
 
         // Create panel instances
-        this.loadSavePanel = new LoadSavePanel(universeBackend, soundPlayer, notificationManager);
+        this.loadSavePanel = new LoadSavePanel(universeBackend, saveManager, soundPlayer, notificationManager);
         this.attachCloseButton(this.loadSavePanel.htmlRoot);
         document.body.appendChild(this.loadSavePanel.htmlRoot);
 

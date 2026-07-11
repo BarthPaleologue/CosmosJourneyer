@@ -1,6 +1,11 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
+import {
+    createCommanderArchive,
+    createCommanderArchiveFileName,
+    parseCommanderArchive,
+} from "@/backend/save/commanderArchive";
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
@@ -30,9 +35,12 @@ export class SaveLoadingPanelContent {
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
+    private readonly saveBackend: ISaveBackend;
+    private readonly universeBackend: UniverseBackend;
 
     constructor(
         universeBackend: UniverseBackend,
+        saveBackend: ISaveBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -41,6 +49,13 @@ export class SaveLoadingPanelContent {
 
         this.soundPlayer = soundPlayer;
         this.notificationManager = notificationManager;
+        this.saveBackend = saveBackend;
+        this.universeBackend = universeBackend;
+
+        const migrationNotice = document.createElement("p");
+        migrationNotice.classList.add("saveMigrationNotice");
+        migrationNotice.innerHTML = i18n.t("sidePanel:saveMigrationNotice");
+        this.htmlRoot.appendChild(migrationNotice);
 
         const dropFileZone = document.createElement("div");
         dropFileZone.id = "dropFileZone";
@@ -86,14 +101,14 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            await this.loadSaveFile(file, universeBackend);
+            await this.handleSelectedFile(file);
         });
 
         dropFileZone.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
             const fileInput = document.createElement("input");
             fileInput.type = "file";
-            fileInput.accept = "application/json";
+            fileInput.accept = "application/json,.json,application/zip,.zip";
             fileInput.onchange = async () => {
                 const file = fileInput.files?.[0];
                 if (file === undefined) {
@@ -101,7 +116,7 @@ export class SaveLoadingPanelContent {
                     return;
                 }
 
-                await this.loadSaveFile(file, universeBackend);
+                await this.handleSelectedFile(file);
             };
             fileInput.click();
         });
@@ -198,6 +213,7 @@ export class SaveLoadingPanelContent {
 
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
+            continueButton.title = i18n.t("sidePanel:continueCommander");
             continueButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 this.onLoadSaveObservable.notifyObservers(latestSave);
@@ -210,6 +226,7 @@ export class SaveLoadingPanelContent {
 
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
+            shareButton.title = i18n.t("sidePanel:shareCommander");
             shareButton.addEventListener("click", async () => {
                 this.soundPlayer.playNow("click");
                 const url = createUrlFromSave(latestSave);
@@ -232,6 +249,23 @@ export class SaveLoadingPanelContent {
             shareIcon.src = shareIconPath;
             shareButton.appendChild(shareIcon);
 
+            const downloadButton = document.createElement("button");
+            downloadButton.classList.add("icon", "large");
+            downloadButton.title = i18n.t("sidePanel:downloadCommanderArchive");
+            downloadButton.addEventListener("click", () => {
+                this.soundPlayer.playNow("click");
+                const archive = createCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
+                this.downloadBlob(
+                    new Blob([new Uint8Array(archive)], { type: "application/zip" }),
+                    createCommanderArchiveFileName(cmdrUuid, latestSave.player.name),
+                );
+            });
+            cmdrHeaderButtons.appendChild(downloadButton);
+
+            const downloadIcon = document.createElement("img");
+            downloadIcon.src = downloadIconPath;
+            downloadButton.appendChild(downloadIcon);
+
             const savesList = document.createElement("div");
 
             savesList.classList.add("savesList");
@@ -251,12 +285,15 @@ export class SaveLoadingPanelContent {
 
             const expandButton = document.createElement("button");
             expandButton.classList.add("expandButton", "icon", "large");
+            expandButton.title = i18n.t("sidePanel:showCommanderSaves");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
-                expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
+                const isHidden = savesList.classList.contains("hidden");
+                expandButton.title = i18n.t(isHidden ? "sidePanel:showCommanderSaves" : "sidePanel:hideCommanderSaves");
+                expandButton.appendChild(isHidden ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
         }
@@ -361,13 +398,10 @@ export class SaveLoadingPanelContent {
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
-            const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${save.player.name}_${save.timestamp}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            this.downloadBlob(
+                new Blob([JSON.stringify(save)], { type: "application/json" }),
+                `${save.player.name}_${save.timestamp}.json`,
+            );
         });
         saveButtons.appendChild(downloadButton);
 
@@ -402,6 +436,65 @@ export class SaveLoadingPanelContent {
         deleteButton.appendChild(trashIcon);
 
         return saveDiv;
+    }
+
+    private downloadBlob(blob: Blob, fileName: string): void {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = fileName;
+        anchor.click();
+        URL.revokeObjectURL(url);
+    }
+
+    private async handleSelectedFile(file: File): Promise<void> {
+        if (file.name.toLowerCase().endsWith(".zip") || file.type === "application/zip") {
+            await this.importCommanderArchive(file);
+            return;
+        }
+
+        await this.loadSaveFile(file, this.universeBackend);
+    }
+
+    private async importCommanderArchive(file: File): Promise<void> {
+        const archiveResult = parseCommanderArchive(new Uint8Array(await file.arrayBuffer()), this.universeBackend);
+        if (!archiveResult.success) {
+            console.error("Could not import Commander archive:", archiveResult.error);
+            await alertModal(i18n.t("sidePanel:invalidCommanderArchive"), this.soundPlayer);
+            return;
+        }
+
+        const existingSaves = await this.saveBackend.getSavesForCmdr(archiveResult.value.cmdrUuid);
+        const existingSaveUuids = new Set(
+            existingSaves === undefined ? [] : existingSaves.manual.concat(existingSaves.auto).map((save) => save.uuid),
+        );
+        const savesToImport = {
+            manual: archiveResult.value.saves.manual.filter((save) => !existingSaveUuids.has(save.uuid)),
+            auto: archiveResult.value.saves.auto.filter((save) => !existingSaveUuids.has(save.uuid)),
+        };
+        const importedCount = savesToImport.manual.length + savesToImport.auto.length;
+        const archiveSaveCount = archiveResult.value.saves.manual.length + archiveResult.value.saves.auto.length;
+
+        if (importedCount > 0) {
+            const success = await this.saveBackend.importSaves({
+                [archiveResult.value.cmdrUuid]: savesToImport,
+            });
+            if (!success) {
+                await alertModal(i18n.t("sidePanel:commanderArchiveImportFailed"), this.soundPlayer);
+                return;
+            }
+        }
+
+        this.notificationManager.create(
+            "general",
+            "success",
+            i18n.t("sidePanel:commanderArchiveImported", {
+                importedCount,
+                skippedCount: archiveSaveCount - importedCount,
+            }),
+            5000,
+        );
+        await this.populateCmdrList(this.universeBackend, this.saveBackend);
     }
 
     private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {

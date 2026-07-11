@@ -1,9 +1,7 @@
-:root {
+#spaceStationUI {
     --space-station-ui-gap: 10px;
     --space-station-ui-icon-size: 75px;
-}
 
-#spaceStationUI {
     position: absolute;
     top: 0;
     left: 0;
