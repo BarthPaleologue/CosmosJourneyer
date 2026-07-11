@@ -238,20 +238,18 @@ export class SaveBackendSingleFile implements ISaveBackend {
     }
 
     public async importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean> {
-        const promises: Array<Promise<boolean>> = [];
+        let success = true;
         for (const [cmdrUuid, cmdrSaves] of Object.entries(saves)) {
             for (const manualSave of cmdrSaves.manual) {
-                promises.push(this.addManualSave(cmdrUuid, manualSave));
+                success = (await this.addManualSave(cmdrUuid, manualSave)) && success;
             }
 
             for (const autoSave of cmdrSaves.auto) {
-                promises.push(this.addAutoSave(cmdrUuid, autoSave));
+                success = (await this.addAutoSave(cmdrUuid, autoSave)) && success;
             }
         }
 
-        const results = await Promise.all(promises);
-
-        return results.every((result) => result);
+        return success;
     }
 
     public exportSaves(): Promise<Record<string, CmdrSaves>> {
