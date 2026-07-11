@@ -1,6 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
+import { createCommanderArchive, createCommanderArchiveFileName } from "@/backend/save/commanderArchive";
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
@@ -232,6 +233,22 @@ export class SaveLoadingPanelContent {
             shareIcon.src = shareIconPath;
             shareButton.appendChild(shareIcon);
 
+            const downloadButton = document.createElement("button");
+            downloadButton.classList.add("icon", "large");
+            downloadButton.addEventListener("click", () => {
+                this.soundPlayer.playNow("click");
+                const archive = createCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
+                this.downloadBlob(
+                    new Blob([new Uint8Array(archive)], { type: "application/zip" }),
+                    createCommanderArchiveFileName(cmdrUuid, latestSave.player.name),
+                );
+            });
+            cmdrHeaderButtons.appendChild(downloadButton);
+
+            const downloadIcon = document.createElement("img");
+            downloadIcon.src = downloadIconPath;
+            downloadButton.appendChild(downloadIcon);
+
             const savesList = document.createElement("div");
 
             savesList.classList.add("savesList");
@@ -361,13 +378,10 @@ export class SaveLoadingPanelContent {
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
-            const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${save.player.name}_${save.timestamp}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            this.downloadBlob(
+                new Blob([JSON.stringify(save)], { type: "application/json" }),
+                `${save.player.name}_${save.timestamp}.json`,
+            );
         });
         saveButtons.appendChild(downloadButton);
 
@@ -402,6 +416,15 @@ export class SaveLoadingPanelContent {
         deleteButton.appendChild(trashIcon);
 
         return saveDiv;
+    }
+
+    private downloadBlob(blob: Blob, fileName: string): void {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = fileName;
+        anchor.click();
+        URL.revokeObjectURL(url);
     }
 
     private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {
