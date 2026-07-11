@@ -5,14 +5,16 @@ on:
             - main
 
 permissions:
-    contents: write
+    contents: read
+    pages: write
+    id-token: write
 
 concurrency:
-    group: main-preview-game
-    cancel-in-progress: true
+    group: github-pages
+    cancel-in-progress: false
 
 jobs:
-    deploy_game_preview:
+    build_game_preview:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
@@ -54,11 +56,22 @@ jobs:
             - name: Build project
               run: pnpm run build
 
-            - name: Deploy to GitHub Pages (Production)
-              uses: JamesIves/github-pages-deploy-action@v4
+            - name: Configure GitHub Pages
+              uses: actions/configure-pages@v6
+
+            - name: Upload game preview artifact
+              uses: actions/upload-pages-artifact@v5
               with:
-                  folder: packages/game/dist
-                  branch: gh-pages
-                  clean: false
-                  force: false
-                  target-folder: preview
+                  path: packages/game/dist
+
+    deploy_game_preview:
+        needs: build_game_preview
+        timeout-minutes: 10
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - name: Deploy game preview to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v5

@@ -1,0 +1,62 @@
+name: Deploy Website
+
+on:
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: "Run rsync without changing the VPS"
+                required: true
+                type: boolean
+                default: true
+
+jobs:
+    deploy-website:
+        name: Build and deploy website artifact
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        environment:
+            name: production
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build website artifact
+              run: pnpm build:website
+
+            - name: Configure SSH agent
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+            - name: Add VPS to known hosts
+              env:
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -p "$VPS_SSH_PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts
+
+            - name: Deploy website artifact to VPS
+              env:
+                  DEPLOY_DRY_RUN: ${{ inputs.dry_run }}
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  VPS_WEBSITE_PATH: ${{ secrets.VPS_WEBSITE_PATH }}
+              run: bash ./scripts/deploy-website-vps.sh

@@ -1,4 +1,4 @@
-name: Electron Build And Release
+name: Deploy Release
 
 on:
     workflow_dispatch:
@@ -7,11 +7,78 @@ on:
                 description: "Release version, e.g. 1.11.0"
                 required: true
                 type: string
+            dry_run:
+                description: "Run deployment rsync commands without changing the VPS"
+                required: true
+                type: boolean
+                default: true
 
 jobs:
-    build-electron:
+    deploy-game:
+        name: Build and deploy game artifact
         permissions:
-            contents: write
+            contents: read
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        environment:
+            name: production
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Setup Rust toolchain
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: wasm32-unknown-unknown
+
+            - name: Setup wasm-pack
+              uses: taiki-e/install-action@v2
+              with:
+                  tool: wasm-pack
+
+            - name: Build game artifact
+              run: pnpm build:game
+
+            - name: Configure SSH agent
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+            - name: Add VPS to known hosts
+              env:
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -p "$VPS_SSH_PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts
+
+            - name: Deploy game artifact to VPS
+              env:
+                  DEPLOY_DRY_RUN: ${{ inputs.dry_run }}
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  VPS_GAME_PATH: ${{ secrets.VPS_GAME_PATH }}
+              run: bash ./scripts/deploy-game-vps.sh
+
+    build-electron:
+        name: Build Electron artifacts
+        permissions:
+            contents: read
         timeout-minutes: 30
         strategy:
             fail-fast: false
@@ -59,7 +126,11 @@ jobs:
                   path: packages/desktop-electron/release/*
 
     publish-electron:
-        needs: build-electron
+        name: Create draft GitHub release
+        if: ${{ !inputs.dry_run }}
+        needs:
+            - build-electron
+            - deploy-game
         permissions:
             contents: write
         runs-on: ubuntu-latest
