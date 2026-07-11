@@ -1,6 +1,7 @@
 {
     "loadSave": "Load a save",
     "dropASaveFileHere": "Drop a save file or Commander archive here",
+    "saveMigrationNotice": "Missing your Commanders? Saves are not synchronized automatically between websites. Check both <a href=\"https://cosmosjourneyer.com/game\">cosmosjourneyer.com</a> and the <a href=\"https://barthpaleologue.github.io/CosmosJourneyer/\">development version</a>. Download a Commander archive there, then import it here.",
     "continueCommander": "Continue from this Commander's latest save",
     "shareCommander": "Copy a link to this Commander's latest save",
     "downloadCommanderArchive": "Download all saves for this Commander",

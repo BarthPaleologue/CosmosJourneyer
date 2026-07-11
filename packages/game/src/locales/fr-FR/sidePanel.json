@@ -1,6 +1,7 @@
 {
     "loadSave": "Charger une sauvegarde",
     "dropASaveFileHere": "Déposez une sauvegarde ou une archive de Commandant ici",
+    "saveMigrationNotice": "Vos Commandants sont introuvables ? Les sauvegardes ne sont pas synchronisées automatiquement entre les sites. Vérifiez à la fois <a href=\"https://cosmosjourneyer.com/game\">cosmosjourneyer.com</a> et <a href=\"https://barthpaleologue.github.io/CosmosJourneyer/\">la version de développement</a>. Téléchargez-y l'archive d'un Commandant, puis importez-la ici.",
     "continueCommander": "Continuer depuis la dernière sauvegarde de ce Commandant",
     "shareCommander": "Copier un lien vers la dernière sauvegarde de ce Commandant",
     "downloadCommanderArchive": "Télécharger toutes les sauvegardes de ce Commandant",

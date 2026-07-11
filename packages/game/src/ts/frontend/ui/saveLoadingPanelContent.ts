@@ -52,6 +52,11 @@ export class SaveLoadingPanelContent {
         this.saveBackend = saveBackend;
         this.universeBackend = universeBackend;
 
+        const migrationNotice = document.createElement("p");
+        migrationNotice.classList.add("saveMigrationNotice");
+        migrationNotice.innerHTML = i18n.t("sidePanel:saveMigrationNotice");
+        this.htmlRoot.appendChild(migrationNotice);
+
         const dropFileZone = document.createElement("div");
         dropFileZone.id = "dropFileZone";
         this.htmlRoot.appendChild(dropFileZone);
