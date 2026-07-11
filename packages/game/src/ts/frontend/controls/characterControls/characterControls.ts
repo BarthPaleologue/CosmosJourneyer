@@ -63,11 +63,12 @@ export class CharacterControls implements Controls {
         this.firstPersonCamera.minZ = 1;
         this.firstPersonCamera.parent = this.getTransform();
 
+        const thirdPersonInitialRadius = 3;
         this.thirdPersonCamera = new ArcRotateCamera(
             "characterThirdPersonCamera",
             Math.PI / 2,
             Math.PI / 2 - Math.PI / 12,
-            3,
+            thirdPersonInitialRadius,
             new Vector3(0, 1.5, 0),
             scene,
         );
@@ -76,6 +77,7 @@ export class CharacterControls implements Controls {
         this.thirdPersonCamera.minZ = 1;
         this.thirdPersonCamera.maxZ = Settings.EARTH_RADIUS * 5;
         this.thirdPersonCamera.wheelPrecision *= 3;
+        this.thirdPersonCamera.targetScreenOffset.x = thirdPersonInitialRadius * 0.33;
         this.thirdPersonCamera.parent = this.getTransform();
 
         this.activeCamera = this.firstPersonCamera;

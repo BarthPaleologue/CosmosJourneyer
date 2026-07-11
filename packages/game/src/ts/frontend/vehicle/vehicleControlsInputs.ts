@@ -46,6 +46,10 @@ const brakeAction = new Action({
     bindings: [keyboard.getControl("Space")],
 });
 
+const boostAction = new Action({
+    bindings: [keyboard.getControl("ShiftLeft")],
+});
+
 const toggleCameraAction = new Action({
     bindings: [keyboard.getControl("KeyB")],
 });
@@ -86,6 +90,7 @@ export const VehicleInputs = new InputMap("VehicleInputs", {
     accelerate: accelerateAction,
     steer: steerAction,
     brake: brakeAction,
+    boost: boostAction,
     toggleCamera: new PressInteraction(toggleCameraAction),
     toggleDoors: new PressInteraction(toggleDoorsAction),
     resetCamera: new PressInteraction(resetCameraAction),

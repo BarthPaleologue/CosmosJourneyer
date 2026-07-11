@@ -20,6 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import {
     PhysicsConstraintAxis,
     PhysicsConstraintMotorType,
@@ -53,7 +54,7 @@ export type WheelModel = {
 type WheelDraft = {
     model: WheelModel;
     wheelMesh: Mesh;
-    axleMesh: Mesh;
+    axleMesh: TransformNode;
     frameBody: PhysicsBody;
     scene: Scene;
 };
@@ -69,7 +70,7 @@ export class Wheel {
     readonly motor: Physics6DoFConstraint | null;
 
     readonly axle: {
-        mesh: Mesh;
+        mesh: TransformNode;
         body: PhysicsBody;
         shape: PhysicsShape;
     };
@@ -150,7 +151,7 @@ export class Wheel {
     }
 }
 
-function AddAxlePhysics(mesh: Mesh, mass: number, bounce: number, friction: number, scene: Scene) {
+function AddAxlePhysics(mesh: TransformNode, mass: number, bounce: number, friction: number, scene: Scene) {
     const aggregate = new PhysicsAggregate(
         mesh,
         PhysicsShapeType.BOX,
@@ -196,7 +197,7 @@ function AddWheelPhysics(
 }
 
 function AttachWheelToAxle(
-    axle: { mesh: Mesh; body: PhysicsBody },
+    axle: { mesh: TransformNode; body: PhysicsBody },
     wheel: { mesh: Mesh; body: PhysicsBody },
     scene: Scene,
 ) {
@@ -289,9 +290,8 @@ function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, 
 }
 
 export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
-    const axleMesh = MeshBuilder.CreateCylinder("Axle", { diameter: radius * 0.7 * 2, height: radius }, scene);
+    const axleMesh = new TransformNode("Axle", scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
-    axleMesh.bakeCurrentTransformIntoVertices();
     axleMesh.position.copyFrom(position);
 
     return axleMesh;

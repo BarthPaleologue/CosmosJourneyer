@@ -1,1 +1,112 @@
-{"timestamp":1746350637462,"player":{"uuid":"00000000-0000-0000-0000-000000000000","name":"Tutorial","balance":10000,"creationDate":"2025-05-04T09:19:23.017Z","timePlayedSeconds":249,"visitedSystemHistory":[],"discoveries":{"uploaded":[],"local":[]},"currentItinerary":[],"systemBookmarks":[],"currentMissions":[{"missionGiver":{"systemCoordinates":{"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386,"starSectorX":0,"starSectorY":0,"starSectorZ":0},"idInSystem":"[[[]->star0]->telluricPlanet1]->spaceStation0"},"tree":{"type":0,"objectId":{"systemCoordinates":{"starSectorX":1,"starSectorY":4,"starSectorZ":1,"localX":0.02561151633300418,"localY":-0.11083881119770872,"localZ":0.026431881136462},"idInSystem":"[[]->star0]->mengerSponge0"},"state":0},"reward":71000,"type":0},{"missionGiver":{"systemCoordinates":{"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386,"starSectorX":0,"starSectorY":0,"starSectorZ":0},"idInSystem":"[[[]->star0]->telluricPlanet1]->spaceStation0"},"tree":{"type":0,"objectId":{"systemCoordinates":{"starSectorX":2,"starSectorY":0,"starSectorZ":-1,"localX":-0.1854024420890037,"localY":-0.1628170444922601,"localZ":-0.42941410091212673},"idInSystem":"[]->blackHole0"},"state":0},"reward":70500,"type":0},{"missionGiver":{"systemCoordinates":{"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386,"starSectorX":0,"starSectorY":0,"starSectorZ":0},"idInSystem":"[[[]->star0]->telluricPlanet1]->spaceStation0"},"tree":{"type":0,"objectId":{"systemCoordinates":{"starSectorX":0,"starSectorY":-3,"starSectorZ":0,"localX":-0.21676538266090928,"localY":0.2942857922959541,"localZ":-0.1888475882303191},"idInSystem":"[]->blackHole0"},"state":0},"reward":100500,"type":0},{"missionGiver":{"systemCoordinates":{"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386,"starSectorX":0,"starSectorY":0,"starSectorZ":0},"idInSystem":"[[[]->star0]->telluricPlanet1]->spaceStation0"},"tree":{"type":0,"objectId":{"systemCoordinates":{"starSectorX":-3,"starSectorY":-1,"starSectorZ":0,"localX":0.2960593378152975,"localY":0.2122889010758553,"localZ":0.45815722456116104},"idInSystem":"[]->neutronStar0"},"state":0},"reward":103500,"type":0}],"completedMissions":[],"spaceShips":[{"id":"d91271ff-50a1-4bb6-8006-3b15636b7628","name":"Wanderer","type":"WANDERER","components":{"primary":{"warpDrive":{"type":"warpDrive","size":3,"quality":1},"fuelTank":{"type":"fuelTank","size":2,"quality":1,"currentFuel01":0.9999999999605679},"thrusters":{"type":"thrusters","size":3,"quality":1}},"optional":[null,{"type":"fuelScoop","size":2,"quality":1},{"type":"discoveryScanner","size":2,"quality":1}]}}],"spareSpaceshipComponents":[],"tutorials":{"flightCompleted":true,"stationLandingCompleted":true,"starMapCompleted":false,"fuelScoopingCompleted":false}},"playerLocation":{"type":"inSpaceship","shipId":"d91271ff-50a1-4bb6-8006-3b15636b7628"},"shipLocations":{"d91271ff-50a1-4bb6-8006-3b15636b7628":{"type":"relative","universeObjectId":{"systemCoordinates":{"localX":0.49137314641446483,"localY":0.48043087077347135,"localZ":0.38353311777279386,"starSectorX":0,"starSectorY":0,"starSectorZ":0},"idInSystem":"[[[]->star0]->telluricPlanet1]->spaceStation0"},"position":{"x":0,"y":0,"z":66758.3748405016},"rotation":{"x":-0.7528543156495244,"y":0.4437797951451762,"z":-0.15113211133886262,"w":0.4619837202306639}}}}
+{
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "timestamp": 1783447080173,
+    "player": {
+        "uuid": "00000000-0000-0000-0000-000000000000",
+        "name": "Tutorial",
+        "currentItinerary": null,
+        "currentMissions": [
+            {
+                "missionGiver": {
+                    "idInSystem": "[[[]->star0]->gasPlanet3]->spaceStation0",
+                    "systemCoordinates": {
+                        "starSectorX": -1,
+                        "starSectorY": 1,
+                        "starSectorZ": -2,
+                        "localX": 0.16410029989858177,
+                        "localY": 0.4016626718927466,
+                        "localZ": -0.020077824369109154
+                    }
+                },
+                "tree": {
+                    "type": "fly_by",
+                    "objectId": {
+                        "idInSystem": "[]->neutronStar0",
+                        "systemCoordinates": {
+                            "starSectorX": 1,
+                            "starSectorY": 1,
+                            "starSectorZ": -4,
+                            "localX": 0.4340968001326997,
+                            "localY": -0.06310524678002355,
+                            "localZ": 0.25255573389705077
+                        }
+                    },
+                    "state": "notInSystem"
+                },
+                "reward": 87000,
+                "type": "sightSeeingFlyBy"
+            }
+        ],
+        "spaceShips": [
+            {
+                "id": "00000000-0000-0000-0000-000000000000",
+                "name": "Wanderer",
+                "type": "WANDERER",
+                "components": {
+                    "primary": {
+                        "warpDrive": {
+                            "type": "warpDrive",
+                            "size": 3,
+                            "quality": 1
+                        },
+                        "thrusters": {
+                            "type": "thrusters",
+                            "size": 3,
+                            "quality": 1
+                        },
+                        "fuelTank": {
+                            "type": "fuelTank",
+                            "size": 2,
+                            "quality": 1,
+                            "currentFuel01": 1
+                        }
+                    },
+                    "optional": [
+                        null,
+                        {
+                            "type": "fuelScoop",
+                            "size": 2,
+                            "quality": 1
+                        },
+                        {
+                            "type": "discoveryScanner",
+                            "size": 2,
+                            "quality": 1
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "playerLocation": {
+        "type": "inSpaceship",
+        "shipId": "00000000-0000-0000-0000-000000000000"
+    },
+    "shipLocations": {
+        "00000000-0000-0000-0000-000000000000": {
+            "type": "relative",
+            "universeObjectId": {
+                "idInSystem": "[[[]->star0]->gasPlanet3]->spaceStation0",
+                "systemCoordinates": {
+                    "starSectorX": -1,
+                    "starSectorY": 1,
+                    "starSectorZ": -2,
+                    "localX": 0.16410029989858177,
+                    "localY": 0.4016626718927466,
+                    "localZ": -0.020077824369109154
+                }
+            },
+            "position": {
+                "x": 156.7268064466923,
+                "y": 15185.527862661304,
+                "z": -331.88640943652854
+            },
+            "rotation": {
+                "x": -0.08810483394057667,
+                "y": 0.24685287736307537,
+                "z": -0.5948853710425777,
+                "w": -0.7598766794314871
+            }
+        }
+    }
+}

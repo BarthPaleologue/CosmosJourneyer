@@ -256,7 +256,7 @@ export class CosmosJourneyer {
         });
 
         this.sidePanels.tutorialsPanel.content.onTutorialSelected.add(async (tutorial) => {
-            if (!this.mainMenu.isVisible()) {
+            if (!this.mainMenu.isVisible() && this.player.uuid !== Settings.TUTORIAL_SAVE_UUID) {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
                 await this.createAutoSave();
                 const shouldLoadTutorial = await promptModalBoolean(
@@ -861,6 +861,7 @@ export class CosmosJourneyer {
      */
     public async createAutoSave(): Promise<void> {
         if (!this.isAutoSaveEnabled) return;
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
 
         const saveData = await this.generateSaveData();
 
@@ -868,8 +869,6 @@ export class CosmosJourneyer {
         const uuid = saveData.player.uuid;
 
         if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
-        if (uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
-
         await this.backend.save.addAutoSave(uuid, saveData);
 
         this.autoSaveTimerSeconds = 0;

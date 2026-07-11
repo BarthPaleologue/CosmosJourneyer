@@ -163,7 +163,7 @@ export function generateTelluricPlanetModel(
         mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };
 
-    const rings: RingsModel | null = uniformRandBool(0.6, rng, GenerationSteps.RINGS)
+    const rings: RingsModel | null = uniformRandBool(0.01, rng, GenerationSteps.RINGS)
         ? generateSeededRingsModel(radius, rng)
         : null;
 
