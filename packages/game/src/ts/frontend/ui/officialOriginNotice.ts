@@ -19,7 +19,7 @@ import i18n from "@/i18n";
 
 export function isOfficialGameLocation(location: Pick<Location, "hostname" | "protocol">): boolean {
     return (
-        location.protocol === "file:" ||
+        location.protocol === "app:" ||
         location.hostname === "cosmosjourneyer.com" ||
         location.hostname === "localhost" ||
         location.hostname === "127.0.0.1" ||
