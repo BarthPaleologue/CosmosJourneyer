@@ -1,7 +1,11 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
-import { createCommanderArchive, createCommanderArchiveFileName } from "@/backend/save/commanderArchive";
+import {
+    createCommanderArchive,
+    createCommanderArchiveFileName,
+    parseCommanderArchive,
+} from "@/backend/save/commanderArchive";
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
@@ -31,9 +35,12 @@ export class SaveLoadingPanelContent {
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
+    private readonly saveBackend: ISaveBackend;
+    private readonly universeBackend: UniverseBackend;
 
     constructor(
         universeBackend: UniverseBackend,
+        saveBackend: ISaveBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
     ) {
@@ -42,6 +49,8 @@ export class SaveLoadingPanelContent {
 
         this.soundPlayer = soundPlayer;
         this.notificationManager = notificationManager;
+        this.saveBackend = saveBackend;
+        this.universeBackend = universeBackend;
 
         const dropFileZone = document.createElement("div");
         dropFileZone.id = "dropFileZone";
@@ -87,14 +96,14 @@ export class SaveLoadingPanelContent {
                 return;
             }
 
-            await this.loadSaveFile(file, universeBackend);
+            await this.handleSelectedFile(file);
         });
 
         dropFileZone.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
             const fileInput = document.createElement("input");
             fileInput.type = "file";
-            fileInput.accept = "application/json";
+            fileInput.accept = "application/json,.json,application/zip,.zip";
             fileInput.onchange = async () => {
                 const file = fileInput.files?.[0];
                 if (file === undefined) {
@@ -102,7 +111,7 @@ export class SaveLoadingPanelContent {
                     return;
                 }
 
-                await this.loadSaveFile(file, universeBackend);
+                await this.handleSelectedFile(file);
             };
             fileInput.click();
         });
@@ -431,6 +440,56 @@ export class SaveLoadingPanelContent {
         anchor.download = fileName;
         anchor.click();
         URL.revokeObjectURL(url);
+    }
+
+    private async handleSelectedFile(file: File): Promise<void> {
+        if (file.name.toLowerCase().endsWith(".zip") || file.type === "application/zip") {
+            await this.importCommanderArchive(file);
+            return;
+        }
+
+        await this.loadSaveFile(file, this.universeBackend);
+    }
+
+    private async importCommanderArchive(file: File): Promise<void> {
+        const archiveResult = parseCommanderArchive(new Uint8Array(await file.arrayBuffer()), this.universeBackend);
+        if (!archiveResult.success) {
+            console.error("Could not import Commander archive:", archiveResult.error);
+            await alertModal(i18n.t("sidePanel:invalidCommanderArchive"), this.soundPlayer);
+            return;
+        }
+
+        const existingSaves = await this.saveBackend.getSavesForCmdr(archiveResult.value.cmdrUuid);
+        const existingSaveUuids = new Set(
+            existingSaves === undefined ? [] : existingSaves.manual.concat(existingSaves.auto).map((save) => save.uuid),
+        );
+        const savesToImport = {
+            manual: archiveResult.value.saves.manual.filter((save) => !existingSaveUuids.has(save.uuid)),
+            auto: archiveResult.value.saves.auto.filter((save) => !existingSaveUuids.has(save.uuid)),
+        };
+        const importedCount = savesToImport.manual.length + savesToImport.auto.length;
+        const archiveSaveCount = archiveResult.value.saves.manual.length + archiveResult.value.saves.auto.length;
+
+        if (importedCount > 0) {
+            const success = await this.saveBackend.importSaves({
+                [archiveResult.value.cmdrUuid]: savesToImport,
+            });
+            if (!success) {
+                await alertModal(i18n.t("sidePanel:commanderArchiveImportFailed"), this.soundPlayer);
+                return;
+            }
+        }
+
+        this.notificationManager.create(
+            "general",
+            "success",
+            i18n.t("sidePanel:commanderArchiveImported", {
+                importedCount,
+                skippedCount: archiveSaveCount - importedCount,
+            }),
+            5000,
+        );
+        await this.populateCmdrList(this.universeBackend, this.saveBackend);
     }
 
     private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {

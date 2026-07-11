@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { createCommanderArchive, createCommanderArchiveFileName } from "./commanderArchive";
+import { createCommanderArchive, createCommanderArchiveFileName, parseCommanderArchive } from "./commanderArchive";
 import { safeParseSave } from "./saveFileData";
 
 import saveData from "@assets/tutorials/starMapTutorial/save.json";
@@ -37,5 +37,28 @@ describe("Commander archives", () => {
         expect(createCommanderArchiveFileName(save.player.uuid, " Cmdr / Python ")).toBe(
             `CosmosJourneyer_Cmdr_Python_${save.player.uuid}.zip`,
         );
+    });
+
+    it("round-trips a Commander archive", () => {
+        const archive = createCommanderArchive(save.player.uuid, "Cmdr Python", {
+            manual: [save],
+            auto: [],
+        });
+
+        expect(parseCommanderArchive(archive, universeBackend)).toEqual({
+            success: true,
+            value: {
+                cmdrUuid: save.player.uuid,
+                cmdrName: "Cmdr Python",
+                saves: { manual: [save], auto: [] },
+            },
+        });
+    });
+
+    it("rejects data that is not a ZIP archive", () => {
+        expect(parseCommanderArchive(new Uint8Array([1, 2, 3]), universeBackend)).toEqual({
+            success: false,
+            error: "INVALID_ZIP",
+        });
     });
 });
