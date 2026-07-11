@@ -199,6 +199,7 @@ export class SaveLoadingPanelContent {
 
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
+            continueButton.title = i18n.t("sidePanel:continueCommander");
             continueButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 this.onLoadSaveObservable.notifyObservers(latestSave);
@@ -211,6 +212,7 @@ export class SaveLoadingPanelContent {
 
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
+            shareButton.title = i18n.t("sidePanel:shareCommander");
             shareButton.addEventListener("click", async () => {
                 this.soundPlayer.playNow("click");
                 const url = createUrlFromSave(latestSave);
@@ -235,6 +237,7 @@ export class SaveLoadingPanelContent {
 
             const downloadButton = document.createElement("button");
             downloadButton.classList.add("icon", "large");
+            downloadButton.title = i18n.t("sidePanel:downloadCommanderArchive");
             downloadButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 const archive = createCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
@@ -268,12 +271,15 @@ export class SaveLoadingPanelContent {
 
             const expandButton = document.createElement("button");
             expandButton.classList.add("expandButton", "icon", "large");
+            expandButton.title = i18n.t("sidePanel:showCommanderSaves");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
-                expandButton.appendChild(savesList.classList.contains("hidden") ? expandIcon : collapseIcon);
+                const isHidden = savesList.classList.contains("hidden");
+                expandButton.title = i18n.t(isHidden ? "sidePanel:showCommanderSaves" : "sidePanel:hideCommanderSaves");
+                expandButton.appendChild(isHidden ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
         }

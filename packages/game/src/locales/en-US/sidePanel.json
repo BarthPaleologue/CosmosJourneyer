@@ -1,6 +1,11 @@
 {
     "loadSave": "Load a save",
     "dropASaveFileHere": "Drop a save file here",
+    "continueCommander": "Continue from this Commander's latest save",
+    "shareCommander": "Copy a link to this Commander's latest save",
+    "downloadCommanderArchive": "Download all saves for this Commander",
+    "showCommanderSaves": "Show this Commander's saves",
+    "hideCommanderSaves": "Hide this Commander's saves",
     "lastPlayedOn": "Last explored on {{val, datetime}}",
     "journeyedFor": "Journeyed for {{nbHours}} hours",
     "cmdrNameChangePrompt": "How would you like to name this Commander? This action will affect all saves of this Commander.",
