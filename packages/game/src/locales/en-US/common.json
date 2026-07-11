@@ -8,5 +8,6 @@
     "unknown": "Unknown",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "ok": "OK"
+    "ok": "OK",
+    "unofficialOriginNotice": "This is not the official stable version of Cosmos Journeyer. Play the latest stable version at <a href=\"https://cosmosjourneyer.com\">cosmosjourneyer.com</a>."
 }

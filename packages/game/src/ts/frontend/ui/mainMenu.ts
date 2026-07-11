@@ -40,6 +40,7 @@ import i18n from "@/i18n";
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutQuadratic } from "../helpers/animations/interpolations";
+import { createOfficialOriginNotice } from "./officialOriginNotice";
 import { type SidePanels } from "./sidePanels";
 
 export class MainMenu {
@@ -212,6 +213,11 @@ export class MainMenu {
         this.creditsButton = elements.creditsButton;
         this.aboutButton = elements.aboutButton;
         this.menuItems = elements.menuItems;
+
+        const officialOriginNotice = createOfficialOriginNotice();
+        if (officialOriginNotice !== null) {
+            this.htmlRoot.appendChild(officialOriginNotice);
+        }
 
         this.htmlRoot.style.display = "none";
         document.body.appendChild(this.htmlRoot);

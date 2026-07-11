@@ -1,0 +1,20 @@
+.officialOriginNotice {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1100;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px 48px;
+    color: white;
+    background: var(--warning-background-color);
+    border-bottom: 1px solid var(--warning-border-color);
+    font-family: var(--main-font);
+    font-size: max(14px, var(--text-size));
+    line-height: 1.4;
+    text-align: center;
+
+    a {
+        color: white;
+        font-weight: bold;
+    }
+}

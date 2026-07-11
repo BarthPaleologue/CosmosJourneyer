@@ -4,6 +4,7 @@
 @import "./spaceStationUI/spaceStationUI.css";
 @import "./pauseMenu/index.css";
 @import "./mainMenu.css";
+@import "./officialOriginNotice.css";
 @import "./inputs.css";
 @import "./loadingScreen.css";
 @import "./targetCursors.css";
@@ -58,18 +59,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-:root {
-    --text-size: 2vmin;
-    --h2-size: calc(1.5 * var(--text-size));
-    --h1-size: calc(2 * var(--text-size));
-    --menu-items-size: 3.2vmin;
-    --accent-color: #002b6a;
-    --accent-color-dark: #001a3f;
-    --accent-color-light: #003f9f;
-    --disabled-color: rgb(100, 100, 100);
-    --main-font: "Nasalization", sans-serif;
 }
 
 body {
