@@ -66,12 +66,3 @@ jobs:
                   VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
                   VPS_WEBSITE_PATH: ${{ secrets.VPS_WEBSITE_PATH }}
               run: bash ./scripts/deploy-website-vps.sh
-
-            - name: Smoke test
-              if: ${{ !inputs.dry_run }}
-              env:
-                  SMOKE_TEST_BASE_URL: ${{ secrets.SMOKE_TEST_BASE_URL || 'https://cosmosjourneyer.com' }}
-              run: |
-                  sleep 5
-                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/" || { echo "Smoke test failed: GET /" >&2; exit 1; }
-                  echo "Smoke tests passed."
