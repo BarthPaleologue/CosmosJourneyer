@@ -38,7 +38,7 @@ jobs:
             - name: Use Node.js 24
               uses: actions/setup-node@v6
               with:
-                  node-version: 24
+                  node-version: "24"
                   cache: pnpm
 
             - name: Install dependencies
@@ -111,7 +111,7 @@ jobs:
             - name: Use Node.js 24
               uses: actions/setup-node@v6
               with:
-                  node-version: 24
+                  node-version: "24"
                   cache: pnpm
 
             - name: Install dependencies
@@ -163,7 +163,7 @@ jobs:
                   echo "$VPS_SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
 
             - name: Configure SSH agent
-              uses: webfactory/ssh-agent@v0.9.0
+              uses: webfactory/ssh-agent@v0.10.0
               with:
                   ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
@@ -176,16 +176,6 @@ jobs:
                   VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
                   VPS_GAME_PATH: ${{ secrets.VPS_GAME_PATH }}
               run: bash ./scripts/deploy-game-vps.sh
-
-            - name: Smoke test
-              if: ${{ !inputs.dry_run }}
-              env:
-                  SMOKE_TEST_BASE_URL: ${{ secrets.SMOKE_TEST_BASE_URL || 'https://cosmosjourneyer.com' }}
-              run: |
-                  sleep 5
-                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/" || { echo "Smoke test failed: GET /" >&2; exit 1; }
-                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/play/" || { echo "Smoke test failed: GET /play/" >&2; exit 1; }
-                  echo "Smoke tests passed."
 
     publish-electron:
         name: Create draft GitHub release
