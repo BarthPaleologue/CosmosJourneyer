@@ -36,7 +36,7 @@ jobs:
             - name: Use Node.js 24
               uses: actions/setup-node@v6
               with:
-                  node-version: 24
+                  node-version: "24"
                   cache: pnpm
 
             - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
                   echo "$VPS_SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
 
             - name: Configure SSH agent
-              uses: webfactory/ssh-agent@v0.9.0
+              uses: webfactory/ssh-agent@v0.10.0
               with:
                   ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
