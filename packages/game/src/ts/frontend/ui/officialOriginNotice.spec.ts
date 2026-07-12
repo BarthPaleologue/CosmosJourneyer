@@ -7,7 +7,7 @@ describe("isOfficialGameLocation", () => {
         { protocol: "https:", hostname: "cosmosjourneyer.com" },
         { protocol: "http:", hostname: "localhost" },
         { protocol: "http:", hostname: "127.0.0.1" },
-        { protocol: "file:", hostname: "" },
+        { protocol: "app:", hostname: "bundle" },
     ])("accepts an official or local location", (location) => {
         expect(isOfficialGameLocation(location)).toBe(true);
     });

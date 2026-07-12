@@ -33,6 +33,9 @@
         "lint": "eslint src",
         "typecheck": "tsc --noEmit"
     },
+    "dependencies": {
+        "electron-updater": "^6.8.9"
+    },
     "devDependencies": {
         "@types/node": "^26.0.1",
         "concurrently": "^10.0.3",
@@ -46,7 +49,13 @@
     "build": {
         "appId": "com.cosmosjourneyer",
         "productName": "Cosmos Journeyer",
+        "executableName": "cosmos-journeyer",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+        "publish": {
+            "provider": "github",
+            "owner": "BarthPaleologue",
+            "repo": "CosmosJourneyer"
+        },
         "directories": {
             "output": "release"
         },
@@ -61,7 +70,8 @@
             "category": "public.app-category.games",
             "icon": "assets/icons/icon.icns",
             "target": [
-                "dmg"
+                "dmg",
+                "zip"
             ]
         },
         "win": {
@@ -73,10 +83,12 @@
         "linux": {
             "category": "Game",
             "icon": "assets/icons",
+            "syncDesktopName": true,
             "target": [
                 "AppImage",
                 "deb"
             ]
         }
-    }
+    },
+    "desktopName": "cosmos-journeyer.desktop"
 }

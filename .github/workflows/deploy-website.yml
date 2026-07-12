@@ -1,0 +1,77 @@
+name: Deploy Website
+
+on:
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: "Run rsync without changing the VPS"
+                required: true
+                type: boolean
+                default: true
+
+concurrency:
+    group: production-website-release
+    cancel-in-progress: false
+
+jobs:
+    deploy-website:
+        name: Build and deploy website artifact
+        if: github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+        environment:
+            name: production
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: true
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build website artifact
+              run: pnpm --filter @cosmos-journeyer/website... build
+
+            - name: Configure known hosts
+              env:
+                  VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "$VPS_SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+
+            - name: Configure SSH agent
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+            - name: Deploy website artifact to VPS
+              env:
+                  DEPLOY_DRY_RUN: ${{ inputs.dry_run }}
+                  GITHUB_SHA: ${{ github.sha }}
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+                  VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
+                  VPS_WEBSITE_PATH: ${{ secrets.VPS_WEBSITE_PATH }}
+              run: bash ./scripts/deploy-website-vps.sh
+
+            - name: Smoke test
+              if: ${{ !inputs.dry_run }}
+              env:
+                  SMOKE_TEST_BASE_URL: ${{ secrets.SMOKE_TEST_BASE_URL || 'https://cosmosjourneyer.com' }}
+              run: |
+                  sleep 5
+                  curl -sSf -o /dev/null "${SMOKE_TEST_BASE_URL}/" || { echo "Smoke test failed: GET /" >&2; exit 1; }
+                  echo "Smoke tests passed."
