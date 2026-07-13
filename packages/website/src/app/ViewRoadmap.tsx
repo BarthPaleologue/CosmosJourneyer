@@ -1,105 +1,63 @@
-//  This file is part of Cosmos Journeyer
-//
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import Image from "next/image";
 
-"use client";
+type MilestoneStatus = "In development" | "Planned";
 
-import { useRef, type FC } from "react";
-
-import { RoadmapItems } from "@/utils/constants";
-
-import { RoadmapItemComponent } from "@/components/RoadmapItem";
-import { ScrollArrow } from "@/components/ScrollArrow";
-import { useScrollTo } from "@/hooks/useScrollTo";
-
-export interface ViewRoadmapProps {
-    className?: string;
+interface Milestone {
+    readonly status: MilestoneStatus;
+    readonly title: string;
+    readonly description: string;
+    readonly image: string;
+    readonly alt: string;
 }
 
-export const ViewRoadmap: FC<ViewRoadmapProps> = ({ className = "" }) => {
-    const roadmapRef = useRef<HTMLDivElement>(null);
-    const { scrollToView } = useScrollTo();
+const milestones = [
+    {
+        status: "In development",
+        title: "Visual overhaul",
+        description: "Improve and optimize the game's visuals. Add SSR and SSAO.",
+        image: "/static/showcase/station.webp",
+        alt: "A rotating space station illuminated by a nearby star",
+    },
+    {
+        status: "Planned",
+        title: "Universal input system",
+        description: "Rework the input system to support gamepads and fully rebindable controls.",
+        image: "/static/showcase/input-system.webp",
+        alt: "A spacecraft flying above an icy planet in front of a star",
+    },
+    {
+        status: "Planned",
+        title: "Handcrafted stories",
+        description: "Meet memorable characters and travel with them across the cosmos.",
+        image: "/static/showcase/stories.webp",
+        alt: "A rover traveling across the surface of a moon",
+    },
+] as const satisfies readonly Milestone[];
 
-    const scrollOffset = 600;
-
-    const scrollLeft = () => {
-        if (roadmapRef.current) {
-            roadmapRef.current.scrollBy({
-                left: -scrollOffset,
-                behavior: "smooth",
-            });
-        }
-    };
-
-    const scrollRight = () => {
-        if (roadmapRef.current) {
-            roadmapRef.current.scrollBy({
-                left: scrollOffset,
-                behavior: "smooth",
-            });
-        }
-    };
-
-    return (
-        <div className={`fullView ${className}`} id="viewRoadmap">
-            <div className="headerRoadmap">
-                <ScrollArrow
-                    direction="up"
-                    onClick={() => {
-                        scrollToView(0);
-                    }}
-                    ariaLabel="Scroll to top"
-                />
-
-                <h2>Roadmap</h2>
-
-                <div className="roadmapContainer">
-                    <div id="roadmap" ref={roadmapRef}>
-                        {RoadmapItems.map((item) => (
-                            <RoadmapItemComponent key={item.id} item={item} />
-                        ))}
-                    </div>
-
-                    <button
-                        className="roadmapNavButton roadmapNavLeft"
-                        onClick={scrollLeft}
-                        aria-label="Scroll roadmap left"
-                        type="button"
-                    >
-                        &#8249;
-                    </button>
-
-                    <button
-                        className="roadmapNavButton roadmapNavRight"
-                        onClick={scrollRight}
-                        aria-label="Scroll roadmap right"
-                        type="button"
-                    >
-                        &#8250;
-                    </button>
-                </div>
-
-                <ScrollArrow
-                    direction="down"
-                    onClick={() => {
-                        scrollToView(2);
-                    }}
-                    ariaLabel="Scroll to next section"
-                />
+export const ViewRoadmap = () => (
+    <section className="contentSection roadmapSection" id="roadmap">
+        <div className="roadmapHeading">
+            <div>
+                <h2>
+                    What comes
+                    <br />
+                    next.
+                </h2>
             </div>
         </div>
-    );
-};
+
+        <div className="milestoneGrid">
+            {milestones.map((milestone, index) => (
+                <article className="milestone" key={milestone.title}>
+                    <div className="milestoneImage">
+                        <Image src={milestone.image} alt={milestone.alt} fill sizes="(max-width: 800px) 100vw, 33vw" />
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                    </div>
+                    <p className="milestoneStatus">{milestone.status}</p>
+                    <h3>{milestone.title}</h3>
+                    <p>{milestone.description}</p>
+                </article>
+            ))}
+        </div>
+    </section>
+);

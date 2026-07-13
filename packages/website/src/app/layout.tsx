@@ -3,31 +3,32 @@
 //  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
+//  it under the terms of the GNU Affero General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 //
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+//  GNU Affero General Public License for more details.
 //
-//  You should have received a copy of the GNU General Public License
+//  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-import { SiteConfig } from "@/utils/constants";
+import { siteConfig } from "@/siteConfig";
+import "@/styles/site.css";
 
 export const metadata: Metadata = {
-    metadataBase: new URL(SiteConfig.url),
+    metadataBase: new URL(siteConfig.url),
     title: {
-        default: SiteConfig.name,
-        template: `%s | ${SiteConfig.name}`,
+        default: siteConfig.name,
+        template: `%s | ${siteConfig.name}`,
     },
-    description: SiteConfig.description,
-    applicationName: SiteConfig.name,
+    description: siteConfig.description,
+    applicationName: siteConfig.name,
     authors: [{ name: "Barthélemy Paléologue" }],
     generator: "Next.js",
     keywords: [
@@ -56,30 +57,34 @@ export const metadata: Metadata = {
     openGraph: {
         type: "website",
         locale: "en_US",
-        url: SiteConfig.url,
-        title: SiteConfig.name,
-        description: SiteConfig.description,
-        siteName: SiteConfig.name,
+        url: siteConfig.url,
+        title: siteConfig.name,
+        description: siteConfig.description,
+        siteName: siteConfig.name,
         images: [
             {
-                url: "/icon.png",
-                width: 1200,
-                height: 630,
-                alt: SiteConfig.name,
+                url: "/static/header4.webp",
+                width: 3840,
+                height: 2160,
+                alt: siteConfig.name,
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: SiteConfig.name,
-        description: SiteConfig.description,
-        images: ["/icon.png"],
+        title: siteConfig.name,
+        description: siteConfig.description,
+        images: ["/static/header4.webp"],
     },
     icons: {
         icon: "/favicon.ico",
         shortcut: "/favicon.ico",
         apple: "/icon.png",
     },
+};
+
+export const viewport: Viewport = {
+    themeColor: "#000000",
 };
 
 interface RootLayoutProps {
@@ -89,10 +94,6 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang="en">
-            <head>
-                <meta name="theme-color" content="#000000" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-            </head>
             <body>{children}</body>
         </html>
     );
