@@ -184,6 +184,57 @@ a:focus-visible {
     font-size: 1.15rem;
     line-height: 0;
 }
+.desktopDownloads {
+    width: min(760px, 100%);
+    margin-top: 42px;
+}
+.desktopDownloads > p {
+    margin: 0 0 12px;
+    color: #9ba2aa;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+.desktopDownloads > div {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+.desktopDownloads a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px 30px 14px 14px;
+    border-right: 1px solid var(--line);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.desktopDownloads a:last-child {
+    border-right: 0;
+}
+.desktopDownloads a:hover {
+    background: rgb(119 199 255 / 10%);
+}
+.desktopDownloads a span {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.desktopDownloads a small {
+    color: #828a92;
+    font-size: 0.62rem;
+}
+.desktopDownloads a strong {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 400;
+    translate: 0 -50%;
+}
 .heroFootnote {
     position: absolute;
     z-index: 2;
@@ -547,6 +598,15 @@ footer a:hover {
     .hero h1 {
         font-size: clamp(3.15rem, 14.5vw, 6.4rem);
         letter-spacing: -0.055em;
+    }
+    .desktopDownloads > div {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .desktopDownloads a:nth-child(2) {
+        border-right: 0;
+    }
+    .desktopDownloads a:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
     }
     .heroFootnote {
         left: 18px;

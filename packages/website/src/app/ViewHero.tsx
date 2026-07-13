@@ -41,6 +41,19 @@ export const ViewHero = () => {
                         Explore the game <span>↓</span>
                     </a>
                 </div>
+
+                <div className="desktopDownloads">
+                    <p>Download desktop · v{siteConfig.desktopRelease.version}</p>
+                    <div>
+                        {siteConfig.desktopRelease.downloads.map((download) => (
+                            <a href={download.url} key={download.platform} target="_blank" rel="noopener noreferrer">
+                                <span>{download.platform}</span>
+                                <small>{download.detail}</small>
+                                <strong aria-hidden="true">↓</strong>
+                            </a>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             <div className="heroFootnote" aria-label="Game highlights">
