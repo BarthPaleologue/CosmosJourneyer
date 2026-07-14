@@ -133,7 +133,7 @@ a:focus-visible {
     text-transform: uppercase;
 }
 .hero h1 {
-    font-size: clamp(4.2rem, 10.7vw, 11.5rem);
+    font-size: clamp(4.2rem, 9.7vw, 10.5rem);
     text-shadow: 0 0 60px rgb(119 199 255 / 18%);
 }
 .heroLead {
@@ -520,7 +520,7 @@ footer a:hover {
         translate: 0 16px;
     }
     .hero h1 {
-        font-size: clamp(4.2rem, 9vw, 9rem);
+        font-size: clamp(4.2rem, 8.2vw, 8.2rem);
     }
     .heroLead {
         margin: 24px 0;
@@ -596,7 +596,7 @@ footer a:hover {
         translate: 0 20px;
     }
     .hero h1 {
-        font-size: clamp(3.15rem, 14.5vw, 6.4rem);
+        font-size: clamp(3.15rem, 13.1vw, 5.8rem);
         letter-spacing: -0.055em;
     }
     .desktopDownloads > div {
