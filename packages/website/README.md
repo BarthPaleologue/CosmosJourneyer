@@ -33,7 +33,7 @@ Run the following from `packages/website`:
 
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
-- `pnpm start` - Start production server
+- `pnpm start` - Serve the static production build
 
 ### Code Quality
 
@@ -45,8 +45,7 @@ Run the following from `packages/website`:
 
 ### Testing & Deployment
 
-- `pnpm test:all` - Run all checks (lint + type-check + build)
-- `pnpm serve:prod` - Serve production build locally
+- `pnpm test:all` - Build the site, then run lint and type-check
 
 ## Tech Stack
 
