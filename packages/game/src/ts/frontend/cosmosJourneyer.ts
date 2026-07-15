@@ -446,7 +446,7 @@ export class CosmosJourneyer {
         starMapScene.useRightHandedSystem = true;
         starMapScene.clearColor.set(0, 0, 0, 1);
 
-        const mainHavokPlugin = new HavokPlugin(true, havokInstance);
+        const mainHavokPlugin = new HavokPlugin(true, havokInstance, { disableWorldRegions: true });
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         starSystemViewScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
