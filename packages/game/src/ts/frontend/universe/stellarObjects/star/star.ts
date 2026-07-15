@@ -17,12 +17,10 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { type Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type StarModel } from "@cosmos-journeyer/universe-model";
@@ -53,8 +51,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
 
     private readonly emissiveColor: Color3;
 
-    readonly aggregate: PhysicsAggregate;
-
     readonly volumetricLightUniforms = new VolumetricLightUniforms();
 
     readonly ringsUniforms: RingsUniforms | null;
@@ -84,18 +80,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
             scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.SPHERE,
-            {
-                mass: 0,
-                restitution: 0.2,
-            },
-            scene,
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
 
         const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
         this.emissiveColor = new Color3(starColor.r, starColor.g, starColor.b);
@@ -155,7 +139,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
     }
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
-        this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
         this.ringsUniforms?.dispose(ringsLutPool);

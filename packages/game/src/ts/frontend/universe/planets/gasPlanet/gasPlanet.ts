@@ -18,13 +18,10 @@
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { type Material } from "@babylonjs/core/Materials/material";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 import { EarthRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -56,8 +53,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
     private readonly mesh: Mesh;
     readonly material: GasPlanetProceduralMaterial | Material;
 
-    readonly aggregate: PhysicsAggregate;
-
     readonly atmosphereUniforms: AtmosphereUniforms;
 
     readonly ringsUniforms: RingsUniforms | null;
@@ -87,20 +82,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
             scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2,
-            },
-            scene,
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         if (this.model.colorPalette.type === "procedural") {
             this.material = new GasPlanetProceduralMaterial(
@@ -164,7 +145,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.mesh.dispose();
-        this.aggregate.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
         this.ringsUniforms?.dispose(ringsLutPool);
