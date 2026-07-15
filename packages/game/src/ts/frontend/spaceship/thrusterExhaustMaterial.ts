@@ -67,7 +67,7 @@ export class ThrusterExhaustMaterial {
             attributes: ["position"],
             uniforms: [
                 "world",
-                "worldViewProjection",
+                "viewProjection",
                 "inverseWorld",
                 "elapsedSeconds",
                 "view",

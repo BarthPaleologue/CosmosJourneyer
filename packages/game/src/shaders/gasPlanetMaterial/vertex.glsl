@@ -21,7 +21,7 @@ attribute vec3 position;
 attribute vec3 normal;
 
 uniform mat4 world;
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 
 uniform vec3 cameraPosition;
 
@@ -33,10 +33,10 @@ varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 
 void main() {
-    vec4 outPosition = worldViewProjection * vec4(position, 1.0);
-    gl_Position = outPosition;
+    vec4 positionW = world * vec4(position, 1.0);
+    gl_Position = viewProjection * positionW;
 
-    vPositionW = vec3(world * vec4(position, 1.0));
+    vPositionW = positionW.xyz;
 
     vNormalW = normalize(vec3(world * vec4(normal, 0.0)));
 
