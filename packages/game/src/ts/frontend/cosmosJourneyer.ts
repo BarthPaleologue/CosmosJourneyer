@@ -403,6 +403,7 @@ export class CosmosJourneyer {
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
+                  useHighPrecisionMatrix: true,
                   twgslOptions: {
                       wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
                       jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
