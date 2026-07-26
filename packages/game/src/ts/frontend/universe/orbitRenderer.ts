@@ -26,9 +26,9 @@ import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObje
 import { type CreateLinesMeshFunction } from "./lineRendering";
 
 export class OrbitRenderer {
-    private orbitMeshes: Map<OrbitalObject, Mesh> = new Map();
+    private readonly orbitMeshes: Map<OrbitalObject, Mesh> = new Map();
 
-    private orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
+    private readonly orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
 
     private _isVisible = false;
 
@@ -81,6 +81,10 @@ export class OrbitRenderer {
         orbitMesh.ignoreCameraMaxZ = true;
         orbitMesh.alwaysSelectAsActiveMesh = true;
         this.orbitMeshes.set(orbitalObject, orbitMesh);
+    }
+
+    getOrbitMesh(orbitalObject: OrbitalObject): Mesh | undefined {
+        return this.orbitMeshes.get(orbitalObject);
     }
 
     setVisibility(visible: boolean) {

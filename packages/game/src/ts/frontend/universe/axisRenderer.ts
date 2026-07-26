@@ -27,7 +27,7 @@ import { type CreateLinesMeshFunction } from "./lineRendering";
  * Visual helper designed to display the rotation axis of given objects
  */
 export class AxisRenderer {
-    private axisMeshes: Array<Mesh> = [];
+    private axisMeshes: Map<Transformable, Mesh> = new Map();
 
     private _isVisible = false;
 
@@ -69,7 +69,11 @@ export class AxisRenderer {
         rotationAxisHelper.alwaysSelectAsActiveMesh = true;
 
         rotationAxisHelper.parent = orbitalObject.getTransform();
-        this.axisMeshes.push(rotationAxisHelper);
+        this.axisMeshes.set(orbitalObject, rotationAxisHelper);
+    }
+
+    getAxisMesh(orbitalObject: Transformable): Mesh | undefined {
+        return this.axisMeshes.get(orbitalObject);
     }
 
     /**
@@ -78,7 +82,7 @@ export class AxisRenderer {
      */
     setVisibility(visible: boolean) {
         this._isVisible = visible;
-        for (const axisMesh of this.axisMeshes) {
+        for (const axisMesh of this.axisMeshes.values()) {
             axisMesh.setEnabled(visible);
         }
     }
@@ -98,6 +102,6 @@ export class AxisRenderer {
         this.axisMeshes.forEach((orbitMesh) => {
             orbitMesh.dispose(false, true);
         });
-        this.axisMeshes = [];
+        this.axisMeshes.clear();
     }
 }
