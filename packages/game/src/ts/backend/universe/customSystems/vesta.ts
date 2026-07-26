@@ -378,10 +378,10 @@ export function getVestaSystemModel(): StarSystemModel {
         },
         colorPalette: {
             type: "procedural",
-            color1: { r: 1, g: 1, b: 1 },
+            color1: { r: 0.2, g: 0.7, b: 0.3 },
             color2: { r: 1, g: 1, b: 1 },
-            color3: { r: 1, g: 1, b: 1 },
-            colorSharpness: 1,
+            color3: { r: 0.0, g: 0.5, b: 0.0 },
+            colorSharpness: 0.8,
         },
         rings: null,
     };
