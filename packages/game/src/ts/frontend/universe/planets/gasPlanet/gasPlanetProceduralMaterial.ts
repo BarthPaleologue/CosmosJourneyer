@@ -41,7 +41,7 @@ const GasPlanetMaterialUniformNames = {
     COLOR2: "color2",
     COLOR3: "color3",
     COLOR_SHARPNESS: "colorSharpness",
-};
+} as const;
 
 export class GasPlanetProceduralMaterial extends ShaderMaterial {
     private elapsedSeconds = 0;
