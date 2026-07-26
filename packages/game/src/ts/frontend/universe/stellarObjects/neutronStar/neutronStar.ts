@@ -17,13 +17,10 @@
 
 import { type Camera } from "@babylonjs/core/Cameras/camera";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import { type Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type NeutronStarModel } from "@cosmos-journeyer/universe-model";
@@ -58,8 +55,6 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
 
     private readonly material: StarMaterial;
 
-    readonly aggregate: PhysicsAggregate;
-
     readonly volumetricLightUniforms = new VolumetricLightUniforms();
 
     readonly ringsUniforms: RingsUniforms | null;
@@ -85,20 +80,6 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
             scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
-
-        this.aggregate = new PhysicsAggregate(
-            this.getTransform(),
-            PhysicsShapeType.CONTAINER,
-            {
-                mass: 0,
-                restitution: 0.2,
-            },
-            scene,
-        );
-        this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
-        this.aggregate.body.disablePreStep = false;
-        const physicsShape = new PhysicsShapeSphere(Vector3.Zero(), this.model.radius, scene);
-        this.aggregate.shape.addChildFromParent(this.getTransform(), physicsShape, this.mesh);
 
         const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
         this.emissiveColor = new Color3(starColor.r, starColor.g, starColor.b);
@@ -158,7 +139,6 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
     }
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
-        this.aggregate.dispose();
         this.mesh.dispose();
         this.material.dispose();
         this.asteroidField?.dispose();
