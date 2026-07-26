@@ -669,8 +669,17 @@ export class StarSystemView implements View {
             });
         }
 
-        this.orbitRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
-        this.axisRenderer.setOrbitalObjects(starSystem.getOrbitalObjects(), this.scene);
+        const orbitalObject = starSystem.getOrbitalObjects();
+
+        this.orbitRenderer.setOrbitalObjects(orbitalObject, this.scene);
+        this.axisRenderer.setOrbitalObjects(orbitalObject, this.scene);
+
+        for (const anomaly of starSystem.getAnomalies()) {
+            const orbitMesh = this.orbitRenderer.getOrbitMesh(anomaly);
+            orbitMesh?.dispose();
+            const axisMesh = this.axisRenderer.getAxisMesh(anomaly);
+            axisMesh?.dispose();
+        }
 
         this.spaceShipLayer.setTarget(null);
         this.targetCursorLayer.setTarget(null);
