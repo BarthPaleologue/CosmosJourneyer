@@ -97,43 +97,43 @@ const nextMissionInteraction = new PressInteraction(
 
 const resetCameraInteraction = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad0")],
+        bindings: [keyboard.getControl("Numpad0"), keyboard.getControl("Digit0")],
     }),
 );
 
 const switchToCameraPreset1 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad1")],
+        bindings: [keyboard.getControl("Numpad1"), keyboard.getControl("Digit1")],
     }),
 );
 
 const switchToCameraPreset2 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad2")],
+        bindings: [keyboard.getControl("Numpad2"), keyboard.getControl("Digit2")],
     }),
 );
 
 const switchToCameraPreset3 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad3")],
+        bindings: [keyboard.getControl("Numpad3"), keyboard.getControl("Digit3")],
     }),
 );
 
 const switchToCameraPreset4 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad4")],
+        bindings: [keyboard.getControl("Numpad4"), keyboard.getControl("Digit4")],
     }),
 );
 
 const switchToCameraPreset5 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad5")],
+        bindings: [keyboard.getControl("Numpad5"), keyboard.getControl("Digit5")],
     }),
 );
 
 const switchToCameraPreset6 = new PressInteraction(
     new Action({
-        bindings: [keyboard.getControl("Numpad6")],
+        bindings: [keyboard.getControl("Numpad6"), keyboard.getControl("Digit6")],
     }),
 );
 
