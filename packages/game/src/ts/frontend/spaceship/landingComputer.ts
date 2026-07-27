@@ -251,7 +251,7 @@ export class LandingComputer {
         const targetPosition = currentPosition.add(currentUp.scale(15));
         const targetForward = Vector3.TransformCoordinates(
             currentForward,
-            Matrix.RotationAxis(currentRight, -Math.PI / 6),
+            Matrix.RotationAxis(currentRight, -Math.PI / 4),
         );
 
         const deltaRotation = Quaternion.FromUnitVectorsToRef(currentForward, targetForward, Quaternion.Identity());
