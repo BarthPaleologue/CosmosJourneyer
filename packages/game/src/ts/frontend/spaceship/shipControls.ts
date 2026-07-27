@@ -146,7 +146,7 @@ export class ShipControls implements Controls {
             if (
                 warpDrive.isDisabled() &&
                 nearestOrbitalObject !== null &&
-                !canEngageWarpDrive(spaceship.getTransform(), 0, nearestOrbitalObject)
+                !canEngageWarpDrive(spaceship.getTransform(), spaceship.getAltimeter(), 0, nearestOrbitalObject)
             ) {
                 tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;

@@ -22,25 +22,37 @@ import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObje
 
 import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
 
+import type { Altimeter } from "../altimeter";
+
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
+    shipAltimeter: Altimeter,
     currentVelocity: number,
     nearestOrbitalObject: OrbitalObject,
 ) {
     const shipPosition = shipTransform.getAbsolutePosition();
-    const distanceToObject = Vector3.Distance(shipPosition, nearestOrbitalObject.getTransform().getAbsolutePosition());
-    const emergencyStopDistance = nearestOrbitalObject.getBoundingRadius() * 1.05;
-    if (distanceToObject < emergencyStopDistance) {
+    const nearestObjectPosition = nearestOrbitalObject.getTransform().getAbsolutePosition();
+
+    const distanceToObjectCenter = Vector3.Distance(shipPosition, nearestObjectPosition);
+
+    const altimeterDistance = shipAltimeter.getAltitude();
+    const roughDistance = distanceToObjectCenter - nearestOrbitalObject.getBoundingRadius();
+    const distanceToObject = altimeterDistance !== null ? Math.min(altimeterDistance, roughDistance) : roughDistance;
+
+    const emergencyMargin = 0.03 * nearestOrbitalObject.getBoundingRadius();
+    if (distanceToObject <= emergencyMargin) {
         return false;
     }
 
+    const shipForward = shipTransform.forward;
+    const directionToObject = nearestObjectPosition.subtract(shipPosition).normalize();
+
     const nbSecondsPrediction = 0.3;
-    const predictedPosition = shipPosition.add(shipTransform.forward.scale(currentVelocity * nbSecondsPrediction));
-    const predictedDistanceToObject = Vector3.Distance(
-        predictedPosition,
-        nearestOrbitalObject.getTransform().getAbsolutePosition(),
-    );
-    if (predictedDistanceToObject < emergencyStopDistance) {
+    const predictedTraveledDistance = currentVelocity * nbSecondsPrediction;
+    const predictedDistanceToObject = distanceToObject - predictedTraveledDistance; // worst case scenario
+    const willBeTooClose = predictedDistanceToObject < emergencyMargin;
+    const isGettingCloser = shipForward.dot(directionToObject) > 0;
+    if (willBeTooClose && isGettingCloser) {
         return false;
     }
 
@@ -58,6 +70,8 @@ export function canEngageWarpDrive(
     if (asteroidField === null) {
         return true;
     }
+
+    const predictedPosition = shipPosition.add(shipForward.scale(predictedTraveledDistance));
 
     const ringVolume = asteroidField.getRingVolume();
     const ringProjection = projectPositionOnRingPlane(shipPosition, ringVolume);
