@@ -1,6 +1,6 @@
 {
     "name": "@cosmos-journeyer/desktop-electron",
-    "version": "1.11.1",
+    "version": "1.11.2",
     "private": true,
     "description": "Electron desktop shell for Cosmos Journeyer.",
     "homepage": "https://cosmosjourneyer.com",
@@ -50,7 +50,7 @@
         "appId": "com.cosmosjourneyer",
         "productName": "Cosmos Journeyer",
         "executableName": "cosmos-journeyer",
-        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+        "artifactName": "Cosmos-Journeyer-${version}-${os}-${arch}.${ext}",
         "publish": {
             "provider": "github",
             "owner": "BarthPaleologue",
