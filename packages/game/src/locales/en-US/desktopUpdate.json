@@ -1,0 +1,21 @@
+{
+    "updateAvailableTitle": "Cosmos Journeyer {{version}} is available",
+    "updateDescription": "Updates bring new features and fixes ({{changelog}}).\nThere is also a small risk of data loss, so we recommend backing up your Commander first.",
+    "updateAvailableChangelogLink": "see changelog",
+    "backupExplanation": "Keep this ZIP backup somewhere safe in case the update causes a problem with your Commander.",
+    "downloadLatestCommanderBackup": "Backup latest Commander",
+    "downloadCurrentCommanderBackup": "Backup current Commander",
+    "downloadUpdate": "Download",
+    "later": "Later",
+    "downloadingTitle": "Downloading Cosmos Journeyer {{version}}",
+    "downloadProgress": "{{percent}}%",
+    "updateReadyTitle": "Cosmos Journeyer {{version}} is ready",
+    "installNow": "Install now",
+    "installOnQuit": "Install when the game closes",
+    "downloadFailedTitle": "The update could not be downloaded",
+    "installationUnchangedAfterDownloadFailure": "Your current installation has not been changed.",
+    "downloadCanBeRetried": "You can retry the download now or later.",
+    "retryDownload": "Retry",
+    "backupFailed": "The Commander backup could not be created.",
+    "installBlockedBySafetySaveFailure": "The safety save could not be created, so the update installation was not started."
+}

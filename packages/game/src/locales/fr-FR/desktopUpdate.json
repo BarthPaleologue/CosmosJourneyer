@@ -1,0 +1,21 @@
+{
+    "updateAvailableTitle": "Cosmos Journeyer {{version}} est disponible",
+    "updateDescription": "Les mises à jour apportent de nouvelles fonctionnalités et des correctifs ({{changelog}}).\nIl existe aussi un faible risque de perte de données : nous vous recommandons donc de créer d’abord une copie de secours de votre Commandant.",
+    "updateAvailableChangelogLink": "voir le changelog",
+    "backupExplanation": "Conservez cette copie de secours ZIP en lieu sûr au cas où la mise à jour causerait un problème avec votre Commandant.",
+    "downloadLatestCommanderBackup": "Copie de secours du Commandant le plus récent",
+    "downloadCurrentCommanderBackup": "Copie de secours du Commandant actuel",
+    "downloadUpdate": "Télécharger",
+    "later": "Plus tard",
+    "downloadingTitle": "Téléchargement de Cosmos Journeyer {{version}}",
+    "downloadProgress": "{{percent}} %",
+    "updateReadyTitle": "Cosmos Journeyer {{version}} est prêt",
+    "installNow": "Installer maintenant",
+    "installOnQuit": "Installer à la fermeture",
+    "downloadFailedTitle": "Impossible de télécharger la mise à jour",
+    "installationUnchangedAfterDownloadFailure": "L’installation actuelle n’a pas été modifiée.",
+    "downloadCanBeRetried": "Vous pouvez réessayer le téléchargement maintenant ou plus tard.",
+    "retryDownload": "Réessayer",
+    "backupFailed": "Impossible de créer la copie de secours du Commandant.",
+    "installBlockedBySafetySaveFailure": "Impossible de créer la sauvegarde de sécurité ; l’installation de la mise à jour n’a donc pas été lancée."
+}
