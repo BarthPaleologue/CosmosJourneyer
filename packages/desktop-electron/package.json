@@ -26,10 +26,13 @@
         "clean:renderer": "node ./scripts/clean-game-dist.mjs",
         "sync:renderer": "node ./scripts/sync-game-dist.mjs",
         "dev": "pnpm run clean:renderer && concurrently -k -s first \"pnpm --filter @cosmos-journeyer/game build:watch\" \"pnpm run dev:app\"",
-        "dev:app": "pnpm run build:main && node ./scripts/wait-for-renderer.mjs && cross-env ELECTRON_RUN_AS_NODE= COSMOS_DESKTOP_DEV=1 electron dist/main.js",
+        "dev:app": "pnpm run build:main && node ./scripts/wait-for-renderer.mjs && cross-env ELECTRON_RUN_AS_NODE= COSMOS_DESKTOP_DEV=1 electron --no-sandbox dist/main.js",
+        "dev:mock-update": "cross-env COSMOS_DESKTOP_MOCK_UPDATE=1 pnpm run dev",
+        "dev:mock-update:delayed": "cross-env COSMOS_DESKTOP_MOCK_UPDATE=1 COSMOS_DESKTOP_MOCK_UPDATE_DELAY_MS=60000 pnpm run dev",
         "package": "pnpm run build && electron-builder --publish never",
         "format": "oxfmt . --write",
         "format:check": "oxfmt . --check",
+        "test:unit": "vitest run src",
         "lint": "eslint src",
         "typecheck": "tsc --noEmit"
     },
@@ -44,7 +47,8 @@
         "electron-builder": "^26.15.3",
         "eslint": "catalog:",
         "oxfmt": "catalog:",
-        "typescript": "catalog:"
+        "typescript": "catalog:",
+        "vitest": "catalog:"
     },
     "build": {
         "appId": "com.cosmosjourneyer",
@@ -64,6 +68,8 @@
             "dist/**/*.js.map",
             "dist/**/*.cjs",
             "dist/**/*.cjs.map",
+            "!dist/**/*.spec.js",
+            "!dist/**/*.spec.js.map",
             "dist/renderer/**/*"
         ],
         "mac": {

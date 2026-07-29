@@ -4,12 +4,14 @@ import { fileURLToPath } from "node:url";
 
 import type * as ElectronModule from "electron";
 
-import { startAutoUpdatePolling } from "./autoUpdate.js";
+import { createDesktopAutoUpdateService, type DesktopAutoUpdateService } from "./autoUpdate.js";
 import { createDevWatcher, type DevWatcher } from "./devWatcher.js";
+import { createDevelopmentAutoUpdater } from "./mockAutoUpdater.js";
 import { appHost, appScheme, createHandleAppProtocol } from "./protocol.js";
+import { updateIpcChannels } from "./updateContract.js";
 
 const require = createRequire(import.meta.url);
-const { app, BrowserWindow, protocol } = require("electron") as typeof ElectronModule;
+const { app, BrowserWindow, ipcMain, protocol, shell } = require("electron") as typeof ElectronModule;
 
 const isDevelopment = process.env["COSMOS_DESKTOP_DEV"] === "1";
 
@@ -18,7 +20,7 @@ const packagedRendererDir = join(currentDir, "renderer");
 const developmentRendererDir = resolve(currentDir, "..", "..", "game", "dist");
 const rendererDir = isDevelopment ? developmentRendererDir : packagedRendererDir;
 
-let stopAutoUpdatePolling: (() => void) | null = null;
+let autoUpdateService: DesktopAutoUpdateService | null = null;
 let devWatcher: DevWatcher | null = null;
 
 protocol.registerSchemesAsPrivileged([
@@ -43,6 +45,7 @@ function createMainWindow(): ElectronModule.BrowserWindow {
             contextIsolation: true,
             nodeIntegration: false,
             sandbox: true,
+            preload: join(currentDir, "preload.cjs"),
         },
     });
 
@@ -52,12 +55,15 @@ function createMainWindow(): ElectronModule.BrowserWindow {
     return window;
 }
 
-void app.whenReady().then(async () => {
+void app.whenReady().then(() => {
     devWatcher = createDevWatcher(rendererDir);
     protocol.handle(appScheme, createHandleAppProtocol(rendererDir));
+    registerAutoUpdateIpc();
     createMainWindow();
-    if (app.isPackaged) {
-        stopAutoUpdatePolling = await startAutoUpdatePolling();
+    const developmentUpdater = createDevelopmentAutoUpdater(app, isDevelopment);
+    if (app.isPackaged || developmentUpdater !== null) {
+        autoUpdateService = createDesktopAutoUpdateService(broadcastUpdateState, developmentUpdater ?? undefined);
+        autoUpdateService.start();
     }
 
     app.on("activate", () => {
@@ -67,12 +73,32 @@ void app.whenReady().then(async () => {
     });
 });
 
+function broadcastUpdateState(state: ReturnType<DesktopAutoUpdateService["getState"]>): void {
+    for (const window of BrowserWindow.getAllWindows()) {
+        window.webContents.send(updateIpcChannels.stateChanged, state);
+    }
+}
+
 app.on("before-quit", () => {
-    stopAutoUpdatePolling?.();
-    stopAutoUpdatePolling = null;
     devWatcher?.close();
     devWatcher = null;
 });
+
+function registerAutoUpdateIpc(): void {
+    ipcMain.handle(updateIpcChannels.getState, () => autoUpdateService?.getState() ?? { type: "idle" });
+    ipcMain.handle(updateIpcChannels.download, () => autoUpdateService?.downloadUpdate());
+    ipcMain.handle(updateIpcChannels.cancelDownload, () => autoUpdateService?.cancelDownload());
+    ipcMain.handle(updateIpcChannels.installOnQuit, () => autoUpdateService?.installOnQuit());
+    ipcMain.handle(updateIpcChannels.installNow, () => autoUpdateService?.installNow());
+    ipcMain.handle(updateIpcChannels.openReleasePage, async () => {
+        const state = autoUpdateService?.getState() ?? { type: "idle" };
+        if (state.type === "idle" || state.type === "installOnQuit") {
+            return;
+        }
+        const releaseUrl = `https://github.com/BarthPaleologue/CosmosJourneyer/releases/tag/v${encodeURIComponent(state.version)}`;
+        await shell.openExternal(releaseUrl);
+    });
+}
 
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
