@@ -54,6 +54,7 @@ export class MainMenu {
     readonly onContributeObservable = new Observable<void>();
     readonly onCreditsObservable = new Observable<void>();
     readonly onAboutObservable = new Observable<void>();
+    readonly onVisibilityChanged = new Observable<void>();
 
     private readonly htmlRoot: HTMLElement;
     private readonly title: HTMLElement;
@@ -392,6 +393,7 @@ export class MainMenu {
             } else {
                 this.scene.onBeforeRenderObservable.removeCallback(animationCallback);
                 this.htmlRoot.style.display = "none";
+                this.onVisibilityChanged.notifyObservers();
 
                 this.starSystemView.setUIEnabled(true);
                 onAnimationFinished();
@@ -426,6 +428,7 @@ export class MainMenu {
         this.showVersion();
         this.showMenu();
         this.htmlRoot.style.display = "block";
+        this.onVisibilityChanged.notifyObservers();
         this.starSystemView.setUIEnabled(false);
     }
 
@@ -434,6 +437,7 @@ export class MainMenu {
         this.hideMenu();
         this.sidePanels.hideActivePanel();
         this.htmlRoot.style.display = "none";
+        this.onVisibilityChanged.notifyObservers();
     }
 
     public isVisible() {

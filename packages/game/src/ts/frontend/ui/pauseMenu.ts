@@ -43,6 +43,7 @@ export class PauseMenu {
     readonly onShare = new Observable<void>();
     readonly onSave = new Observable<void>();
     readonly onResume = new Observable<void>();
+    readonly onVisibilityChanged = new Observable<void>();
 
     constructor(sidePanels: SidePanels, soundPlayer: ISoundPlayer) {
         this.sidePanels = sidePanels;
@@ -122,6 +123,7 @@ export class PauseMenu {
         this.rootNode.style.display = visible ? "grid" : "none";
         this.mask.style.display = visible ? "block" : "none";
         if (!visible) this.sidePanels.hideActivePanel();
+        this.onVisibilityChanged.notifyObservers();
     }
 
     public isVisible(): boolean {
