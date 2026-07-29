@@ -1,3 +1,9 @@
+.progressBar {
+    --progress: 0%;
+    height: 0.5vmin;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--progress), rgba(0, 0, 0, 0.9) var(--progress));
+}
+
 #babylonjsLoadingDiv {
     opacity: 0;
     transition: opacity 1.5s ease;
@@ -31,8 +37,6 @@
 
     --column-gap: 1vw;
     --logoSize: 5vw;
-    --progressBarHeight: 0.5vmin;
-
     .progressBarContainer {
         position: absolute;
         bottom: 3%;
@@ -45,14 +49,7 @@
     }
 
     .progressBar {
-        --progress: 0;
         flex-grow: 1;
-        height: var(--progressBarHeight);
-        background: linear-gradient(
-            to right,
-            rgba(255, 255, 255, 0.9) var(--progress),
-            rgba(0, 0, 0, 0.9) var(--progress)
-        );
     }
 
     .imageSpinnerContainer {
