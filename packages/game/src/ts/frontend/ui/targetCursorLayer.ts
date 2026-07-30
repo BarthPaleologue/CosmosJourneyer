@@ -51,10 +51,12 @@ export class TargetCursorLayer implements IDisposable {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObject(object: Targetable) {
-        const overlay = new ObjectTargetCursor(object);
-        this.targetCursors.push(overlay);
-        this.layerRoot.appendChild(overlay.htmlRoot);
+    public addObjects(objects: ReadonlyArray<Targetable>) {
+        for (const object of objects) {
+            const overlay = new ObjectTargetCursor(object);
+            this.targetCursors.push(overlay);
+            this.layerRoot.appendChild(overlay.htmlRoot);
+        }
     }
 
     public removeObject(object: Targetable) {
@@ -103,6 +105,7 @@ export class TargetCursorLayer implements IDisposable {
             targetCursor.dispose();
         }
         this.targetCursors = [];
+        this.setTarget(null);
     }
 
     public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean) {

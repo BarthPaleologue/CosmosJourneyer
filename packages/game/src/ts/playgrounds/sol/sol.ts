@@ -88,10 +88,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     );
 
     const targetCursorLayer = new TargetCursorLayer();
-
-    for (const bodies of starSystemController.getCelestialBodies()) {
-        targetCursorLayer.addObject(bodies);
-    }
+    targetCursorLayer.addObjects(starSystemController.getCelestialBodies());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

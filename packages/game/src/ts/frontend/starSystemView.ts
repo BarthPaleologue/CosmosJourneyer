@@ -89,6 +89,8 @@ import { CustomAnimation } from "./helpers/animations/customAnimation";
 import { easeInOutCubic } from "./helpers/animations/interpolations";
 import { DepthRendererManager } from "./helpers/depthRendererManager";
 import { setCollisionsEnabled } from "./helpers/havok";
+import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
+import { getGuidanceMissionTargetables, getSystemTargetables } from "./helpers/targeting";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import { type Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -350,112 +352,13 @@ export class StarSystemView implements View {
             this.setTarget(closestObjectToCenter);
         });
 
-        StarSystemInputs.map.jumpToSystem.on("complete", async () => {
-            const target = this.targetCursorLayer.getTarget();
-            if (!(target instanceof SystemTarget)) return;
-
-            const shipControls = this.getSpaceshipControls();
-            const spaceship = shipControls.getSpaceship();
-
-            const warpDrive = spaceship.getInternals().getWarpDrive();
-            if (warpDrive === null) {
+        StarSystemInputs.map.jumpToSystem.on("complete", () => {
+            const target = this.getSelectedSystemTarget();
+            if (target === null) {
                 return;
             }
 
-            if (!this.jumpLock) this.jumpLock = true;
-            else return;
-
-            const currentSystemPosition = wrapVector3(
-                this.universeBackend.getSystemGalacticPosition(this.getStarSystem().model.coordinates),
-            );
-            const targetSystemPosition = wrapVector3(
-                this.universeBackend.getSystemGalacticPosition(target.systemCoordinates),
-            );
-
-            const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
-
-            const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
-
-            if (spaceship.getRemainingFuel() < fuelForJump) {
-                this.notificationManager.create("spaceship", "error", i18n.t("notifications:notEnoughFuel"), 5000);
-                this.jumpLock = false;
-                return;
-            }
-
-            const currentForward = shipControls.getTransform().forward;
-            const targetForward = target
-                .getTransform()
-                .getAbsolutePosition()
-                .subtract(shipControls.getTransform().getAbsolutePosition())
-                .normalize();
-
-            const initialRotation = shipControls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
-
-            const deltaRotation = Quaternion.Identity();
-            Quaternion.FromUnitVectorsToRef(currentForward, targetForward, deltaRotation);
-            const { angle: rotationAngle } = deltaRotation.toAxisAngle();
-
-            const finalRotation = deltaRotation.multiply(initialRotation);
-
-            const rotationSpeed = Math.PI / 8;
-
-            const rotationAnimation = CustomAnimation.FromTo(
-                initialRotation,
-                finalRotation,
-                (from, to, progress) => Quaternion.Slerp(from, to, progress),
-                rotationAngle / rotationSpeed,
-                { easing: easeInOutCubic },
-            );
-
-            await new Promise<void>((resolve) => {
-                const observer = this.scene.onBeforeRenderObservable.add(() => {
-                    rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
-                    shipControls.getTransform().rotationQuaternion = rotationAnimation.getCurrentValue();
-                    if (rotationAnimation.isFinished()) {
-                        observer.remove();
-                        resolve();
-                    }
-                });
-            });
-
-            this.onBeforeJump.notifyObservers();
-
-            // then, initiate hyper space jump
-            if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
-            spaceship.hyperSpaceTunnel.setEnabled(true);
-            spaceship.spaceDots.getTransform().setEnabled(false);
-            spaceship.soundInstances.hyperSpace.setVolume(0.5);
-            soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
-            const observer = this.scene.onBeforeRenderObservable.add(() => {
-                const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
-                spaceship.hyperSpaceTunnel.update(deltaSeconds);
-                spaceship.spaceDots.update(deltaSeconds);
-            });
-
-            spaceship.burnFuel(fuelForJump);
-
-            const starSystemCoordinates = target.systemCoordinates;
-            const systemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
-            if (systemModel === null) {
-                throw new Error("System model not found for coordinates generated by getNeighborStarSystemCoordinates");
-            }
-            await this.loadStarSystem(systemModel);
-
-            this.scene.onBeforeRenderObservable.addOnce(() => {
-                this.initStarSystem(Date.now() / 1000);
-
-                spaceship.hyperSpaceTunnel.setEnabled(false);
-                spaceship.spaceDots.getTransform().setEnabled(true);
-                spaceship.soundInstances.hyperSpace.setVolume(0);
-
-                spaceship.completeHyperspaceJump();
-
-                soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
-                observer.remove();
-                this.jumpLock = false;
-
-                this.onAfterJump.notifyObservers();
-            });
+            void this.jumpToSystem(target);
         });
 
         StarSystemInputs.map.toggleSpaceShipCharacter.on("complete", async () => {
@@ -512,7 +415,7 @@ export class StarSystemView implements View {
                 const rover = roverResult.value;
                 rover.brake();
                 this.vehicleControls.setVehicle(rover);
-                this.targetCursorLayer.addObject(rover);
+                this.targetCursorLayer.addObjects([rover]);
 
                 this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
 
@@ -640,49 +543,39 @@ export class StarSystemView implements View {
     public initStarSystem(timestampSeconds: number): void {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, this.chunkForge, timestampSeconds);
-        this.targetCursorLayer.reset();
+
+        const spaceship = this.getSpaceshipControls().getSpaceship();
+
+        const scene = this.scene;
 
         this.postProcessManager.addCelestialBodies(
             starSystem.getCelestialBodies(),
             starSystem.stellarLightSystem.getLights(),
             [
                 starSystem.starFieldBox.mesh,
-                ...(this.spaceshipControls
-                    ?.getSpaceship()
-                    .getMainThrusters()
-                    .map((thruster) => thruster.exhaust.getProxyMesh()) ?? []),
+                ...spaceship.getMainThrusters().map((thruster) => thruster.exhaust.getProxyMesh()),
             ],
         );
 
-        const celestialBodies = starSystem.getCelestialBodies();
-        const spaceStations = starSystem.getOrbitalFacilities();
-
-        celestialBodies.forEach((body) => {
-            this.targetCursorLayer.addObject(body);
-        });
-
-        for (const spaceStation of spaceStations) {
-            this.targetCursorLayer.addObject(spaceStation);
-
-            spaceStation.getSubTargets().forEach((subTarget) => {
-                this.targetCursorLayer.addObject(subTarget);
-            });
+        const currentJumpRange = spaceship.getInternals().getWarpDrive()?.rangeLY ?? 0;
+        for (const neighbor of getNeighborStarSystemCoordinates(
+            starSystem.model.coordinates,
+            Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
+            this.universeBackend,
+        )) {
+            starSystem.addSystemTarget(neighbor.coordinates, this.universeBackend);
         }
 
-        const orbitalObject = starSystem.getOrbitalObjects();
+        this.initTargetCursorLayerFromSystem(this.targetCursorLayer, starSystem, spaceship);
 
-        this.orbitRenderer.setOrbitalObjects(orbitalObject, this.scene);
-        this.axisRenderer.setOrbitalObjects(orbitalObject, this.scene);
+        const orbitAxisRenderList = getOrbitAxisObjectList(starSystem);
 
-        for (const anomaly of starSystem.getAnomalies()) {
-            const orbitMesh = this.orbitRenderer.getOrbitMesh(anomaly);
-            orbitMesh?.dispose();
-            const axisMesh = this.axisRenderer.getAxisMesh(anomaly);
-            axisMesh?.dispose();
-        }
+        this.orbitRenderer.setOrbitalObjects(orbitAxisRenderList, scene);
+        this.axisRenderer.setOrbitalObjects(orbitAxisRenderList, scene);
 
         this.spaceShipLayer.setTarget(null);
-        this.targetCursorLayer.setTarget(null);
+
+        const celestialBodies = starSystem.getCelestialBodies();
 
         const firstBody = celestialBodies[0];
         if (firstBody === undefined) throw new Error("No bodies in star system");
@@ -729,25 +622,6 @@ export class StarSystemView implements View {
             );
         }
 
-        const currentSpaceship = this.spaceshipControls?.getSpaceship();
-        const currentJumpRange = currentSpaceship?.getInternals().getWarpDrive()?.rangeLY ?? 0;
-
-        if (currentSpaceship !== undefined) {
-            this.targetCursorLayer.addObject(currentSpaceship);
-        }
-
-        for (const neighbor of getNeighborStarSystemCoordinates(
-            starSystem.model.coordinates,
-            Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
-            this.universeBackend,
-        )) {
-            const systemTarget = this.getStarSystem().addSystemTarget(neighbor.coordinates, this.universeBackend);
-            if (systemTarget === null) {
-                continue;
-            }
-            this.targetCursorLayer.addObject(systemTarget);
-        }
-
         if (this.player.currentItinerary !== null) {
             const targetCoordinates = this.player.currentItinerary[1];
             if (starSystemCoordinatesEquals(starSystem.model.coordinates, targetCoordinates)) {
@@ -771,6 +645,18 @@ export class StarSystemView implements View {
         this.scene.getEngine().loadingScreen.hideLoadingUI();
 
         this._isLoadingSystem = false;
+    }
+
+    private initTargetCursorLayerFromSystem(
+        targetCursorLayer: TargetCursorLayer,
+        starSystem: StarSystemController,
+        spaceship: Spaceship,
+    ) {
+        const targetables: Array<Targetable> = [spaceship];
+        targetables.push(...getSystemTargetables(starSystem));
+
+        targetCursorLayer.reset();
+        targetCursorLayer.addObjects(targetables);
     }
 
     /**
@@ -803,7 +689,7 @@ export class StarSystemView implements View {
         );
         this.player.instancedSpaceships.push(spaceship);
 
-        this.targetCursorLayer.addObject(spaceship);
+        this.targetCursorLayer.addObjects([spaceship]);
 
         this.interactionSystem.register({
             getPhysicsAggregate: () => spaceship.aggregate,
@@ -892,6 +778,126 @@ export class StarSystemView implements View {
         }
 
         await this.setActiveControls(this.spaceshipControls);
+    }
+
+    private getSelectedSystemTarget(): SystemTarget | null {
+        const target = this.targetCursorLayer.getTarget();
+        if (target instanceof SystemTarget) {
+            return target;
+        }
+
+        return null;
+    }
+
+    private async jumpToSystem(target: SystemTarget) {
+        const shipControls = this.getSpaceshipControls();
+        const spaceship = shipControls.getSpaceship();
+        const warpDrive = spaceship.getInternals().getWarpDrive();
+        if (warpDrive === null) {
+            return;
+        }
+
+        const starSystemCoordinates = target.systemCoordinates;
+        const systemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+        if (systemModel === null) {
+            await alertModal(
+                "System model not found for coordinates generated by getNeighborStarSystemCoordinates",
+                this.soundPlayer,
+            );
+            return;
+        }
+
+        if (this.jumpLock) {
+            return;
+        }
+
+        this.jumpLock = true;
+
+        const currentSystemPosition = wrapVector3(
+            this.universeBackend.getSystemGalacticPosition(this.getStarSystem().model.coordinates),
+        );
+        const targetSystemPosition = wrapVector3(
+            this.universeBackend.getSystemGalacticPosition(target.systemCoordinates),
+        );
+
+        const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
+        const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
+
+        if (spaceship.getRemainingFuel() < fuelForJump) {
+            this.notificationManager.create("spaceship", "error", i18n.t("notifications:notEnoughFuel"), 5000);
+            this.jumpLock = false;
+            return;
+        }
+
+        const currentForward = shipControls.getTransform().forward;
+        const targetForward = target
+            .getTransform()
+            .getAbsolutePosition()
+            .subtract(shipControls.getTransform().getAbsolutePosition())
+            .normalize();
+
+        const initialRotation = shipControls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
+
+        const deltaRotation = Quaternion.Identity();
+        Quaternion.FromUnitVectorsToRef(currentForward, targetForward, deltaRotation);
+        const { angle: rotationAngle } = deltaRotation.toAxisAngle();
+
+        const finalRotation = deltaRotation.multiply(initialRotation);
+
+        const rotationSpeed = Math.PI / 8;
+
+        const rotationAnimation = CustomAnimation.FromTo(
+            initialRotation,
+            finalRotation,
+            (from, to, progress) => Quaternion.Slerp(from, to, progress),
+            rotationAngle / rotationSpeed,
+            { easing: easeInOutCubic },
+        );
+
+        await new Promise<void>((resolve) => {
+            const observer = this.scene.onBeforeRenderObservable.add(() => {
+                rotationAnimation.update(this.scene.getEngine().getDeltaTime() / 1000);
+                shipControls.getTransform().rotationQuaternion = rotationAnimation.getCurrentValue();
+                if (rotationAnimation.isFinished()) {
+                    observer.remove();
+                    resolve();
+                }
+            });
+        });
+
+        this.onBeforeJump.notifyObservers();
+
+        // then, initiate hyper space jump
+        if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
+        spaceship.hyperSpaceTunnel.setEnabled(true);
+        spaceship.spaceDots.getTransform().setEnabled(false);
+        spaceship.soundInstances.hyperSpace.setVolume(0.5);
+        this.soundPlayer.setInstanceMask(AudioMasks.HYPER_SPACE);
+        const observer = this.scene.onBeforeRenderObservable.add(() => {
+            const deltaSeconds = this.scene.getEngine().getDeltaTime() / 1000;
+            spaceship.hyperSpaceTunnel.update(deltaSeconds);
+            spaceship.spaceDots.update(deltaSeconds);
+        });
+
+        spaceship.burnFuel(fuelForJump);
+
+        await this.loadStarSystem(systemModel);
+
+        this.scene.onBeforeRenderObservable.addOnce(() => {
+            this.initStarSystem(Date.now() / 1000);
+
+            spaceship.hyperSpaceTunnel.setEnabled(false);
+            spaceship.spaceDots.getTransform().setEnabled(true);
+            spaceship.soundInstances.hyperSpace.setVolume(0);
+
+            spaceship.completeHyperspaceJump();
+
+            this.soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
+            observer.remove();
+            this.jumpLock = false;
+
+            this.onAfterJump.notifyObservers();
+        });
     }
 
     private ensureCurrentSystemInHistory(): void {
@@ -1029,7 +1035,9 @@ export class StarSystemView implements View {
 
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
-        this.targetCursorLayer.setAdditionalPinnedTargets(this.getGuidanceMissionTargetObjects());
+        this.targetCursorLayer.setAdditionalPinnedTargets(
+            getGuidanceMissionTargetables(this.player.currentMissions, starSystem),
+        );
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);
@@ -1317,15 +1325,6 @@ export class StarSystemView implements View {
         return this.starSystem;
     }
 
-    private getGuidanceMissionTargetObjects(): Targetable[] {
-        const starSystem = this.getStarSystem();
-        return this.player.currentMissions
-            .flatMap((mission) => mission.getGuidanceTargetObjectIds())
-            .filter((objectId) => starSystemCoordinatesEquals(objectId.systemCoordinates, starSystem.model.coordinates))
-            .map((objectId) => starSystem.getOrbitalObjectById(objectId.idInSystem))
-            .filter((object) => object !== undefined);
-    }
-
     public hideHtmlUI() {
         this.spaceShipLayer.setVisibility(false);
         this.targetCursorLayer.setEnabled(false);
@@ -1366,7 +1365,7 @@ export class StarSystemView implements View {
             const newTarget = this.getStarSystem().addSystemTarget(targetSeed, this.universeBackend);
             if (newTarget !== null) {
                 target = newTarget;
-                this.targetCursorLayer.addObject(target);
+                this.targetCursorLayer.addObjects([target]);
             }
         }
 
