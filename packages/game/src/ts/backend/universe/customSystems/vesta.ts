@@ -45,7 +45,7 @@ import type {
 
 import { CropType } from "@/utils/agriculture";
 
-export function getVestaSystemModel(): StarSystemModel {
+export function getVestaSystemModel() {
     const coordinates: StarSystemCoordinates = {
         starSectorX: -1,
         starSectorY: 2,
@@ -84,7 +84,7 @@ export function getVestaSystemModel(): StarSystemModel {
 
     const janusOrbitRadius = astronomicalUnitToMeters(0.2);
     const janusOrbitalPeriod = getOrbitalPeriod(janusOrbitRadius, vesta.mass);
-    const janus: TelluricPlanetModel = {
+    const janus = {
         type: "telluricPlanet",
         name: "Janus",
         id: "janus",
@@ -128,7 +128,7 @@ export function getVestaSystemModel(): StarSystemModel {
             min: 50,
             max: 400,
         },
-    };
+    } as const satisfies TelluricPlanetModel;
 
     const aphroditeRadius = EarthRadius * 0.2;
     const aphrodite = {
@@ -199,7 +199,7 @@ export function getVestaSystemModel(): StarSystemModel {
             min: celsiusToKelvin(-10),
             max: celsiusToKelvin(40),
         },
-    } satisfies TelluricPlanetModel;
+    } as const satisfies TelluricPlanetModel;
 
     const adonisOrbitRadius = aphrodite.rings.outerRadius * 2;
     const adonis = {
@@ -245,7 +245,7 @@ export function getVestaSystemModel(): StarSystemModel {
             min: 50,
             max: 350,
         },
-    } satisfies TelluricSatelliteModel;
+    } as const satisfies TelluricSatelliteModel;
 
     const phileasOrbitRadius = getOrbitRadiusFromPeriod(durationToSeconds({ days: 80 }), aphrodite.mass);
     const phileas = {
@@ -291,9 +291,9 @@ export function getVestaSystemModel(): StarSystemModel {
             min: 50,
             max: 350,
         },
-    } satisfies TelluricSatelliteModel;
+    } as const satisfies TelluricSatelliteModel;
 
-    const newJulesVerne: SpaceStationModel = {
+    const newJulesVerne = {
         type: "spaceStation",
         name: "New Jules Verne",
         id: "newJulesVerne",
@@ -345,11 +345,11 @@ export function getVestaSystemModel(): StarSystemModel {
             { type: "utility", hasTanks: true },
             { type: "landingBay", heightFactor: 2 },
         ],
-    };
+    } as const satisfies SpaceStationModel;
 
     const snowLine = getWaterIceFrostLine(vesta.blackBodyTemperature, vesta.radius);
 
-    const melpomene: GasPlanetModel = {
+    const melpomene = {
         type: "gasPlanet",
         name: "Melpomene",
         id: "melpomene",
@@ -384,7 +384,7 @@ export function getVestaSystemModel(): StarSystemModel {
             colorSharpness: 0.8,
         },
         rings: null,
-    };
+    } as const satisfies GasPlanetModel;
 
     return {
         name: "Vesta",
@@ -394,5 +394,5 @@ export function getVestaSystemModel(): StarSystemModel {
         satellites: [adonis, phileas],
         anomalies: [],
         orbitalFacilities: [newJulesVerne],
-    };
+    } as const satisfies StarSystemModel;
 }
