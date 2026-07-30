@@ -7,6 +7,29 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Paris"
+    cooldown:
+      semver-major-days: 14
+    groups:
+      babylonjs:
+        applies-to: "version-updates"
+        patterns:
+          - "@babylonjs/*"
+        exclude-patterns:
+          - "@babylonjs/havok"
+
+      production-minor-patch:
+        applies-to: "version-updates"
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+
+      development-minor-patch:
+        applies-to: "version-updates"
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "uv"
     directory: "/packages/gaia-explorer"
@@ -15,6 +38,16 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Paris"
+    cooldown:
+      semver-major-days: 14
+    groups:
+      minor-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "cargo"
     directory: "/packages/terrain-generation"
@@ -23,6 +56,16 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Paris"
+    cooldown:
+      semver-major-days: 14
+    groups:
+      minor-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -31,3 +74,11 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Paris"
+    groups:
+      minor-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
