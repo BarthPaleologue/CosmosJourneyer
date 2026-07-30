@@ -190,8 +190,8 @@ importers:
         specifier: ^8.48.0
         version: 8.48.0(@babylonjs/core@8.48.0)
       '@babylonjs/node-editor':
-        specifier: ^8.48.0
-        version: 8.48.0(@babylonjs/core@8.48.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)
+        specifier: ^9.19.0
+        version: 9.19.0(@babylonjs/core@8.48.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)
       '@brianchirls/game-input':
         specifier: ^0.1.1
         version: 0.1.1
@@ -480,10 +480,10 @@ packages:
     peerDependencies:
       '@babylonjs/core': ^8.6.0
 
-  '@babylonjs/node-editor@8.48.0':
-    resolution: {integrity: sha512-Dl2YcCPtQkYrOvK3BaHSr1NSzNU8O9A5YAOSOj8yJ63OWIHPSyOsjDs0vnXZkV+rlYN3h5OrSRPZNAo3PZxWLA==}
+  '@babylonjs/node-editor@9.19.0':
+    resolution: {integrity: sha512-fqnwb3w9Xd4WEn44ghMEzVi/KgqWzL79kzkG4s+ryXh7H15tfUz4g7e81/21nsifM0OF6GBsUxO4MxaZX1RPKw==}
     peerDependencies:
-      '@babylonjs/core': ^8.0.0
+      '@babylonjs/core': ^9.0.0
       '@types/react': '>=16.7.3'
       '@types/react-dom': '>=16.0.9'
 
@@ -3964,7 +3964,7 @@ snapshots:
     dependencies:
       '@babylonjs/core': 8.48.0
 
-  '@babylonjs/node-editor@8.48.0(@babylonjs/core@8.48.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)':
+  '@babylonjs/node-editor@9.19.0(@babylonjs/core@8.48.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)':
     dependencies:
       '@babylonjs/core': 8.48.0
       '@types/react': 19.2.17
