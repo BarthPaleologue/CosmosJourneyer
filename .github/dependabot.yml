@@ -74,8 +74,6 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Paris"
-    cooldown:
-      semver-major-days: 14
     groups:
       minor-patch:
         applies-to: "version-updates"
