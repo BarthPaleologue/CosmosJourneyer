@@ -34,6 +34,8 @@ import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@
 import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { addAuthoredEntityModels } from "@/backend/persistentEntities/authoredEntityModels";
+import { PersistentEntityRegistry } from "@/backend/persistentEntities/persistentEntityRegistry";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -241,6 +243,8 @@ export class StarSystemView implements View {
 
     private readonly t: TFunction;
 
+    private readonly persistentEntityRegistry: PersistentEntityRegistry;
+
     /**
      * Creates an empty star system view with a scene, a gui and a physics engine
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
@@ -294,6 +298,9 @@ export class StarSystemView implements View {
         this.progressMonitor = progressMonitor;
 
         this.t = t;
+
+        this.persistentEntityRegistry = new PersistentEntityRegistry();
+        addAuthoredEntityModels(this.persistentEntityRegistry);
 
         this.interactionSystem = new InteractionSystem(
             CollisionMask.INTERACTIVE,
@@ -532,10 +539,14 @@ export class StarSystemView implements View {
             this.spaceStationLayer.reset();
         }
 
+        const persistentEntityModels = this.persistentEntityRegistry.get(starSystemModel.coordinates) ?? [];
+
         this.starSystem = await StarSystemController.CreateAsync(
             starSystemModel,
+            persistentEntityModels,
             this.loader,
             this.assets,
+            this.terrainSystem,
             this.scene,
             this.progressMonitor,
         );
