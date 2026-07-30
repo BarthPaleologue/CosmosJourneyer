@@ -37,8 +37,10 @@ export function getSystemTargets(starSystem: StarSystemController): Array<Target
     const orbitalObjects = starSystem.getOrbitalObjects();
     const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTargets(object));
     out.push(...orbitalObjectTargets);
-
     out.push(...starSystem.getSystemTargets().map(createSystemTarget));
+
+    const persistentEntities = starSystem.persistentEntitySystem.getEntities();
+    out.push(...persistentEntities.map(createPersistentContentTarget));
 
     return out;
 }

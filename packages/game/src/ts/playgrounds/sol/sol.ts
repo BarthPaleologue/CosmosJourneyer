@@ -70,8 +70,10 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     const starSystemLoader = new StarSystemLoader();
     const starSystemController = await StarSystemController.CreateAsync(
         getSolSystemModel(),
+        [],
         starSystemLoader,
         assets,
+        terrainSystem,
         scene,
         progressMonitor,
     );

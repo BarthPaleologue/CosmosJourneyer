@@ -34,6 +34,7 @@ import { createCustomSystemScene } from "./customSystem";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
+import { createDiaryScene } from "./diary";
 import { createFlightDemoScene } from "./flightDemo";
 import { createForestScene } from "./forest";
 import { createGasPlanetScene } from "./gasPlanet";
@@ -128,6 +129,7 @@ export class PlaygroundRegistry {
         ["cryptographicSecret", createCryptographicSecretScene],
         ["customSystem", createCustomSystemScene],
         ["qrScan", createQrScanScene],
+        ["diary", createDiaryScene],
     ]);
 
     register(
