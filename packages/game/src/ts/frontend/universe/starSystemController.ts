@@ -50,7 +50,7 @@ import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
 import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
-import type { StarSystemLoader } from "./starSystemLoader";
+import type { StarSystemLoader, StarSystemLoaderOutput } from "./starSystemLoader";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.
@@ -109,13 +109,7 @@ export class StarSystemController {
      */
     private constructor(
         model: DeepReadonly<StarSystemModel>,
-        orbitalObjects: {
-            stellarObjects: Readonly<NonEmptyArray<StellarObject>>;
-            planets: ReadonlyArray<Planet>;
-            satellites: ReadonlyArray<TelluricPlanet>;
-            anomalies: ReadonlyArray<Anomaly>;
-            orbitalFacilities: ReadonlyArray<OrbitalFacility>;
-        },
+        orbitalObjects: Readonly<StarSystemLoaderOutput>,
         assets: RenderingAssets,
         scene: Scene,
     ) {
