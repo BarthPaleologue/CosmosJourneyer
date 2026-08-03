@@ -70,7 +70,7 @@
         "zod": "catalog:"
     },
     "devDependencies": {
-        "@playwright/test": "^1.62.0",
+        "@playwright/test": "^1.62.1",
         "@types/d3": "^7.4.3",
         "@types/earcut": "^3.0.0",
         "@types/qrcode": "^1.5.6",
