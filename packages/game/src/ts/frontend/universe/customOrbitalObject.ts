@@ -24,16 +24,26 @@ import type { OrbitalObjectBase } from "./architecture/orbitalObjectBase";
 import { ObjectTargetCursorType } from "./architecture/targetable";
 import type { Targetable, TargetInfo } from "./architecture/targetable";
 
+type CustomOrbitalObjectOptions = Partial<{
+    getTypeName: CustomOrbitalObject["getTypeName"];
+}>;
+
 export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targetable {
-    private readonly _transform: TransformNode;
+    private readonly transform: TransformNode;
     readonly model: DeepReadonly<OrbitalObjectModelBase<"custom">>;
     readonly type: "custom";
     private readonly boundingRadius: number;
     readonly targetInfo: TargetInfo;
 
-    constructor(transform: TransformNode, model: DeepReadonly<OrbitalObjectModelBase<"custom">>) {
-        this._transform = transform;
-        this._transform.rotationQuaternion = Quaternion.Identity();
+    private readonly _getTypeName: CustomOrbitalObject["getTypeName"];
+
+    constructor(
+        transform: TransformNode,
+        model: DeepReadonly<OrbitalObjectModelBase<"custom">>,
+        options?: CustomOrbitalObjectOptions,
+    ) {
+        this.transform = transform;
+        this.transform.rotationQuaternion = Quaternion.Identity();
 
         this.model = model;
         this.type = model.type;
@@ -43,14 +53,16 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targeta
 
         this.targetInfo = {
             type: ObjectTargetCursorType.CELESTIAL_BODY,
+            name: model.name,
             minDistance: 0,
             maxDistance: 0,
-            name: transform.name,
         };
+
+        this._getTypeName = options?.getTypeName ?? (() => "Custom Orbital Object");
     }
 
     getTransform(): TransformNode {
-        return this._transform;
+        return this.transform;
     }
 
     getBoundingRadius(): number {
@@ -58,7 +70,7 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targeta
     }
 
     getTypeName(): string {
-        return "Wrapped Orbital Object";
+        return this._getTypeName();
     }
 
     dispose(): void {
