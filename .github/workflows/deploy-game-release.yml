@@ -50,7 +50,7 @@ jobs:
                   targets: wasm32-unknown-unknown
 
             - name: Setup wasm-pack
-              uses: taiki-e/install-action@v2
+              uses: taiki-e/install-action@v2.85.5
               with:
                   tool: wasm-pack
 
