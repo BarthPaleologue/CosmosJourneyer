@@ -63,11 +63,11 @@ export async function loadVoiceLines(
     const loadSoundAsync = async (
         name: string,
         url: string,
-        audioEngine: AudioEngineV2,
+        engine: AudioEngineV2,
         options?: Partial<IStaticSoundOptions>,
     ) => {
         progressMonitor.startTask();
-        const sound = await CreateSoundAsync(name, url, options, audioEngine);
+        const sound = await CreateSoundAsync(name, url, options, engine);
         progressMonitor.completeTask();
         return sound;
     };

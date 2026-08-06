@@ -71,8 +71,8 @@ export function generateMissionsDom(
         const spaceStations = systemModel.orbitalFacilities.map<{
             model: DeepReadonly<OrbitalFacilityModel>;
             distance: number;
-        }>((stationModel) => {
-            return { model: stationModel, distance: neighbor.distance };
+        }>((facilityModel) => {
+            return { model: facilityModel, distance: neighbor.distance };
         });
         neighborSpaceStations = neighborSpaceStations.concat(spaceStations);
     }

@@ -826,14 +826,14 @@ export function swizzle(
 
 /**
  * Returns a constant color input block.
- * @param color - The color value.
+ * @param value - The color value.
  * @param options - Optional target options.
  */
-export function color(color: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function color(value: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const colorBlock = new InputBlock("color");
     colorBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     colorBlock.isConstant = true;
-    colorBlock.value = color;
+    colorBlock.value = value;
 
     return colorBlock.output;
 }
@@ -852,7 +852,7 @@ export function sampleGradient(
     const gradientBlock = new GradientBlock("Gradient");
     gradientBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    gradientBlock.colorSteps = gradientSteps.map(([value, color]) => new GradientBlockColorStep(value, color));
+    gradientBlock.colorSteps = gradientSteps.map(([value, stepColor]) => new GradientBlockColorStep(value, stepColor));
     t.connectTo(gradientBlock.gradient);
 
     return gradientBlock.output;
@@ -894,14 +894,17 @@ export function hslToRgb(
 
 /**
  * Converts a Babylon.js vector to a node material input block.
- * @param vec - The Babylon.js vector.
+ * @param inputVector - The Babylon.js vector.
  * @param options - Optional target options.
  */
-export function vec(vec: Vector2 | Vector3 | Vector4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function vec(
+    inputVector: Vector2 | Vector3 | Vector4,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
     const vector = new InputBlock("Mesh UV scale factor");
     vector.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     vector.isConstant = true;
-    vector.value = vec;
+    vector.value = inputVector;
 
     return vector.output;
 }

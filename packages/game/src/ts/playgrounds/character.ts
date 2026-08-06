@@ -153,10 +153,10 @@ export async function createCharacterDemoScene(
         character2.update(deltaSeconds);
         character3.update(deltaSeconds);
 
-        for (const character of characters) {
-            const gravity = gravitySystem.getLastComputedForce(character.aggregate.body) ?? Vector3.Up();
+        for (const characterInstance of characters) {
+            const gravity = gravitySystem.getLastComputedForce(characterInstance.aggregate.body) ?? Vector3.Up();
             const upDirection = gravity.normalize().negateInPlace();
-            setUpVector(character.getTransform(), upDirection);
+            setUpVector(characterInstance.getTransform(), upDirection);
         }
 
         character.getHeadPositionToRef(headTrackingTarget);

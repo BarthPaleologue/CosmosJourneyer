@@ -60,12 +60,12 @@ export class TargetCursorLayer implements IDisposable {
     }
 
     public removeObject(object: Targetable) {
-        const targetCursor = this.targetCursors.find((targetCursor) => targetCursor.object === object);
+        const targetCursor = this.targetCursors.find((cursor) => cursor.object === object);
         if (targetCursor === undefined) {
             return;
         }
 
-        this.targetCursors = this.targetCursors.filter((targetCursor) => targetCursor.object !== object);
+        this.targetCursors = this.targetCursors.filter((cursor) => cursor.object !== object);
         this.additionalPinnedTargets.delete(object);
         targetCursor.dispose();
 

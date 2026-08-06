@@ -18,7 +18,7 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
     const meanAnomaly = orbitalPeriod > 0 ? orbit.initialMeanAnomaly - (2 * Math.PI * t) / orbitalPeriod : 0;
 
     const trueAnomaly = findMinimumNewtonRaphson(
-        (trueAnomaly) => keplerEquation(trueAnomaly, meanAnomaly, orbit.eccentricity),
+        (anomaly) => keplerEquation(anomaly, meanAnomaly, orbit.eccentricity),
         meanAnomaly,
     );
 

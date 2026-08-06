@@ -116,7 +116,7 @@ export class AsteroidPatch {
                 instance.physicsBody !== null &&
                 instance.physicsBody !== undefined
             ) {
-                const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
+                const body = this.instancePhysicsBodies.find((physicsBody) => physicsBody === instance.physicsBody);
                 if (body !== undefined) {
                     body.dispose();
                     this.instancePhysicsBodies.splice(this.instancePhysicsBodies.indexOf(body), 1);

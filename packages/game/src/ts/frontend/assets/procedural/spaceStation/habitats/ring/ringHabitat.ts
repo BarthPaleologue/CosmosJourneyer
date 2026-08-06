@@ -222,8 +222,8 @@ export class RingHabitat implements Transformable {
             arm.rotationQuaternion = rotation;
             arm.parent = this.getTransform();
 
-            const lightYStep = 350;
-            for (let lightY = lightYStep; lightY <= this.radius - lightYStep; lightY += lightYStep) {
+            const armLightYStep = 350;
+            for (let lightY = armLightYStep; lightY <= this.radius - armLightYStep; lightY += armLightYStep) {
                 for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
                     const phi = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
                     const position = new Vector3(

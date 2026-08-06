@@ -87,8 +87,8 @@ export function processAsteroids(container: AssetContainer, scalings: ReadonlyAr
 
     asteroids.push(...diversifyAsteroid(asteroid, scalings));
 
-    for (const asteroid of asteroids) {
-        asteroid.setEnabled(false);
+    for (const asteroidInstance of asteroids) {
+        asteroidInstance.setEnabled(false);
     }
 
     container.addAllToScene();

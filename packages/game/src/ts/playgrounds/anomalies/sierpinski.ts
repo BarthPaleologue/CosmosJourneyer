@@ -63,9 +63,9 @@ export function createSierpinskiScene(
         scene,
     );
 
-    scene.cameras.forEach((camera) => camera.attachPostProcess(pp));
-    scene.onNewCameraAddedObservable.add((camera) => {
-        camera.attachPostProcess(pp);
+    scene.cameras.forEach((cam) => cam.attachPostProcess(pp));
+    scene.onNewCameraAddedObservable.add((cam) => {
+        cam.attachPostProcess(pp);
     });
 
     scene.onBeforeRenderObservable.add(() => {
@@ -73,8 +73,8 @@ export function createSierpinskiScene(
         pp.update(deltaSeconds);
     });
 
-    scene.onBeforeCameraRenderObservable.add((camera) => {
-        depthRendererManager.setActiveCamera(camera);
+    scene.onBeforeCameraRenderObservable.add((cam) => {
+        depthRendererManager.setActiveCamera(cam);
     });
 
     return Promise.resolve(scene);

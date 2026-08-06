@@ -77,8 +77,8 @@ export function createAtmosphericScatteringScene(
         controls.update(deltaSeconds);
     });
 
-    scene.onBeforeCameraRenderObservable.add((camera) => {
-        depthRendererManager.setActiveCamera(camera);
+    scene.onBeforeCameraRenderObservable.add((cam) => {
+        depthRendererManager.setActiveCamera(cam);
     });
 
     return Promise.resolve(scene);

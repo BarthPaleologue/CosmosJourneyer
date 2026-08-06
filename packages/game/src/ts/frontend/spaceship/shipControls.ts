@@ -95,13 +95,13 @@ export class ShipControls implements Controls {
     private readonly notificationManager: INotificationManager;
 
     constructor(
-        spaceship: Spaceship,
+        ship: Spaceship,
         scene: Scene,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
     ) {
-        this.spaceship = spaceship;
+        this.spaceship = ship;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -289,7 +289,7 @@ export class ShipControls implements Controls {
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset5, "cockpitSelfie");
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset6, "rearBelow");
 
-        this.setSpaceship(spaceship);
+        this.setSpaceship(ship);
     }
 
     private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {

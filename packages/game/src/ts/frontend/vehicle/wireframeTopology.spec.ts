@@ -97,13 +97,13 @@ describe("WireframeTopology", () => {
 
         const asPairsNormalized = (a: Uint32Array) =>
             Array.from({ length: a.length / 2 }, (_, i) => {
-                const v1 = a[2 * i];
-                const v2 = a[2 * i + 1];
-                if (v1 === undefined || v2 === undefined) {
+                const edgeV1 = a[2 * i];
+                const edgeV2 = a[2 * i + 1];
+                if (edgeV1 === undefined || edgeV2 === undefined) {
                     throw new Error("Invalid edge indices");
                 }
 
-                const p = [v1, v2];
+                const p = [edgeV1, edgeV2];
                 p.sort((x, y) => x - y);
                 return p;
             });

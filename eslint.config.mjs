@@ -90,6 +90,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/prefer-readonly": "error",
 
+        "@typescript-eslint/no-shadow": "error",
+
         "@typescript-eslint/no-misused-promises": [
             "error",
             {

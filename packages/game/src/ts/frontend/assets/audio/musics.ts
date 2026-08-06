@@ -61,11 +61,11 @@ export async function loadMusics(
     const loadSoundAsync = async (
         name: string,
         url: string,
-        audioEngine: AudioEngineV2,
+        engine: AudioEngineV2,
         options?: Partial<IStreamingSoundOptions>,
     ) => {
         progressMonitor.startTask();
-        const sound = await CreateStreamingSoundAsync(name, url, options, audioEngine);
+        const sound = await CreateStreamingSoundAsync(name, url, options, engine);
         progressMonitor.completeTask();
         return sound;
     };

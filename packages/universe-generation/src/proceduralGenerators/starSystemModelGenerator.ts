@@ -119,14 +119,14 @@ export function generateStarSystemModel(
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
         const parentIds = stellarObjects.map((object) => object.id);
 
-        const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * SeedHalfRange;
+        const planetSeed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * SeedHalfRange;
 
         switch (bodyType) {
             case "telluricPlanet":
                 planets.push(
                     generateTelluricPlanetModel(
                         createOrbitalObjectId(parentIds, "telluricPlanet", i),
-                        seed,
+                        planetSeed,
                         planetName,
                         stellarObjects,
                     ),
@@ -136,7 +136,7 @@ export function generateStarSystemModel(
                 planets.push(
                     generateGasPlanetModel(
                         createOrbitalObjectId(parentIds, "gasPlanet", i),
-                        seed,
+                        planetSeed,
                         planetName,
                         stellarObjects,
                     ),

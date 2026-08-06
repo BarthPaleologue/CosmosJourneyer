@@ -46,8 +46,12 @@ export function generateGasPlanetModel(
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
-        const radius = getGasPlanetOrbitRadius(parent.blackBodyTemperature, getCelestialBodyRadius(parent), rng);
-        orbitRadiuses.push(radius);
+        const parentOrbitRadius = getGasPlanetOrbitRadius(
+            parent.blackBodyTemperature,
+            getCelestialBodyRadius(parent),
+            rng,
+        );
+        orbitRadiuses.push(parentOrbitRadius);
     }
 
     const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
