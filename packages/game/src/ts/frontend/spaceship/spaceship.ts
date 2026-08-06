@@ -384,8 +384,11 @@ export class Spaceship implements Transformable, Targetable {
             return;
         }
 
-        if (!warpDrive.isEnabled()) this.enableWarpDrive();
-        else this.disableWarpDrive();
+        if (!warpDrive.isEnabled()) {
+            this.enableWarpDrive();
+        } else {
+            this.disableWarpDrive();
+        }
     }
 
     public setMainEngineThrottle(throttle: number) {
@@ -528,9 +531,15 @@ export class Spaceship implements Transformable, Targetable {
 
     private handleFuelScoop(deltaSeconds: number) {
         const fuelScoop = this.getInternals().getFuelScoop();
-        if (fuelScoop === null) return;
-        if (this.nearestCelestialBody === null) return;
-        if (!["star", "gasPlanet"].includes(this.nearestCelestialBody.model.type)) return;
+        if (fuelScoop === null) {
+            return;
+        }
+        if (this.nearestCelestialBody === null) {
+            return;
+        }
+        if (!["star", "gasPlanet"].includes(this.nearestCelestialBody.model.type)) {
+            return;
+        }
 
         const distanceToBody = Vector3.Distance(
             this.getTransform().getAbsolutePosition(),
@@ -652,9 +661,9 @@ export class Spaceship implements Transformable, Targetable {
 
         warpDrive.update(warpInfluences, shipPosition, shipForward, deltaSeconds);
 
-        if (warpDrive.isEnabled())
+        if (warpDrive.isEnabled()) {
             this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));
-        else {
+        } else {
             this.spaceDots.setThrottle(0);
             this.spaceDots.setSteering(0, 0);
         }

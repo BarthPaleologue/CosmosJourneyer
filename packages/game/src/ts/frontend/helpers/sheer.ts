@@ -37,8 +37,12 @@ export function sheerAlongY(mesh: Mesh, amountY: number) {
             continue;
         }
 
-        if (z < minZ) minZ = z;
-        if (z > maxZ) maxZ = z;
+        if (z < minZ) {
+            minZ = z;
+        }
+        if (z > maxZ) {
+            maxZ = z;
+        }
     }
     const height = maxZ - minZ;
     if (height === 0) {

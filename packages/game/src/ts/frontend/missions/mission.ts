@@ -155,7 +155,9 @@ export class Mission {
      * @param context The current mission context
      */
     update(context: MissionContext): void {
-        if (this.isCompleted()) return;
+        if (this.isCompleted()) {
+            return;
+        }
         this.tree.updateState(context);
     }
 

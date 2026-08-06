@@ -29,7 +29,9 @@ import { type StarSystemController } from "@/frontend/universe/starSystemControl
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
     let nearest = bodies[0];
-    if (nearest === undefined) throw new Error("no bodieees !");
+    if (nearest === undefined) {
+        throw new Error("no bodieees !");
+    }
     for (const body of bodies) {
         const newDistance = objectPosition.subtract(body.getTransform().getAbsolutePosition()).length();
         if (distance === -1 || newDistance < distance) {

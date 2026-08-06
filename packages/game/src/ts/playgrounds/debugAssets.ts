@@ -60,7 +60,9 @@ export async function createDebugAssetsScene(
     let meshCounter = 0;
     for (const rootMesh of scene.meshes) {
         rootMesh.isVisible = true;
-        if (rootMesh.parent !== null) continue;
+        if (rootMesh.parent !== null) {
+            continue;
+        }
         meshCounter++;
         const extent = rootMesh.getHierarchyBoundingVectors();
         const maxDimension = Math.max(

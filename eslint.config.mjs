@@ -79,6 +79,9 @@ const typeScriptWorkspaceRules = {
 
         "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
 
+        // enforce braces around control flow statements
+        curly: "error",
+
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/require-array-sort-compare": "error",

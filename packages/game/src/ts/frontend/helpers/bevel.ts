@@ -31,7 +31,9 @@ export function bevelPolygon(
     borderRadius: number,
 ): Array<Vector3> {
     const n = points.length;
-    if (n < 3) return points.slice();
+    if (n < 3) {
+        return points.slice();
+    }
 
     const result: Array<Vector3> = [];
     const fraction = borderRadius;

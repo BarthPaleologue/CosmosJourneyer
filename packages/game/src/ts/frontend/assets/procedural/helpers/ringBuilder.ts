@@ -64,7 +64,9 @@ export function createRingVertexData(radius: number, thickness: number, height: 
         uvs.push(i / tesselation, 1);
         uvs.push(i / tesselation, 0);
 
-        if (i === 0) continue;
+        if (i === 0) {
+            continue;
+        }
 
         const stride = 8;
 

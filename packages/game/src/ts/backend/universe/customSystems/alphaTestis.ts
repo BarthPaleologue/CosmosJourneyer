@@ -56,8 +56,12 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
 
     const ares = generateTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
     ares.ocean = null;
-    if (ares.clouds !== null) ares.clouds.coverage = 1;
-    if (ares.atmosphere !== null) ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
+    if (ares.clouds !== null) {
+        ares.clouds.coverage = 1;
+    }
+    if (ares.atmosphere !== null) {
+        ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
+    }
 
     ares.orbit.semiMajorAxis = 25100 * hecate.radius;
 

@@ -97,7 +97,9 @@ export function generateTelluricPlanetModel(
     };
 
     let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
-    if (radius <= 0.3 * ScaledEarthRadius) pressure = 0;
+    if (radius <= 0.3 * ScaledEarthRadius) {
+        pressure = 0;
+    }
 
     const atmosphere: AtmosphereModel | null =
         pressure > 0

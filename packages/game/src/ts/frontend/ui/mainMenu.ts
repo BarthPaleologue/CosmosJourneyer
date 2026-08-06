@@ -225,7 +225,9 @@ export class MainMenu {
 
         // Set version text content
         const childLink = this.version.querySelector("a");
-        if (childLink === null) throw new Error("version link does not exist!");
+        if (childLink === null) {
+            throw new Error("version link does not exist!");
+        }
         childLink.textContent = `Alpha ${packageInfo.version}`;
 
         // Add sound events to all menu items
@@ -386,7 +388,9 @@ export class MainMenu {
         const animationCallback = () => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
-            if (!translationAnimation.isFinished()) translationAnimation.update(deltaTime);
+            if (!translationAnimation.isFinished()) {
+                translationAnimation.update(deltaTime);
+            }
             if (!rotationAnimation.isFinished()) {
                 rotationAnimation.update(deltaTime);
                 this.controls.getTransform().rotationQuaternion = rotationAnimation.getCurrentValue();

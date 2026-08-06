@@ -94,7 +94,9 @@ export class HyperSpaceTunnel implements Transformable {
 
         this.warpConeMaterial.setFloat("time", this.elapsedSeconds);
 
-        if (this.parent === null) return;
+        if (this.parent === null) {
+            return;
+        }
 
         this.hyperTunnel.position = this.parent.getAbsolutePosition();
 
@@ -108,7 +110,9 @@ export class HyperSpaceTunnel implements Transformable {
         const targetForward = this.parent.forward;
         const currentForward = this.getTransform().forward;
 
-        if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
+        if (targetForward.equalsWithEpsilon(currentForward, 0.001)) {
+            return;
+        }
 
         const rotationAxis = Vector3.Cross(currentForward, targetForward);
         const theta = Math.acos(clamp(Vector3.Dot(currentForward, targetForward), -1, 1));

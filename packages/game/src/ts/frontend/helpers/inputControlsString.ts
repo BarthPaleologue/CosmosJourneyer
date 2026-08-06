@@ -5,8 +5,11 @@ import type PressInteraction from "@brianchirls/game-input/interactions/PressInt
 export function stickInputToString(input: StickInputControl): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
-        if (key === "x" || key === "y") return;
-        else keys.push([key, input.name]);
+        if (key === "x" || key === "y") {
+            return;
+        } else {
+            keys.push([key, input.name]);
+        }
     });
     return keys;
 }
@@ -17,7 +20,9 @@ export function dPadCompositeToString(
 ): [string, string][] {
     const keys: [string, string][] = [];
     input.children.forEach((child, key) => {
-        if (key === "x" || key === "y") return;
+        if (key === "x" || key === "y") {
+            return;
+        }
         let name = child.name;
         // remove the "key:" prefix
         name = name.replace("key:", "");

@@ -9,10 +9,10 @@ import { type DesktopUpdateState } from "./updateContract.js";
 class MockUpdater extends EventEmitter {
     public autoDownload = true;
     public autoInstallOnAppQuit = true;
-    public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => null);
-    public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(async () => [
-        "update",
-    ]);
+    public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => Promise.resolve(null));
+    public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(async () =>
+        Promise.resolve(["update"]),
+    );
     public readonly quitAndInstall = vi.fn();
 }
 

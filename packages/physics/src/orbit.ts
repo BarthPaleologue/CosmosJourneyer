@@ -46,14 +46,18 @@ export function computeLpFactor(x: number, y: number, p: number) {
  * @return The orbital period in seconds or 0 if the parent mass is 0
  */
 export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number) {
-    if (parentMass === 0) return 0;
+    if (parentMass === 0) {
+        return 0;
+    }
     const a = semiMajorAxis;
     const M = parentMass;
     return 2 * Math.PI * Math.sqrt(a ** 3 / (G * M));
 }
 
 export function getSemiMajorAxisFromPeriod(period: number, parentMass: number) {
-    if (parentMass === 0) return 0;
+    if (parentMass === 0) {
+        return 0;
+    }
     const M = parentMass;
     return Math.cbrt((period / (2 * Math.PI)) ** 2 * G * M);
 }

@@ -135,7 +135,9 @@ export class SpaceStationLayer {
                 player.getName(),
                 this.soundPlayer,
             );
-            if (newName === null) return;
+            if (newName === null) {
+                return;
+            }
             player.setName(newName);
         });
 
@@ -345,7 +347,9 @@ export class SpaceStationLayer {
     }
 
     public setVisibility(visible: boolean) {
-        if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) return;
+        if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) {
+            return;
+        }
         this.rootHtml.style.visibility = visible ? "visible" : "hidden";
     }
 
@@ -358,7 +362,9 @@ export class SpaceStationLayer {
         stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
         player: Player,
     ) {
-        if (this.currentStation === station) return;
+        if (this.currentStation === station) {
+            return;
+        }
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.headerStationName.textContent = station.name;

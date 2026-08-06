@@ -129,7 +129,9 @@ export class AsteroidPatch {
         });
 
         for (let i = 0; i < AsteroidPatch.BATCH_SIZE; i++) {
-            if (this.nbInstances === this.positions.length) break;
+            if (this.nbInstances === this.positions.length) {
+                break;
+            }
 
             const typeIndex = this.typeIndices[this.nbInstances];
             if (typeIndex === undefined) {

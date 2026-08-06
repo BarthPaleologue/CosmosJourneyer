@@ -83,7 +83,9 @@ export class StarMapNebulaPostProcess {
         });
 
         this.fogPass.onApplyObservable.add((effect) => {
-            if (this.activeCamera === null) return;
+            if (this.activeCamera === null) {
+                return;
+            }
             const floatingOriginEnabled = scene.floatingOriginMode;
             const floatingOriginOffset = scene.floatingOriginOffset;
             setCameraUniforms(effect, this.activeCamera, floatingOriginEnabled);

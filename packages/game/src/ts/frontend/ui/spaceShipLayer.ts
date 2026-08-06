@@ -130,7 +130,9 @@ export class SpaceShipLayer {
 
     public setTarget(target: TransformNode | null, forcedValue?: boolean) {
         let shouldHide = target === null || this.currentTarget === target;
-        if (forcedValue !== undefined) shouldHide = !forcedValue;
+        if (forcedValue !== undefined) {
+            shouldHide = !forcedValue;
+        }
         if (shouldHide) {
             this.targetHelper.style.display = "none";
             this.currentTarget = null;

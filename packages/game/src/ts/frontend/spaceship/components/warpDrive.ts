@@ -248,8 +248,9 @@ export class WarpDrive implements ReadonlyWarpDrive {
             case "disengaging":
                 this.maxTargetSpeed *= 0.9;
                 this.currentSpeed *= 0.9;
-                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED)
+                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED) {
                     this.disable();
+                }
                 break;
             case "enabled":
                 this.updateMaxTargetSpeed(influences, shipPosition, shipForward);

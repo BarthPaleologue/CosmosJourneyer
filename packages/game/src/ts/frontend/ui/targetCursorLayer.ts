@@ -82,7 +82,9 @@ export class TargetCursorLayer implements IDisposable {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
         this.targetCursors.forEach((overlay) => {
-            if (!overlay.isVisible()) return;
+            if (!overlay.isVisible()) {
+                return;
+            }
 
             const screenCoordinates = overlay.screenCoordinates;
             const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
@@ -110,7 +112,9 @@ export class TargetCursorLayer implements IDisposable {
 
     public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean) {
         let shouldHide = this.target === object;
-        if (forcedValue !== undefined) shouldHide = !forcedValue;
+        if (forcedValue !== undefined) {
+            shouldHide = !forcedValue;
+        }
 
         if (shouldHide) {
             this.target = null;

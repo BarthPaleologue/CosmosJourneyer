@@ -93,10 +93,14 @@ export class OPFSFileSystem implements IFileSystem {
         try {
             const parts = path.split("/").filter(Boolean);
             const fileName = parts.pop();
-            if (fileName === undefined) throw new Error("Invalid file path");
+            if (fileName === undefined) {
+                throw new Error("Invalid file path");
+            }
 
             const dirHandle = await this.getDirectoryHandle("/" + parts.join("/"), create);
-            if (!dirHandle) return null;
+            if (!dirHandle) {
+                return null;
+            }
 
             return await dirHandle.getFileHandle(fileName, { create });
         } catch (error) {
@@ -121,10 +125,14 @@ export class OPFSFileSystem implements IFileSystem {
         try {
             const parts = path.split("/").filter(Boolean);
             const dirName = parts.pop();
-            if (dirName === undefined) return false;
+            if (dirName === undefined) {
+                return false;
+            }
 
             const parentHandle = await this.getDirectoryHandle("/" + parts.join("/"));
-            if (!parentHandle) return false;
+            if (!parentHandle) {
+                return false;
+            }
 
             await parentHandle.removeEntry(dirName, { recursive: true });
             return true;
@@ -137,7 +145,9 @@ export class OPFSFileSystem implements IFileSystem {
     public async listDirectory(path: string): Promise<string[] | null> {
         try {
             const dirHandle = await this.getDirectoryHandle(path);
-            if (!dirHandle) return null;
+            if (!dirHandle) {
+                return null;
+            }
 
             const entries: string[] = [];
             for await (const [name] of dirHandle.entries()) {
@@ -159,7 +169,9 @@ export class OPFSFileSystem implements IFileSystem {
     public async writeFile(path: string, content: string): Promise<boolean> {
         try {
             const fileHandle = await this.getFileHandle(path, true);
-            if (!fileHandle) return false;
+            if (!fileHandle) {
+                return false;
+            }
 
             const writable = await fileHandle.createWritable();
             await writable.write(content);
@@ -175,7 +187,9 @@ export class OPFSFileSystem implements IFileSystem {
     public async readFile(path: string): Promise<string | null> {
         try {
             const fileHandle = await this.getFileHandle(path);
-            if (!fileHandle) return null;
+            if (!fileHandle) {
+                return null;
+            }
 
             const file = await fileHandle.getFile();
             return await file.text();
@@ -189,10 +203,14 @@ export class OPFSFileSystem implements IFileSystem {
         try {
             const parts = path.split("/").filter(Boolean);
             const fileName = parts.pop();
-            if (fileName === undefined) return false;
+            if (fileName === undefined) {
+                return false;
+            }
 
             const dirHandle = await this.getDirectoryHandle("/" + parts.join("/"));
-            if (!dirHandle) return false;
+            if (!dirHandle) {
+                return false;
+            }
 
             await dirHandle.removeEntry(fileName);
             return true;

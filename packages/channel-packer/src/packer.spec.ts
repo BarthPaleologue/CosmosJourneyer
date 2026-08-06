@@ -31,7 +31,7 @@ const engine = createPackerEngine<TestInput, Uint8Array>(
         async encodePng(packed) {
             const bytes = new Uint8Array(packed.pixels.length);
             bytes.set(packed.pixels);
-            return bytes;
+            return Promise.resolve(bytes);
         },
     },
 );

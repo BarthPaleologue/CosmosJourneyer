@@ -79,7 +79,9 @@ export function createHelixVertexData(
             uvs.push(i / tessellation, 1);
             uvs.push(i / tessellation, 0);
 
-            if (turnIndex === 0 && i === 0) continue;
+            if (turnIndex === 0 && i === 0) {
+                continue;
+            }
 
             const stride = 8;
             const spiralIndexOffset = turnIndex * stride * tessellation;

@@ -152,16 +152,24 @@ export class CurrentMissionDisplay {
             this.setMission(this.player.currentMissions[0], universeBackend);
         } else if (this.activeMission === null && allMissions.length !== 0) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission, universeBackend);
-            else this.setNoMissionActive();
+            if (defaultMission !== undefined) {
+                this.setMission(defaultMission, universeBackend);
+            } else {
+                this.setNoMissionActive();
+            }
         }
 
-        if (this.activeMission === null) return;
+        if (this.activeMission === null) {
+            return;
+        }
 
         if (allMissions.indexOf(this.activeMission) === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission, universeBackend);
-            else this.setNoMissionActive();
+            if (defaultMission !== undefined) {
+                this.setMission(defaultMission, universeBackend);
+            } else {
+                this.setNoMissionActive();
+            }
             return;
         }
 
@@ -169,8 +177,9 @@ export class CurrentMissionDisplay {
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
         const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
-        if (nextTaskText !== this.missionPanelNextTask.textContent)
+        if (nextTaskText !== this.missionPanelNextTask.textContent) {
             this.missionPanelNextTask.textContent = nextTaskText;
+        }
     }
 
     public setNextMission(universeBackend: UniverseBackend) {
@@ -182,8 +191,11 @@ export class CurrentMissionDisplay {
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission, universeBackend);
-            else this.setNoMissionActive();
+            if (defaultMission !== undefined) {
+                this.setMission(defaultMission, universeBackend);
+            } else {
+                this.setNoMissionActive();
+            }
             return;
         }
 
@@ -204,12 +216,17 @@ export class CurrentMissionDisplay {
         const currentMissionIndex = allMissions.indexOf(this.activeMission);
         if (currentMissionIndex === -1) {
             const defaultMission = allMissions.at(0);
-            if (defaultMission !== undefined) this.setMission(defaultMission, universeBackend);
-            else this.setNoMissionActive();
+            if (defaultMission !== undefined) {
+                this.setMission(defaultMission, universeBackend);
+            } else {
+                this.setNoMissionActive();
+            }
             return;
         }
 
-        if (currentMissionIndex === 0) return;
+        if (currentMissionIndex === 0) {
+            return;
+        }
 
         const previousMission = allMissions.at(currentMissionIndex - 1);
         if (previousMission === undefined) {

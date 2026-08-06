@@ -47,22 +47,30 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
 
     private evaluateTelluricPlanetMultiplier(model: DeepReadonly<TelluricPlanetModel>) {
         let multiplier = 1;
-        if (model.clouds !== null) multiplier += 1.0;
-        if (model.rings !== null) multiplier += 1.0;
+        if (model.clouds !== null) {
+            multiplier += 1.0;
+        }
+        if (model.rings !== null) {
+            multiplier += 1.0;
+        }
 
         return multiplier;
     }
 
     private evaluateTelluricSatelliteMultiplier(model: DeepReadonly<TelluricSatelliteModel>) {
         let multiplier = 0.5;
-        if (model.clouds !== null) multiplier += 1.0;
+        if (model.clouds !== null) {
+            multiplier += 1.0;
+        }
 
         return multiplier;
     }
 
     private evaluateGasPlanetMultiplier(model: DeepReadonly<GasPlanetModel>) {
         let multiplier = 1;
-        if (model.rings !== null) multiplier += 1.0;
+        if (model.rings !== null) {
+            multiplier += 1.0;
+        }
 
         return multiplier;
     }

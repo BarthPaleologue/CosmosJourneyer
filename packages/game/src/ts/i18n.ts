@@ -84,7 +84,9 @@ export async function initI18n() {
     // perform all static translations
     document.querySelectorAll("*[data-i18n]").forEach((element) => {
         const key = element.getAttribute("data-i18n");
-        if (key === null) throw new Error("data-i18n attribute is null");
+        if (key === null) {
+            throw new Error("data-i18n attribute is null");
+        }
 
         // this should be safe as we are not doing any interpolation
         // (as long as the translation are reviewed before being merged of course)

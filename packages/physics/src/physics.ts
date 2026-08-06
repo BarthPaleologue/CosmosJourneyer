@@ -32,7 +32,9 @@ export function waterBoilingTemperature(pressure: number): number {
     const T1 = celsiusToKelvin(100.0); // boiling point of water at sea level on Earth in Kelvin
     const DH = 40660.0;
     const R = 8.314;
-    if (P2 <= 0.0) return 0.0; // when pressure is 0, water cannot exist in liquid state
+    if (P2 <= 0.0) {
+        return 0.0;
+    } // when pressure is 0, water cannot exist in liquid state
     return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH));
 }
 
@@ -127,16 +129,24 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
     const epsilon = 0.05;
 
     // if pressure is too low, there is no ocean (airless world)
-    if (pressure < epsilon) return false;
+    if (pressure < epsilon) {
+        return false;
+    }
 
     // if boiling point is lower than freezing point, ice sublimates instead of melting
-    if (waterBoilingPoint < waterFreezingPoint) return false;
+    if (waterBoilingPoint < waterFreezingPoint) {
+        return false;
+    }
 
     // if temperature is too high, there is no ocean (desert world)
-    if (minTemperature > waterBoilingPoint) return false;
+    if (minTemperature > waterBoilingPoint) {
+        return false;
+    }
 
     // if temperature is too low, there is no ocean (frozen world)
-    if (maxTemperature < waterFreezingPoint) return false;
+    if (maxTemperature < waterFreezingPoint) {
+        return false;
+    }
 
     return true;
 }

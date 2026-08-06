@@ -211,7 +211,9 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * If the chunk has no Havok body, this method does nothing
      */
     public updatePosition() {
-        if (this.physicsBody === null) return;
+        if (this.physicsBody === null) {
+            return;
+        }
         this.getTransform().setAbsolutePosition(
             Vector3.TransformCoordinates(this.positionOnSphere, this.parent.getWorldMatrix()),
         );

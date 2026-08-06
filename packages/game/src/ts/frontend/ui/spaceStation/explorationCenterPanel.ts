@@ -94,7 +94,9 @@ export class ExplorationCenterPanel {
             this.soundPlayer.playNow("click");
 
             const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
-            if (connectionInfo === null) return;
+            if (connectionInfo === null) {
+                return;
+            }
         });
         encyclopaediaContainer.appendChild(addEncyclopaediaInstanceButton);
 
@@ -180,7 +182,9 @@ export class ExplorationCenterPanel {
 
     private filterDiscoveryListByQuery(query: string) {
         for (const listItem of this.discoveryList.children) {
-            if (!(listItem instanceof HTMLDivElement)) continue;
+            if (!(listItem instanceof HTMLDivElement)) {
+                continue;
+            }
             listItem.hidden = !listItem.innerHTML.toLowerCase().includes(query);
         }
     }

@@ -195,14 +195,21 @@ export class ObjectTargetCursor {
         );
 
         let size = 100 * (screenSize * 1.3);
-        if (this.minSize > 0) size = Math.max(size, this.minSize);
-        if (this.maxSize > 0) size = Math.min(size, this.maxSize);
+        if (this.minSize > 0) {
+            size = Math.max(size, this.minSize);
+        }
+        if (this.maxSize > 0) {
+            size = Math.min(size, this.maxSize);
+        }
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);
 
         this.alpha = 1.0;
-        if (this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned)
+        if (this.minDistance > 0) {
+            this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
+        }
+        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned) {
             this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+        }
 
         this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
         this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";

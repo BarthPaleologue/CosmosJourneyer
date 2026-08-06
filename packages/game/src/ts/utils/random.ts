@@ -28,7 +28,9 @@ export function wheelOfFortune<T>(options: [T, number][], randomValue: number): 
     let current = 0;
     for (const [option, weight] of options) {
         current += weight;
-        if (choice < current) return option;
+        if (choice < current) {
+            return option;
+        }
     }
     throw new Error("Wheel of fortune failed");
 }

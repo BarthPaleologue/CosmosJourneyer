@@ -316,7 +316,9 @@ export class StarSystemController {
         this.updateOrbitalSimulation(this.stellarObjects[0], timestampSeconds);
 
         // Perform warm-up updates with small time steps
-        for (let i = 0; i < nbWarmUpUpdates; i++) this.updateOrbitalSimulation(this.stellarObjects[0], 1);
+        for (let i = 0; i < nbWarmUpUpdates; i++) {
+            this.updateOrbitalSimulation(this.stellarObjects[0], 1);
+        }
     }
 
     /**

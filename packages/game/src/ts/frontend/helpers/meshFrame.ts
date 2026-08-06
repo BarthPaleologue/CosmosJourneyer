@@ -40,10 +40,14 @@ export function createEdgeTubeFrame(
     for (let i = 0; i < edges.length; i += 2) {
         const a = edges[i];
         const b = edges[i + 1];
-        if (a === undefined || b === undefined) continue;
+        if (a === undefined || b === undefined) {
+            continue;
+        }
 
         const k = edgeKey(a, b);
-        if (seen.has(k)) continue;
+        if (seen.has(k)) {
+            continue;
+        }
         seen.add(k);
 
         usedVerts.add(a);
@@ -68,14 +72,18 @@ export function createEdgeTubeFrame(
         const x = positions[3 * vi];
         const y = positions[3 * vi + 1];
         const z = positions[3 * vi + 2];
-        if (x === undefined || y === undefined || z === undefined) continue;
+        if (x === undefined || y === undefined || z === undefined) {
+            continue;
+        }
         const joint = MeshBuilder.CreateSphere(`j_${vi}`, { diameter: radius * 2, segments: 12 }, scene);
         joint.position.set(x, y, z);
         tubes.push(joint);
     }
 
     const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
-    if (!merged) return null;
+    if (!merged) {
+        return null;
+    }
     merged.name = name;
     return merged;
 }

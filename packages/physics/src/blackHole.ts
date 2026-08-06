@@ -51,7 +51,9 @@ export function getShadowRadius(mass: number): number {
  * The angular momentum is important in the Kerr metric to compute frame dragging.
  */
 export function estimateBlackHoleAngularMomentum(mass: number, rotationPeriod: number): number {
-    if (rotationPeriod === 0) return 0;
+    if (rotationPeriod === 0) {
+        return 0;
+    }
 
     const estimatedOriginalStarRadius = estimateStarRadiusFromMass(mass);
 
@@ -94,7 +96,9 @@ export function getErgosphereRadius(mass: number, rotationPeriod: number, theta:
     const a = getKerrMetricA(mass, rotationPeriod);
     const cosTheta = Math.cos(theta);
 
-    if (a > m) throw new Error(`Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: ${a}`);
+    if (a > m) {
+        throw new Error(`Black hole angular momentum exceeds maximum value for a Kerr black hole. a > m: ${a}`);
+    }
 
     return m + Math.sqrt(m * m - a * a * cosTheta * cosTheta);
 }

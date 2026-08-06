@@ -68,12 +68,16 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
     }
 
     equals(other: MissionNode): boolean {
-        if (!(other instanceof MissionFlyByNode)) return false;
+        if (!(other instanceof MissionFlyByNode)) {
+            return false;
+        }
         return universeObjectIdEquals(this.objectId, other.objectId);
     }
 
     updateState(context: MissionContext) {
-        if (this.isCompleted()) return;
+        if (this.isCompleted()) {
+            return;
+        }
 
         const currentSystem = context.currentSystem;
         const currentSystemModel = currentSystem.model;

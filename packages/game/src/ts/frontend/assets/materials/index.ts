@@ -99,7 +99,9 @@ export function createDebugMaterial(name: string, diffuse: boolean, wireframe: b
     if (!diffuse) {
         mat.emissiveColor = Color3.Random();
         mat.disableLighting = true;
-    } else mat.diffuseColor = Color3.Random();
+    } else {
+        mat.diffuseColor = Color3.Random();
+    }
     mat.wireframe = wireframe;
     return mat;
 }

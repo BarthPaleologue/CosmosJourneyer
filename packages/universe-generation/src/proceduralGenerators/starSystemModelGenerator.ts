@@ -324,8 +324,12 @@ export function generateStarSystemModel(
 function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {
     // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
     const sample = rng(GenerationSteps.STARS + index);
-    if (sample < 0.0006) return "blackHole";
-    if (sample < 0.0026) return "neutronStar";
+    if (sample < 0.0006) {
+        return "blackHole";
+    }
+    if (sample < 0.0026) {
+        return "neutronStar";
+    }
 
     return "star";
 }

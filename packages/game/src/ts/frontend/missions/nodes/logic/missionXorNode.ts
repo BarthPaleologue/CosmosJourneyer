@@ -41,21 +41,29 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
     }
 
     equals(other: MissionNode): boolean {
-        if (!(other instanceof MissionXorNode)) return false;
-        if (this.children.length !== other.children.length) return false;
+        if (!(other instanceof MissionXorNode)) {
+            return false;
+        }
+        if (this.children.length !== other.children.length) {
+            return false;
+        }
         for (const [i, thisChild] of this.children.entries()) {
             const otherChild = other.children[i];
             if (otherChild === undefined) {
                 continue;
             }
 
-            if (!thisChild.equals(otherChild)) return false;
+            if (!thisChild.equals(otherChild)) {
+                return false;
+            }
         }
         return true;
     }
 
     updateState(context: MissionContext) {
-        if (this.hasCompletedLock) return;
+        if (this.hasCompletedLock) {
+            return;
+        }
         this.children.forEach((child) => {
             child.updateState(context);
         });
@@ -71,7 +79,9 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
     ): string {
-        if (this.hasCompletedLock) return "Mission completed";
+        if (this.hasCompletedLock) {
+            return "Mission completed";
+        }
         return this.children
             .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
             .join(" xor ");

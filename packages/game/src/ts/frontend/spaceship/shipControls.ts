@@ -205,7 +205,9 @@ export class ShipControls implements Controls {
             }
 
             const closestWalkableObject = spaceship.getClosestWalkableObject();
-            if (closestWalkableObject === null) return;
+            if (closestWalkableObject === null) {
+                return;
+            }
 
             const distance = Vector3.Distance(
                 this.getTransform().getAbsolutePosition(),
@@ -225,8 +227,12 @@ export class ShipControls implements Controls {
 
         this.emitLandingRequestHandler = () => {
             const spaceship = this.getSpaceship();
-            if (spaceship.isLanded() || spaceship.isLanding()) return;
-            if (this.closestLandableFacility === null) return;
+            if (spaceship.isLanded() || spaceship.isLanding()) {
+                return;
+            }
+            if (this.closestLandableFacility === null) {
+                return;
+            }
             const landingPad = this.closestLandableFacility.getLandingPadManager().handleLandingRequest({
                 minimumPadSize: LandingPadSize.SMALL,
             });
@@ -515,7 +521,9 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
-            if (isEmergency) this.tts.sayNow("Charlotte", "warp_drive_emergency_shut_down");
+            if (isEmergency) {
+                this.tts.sayNow("Charlotte", "warp_drive_emergency_shut_down");
+            }
             this.onToggleWarpDrive.notifyObservers(false);
         });
 

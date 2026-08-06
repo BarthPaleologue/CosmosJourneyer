@@ -114,7 +114,9 @@ export class StarMapUI {
         this.selectedSystemCursor.classList.add("targetCursor", "rounded");
         this.selectedSystemCursorContainer.appendChild(this.selectedSystemCursor);
         this.selectedSystemCursor.addEventListener("click", () => {
-            if (this.selectedSystem === null) return;
+            if (this.selectedSystem === null) {
+                return;
+            }
             this.onSystemFocusObservable.notifyObservers(this.selectedSystem);
         });
 
@@ -126,7 +128,9 @@ export class StarMapUI {
         this.hoveredSystemCursor.classList.add("targetCursor", "rounded");
         this.hoveredSystemCursorContainer.appendChild(this.hoveredSystemCursor);
         this.hoveredSystemCursor.addEventListener("click", () => {
-            if (this.hoveredSystem === null) return;
+            if (this.hoveredSystem === null) {
+                return;
+            }
             this.onSystemFocusObservable.notifyObservers(this.hoveredSystem);
         });
 
@@ -138,7 +142,9 @@ export class StarMapUI {
         this.currentSystemCursor.classList.add("targetCursor", "rounded", "target");
         this.currentSystemCursorContainer.appendChild(this.currentSystemCursor);
         this.currentSystemCursor.addEventListener("click", () => {
-            if (this.currentSystem === null) return;
+            if (this.currentSystem === null) {
+                return;
+            }
             this.onSystemFocusObservable.notifyObservers(this.currentSystem);
         });
 
@@ -353,7 +359,9 @@ export class StarMapUI {
     }
 
     setHoveredSystem(system: StarSystemCoordinates | null) {
-        if (system === this.currentSystem || system === this.selectedSystem) return;
+        if (system === this.currentSystem || system === this.selectedSystem) {
+            return;
+        }
         this.hoveredSystem = system;
     }
 

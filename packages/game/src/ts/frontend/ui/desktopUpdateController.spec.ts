@@ -181,7 +181,7 @@ function createPlayerActions(getContext: () => UpdatePresentationContext): Deskt
     return {
         getPresentationContext: getContext,
         canBackupCurrentCommander: () => true,
-        downloadCommanderBackup: async () => true,
-        prepareImmediateInstall: async () => true,
+        downloadCommanderBackup: async () => Promise.resolve(true),
+        prepareImmediateInstall: async () => Promise.resolve(true),
     };
 }

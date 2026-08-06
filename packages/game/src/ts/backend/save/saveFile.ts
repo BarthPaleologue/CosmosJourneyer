@@ -31,10 +31,16 @@ export async function parseSaveFile(
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (event) => {
-            if (event.target === null) throw new Error("event.target is null");
+            if (event.target === null) {
+                throw new Error("event.target is null");
+            }
             const data = event.target.result;
-            if (data === null) throw new Error("data is null");
-            if (data instanceof ArrayBuffer) throw new Error("data is an ArrayBuffer");
+            if (data === null) {
+                throw new Error("data is null");
+            }
+            if (data instanceof ArrayBuffer) {
+                throw new Error("data is an ArrayBuffer");
+            }
 
             const parsedData = jsonSafeParse(data);
             if (parsedData === null) {

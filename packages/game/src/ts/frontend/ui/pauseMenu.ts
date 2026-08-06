@@ -122,7 +122,9 @@ export class PauseMenu {
     public setVisibility(visible: boolean) {
         this.rootNode.style.display = visible ? "grid" : "none";
         this.mask.style.display = visible ? "block" : "none";
-        if (!visible) this.sidePanels.hideActivePanel();
+        if (!visible) {
+            this.sidePanels.hideActivePanel();
+        }
         this.onVisibilityChanged.notifyObservers();
     }
 

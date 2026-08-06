@@ -333,8 +333,11 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) this.soundPlayer.playNow("enable_orbit_display");
-            else this.soundPlayer.playNow("disable_orbit_display");
+            if (enabled) {
+                this.soundPlayer.playNow("enable_orbit_display");
+            } else {
+                this.soundPlayer.playNow("disable_orbit_display");
+            }
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -578,7 +581,9 @@ export class StarSystemView implements View {
         const celestialBodies = starSystem.getCelestialBodies();
 
         const firstBody = celestialBodies[0];
-        if (firstBody === undefined) throw new Error("No bodies in star system");
+        if (firstBody === undefined) {
+            throw new Error("No bodies in star system");
+        }
 
         const activeControls = this.activeControls;
         if (activeControls === null) {
@@ -587,8 +592,11 @@ export class StarSystemView implements View {
         }
 
         let controllerDistanceFactor = 4;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
-        else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+        if (firstBody instanceof BlackHole) {
+            controllerDistanceFactor = 50;
+        } else if (firstBody instanceof NeutronStar) {
+            controllerDistanceFactor = 100_000;
+        }
 
         const previousSystem = this.player.visitedSystemHistory.at(-1);
         if (previousSystem === undefined) {
@@ -664,7 +672,9 @@ export class StarSystemView implements View {
      */
     public async resetPlayer(nextPlayer: Player) {
         const spaceshipSerialized = nextPlayer.serializedSpaceships[0];
-        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+        if (spaceshipSerialized === undefined) {
+            throw new Error("No spaceship serialized in player");
+        }
 
         const spaceship = await Spaceship.Deserialize(
             spaceshipSerialized,
@@ -873,7 +883,9 @@ export class StarSystemView implements View {
         this.onBeforeJump.notifyObservers();
 
         // then, initiate hyper space jump
-        if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
+        if (!warpDrive.isEnabled()) {
+            spaceship.enableWarpDrive();
+        }
         spaceship.hyperSpaceTunnel.setEnabled(true);
         spaceship.spaceDots.getTransform().setEnabled(false);
         spaceship.soundInstances.hyperSpace.setVolume(0.5);
@@ -926,11 +938,17 @@ export class StarSystemView implements View {
     }
 
     private updateBeforeRender(deltaSeconds: number) {
-        if (this._isLoadingSystem) return;
+        if (this._isLoadingSystem) {
+            return;
+        }
 
         const starSystem = this.getStarSystem();
-        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
-        if (this.characterControls === null) throw new Error("Character controls is null");
+        if (this.spaceshipControls === null) {
+            throw new Error("Spaceship controls is null");
+        }
+        if (this.characterControls === null) {
+            throw new Error("Character controls is null");
+        }
 
         if (this.activeControls !== null && this.activeControls.getActiveCamera() !== this.scene.activeCamera) {
             this.scene.activeCamera?.detachControl();
@@ -1029,7 +1047,9 @@ export class StarSystemView implements View {
 
         const newlyCompletedMissions: Mission[] = [];
         this.player.currentMissions.forEach((mission) => {
-            if (mission.isCompleted()) return;
+            if (mission.isCompleted()) {
+                return;
+            }
             mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.earn(mission.getReward());
@@ -1099,7 +1119,9 @@ export class StarSystemView implements View {
      * @throws Error if the spaceship controls is null (the assets are not initialized, you must call `initAssets` before)
      */
     public getSpaceshipControls() {
-        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
+        if (this.spaceshipControls === null) {
+            throw new Error("Spaceship controls is null");
+        }
         return this.spaceshipControls;
     }
 
@@ -1109,7 +1131,9 @@ export class StarSystemView implements View {
      * @throws Error if the character controls is null (the assets are not initialized, you must call `initAssets` before)
      */
     public getCharacterControls() {
-        if (this.characterControls === null) throw new Error("Character controls is null");
+        if (this.characterControls === null) {
+            throw new Error("Character controls is null");
+        }
         return this.characterControls;
     }
 
@@ -1119,7 +1143,9 @@ export class StarSystemView implements View {
      * @throws Error if the default controls is null (the assets are not initialized, you must call `initAssets` before)
      */
     public getDefaultControls() {
-        if (this.defaultControls === null) throw new Error("Default controls is null");
+        if (this.defaultControls === null) {
+            throw new Error("Default controls is null");
+        }
         return this.defaultControls;
     }
 
@@ -1326,7 +1352,9 @@ export class StarSystemView implements View {
      * @throws Error if the star system is null
      */
     public getStarSystem() {
-        if (this.starSystem === null) throw new Error("Star system not initialized");
+        if (this.starSystem === null) {
+            throw new Error("Star system not initialized");
+        }
         return this.starSystem;
     }
 
@@ -1349,7 +1377,9 @@ export class StarSystemView implements View {
             return;
         }
 
-        if (target === null) return;
+        if (target === null) {
+            return;
+        }
 
         this.spaceShipLayer.setTarget(target.getTransform());
         this.targetCursorLayer.setTarget(target);

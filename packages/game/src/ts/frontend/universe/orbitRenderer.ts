@@ -99,7 +99,9 @@ export class OrbitRenderer {
     }
 
     update(referencePlaneRotation: Matrix) {
-        if (!this._isVisible) return;
+        if (!this._isVisible) {
+            return;
+        }
         for (const [orbitalObject, parents] of this.orbitalObjectToParents) {
             const orbitMesh = this.orbitMeshes.get(orbitalObject);
             if (orbitMesh === undefined) {

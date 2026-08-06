@@ -134,7 +134,9 @@ function readPngInternationalTextChunk(png: Uint8Array, keyword: string): string
 
         if (chunkType === internationalTextChunkType) {
             const text = readInternationalTextChunkData(png.subarray(dataStart, dataEnd), keyword);
-            if (text !== null) return text;
+            if (text !== null) {
+                return text;
+            }
         }
 
         offset = dataEnd + 4;
@@ -203,19 +205,29 @@ function createInternationalTextChunkData(keyword: string, text: string): Uint8A
 
 function readInternationalTextChunkData(data: Uint8Array, expectedKeyword: string): string | null {
     const keywordEnd = data.indexOf(0);
-    if (keywordEnd === -1) return null;
+    if (keywordEnd === -1) {
+        return null;
+    }
 
     const keyword = bytesToAscii(data.subarray(0, keywordEnd));
-    if (keyword !== expectedKeyword) return null;
+    if (keyword !== expectedKeyword) {
+        return null;
+    }
 
     const compressionFlag = data[keywordEnd + 1];
-    if (compressionFlag !== 0) return null;
+    if (compressionFlag !== 0) {
+        return null;
+    }
 
     const languageTagEnd = data.indexOf(0, keywordEnd + 3);
-    if (languageTagEnd === -1) return null;
+    if (languageTagEnd === -1) {
+        return null;
+    }
 
     const translatedKeywordEnd = data.indexOf(0, languageTagEnd + 1);
-    if (translatedKeywordEnd === -1) return null;
+    if (translatedKeywordEnd === -1) {
+        return null;
+    }
 
     return new TextDecoder().decode(data.subarray(translatedKeywordEnd + 1));
 }
@@ -243,7 +255,9 @@ function findChunkOffset(png: Uint8Array, chunkType: string): number {
             throw new Error("Invalid PNG: chunk length exceeds file size");
         }
 
-        if (type === chunkType) return offset;
+        if (type === chunkType) {
+            return offset;
+        }
 
         offset = nextOffset;
     }

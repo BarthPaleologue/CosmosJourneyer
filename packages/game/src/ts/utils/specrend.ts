@@ -355,7 +355,9 @@ function gamma_correct(cs: ColourSystem, c: number): number {
 function norm_rgb(r: number, g: number, b: number): [number, number, number] {
     let greatest = Math.max(r, Math.max(g, b));
 
-    if (greatest === 0) greatest = 1;
+    if (greatest === 0) {
+        greatest = 1;
+    }
 
     return [r / greatest, g / greatest, b / greatest];
 }
