@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2024 Barthémy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -110,20 +110,10 @@ export class Player {
         this.tutorials = serializedPlayer.tutorials;
     }
 
-    /**
-     * Returns true if the player has visited the given object, false otherwise.
-     * @param objectId The object to check if the player has visited it.
-     * @returns True if the player has visited the object, false otherwise.
-     */
     hasVisitedObject(objectId: UniverseObjectId): boolean {
         return this.visitedObjects.has(serializeUniverseObjectId(objectId));
     }
 
-    /**
-     * Adds the given object to the list of visited objects if it is not already in the list.
-     * @param objectId The object to add to the list of visited objects.
-     * @returns True if the object was added, false if it was already in the list.
-     */
     addVisitedObjectIfNew(objectId: UniverseObjectId) {
         if (this.hasVisitedObject(objectId)) {
             return false;
@@ -198,14 +188,10 @@ export class Player {
                 player.instancedSpaceships.map((spaceship) => spaceship.serialize()),
             ),
             spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
-            tutorials: player.tutorials,
+            tutorials: structuredClone(player.tutorials),
         };
     }
 
-    /**
-     * Performs a deep copy of the player
-     * @param player the player to copy from
-     */
     public copyFrom(player: Player, universeBackend: UniverseBackend) {
         this.uuid = player.uuid;
         this.setName(player.getName());
