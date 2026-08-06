@@ -82,7 +82,7 @@ export async function createStarSystemViewScene(
         progressMonitor,
     );
 
-    await starSystemView.resetPlayer();
+    await starSystemView.resetPlayer(player);
 
     await starSystemView.switchToSpaceshipControls();
 

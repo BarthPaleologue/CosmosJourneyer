@@ -660,10 +660,21 @@ export class StarSystemView implements View {
     }
 
     /**
-     * Call this when the player object is changed when loading a save.
-     * It will remove the current controls and recreate them based on the player object.
+     * Instantiates the incoming player's spaceship before atomically replacing the current player and controls.
      */
-    public async resetPlayer() {
+    public async resetPlayer(nextPlayer: Player) {
+        const spaceshipSerialized = nextPlayer.serializedSpaceships[0];
+        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+
+        const spaceship = await Spaceship.Deserialize(
+            spaceshipSerialized,
+            nextPlayer.spareSpaceshipComponents,
+            this.scene,
+            this.assets,
+            this.soundPlayer,
+            this.physicsEngine,
+        );
+
         this.postProcessManager.reset();
 
         const maxZ = Settings.EARTH_RADIUS * 1e5;
@@ -676,17 +687,11 @@ export class StarSystemView implements View {
 
         this.vehicleControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
 
-        const spaceshipSerialized = this.player.serializedSpaceships.shift();
-        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+        if (nextPlayer !== this.player) {
+            this.player.copyFrom(nextPlayer, this.universeBackend);
+        }
 
-        const spaceship = await Spaceship.Deserialize(
-            spaceshipSerialized,
-            this.player.spareSpaceshipComponents,
-            this.scene,
-            this.assets,
-            this.soundPlayer,
-            this.physicsEngine,
-        );
+        this.player.serializedSpaceships.shift();
         this.player.instancedSpaceships.push(spaceship);
 
         this.targetCursorLayer.addObjects([spaceship]);

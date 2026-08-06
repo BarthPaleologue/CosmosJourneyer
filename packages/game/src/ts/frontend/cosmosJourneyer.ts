@@ -494,7 +494,7 @@ export class CosmosJourneyer {
             notificationManager,
         );
 
-        await starSystemView.resetPlayer();
+        await starSystemView.resetPlayer(player);
 
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
@@ -806,19 +806,7 @@ export class CosmosJourneyer {
               }
             : shipUniverseCoordinates;
 
-        const camera = this.activeView.getMainScene().activeCamera;
-        let thumbnailDataUrl: string | undefined = undefined;
-        if (camera !== null) {
-            const thumbnailBytes = await makeScreenshotPng(this.engine, camera, {
-                size: {
-                    width: 256,
-                    height: 144,
-                },
-            });
-            thumbnailDataUrl = bytesToDataUrl(thumbnailBytes, "image/png");
-        }
-
-        return {
+        const saveData: Save = {
             uuid: crypto.randomUUID(),
             timestamp: Date.now(),
             player: Player.Serialize(this.player),
@@ -829,8 +817,22 @@ export class CosmosJourneyer {
             shipLocations: {
                 [spaceship.id]: shipLocation,
             },
-            thumbnail: thumbnailDataUrl,
         };
+
+        const camera = this.activeView.getMainScene().activeCamera;
+        if (camera === null) {
+            return saveData;
+        }
+
+        const thumbnailBytes = await makeScreenshotPng(this.engine, camera, {
+            size: {
+                width: 256,
+                height: 144,
+            },
+        });
+
+        saveData.thumbnail = bytesToDataUrl(thumbnailBytes, "image/png");
+        return saveData;
     }
 
     public async createManualSave(): Promise<boolean> {
@@ -948,8 +950,7 @@ export class CosmosJourneyer {
         this.loadingProgressMonitor.reset();
         this.engine.loadingScreen.displayLoadingUI();
 
-        this.player.copyFrom(Player.Default(this.backend.universe), this.backend.universe);
-        await this.starSystemView.resetPlayer();
+        await this.starSystemView.resetPlayer(Player.Default(this.backend.universe));
         this.starSystemView.setUIEnabled(false);
         await this.mainMenu.init();
         this.starSystemView.initStarSystem(Date.now() / 1000);
@@ -1000,11 +1001,10 @@ export class CosmosJourneyer {
         }
 
         const newPlayer = Player.Deserialize(saveData.player, this.backend.universe);
-        this.player.copyFrom(newPlayer, this.backend.universe);
+        await this.starSystemView.resetPlayer(newPlayer);
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.backend.encyclopaedia.contributeDiscoveryIfNew(discovery);
         });
-        await this.starSystemView.resetPlayer();
 
         this.loadingProgressMonitor.reset();
         this.engine.loadingScreen.displayLoadingUI();
