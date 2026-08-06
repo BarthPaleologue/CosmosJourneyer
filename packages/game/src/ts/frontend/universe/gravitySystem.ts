@@ -59,7 +59,7 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>) {
+    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>): Vector3 {
         const objectMass = body.getMassProperties().mass;
         if (objectMass === undefined || objectMass === 0) {
             return Vector3.Zero();

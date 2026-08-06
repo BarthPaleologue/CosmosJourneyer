@@ -96,7 +96,7 @@ export function getRandomStellarType(rng: (step: number) => number): StellarType
     );
 }
 
-export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number) {
+export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
     switch (stellarType) {
         case "M":
             return randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE);

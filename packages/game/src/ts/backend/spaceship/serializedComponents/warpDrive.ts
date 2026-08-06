@@ -26,7 +26,7 @@ export const SerializedWarpDriveSchema = z.object({
 
 export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
 
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive) {
+export function getWarpDriveSpec(warpDrive: SerializedWarpDrive): { maxSpeed: number; rangeLy: number } {
     return {
         maxSpeed: 15 * C * (warpDrive.size + warpDrive.quality / 10),
         rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),

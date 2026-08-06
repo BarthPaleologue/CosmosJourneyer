@@ -59,7 +59,7 @@ export function durationToSeconds(duration: Duration): number {
  * @param celsius The temperature in Celsius
  * @returns The temperature in Kelvin
  */
-export function celsiusToKelvin(celsius: number) {
+export function celsiusToKelvin(celsius: number): number {
     return celsius + 273.15;
 }
 
@@ -68,7 +68,7 @@ export function celsiusToKelvin(celsius: number) {
  * @param kelvin The temperature in Kelvin
  * @returns The temperature in Celsius
  */
-export function kelvinToCelsius(kelvin: number) {
+export function kelvinToCelsius(kelvin: number): number {
     return kelvin - 273.15;
 }
 

@@ -77,11 +77,11 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.material = this.warpConeMaterial;
     }
 
-    setParent(parent: TransformNode) {
+    setParent(parent: TransformNode): void {
         this.parent = parent;
     }
 
-    setEnabled(enabled: boolean) {
+    setEnabled(enabled: boolean): void {
         this.hyperTunnel.setEnabled(enabled);
     }
 
@@ -89,7 +89,7 @@ export class HyperSpaceTunnel implements Transformable {
         return this.hyperTunnel;
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         this.warpConeMaterial.setFloat("time", this.elapsedSeconds);
@@ -120,7 +120,7 @@ export class HyperSpaceTunnel implements Transformable {
         rotate(this.hyperTunnel, rotationAxis, theta);
     }
 
-    dispose() {
+    dispose(): void {
         this.hyperTunnel.dispose();
     }
 }

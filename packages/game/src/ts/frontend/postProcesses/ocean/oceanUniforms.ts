@@ -59,7 +59,7 @@ export class OceanUniforms {
         return Object.values(OceanUniformNames);
     }
 
-    setUniforms(effect: Effect, planetTransform: TransformNode) {
+    setUniforms(effect: Effect, planetTransform: TransformNode): void {
         effect.setFloat(OceanUniformNames.OCEAN_RADIUS, this.oceanRadius);
         effect.setFloat(OceanUniformNames.OCEAN_SMOOTHNESS, this.smoothness);
         effect.setFloat(OceanUniformNames.OCEAN_SPECULAR_POWER, this.specularPower);
@@ -76,7 +76,7 @@ export class OceanUniforms {
         return Object.values(OceanSamplerNames);
     }
 
-    setSamplers(effect: Effect) {
+    setSamplers(effect: Effect): void {
         effect.setTexture(OceanSamplerNames.NORMAL_MAP_1, this.textures.normalMap1);
         effect.setTexture(OceanSamplerNames.NORMAL_MAP_2, this.textures.normalMap2);
     }

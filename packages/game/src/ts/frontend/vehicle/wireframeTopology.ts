@@ -43,7 +43,7 @@ export class WireframeTopology {
      * @param vertexA The handle to the first vertex to connect.
      * @param vertexB The handle to the second vertex to connect.
      */
-    connect(vertexA: VertexHandle, vertexB: VertexHandle) {
+    connect(vertexA: VertexHandle, vertexB: VertexHandle): void {
         const a = Math.min(vertexA, vertexB);
         const b = Math.max(vertexA, vertexB);
         this.edges.set(this.getEdgeKey(a, b), [a, b]);

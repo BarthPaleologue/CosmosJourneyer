@@ -81,7 +81,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         });
 
         return await new Promise<Result<Worker, Error>>((resolve) => {
-            const handleReady = (event: MessageEvent<unknown>) => {
+            const handleReady = (event: MessageEvent<unknown>): void => {
                 if (event.data !== "ready") {
                     cleanup();
                     worker.terminate();
@@ -93,13 +93,13 @@ export class ChunkForgeWorkers implements ChunkForge {
                 resolve(ok(worker));
             };
 
-            const handleError = (event: ErrorEvent | MessageEvent<unknown>) => {
+            const handleError = (event: ErrorEvent | MessageEvent<unknown>): void => {
                 cleanup();
                 worker.terminate();
                 resolve(err(new Error(`Worker error before ready`, { cause: event })));
             };
 
-            const cleanup = () => {
+            const cleanup = (): void => {
                 worker.removeEventListener("message", handleReady);
                 worker.removeEventListener("error", handleError);
                 worker.removeEventListener("messageerror", handleError);
@@ -111,7 +111,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         });
     }
 
-    public addTask(task: BuildTask) {
+    public addTask(task: BuildTask): void {
         this.output.set(task.chunkId, { status: "pending" });
         this.workerPool.submitTask(task);
     }
@@ -131,7 +131,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         };
     }
 
-    private handleWorkerResult(e: MessageEvent) {
+    private handleWorkerResult(e: MessageEvent): void {
         const dataResult = ReturnedChunkDataSchema.safeParse(e.data);
         if (!dataResult.success) {
             return;
@@ -156,15 +156,15 @@ export class ChunkForgeWorkers implements ChunkForge {
     /**
      * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
-    public update() {
+    public update(): void {
         this.workerPool.update();
     }
 
-    public isIdle() {
+    public isIdle(): boolean {
         return this.workerPool.isIdle();
     }
 
-    public reset() {
+    public reset(): void {
         this.workerPool.reset();
         this.output.clear();
     }

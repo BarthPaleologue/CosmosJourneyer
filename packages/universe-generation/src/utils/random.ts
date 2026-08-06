@@ -11,7 +11,7 @@ export function wheelOfFortune<T>(options: [T, number][], randomValue: number): 
     throw new Error("Wheel of fortune failed");
 }
 
-export function uniformToExponential(uniformValue: number, lambda: number) {
+export function uniformToExponential(uniformValue: number, lambda: number): number {
     return -Math.log(uniformValue) / lambda;
 }
 

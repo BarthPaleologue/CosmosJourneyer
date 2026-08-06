@@ -44,7 +44,7 @@ export class StarMapBookmarkButton {
         });
     }
 
-    setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates) {
+    setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates): void {
         this.selectedSystemCoordinates = starSystemCoordinates;
         this.isSelectedSystemBookmarked =
             this.player.systemBookmarks.find((bookmark) =>

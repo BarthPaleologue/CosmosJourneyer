@@ -43,15 +43,15 @@ export class TargetCursorLayer implements IDisposable {
         document.body.appendChild(this.layerRoot);
     }
 
-    public setEnabled(enabled: boolean) {
+    public setEnabled(enabled: boolean): void {
         this.layerRoot.style.display = enabled ? "block" : "none";
     }
 
-    public isEnabled() {
+    public isEnabled(): boolean {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObjects(objects: ReadonlyArray<Targetable>) {
+    public addObjects(objects: ReadonlyArray<Targetable>): void {
         for (const object of objects) {
             const overlay = new ObjectTargetCursor(object);
             this.targetCursors.push(overlay);
@@ -59,7 +59,7 @@ export class TargetCursorLayer implements IDisposable {
         }
     }
 
-    public removeObject(object: Targetable) {
+    public removeObject(object: Targetable): void {
         const targetCursor = this.targetCursors.find((cursor) => cursor.object === object);
         if (targetCursor === undefined) {
             return;
@@ -78,7 +78,7 @@ export class TargetCursorLayer implements IDisposable {
         }
     }
 
-    private computeClosestToScreenCenterOrbitalObject() {
+    private computeClosestToScreenCenterOrbitalObject(): void {
         let nearest = null;
         let closestDistance = Number.POSITIVE_INFINITY;
         this.targetCursors.forEach((overlay) => {
@@ -98,11 +98,11 @@ export class TargetCursorLayer implements IDisposable {
         this.closestToScreenCenterOrbitalObject = nearest;
     }
 
-    public getClosestToScreenCenterOrbitalObject() {
+    public getClosestToScreenCenterOrbitalObject(): Targetable | null {
         return this.closestToScreenCenterOrbitalObject;
     }
 
-    public reset() {
+    public reset(): void {
         for (const targetCursor of this.targetCursors) {
             targetCursor.dispose();
         }
@@ -110,7 +110,7 @@ export class TargetCursorLayer implements IDisposable {
         this.setTarget(null);
     }
 
-    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean) {
+    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean): void {
         let shouldHide = this.target === object;
         if (forcedValue !== undefined) {
             shouldHide = !forcedValue;
@@ -124,18 +124,18 @@ export class TargetCursorLayer implements IDisposable {
         this.target = object;
     }
 
-    public getTarget() {
+    public getTarget(): (Transformable & HasBoundingSphere & TypedObject) | null {
         return this.target;
     }
 
-    public setAdditionalPinnedTargets(objects: ReadonlyArray<Targetable>) {
+    public setAdditionalPinnedTargets(objects: ReadonlyArray<Targetable>): void {
         this.additionalPinnedTargets.clear();
         for (const object of objects) {
             this.additionalPinnedTargets.add(object);
         }
     }
 
-    public update(camera: Camera) {
+    public update(camera: Camera): void {
         if (!this.isEnabled()) {
             return;
         }
@@ -153,7 +153,7 @@ export class TargetCursorLayer implements IDisposable {
         this.computeClosestToScreenCenterOrbitalObject();
     }
 
-    public dispose() {
+    public dispose(): void {
         this.reset();
     }
 }

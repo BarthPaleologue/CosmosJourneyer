@@ -537,7 +537,7 @@ function bb_spectrum(wavelength: number): number {
       10000 K      0.2807 0.2884 0.4310   0.602 0.693 1.000
 */
 
-export function demonstrate() {
+export function demonstrate(): void {
     const cs = HDTVsystem;
 
     console.log("Temperature       x      y      z       R     G     B");

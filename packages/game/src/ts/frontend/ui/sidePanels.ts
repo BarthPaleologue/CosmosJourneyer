@@ -97,7 +97,7 @@ export class SidePanels {
         panel.appendChild(closeButton);
     }
 
-    public async toggleActivePanel(type: PanelType) {
+    public async toggleActivePanel(type: PanelType): Promise<void> {
         const newPanel = this.panelFromType(type);
         if (this.activeRightPanel === newPanel) {
             return;
@@ -115,7 +115,7 @@ export class SidePanels {
         newPanel.classList.add("visible");
     }
 
-    public hideActivePanel() {
+    public hideActivePanel(): void {
         if (this.activeRightPanel !== null) {
             this.activeRightPanel.classList.remove("visible");
             this.activeRightPanel = null;

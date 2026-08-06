@@ -90,7 +90,7 @@ export class StarMaterial extends ShaderMaterial {
         });
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
     }
 }

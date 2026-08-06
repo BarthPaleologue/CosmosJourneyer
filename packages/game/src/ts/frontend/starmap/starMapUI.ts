@@ -239,7 +239,7 @@ export class StarMapUI {
         });
     }
 
-    update(playerPosition: Vector3) {
+    update(playerPosition: Vector3): void {
         const width = this.scene.getEngine().getRenderWidth();
         const height = this.scene.getEngine().getRenderHeight();
 
@@ -358,21 +358,21 @@ export class StarMapUI {
         }
     }
 
-    setHoveredSystem(system: StarSystemCoordinates | null) {
+    setHoveredSystem(system: StarSystemCoordinates | null): void {
         if (system === this.currentSystem || system === this.selectedSystem) {
             return;
         }
         this.hoveredSystem = system;
     }
 
-    setCurrentSystem(systemCoordinates: StarSystemCoordinates) {
+    setCurrentSystem(systemCoordinates: StarSystemCoordinates): void {
         this.currentSystem = systemCoordinates;
     }
 
     setSelectedSystem(
         targetSystemModel: DeepReadonly<StarSystemModel>,
         currentSystemCoordinates: StarSystemCoordinates | null,
-    ) {
+    ): void {
         this.selectedSystem = targetSystemModel.coordinates;
 
         const targetPosition = wrapVector3(
@@ -435,7 +435,7 @@ export class StarMapUI {
         }
     }
 
-    rebuildSystemIcons() {
+    rebuildSystemIcons(): void {
         const bookmarkedSystems = this.player.systemBookmarks;
         const targetSystems = this.player.currentMissions.flatMap((mission) => mission.getTargetSystems());
 
@@ -476,7 +476,7 @@ export class StarMapUI {
         });
     }
 
-    dispose() {
+    dispose(): void {
         this.scene.dispose();
         this.htmlRoot.remove();
     }

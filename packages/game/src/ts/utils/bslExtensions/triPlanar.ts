@@ -92,7 +92,11 @@ export function triPlanarMaterial(
     };
 }
 
-export function getTriPlanarUVs(samplePoint: NodeMaterialConnectionPoint) {
+export function getTriPlanarUVs(samplePoint: NodeMaterialConnectionPoint): {
+    uvX: NodeMaterialConnectionPoint;
+    uvY: NodeMaterialConnectionPoint;
+    uvZ: NodeMaterialConnectionPoint;
+} {
     const { x, y, z } = splitVec(samplePoint);
     return {
         uvX: vec2(z, y),
@@ -106,7 +110,11 @@ export function whiteoutBlend(
     tangentNormalY: NodeMaterialConnectionPoint,
     tangentNormalZ: NodeMaterialConnectionPoint,
     surfaceNormal: NodeMaterialConnectionPoint,
-) {
+): {
+    finalNormalX: NodeMaterialConnectionPoint;
+    finalNormalY: NodeMaterialConnectionPoint;
+    finalNormalZ: NodeMaterialConnectionPoint;
+} {
     // Whiteout blend from Ben Golus' blog https://bgolus.medium.com/normal-mapping-for-a-triplanar-shader-10bf39dca05a#da52
     const surfaceNormalZY = swizzle(surfaceNormal, "zy");
     const surfaceNormalXZ = swizzle(surfaceNormal, "xz");
@@ -146,7 +154,7 @@ export function getTriPlanarBlending(surfaceNormal: NodeMaterialConnectionPoint,
         sampleX: NodeMaterialConnectionPoint,
         sampleY: NodeMaterialConnectionPoint,
         sampleZ: NodeMaterialConnectionPoint,
-    ) => {
+    ): NodeMaterialConnectionPoint => {
         return addN([
             mul(sampleX, normalizedBlendWeights.x),
             mul(sampleY, normalizedBlendWeights.y),

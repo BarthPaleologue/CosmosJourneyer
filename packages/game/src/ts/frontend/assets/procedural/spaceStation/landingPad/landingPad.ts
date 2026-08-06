@@ -117,7 +117,7 @@ export class LandingPad implements ILandingPad {
         };
     }
 
-    disablePhysics() {
+    disablePhysics(): void {
         if (this.deckAggregate === null) {
             return;
         }
@@ -126,7 +126,7 @@ export class LandingPad implements ILandingPad {
         this.deckAggregate = null;
     }
 
-    enablePhysics(scene: Scene) {
+    enablePhysics(scene: Scene): void {
         if (this.deckAggregate !== null) {
             return;
         }
@@ -168,7 +168,7 @@ export class LandingPad implements ILandingPad {
         ];
     }
 
-    dispose() {
+    dispose(): void {
         this.decal?.material.dispose();
         this.decal?.mesh.dispose();
         this.deckAggregate?.dispose();

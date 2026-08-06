@@ -55,7 +55,7 @@ export class AiSpaceshipControls implements Controls {
 
     update(): void {}
 
-    dispose(soundPlayer: ISoundPlayer) {
+    dispose(soundPlayer: ISoundPlayer): void {
         this.spaceship.dispose(soundPlayer);
     }
 }

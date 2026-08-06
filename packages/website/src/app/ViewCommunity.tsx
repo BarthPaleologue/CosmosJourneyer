@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 import { FAQ, type FAQItem } from "@/components/FAQ";
 import { siteConfig } from "@/siteConfig";
 
@@ -83,7 +85,7 @@ const faqItems = [
     },
 ] as const satisfies readonly FAQItem[];
 
-export const ViewCommunity = () => (
+export const ViewCommunity = (): ReactElement => (
     <section className="communitySection" id="community">
         <div className="communityBackdrop" aria-hidden="true" />
         <div className="communityLayout">

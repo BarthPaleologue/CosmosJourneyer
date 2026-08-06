@@ -25,7 +25,9 @@ export const SerializedDiscoveryScannerSchema = z.object({
 
 export type SerializedDiscoveryScanner = z.infer<typeof SerializedDiscoveryScannerSchema>;
 
-export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner) {
+export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner): {
+    relativeRange: number;
+} {
     return {
         relativeRange: serializedDiscoveryScanner.size + serializedDiscoveryScanner.quality / 10,
     };

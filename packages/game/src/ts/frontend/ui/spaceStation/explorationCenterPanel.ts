@@ -180,7 +180,7 @@ export class ExplorationCenterPanel {
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
 
-    private filterDiscoveryListByQuery(query: string) {
+    private filterDiscoveryListByQuery(query: string): void {
         for (const listItem of this.discoveryList.children) {
             if (!(listItem instanceof HTMLDivElement)) {
                 continue;
@@ -189,7 +189,7 @@ export class ExplorationCenterPanel {
         }
     }
 
-    async populate(universeBackend: UniverseBackend) {
+    async populate(universeBackend: UniverseBackend): Promise<void> {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 

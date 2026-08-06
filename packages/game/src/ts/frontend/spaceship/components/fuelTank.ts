@@ -54,11 +54,11 @@ export class FuelTank {
         this.currentFuel -= amount;
     }
 
-    getCurrentFuel() {
+    getCurrentFuel(): number {
         return this.currentFuel;
     }
 
-    getMaxFuel() {
+    getMaxFuel(): number {
         return this.maxFuel;
     }
 

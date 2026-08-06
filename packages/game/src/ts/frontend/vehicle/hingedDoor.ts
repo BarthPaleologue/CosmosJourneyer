@@ -58,12 +58,12 @@ export class HingedDoor implements Door {
         this.close();
     }
 
-    open() {
+    open(): void {
         this.hinge.setAxisMotorTarget(this.axis, this.openedAngle);
         this.state = "opened";
     }
 
-    close() {
+    close(): void {
         this.hinge.setAxisMotorTarget(this.axis, this.closedAngle);
         this.state = "closed";
     }
@@ -82,7 +82,7 @@ export class HingedDoor implements Door {
                 return [
                     {
                         label: i18n.t("interactions:close"),
-                        perform: async () => {
+                        perform: async (): Promise<void> => {
                             this.close();
                             return Promise.resolve();
                         },
@@ -92,7 +92,7 @@ export class HingedDoor implements Door {
                 return [
                     {
                         label: i18n.t("interactions:open"),
-                        perform: async () => {
+                        perform: async (): Promise<void> => {
                             this.open();
                             return Promise.resolve();
                         },
@@ -101,7 +101,7 @@ export class HingedDoor implements Door {
         }
     }
 
-    dispose() {
+    dispose(): void {
         this.hinge.dispose();
         this.doorAggregate.dispose();
         this.doorAggregate.transformNode.dispose();

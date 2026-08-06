@@ -236,7 +236,7 @@ export class SpaceshipOutfittingUI {
         rowContainer2.appendChild(this.equipButton);
     }
 
-    generate(shipInternals: SpaceshipInternals, player: Player, soundPlayer: ISoundPlayer) {
+    generate(shipInternals: SpaceshipInternals, player: Player, soundPlayer: ISoundPlayer): void {
         this.componentList.innerHTML = "";
 
         const primaryH2 = document.createElement("h2");
@@ -286,7 +286,7 @@ export class SpaceshipOutfittingUI {
         return slotUI;
     }
 
-    private handleClickOnSlot(componentSlot: ComponentSlot, player: Player) {
+    private handleClickOnSlot(componentSlot: ComponentSlot, player: Player): void {
         this.equippedComponentSpec.displayComponent(componentSlot.getComponent()?.serialize() ?? null);
         this.storeButton.disabled = componentSlot.getComponent() === null;
         this.sellButton.disabled = componentSlot.getComponent() === null;

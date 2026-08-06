@@ -61,7 +61,7 @@ export async function createAutomaticLandingScene(
 
     const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene));
 
-    const initShipTransform = () => {
+    const initShipTransform = (): void => {
         ship.getTransform().position.copyFromFloats(
             randRange(-50, 50, Math.random, 0),
             randRange(30, 50, Math.random, 0),
@@ -108,7 +108,7 @@ export async function createAutomaticLandingScene(
 
     enableShadows(sun, new DepthRendererManager(scene));
 
-    const engageLanding = () => {
+    const engageLanding = (): void => {
         ship.engageLandingOnPad(landingPad);
         //ship.engageSurfaceLanding(ground);
     };

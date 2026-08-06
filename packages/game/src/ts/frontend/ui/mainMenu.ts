@@ -299,7 +299,7 @@ export class MainMenu {
         });
     }
 
-    async init() {
+    async init(): Promise<void> {
         await this.starSystemView.loadStarSystem(this.starSystemModel);
         await this.syncContinueButton();
 
@@ -330,7 +330,7 @@ export class MainMenu {
         this.continueButton.style.display = latestSave === null ? "none" : "";
     }
 
-    private startAnimation(onAnimationFinished: () => void) {
+    private startAnimation(onAnimationFinished: () => void): void {
         this.sidePanels.hideActivePanel();
 
         const starSystemController = this.starSystemView.getStarSystem();
@@ -385,7 +385,7 @@ export class MainMenu {
             },
         );
 
-        const animationCallback = () => {
+        const animationCallback = (): void => {
             const deltaTime = this.scene.getEngine().getDeltaTime() / 1000;
 
             if (!translationAnimation.isFinished()) {
@@ -412,23 +412,23 @@ export class MainMenu {
         this.hideVersion();
     }
 
-    private hideVersion() {
+    private hideVersion(): void {
         this.version.style.transform = "translateY(100%)";
     }
 
-    private showVersion() {
+    private showVersion(): void {
         this.version.style.transform = "";
     }
 
-    private hideMenu() {
+    private hideMenu(): void {
         this.menuItems.style.left = "-20%";
     }
 
-    private showMenu() {
+    private showMenu(): void {
         this.menuItems.style.left = "";
     }
 
-    public show() {
+    public show(): void {
         this.showVersion();
         this.showMenu();
         this.htmlRoot.style.display = "block";
@@ -436,7 +436,7 @@ export class MainMenu {
         this.starSystemView.setUIEnabled(false);
     }
 
-    public hide() {
+    public hide(): void {
         this.hideVersion();
         this.hideMenu();
         this.sidePanels.hideActivePanel();
@@ -444,7 +444,7 @@ export class MainMenu {
         this.onVisibilityChanged.notifyObservers();
     }
 
-    public isVisible() {
+    public isVisible(): boolean {
         return this.htmlRoot.style.display !== "none";
     }
 }

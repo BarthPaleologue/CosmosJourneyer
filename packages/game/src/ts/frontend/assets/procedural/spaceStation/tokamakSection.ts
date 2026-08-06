@@ -179,7 +179,7 @@ export class TokamakSection implements StationSection {
         return this.lights;
     }
 
-    update(cameraWorldPosition: Vector3) {
+    update(cameraWorldPosition: Vector3): void {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         const toggleDistance = 20e3;
@@ -235,7 +235,7 @@ export class TokamakSection implements StationSection {
         return this.attachment;
     }
 
-    public dispose() {
+    public dispose(): void {
         this.radiatorMaterial.dispose();
 
         this.attachment.dispose();

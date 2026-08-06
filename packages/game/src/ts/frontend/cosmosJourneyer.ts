@@ -598,10 +598,11 @@ export class CosmosJourneyer {
         const controller = new DesktopUpdateController(
             api,
             {
-                getPresentationContext: () => this.getUpdatePresentationContext(),
-                canBackupCurrentCommander: () => this.canPersistCurrentCommander(),
-                downloadCommanderBackup: async (context) => this.downloadUpdateCommanderBackup(context),
-                prepareImmediateInstall: async () => this.prepareImmediateUpdateInstall(),
+                getPresentationContext: (): UpdatePresentationContext => this.getUpdatePresentationContext(),
+                canBackupCurrentCommander: (): boolean => this.canPersistCurrentCommander(),
+                downloadCommanderBackup: async (context): Promise<boolean> =>
+                    this.downloadUpdateCommanderBackup(context),
+                prepareImmediateInstall: async (): Promise<boolean> => this.prepareImmediateUpdateInstall(),
             },
             this.notificationManager,
             this.soundPlayer,
@@ -1036,7 +1037,7 @@ export class CosmosJourneyer {
         });
     }
 
-    public loadTutorial(tutorial: Tutorial) {
+    public loadTutorial(tutorial: Tutorial): void {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
             const saveResult = tutorial.getSaveData(this.backend.universe);
@@ -1176,7 +1177,7 @@ export class CosmosJourneyer {
         }
     }
 
-    public async loadLocation(location: UniverseCoordinates) {
+    public async loadLocation(location: UniverseCoordinates): Promise<void> {
         if (location.type === "relative") {
             await this.loadRelativeLocation(location);
         } else if (location.type === "atStation") {
@@ -1184,7 +1185,7 @@ export class CosmosJourneyer {
         }
     }
 
-    public async loadRelativeLocation(location: RelativeCoordinates) {
+    public async loadRelativeLocation(location: RelativeCoordinates): Promise<void> {
         const controls = this.starSystemView.getActiveControls();
         if (controls === null) {
             console.warn("No controls!");
@@ -1238,7 +1239,7 @@ export class CosmosJourneyer {
         this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
     }
 
-    public async loadAtStationLocation(location: AtStationCoordinates) {
+    public async loadAtStationLocation(location: AtStationCoordinates): Promise<void> {
         const controls = this.starSystemView.getActiveControls();
         if (controls === null) {
             console.warn("No controls!");

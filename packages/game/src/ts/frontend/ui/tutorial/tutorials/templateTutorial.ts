@@ -40,11 +40,11 @@ export class TemplateTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return "Template Tutorial";
     }
 
-    getDescription() {
+    getDescription(): string {
         return "This is a template tutorial to help building more tutorials!";
     }
 

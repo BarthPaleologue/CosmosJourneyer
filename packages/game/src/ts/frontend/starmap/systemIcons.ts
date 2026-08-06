@@ -65,7 +65,7 @@ export class SystemIcons {
         return this.systemCoordinates;
     }
 
-    dispose() {
+    dispose(): void {
         this.htmlRoot.remove();
     }
 

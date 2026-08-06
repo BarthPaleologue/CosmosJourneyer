@@ -92,11 +92,11 @@ export class Tts implements ITts {
         }
     }
 
-    public sayNow(speaker: Speaker, line: VoiceLine) {
+    public sayNow(speaker: Speaker, line: VoiceLine): void {
         this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line).play();
     }
 
-    public enqueueSay(speaker: Speaker, line: VoiceLine) {
+    public enqueueSay(speaker: Speaker, line: VoiceLine): void {
         this.soundQueue.add(this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line));
     }
 

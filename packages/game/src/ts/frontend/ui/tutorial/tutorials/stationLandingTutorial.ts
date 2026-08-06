@@ -44,11 +44,11 @@ export class StationLandingTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return i18n.t("tutorials:stationLanding:title");
     }
 
-    getDescription() {
+    getDescription(): string {
         return i18n.t("tutorials:stationLanding:description");
     }
 

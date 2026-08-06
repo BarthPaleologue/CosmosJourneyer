@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { WireframeTopology } from "./wireframeTopology";
 
-const asTriples = (arr: Uint32Array) =>
+const asTriples = (arr: Uint32Array): string[] =>
     Array.from({ length: Math.floor(arr.length / 3) }, (_, i) => {
         const v1 = arr[3 * i];
         const v2 = arr[3 * i + 1];
@@ -95,7 +95,7 @@ describe("WireframeTopology", () => {
         }
         const edges = edgesResult.value;
 
-        const asPairsNormalized = (a: Uint32Array) =>
+        const asPairsNormalized = (a: Uint32Array): number[][] =>
             Array.from({ length: a.length / 2 }, (_, i) => {
                 const edgeV1 = a[2 * i];
                 const edgeV2 = a[2 * i + 1];

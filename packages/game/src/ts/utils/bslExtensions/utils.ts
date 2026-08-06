@@ -32,14 +32,18 @@ import {
     type TargetOptions,
 } from "babylonjs-shading-language";
 
-export function triangleWave3d(input: NodeMaterialConnectionPoint, phase: Vector3, period: number) {
+export function triangleWave3d(
+    input: NodeMaterialConnectionPoint,
+    phase: Vector3,
+    period: number,
+): NodeMaterialConnectionPoint {
     return abs(sub(mod(add(input, vec(phase)), f(period)), f(period * 0.5)));
 }
 
 export function unpackNormal(
     normalMapSample: NodeMaterialConnectionPoint,
     options?: Partial<{ normalStrength: NodeMaterialConnectionPoint; invertY: boolean }>,
-) {
+): NodeMaterialConnectionPoint {
     let unpackedNormal = remap(normalMapSample, [0, 1], [-1, 1]);
     if (options?.invertY !== undefined && options.invertY) {
         unpackedNormal = mul(unpackedNormal, vec(new Vector3(1, -1, 1)));
@@ -91,7 +95,7 @@ export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOption
 export function scaleTangentNormal(
     tangentNormal: NodeMaterialConnectionPoint,
     normalStrength: NodeMaterialConnectionPoint,
-) {
+): NodeMaterialConnectionPoint {
     const tangentNormalSplit = splitVec(tangentNormal);
     return normalize(
         vec3({

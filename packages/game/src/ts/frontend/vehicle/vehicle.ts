@@ -98,15 +98,15 @@ export class Vehicle implements Targetable {
         };
     }
 
-    getSteeringMode() {
+    getSteeringMode(): SteeringMode {
         return this.steeringMode;
     }
 
-    setSteeringMode(mode: SteeringMode) {
+    setSteeringMode(mode: SteeringMode): void {
         this.steeringMode = mode;
     }
 
-    setTargetSteeringAngle(angle: number) {
+    setTargetSteeringAngle(angle: number): void {
         const linearVelocity = this.frame.body.getLinearVelocity().length();
         const maxSteeringAngle = lerp(
             this.maxSteeringAngle.highSpeed,
@@ -131,7 +131,7 @@ export class Vehicle implements Targetable {
         }
     }
 
-    setTargetSpeed(speed: number) {
+    setTargetSpeed(speed: number): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
         this.targetSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
         const motorTorque = this.boostEnabled ? 15_000 : 5_000;
@@ -147,12 +147,12 @@ export class Vehicle implements Targetable {
         }
     }
 
-    accelerate(acceleration: number, deltaSeconds: number) {
+    accelerate(acceleration: number, deltaSeconds: number): void {
         this.setTargetSpeed(this.targetSpeed + acceleration * deltaSeconds);
         this.targetSpeed = lerpSmooth(this.targetSpeed, 0, 2.5, deltaSeconds);
     }
 
-    brake() {
+    brake(): void {
         const brakeTorque = 20_000;
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
@@ -166,12 +166,12 @@ export class Vehicle implements Targetable {
         this.targetSpeed = 0;
     }
 
-    turn(steeringSpeed: number, deltaSeconds: number) {
+    turn(steeringSpeed: number, deltaSeconds: number): void {
         this.setTargetSteeringAngle(this.targetSteeringAngle + steeringSpeed * deltaSeconds);
         this.targetSteeringAngle = lerpSmooth(this.targetSteeringAngle, 0, 0.225, deltaSeconds);
     }
 
-    setBoostEnabled(enabled: boolean) {
+    setBoostEnabled(enabled: boolean): void {
         this.boostEnabled = enabled;
     }
 
@@ -187,11 +187,11 @@ export class Vehicle implements Targetable {
         return i18n.t("objectTypes:vehicle");
     }
 
-    getFrameAggregate() {
+    getFrameAggregate(): PhysicsAggregate {
         return this.frame;
     }
 
-    dispose() {
+    dispose(): void {
         for (const door of this.doors) {
             door.dispose();
         }

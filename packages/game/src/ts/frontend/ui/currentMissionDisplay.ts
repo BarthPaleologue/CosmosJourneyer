@@ -137,7 +137,11 @@ export class CurrentMissionDisplay {
         });
     }
 
-    public update(context: MissionContext, keyboardLayout: Map<string, string>, universeBackend: UniverseBackend) {
+    public update(
+        context: MissionContext,
+        keyboardLayout: Map<string, string>,
+        universeBackend: UniverseBackend,
+    ): void {
         const currentMissionCount = this.player.currentMissions.length;
         const newestCurrentMission = this.player.currentMissions.at(-1);
         if (currentMissionCount > this.knownCurrentMissionCount && newestCurrentMission !== undefined) {
@@ -182,7 +186,7 @@ export class CurrentMissionDisplay {
         }
     }
 
-    public setNextMission(universeBackend: UniverseBackend) {
+    public setNextMission(universeBackend: UniverseBackend): void {
         if (this.activeMission === null) {
             return;
         }
@@ -207,7 +211,7 @@ export class CurrentMissionDisplay {
         this.setMission(nextMission, universeBackend);
     }
 
-    public setPreviousMission(universeBackend: UniverseBackend) {
+    public setPreviousMission(universeBackend: UniverseBackend): void {
         if (this.activeMission === null) {
             return;
         }
@@ -236,7 +240,7 @@ export class CurrentMissionDisplay {
         this.setMission(previousMission, universeBackend);
     }
 
-    private setMission(mission: Mission, universeBackend: UniverseBackend) {
+    private setMission(mission: Mission, universeBackend: UniverseBackend): void {
         this.activeMission = mission;
         this.missionPanelTitle.innerText = mission.getTypeString();
         this.missionPanelDescription.innerText = mission.describe(universeBackend);
@@ -248,7 +252,7 @@ export class CurrentMissionDisplay {
         return this.player.completedMissions.concat(this.player.currentMissions);
     }
 
-    private updateMissionCounter() {
+    private updateMissionCounter(): void {
         if (this.activeMission === null) {
             this.missionCounter.innerText = "0/0";
             return;
@@ -259,7 +263,7 @@ export class CurrentMissionDisplay {
         this.missionCounter.innerText = `${missionIndex + 1}/${allMissions.length}`;
     }
 
-    private setNoMissionActive() {
+    private setNoMissionActive(): void {
         this.activeMission = null;
 
         this.missionPanelTitle.innerText = i18n.t("missions:common:noActiveMission");
@@ -269,7 +273,7 @@ export class CurrentMissionDisplay {
         this.rootNode.classList.remove("completed");
     }
 
-    public dispose() {
+    public dispose(): void {
         this.rootNode.remove();
     }
 }

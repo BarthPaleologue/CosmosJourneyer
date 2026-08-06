@@ -26,14 +26,14 @@ export function createEdgeTubeFrame(
     edges: Uint32Array,
     radius: number,
     scene: Scene,
-) {
-    const edgeKey = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
+): Mesh | null {
+    const edgeKey = (a: number, b: number): string => (a < b ? `${a}_${b}` : `${b}_${a}`);
     const seen = new Set<string>();
     const tubes: Array<Mesh> = [];
     const tessellation = 12;
     const overlap = 0;
 
-    const getVec = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
+    const getVec = (i: number): Vector3 => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
     const usedVerts = new Set<number>();
 

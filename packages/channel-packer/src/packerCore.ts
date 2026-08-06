@@ -68,10 +68,26 @@ export class ImageCache {
     }
 }
 
+export interface PackerEngine<TInput, TEncodedPng> {
+    generatePreview(
+        request: PackRequest,
+        inputsByKey: ReadonlyMap<string, TInput>,
+        cache: ImageCache,
+        maxPreviewEdge: number,
+    ): Promise<PreviewResponse>;
+    savePacked(
+        request: PackRequest,
+        inputsByKey: ReadonlyMap<string, TInput>,
+        cache: ImageCache,
+        fileName: string,
+    ): Promise<SaveResponse<TEncodedPng>>;
+    synchronizeCache(request: PackRequest, cache: ImageCache): void;
+}
+
 export function createPackerEngine<TInput, TEncodedPng>(
     fileAdapter: PackerFileAdapter<TInput>,
     imageAdapter: PackerImageAdapter<TEncodedPng>,
-) {
+): PackerEngine<TInput, TEncodedPng> {
     return {
         async generatePreview(
             request: PackRequest,
@@ -200,7 +216,7 @@ async function loadImages<TInput>(
             throw new PackerError("Missing source texture data. Re-select the input texture and try again.");
         }
 
-        const image = await (async () => {
+        const image = await (async (): Promise<DecodedImage> => {
             const existing = requestImages.get(inputKey);
             if (existing !== undefined) {
                 return existing;

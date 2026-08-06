@@ -301,7 +301,11 @@ export class SpaceStationLayer {
         this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
     }
 
-    private async setMainPanelState(state: MainPanelState, player: Player, universeBackend: UniverseBackend) {
+    private async setMainPanelState(
+        state: MainPanelState,
+        player: Player,
+        universeBackend: UniverseBackend,
+    ): Promise<undefined> {
         if (this.mainPanelState === state) {
             this.mainPanelState = "none";
         } else {
@@ -346,7 +350,7 @@ export class SpaceStationLayer {
         }
     }
 
-    public setVisibility(visible: boolean) {
+    public setVisibility(visible: boolean): void {
         if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) {
             return;
         }
@@ -361,7 +365,7 @@ export class SpaceStationLayer {
         station: DeepReadonly<OrbitalFacilityModel>,
         stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
         player: Player,
-    ) {
+    ): void {
         if (this.currentStation === station) {
             return;
         }
@@ -373,15 +377,15 @@ export class SpaceStationLayer {
         this.updatePlayerBalance(player.getBalance());
     }
 
-    private updatePlayerName(name: string) {
+    private updatePlayerName(name: string): void {
         this.playerName.textContent = `CMDR ${name}`;
     }
 
-    private updatePlayerBalance(balance: number) {
+    private updatePlayerBalance(balance: number): void {
         this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${balance.toLocaleString()}`;
     }
 
-    public reset() {
+    public reset(): void {
         this.currentStation = null;
         this.headerStationName.textContent = "";
         this.playerName.textContent = "";

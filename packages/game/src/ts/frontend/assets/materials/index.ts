@@ -94,7 +94,12 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     };
 }
 
-export function createDebugMaterial(name: string, diffuse: boolean, wireframe: boolean, scene: Scene) {
+export function createDebugMaterial(
+    name: string,
+    diffuse: boolean,
+    wireframe: boolean,
+    scene: Scene,
+): StandardMaterial {
     const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
     if (!diffuse) {
         mat.emissiveColor = Color3.Random();

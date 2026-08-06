@@ -70,7 +70,7 @@ describe("LandingComputer", () => {
     it("should set landing pad target", () => {
         const mockLandingPad = {
             getTransform: () => ({
-                getAbsolutePosition: () => new Vector3(0, 10, 0),
+                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),
@@ -108,7 +108,7 @@ describe("LandingComputer", () => {
     it("should timeout after max seconds", () => {
         const mockLandingPad = {
             getTransform: () => ({
-                getAbsolutePosition: () => new Vector3(0, 10, 0),
+                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),
@@ -129,7 +129,7 @@ describe("LandingComputer", () => {
     it("should report progress during normal operation", () => {
         const mockLandingPad = {
             getTransform: () => ({
-                getAbsolutePosition: () => new Vector3(0, 10, 0),
+                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
                 up: Vector3.Up(),
                 absoluteRotationQuaternion: new Quaternion(),
             }),

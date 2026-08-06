@@ -238,7 +238,7 @@ export class SolarSection implements StationSection {
         armTessellation: number,
         requiredSurface: number,
         solarPanelMaterial: SolarPanelMaterial,
-    ) {
+    ): void {
         const scene = this.getTransform().getScene();
         const halfRequiredSurface = requiredSurface / 2;
         const armSize = armLength;
@@ -272,7 +272,11 @@ export class SolarSection implements StationSection {
         }
     }
 
-    private generateStarPattern(armCount: number, requiredSurface: number, solarPanelMaterial: SolarPanelMaterial) {
+    private generateStarPattern(
+        armCount: number,
+        requiredSurface: number,
+        solarPanelMaterial: SolarPanelMaterial,
+    ): { position: Vector3; rotation: Quaternion }[] {
         const scene = this.getTransform().getScene();
 
         const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
@@ -352,7 +356,7 @@ export class SolarSection implements StationSection {
 
     private addSolarPanelLightPoints(
         lightPoints: Array<{ position: Vector3; rotation?: Quaternion; scale?: Vector3 }>,
-    ) {
+    ): void {
         if (this.solarPanels.length === 0) {
             return;
         }
@@ -408,7 +412,7 @@ export class SolarSection implements StationSection {
         return this.lights;
     }
 
-    update(cameraWorldPosition: Vector3) {
+    update(cameraWorldPosition: Vector3): void {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
@@ -453,7 +457,7 @@ export class SolarSection implements StationSection {
         return this.attachment;
     }
 
-    public dispose() {
+    public dispose(): void {
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();
         this.attachmentAggregate = null;

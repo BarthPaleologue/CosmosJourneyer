@@ -51,7 +51,7 @@ export class ComponentBrowserUI {
         types: ReadonlyArray<SerializedComponent["type"]>,
         maxComponentSize: number,
         spareParts: ReadonlySet<SerializedComponent>,
-    ) {
+    ): void {
         this.root.innerHTML = "";
 
         types.forEach((type) => {
@@ -59,7 +59,7 @@ export class ComponentBrowserUI {
         });
     }
 
-    private select(serializedComponent: SerializedComponent) {
+    private select(serializedComponent: SerializedComponent): void {
         this.selectedComponent = serializedComponent;
         this.onComponentSelect.notifyObservers(serializedComponent);
     }
@@ -68,7 +68,7 @@ export class ComponentBrowserUI {
         componentType: SerializedComponent["type"],
         maxComponentSize: number,
         spareParts: ReadonlySet<SerializedComponent>,
-    ) {
+    ): void {
         this.root.innerHTML = "";
 
         const sparePartsTitle = document.createElement("h2");

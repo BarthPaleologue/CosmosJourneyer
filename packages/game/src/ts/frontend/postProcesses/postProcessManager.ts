@@ -276,7 +276,7 @@ export class PostProcessManager {
         star: Star,
         lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
-    ) {
+    ): void {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             star.mesh,
@@ -324,7 +324,7 @@ export class PostProcessManager {
         neutronStar: NeutronStar,
         lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
-    ) {
+    ): void {
         const postProcesses: PostProcess[] = [];
         const volumetricLight = new VolumetricLight(
             neutronStar.mesh,
@@ -377,7 +377,7 @@ export class PostProcessManager {
      * Creates a new BlackHole postprocess for the given black hole and adds it to the manager.
      * @param blackHole A black hole
      */
-    public addBlackHole(blackHole: BlackHole) {
+    public addBlackHole(blackHole: BlackHole): void {
         const blackHolePostProcess = new BlackHolePostProcess(
             blackHole.getTransform(),
             blackHole.blackHoleUniforms,
@@ -389,7 +389,7 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(blackHole, [blackHolePostProcess], blackHole.getBoundingRadius());
     }
 
-    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
+    public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>): void {
         const postProcesses: PostProcess[] = [];
 
         if (
@@ -432,7 +432,7 @@ export class PostProcessManager {
         );
     }
 
-    public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<DirectionalLight>) {
+    public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<DirectionalLight>): void {
         const postProcesses: PostProcess[] = [];
 
         const celestialBodyUberShader = new CelestialBodyUberShaderPass(
@@ -472,7 +472,7 @@ export class PostProcessManager {
         >,
         stellarObjects: ReadonlyArray<DirectionalLight>,
         ringsUniforms: RingsUniforms | null,
-    ) {
+    ): void {
         const raymarchedBodyPass = new CelestialBodyUberShaderPass(
             {
                 transform: body.getTransform(),
@@ -500,7 +500,7 @@ export class PostProcessManager {
         bodies: ReadonlyArray<CelestialBody>,
         lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
-    ) {
+    ): void {
         for (const object of bodies) {
             switch (object.type) {
                 case "star":
@@ -553,7 +553,7 @@ export class PostProcessManager {
     /**
      * Rebuilds the rendering pipeline with body post-processes ordered from farthest to nearest.
      */
-    private rebuild() {
+    private rebuild(): void {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
         this.renderingPipeline.dispose();
@@ -577,7 +577,7 @@ export class PostProcessManager {
      * Updates time-dependent post-processes and rebuilds the pipeline if necessary
      * @param deltaSeconds The time in seconds since the last frame
      */
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         for (const postProcesses of this.updatablePostProcesses) {
             for (const postProcess of postProcesses) {
                 postProcess.update(deltaSeconds);
@@ -597,7 +597,7 @@ export class PostProcessManager {
      * Disposes of all post-processes tied to a star system (everything except color correction and FXAA).
      * Recreates the rendering pipeline in a minimal state.
      */
-    public reset() {
+    public reset(): void {
         this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
         this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
         this.renderingPipeline.dispose();

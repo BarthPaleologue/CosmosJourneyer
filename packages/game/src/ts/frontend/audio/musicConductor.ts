@@ -54,7 +54,7 @@ export class MusicConductor {
         });
     }
 
-    public setMusicFromSelection(musicSelection: ReadonlyArray<AbstractSound>) {
+    public setMusicFromSelection(musicSelection: ReadonlyArray<AbstractSound>): void {
         if (this.currentMusic !== null && musicSelection.includes(this.currentMusic)) {
             return;
         }
@@ -67,7 +67,7 @@ export class MusicConductor {
         this.setMusic(selectedMusic);
     }
 
-    public setMusic(newMusic: AbstractSound | null) {
+    public setMusic(newMusic: AbstractSound | null): void {
         if (this.currentMusic === newMusic) {
             return;
         }
@@ -93,7 +93,7 @@ export class MusicConductor {
         console.log("currently playing", this.currentMusic.name);
     }
 
-    public setSoundtrackVolume(volume: number) {
+    public setSoundtrackVolume(volume: number): void {
         this.volume = volume;
         if (this.currentMusic !== null) {
             this.currentMusic.setVolume(volume);
@@ -103,7 +103,7 @@ export class MusicConductor {
         return this.volume;
     }
 
-    public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number) {
+    public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number): void {
         if (this.currentMusic !== null) {
             if (isPaused && this.pauseMusicWhenPaused && this.currentMusic.state === SoundState.Started) {
                 this.currentMusic.pause();

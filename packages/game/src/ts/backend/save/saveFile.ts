@@ -30,7 +30,7 @@ export async function parseSaveFile(
 ): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = (event): void => {
             if (event.target === null) {
                 throw new Error("event.target is null");
             }

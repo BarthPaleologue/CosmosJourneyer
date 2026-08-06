@@ -277,7 +277,7 @@ export class LandingBay {
         this.lights.push(...this.landingPadLights.lights);
     }
 
-    setLandingPadStatus(landingPadIndex: number, status: LandingPadStatus) {
+    setLandingPadStatus(landingPadIndex: number, status: LandingPadStatus): void {
         const statusColor = new Color3();
         switch (status) {
             case LandingPadStatus.AVAILABLE:
@@ -295,7 +295,7 @@ export class LandingBay {
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 3, statusColor);
     }
 
-    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(
             Axis.Y,
             deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG * 0.1),
@@ -359,7 +359,7 @@ export class LandingBay {
         return i18n.t("objectTypes:landingBay");
     }
 
-    dispose() {
+    dispose(): void {
         this.root.dispose();
         this.ring.dispose();
 

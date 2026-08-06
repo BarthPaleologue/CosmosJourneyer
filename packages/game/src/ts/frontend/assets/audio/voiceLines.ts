@@ -20,7 +20,7 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
 import { CreateSoundAsync, type AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
-import type { IStaticSoundOptions } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
+import type { IStaticSoundOptions, StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -65,7 +65,7 @@ export async function loadVoiceLines(
         url: string,
         engine: AudioEngineV2,
         options?: Partial<IStaticSoundOptions>,
-    ) => {
+    ): Promise<StaticSound> => {
         progressMonitor.startTask();
         const sound = await CreateSoundAsync(name, url, options, engine);
         progressMonitor.completeTask();

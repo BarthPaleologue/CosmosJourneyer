@@ -65,7 +65,7 @@ export async function createFlightDemoScene(
 
     const box = MeshBuilder.CreateBox("box", { size: 50 }, scene);
 
-    const randRange = (min: number, max: number) => Math.random() * (max - min) + min;
+    const randRange = (min: number, max: number): number => Math.random() * (max - min) + min;
     const range = 5e3;
     const instanceCount = 10_000;
     const matrixBuffer = new Float32Array(instanceCount * 16);

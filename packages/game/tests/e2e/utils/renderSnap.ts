@@ -11,9 +11,11 @@ export async function renderAndSnap(
         };
         flagToWait: string;
     },
-) {
+): Promise<void> {
     const urlParams = new URLSearchParams();
-    if (opts.scene !== undefined) urlParams.set("scene", opts.scene);
+    if (opts.scene !== undefined) {
+        urlParams.set("scene", opts.scene);
+    }
     for (const [key, value] of Object.entries(opts.urlParams ?? {})) {
         urlParams.set(key, String(value));
     }

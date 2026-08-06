@@ -45,7 +45,7 @@ export async function createDebugAssetsScene(
     const hemi = new HemisphericLight("hemisphericLight", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    function showTexture(texture: BaseTexture, position: Vector3) {
+    function showTexture(texture: BaseTexture, position: Vector3): void {
         const plane = MeshBuilder.CreateGround("plane", { width: 0.9, height: 0.9 }, scene);
         const material = new StandardMaterial("material", scene);
         material.emissiveTexture = texture;

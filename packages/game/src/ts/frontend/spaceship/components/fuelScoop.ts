@@ -33,7 +33,7 @@ export class FuelScoop {
         this.fuelPerSecond = spec.fuelPerSecond;
     }
 
-    serialize() {
+    serialize(): { type: "fuelScoop"; size: number; quality: number } {
         return {
             type: this.type,
             size: this.size,

@@ -92,7 +92,7 @@ export class AsteroidField implements IDisposable {
      * @param cameraWorldPosition The position of the camera in world space
      * @param deltaSeconds The seconds elapsed since last frame
      */
-    public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number) {
+    public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number): void {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);
@@ -173,7 +173,7 @@ export class AsteroidField implements IDisposable {
         }
     }
 
-    dispose() {
+    dispose(): void {
         for (const value of this.patches.values()) {
             value.patch.dispose();
         }

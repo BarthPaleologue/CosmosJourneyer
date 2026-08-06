@@ -61,7 +61,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         return true;
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.hasCompletedLock) {
             return;
         }
@@ -82,7 +82,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
      * Set the active child index. Useful when deserializing an ongoing mission.
      * @param index The index of the child to set as active.
      */
-    setActiveChildIndex(index: number) {
+    setActiveChildIndex(index: number): void {
         if (index < 0 || index >= this.children.length) {
             throw new Error(
                 `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`,

@@ -59,7 +59,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
      * Set the state of the fly-by mission. Useful when deserializing an ongoing mission.
      * @param state The state of the mission
      */
-    public setState(state: FlyByState) {
+    public setState(state: FlyByState): void {
         this.state = state;
     }
 
@@ -74,7 +74,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         return universeObjectIdEquals(this.objectId, other.objectId);
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.isCompleted()) {
             return;
         }

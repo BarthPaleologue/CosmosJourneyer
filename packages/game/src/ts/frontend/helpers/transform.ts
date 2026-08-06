@@ -36,7 +36,7 @@ export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis:
     transformNode.computeWorldMatrix(true);
 }
 
-export function rotate(transformNode: TransformNode, axis: Vector3, amount: number) {
+export function rotate(transformNode: TransformNode, axis: Vector3, amount: number): void {
     transformNode.rotate(axis, amount, Space.WORLD);
 }
 

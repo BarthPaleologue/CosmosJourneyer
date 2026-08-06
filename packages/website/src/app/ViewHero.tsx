@@ -7,9 +7,11 @@
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
 
+import type { ReactElement } from "react";
+
 import { siteConfig } from "@/siteConfig";
 
-export const ViewHero = () => {
+export const ViewHero = (): ReactElement => {
     return (
         <section className="hero" id="top">
             <video

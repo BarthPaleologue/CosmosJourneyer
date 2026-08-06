@@ -52,7 +52,7 @@ export class SpaceshipDockUI {
         this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player, soundPlayer);
     }
 
-    public generate(player: Player, soundPlayer: ISoundPlayer) {
+    public generate(player: Player, soundPlayer: ISoundPlayer): void {
         this.currentSpaceshipContainer.innerHTML = "";
 
         const currentSpaceship = player.instancedSpaceships.at(0);

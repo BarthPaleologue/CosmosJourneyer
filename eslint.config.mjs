@@ -97,6 +97,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/promise-function-async": "error",
 
+        "@typescript-eslint/explicit-function-return-type": "error",
+
         "@typescript-eslint/no-misused-promises": [
             "error",
             {

@@ -60,7 +60,7 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
         return true;
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.hasCompletedLock) {
             return;
         }

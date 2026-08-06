@@ -60,7 +60,7 @@ export class CloudsUniforms {
         this.fallbackTexture = createEmptyTexture(scene);
     }
 
-    public setUniforms(effect: Effect) {
+    public setUniforms(effect: Effect): void {
         effect.setFloat(CloudsUniformNames.LAYER_RADIUS, this.model.layerRadius);
         effect.setFloat(CloudsUniformNames.FREQUENCY, this.model.frequency);
         effect.setFloat(CloudsUniformNames.DETAIL_FREQUENCY, this.model.detailFrequency);
@@ -73,7 +73,7 @@ export class CloudsUniforms {
         effect.setFloat(CloudsUniformNames.SPECULAR_POWER, this.model.specularPower);
     }
 
-    public setSamplers(effect: Effect) {
+    public setSamplers(effect: Effect): void {
         if (this.lut.canBeSampled()) {
             effect.setTexture(CloudsSamplerNames.LUT, this.lut.getTexture());
         } else {
@@ -81,7 +81,7 @@ export class CloudsUniforms {
         }
     }
 
-    public dispose(cloudsLutPool: ItemPool<CloudsLut>) {
+    public dispose(cloudsLutPool: ItemPool<CloudsLut>): void {
         cloudsLutPool.release(this.lut);
     }
 }

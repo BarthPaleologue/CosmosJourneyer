@@ -11,7 +11,7 @@ export class InputMap<T extends Record<string, Action<any> | Interaction>> {
         this.map = map;
     }
 
-    setEnabled(enabled: boolean) {
+    setEnabled(enabled: boolean): void {
         for (const actionOrInteraction of Object.values(this.map)) {
             if (actionOrInteraction instanceof Action) {
                 actionOrInteraction.enabled = enabled;

@@ -17,15 +17,15 @@
 
 import { G } from "./constants";
 
-export function getSemiMajorAxis(periapsis: number, apoapsis: number) {
+export function getSemiMajorAxis(periapsis: number, apoapsis: number): number {
     return (periapsis + apoapsis) / 2;
 }
 
-export function getEccentricity(periapsis: number, apoapsis: number) {
+export function getEccentricity(periapsis: number, apoapsis: number): number {
     return (apoapsis - periapsis) / (apoapsis + periapsis);
 }
 
-export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentricity: number) {
+export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentricity: number): number {
     return meanAnomaly - trueAnomaly + eccentricity * Math.sin(trueAnomaly); // = 0
 }
 
@@ -35,7 +35,7 @@ export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentr
  * @param y The y-coordinate of the point along the orbit.
  * @param p The p-norm shaping the orbit.
  */
-export function computeLpFactor(x: number, y: number, p: number) {
+export function computeLpFactor(x: number, y: number, p: number): number {
     return 1 / (Math.abs(x) ** p + Math.abs(y) ** p) ** (1 / p);
 }
 
@@ -45,7 +45,7 @@ export function computeLpFactor(x: number, y: number, p: number) {
  * @param parentMass
  * @return The orbital period in seconds or 0 if the parent mass is 0
  */
-export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number) {
+export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number): number {
     if (parentMass === 0) {
         return 0;
     }
@@ -54,7 +54,7 @@ export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number) {
     return 2 * Math.PI * Math.sqrt(a ** 3 / (G * M));
 }
 
-export function getSemiMajorAxisFromPeriod(period: number, parentMass: number) {
+export function getSemiMajorAxisFromPeriod(period: number, parentMass: number): number {
     if (parentMass === 0) {
         return 0;
     }
@@ -68,7 +68,7 @@ export function getSemiMajorAxisFromPeriod(period: number, parentMass: number) {
  * @param parentMass The mass of the parent object in kilograms
  * @returns The radius of the orbit in meters
  */
-export function getOrbitRadiusFromPeriod(period: number, parentMass: number) {
+export function getOrbitRadiusFromPeriod(period: number, parentMass: number): number {
     const omega = (2 * Math.PI) / period;
     return Math.cbrt((G * parentMass) / (omega * omega));
 }

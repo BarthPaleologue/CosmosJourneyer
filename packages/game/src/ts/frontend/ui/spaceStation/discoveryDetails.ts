@@ -116,7 +116,7 @@ export class DiscoveryDetails {
         void this.setDiscovery(null, universeBackend);
     }
 
-    async setDiscovery(discovery: SpaceDiscoveryData | null, universeBackend: UniverseBackend) {
+    async setDiscovery(discovery: SpaceDiscoveryData | null, universeBackend: UniverseBackend): Promise<void> {
         this.htmlRoot.innerHTML = "";
         this.htmlRoot.classList.toggle("empty", discovery === null);
         this.currentDiscovery = discovery;

@@ -26,7 +26,7 @@ export const SerializedFuelTankSchema = z.object({
 
 export type SerializedFuelTank = z.infer<typeof SerializedFuelTankSchema>;
 
-export function getFuelTankSpecs(fuelTank: SerializedFuelTank) {
+export function getFuelTankSpecs(fuelTank: SerializedFuelTank): { maxFuel: number } {
     return {
         maxFuel: 50 * (fuelTank.size + fuelTank.quality / 10),
     };

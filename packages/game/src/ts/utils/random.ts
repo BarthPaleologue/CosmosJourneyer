@@ -41,7 +41,7 @@ export function wheelOfFortune<T>(options: [T, number][], randomValue: number): 
  * @param lambda The lambda parameter of the exponential distribution
  * @see https://en.wikipedia.org/wiki/Exponential_distribution#Random_variate_generation
  */
-export function uniformToExponential(uniformValue: number, lambda: number) {
+export function uniformToExponential(uniformValue: number, lambda: number): number {
     return -Math.log(uniformValue) / lambda;
 }
 

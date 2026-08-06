@@ -431,7 +431,7 @@ export class StarSystemController {
      * Updates the material shaders of all the bodies in the system with the given delta time
      * @param deltaSeconds The time elapsed in seconds since the last update
      */
-    private updateShaders(deltaSeconds: number) {
+    private updateShaders(deltaSeconds: number): void {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             console.warn("No camera!");
@@ -485,14 +485,14 @@ export class StarSystemController {
         return this.referencePlaneRotation;
     }
 
-    public getOrbitalObjectById(id: OrbitalObjectId) {
+    public getOrbitalObjectById(id: OrbitalObjectId): OrbitalObject | undefined {
         return this.getOrbitalObjects().find((object) => object.model.id === id);
     }
 
     /**
      * Disposes all the bodies in the system
      */
-    public dispose() {
+    public dispose(): void {
         this.scatteringSystem.dispose();
         this.orbitalFacilityToParents.clear();
 

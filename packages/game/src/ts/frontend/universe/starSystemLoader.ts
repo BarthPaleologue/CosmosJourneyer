@@ -62,7 +62,13 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ) {
+    ): Promise<{
+        stellarObjects: readonly [StellarObject, ...StellarObject[]];
+        planets: readonly Planet[];
+        satellites: readonly TelluricPlanet[];
+        anomalies: readonly Anomaly[];
+        orbitalFacilities: readonly OrbitalFacility[];
+    }> {
         const numberOfObjects =
             systemModel.stellarObjects.length +
             systemModel.planets.length +

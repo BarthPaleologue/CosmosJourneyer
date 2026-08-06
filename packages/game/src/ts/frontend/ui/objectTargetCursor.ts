@@ -145,20 +145,20 @@ export class ObjectTargetCursor {
         this.maxDistance = object.targetInfo.maxDistance;
     }
 
-    setTarget(isTarget: boolean) {
+    setTarget(isTarget: boolean): void {
         this.isTarget = isTarget;
         this.cursor.classList.toggle("target", isTarget);
     }
 
-    setPinned(isPinned: boolean) {
+    setPinned(isPinned: boolean): void {
         this.isPinned = isPinned;
     }
 
-    setInformationEnabled(enabled: boolean) {
+    setInformationEnabled(enabled: boolean): void {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera) {
+    update(camera: Camera): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -225,11 +225,11 @@ export class ObjectTargetCursor {
         this.lastDistance = distance;
     }
 
-    isVisible() {
+    isVisible(): boolean {
         return this.alpha > 0 && this.isOnScreen;
     }
 
-    dispose() {
+    dispose(): void {
         this.htmlRoot.remove();
     }
 }

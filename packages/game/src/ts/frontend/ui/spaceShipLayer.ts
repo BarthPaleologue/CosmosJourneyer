@@ -120,7 +120,7 @@ export class SpaceShipLayer {
         });
     }
 
-    public setVisibility(visible: boolean) {
+    public setVisibility(visible: boolean): void {
         this.root.style.visibility = visible ? "visible" : "hidden";
     }
 
@@ -128,7 +128,7 @@ export class SpaceShipLayer {
         return this.root.style.visibility === "visible";
     }
 
-    public setTarget(target: TransformNode | null, forcedValue?: boolean) {
+    public setTarget(target: TransformNode | null, forcedValue?: boolean): void {
         let shouldHide = target === null || this.currentTarget === target;
         if (forcedValue !== undefined) {
             shouldHide = !forcedValue;
@@ -148,7 +148,7 @@ export class SpaceShipLayer {
         missionContext: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
-    ) {
+    ): void {
         if (!this.isVisible()) {
             return;
         }
@@ -174,7 +174,7 @@ export class SpaceShipLayer {
         this.currentMissionDisplay.update(missionContext, keyboardLayout, universeBackend);
     }
 
-    displayShipHud(spaceship: Spaceship, nextJumpFuelFraction: number) {
+    displayShipHud(spaceship: Spaceship, nextJumpFuelFraction: number): void {
         if (!this.isVisible()) {
             return;
         }
@@ -199,7 +199,7 @@ export class SpaceShipLayer {
         );
     }
 
-    dispose() {
+    dispose(): void {
         this.root.remove();
     }
 }

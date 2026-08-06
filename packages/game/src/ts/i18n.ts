@@ -22,7 +22,7 @@ import { z } from "zod";
  * Load all the resources from the locales folder and return them in the i18next format.
  * This takes place at build time, so the resources are bundled with the application.
  */
-function loadResources() {
+function loadResources(): Resource {
     const localeModules = import.meta.glob("../locales/**/*.json", {
         eager: true,
         import: "default",
@@ -69,7 +69,7 @@ function loadResources() {
     return resources;
 }
 
-export async function initI18n() {
+export async function initI18n(): Promise<void> {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);
     const language = urlParams.get("lang") ?? navigator.language;

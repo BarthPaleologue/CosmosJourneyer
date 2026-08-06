@@ -85,7 +85,7 @@ export class InteractionLayer {
         this.keyboardLayoutMap = keyboardLayoutMap;
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         this.updateFadeAnimations(deltaSeconds);
 
         const activeCamera = this.interactionSystem.scene.activeCamera;
@@ -119,7 +119,7 @@ export class InteractionLayer {
         }
     }
 
-    private updateFadeAnimations(deltaSeconds: number) {
+    private updateFadeAnimations(deltaSeconds: number): void {
         const currentTarget = this.interactionSystem.getCurrentTarget();
         if (currentTarget === null && this.bodyToFadeIn !== null) {
             this.bodiesToFadeOut.add(this.bodyToFadeIn);
@@ -136,7 +136,7 @@ export class InteractionLayer {
         this.updateFadeOut(deltaSeconds);
     }
 
-    private updateFadeIn(deltaSeconds: number) {
+    private updateFadeIn(deltaSeconds: number): void {
         if (this.bodyToFadeIn === null) {
             return;
         }
@@ -164,7 +164,7 @@ export class InteractionLayer {
         transform.edgesColor.a += this.edgesAlpha * (deltaSeconds / this.fadeInSeconds);
     }
 
-    private updateFadeOut(deltaSeconds: number) {
+    private updateFadeOut(deltaSeconds: number): void {
         for (const body of this.bodiesToFadeOut) {
             const transform = body.transformNode;
             if (!(transform instanceof AbstractMesh)) {
@@ -182,7 +182,7 @@ export class InteractionLayer {
         }
     }
 
-    public setVisible(isVisible: boolean) {
+    public setVisible(isVisible: boolean): void {
         this.root.style.display = isVisible ? "flex" : "none";
     }
 }

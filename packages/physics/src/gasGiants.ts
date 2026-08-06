@@ -22,7 +22,7 @@ import { JupiterMass, JupiterRadius } from "./constants/astrophysics";
  * @returns An estimate of the radius of the gas giant in meters. Works best for cool gas giants (below 1000 K).
  * @see https://arxiv.org/pdf/1909.09207
  */
-export function getCoolGasGiantRadiusFromMass(mass: number) {
+export function getCoolGasGiantRadiusFromMass(mass: number): number {
     const c0 = 0.96;
     const c1 = 0.21;
     const c2 = -0.2;

@@ -51,7 +51,7 @@ export class ComponentSpecUI {
         this.displayComponent(null);
     }
 
-    public displayComponent(serializedComponent: SerializedComponent | null) {
+    public displayComponent(serializedComponent: SerializedComponent | null): void {
         this.root.innerHTML = "";
 
         if (serializedComponent === null) {
@@ -111,7 +111,7 @@ export class ComponentSpecUI {
         return container;
     }
 
-    private displayFuelTank(serializedFuelTank: SerializedFuelTank) {
+    private displayFuelTank(serializedFuelTank: SerializedFuelTank): HTMLDivElement {
         const spec = getFuelTankSpecs(serializedFuelTank);
         const container = document.createElement("div");
 

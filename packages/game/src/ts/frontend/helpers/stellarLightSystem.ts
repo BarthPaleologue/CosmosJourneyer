@@ -54,7 +54,7 @@ export class StellarLightSystem {
         this.ambientLight.intensity = 0.02;
     }
 
-    public registerStellarObject(transform: TransformNode, color: Color3) {
+    public registerStellarObject(transform: TransformNode, color: Color3): void {
         const light = new DirectionalLight(`${transform.name}Light`, Vector3.Down(), this.scene);
         light.diffuse.copyFrom(color);
 
@@ -68,7 +68,7 @@ export class StellarLightSystem {
         this.lights.push(light);
     }
 
-    public addShadowCaster(mesh: TransformNode | AbstractMesh) {
+    public addShadowCaster(mesh: TransformNode | AbstractMesh): void {
         for (const { shadowGenerator } of this.stellarObjects) {
             if (mesh instanceof AbstractMesh) {
                 shadowGenerator.addShadowCaster(mesh);
@@ -80,13 +80,13 @@ export class StellarLightSystem {
         }
     }
 
-    public addShadowCasters(meshes: ReadonlyArray<TransformNode | AbstractMesh>) {
+    public addShadowCasters(meshes: ReadonlyArray<TransformNode | AbstractMesh>): void {
         for (const mesh of meshes) {
             this.addShadowCaster(mesh);
         }
     }
 
-    public update(camera: Camera, nearestCelestialBody: CelestialBody) {
+    public update(camera: Camera, nearestCelestialBody: CelestialBody): void {
         const cameraPosition = camera.globalPosition;
         const overallDirectionToLight = Vector3.Zero();
         for (const { transform, light } of this.stellarObjects) {
@@ -140,7 +140,7 @@ export class StellarLightSystem {
         return this.lights;
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const { light, shadowGenerator } of this.stellarObjects) {
             light.dispose();
             shadowGenerator.dispose();

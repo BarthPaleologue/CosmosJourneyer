@@ -121,7 +121,7 @@ export class LoadingScreen implements ILoadingScreen {
             return;
         }
 
-        const onTransitionEnd = () => {
+        const onTransitionEnd = (): void => {
             if (this.loadingTextDiv) {
                 this.loadingTextDiv.remove();
                 this.loadingTextDiv = null;
@@ -139,7 +139,7 @@ export class LoadingScreen implements ILoadingScreen {
         this.loadingDiv.addEventListener("transitionend", onTransitionEnd);
     }
 
-    public setProgress(startedCount: number, completedCount: number) {
+    public setProgress(startedCount: number, completedCount: number): void {
         const percentage = startedCount === 0 ? 0 : (completedCount / startedCount) * 100;
         this.loadingUIText =
             startedCount === 0
@@ -181,7 +181,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     // Resize
-    private readonly resizeLoadingUI = () => {
+    private readonly resizeLoadingUI = (): void => {
         const canvasRect = this.canvas.getBoundingClientRect();
         const canvasPositioning = window.getComputedStyle(this.canvas).position;
 

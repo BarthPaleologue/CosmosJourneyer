@@ -39,7 +39,7 @@ export class TransformTranslationAnimation {
         );
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         if (this.animation.isFinished()) {
             return;
         }

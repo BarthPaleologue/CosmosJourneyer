@@ -58,7 +58,7 @@ export async function createButterflyScene(
 
     const rng = seededSquirrelNoise(0);
     let rngState = 0;
-    const wrappedRng = () => {
+    const wrappedRng = (): number => {
         return rng(rngState++);
     };
 

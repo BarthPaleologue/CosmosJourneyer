@@ -47,7 +47,7 @@ export function positionNearObject(
     localPosition: Vector3,
     localRotation: Quaternion,
     transform: TransformNode,
-) {
+): void {
     const objectRadius = orbitalObject.getBoundingRadius();
     const currentDistance = localPosition.length();
 

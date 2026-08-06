@@ -85,7 +85,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
      * Set the state of the asteroid field mission. Useful when deserializing an ongoing mission.
      * @param state The state of the mission
      */
-    public setState(state: AsteroidFieldMissionState) {
+    public setState(state: AsteroidFieldMissionState): void {
         this.state = state;
     }
 
@@ -100,7 +100,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         return universeObjectIdEquals(this.objectId, other.objectId);
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.isCompleted()) {
             return;
         }

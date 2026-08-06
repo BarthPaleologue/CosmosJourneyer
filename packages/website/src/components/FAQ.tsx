@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 export interface FAQItem {
     readonly id: string;
@@ -10,7 +10,7 @@ interface FAQProps {
     items: readonly FAQItem[];
 }
 
-export const FAQ = ({ items }: FAQProps) => (
+export const FAQ = ({ items }: FAQProps): ReactElement => (
     <div className="faq" aria-label="Frequently asked questions">
         {items.map((item) => (
             <article className="faqItem" key={item.id}>

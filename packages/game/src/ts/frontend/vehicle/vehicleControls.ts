@@ -97,15 +97,15 @@ export class VehicleControls implements Controls {
         this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset4, "frontLookingRight");
     }
 
-    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {
-        const handler = () => {
+    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames): void {
+        const handler = (): void => {
             this.resetCamera(presetName);
         };
 
         input.on("complete", handler);
     }
 
-    private resetCamera(presetName: ThirdPersonCameraPresetNames) {
+    private resetCamera(presetName: ThirdPersonCameraPresetNames): void {
         this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
             {
                 alpha: this.thirdPersonCamera.alpha,
@@ -139,15 +139,15 @@ export class VehicleControls implements Controls {
         return this.activeCamera;
     }
 
-    switchToFirstPersonCamera() {
+    switchToFirstPersonCamera(): void {
         this.activeCamera = this.firstPersonCamera;
     }
 
-    switchToThirdPersonCamera() {
+    switchToThirdPersonCamera(): void {
         this.activeCamera = this.thirdPersonCamera;
     }
 
-    setVehicle(vehicle: Vehicle | null) {
+    setVehicle(vehicle: Vehicle | null): void {
         this.vehicle = vehicle;
         if (vehicle === null) {
             this.firstPersonCamera.parent = null;
@@ -168,7 +168,7 @@ export class VehicleControls implements Controls {
         this.firstPersonCamera.parent = vehicleTransform;
     }
 
-    setUpDirection(up: Vector3) {
+    setUpDirection(up: Vector3): void {
         const deltaRotation = Quaternion.FromUnitVectorsToRef(this.thirdPersonTransform.up, up, Quaternion.Identity());
 
         this.thirdPersonTransform.rotationQuaternion = deltaRotation.multiply(
@@ -176,7 +176,7 @@ export class VehicleControls implements Controls {
         );
     }
 
-    getVehicle() {
+    getVehicle(): Vehicle | null {
         return this.vehicle;
     }
 

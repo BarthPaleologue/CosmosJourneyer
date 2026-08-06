@@ -89,11 +89,11 @@ export class RockMaterial {
         this.material.build();
     }
 
-    get() {
+    get(): NodeMaterial {
         return this.material;
     }
 
-    dispose() {
+    dispose(): void {
         this.material.dispose();
     }
 }

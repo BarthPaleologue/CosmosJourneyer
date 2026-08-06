@@ -48,11 +48,11 @@ export class FlightTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return i18n.t("tutorials:flightTutorial:title");
     }
 
-    getDescription() {
+    getDescription(): string {
         return i18n.t("tutorials:flightTutorial:description");
     }
 

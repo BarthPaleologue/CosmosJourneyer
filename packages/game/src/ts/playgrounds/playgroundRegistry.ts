@@ -131,7 +131,7 @@ export class PlaygroundRegistry {
     register(
         name: string,
         createScene: (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) => Promise<Scene>,
-    ) {
+    ): void {
         this.map.set(name, createScene);
     }
 

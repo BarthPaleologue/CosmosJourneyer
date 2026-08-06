@@ -19,7 +19,12 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 
-export function createSquareMatrixBuffer(position: Vector3, size: number, resolution: number, rng: () => number) {
+export function createSquareMatrixBuffer(
+    position: Vector3,
+    size: number,
+    resolution: number,
+    rng: () => number,
+): Float32Array<ArrayBuffer> {
     const matrixBuffer = new Float32Array(resolution * resolution * 16);
     const cellSize = size / resolution;
     let index = 0;
@@ -45,7 +50,7 @@ export function createSquareMatrixBuffer(position: Vector3, size: number, resolu
     return matrixBuffer;
 }
 
-export function createCircleInstanceBuffer(radius: number, nbPoints: number) {
+export function createCircleInstanceBuffer(radius: number, nbPoints: number): Float32Array<ArrayBuffer> {
     const buffer = new Float32Array(16 * nbPoints);
 
     for (let i = 0; i < nbPoints; i++) {

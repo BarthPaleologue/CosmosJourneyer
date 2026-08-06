@@ -144,7 +144,7 @@ export class DefaultControls implements Controls {
         this.getActiveCamera().getViewMatrix();
     }
 
-    dispose() {
+    dispose(): void {
         this.transform.dispose();
         this.camera.dispose();
     }

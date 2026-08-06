@@ -22,7 +22,7 @@ import { getVestaSystemModel } from "./vesta";
 
 // import { getSolSystemModel } from "./sol";
 
-export function registerCustomSystems(universeBackend: UniverseBackend) {
+export function registerCustomSystems(universeBackend: UniverseBackend): void {
     universeBackend.registerCustomSystem(getVestaSystemModel());
     universeBackend.registerCustomSystem(getChronosSystemModel());
     // universeBackend.registerCustomSystem(getSolSystemModel());

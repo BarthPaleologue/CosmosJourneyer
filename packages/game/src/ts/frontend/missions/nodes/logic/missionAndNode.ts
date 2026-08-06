@@ -62,7 +62,7 @@ export class MissionAndNode implements MissionNodeBase<MissionAndNodeSerialized>
         return true;
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.hasCompletedLock) {
             return;
         }

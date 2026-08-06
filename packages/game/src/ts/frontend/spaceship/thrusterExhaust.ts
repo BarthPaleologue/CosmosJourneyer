@@ -85,13 +85,13 @@ export class ThrusterExhaust implements Transformable {
         return this.proxyMesh.isEnabled();
     }
 
-    setThrottle(throttle: number) {
+    setThrottle(throttle: number): void {
         this.throttle = Math.min(Math.max(throttle, 0), 1);
         this.material.setThrottle(this.throttle);
         this.proxyMesh.setEnabled(this.throttle > 0.001);
     }
 
-    setLength(length: number) {
+    setLength(length: number): void {
         this.length = Math.max(length, 1e-3);
         this.material.setLength(this.length);
 
@@ -102,32 +102,32 @@ export class ThrusterExhaust implements Transformable {
         this.proxyMesh.material = this.material.get();
     }
 
-    setPressure(environmentPressure: number, chamberPressure: number) {
+    setPressure(environmentPressure: number, chamberPressure: number): void {
         const safeEnvironmentPressure = Math.max(environmentPressure, 0);
         const safeChamberPressure = Math.max(chamberPressure, 1e-6);
         this.setPressureRatio(safeEnvironmentPressure / safeChamberPressure);
     }
 
-    setRoundness(roundness: number) {
+    setRoundness(roundness: number): void {
         this.roundness = Math.min(Math.max(roundness, 0), 1);
         this.material.setRoundness(this.roundness);
     }
 
-    setExhaustSpeed(exhaustSpeed: number) {
+    setExhaustSpeed(exhaustSpeed: number): void {
         this.exhaustSpeed = Math.max(exhaustSpeed, 0);
         this.material.setExhaustSpeed(this.exhaustSpeed);
     }
 
-    private setPressureRatio(pressureRatio: number) {
+    private setPressureRatio(pressureRatio: number): void {
         this.pressureRatio = Math.max(pressureRatio, 1e-6);
         this.material.setPressureRatio(this.pressureRatio);
     }
 
-    getProxyMesh() {
+    getProxyMesh(): Mesh {
         return this.proxyMesh;
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         if (!this.proxyMesh.isEnabled()) {
             return;
         }
@@ -135,7 +135,7 @@ export class ThrusterExhaust implements Transformable {
         this.material.update(deltaSeconds);
     }
 
-    dispose() {
+    dispose(): void {
         this.material.dispose();
         this.proxyMesh.dispose();
         this.transform.dispose();

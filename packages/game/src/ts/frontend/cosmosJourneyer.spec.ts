@@ -54,7 +54,7 @@ describe("CosmosJourneyer", () => {
 
         const spaceship = {
             id: serializedSpaceship.id,
-            isLandedAtFacility: () => false,
+            isLandedAtFacility: (): boolean => false,
         };
         const context = {
             activeView: {
@@ -73,8 +73,8 @@ describe("CosmosJourneyer", () => {
             player,
             starSystemView: {
                 getSpaceshipControls: () => ({
-                    getSpaceship: () => spaceship,
-                    getTransform: () => ({}),
+                    getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
+                    getTransform: (): object => ({}),
                 }),
             },
         } as unknown as CosmosJourneyer;

@@ -160,7 +160,7 @@ describe("SaveBackendMultiFile", () => {
     const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
     const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";
 
-    const createTestSave = (timestamp: number, uuid?: string) => {
+    const createTestSave = (timestamp: number, uuid?: string): Save => {
         return {
             uuid: uuid ?? crypto.randomUUID(),
             timestamp,

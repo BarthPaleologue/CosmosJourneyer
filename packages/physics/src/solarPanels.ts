@@ -25,6 +25,6 @@ export function getSolarPanelSurfaceFromEnergyRequirement(
     efficiency: number,
     energyRequirement: number,
     stellarEnergyFlux: number,
-) {
+): number {
     return energyRequirement / (efficiency * stellarEnergyFlux);
 }

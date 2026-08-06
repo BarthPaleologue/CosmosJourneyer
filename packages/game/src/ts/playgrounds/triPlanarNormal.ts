@@ -129,7 +129,7 @@ export async function createTriPlanarNormalScene(
     return scene;
 }
 
-function updateLightDirection(light: DirectionalLight, azimuthDegrees: number, elevationDegrees: number) {
+function updateLightDirection(light: DirectionalLight, azimuthDegrees: number, elevationDegrees: number): void {
     const azimuth = degreesToRadians(azimuthDegrees);
     const elevation = degreesToRadians(elevationDegrees);
     const cosElevation = Math.cos(elevation);
@@ -147,7 +147,7 @@ function createAngleSlider(
     maximum: number,
     value: number,
     onValueChanged: (value: number) => void,
-) {
+): { labelBlock: TextBlock; slider: Slider } {
     const labelBlock = new TextBlock(`${label}Label`, `${label}: ${Math.round(value)}°`);
     labelBlock.height = "30px";
     labelBlock.paddingLeft = "10px";
@@ -168,7 +168,7 @@ function createAngleSlider(
     return { labelBlock, slider };
 }
 
-function createLightControlUi(scene: Scene, light: DirectionalLight) {
+function createLightControlUi(scene: Scene, light: DirectionalLight): void {
     const ui = AdvancedDynamicTexture.CreateFullscreenUI("triPlanarNormalUi", true, scene);
 
     const panelContainer = new Rectangle("lightControlContainer");

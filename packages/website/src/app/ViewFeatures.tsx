@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactElement } from "react";
 
 const features = [
     {
@@ -24,7 +25,7 @@ const features = [
     },
 ] as const;
 
-export const ViewFeatures = () => (
+export const ViewFeatures = (): ReactElement => (
     <section className="contentSection featureSection" id="discover">
         <div className="featureGrid">
             {features.map((feature, index) => (

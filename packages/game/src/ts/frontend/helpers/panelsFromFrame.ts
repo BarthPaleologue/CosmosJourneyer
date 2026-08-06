@@ -62,7 +62,7 @@ export function createPanelsFromFrame(
     scene: Scene,
 ): Mesh | null {
     const vertexCount = positions.length / 3;
-    const getVec3 = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
+    const getVec3 = (i: number): Vector3 => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
     // Undirected adjacency
     const adjacency: Array<Set<number>> = Array.from({ length: vertexCount }, () => new Set<number>());
@@ -133,7 +133,7 @@ export function createPanelsFromFrame(
     }
 
     // Face tracing by rightmost turns
-    const directedEdgeKey = (u: number, v: number) => `${u}>${v}`;
+    const directedEdgeKey = (u: number, v: number): string => `${u}>${v}`;
     const visitedDirected = new Set<string>();
     const candidateLoops: number[][] = [];
     const maxSteps = 4 * edges.length;

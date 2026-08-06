@@ -42,7 +42,7 @@ export class SoundInstance implements ISoundInstance {
         this.sound.loop = options?.loop ?? false;
     }
 
-    static async New(baseSound: StaticSound, options?: Partial<SoundInstanceOptions>) {
+    static async New(baseSound: StaticSound, options?: Partial<SoundInstanceOptions>): Promise<SoundInstance> {
         return new SoundInstance(await baseSound.cloneAsync(), options);
     }
 
@@ -50,12 +50,12 @@ export class SoundInstance implements ISoundInstance {
         this.sound.play();
     }
 
-    setVolume(volume: number, options?: Partial<IAudioParameterRampOptions>) {
+    setVolume(volume: number, options?: Partial<IAudioParameterRampOptions>): void {
         this.targetVolume = volume;
         this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, options);
     }
 
-    setMaskFactor(factor: number, options?: Partial<IAudioParameterRampOptions>) {
+    setMaskFactor(factor: number, options?: Partial<IAudioParameterRampOptions>): void {
         this.maskFactor = factor;
         this.sound.setVolume(this.targetVolume * this.volumeMultiplier * this.maskFactor, options);
     }
@@ -64,7 +64,7 @@ export class SoundInstance implements ISoundInstance {
         return this.mask;
     }
 
-    dispose() {
+    dispose(): void {
         this.sound.dispose();
     }
 }

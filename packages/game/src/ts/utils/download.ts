@@ -20,7 +20,7 @@
  * @param content The content of the file.
  * @param filename The name of the file.
  */
-export function downloadTextFile(content: string, filename: string) {
+export function downloadTextFile(content: string, filename: string): void {
     // Create a Blob with the text content
     const blob = new Blob([content], { type: "text/plain" });
 

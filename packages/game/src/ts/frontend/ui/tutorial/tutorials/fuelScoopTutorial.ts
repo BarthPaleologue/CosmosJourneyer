@@ -42,10 +42,10 @@ export class FuelScoopTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return i18n.t("tutorials:fuelScooping:title");
     }
-    getDescription() {
+    getDescription(): string {
         return i18n.t("tutorials:fuelScooping:description");
     }
     async getContentPanelsHtml(): Promise<string[]> {

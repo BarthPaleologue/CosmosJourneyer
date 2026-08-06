@@ -75,7 +75,7 @@ export class StellarPathfinder {
         startSystemCoordinates: StarSystemCoordinates,
         targetSystemCoordinates: StarSystemCoordinates,
         jumpRange: number,
-    ) {
+    ): void {
         this.coordinatesToPrevious.clear();
         this.openList.clear();
         this.closedList = [];
@@ -134,7 +134,7 @@ export class StellarPathfinder {
      * Update the pathfinder to find the next step in the path.
      * Executes one A* iteration.
      */
-    public update() {
+    public update(): void {
         if (this.startSystem === null || this.targetSystem === null) {
             throw new Error("Cannot update pathfinder without initializing it first");
         }

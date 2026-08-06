@@ -62,7 +62,10 @@ export type EffectiveTemperatureStar = {
  * @param planetAlbedo The albedo of the planet (0 = black, 1 = white)
  * @returns The effective temperature of the planet in Kelvin
  */
-export function computeEffectiveTemperature(stars: ReadonlyArray<EffectiveTemperatureStar>, planetAlbedo: number) {
+export function computeEffectiveTemperature(
+    stars: ReadonlyArray<EffectiveTemperatureStar>,
+    planetAlbedo: number,
+): number {
     let totalFlux = 0;
     for (const { temperature, radius, distance } of stars) {
         totalFlux += (temperature ** 4 * radius ** 2) / distance ** 2;
@@ -77,7 +80,7 @@ export function computeEffectiveTemperature(stars: ReadonlyArray<EffectiveTemper
  * @param opticalDepth The infrared optical depth tau at the level of interest
  * @returns The gray-atmosphere temperature in Kelvin
  */
-export function computeGrayAtmosphereTemperature(effectiveTemperature: number, opticalDepth: number) {
+export function computeGrayAtmosphereTemperature(effectiveTemperature: number, opticalDepth: number): number {
     return effectiveTemperature * Math.pow((3 / 4) * (opticalDepth + 2 / 3), 0.25);
 }
 
@@ -88,7 +91,7 @@ export function computeGrayAtmosphereTemperature(effectiveTemperature: number, o
  * @returns The estimated radius of the object in meters
  * @see https://en.wikipedia.org/wiki/Main_sequence#Sample_parameters
  */
-export function estimateStarRadiusFromMass(mass: number) {
+export function estimateStarRadiusFromMass(mass: number): number {
     const massInSolarUnits = mass / SolarMass;
 
     const estimatedRadiusInSolarUnits = Math.pow(massInSolarUnits, 0.78);
@@ -103,7 +106,7 @@ export function estimateStarRadiusFromMass(mass: number) {
  * @returns The computed distance in meters
  * @see https://astronomy.stackexchange.com/questions/33498/what-is-the-gravitational-lensing-focal-distance-of-a-white-dwarf-star
  */
-export function getGravitationalLensFocalDistance(mass: number, radius: number) {
+export function getGravitationalLensFocalDistance(mass: number, radius: number): number {
     return (C * radius) ** 2 / (4 * G * mass);
 }
 
@@ -158,7 +161,7 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
  * @param distance The distance to the center of the parent object in meters
  * @see https://en.wikipedia.org/wiki/Space_elevator#Apparent_gravitational_field
  */
-export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number) {
+export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number): number {
     const omega = (2 * Math.PI) / period;
     return (-G * mass) / (distance * distance) + distance * omega * omega;
 }

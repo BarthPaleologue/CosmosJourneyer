@@ -65,7 +65,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
      * Set the state of the landing mission. Useful when deserializing an ongoing mission.
      * @param state The state of the mission
      */
-    setState(state: LandMissionState) {
+    setState(state: LandMissionState): void {
         this.state = state;
     }
 
@@ -80,7 +80,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         return universeObjectIdEquals(this.objectId, other.objectId);
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.isCompleted()) {
             return;
         }

@@ -106,7 +106,7 @@ describe("SaveManager", () => {
         },
     } as const satisfies Record<string, CmdrSaves>;
 
-    const createTestSave = (timestamp: number) => {
+    const createTestSave = (timestamp: number): Save => {
         return {
             uuid: crypto.randomUUID(),
             timestamp,

@@ -105,36 +105,36 @@ export class ThrusterExhaustMaterial {
         return this.material;
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
         this.material.setFloat("elapsedSeconds", this.elapsedSeconds);
     }
 
-    setInverseWorld(inverseWorld: Matrix) {
+    setInverseWorld(inverseWorld: Matrix): void {
         this.material.setMatrix("inverseWorld", inverseWorld);
     }
 
-    setPressureRatio(pressureRatio: number) {
+    setPressureRatio(pressureRatio: number): void {
         this.material.setFloat("exhaustPressureRatio", pressureRatio);
     }
 
-    setRoundness(roundness: number) {
+    setRoundness(roundness: number): void {
         this.material.setFloat("exhaustRoundness", roundness);
     }
 
-    setThrottle(throttle: number) {
+    setThrottle(throttle: number): void {
         this.material.setFloat("throttle", throttle);
     }
 
-    setExhaustSpeed(exhaustSpeed: number) {
+    setExhaustSpeed(exhaustSpeed: number): void {
         this.material.setFloat("exhaustSpeed", exhaustSpeed);
     }
 
-    setLength(length: number) {
+    setLength(length: number): void {
         this.material.setFloat("exhaustLength", length);
     }
 
-    dispose() {
+    dispose(): void {
         this.material.dispose();
     }
 }

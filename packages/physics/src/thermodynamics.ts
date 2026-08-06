@@ -22,7 +22,7 @@ import { StefanBoltzmannConstant } from "./constants/derived";
  * @param temperatureKelvin The temperature of the black body in Kelvin.
  * @returns The radiative flux in W/m².
  */
-export function getBlackBodyRadiatedFlux(temperatureKelvin: number) {
+export function getBlackBodyRadiatedFlux(temperatureKelvin: number): number {
     return StefanBoltzmannConstant * temperatureKelvin ** 4;
 }
 
@@ -32,7 +32,7 @@ export function getBlackBodyRadiatedFlux(temperatureKelvin: number) {
  * @param emissivity The emissivity of the surface (between 0=perfect reflector and 1=perfect radiator).
  * @returns The emitted radiative flux in W/m².
  */
-export function getRadiatedFlux(temperatureKelvin: number, emissivity: number) {
+export function getRadiatedFlux(temperatureKelvin: number, emissivity: number): number {
     return emissivity * getBlackBodyRadiatedFlux(temperatureKelvin);
 }
 
@@ -42,7 +42,7 @@ export function getRadiatedFlux(temperatureKelvin: number, emissivity: number) {
  * @param radius The radius of the sphere in meters.
  * @returns The total radiated power in Watts.
  */
-export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number) {
+export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number): number {
     return getBlackBodyRadiatedFlux(temperatureKelvin) * 4 * Math.PI * radius ** 2;
 }
 
@@ -55,7 +55,7 @@ export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number
  * @param distance The distance from the sphere center in meters.
  * @returns The irradiance in W/m² at the given distance.
  */
-export function getSphereIrradianceAtDistance(temperatureKelvin: number, radius: number, distance: number) {
+export function getSphereIrradianceAtDistance(temperatureKelvin: number, radius: number, distance: number): number {
     return getBlackBodyLuminosity(temperatureKelvin, radius) / (4 * Math.PI * distance ** 2);
 }
 

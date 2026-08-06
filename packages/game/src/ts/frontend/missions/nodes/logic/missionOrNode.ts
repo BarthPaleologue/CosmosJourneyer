@@ -62,7 +62,7 @@ export class MissionOrNode implements MissionNodeBase<MissionOrNodeSerialized> {
         return true;
     }
 
-    updateState(context: MissionContext) {
+    updateState(context: MissionContext): void {
         if (this.hasCompletedLock) {
             return;
         }

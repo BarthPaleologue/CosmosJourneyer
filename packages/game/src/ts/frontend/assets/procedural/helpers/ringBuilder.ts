@@ -10,7 +10,12 @@ import { type Scene } from "@babylonjs/core/scene";
  * @param height The height of the cylinder.
  * @param tesselation The number of sides of the cylinder.
  */
-export function createRingVertexData(radius: number, thickness: number, height: number, tesselation: number) {
+export function createRingVertexData(
+    radius: number,
+    thickness: number,
+    height: number,
+    tesselation: number,
+): VertexData {
     const indices: number[] = [];
     const positions: number[] = [];
     const normals: number[] = [];
@@ -104,7 +109,7 @@ export function createRingVertexData(radius: number, thickness: number, height: 
     return vertexData;
 }
 
-export function createRing(radius: number, thickness: number, height: number, tesselation: number, scene: Scene) {
+export function createRing(radius: number, thickness: number, height: number, tesselation: number, scene: Scene): Mesh {
     const vertexData = createRingVertexData(radius, thickness, height, tesselation);
     const ring = new Mesh("ring", scene);
     vertexData.applyToMesh(ring);

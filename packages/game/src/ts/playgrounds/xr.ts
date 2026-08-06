@@ -211,7 +211,7 @@ export async function createXrScene(
         return mengerSponge.getTransform();
     }
 
-    function setupPP(pp: CelestialBodyUberShaderPass) {
+    function setupPP(pp: CelestialBodyUberShaderPass): void {
         scene.cameras.forEach((cam) => cam.attachPostProcess(pp));
         scene.onNewCameraAddedObservable.add((cam) => {
             cam.attachPostProcess(pp);

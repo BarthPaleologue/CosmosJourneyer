@@ -26,7 +26,7 @@ export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,
     textures: GasPlanetTextures,
     scene: Scene,
-) {
+): StandardMaterial {
     const material = new StandardMaterial("gasPlanetMaterial", scene);
     switch (textureId) {
         case "jupiter":

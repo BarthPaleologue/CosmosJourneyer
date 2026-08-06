@@ -45,7 +45,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return Promise.resolve(this.spaceExplorationData.has(serializeUniverseObjectId(objectId)));
     }
 
-    private evaluateTelluricPlanetMultiplier(model: DeepReadonly<TelluricPlanetModel>) {
+    private evaluateTelluricPlanetMultiplier(model: DeepReadonly<TelluricPlanetModel>): number {
         let multiplier = 1;
         if (model.clouds !== null) {
             multiplier += 1.0;
@@ -57,7 +57,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return multiplier;
     }
 
-    private evaluateTelluricSatelliteMultiplier(model: DeepReadonly<TelluricSatelliteModel>) {
+    private evaluateTelluricSatelliteMultiplier(model: DeepReadonly<TelluricSatelliteModel>): number {
         let multiplier = 0.5;
         if (model.clouds !== null) {
             multiplier += 1.0;
@@ -66,7 +66,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return multiplier;
     }
 
-    private evaluateGasPlanetMultiplier(model: DeepReadonly<GasPlanetModel>) {
+    private evaluateGasPlanetMultiplier(model: DeepReadonly<GasPlanetModel>): number {
         let multiplier = 1;
         if (model.rings !== null) {
             multiplier += 1.0;
@@ -134,7 +134,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return ok(Math.ceil(valueFromDistance * objectTypeMultiplier));
     }
 
-    public reset() {
+    public reset(): void {
         this.spaceExplorationData.clear();
     }
 

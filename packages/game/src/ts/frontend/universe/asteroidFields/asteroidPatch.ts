@@ -165,13 +165,13 @@ export class AsteroidPatch {
         return this.nbInstances;
     }
 
-    public setEnabled(enabled: boolean) {
+    public setEnabled(enabled: boolean): void {
         this.instances.forEach((instance) => {
             instance.setEnabled(enabled);
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.clearInstances();
         this.positions.length = 0;
         this.rotations.length = 0;

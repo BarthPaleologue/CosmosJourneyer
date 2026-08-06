@@ -51,8 +51,8 @@ describe("StarSystemView", () => {
 
         const oldSpaceship = { dispose: vi.fn() };
         const spaceshipControls = {
-            getCameras: () => [],
-            getSpaceship: () => oldSpaceship,
+            getCameras: (): never[] => [],
+            getSpaceship: (): { dispose: () => void } => oldSpaceship,
             reset: vi.fn(),
             setSpaceship: vi.fn(),
         };

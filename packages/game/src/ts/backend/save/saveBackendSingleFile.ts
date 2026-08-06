@@ -203,7 +203,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return Promise.resolve([...this.saves.keys()]);
     }
 
-    public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>) {
+    public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
 
         const existingSave = cmdrSaves.manual.find((s) => s.uuid === save.uuid);
@@ -218,7 +218,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.save();
     }
 
-    public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>) {
+    public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
 
         const existingSave = cmdrSaves.auto.find((s) => s.uuid === save.uuid);

@@ -312,7 +312,7 @@ export class StarMapView implements View {
         return GreasedLineTools.SegmentizeLineBySegmentCount(points, points.length - 1);
     }
 
-    private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
+    private drawCurrentItinerary(path: DeepReadonly<Itinerary>): void {
         if (this.currentItineraryLine !== null) {
             this.currentItineraryLine.dispose(undefined, true);
         }
@@ -329,7 +329,7 @@ export class StarMapView implements View {
         );
     }
 
-    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
+    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]): void {
         if (this.visitedSystemsLines !== null) {
             this.visitedSystemsLines.dispose(undefined, true);
             this.visitedSystemsLines = null;
@@ -357,7 +357,7 @@ export class StarMapView implements View {
         );
     }
 
-    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean) {
+    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean): void {
         this.currentSystemCoordinates = starSystemCoordinates;
         this.selectedSystemCoordinates = starSystemCoordinates;
 
@@ -365,7 +365,7 @@ export class StarMapView implements View {
         this.focusOnCurrentSystem(skipAnimation);
     }
 
-    public focusOnCurrentSystem(skipAnimation = false) {
+    public focusOnCurrentSystem(skipAnimation = false): void {
         if (this.currentSystemCoordinates === null) {
             console.warn("No current system seed!");
             return;
@@ -373,7 +373,7 @@ export class StarMapView implements View {
         this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
-    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
+    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false): void {
         const starSystemPosition = wrapVector3(this.universeBackend.getSystemGalacticPosition(starSystemCoordinates));
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
@@ -446,11 +446,11 @@ export class StarMapView implements View {
         this.starMapUI.setHoveredSystem(null);
     }
 
-    public render() {
+    public render(): void {
         this.scene.render();
     }
 
-    public attachControl() {
+    public attachControl(): void {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
         if (this.player.currentItinerary !== null) {
@@ -467,7 +467,7 @@ export class StarMapView implements View {
         }
     }
 
-    public detachControl() {
+    public detachControl(): void {
         this.scene.detachControl();
         this.starMapUI.htmlRoot.classList.add("hidden");
     }

@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
         ] as Array<PluginOption>,
         worker: {
             format: "es",
-            plugins: () => [wasm()] as Array<PluginOption>,
+            plugins: (): Array<PluginOption> => [wasm()] as Array<PluginOption>,
         },
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],
         build: {

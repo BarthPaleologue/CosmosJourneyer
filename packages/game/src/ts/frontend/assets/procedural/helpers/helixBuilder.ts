@@ -19,7 +19,7 @@ export function createHelixVertexData(
     turnCount: number,
     pitch: number,
     tessellation: number,
-) {
+): VertexData {
     const indices: number[] = [];
     const positions: number[] = [];
     const normals: number[] = [];
@@ -139,7 +139,7 @@ export function createHelix(
     turnCount: number,
     pitch: number,
     scene: Scene,
-) {
+): Mesh {
     const vertexData = createHelixVertexData(radius, thickness, height, turnCount, pitch, tessellation);
     const ring = new Mesh(name, scene);
     vertexData.applyToMesh(ring);
