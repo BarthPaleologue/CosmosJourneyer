@@ -302,6 +302,30 @@ export class ShipControls implements Controls {
         this.cameraPresetInputHandlers.push({ input, handler });
     }
 
+    private handleUpDownInput() {
+        const spaceship = this.spaceship;
+        if (spaceship.isLanded()) {
+            this.cancelLandingRequest(spaceship);
+            spaceship.takeOff();
+        } else if (spaceship.isLanding()) {
+            this.cancelLandingRequest(spaceship);
+            spaceship.cancelLanding();
+        }
+        if (!spaceship.isAutoPiloted()) {
+            spaceship.aggregate.body.applyForce(
+                this.getTransform().up.scale(9.8 * 10_000 * SpaceShipControlsInputs.map.upDown.value),
+                spaceship.aggregate.body.getObjectCenterWorld(),
+            );
+        }
+    }
+
+    private cancelLandingRequest(spaceship: Spaceship) {
+        const currentLandingPad = spaceship.getTargetLandingPad();
+        if (currentLandingPad !== null) {
+            this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
+        }
+    }
+
     public getTransform(): TransformNode {
         return this.getSpaceship().getTransform();
     }
@@ -359,25 +383,7 @@ export class ShipControls implements Controls {
             spaceship.increaseMainEngineThrottle(deltaSeconds * SpaceShipControlsInputs.map.throttle.value);
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
-                if (spaceship.isLanded()) {
-                    const currentLandingPad = spaceship.getTargetLandingPad();
-                    if (currentLandingPad !== null) {
-                        this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
-                    }
-                    spaceship.takeOff();
-                } else if (spaceship.isLanding()) {
-                    const currentLandingPad = spaceship.getTargetLandingPad();
-                    if (currentLandingPad !== null) {
-                        this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
-                    }
-                    spaceship.cancelLanding();
-                }
-                if (!spaceship.isAutoPiloted()) {
-                    spaceship.aggregate.body.applyForce(
-                        this.getTransform().up.scale(9.8 * 10_000 * SpaceShipControlsInputs.map.upDown.value),
-                        spaceship.aggregate.body.getObjectCenterWorld(),
-                    );
-                }
+                this.handleUpDownInput();
             }
 
             if (!spaceship.isLanded()) {

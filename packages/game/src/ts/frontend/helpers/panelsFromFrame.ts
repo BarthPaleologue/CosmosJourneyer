@@ -152,38 +152,17 @@ export function createPanelsFromFrame(
             const startKey = directedEdgeKey(u0, v0);
             if (visitedDirected.has(startKey)) continue;
 
-            const loop: number[] = [u0];
-            let u = u0;
-            let v = v0;
-            let steps = 0;
-
-            while (steps++ < maxSteps) {
-                visitedDirected.add(directedEdgeKey(u, v));
-                loop.push(v);
-
-                if (v === u0) {
-                    // Closed at start vertex
-                    candidateLoops.push(loop.slice()); // includes repeated start
-                    break;
-                }
-
-                const order = clockwiseNeighbors[v];
-                if (!order || order.length === 0) break;
-                const idx = neighborToIndex[v]?.get(u);
-                if (idx === undefined) {
-                    break;
-                }
-
-                // Rightmost turn: previous neighbor in circular order
-                const nextIdx = (idx - 1 + order.length) % order.length;
-                const w = order[nextIdx];
-                if (w === undefined) {
-                    break;
-                }
-
-                if (visitedDirected.has(directedEdgeKey(v, w)) && w !== u0) break;
-                u = v;
-                v = w;
+            const loop = traceFace(
+                u0,
+                v0,
+                clockwiseNeighbors,
+                neighborToIndex,
+                directedEdgeKey,
+                visitedDirected,
+                maxSteps,
+            );
+            if (loop !== null) {
+                candidateLoops.push(loop);
             }
         }
     }
@@ -310,4 +289,55 @@ export function createPanelsFromFrame(
     if (!merged) return null;
     merged.name = name;
     return merged;
+}
+
+/**
+ * Walks the directed edge (u0 -> v0) following the rightmost-turn rule until it
+ * either closes on the start vertex or is interrupted. Mutates `visitedDirected`
+ * with every traversed directed edge so that no face is traced twice.
+ * @returns The face loop (including the repeated start vertex) or null if the walk was interrupted.
+ */
+function traceFace(
+    u0: number,
+    v0: number,
+    clockwiseNeighbors: Array<Array<number>>,
+    neighborToIndex: Array<Map<number, number>>,
+    directedEdgeKey: (u: number, v: number) => string,
+    visitedDirected: Set<string>,
+    maxSteps: number,
+): number[] | null {
+    const loop: number[] = [u0];
+    let u = u0;
+    let v = v0;
+    let steps = 0;
+
+    while (steps++ < maxSteps) {
+        visitedDirected.add(directedEdgeKey(u, v));
+        loop.push(v);
+
+        if (v === u0) {
+            // Closed at start vertex
+            return loop.slice(); // includes repeated start
+        }
+
+        const order = clockwiseNeighbors[v];
+        if (!order || order.length === 0) break;
+        const idx = neighborToIndex[v]?.get(u);
+        if (idx === undefined) {
+            break;
+        }
+
+        // Rightmost turn: previous neighbor in circular order
+        const nextIdx = (idx - 1 + order.length) % order.length;
+        const w = order[nextIdx];
+        if (w === undefined) {
+            break;
+        }
+
+        if (visitedDirected.has(directedEdgeKey(v, w)) && w !== u0) break;
+        u = v;
+        v = w;
+    }
+
+    return null;
 }

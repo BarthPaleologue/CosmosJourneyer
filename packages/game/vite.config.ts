@@ -30,25 +30,15 @@ const licenseBanner = `/*
  */
 `;
 
-const getLocalNetworkAddress = () => {
+const getLocalNetworkAddress = (): string | undefined => {
     try {
-        const networkInterfaces = os.networkInterfaces();
-        for (const networkInterface of Object.values(networkInterfaces)) {
-            if (!networkInterface) {
-                continue;
-            }
-
-            for (const address of networkInterface) {
-                if (address.family === "IPv4" && !address.internal) {
-                    return address.address;
-                }
-            }
-        }
+        const address = Object.values(os.networkInterfaces())
+            .flat()
+            .find((candidate) => candidate !== undefined && candidate.family === "IPv4" && !candidate.internal);
+        return address?.address;
     } catch {
         return undefined;
     }
-
-    return undefined;
 };
 
 export default defineConfig(({ mode }) => {

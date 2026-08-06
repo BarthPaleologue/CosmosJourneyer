@@ -737,33 +737,7 @@ export class Spaceship implements Transformable, Targetable {
             const forwardDirection = this.getTransform().forward;
             const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
 
-            if (this.mainEngineThrottle !== 0) {
-                const throttleVolume = Math.abs(this.mainEngineThrottle) * this.thrusterSoundMaxVolume;
-                this.soundInstances.thruster.setVolume(throttleVolume);
-            } else {
-                this.soundInstances.thruster.setVolume(0);
-            }
-
-            if (!this.isAutoPiloted()) {
-                const speedDifference = forwardSpeed - this.mainEngineTargetSpeed;
-                if (Math.abs(speedDifference) > 2) {
-                    if (speedDifference < 0) {
-                        this.aggregate.body.applyForce(
-                            forwardDirection.scale(this.thrusterForce),
-                            this.aggregate.body.getObjectCenterWorld(),
-                        );
-                    } else {
-                        this.aggregate.body.applyForce(
-                            forwardDirection.scale(-0.7 * this.thrusterForce),
-                            this.aggregate.body.getObjectCenterWorld(),
-                        );
-                    }
-                }
-
-                // damp other speed
-                const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
-                this.aggregate.body.applyForce(otherSpeed.scale(-5000), this.aggregate.body.getObjectCenterWorld());
-            }
+            this.applyMainEngineForces(forwardSpeed, linearVelocity, forwardDirection);
 
             this.mainThrusters.forEach((thruster) => {
                 thruster.setThrottle(this.mainEngineThrottle);
@@ -772,25 +746,7 @@ export class Spaceship implements Transformable, Targetable {
             this.soundInstances.acceleratingWarpDrive.setVolume(0);
             this.soundInstances.deceleratingWarpDrive.setVolume(0);
 
-            if (this.targetLandingPad !== null && this.landingComputer !== null) {
-                const shipRelativePosition = this.getTransform()
-                    .getAbsolutePosition()
-                    .subtract(this.targetLandingPad.getTransform().getAbsolutePosition());
-                const distanceToPad = shipRelativePosition.length();
-                const verticalDistance = Vector3.Dot(shipRelativePosition, this.targetLandingPad.getTransform().up);
-                if (distanceToPad < 600 && verticalDistance > 0) {
-                    if (this.state !== "landing") {
-                        this.landingComputer.setTarget({
-                            kind: "landing_pad",
-                            landingPad: this.targetLandingPad,
-                        });
-
-                        this.state = "landing";
-
-                        this.onAutoPilotEngaged.notifyObservers();
-                    }
-                }
-            }
+            this.tryAutoLand();
         }
 
         if (this.landingComputer !== null) {
@@ -828,6 +784,64 @@ export class Spaceship implements Transformable, Targetable {
 
         for (const thruster of this.mainThrusters) {
             thruster.update(deltaSeconds);
+        }
+    }
+
+    private applyMainEngineForces(forwardSpeed: number, linearVelocity: Vector3, forwardDirection: Vector3) {
+        if (this.mainEngineThrottle !== 0) {
+            const throttleVolume = Math.abs(this.mainEngineThrottle) * this.thrusterSoundMaxVolume;
+            this.soundInstances.thruster.setVolume(throttleVolume);
+        } else {
+            this.soundInstances.thruster.setVolume(0);
+        }
+
+        if (!this.isAutoPiloted()) {
+            const speedDifference = forwardSpeed - this.mainEngineTargetSpeed;
+            if (Math.abs(speedDifference) > 2) {
+                if (speedDifference < 0) {
+                    this.aggregate.body.applyForce(
+                        forwardDirection.scale(this.thrusterForce),
+                        this.aggregate.body.getObjectCenterWorld(),
+                    );
+                } else {
+                    this.aggregate.body.applyForce(
+                        forwardDirection.scale(-0.7 * this.thrusterForce),
+                        this.aggregate.body.getObjectCenterWorld(),
+                    );
+                }
+            }
+
+            // damp other speed
+            const otherSpeed = linearVelocity.subtract(forwardDirection.scale(forwardSpeed));
+            this.aggregate.body.applyForce(otherSpeed.scale(-5000), this.aggregate.body.getObjectCenterWorld());
+        }
+    }
+
+    private tryAutoLand() {
+        const targetLandingPad = this.targetLandingPad;
+        const landingComputer = this.landingComputer;
+        if (targetLandingPad === null || landingComputer === null) {
+            return;
+        }
+
+        const shipRelativePosition = this.getTransform()
+            .getAbsolutePosition()
+            .subtract(targetLandingPad.getTransform().getAbsolutePosition());
+        const distanceToPad = shipRelativePosition.length();
+        const verticalDistance = Vector3.Dot(shipRelativePosition, targetLandingPad.getTransform().up);
+        if (distanceToPad >= 600 || verticalDistance <= 0) {
+            return;
+        }
+
+        if (this.state !== "landing") {
+            landingComputer.setTarget({
+                kind: "landing_pad",
+                landingPad: targetLandingPad,
+            });
+
+            this.state = "landing";
+
+            this.onAutoPilotEngaged.notifyObservers();
         }
     }
 

@@ -135,22 +135,38 @@ export class WireframeTopology {
         for (const [u, nu] of adj) {
             for (const v of nu) {
                 if (v <= u) continue;
-                const nv = adj.get(v);
-                if (!nv) return err(`Adjacency missing for vertex ${v}`);
-                for (const w of nv) {
-                    if (w <= v) continue;
-                    if (!nu.has(w)) continue;
-                    const triangle = this.resolveTriangleIndices(indexOf, u, v, w);
-                    if (!triangle.success) {
-                        return err(triangle.error);
-                    }
-
-                    triangles.push(triangle.value[0], triangle.value[1], triangle.value[2]);
+                const result = this.addTrianglesForVertex(indexOf, adj, nu, u, v, triangles);
+                if (!result.success) {
+                    return err(result.error);
                 }
             }
         }
 
         return ok(new Uint32Array(triangles));
+    }
+
+    private addTrianglesForVertex(
+        indexOf: Map<VertexHandle, number>,
+        adj: Map<VertexHandle, Set<VertexHandle>>,
+        nu: Set<VertexHandle>,
+        u: VertexHandle,
+        v: VertexHandle,
+        triangles: number[],
+    ): Result<void, string> {
+        const nv = adj.get(v);
+        if (!nv) return err(`Adjacency missing for vertex ${v}`);
+        for (const w of nv) {
+            if (w <= v) continue;
+            if (!nu.has(w)) continue;
+            const triangle = this.resolveTriangleIndices(indexOf, u, v, w);
+            if (!triangle.success) {
+                return err(triangle.error);
+            }
+
+            triangles.push(triangle.value[0], triangle.value[1], triangle.value[2]);
+        }
+
+        return ok(undefined);
     }
 
     private resolveTriangleIndices(

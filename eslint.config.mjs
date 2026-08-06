@@ -105,7 +105,7 @@ const typeScriptWorkspaceRules = {
         eqeqeq: "error",
 
         // maximum block nesting depth
-        "max-depth": "error",
+        "max-depth": ["error", 3],
 
         // no Promise.reject()
         "no-restricted-syntax": [

@@ -202,22 +202,9 @@ export class HelixHabitat implements Transformable {
                 arm.position.y = (armIndex / armCount) * helixLength - helixLength / 2;
                 arm.parent = this.getTransform();
 
-                const lightYStep = 350;
-                for (let lightY = lightYStep; lightY <= this.radius; lightY += lightYStep) {
-                    for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
-                        const theta = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
-                        const position = new Vector3(
-                            (armRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / armTessellation),
-                            lightY,
-                            (armRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / armTessellation),
-                        );
-
-                        position.rotateByQuaternionToRef(rotation, position);
-                        position.y += arm.position.y;
-
-                        armLightPoints.push({ position, rotation });
-                    }
-                }
+                armLightPoints.push(
+                    ...this.getArmLightPoints(rotation, arm.position.y, armRadius, lightRadius, armTessellation),
+                );
 
                 this.arms.push(arm);
             }
@@ -317,6 +304,34 @@ export class HelixHabitat implements Transformable {
                 ),
             });
         }
+    }
+
+    private getArmLightPoints(
+        rotation: Quaternion,
+        armPositionY: number,
+        armRadius: number,
+        lightRadius: number,
+        armTessellation: number,
+    ): Array<{ position: Vector3; rotation: Quaternion }> {
+        const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+        const lightYStep = 350;
+        for (let lightY = lightYStep; lightY <= this.radius; lightY += lightYStep) {
+            for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
+                const theta = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
+                const position = new Vector3(
+                    (armRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / armTessellation),
+                    lightY,
+                    (armRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / armTessellation),
+                );
+
+                position.rotateByQuaternionToRef(rotation, position);
+                position.y += armPositionY;
+
+                lightPoints.push({ position, rotation });
+            }
+        }
+
+        return lightPoints;
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
