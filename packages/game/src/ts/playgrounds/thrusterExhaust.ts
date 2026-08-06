@@ -115,7 +115,7 @@ function createControlPanel(exhaust: ThrusterExhaust): HTMLDivElement {
     return panel;
 }
 
-export function createThrusterExhaustScene(
+export async function createThrusterExhaustScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

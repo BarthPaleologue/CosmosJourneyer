@@ -23,7 +23,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
-export function createJuliaSetScene(
+export async function createJuliaSetScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

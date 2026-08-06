@@ -29,7 +29,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         this.universeBackend = universeBackend;
     }
 
-    public contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
+    public async contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
         const key = serializeUniverseObjectId(data.objectId);
 
         const previousData = this.spaceExplorationData.get(key);
@@ -41,7 +41,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
         return Promise.resolve(true);
     }
 
-    public hasObjectBeenDiscovered(objectId: UniverseObjectId): Promise<boolean> {
+    public async hasObjectBeenDiscovered(objectId: UniverseObjectId): Promise<boolean> {
         return Promise.resolve(this.spaceExplorationData.has(serializeUniverseObjectId(objectId)));
     }
 

@@ -37,7 +37,7 @@ const OCCLUDER_POSITIONS = {
     occluded: new Vector3(60, 0, 110),
 } as const;
 
-export function createLensFlareOcclusionScene(
+export async function createLensFlareOcclusionScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

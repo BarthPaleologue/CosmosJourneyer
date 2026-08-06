@@ -26,7 +26,7 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 
-export function createAtmosphericScatteringScene(
+export async function createAtmosphericScatteringScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

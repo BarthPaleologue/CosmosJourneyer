@@ -19,11 +19,11 @@ class DesktopUpdateApiMock implements DesktopUpdateApi {
     private listener: ((state: DesktopUpdateState) => void) | null = null;
     private state: DesktopUpdateState;
 
-    public readonly download = vi.fn<() => Promise<void>>(() => Promise.resolve());
-    public readonly cancelDownload = vi.fn<() => Promise<void>>(() => Promise.resolve());
-    public readonly installOnQuit = vi.fn<() => Promise<void>>(() => Promise.resolve());
-    public readonly installNow = vi.fn<() => Promise<void>>(() => Promise.resolve());
-    public readonly openReleasePage = vi.fn<() => Promise<void>>(() => Promise.resolve());
+    public readonly download = vi.fn<() => Promise<void>>(async () => {});
+    public readonly cancelDownload = vi.fn<() => Promise<void>>(async () => {});
+    public readonly installOnQuit = vi.fn<() => Promise<void>>(async () => {});
+    public readonly installNow = vi.fn<() => Promise<void>>(async () => {});
+    public readonly openReleasePage = vi.fn<() => Promise<void>>(async () => {});
 
     public constructor(state: DesktopUpdateState) {
         this.state = state;
@@ -181,7 +181,7 @@ function createPlayerActions(getContext: () => UpdatePresentationContext): Deskt
     return {
         getPresentationContext: getContext,
         canBackupCurrentCommander: () => true,
-        downloadCommanderBackup: () => Promise.resolve(true),
-        prepareImmediateInstall: () => Promise.resolve(true),
+        downloadCommanderBackup: async () => true,
+        prepareImmediateInstall: async () => true,
     };
 }

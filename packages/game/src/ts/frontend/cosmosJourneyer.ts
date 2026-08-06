@@ -313,8 +313,8 @@ export class CosmosJourneyer {
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels, this.soundPlayer);
-        this.pauseMenu.onResume.add(() => this.resume());
-        this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
+        this.pauseMenu.onResume.add(async () => this.resume());
+        this.pauseMenu.onScreenshot.add(async () => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             this.engine.onEndFrameObservable.addOnce(async () => {
                 const save = await this.generateSaveData();
@@ -566,8 +566,8 @@ export class CosmosJourneyer {
             {
                 getPresentationContext: () => this.getUpdatePresentationContext(),
                 canBackupCurrentCommander: () => this.canPersistCurrentCommander(),
-                downloadCommanderBackup: (context) => this.downloadUpdateCommanderBackup(context),
-                prepareImmediateInstall: () => this.prepareImmediateUpdateInstall(),
+                downloadCommanderBackup: async (context) => this.downloadUpdateCommanderBackup(context),
+                prepareImmediateInstall: async () => this.prepareImmediateUpdateInstall(),
             },
             this.notificationManager,
             this.soundPlayer,

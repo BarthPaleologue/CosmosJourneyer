@@ -38,7 +38,7 @@ class MockFileSystem implements IFileSystem {
         this.directories.add("/corrupted");
     }
 
-    public createDirectory(path: string): Promise<boolean> {
+    public async createDirectory(path: string): Promise<boolean> {
         // Create all parent directories
         const parts = path.split("/").filter(Boolean);
         let currentPath = "";
@@ -49,7 +49,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(true);
     }
 
-    public deleteDirectory(path: string): Promise<boolean> {
+    public async deleteDirectory(path: string): Promise<boolean> {
         // Delete directory and all files within it
         for (const filePath of this.files.keys()) {
             if (filePath.startsWith(path + "/")) {
@@ -67,7 +67,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(true);
     }
 
-    public listDirectory(path: string): Promise<string[] | null> {
+    public async listDirectory(path: string): Promise<string[] | null> {
         if (!this.directories.has(path)) {
             return Promise.resolve(null);
         }
@@ -107,7 +107,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(Array.from(items).sort());
     }
 
-    public directoryExists(path: string): Promise<boolean> {
+    public async directoryExists(path: string): Promise<boolean> {
         return Promise.resolve(this.directories.has(path));
     }
 
@@ -122,16 +122,16 @@ class MockFileSystem implements IFileSystem {
         return true;
     }
 
-    public readFile(path: string): Promise<string | null> {
+    public async readFile(path: string): Promise<string | null> {
         const content = this.files.get(path);
         return Promise.resolve(content ?? null);
     }
 
-    public deleteFile(path: string): Promise<boolean> {
+    public async deleteFile(path: string): Promise<boolean> {
         return Promise.resolve(this.files.delete(path));
     }
 
-    public fileExists(path: string): Promise<boolean> {
+    public async fileExists(path: string): Promise<boolean> {
         return Promise.resolve(this.files.has(path));
     }
 

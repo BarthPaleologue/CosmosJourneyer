@@ -194,7 +194,7 @@ async function handleAppProtocol(rendererDir: string, request: Request): Promise
 }
 
 export function createHandleAppProtocol(rendererDir: string): (request: Request) => Promise<Response> {
-    return (request: Request) => handleAppProtocol(rendererDir, request);
+    return async (request: Request) => handleAppProtocol(rendererDir, request);
 }
 
 export async function rendererBuildIsReady(rendererDir: string): Promise<boolean> {
@@ -203,7 +203,7 @@ export async function rendererBuildIsReady(rendererDir: string): Promise<boolean
     try {
         const indexHtml = await readFile(indexPath, "utf8");
         const assetPaths = getLocalAssetPaths(indexHtml, rendererDir);
-        await Promise.all(assetPaths.map((assetPath) => access(assetPath)));
+        await Promise.all(assetPaths.map(async (assetPath) => access(assetPath)));
         return true;
     } catch {
         return false;

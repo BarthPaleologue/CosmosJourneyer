@@ -23,7 +23,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
-export function createMandelboxScene(
+export async function createMandelboxScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

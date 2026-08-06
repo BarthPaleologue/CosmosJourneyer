@@ -163,7 +163,7 @@ export class SoundPlayerMock implements ISoundPlayer {
         // No-op
     }
 
-    createInstance(): Promise<ISoundInstance> {
+    async createInstance(): Promise<ISoundInstance> {
         return Promise.resolve(new SoundInstanceMock());
     }
 

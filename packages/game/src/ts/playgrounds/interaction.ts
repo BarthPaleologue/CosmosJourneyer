@@ -145,7 +145,7 @@ export async function createInteractionDemo(
     const button = new Button(
         {
             label: "Spawn Box",
-            perform: () => {
+            perform: async () => {
                 sounds.menuSelect.setVolume(5);
                 sounds.menuSelect.play();
 
@@ -221,7 +221,7 @@ function spawnBoxAtPosition(
         getInteractions: () => [
             {
                 label: "push",
-                perform: () => {
+                perform: async () => {
                     const cameraRay = scene.activeCamera?.getForwardRay(
                         1,
                         scene.activeCamera.getWorldMatrix(),
@@ -243,14 +243,14 @@ function spawnBoxAtPosition(
             },
             {
                 label: "spin",
-                perform: () => {
+                perform: async () => {
                     boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
                     return Promise.resolve();
                 },
             },
             {
                 label: "change color",
-                perform: () => {
+                perform: async () => {
                     box.material = new PBRMaterial("boxMaterial", scene);
                     (box.material as PBRMaterial).albedoColor = Color3.Random();
                     (box.material as PBRMaterial).metallic = 0;
@@ -260,14 +260,14 @@ function spawnBoxAtPosition(
             },
             {
                 label: "delete",
-                perform: () => {
+                perform: async () => {
                     box.dispose();
                     return Promise.resolve();
                 },
             },
             {
                 label: "make bouncy",
-                perform: () => {
+                perform: async () => {
                     boxAggregate.shape.material.restitution = 1.5;
                     return Promise.resolve();
                 },

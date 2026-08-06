@@ -25,7 +25,7 @@ import {
     type ProceduralSpotLightInstanceData,
 } from "@/frontend/assets/procedural/spotLight";
 
-export function createSpotLightsScene(
+export async function createSpotLightsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

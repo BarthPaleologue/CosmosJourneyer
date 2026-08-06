@@ -175,7 +175,7 @@ export async function createRoverScene(
         getInteractions: () => [
             {
                 label: "Drive",
-                perform: () => {
+                perform: async () => {
                     setRoverActive();
                     return Promise.resolve();
                 },
@@ -219,7 +219,7 @@ export async function createRoverScene(
             getInteractions: () => [
                 {
                     label: "spin",
-                    perform: () => {
+                    perform: async () => {
                         boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
                         return Promise.resolve();
                     },

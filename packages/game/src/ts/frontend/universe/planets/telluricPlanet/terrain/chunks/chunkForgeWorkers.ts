@@ -51,7 +51,9 @@ export class ChunkForgeWorkers implements ChunkForge {
     public static async New(nbVerticesPerRow: number): Promise<Result<ChunkForgeWorkers, Error>> {
         const nbMaxWorkers = Math.max(1, navigator.hardwareConcurrency - 1); // -1 because the main thread is also used
 
-        const workerResults = await Promise.all(Array.from({ length: nbMaxWorkers }, () => this.CreateBuildWorker()));
+        const workerResults = await Promise.all(
+            Array.from({ length: nbMaxWorkers }, async () => this.CreateBuildWorker()),
+        );
 
         const errors: Array<Error> = [];
         const availableWorkers: Array<Worker> = [];

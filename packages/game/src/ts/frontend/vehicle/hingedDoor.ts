@@ -82,9 +82,8 @@ export class HingedDoor implements Door {
                 return [
                     {
                         label: i18n.t("interactions:close"),
-                        perform: () => {
+                        perform: async () => {
                             this.close();
-                            return Promise.resolve();
                         },
                     },
                 ];
@@ -92,9 +91,8 @@ export class HingedDoor implements Door {
                 return [
                     {
                         label: i18n.t("interactions:open"),
-                        perform: () => {
+                        perform: async () => {
                             this.open();
-                            return Promise.resolve();
                         },
                     },
                 ];

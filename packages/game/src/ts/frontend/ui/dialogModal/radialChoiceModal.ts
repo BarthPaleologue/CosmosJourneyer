@@ -23,7 +23,7 @@ export type RadialChoiceModalOptions = {
     useVirtualCursor: boolean;
 };
 
-export function radialChoiceModal<T>(
+export async function radialChoiceModal<T>(
     choices: ReadonlyArray<T>,
     toString: (value: T) => string,
     soundPlayer: ISoundPlayer,

@@ -19,7 +19,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-export function promptModalString(
+export async function promptModalString(
     prompt: string,
     defaultValue: string,
     soundPlayer: ISoundPlayer,

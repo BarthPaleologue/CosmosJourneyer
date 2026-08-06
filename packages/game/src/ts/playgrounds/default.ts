@@ -21,7 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 
-export function createDefaultScene(
+export async function createDefaultScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

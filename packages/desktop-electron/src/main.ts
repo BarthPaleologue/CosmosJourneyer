@@ -86,8 +86,8 @@ app.on("before-quit", () => {
 
 function registerAutoUpdateIpc(): void {
     ipcMain.handle(updateIpcChannels.getState, () => autoUpdateService?.getState() ?? { type: "idle" });
-    ipcMain.handle(updateIpcChannels.download, () => autoUpdateService?.downloadUpdate());
-    ipcMain.handle(updateIpcChannels.cancelDownload, () => autoUpdateService?.cancelDownload());
+    ipcMain.handle(updateIpcChannels.download, async () => autoUpdateService?.downloadUpdate());
+    ipcMain.handle(updateIpcChannels.cancelDownload, async () => autoUpdateService?.cancelDownload());
     ipcMain.handle(updateIpcChannels.installOnQuit, () => autoUpdateService?.installOnQuit());
     ipcMain.handle(updateIpcChannels.installNow, () => autoUpdateService?.installNow());
     ipcMain.handle(updateIpcChannels.openReleasePage, async () => {

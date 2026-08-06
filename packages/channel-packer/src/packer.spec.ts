@@ -9,12 +9,12 @@ interface TestInput {
     readonly image: DecodedImage;
 }
 
-const decodeImage = vi.fn((input: TestInput): Promise<DecodedImage> => Promise.resolve(input.image));
-const readSignature = vi.fn((input: TestInput): Promise<FileSignature> => Promise.resolve(input.signature));
+const decodeImage = vi.fn(async (input: TestInput): Promise<DecodedImage> => Promise.resolve(input.image));
+const readSignature = vi.fn(async (input: TestInput): Promise<FileSignature> => Promise.resolve(input.signature));
 
 const engine = createPackerEngine<TestInput, Uint8Array>(
     {
-        readSignature(input) {
+        async readSignature(input) {
             return readSignature(input);
         },
         async decodeImage(input) {
@@ -28,10 +28,10 @@ const engine = createPackerEngine<TestInput, Uint8Array>(
         buildPreviewTexture(packed, maxEdge) {
             return resizePreview(packed, maxEdge);
         },
-        encodePng(packed) {
+        async encodePng(packed) {
             const bytes = new Uint8Array(packed.pixels.length);
             bytes.set(packed.pixels);
-            return Promise.resolve(bytes);
+            return bytes;
         },
     },
 );

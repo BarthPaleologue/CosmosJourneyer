@@ -92,6 +92,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/no-shadow": "error",
 
+        "@typescript-eslint/promise-function-async": "error",
+
         "@typescript-eslint/no-misused-promises": [
             "error",
             {

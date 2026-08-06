@@ -27,12 +27,12 @@ export class SaveLocalStorage implements IFile {
         this.key = key;
     }
 
-    public write(content: string): Promise<boolean> {
+    public async write(content: string): Promise<boolean> {
         localStorage.setItem(this.key, content);
         return Promise.resolve(true);
     }
 
-    public read(): Promise<string | null> {
+    public async read(): Promise<string | null> {
         const rawSaves = localStorage.getItem(this.key);
         return Promise.resolve(rawSaves);
     }

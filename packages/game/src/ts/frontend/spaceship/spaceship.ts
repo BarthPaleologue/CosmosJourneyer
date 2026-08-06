@@ -889,7 +889,7 @@ export class Spaceship implements Transformable, Targetable {
         return this.mainThrusters;
     }
 
-    public static CreateDefault(
+    public static async CreateDefault(
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
@@ -905,7 +905,7 @@ export class Spaceship implements Transformable, Targetable {
         );
     }
 
-    public static Deserialize(
+    public static async Deserialize(
         serializedSpaceship: DeepReadonly<SerializedSpaceship>,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
