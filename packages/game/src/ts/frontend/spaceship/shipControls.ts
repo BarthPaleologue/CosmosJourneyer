@@ -173,7 +173,6 @@ export class ShipControls implements Controls {
                             SpaceShipControlsInputs.map.emitLandingRequest,
                             keyboardLayoutMap,
                         ).join(", ");
-                        //FIXME: localize
                         this.notificationManager.create(
                             "space-station",
                             "info",

@@ -383,7 +383,6 @@ export class StarMapUI {
             )}`;
         }
 
-        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const starModel = targetSystemModel.stellarObjects[0];
 
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel);

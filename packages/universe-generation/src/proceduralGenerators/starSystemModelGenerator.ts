@@ -110,7 +110,6 @@ export function generateStarSystemModel(
         throw new Error("No stellar objects were generated for the star system");
     }
 
-    //Fixme: planets need to work with black holes as well at some point
     const nbPlanets =
         firstStellarObject.type === "blackHole" ? 0 : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {

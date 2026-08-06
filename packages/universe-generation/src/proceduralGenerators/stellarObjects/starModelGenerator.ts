@@ -37,7 +37,7 @@ export function generateStarModel(
     const stellarType = getRandomStellarType(rng);
 
     const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
-    const mass = 1.9885e30; //TODO: compute mass from physical properties
+    const mass = 1.9885e30;
 
     const rotation: Rotation = {
         siderealPeriod: 24 * 60 * 60,
@@ -48,7 +48,6 @@ export function generateStarModel(
 
     const radius = getRandomRadiusFromStellarType(stellarType, rng);
 
-    // TODO: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
     const parentIds = parentBodies.map((body) => body.id);

@@ -101,7 +101,6 @@ export function generateSpaceStationModel(
 
     const faction = overrides?.faction ?? getFactionFromCoordinates(systemModel.coordinates, rng);
 
-    //TODO: make this dependent on economic model
     const population = 250_000 + Math.floor(rng(GenerationSteps.POPULATION) * 500_000);
     const annualEnergyPerCapitaKWh = 200_000; // US average is at 80k KWh https://www.eia.gov/tools/faqs/faq.php?id=85&t=1
 

@@ -69,7 +69,6 @@ export class GravitySystem {
         for (const celestialBody of celestialBodies) {
             const scaledDirection = celestialBody.position.subtract(body.transformNode.getAbsolutePosition());
             const distance = scaledDirection.length();
-            //TODO: when 2.0 comes along, use the correct formula
             //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
             const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
             if (forceMagnitude <= 1e-6) {

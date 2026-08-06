@@ -77,6 +77,8 @@ const typeScriptWorkspaceRules = {
         "import-x/no-duplicates": ["error", { "prefer-inline": true }],
         "import-x/no-extraneous-dependencies": "error",
 
+        "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
+
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/require-array-sort-compare": "error",

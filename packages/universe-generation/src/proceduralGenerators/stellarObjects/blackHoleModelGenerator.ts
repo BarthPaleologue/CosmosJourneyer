@@ -36,12 +36,10 @@ export function generateBlackHoleModel(
 ): BlackHoleModel {
     const rng = getRngFromSeed(seed);
 
-    //FIXME: do not hardcode
     const schwarzschildRadius = 1000e3;
 
     const parentMaxRadius = parentBodies.reduce((max, body) => Math.max(max, getCelestialBodyRadius(body)), 0);
 
-    // TODO: do not hardcode
     const orbitRadius = parentBodies.length === 0 ? 0 : 2 * (parentMaxRadius + schwarzschildRadius);
 
     const parentIds = parentBodies.map((body) => body.id);

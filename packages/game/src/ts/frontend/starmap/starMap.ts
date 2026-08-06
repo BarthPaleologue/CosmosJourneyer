@@ -210,7 +210,6 @@ export class StarMap {
             return;
         }
 
-        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = starSystemModel.stellarObjects[0];
 
         const instanceName = `${starSystemModel.name} Billboard instance`;

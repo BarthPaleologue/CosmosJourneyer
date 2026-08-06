@@ -136,7 +136,6 @@ const GRAD4LUT: [[f32; 4]; 32] = [
 
 // A lookup table to traverse the SIMPLEX around a given point in 4D.
 // Details can be found where this table is used, in the 4D noise method.
-/* TODO: This should not be required, backport it from Bill's GLSL code! */
 const SIMPLEX: [[i32; 4]; 64] = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
@@ -272,7 +271,6 @@ fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
     let (mut i1, mut j1, mut k1) = (0, 0, 0); /* Offsets for second corner of simplex in (i,j,k) coords */
     let (mut i2, mut j2, mut k2) = (0, 0, 0); /* Offsets for third corner of simplex in (i,j,k) coords */
 
-    /* TODO: This code would benefit from a backport from the GLSL version! */
     if x0 >= y0 {
         if y0 >= z0 {
             i1 = 1;
