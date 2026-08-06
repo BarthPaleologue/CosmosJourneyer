@@ -28,8 +28,8 @@ import { type CmdrSaves, type Save } from "./saveFileData";
  * Mock implementation of IFileSystem for testing
  */
 class MockFileSystem implements IFileSystem {
-    private files = new Map<string, string>();
-    private directories = new Set<string>();
+    private readonly files = new Map<string, string>();
+    private readonly directories = new Set<string>();
 
     constructor() {
         // Always have root directories

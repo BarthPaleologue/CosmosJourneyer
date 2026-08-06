@@ -37,7 +37,7 @@ export class StarMapControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
 
     private speed = 10;
-    private inertia = Vector3.Zero();
+    private readonly inertia = Vector3.Zero();
 
     private readonly scene: Scene;
 

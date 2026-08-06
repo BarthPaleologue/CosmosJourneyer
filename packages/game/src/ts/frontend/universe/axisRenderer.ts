@@ -27,7 +27,7 @@ import { type CreateLinesMeshFunction } from "./lineRendering";
  * Visual helper designed to display the rotation axis of given objects
  */
 export class AxisRenderer {
-    private axisMeshes: Map<Transformable, Mesh> = new Map();
+    private readonly axisMeshes: Map<Transformable, Mesh> = new Map();
 
     private _isVisible = false;
 

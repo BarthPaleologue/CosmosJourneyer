@@ -26,7 +26,7 @@ export class LoadingProgressMonitor implements ILoadingProgressMonitor {
     private startedTaskCount = 0;
     private completedTaskCount = 0;
 
-    private progressCallbacks: Array<(startedTaskCount: number, completedTaskCount: number) => void> = [];
+    private readonly progressCallbacks: Array<(startedTaskCount: number, completedTaskCount: number) => void> = [];
 
     public addProgressCallback(callback: (startedTaskCount: number, completedTaskCount: number) => void): void {
         this.progressCallbacks.push(callback);

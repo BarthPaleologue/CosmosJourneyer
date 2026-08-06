@@ -88,6 +88,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/consistent-type-exports": "error",
 
+        "@typescript-eslint/prefer-readonly": "error",
+
         "@typescript-eslint/no-misused-promises": [
             "error",
             {

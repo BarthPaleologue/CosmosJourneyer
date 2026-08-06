@@ -30,7 +30,7 @@ export class HyperSpaceTunnel implements Transformable {
 
     readonly warpConeMaterial: ShaderMaterial;
 
-    private tunnelDiameter = 160;
+    private readonly tunnelDiameter = 160;
 
     private elapsedSeconds = 0;
 

@@ -51,11 +51,11 @@ export class InteractionSystem {
 
     private currentTarget: PhysicsBody | null = null;
 
-    private interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
+    private readonly interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
 
     private longPressTimer: number | null = null;
 
-    private longPressThreshold = 0.3;
+    private readonly longPressThreshold = 0.3;
 
     private shouldCancelShortPress = false;
 

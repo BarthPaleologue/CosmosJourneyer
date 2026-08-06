@@ -105,7 +105,7 @@ export class StarMap {
     /** Scratch buffer for computing a sector's world position (reused to avoid allocations in the hot loop). */
     private readonly sectorWorldPositionScratch = new Vector3();
 
-    private starSectorSize = Settings.STAR_SECTOR_SIZE;
+    private readonly starSectorSize = Settings.STAR_SECTOR_SIZE;
 
     constructor(universeBackend: UniverseBackend, textures: StarMapTextures, scene: Scene) {
         this.scene = scene;

@@ -31,7 +31,7 @@ type CelestialBody = {
 export class GravitySystem {
     private readonly scene: Scene;
 
-    private forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
+    private readonly forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
 
     constructor(scene: Scene) {
         this.scene = scene;

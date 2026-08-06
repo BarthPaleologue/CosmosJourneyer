@@ -38,8 +38,8 @@ export class DefaultControls implements Controls {
     speed = 1;
     rotationSpeed = Math.PI / 4;
 
-    private inertia = Vector3.Zero();
-    private rotationInertia = Vector3.Zero();
+    private readonly inertia = Vector3.Zero();
+    private readonly rotationInertia = Vector3.Zero();
 
     constructor(scene: Scene) {
         this.transform = new TransformNode("playerController", scene);

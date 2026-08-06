@@ -89,7 +89,7 @@ export class StarSystemController {
     /**
      * The list of all system targets in the system
      */
-    private systemTargets: Array<SystemTarget> = [];
+    private readonly systemTargets: Array<SystemTarget> = [];
 
     private elapsedSeconds = 0;
 

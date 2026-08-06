@@ -26,7 +26,7 @@ import { Settings } from "@/settings";
 export class ComponentBrowserUI {
     readonly root: HTMLDivElement;
 
-    private placeHolderText: HTMLElement;
+    private readonly placeHolderText: HTMLElement;
 
     private selectedComponent: SerializedComponent | null = null;
 

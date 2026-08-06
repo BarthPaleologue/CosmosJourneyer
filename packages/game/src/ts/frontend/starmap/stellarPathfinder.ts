@@ -47,9 +47,9 @@ export class StellarPathfinder {
         position: Vector3;
     } | null = null;
 
-    private coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
+    private readonly coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
 
-    private openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
+    private readonly openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
     private closedList: Node[] = [];
 
     private jumpRange = 10;
@@ -59,7 +59,7 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
-    private universeBackend: UniverseBackend;
+    private readonly universeBackend: UniverseBackend;
 
     public constructor(universeBackend: UniverseBackend) {
         this.universeBackend = universeBackend;

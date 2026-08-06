@@ -46,7 +46,7 @@ export class UtilitySection implements StationSection {
     private readonly metalSectionMaterial: Material;
 
     private readonly tanks: Array<AbstractMesh> = [];
-    private tankBodies: Array<PhysicsBody> = [];
+    private readonly tankBodies: Array<PhysicsBody> = [];
     private readonly tankShape: PhysicsShape;
 
     private readonly lights: Array<PointLight> = [];

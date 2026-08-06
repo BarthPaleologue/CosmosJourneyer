@@ -86,7 +86,7 @@ export class Spaceship implements Transformable, Targetable {
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
-    private landingComputer: LandingComputer | null;
+    private readonly landingComputer: LandingComputer | null;
 
     private readonly altimeter: Altimeter;
 
@@ -115,7 +115,7 @@ export class Spaceship implements Transformable, Targetable {
 
     private readonly internals: SpaceshipInternals;
 
-    private mainThrusters: Thruster[] = [];
+    private readonly mainThrusters: Thruster[] = [];
 
     private isFuelScooping = false;
 

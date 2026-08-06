@@ -166,7 +166,7 @@ export class StarSystemView implements View {
      */
     private characterControls: CharacterControls | null = null;
 
-    private vehicleControls: VehicleControls;
+    private readonly vehicleControls: VehicleControls;
 
     /**
      * A debug helper to display the orbits of the orbital objects

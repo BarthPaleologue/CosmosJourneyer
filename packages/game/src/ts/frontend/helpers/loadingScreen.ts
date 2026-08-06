@@ -35,7 +35,7 @@ export class LoadingScreen implements ILoadingScreen {
     private activeLoadingScreenImageIndex = 0;
     private activeLoadingScreenImageLayerIndex = 0;
 
-    private canvas: HTMLCanvasElement;
+    private readonly canvas: HTMLCanvasElement;
 
     /**
      * Creates a new default loading screen
@@ -181,7 +181,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     // Resize
-    private resizeLoadingUI = () => {
+    private readonly resizeLoadingUI = () => {
         const canvasRect = this.canvas.getBoundingClientRect();
         const canvasPositioning = window.getComputedStyle(this.canvas).position;
 
@@ -233,7 +233,7 @@ export class LoadingScreen implements ILoadingScreen {
         return layer;
     }
 
-    private showNextLoadingScreenImage = (): void => {
+    private readonly showNextLoadingScreenImage = (): void => {
         if (!this.loadingScreenImageLayers) {
             return;
         }

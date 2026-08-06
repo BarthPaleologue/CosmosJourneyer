@@ -35,7 +35,7 @@ export class MusicConductor {
     private volume = 1;
     private readonly fadeSeconds = 3;
 
-    private pauseMusicWhenPaused = false;
+    private readonly pauseMusicWhenPaused = false;
 
     private readonly starSystemView: StarSystemView;
 

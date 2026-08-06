@@ -34,7 +34,7 @@ import { Settings } from "@/settings";
 export class ComponentSpecUI {
     readonly root: HTMLElement;
 
-    private placeHolderText: HTMLElement;
+    private readonly placeHolderText: HTMLElement;
 
     constructor(placeHolderText: string) {
         this.root = document.createElement("div");
