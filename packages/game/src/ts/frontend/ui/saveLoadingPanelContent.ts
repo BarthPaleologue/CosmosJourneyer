@@ -1,11 +1,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
-import {
-    createCommanderArchive,
-    createCommanderArchiveFileName,
-    parseCommanderArchive,
-} from "@/backend/save/commanderArchive";
+import { parseCommanderArchive } from "@/backend/save/commanderArchive";
 import { type ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
@@ -14,6 +10,9 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
+
+import { downloadBlob } from "@/utils/downloadBlob";
+import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 
 import i18n from "@/i18n";
 
@@ -254,11 +253,7 @@ export class SaveLoadingPanelContent {
             downloadButton.title = i18n.t("sidePanel:downloadCommanderArchive");
             downloadButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
-                const archive = createCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
-                this.downloadBlob(
-                    new Blob([new Uint8Array(archive)], { type: "application/zip" }),
-                    createCommanderArchiveFileName(cmdrUuid, latestSave.player.name),
-                );
+                downloadCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
             });
             cmdrHeaderButtons.appendChild(downloadButton);
 
@@ -398,7 +393,7 @@ export class SaveLoadingPanelContent {
         downloadButton.classList.add("icon", "large");
         downloadButton.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
-            this.downloadBlob(
+            downloadBlob(
                 new Blob([JSON.stringify(save)], { type: "application/json" }),
                 `${save.player.name}_${save.timestamp}.json`,
             );
@@ -436,15 +431,6 @@ export class SaveLoadingPanelContent {
         deleteButton.appendChild(trashIcon);
 
         return saveDiv;
-    }
-
-    private downloadBlob(blob: Blob, fileName: string): void {
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = fileName;
-        anchor.click();
-        URL.revokeObjectURL(url);
     }
 
     private async handleSelectedFile(file: File): Promise<void> {

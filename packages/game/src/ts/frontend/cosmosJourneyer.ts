@@ -38,6 +38,7 @@ import { type StarSystemCoordinates, getUniverseObjectId } from "@cosmos-journey
 import type { ICosmosJourneyerBackend } from "@/backend";
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
 import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
+import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 import {
     type AtStationCoordinates,
     type RelativeCoordinates,
@@ -56,6 +57,7 @@ import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { DesktopUpdateController, type UpdatePresentationContext } from "@/frontend/ui/desktopUpdateController";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
@@ -64,6 +66,8 @@ import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { type View } from "@/frontend/view";
 
+import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
+import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
 import i18n, { initI18n } from "@/i18n";
@@ -333,6 +337,8 @@ export class CosmosJourneyer {
             else this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
         });
 
+        this.initializeDesktopUpdates();
+
         window.addEventListener("blur", () => {
             if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
         });
@@ -546,6 +552,91 @@ export class CosmosJourneyer {
 
     public isPaused(): boolean {
         return this.state === "paused";
+    }
+
+    private initializeDesktopUpdates(): void {
+        const api = getDesktopUpdateApi();
+        if (api === null) {
+            return;
+        }
+
+        const controller = new DesktopUpdateController(
+            api,
+            {
+                getPresentationContext: () => this.getUpdatePresentationContext(),
+                canBackupCurrentCommander: () => this.canPersistCurrentCommander(),
+                downloadCommanderBackup: (context) => this.downloadUpdateCommanderBackup(context),
+                prepareImmediateInstall: () => this.prepareImmediateUpdateInstall(),
+            },
+            this.notificationManager,
+            this.soundPlayer,
+        );
+        void controller.start();
+        this.mainMenu.onVisibilityChanged.add(() => {
+            controller.refreshPresentation();
+        });
+        this.pauseMenu.onVisibilityChanged.add(() => {
+            controller.refreshPresentation();
+        });
+    }
+
+    private getUpdatePresentationContext(): UpdatePresentationContext {
+        if (this.mainMenu.isVisible()) {
+            return "mainMenu";
+        }
+        if (this.pauseMenu.isVisible()) {
+            return "pauseMenu";
+        }
+        return "gameplay";
+    }
+
+    private async downloadUpdateCommanderBackup(
+        context: Exclude<UpdatePresentationContext, "gameplay">,
+    ): Promise<boolean> {
+        let commanderUuid: string;
+        let commanderName: string;
+        if (context === "pauseMenu") {
+            if (!(await this.createSafetySave())) {
+                return false;
+            }
+            commanderUuid = this.player.uuid;
+            commanderName = this.player.getName();
+        } else {
+            const latestSave = await getLatestSaveFromBackend(this.backend.save);
+            if (latestSave === null) {
+                return false;
+            }
+            commanderUuid = latestSave.player.uuid;
+            commanderName = latestSave.player.name;
+        }
+
+        const saves = await this.backend.save.getSavesForCmdr(commanderUuid);
+        if (saves === undefined) {
+            return false;
+        }
+        downloadCommanderArchive(commanderUuid, commanderName, saves);
+        return true;
+    }
+
+    private async prepareImmediateUpdateInstall(): Promise<boolean> {
+        if (this.getUpdatePresentationContext() !== "pauseMenu" || !this.canPersistCurrentCommander()) {
+            return true;
+        }
+        return this.createSafetySave();
+    }
+
+    private async createSafetySave(): Promise<boolean> {
+        if (!this.canPersistCurrentCommander()) {
+            return false;
+        }
+        const saveData = await this.generateSaveData();
+        return this.backend.save.addAutoSave(saveData.player.uuid, saveData);
+    }
+
+    private canPersistCurrentCommander(): boolean {
+        return (
+            this.player.uuid !== Settings.TUTORIAL_SAVE_UUID && this.player.uuid !== Settings.SHARED_POSITION_SAVE_UUID
+        );
     }
 
     /**
