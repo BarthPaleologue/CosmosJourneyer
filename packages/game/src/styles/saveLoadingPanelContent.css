@@ -66,10 +66,12 @@
                 background: linear-gradient(90deg, var(--cmdr-color) 10px, rgba(0, 0, 0, 0.5) 10px);
                 padding: 20px;
                 display: flex;
-                justify-content: space-between;
+                column-gap: 40px;
 
                 .saveText {
                     display: flex;
+                    flex: 1 1 0;
+                    min-width: 0;
                     flex-direction: column;
                     justify-content: center;
                     row-gap: 10px;
