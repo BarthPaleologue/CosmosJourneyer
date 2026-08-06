@@ -1,6 +1,6 @@
 {
     "name": "@cosmos-journeyer/universe-generation",
-    "version": "1.11.2",
+    "version": "1.11.3",
     "private": true,
     "description": "Pure procedural universe model generators shared across Cosmos Journeyer packages.",
     "license": "AGPL-3.0-only",
