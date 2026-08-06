@@ -113,7 +113,7 @@ export class Player {
     /**
      * Returns true if the player has visited the given object, false otherwise.
      * @param objectId The object to check if the player has visited it.
-     * @returns True if the player has visited the object, false otherwise.
+     * @returns True if the object is visited, false if it is not.
      */
     hasVisitedObject(objectId: UniverseObjectId): boolean {
         return this.visitedObjects.has(serializeUniverseObjectId(objectId));
@@ -198,7 +198,7 @@ export class Player {
                 player.instancedSpaceships.map((spaceship) => spaceship.serialize()),
             ),
             spareSpaceshipComponents: Array.from(player.spareSpaceshipComponents),
-            tutorials: player.tutorials,
+            tutorials: structuredClone(player.tutorials),
         };
     }
 

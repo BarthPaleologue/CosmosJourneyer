@@ -82,9 +82,11 @@ describe("CosmosJourneyer", () => {
         const savePromise = CosmosJourneyer.prototype.generateSaveData.call(context);
 
         player.serializedSpaceships.length = 0;
+        player.tutorials.flightCompleted = true;
         resolveScreenshot?.(new Uint8Array());
 
         const save = await savePromise;
         expect(save.player.spaceShips).toEqual([serializedSpaceship]);
+        expect(save.player.tutorials.flightCompleted).toBe(false);
     });
 });
