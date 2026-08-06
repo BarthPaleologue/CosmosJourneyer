@@ -260,43 +260,63 @@ export class HelixHabitat implements Transformable {
                 for (let sectionIndex = 0; sectionIndex <= sectionCount; sectionIndex++) {
                     const angle =
                         (sectionIndex * Math.PI * 2.0) / sectionCount + (helixIndex * (Math.PI * 2)) / helixCount;
-                    for (const radius of [maxRadius, minRadius]) {
-                        for (let ring = 0; ring < thicknessFactor; ring++) {
-                            const yOffset =
-                                (turnIndex + sectionIndex / sectionCount) * helixPitch -
-                                (turnCount * helixPitch) / 2 +
-                                ring * this.deltaRadius -
-                                helixThickness / 2 +
-                                this.deltaRadius / 2;
-
-                            const position = new Vector3(radius * Math.cos(angle), yOffset, radius * Math.sin(angle));
-
-                            results.push({ position, rotation: Quaternion.Identity() });
-                        }
-                    }
-
                     const yBase = (turnIndex + sectionIndex / sectionCount) * helixPitch - (turnCount * helixPitch) / 2;
-                    for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
-                        const position = new Vector3(
-                            this.radius * Math.cos(angle),
-                            yBase + yOffset,
-                            this.radius * Math.sin(angle),
-                        );
 
-                        results.push({
-                            position,
-                            rotation: Quaternion.FromUnitVectorsToRef(
-                                Vector3.UpReadOnly,
-                                new Vector3(-position.x, 0, -position.z).normalize(),
-                                Quaternion.Identity(),
-                            ),
-                        });
-                    }
+                    this.pushHelixSurfaceLightPoints(
+                        results,
+                        angle,
+                        yBase,
+                        helixThickness,
+                        thicknessFactor,
+                        maxRadius,
+                        minRadius,
+                    );
+                    this.pushHelixEdgeLightPoints(results, angle, yBase, helixThickness);
                 }
             }
         }
 
         return results;
+    }
+
+    private pushHelixSurfaceLightPoints(
+        results: Array<{ position: Vector3; rotation: Quaternion }>,
+        angle: number,
+        yBase: number,
+        helixThickness: number,
+        thicknessFactor: number,
+        maxRadius: number,
+        minRadius: number,
+    ) {
+        for (const radius of [maxRadius, minRadius]) {
+            for (let ring = 0; ring < thicknessFactor; ring++) {
+                const yOffset = yBase + ring * this.deltaRadius - helixThickness / 2 + this.deltaRadius / 2;
+
+                const position = new Vector3(radius * Math.cos(angle), yOffset, radius * Math.sin(angle));
+
+                results.push({ position, rotation: Quaternion.Identity() });
+            }
+        }
+    }
+
+    private pushHelixEdgeLightPoints(
+        results: Array<{ position: Vector3; rotation: Quaternion }>,
+        angle: number,
+        yBase: number,
+        helixThickness: number,
+    ) {
+        for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
+            const position = new Vector3(this.radius * Math.cos(angle), yBase + yOffset, this.radius * Math.sin(angle));
+
+            results.push({
+                position,
+                rotation: Quaternion.FromUnitVectorsToRef(
+                    Vector3.UpReadOnly,
+                    new Vector3(-position.x, 0, -position.z).normalize(),
+                    Quaternion.Identity(),
+                ),
+            });
+        }
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number) {
