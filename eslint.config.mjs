@@ -86,6 +86,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
 
+        "@typescript-eslint/consistent-type-exports": "error",
+
         "@typescript-eslint/no-misused-promises": [
             "error",
             {
