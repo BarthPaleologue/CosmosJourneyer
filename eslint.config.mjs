@@ -194,6 +194,12 @@ export default defineConfig([
         "packages/website/next.config.js",
         "packages/website/next-env.d.ts",
     ]),
+    {
+        linterOptions: {
+            reportUnusedDisableDirectives: "error",
+            reportUnusedInlineConfigs: "error",
+        },
+    },
     eslint.configs.recommended,
     ...strictTypeChecked,
     importX.flatConfigs.recommended,
