@@ -18,7 +18,7 @@
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal/alertModal";
 
-import packageJson from "../../../../../package.json";
+import packageJson from "../../../package.json";
 import type { ConsoleDumper, LogEntry } from "./consoleDumper";
 import { downloadTextFile } from "./download";
 
