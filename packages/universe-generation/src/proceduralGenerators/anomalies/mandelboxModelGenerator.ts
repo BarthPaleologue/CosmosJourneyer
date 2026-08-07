@@ -20,6 +20,7 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type MandelboxModel,
     type OrbitalObjectModel,
@@ -32,7 +33,7 @@ export function generateMandelboxModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<OrbitalObjectModel>,
+    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
 ): MandelboxModel {
     const rng = getRngFromSeed(seed);
 

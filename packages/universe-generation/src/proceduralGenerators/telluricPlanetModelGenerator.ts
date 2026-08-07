@@ -51,7 +51,7 @@ export function generateTelluricPlanetModel(
     seed: number,
     name: string,
     parentBodies: DeepReadonly<Array<StellarObjectModel>>,
-    overrides?: DeepPartial<TelluricPlanetModel>,
+    overrides?: DeepReadonly<DeepPartial<TelluricPlanetModel>>,
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 

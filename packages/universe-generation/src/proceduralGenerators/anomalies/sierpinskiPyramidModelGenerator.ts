@@ -20,6 +20,7 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type SierpinskiPyramidModel,
     type OrbitalObjectModel,
@@ -32,7 +33,7 @@ export function generateSierpinskiPyramidModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<OrbitalObjectModel>,
+    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
 ): SierpinskiPyramidModel {
     const rng = getRngFromSeed(seed);
 

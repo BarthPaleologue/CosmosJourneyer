@@ -1,4 +1,4 @@
-export function wheelOfFortune<T>(options: [T, number][], randomValue: number): T {
+export function wheelOfFortune<T>(options: ReadonlyArray<readonly [T, number]>, randomValue: number): T {
     const total = options.reduce((acc, [, weight]) => acc + weight, 0);
     const choice = randomValue * total;
     let current = 0;

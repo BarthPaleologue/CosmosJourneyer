@@ -57,7 +57,7 @@ export function generateSpaceStationModel(
     seed: number,
     parentBody: DeepReadonly<CelestialBodyModel>,
     systemModel: DeepReadonly<StarSystemModel>,
-    overrides?: DeepPartial<SpaceStationModel>,
+    overrides?: DeepReadonly<DeepPartial<SpaceStationModel>>,
 ): SpaceStationModel {
     const rng = getRngFromSeed(seed);
 

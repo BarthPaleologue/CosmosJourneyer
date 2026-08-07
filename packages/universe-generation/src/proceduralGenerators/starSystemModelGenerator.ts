@@ -21,7 +21,7 @@ import { wheelOfFortune } from "#/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "#/utils/strings/alphabets";
 import { romanNumeral } from "#/utils/strings/romanNumerals";
 import { generateStarName } from "#/utils/strings/starNameGenerator";
-import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
+import { assertUnreachable, isNonEmptyArray, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type StarSystemCoordinates,
     type AnomalyModel,
@@ -72,7 +72,7 @@ const GenerationSteps = {
  */
 export function generateStarSystemModel(
     systemRng: (step: number) => number,
-    coordinates: StarSystemCoordinates,
+    coordinates: DeepReadonly<StarSystemCoordinates>,
     isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
 export const StarSystemCoordinatesSchema = z.object({
@@ -49,7 +50,10 @@ export const StarSystemCoordinatesSchema = z.object({
  */
 export type StarSystemCoordinates = z.infer<typeof StarSystemCoordinatesSchema>;
 
-export function starSystemCoordinatesEquals(a: StarSystemCoordinates, b: StarSystemCoordinates): boolean {
+export function starSystemCoordinatesEquals(
+    a: DeepReadonly<StarSystemCoordinates>,
+    b: DeepReadonly<StarSystemCoordinates>,
+): boolean {
     return (
         a.starSectorX === b.starSectorX &&
         a.starSectorY === b.starSectorY &&
@@ -60,6 +64,6 @@ export function starSystemCoordinatesEquals(a: StarSystemCoordinates, b: StarSys
     );
 }
 
-export function serializeStarSystemCoordinates(coordinates: StarSystemCoordinates): string {
+export function serializeStarSystemCoordinates(coordinates: DeepReadonly<StarSystemCoordinates>): string {
     return `${coordinates.starSectorX}:${coordinates.starSectorY}:${coordinates.starSectorZ}:${coordinates.localX}:${coordinates.localY}:${coordinates.localZ}`;
 }

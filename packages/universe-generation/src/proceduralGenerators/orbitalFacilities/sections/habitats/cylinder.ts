@@ -20,7 +20,7 @@ import type { CylinderHabitatModel } from "@cosmos-journeyer/universe-model";
 
 export function generateCylinderHabitatModel(
     seed: number,
-    surface: CylinderHabitatModel["surface"],
+    surface: Readonly<CylinderHabitatModel["surface"]>,
 ): CylinderHabitatModel {
     const rng = getRngFromSeed(seed);
     const radius = 4e3 + rng(0) * 2e3;

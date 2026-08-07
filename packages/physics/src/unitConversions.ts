@@ -45,7 +45,7 @@ export function metersToLightMinutes(meters: number): number {
  * @param duration The duration expressed in days, hours, minutes, and/or seconds.
  * @returns The duration in seconds.
  */
-export function durationToSeconds(duration: Duration): number {
+export function durationToSeconds(duration: Readonly<Duration>): number {
     const days = duration.days ?? 0;
     const hours = duration.hours ?? 0;
     const minutes = duration.minutes ?? 0;

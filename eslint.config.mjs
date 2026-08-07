@@ -205,6 +205,23 @@ const typeScriptWorkspaceRules = {
     },
 };
 
+const readonlyParameterTypesConfig = {
+    files: [
+        "packages/physics/**/*.{ts,tsx}",
+        "packages/typescript/**/*.{ts,tsx}",
+        "packages/universe-generation/**/*.{ts,tsx}",
+        "packages/universe-model/**/*.{ts,tsx}",
+    ],
+    rules: {
+        "@typescript-eslint/prefer-readonly-parameter-types": [
+            "error",
+            {
+                ignoreInferredTypes: true,
+            },
+        ],
+    },
+};
+
 export default defineConfig([
     globalIgnores([
         "packages/game/src/ts/utils/TWGSL/**",
@@ -236,4 +253,5 @@ export default defineConfig([
     importX.flatConfigs.typescript,
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
+    readonlyParameterTypesConfig,
 ]);

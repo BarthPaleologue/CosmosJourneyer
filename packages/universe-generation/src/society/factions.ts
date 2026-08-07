@@ -1,4 +1,4 @@
-import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Faction, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
@@ -21,7 +21,10 @@ export function factionToString(faction: Faction): string {
     }
 }
 
-export function getFactionFromCoordinates(coordinates: StarSystemCoordinates, rng: (index: number) => number): Faction {
+export function getFactionFromCoordinates(
+    coordinates: DeepReadonly<StarSystemCoordinates>,
+    rng: (index: number) => number,
+): Faction {
     const powerplayData = getPowerPlayData({
         x: coordinates.starSectorX,
         y: coordinates.starSectorY,

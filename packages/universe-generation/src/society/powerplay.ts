@@ -43,7 +43,7 @@ export type PowerPlayData = {
     readonly capitalistCommunist: number;
 };
 
-export function getPowerPlayData(systemGalacticPosition: Vector3Like): PowerPlayData {
+export function getPowerPlayData(systemGalacticPosition: Readonly<Vector3Like>): PowerPlayData {
     const coords = systemGalacticPosition;
 
     return {
