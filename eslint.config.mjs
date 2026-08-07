@@ -153,6 +153,9 @@ const typeScriptWorkspaceRules = {
         // maximum block nesting depth
         "max-depth": ["error", 3],
 
+        // maximum cyclomatic complexity
+        complexity: ["warn", { max: 15, variant: "modified" }],
+
         // no Promise.reject()
         "no-restricted-syntax": [
             "error",
