@@ -29,12 +29,11 @@ export class ConsoleDumper {
 
     constructor() {
         for (const method of ConsoleMethods) {
-            const originalConsoleMethod = console[method];
-            if (typeof originalConsoleMethod !== "function") {
+            if (typeof console[method] !== "function") {
                 continue;
             }
 
-            const originalFn = originalConsoleMethod.bind(console);
+            const originalFn = console[method].bind(console);
             console[method] = (...args: unknown[]): void => {
                 const message = args
                     .map((arg) => {
