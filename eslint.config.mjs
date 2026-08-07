@@ -76,6 +76,7 @@ const typeScriptWorkspaceRules = {
         "import-x/no-cycle": "error",
         "import-x/no-duplicates": ["error", { "prefer-inline": true }],
         "import-x/no-extraneous-dependencies": "error",
+        "import-x/no-mutable-exports": "error",
 
         "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
 
