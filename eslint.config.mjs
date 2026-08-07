@@ -145,6 +145,7 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/no-deprecated": "warn",
         "@typescript-eslint/no-unnecessary-condition": "warn",
+        "@typescript-eslint/no-unsafe-type-assertion": "warn",
 
         // enforce ===
         eqeqeq: "error",
