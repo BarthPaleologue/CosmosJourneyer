@@ -33,7 +33,7 @@ import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";
 
 const GasPlanetMaterialUniformNames = {
     WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
+    VIEW_PROJECTION: "viewProjection",
     CAMERA_POSITION: "cameraPosition",
     SEED: "seed",
     TIME: "time",

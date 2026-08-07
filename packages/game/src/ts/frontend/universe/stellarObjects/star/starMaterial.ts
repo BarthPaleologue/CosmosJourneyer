@@ -32,7 +32,7 @@ import starMaterialVertex from "@shaders/starMaterial/vertex.glsl";
 
 const StarMaterialUniformNames = {
     WORLD: "world",
-    WORLD_VIEW_PROJECTION: "worldViewProjection",
+    VIEW_PROJECTION: "viewProjection",
     SEED: "seed",
     STAR_COLOR: "starColor",
     TIME: "time",

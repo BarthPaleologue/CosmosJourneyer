@@ -69,7 +69,7 @@ export class HyperSpaceTunnel implements Transformable {
         Effect.ShadersStore["warpConeMaterialVertexShader"] = warpConeVertex;
         this.warpConeMaterial = new ShaderMaterial("warpConeMaterial", scene, "warpConeMaterial", {
             attributes: ["position", "uv"],
-            uniforms: ["worldViewProjection", "time"],
+            uniforms: ["world", "viewProjection", "time"],
             samplers: ["warpNoise"],
         });
         this.warpConeMaterial.setTexture("warpNoise", noiseTextures.seamlessPerlin);

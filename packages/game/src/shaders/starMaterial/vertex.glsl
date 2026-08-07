@@ -20,16 +20,17 @@ precision highp float;
 attribute vec3 position;
 
 uniform mat4 world;
-uniform mat4 worldViewProjection;
+uniform mat4 viewProjection;
 
 varying vec3 vPositionW;
 varying vec3 vPosition;
 varying vec3 vUnitSamplePoint;
 
 void main() {
-    gl_Position = worldViewProjection * vec4(position, 1.0);
+    vec4 positionW = world * vec4(position, 1.0);
+    gl_Position = viewProjection * positionW;
 
-    vPositionW = vec3(world * vec4(position, 1.0));
+    vPositionW = positionW.xyz;
 
     vPosition = position;
 

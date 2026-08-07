@@ -403,6 +403,7 @@ export class CosmosJourneyer {
         // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
         const engine = window.location.search.includes("webgpu")
             ? await EngineFactory.CreateAsync(canvas, {
+                  useHighPrecisionMatrix: true,
                   twgslOptions: {
                       wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
                       jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
@@ -446,7 +447,7 @@ export class CosmosJourneyer {
         starMapScene.useRightHandedSystem = true;
         starMapScene.clearColor.set(0, 0, 0, 1);
 
-        const mainHavokPlugin = new HavokPlugin(true, havokInstance);
+        const mainHavokPlugin = new HavokPlugin(true, havokInstance, { disableWorldRegions: true });
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         starSystemViewScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 

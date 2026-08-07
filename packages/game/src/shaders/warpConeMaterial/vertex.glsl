@@ -3,7 +3,8 @@ precision lowp float;
 attribute vec3 position;
 attribute vec2 uv;
 
-uniform mat4 worldViewProjection;
+uniform mat4 world;
+uniform mat4 viewProjection;
 
 uniform float time;
 
@@ -37,8 +38,8 @@ void main() {
 
     vec3 shiftedPosition = position + vec3(noise * 30.0, 0.0, 0.0);
 
-    vec4 outPosition = worldViewProjection * vec4(shiftedPosition, 1.0);
-    gl_Position = outPosition;
+    vec4 positionW = world * vec4(shiftedPosition, 1.0);
+    gl_Position = viewProjection * positionW;
     vPosition = position;
     vUV = uv;
 }
