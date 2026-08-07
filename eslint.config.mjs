@@ -93,6 +93,8 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/prefer-readonly": "error",
 
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
+
         "@typescript-eslint/no-shadow": "error",
 
         "@typescript-eslint/promise-function-async": "error",

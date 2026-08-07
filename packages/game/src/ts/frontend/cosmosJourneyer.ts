@@ -830,13 +830,11 @@ export class CosmosJourneyer {
             return;
         }
 
-        if (this.videoRecorder === null) {
-            this.videoRecorder = new VideoRecorder(this.engine, {
-                fps: 60,
-                recordChunckSize: 3000000,
-                mimeType: "video/webm;codecs=h264",
-            });
-        }
+        this.videoRecorder ??= new VideoRecorder(this.engine, {
+            fps: 60,
+            recordChunckSize: 3000000,
+            mimeType: "video/webm;codecs=h264",
+        });
 
         if (this.videoRecorder.isRecording) {
             this.videoRecorder.stopRecording();
