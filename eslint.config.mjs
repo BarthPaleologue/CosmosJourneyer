@@ -79,6 +79,31 @@ const typeScriptWorkspaceRules = {
         "import-x/no-mutable-exports": "error",
         "import-x/no-relative-packages": "error",
 
+        "import-x/no-restricted-paths": [
+            "error",
+            {
+                basePath: import.meta.dirname,
+                zones: [
+                    {
+                        target: [
+                            "packages/babylonjs-shading-language/src",
+                            "packages/physics/src",
+                            "packages/typescript/src",
+                            "packages/universe-generation/src",
+                            "packages/universe-model/src",
+                        ],
+                        from: [
+                            "packages/channel-packer",
+                            "packages/desktop-electron",
+                            "packages/game",
+                            "packages/website",
+                        ],
+                        message: "Shared library packages must not depend on application packages.",
+                    },
+                ],
+            },
+        ],
+
         "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
 
         // enforce braces around control flow statements
