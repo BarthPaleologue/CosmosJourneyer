@@ -39,7 +39,7 @@ export const UniverseObjectIdSchema = z.object({
  */
 export type UniverseObjectId = z.infer<typeof UniverseObjectIdSchema>;
 
-export function universeObjectIdEquals(a: UniverseObjectId, b: UniverseObjectId): boolean {
+export function universeObjectIdEquals(a: DeepReadonly<UniverseObjectId>, b: DeepReadonly<UniverseObjectId>): boolean {
     return (
         orbitalObjectIdEquals(a.idInSystem, b.idInSystem) &&
         starSystemCoordinatesEquals(a.systemCoordinates, b.systemCoordinates)
@@ -61,6 +61,6 @@ export function getUniverseObjectId(
     };
 }
 
-export function serializeUniverseObjectId(id: UniverseObjectId): string {
+export function serializeUniverseObjectId(id: DeepReadonly<UniverseObjectId>): string {
     return `${serializeStarSystemCoordinates(id.systemCoordinates)}:${id.idInSystem}`;
 }

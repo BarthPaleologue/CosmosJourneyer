@@ -18,7 +18,10 @@
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import type { RingHabitatModel } from "@cosmos-journeyer/universe-model";
 
-export function generateRingHabitatModel(seed: number, surface: RingHabitatModel["surface"]): RingHabitatModel {
+export function generateRingHabitatModel(
+    seed: number,
+    surface: Readonly<RingHabitatModel["surface"]>,
+): RingHabitatModel {
     const rng = getRngFromSeed(seed);
     const baseRadius = 5e3 + rng(0) * 10e3;
     const attachmentTessellation = 4 + 2 * Math.floor(rng(1) * 2);

@@ -76,6 +76,33 @@ const typeScriptWorkspaceRules = {
         "import-x/no-cycle": "error",
         "import-x/no-duplicates": ["error", { "prefer-inline": true }],
         "import-x/no-extraneous-dependencies": "error",
+        "import-x/no-mutable-exports": "error",
+        "import-x/no-relative-packages": "error",
+
+        "import-x/no-restricted-paths": [
+            "error",
+            {
+                basePath: import.meta.dirname,
+                zones: [
+                    {
+                        target: [
+                            "packages/babylonjs-shading-language/src",
+                            "packages/physics/src",
+                            "packages/typescript/src",
+                            "packages/universe-generation/src",
+                            "packages/universe-model/src",
+                        ],
+                        from: [
+                            "packages/channel-packer",
+                            "packages/desktop-electron",
+                            "packages/game",
+                            "packages/website",
+                        ],
+                        message: "Shared library packages must not depend on application packages.",
+                    },
+                ],
+            },
+        ],
 
         "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
 
@@ -92,6 +119,8 @@ const typeScriptWorkspaceRules = {
         "@typescript-eslint/consistent-type-exports": "error",
 
         "@typescript-eslint/prefer-readonly": "error",
+
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
 
         "@typescript-eslint/no-shadow": "error",
 
@@ -116,12 +145,16 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/no-deprecated": "warn",
         "@typescript-eslint/no-unnecessary-condition": "warn",
+        "@typescript-eslint/no-unsafe-type-assertion": "warn",
 
         // enforce ===
         eqeqeq: "error",
 
         // maximum block nesting depth
         "max-depth": ["error", 3],
+
+        // maximum cyclomatic complexity
+        complexity: ["warn", { max: 15, variant: "modified" }],
 
         // no Promise.reject()
         "no-restricted-syntax": [
@@ -172,6 +205,23 @@ const typeScriptWorkspaceRules = {
     },
 };
 
+const readonlyParameterTypesConfig = {
+    files: [
+        "packages/physics/**/*.{ts,tsx}",
+        "packages/typescript/**/*.{ts,tsx}",
+        "packages/universe-generation/**/*.{ts,tsx}",
+        "packages/universe-model/**/*.{ts,tsx}",
+    ],
+    rules: {
+        "@typescript-eslint/prefer-readonly-parameter-types": [
+            "error",
+            {
+                ignoreInferredTypes: true,
+            },
+        ],
+    },
+};
+
 export default defineConfig([
     globalIgnores([
         "packages/game/src/ts/utils/TWGSL/**",
@@ -191,10 +241,17 @@ export default defineConfig([
         "packages/website/next.config.js",
         "packages/website/next-env.d.ts",
     ]),
+    {
+        linterOptions: {
+            reportUnusedDisableDirectives: "error",
+            reportUnusedInlineConfigs: "error",
+        },
+    },
     eslint.configs.recommended,
     ...strictTypeChecked,
     importX.flatConfigs.recommended,
     importX.flatConfigs.typescript,
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
+    readonlyParameterTypesConfig,
 ]);

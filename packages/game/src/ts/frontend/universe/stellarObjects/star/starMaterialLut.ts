@@ -27,9 +27,7 @@ export class StarMaterialLut {
     private hasGeneratedTexture = false;
 
     constructor(scene: Scene) {
-        if (Effect.ShadersStore["starLutFragmentShader"] === undefined) {
-            Effect.ShadersStore["starLutFragmentShader"] = lutFragment;
-        }
+        Effect.ShadersStore["starLutFragmentShader"] ??= lutFragment;
 
         this.lut = new ProceduralTexture(`StarMaterialLut`, 256, "starLut", scene, null, true, false);
         this.lut.refreshRate = 0;

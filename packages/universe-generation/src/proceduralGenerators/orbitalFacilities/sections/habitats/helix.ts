@@ -19,7 +19,10 @@ import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
 import { randRangeInt } from "extended-random";
 
-export function generateHelixHabitatModel(seed: number, surface: HelixHabitatModel["surface"]): HelixHabitatModel {
+export function generateHelixHabitatModel(
+    seed: number,
+    surface: Readonly<HelixHabitatModel["surface"]>,
+): HelixHabitatModel {
     const rng = getRngFromSeed(seed);
     const baseRadius = 10e3 + rng(0) * 10e3;
     const deltaRadius = 700 + rng(1) * 200;

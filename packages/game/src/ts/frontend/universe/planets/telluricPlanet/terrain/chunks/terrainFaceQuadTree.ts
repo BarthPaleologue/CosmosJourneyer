@@ -114,17 +114,15 @@ export class TerrainFaceQuadTree implements Cullable {
      * @param chunkForge
      */
     public updateLOD(lodContext: LodUpdateContext, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
-        if (this.root === null) {
-            this.root = this.createNode(
-                {
-                    lod: 0,
-                    x: 0,
-                    y: 0,
-                },
-                chunkForge,
-                scatteringSystem,
-            );
-        }
+        this.root ??= this.createNode(
+            {
+                lod: 0,
+                x: 0,
+                y: 0,
+            },
+            chunkForge,
+            scatteringSystem,
+        );
 
         this.uploadCompletedChunks(chunkForge);
 

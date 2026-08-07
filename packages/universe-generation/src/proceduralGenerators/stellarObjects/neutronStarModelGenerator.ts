@@ -19,6 +19,7 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
+import { type DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     type OrbitalObjectModel,
     type Orbit,
@@ -39,7 +40,7 @@ export function generateNeutronStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: OrbitalObjectModel[],
+    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
