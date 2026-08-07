@@ -92,7 +92,7 @@ export class AsteroidField implements IDisposable {
      * @param cameraWorldPosition The position of the camera in world space
      * @param deltaSeconds The seconds elapsed since last frame
      */
-    public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number) {
+    public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number): void {
         const planetInverseWorld = this.parent.getWorldMatrix().clone().invert();
 
         const cameraLocalPosition = Vector3.TransformCoordinates(cameraWorldPosition, planetInverseWorld);
@@ -130,16 +130,20 @@ export class AsteroidField implements IDisposable {
                 if (
                     radiusSquared < this.innerRadius * this.innerRadius ||
                     radiusSquared > this.outerRadius * this.outerRadius
-                )
+                ) {
                     continue;
+                }
 
-                if (this.patches.has(`${cellX};${cellZ}`)) continue;
+                if (this.patches.has(`${cellX};${cellZ}`)) {
+                    continue;
+                }
 
                 if (
                     (cameraCellX - cellX) ** 2 + cameraCellY * cameraCellY + (cameraCellZ - cellZ) ** 2 >=
                     this.neighborCellsRenderRadius * this.neighborCellsRenderRadius
-                )
+                ) {
                     continue;
+                }
 
                 const cellCoords = new Vector3(cellX * this.patchSize, 0, cellZ * this.patchSize);
 
@@ -169,7 +173,7 @@ export class AsteroidField implements IDisposable {
         }
     }
 
-    dispose() {
+    dispose(): void {
         for (const value of this.patches.values()) {
             value.patch.dispose();
         }
@@ -216,8 +220,12 @@ export class AsteroidField implements IDisposable {
                 const positionX = position.x + x * cellSize - patchSize / 2 + randomCellPositionX;
                 const positionZ = position.z + z * cellSize - patchSize / 2 + randomCellPositionZ;
 
-                if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) continue;
-                if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) continue;
+                if (positionX * positionX + positionZ * positionZ < minRadius * minRadius) {
+                    continue;
+                }
+                if (positionX * positionX + positionZ * positionZ > maxRadius * maxRadius) {
+                    continue;
+                }
 
                 const positionY = position.y + (rng(asteroidIndex + 8781) - 0.5) * patchThickness;
 

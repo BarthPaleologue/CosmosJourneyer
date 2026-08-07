@@ -135,7 +135,9 @@ export class SpaceStationLayer {
                 player.getName(),
                 this.soundPlayer,
             );
-            if (newName === null) return;
+            if (newName === null) {
+                return;
+            }
             player.setName(newName);
         });
 
@@ -299,7 +301,11 @@ export class SpaceStationLayer {
         this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
     }
 
-    private async setMainPanelState(state: MainPanelState, player: Player, universeBackend: UniverseBackend) {
+    private async setMainPanelState(
+        state: MainPanelState,
+        player: Player,
+        universeBackend: UniverseBackend,
+    ): Promise<undefined> {
         if (this.mainPanelState === state) {
             this.mainPanelState = "none";
         } else {
@@ -344,8 +350,10 @@ export class SpaceStationLayer {
         }
     }
 
-    public setVisibility(visible: boolean) {
-        if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) return;
+    public setVisibility(visible: boolean): void {
+        if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) {
+            return;
+        }
         this.rootHtml.style.visibility = visible ? "visible" : "hidden";
     }
 
@@ -357,8 +365,10 @@ export class SpaceStationLayer {
         station: DeepReadonly<OrbitalFacilityModel>,
         stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
         player: Player,
-    ) {
-        if (this.currentStation === station) return;
+    ): void {
+        if (this.currentStation === station) {
+            return;
+        }
         this.currentStation = station;
         this.currentStationParents = stationParents;
         this.headerStationName.textContent = station.name;
@@ -367,15 +377,15 @@ export class SpaceStationLayer {
         this.updatePlayerBalance(player.getBalance());
     }
 
-    private updatePlayerName(name: string) {
+    private updatePlayerName(name: string): void {
         this.playerName.textContent = `CMDR ${name}`;
     }
 
-    private updatePlayerBalance(balance: number) {
+    private updatePlayerBalance(balance: number): void {
         this.playerBalance.textContent = `Balance: ${Settings.CREDIT_SYMBOL}${balance.toLocaleString()}`;
     }
 
-    public reset() {
+    public reset(): void {
         this.currentStation = null;
         this.headerStationName.textContent = "";
         this.playerName.textContent = "";

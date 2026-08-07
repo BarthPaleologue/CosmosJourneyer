@@ -104,7 +104,7 @@ export class Thruster implements Transformable {
         this.exhaust.update(deltaSeconds);
     }
 
-    public dispose() {
+    public dispose(): void {
         this.exhaust.dispose();
         this.mesh.dispose();
         this.light.dispose();

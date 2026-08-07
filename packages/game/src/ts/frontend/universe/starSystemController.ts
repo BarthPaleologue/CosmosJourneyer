@@ -89,7 +89,7 @@ export class StarSystemController {
     /**
      * The list of all system targets in the system
      */
-    private systemTargets: Array<SystemTarget> = [];
+    private readonly systemTargets: Array<SystemTarget> = [];
 
     private elapsedSeconds = 0;
 
@@ -316,7 +316,9 @@ export class StarSystemController {
         this.updateOrbitalSimulation(this.stellarObjects[0], timestampSeconds);
 
         // Perform warm-up updates with small time steps
-        for (let i = 0; i < nbWarmUpUpdates; i++) this.updateOrbitalSimulation(this.stellarObjects[0], 1);
+        for (let i = 0; i < nbWarmUpUpdates; i++) {
+            this.updateOrbitalSimulation(this.stellarObjects[0], 1);
+        }
     }
 
     /**
@@ -429,7 +431,7 @@ export class StarSystemController {
      * Updates the material shaders of all the bodies in the system with the given delta time
      * @param deltaSeconds The time elapsed in seconds since the last update
      */
-    private updateShaders(deltaSeconds: number) {
+    private updateShaders(deltaSeconds: number): void {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             console.warn("No camera!");
@@ -483,14 +485,14 @@ export class StarSystemController {
         return this.referencePlaneRotation;
     }
 
-    public getOrbitalObjectById(id: OrbitalObjectId) {
+    public getOrbitalObjectById(id: OrbitalObjectId): OrbitalObject | undefined {
         return this.getOrbitalObjects().find((object) => object.model.id === id);
     }
 
     /**
      * Disposes all the bodies in the system
      */
-    public dispose() {
+    public dispose(): void {
         this.scatteringSystem.dispose();
         this.orbitalFacilityToParents.clear();
 

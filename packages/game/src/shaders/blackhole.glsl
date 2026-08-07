@@ -25,7 +25,6 @@ uniform vec3 worldPosition;
 uniform mat4 diskRotation;
 uniform mat4 inverseDiskRotation;
 
-//TODO: make these uniforms
 const float accretionDiskHeight = 1000.0;
 const bool hasAccretionDisk = true;
 const float maxDiskNoiseShearRadians = 2.0 * TAU;
@@ -178,7 +177,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
     vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix) * 1.25;
 
-    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 4.0, vec3(0.8, 0.2, 0.1) * 0.5, redShift);//FIXME: need more realistic redshift
+    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 4.0, vec3(0.8, 0.2, 0.1) * 0.5, redShift);
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);

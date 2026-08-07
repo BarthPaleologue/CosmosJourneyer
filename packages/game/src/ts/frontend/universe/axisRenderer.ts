@@ -27,7 +27,7 @@ import { type CreateLinesMeshFunction } from "./lineRendering";
  * Visual helper designed to display the rotation axis of given objects
  */
 export class AxisRenderer {
-    private axisMeshes: Map<Transformable, Mesh> = new Map();
+    private readonly axisMeshes: Map<Transformable, Mesh> = new Map();
 
     private _isVisible = false;
 
@@ -42,7 +42,7 @@ export class AxisRenderer {
      * @param objects
      * @param scene
      */
-    setOrbitalObjects(objects: ReadonlyArray<Transformable & HasBoundingSphere>, scene: Scene) {
+    setOrbitalObjects(objects: ReadonlyArray<Transformable & HasBoundingSphere>, scene: Scene): void {
         this.reset();
 
         for (const object of objects) {
@@ -52,7 +52,7 @@ export class AxisRenderer {
         this.setVisibility(this._isVisible);
     }
 
-    private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene) {
+    private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene): void {
         const points = [
             new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
             new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0),
@@ -80,7 +80,7 @@ export class AxisRenderer {
      * Set the visibility of the axis of rotations
      * @param visible
      */
-    setVisibility(visible: boolean) {
+    setVisibility(visible: boolean): void {
         this._isVisible = visible;
         for (const axisMesh of this.axisMeshes.values()) {
             axisMesh.setEnabled(visible);
@@ -98,7 +98,7 @@ export class AxisRenderer {
      * Dispose all axis meshes
      * @private
      */
-    public reset() {
+    public reset(): void {
         this.axisMeshes.forEach((orbitMesh) => {
             orbitMesh.dispose(false, true);
         });

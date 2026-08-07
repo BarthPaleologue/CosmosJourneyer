@@ -44,7 +44,7 @@ engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();
 
 // empty render loop so compute shaders can return even without a scene rendering
-const computeUpdate = () => {};
+const computeUpdate = (): void => {};
 engine.runRenderLoop(computeUpdate);
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -111,7 +111,7 @@ if (urlParams.get("qr") !== null) {
 const maxFrameCounter = urlParams.get("freeze");
 const maxFrameCounterValue = Number(maxFrameCounter);
 if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
-    engine["getDeltaTime"] = () => 0; // Disable delta time to freeze the scene
+    engine["getDeltaTime"] = (): number => 0; // Disable delta time to freeze the scene
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;

@@ -103,7 +103,7 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
         });
     }
 
-    public update(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number) {
+    public update(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         this.onBindObservable.addOnce(() => {
@@ -112,7 +112,11 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
         });
     }
 
-    public override dispose(forceDisposeEffect?: boolean, forceDisposeTextures?: boolean, notBoundToMesh?: boolean) {
+    public override dispose(
+        forceDisposeEffect?: boolean,
+        forceDisposeTextures?: boolean,
+        notBoundToMesh?: boolean,
+    ): void {
         super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
     }
 }

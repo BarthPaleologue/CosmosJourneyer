@@ -25,7 +25,7 @@ export function createDevWatcher(rendererDir: string): DevWatcher {
     let reloadTimer: NodeJS.Timeout | null = null;
 
     return {
-        watch(window) {
+        watch(window): void {
             if (process.env["COSMOS_DESKTOP_DEV"] !== "1") {
                 return;
             }
@@ -46,7 +46,7 @@ export function createDevWatcher(rendererDir: string): DevWatcher {
             });
         },
 
-        close() {
+        close(): void {
             fsWatcher?.close();
             fsWatcher = null;
             if (reloadTimer !== null) {

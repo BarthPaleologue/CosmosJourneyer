@@ -185,7 +185,7 @@ export class ProceduralSpotLightInstances implements Transformable {
         light.diffuse = color;
     }
 
-    dispose() {
+    dispose(): void {
         for (const light of this.lights) {
             light.dispose();
         }

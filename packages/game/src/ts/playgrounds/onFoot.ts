@@ -106,7 +106,7 @@ export async function createOnFootScene(
 
     const rng = seededSquirrelNoise(0);
     let rngState = 0;
-    const wrappedRng = () => {
+    const wrappedRng = (): number => {
         return rng(rngState++);
     };
 
@@ -177,7 +177,7 @@ export async function createOnFootScene(
 
     let activeControls: Controls = characterControls;
 
-    const setActiveControls = async (controls: Controls) => {
+    const setActiveControls = async (controls: Controls): Promise<void> => {
         scene.activeCamera?.detachControl();
 
         activeControls = controls;
@@ -221,7 +221,7 @@ export async function createOnFootScene(
         getInteractions: () => [
             {
                 label: "Pilot",
-                perform: async () => {
+                perform: async (): Promise<void> => {
                     await setActiveControls(shipControls);
                     CharacterInputs.setEnabled(false);
                     SpaceShipControlsInputs.setEnabled(true);
@@ -235,7 +235,7 @@ export async function createOnFootScene(
         getInteractions: () => [
             {
                 label: "Drive",
-                perform: async () => {
+                perform: async (): Promise<void> => {
                     await setActiveControls(roverControls);
                     CharacterInputs.setEnabled(false);
                     VehicleInputs.setEnabled(true);

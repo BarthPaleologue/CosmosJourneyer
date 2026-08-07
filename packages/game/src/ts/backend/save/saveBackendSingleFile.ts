@@ -162,7 +162,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return ok(new SaveBackendSingleFile(mainFile, savesMap));
     }
 
-    public getSavesForCmdr(cmdrId: string): Promise<CmdrSaves | undefined> {
+    public async getSavesForCmdr(cmdrId: string): Promise<CmdrSaves | undefined> {
         return Promise.resolve(this.saves.get(cmdrId));
     }
 
@@ -170,12 +170,12 @@ export class SaveBackendSingleFile implements ISaveBackend {
      * Persists the current saves to the storage backend.
      * @returns Boolean indicating success or failure of the save operation
      */
-    private save(): Promise<boolean> {
+    private async save(): Promise<boolean> {
         const savesJson = Object.fromEntries(this.saves);
         return this.backend.write(JSON.stringify(savesJson));
     }
 
-    public deleteSaveForCmdr(cmdrUuid: string, saveUuid: string): Promise<boolean> {
+    public async deleteSaveForCmdr(cmdrUuid: string, saveUuid: string): Promise<boolean> {
         const cmdrSaves = this.saves.get(cmdrUuid);
         if (cmdrSaves === undefined) {
             return Promise.resolve(false);
@@ -194,16 +194,16 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.save();
     }
 
-    public deleteCmdr(cmdrUuid: string): Promise<boolean> {
+    public async deleteCmdr(cmdrUuid: string): Promise<boolean> {
         this.saves.delete(cmdrUuid);
         return this.save();
     }
 
-    public getCmdrUuids(): Promise<string[]> {
+    public async getCmdrUuids(): Promise<string[]> {
         return Promise.resolve([...this.saves.keys()]);
     }
 
-    public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>) {
+    public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
 
         const existingSave = cmdrSaves.manual.find((s) => s.uuid === save.uuid);
@@ -218,7 +218,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.save();
     }
 
-    public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>) {
+    public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrSaves = (await this.getSavesForCmdr(cmdrUuid)) ?? { manual: [], auto: [] };
 
         const existingSave = cmdrSaves.auto.find((s) => s.uuid === save.uuid);
@@ -252,7 +252,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return success;
     }
 
-    public exportSaves(): Promise<Record<string, CmdrSaves>> {
+    public async exportSaves(): Promise<Record<string, CmdrSaves>> {
         return Promise.resolve(structuredClone(Object.fromEntries(this.saves)));
     }
 }

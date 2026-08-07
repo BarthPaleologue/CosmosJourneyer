@@ -95,13 +95,13 @@ export class ShipControls implements Controls {
     private readonly notificationManager: INotificationManager;
 
     constructor(
-        spaceship: Spaceship,
+        ship: Spaceship,
         scene: Scene,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
     ) {
-        this.spaceship = spaceship;
+        this.spaceship = ship;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
@@ -135,7 +135,7 @@ export class ShipControls implements Controls {
 
         this.cameraShakeAnimation = null;
 
-        this.toggleWarpDriveHandler = async () => {
+        this.toggleWarpDriveHandler = async (): Promise<void> => {
             const spaceship = this.getSpaceship();
             const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive === null) {
@@ -173,7 +173,6 @@ export class ShipControls implements Controls {
                             SpaceShipControlsInputs.map.emitLandingRequest,
                             keyboardLayoutMap,
                         ).join(", ");
-                        //FIXME: localize
                         this.notificationManager.create(
                             "space-station",
                             "info",
@@ -187,7 +186,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.toggleWarpDrive.on("complete", this.toggleWarpDriveHandler);
 
-        this.landingHandler = async () => {
+        this.landingHandler = async (): Promise<void> => {
             const spaceship = this.getSpaceship();
             const warpDrive = spaceship.getInternals().getWarpDrive();
             if (warpDrive !== null && warpDrive.isEnabled()) {
@@ -206,7 +205,9 @@ export class ShipControls implements Controls {
             }
 
             const closestWalkableObject = spaceship.getClosestWalkableObject();
-            if (closestWalkableObject === null) return;
+            if (closestWalkableObject === null) {
+                return;
+            }
 
             const distance = Vector3.Distance(
                 this.getTransform().getAbsolutePosition(),
@@ -224,10 +225,14 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
 
-        this.emitLandingRequestHandler = () => {
+        this.emitLandingRequestHandler = (): void => {
             const spaceship = this.getSpaceship();
-            if (spaceship.isLanded() || spaceship.isLanding()) return;
-            if (this.closestLandableFacility === null) return;
+            if (spaceship.isLanded() || spaceship.isLanding()) {
+                return;
+            }
+            if (this.closestLandableFacility === null) {
+                return;
+            }
             const landingPad = this.closestLandableFacility.getLandingPadManager().handleLandingRequest({
                 minimumPadSize: LandingPadSize.SMALL,
             });
@@ -248,7 +253,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", this.emitLandingRequestHandler);
 
-        this.throttleToZeroHandler = () => {
+        this.throttleToZeroHandler = (): void => {
             const spaceship = this.getSpaceship();
             spaceship.setMainEngineThrottle(0);
 
@@ -260,7 +265,7 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
-        this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames) => {
+        this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames): void => {
             this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
                 {
                     alpha: this.thirdPersonCamera.alpha,
@@ -290,11 +295,11 @@ export class ShipControls implements Controls {
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset5, "cockpitSelfie");
         this.bindCameraPresetInput(SpaceShipControlsInputs.map.switchToCameraPreset6, "rearBelow");
 
-        this.setSpaceship(spaceship);
+        this.setSpaceship(ship);
     }
 
-    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames) {
-        const handler = () => {
+    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames): void {
+        const handler = (): void => {
             this.resetCameraHandler(presetName);
         };
 
@@ -302,7 +307,7 @@ export class ShipControls implements Controls {
         this.cameraPresetInputHandlers.push({ input, handler });
     }
 
-    private handleUpDownInput() {
+    private handleUpDownInput(): void {
         const spaceship = this.spaceship;
         if (spaceship.isLanded()) {
             this.cancelLandingRequest(spaceship);
@@ -319,7 +324,7 @@ export class ShipControls implements Controls {
         }
     }
 
-    private cancelLandingRequest(spaceship: Spaceship) {
+    private cancelLandingRequest(spaceship: Spaceship): void {
         const currentLandingPad = spaceship.getTargetLandingPad();
         if (currentLandingPad !== null) {
             this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
@@ -342,7 +347,7 @@ export class ShipControls implements Controls {
         return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 
-    public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null) {
+    public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null): void {
         this.closestLandableFacility = facility;
     }
 
@@ -453,17 +458,17 @@ export class ShipControls implements Controls {
         this.getActiveCamera().getViewMatrix(true);
     }
 
-    syncCameraTransform() {
+    syncCameraTransform(): void {
         this.thirdPersonCameraTransform.rotationQuaternion?.copyFrom(this.getTransform().absoluteRotationQuaternion);
         this.thirdPersonCameraTransform.position = this.getTransform().getAbsolutePosition();
     }
 
-    reset() {
+    reset(): void {
         this.resetCameraHandler("behindCentered");
         this.closestLandableFacility = null;
     }
 
-    setSpaceship(ship: Spaceship) {
+    setSpaceship(ship: Spaceship): void {
         this.spaceship = ship;
         this.firstPersonCamera.parent = this.getTransform();
 
@@ -516,7 +521,9 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
-            if (isEmergency) this.tts.sayNow("Charlotte", "warp_drive_emergency_shut_down");
+            if (isEmergency) {
+                this.tts.sayNow("Charlotte", "warp_drive_emergency_shut_down");
+            }
             this.onToggleWarpDrive.notifyObservers(false);
         });
 
@@ -539,7 +546,7 @@ export class ShipControls implements Controls {
         tts: ITts,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
-    ) {
+    ): Promise<ShipControls> {
         return new ShipControls(
             await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene)),
             scene,
@@ -549,7 +556,7 @@ export class ShipControls implements Controls {
         );
     }
 
-    dispose(soundPlayer: ISoundPlayer) {
+    dispose(soundPlayer: ISoundPlayer): void {
         this.onToggleWarpDrive.clear();
         this.onCompleteLanding.clear();
 

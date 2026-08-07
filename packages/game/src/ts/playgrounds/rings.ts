@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
+import { DirectionalLight, MeshBuilder, type TransformNode, Vector3 } from "@babylonjs/core";
 import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { type RingsModel } from "@cosmos-journeyer/universe-model";
@@ -97,8 +97,8 @@ export async function createRingsScene(
             stellarObjects: [light],
             shadowCasters: [
                 {
-                    getTransform: () => sphere,
-                    getBoundingRadius: () => scalingFactor,
+                    getTransform: (): TransformNode => sphere,
+                    getBoundingRadius: (): number => scalingFactor,
                 },
             ],
         },

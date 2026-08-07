@@ -81,7 +81,7 @@ export class MockAutoUpdaterClient extends EventEmitter implements AutoUpdaterCl
     }
 }
 
-function wait(durationMs: number): Promise<void> {
+async function wait(durationMs: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(resolve, durationMs);
     });

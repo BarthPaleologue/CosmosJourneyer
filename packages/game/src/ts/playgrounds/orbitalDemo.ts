@@ -31,7 +31,7 @@ import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbital
 import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 
-export function createOrbitalDemoScene(
+export async function createOrbitalDemoScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

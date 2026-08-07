@@ -248,8 +248,9 @@ export class WarpDrive implements ReadonlyWarpDrive {
             case "disengaging":
                 this.maxTargetSpeed *= 0.9;
                 this.currentSpeed *= 0.9;
-                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED)
+                if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED) {
                     this.disable();
+                }
                 break;
             case "enabled":
                 this.updateMaxTargetSpeed(influences, shipPosition, shipForward);
@@ -269,7 +270,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param speed The speed of the warp drive in m/s.
      * @returns the amount of fuel (L/s) consumed by the warp drive per second based on the current speed.
      */
-    public getFuelConsumptionRate(speed: number) {
+    public getFuelConsumptionRate(speed: number): number {
         const speed01 = remap(speed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed, 0, 1);
         return 0.15 * (speed01 - 0.75) ** 2 + 0.08; // minimum of 0.08 L/s at 75% throttle
     }
@@ -284,7 +285,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Sets idle throttle and minimum speed after a hyperspace jump
      */
-    public completeHyperspaceJump() {
+    public completeHyperspaceJump(): void {
         this.idleThrottle();
         this.currentSpeed = WarpDrive.MIN_WARP_SPEED;
     }

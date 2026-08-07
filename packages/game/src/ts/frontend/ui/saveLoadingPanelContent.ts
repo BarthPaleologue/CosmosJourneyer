@@ -108,7 +108,7 @@ export class SaveLoadingPanelContent {
             const fileInput = document.createElement("input");
             fileInput.type = "file";
             fileInput.accept = "application/json,.json,application/zip,.zip";
-            fileInput.onchange = async () => {
+            fileInput.onchange = async (): Promise<void> => {
                 const file = fileInput.files?.[0];
                 if (file === undefined) {
                     await alertModal("No file selected", this.soundPlayer);
@@ -125,7 +125,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(this.cmdrList);
     }
 
-    async populateCmdrList(universeBackend: UniverseBackend, saveManager: ISaveBackend) {
+    async populateCmdrList(universeBackend: UniverseBackend, saveManager: ISaveBackend): Promise<void> {
         this.cmdrList.innerHTML = "";
 
         const cmdrUuids = await saveManager.getCmdrUuids();
@@ -410,12 +410,16 @@ export class SaveLoadingPanelContent {
             this.soundPlayer.playNow("click");
 
             const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
-            if (!shouldProceed) return;
+            if (!shouldProceed) {
+                return;
+            }
 
             await saveManager.deleteSaveForCmdr(save.player.uuid, save.uuid);
 
             const cmdrSaves = await saveManager.getSavesForCmdr(save.player.uuid);
-            if (cmdrSaves === undefined) return;
+            if (cmdrSaves === undefined) {
+                return;
+            }
 
             if (cmdrSaves.auto.length === 0 && cmdrSaves.manual.length === 0) {
                 await saveManager.deleteCmdr(save.player.uuid);

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactElement } from "react";
 
 type MilestoneStatus = "In development" | "Planned";
 
@@ -34,7 +35,7 @@ const milestones = [
     },
 ] as const satisfies readonly Milestone[];
 
-export const ViewRoadmap = () => (
+export const ViewRoadmap = (): ReactElement => (
     <section className="contentSection roadmapSection" id="roadmap">
         <div className="roadmapHeading">
             <div>

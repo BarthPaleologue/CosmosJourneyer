@@ -60,11 +60,11 @@ export class CrashReporter {
     private readonly consoleDumper: ConsoleDumper;
     private hasReportedCrash = false;
 
-    private readonly handleError = (event: ErrorEvent) => {
+    private readonly handleError = (event: ErrorEvent): void => {
         void this.reportCrash({ type: "error", value: event }).catch(console.error);
     };
 
-    private readonly handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+    private readonly handleUnhandledRejection = (event: PromiseRejectionEvent): void => {
         void this.reportCrash({ type: "unhandledrejection", value: event }).catch(console.error);
     };
 
@@ -75,12 +75,12 @@ export class CrashReporter {
         window.addEventListener("unhandledrejection", this.handleUnhandledRejection);
     }
 
-    dispose() {
+    dispose(): void {
         window.removeEventListener("error", this.handleError);
         window.removeEventListener("unhandledrejection", this.handleUnhandledRejection);
     }
 
-    async reportCrash(crashSource: CrashSource) {
+    async reportCrash(crashSource: CrashSource): Promise<void> {
         if (this.hasReportedCrash) {
             return;
         }
@@ -131,7 +131,7 @@ export class CrashReporter {
         }
     }
 
-    private async downloadReport(report: CrashReport) {
+    private async downloadReport(report: CrashReport): Promise<void> {
         const reportString = JSON.stringify(report, null, 2);
         downloadTextFile(reportString, "crashLog.txt");
         await alertModal(

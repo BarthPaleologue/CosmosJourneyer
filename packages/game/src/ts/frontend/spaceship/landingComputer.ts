@@ -146,15 +146,15 @@ export class LandingComputer {
         this.attitudeController = new AttitudePDController(4, 4);
     }
 
-    getTarget() {
+    getTarget(): LandingTarget | null {
         return this.target;
     }
 
-    isActive() {
+    isActive(): boolean {
         return this.actionPlan !== null;
     }
 
-    setTarget(target: LandingTarget | null) {
+    setTarget(target: LandingTarget | null): undefined {
         this.target = target;
         this.currentActionIndex = 0;
         this.elapsedSeconds = 0;
@@ -178,7 +178,7 @@ export class LandingComputer {
         }
     }
 
-    liftOff() {
+    liftOff(): void {
         this.target = null;
         this.currentActionIndex = 0;
         this.elapsedSeconds = 0;
@@ -189,7 +189,7 @@ export class LandingComputer {
     private createLandingPadActionPlan(landingPad: ILandingPad): ReadonlyArray<LandingPlanStep> {
         return [
             {
-                getTargetTransform: () => {
+                getTargetTransform: (): { position: Vector3; rotation: Quaternion } => {
                     return {
                         position: landingPad
                             .getTransform()
@@ -212,7 +212,7 @@ export class LandingComputer {
                 },
             },
             {
-                getTargetTransform: () => {
+                getTargetTransform: (): { position: Vector3; rotation: Quaternion } => {
                     return {
                         position: landingPad
                             .getTransform()
@@ -259,7 +259,7 @@ export class LandingComputer {
 
         return [
             {
-                getTargetTransform: () => {
+                getTargetTransform: (): { position: Vector3; rotation: Quaternion } => {
                     return {
                         position: targetPosition,
                         rotation: targetRotation,
@@ -284,7 +284,7 @@ export class LandingComputer {
     private createSurfaceActionPlan(celestialBody: TransformNode): ReadonlyArray<LandingPlanStep> {
         return [
             {
-                getTargetTransform: () => {
+                getTargetTransform: (): { position: Vector3; rotation: Quaternion } | null => {
                     const shipPosition = this.transform.getAbsolutePosition();
                     const gravityDir = celestialBody.position.subtract(shipPosition).normalize();
 

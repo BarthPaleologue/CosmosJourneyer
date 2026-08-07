@@ -26,7 +26,7 @@ export interface Door extends Interactive {
     dispose(): void;
 }
 
-export function toggleDoor(door: Door) {
+export function toggleDoor(door: Door): void {
     switch (door.getState()) {
         case "opened":
             door.close();

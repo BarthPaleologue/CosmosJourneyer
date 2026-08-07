@@ -23,7 +23,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
-export function createMengerSpongeScene(
+export async function createMengerSpongeScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,
@@ -63,9 +63,9 @@ export function createMengerSpongeScene(
         scene,
     );
 
-    scene.cameras.forEach((camera) => camera.attachPostProcess(pp));
-    scene.onNewCameraAddedObservable.add((camera) => {
-        camera.attachPostProcess(pp);
+    scene.cameras.forEach((cam) => cam.attachPostProcess(pp));
+    scene.onNewCameraAddedObservable.add((cam) => {
+        cam.attachPostProcess(pp);
     });
 
     scene.onBeforeRenderObservable.add(() => {
@@ -73,8 +73,8 @@ export function createMengerSpongeScene(
         pp.update(deltaSeconds);
     });
 
-    scene.onBeforeCameraRenderObservable.add((camera) => {
-        depthRendererManager.setActiveCamera(camera);
+    scene.onBeforeCameraRenderObservable.add((cam) => {
+        depthRendererManager.setActiveCamera(cam);
     });
 
     return Promise.resolve(scene);

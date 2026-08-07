@@ -154,14 +154,14 @@ export async function createRoverScene(
 
     let activeControls: Controls = roverControls;
 
-    const setRoverActive = () => {
+    const setRoverActive = (): void => {
         activeControls = roverControls;
         VehicleInputs.setEnabled(true);
         CharacterInputs.setEnabled(false);
         character.setThirdPersonCameraActive();
     };
 
-    const setCharacterActive = () => {
+    const setCharacterActive = (): void => {
         activeControls = character;
         character.setFirstPersonCameraActive();
         VehicleInputs.setEnabled(false);
@@ -175,7 +175,7 @@ export async function createRoverScene(
         getInteractions: () => [
             {
                 label: "Drive",
-                perform: () => {
+                perform: async (): Promise<void> => {
                     setRoverActive();
                     return Promise.resolve();
                 },
@@ -219,7 +219,7 @@ export async function createRoverScene(
             getInteractions: () => [
                 {
                     label: "spin",
-                    perform: () => {
+                    perform: async (): Promise<void> => {
                         boxAggregate.body.applyAngularImpulse(new Vector3(0, 50, 0));
                         return Promise.resolve();
                     },

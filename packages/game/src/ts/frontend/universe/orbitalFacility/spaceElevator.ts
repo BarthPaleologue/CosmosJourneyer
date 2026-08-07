@@ -214,7 +214,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         }
     }
 
-    private generate(assets: RenderingAssets) {
+    private generate(assets: RenderingAssets): void {
         for (const section of this.model.sections) {
             const newSection = this.getSectionFromModel(section, assets);
             const lastNode = this.sections.at(-1)?.getTransform() ?? this.tether;
@@ -225,7 +225,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         }
     }
 
-    private placeNode(node: TransformNode, parent: TransformNode) {
+    private placeNode(node: TransformNode, parent: TransformNode): void {
         // Make sure bounds are current
         parent.computeWorldMatrix(true);
         node.computeWorldMatrix(true);
@@ -238,7 +238,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {
         const parent = parents[0];
         if (parent === undefined) {
             throw new Error("Space Elevator should have exactly one parent");
@@ -277,7 +277,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         return this.root;
     }
 
-    dispose() {
+    dispose(): void {
         for (const section of this.sections) {
             section.dispose();
         }

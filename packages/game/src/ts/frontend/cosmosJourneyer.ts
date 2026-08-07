@@ -267,24 +267,34 @@ export class CosmosJourneyer {
                     i18n.t("tutorials:common:loadTutorialWillLeaveGame"),
                     this.soundPlayer,
                 );
-                if (!shouldLoadTutorial) return;
+                if (!shouldLoadTutorial) {
+                    return;
+                }
             }
             this.sidePanels.hideActivePanel();
             this.loadTutorial(tutorial);
         });
 
         this.starSystemView.getSpaceshipControls().onToggleWarpDrive.add(async (isWarpDriveEnabled) => {
-            if (isWarpDriveEnabled) return;
-            if (this.player.tutorials.stationLandingCompleted) return;
+            if (isWarpDriveEnabled) {
+                return;
+            }
+            if (this.player.tutorials.stationLandingCompleted) {
+                return;
+            }
 
             const shipControls = this.starSystemView.getSpaceshipControls();
             const closestLandableFacility = shipControls.getClosestLandableFacility();
-            if (closestLandableFacility === null) return;
+            if (closestLandableFacility === null) {
+                return;
+            }
 
             const shipPosition = shipControls.getTransform().getAbsolutePosition();
             const facilityPosition = closestLandableFacility.getTransform().position;
             const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
-            if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) return;
+            if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) {
+                return;
+            }
 
             await this.tutorialLayer.setTutorial(new StationLandingTutorial());
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
@@ -313,8 +323,8 @@ export class CosmosJourneyer {
         });
 
         this.pauseMenu = new PauseMenu(this.sidePanels, this.soundPlayer);
-        this.pauseMenu.onResume.add(() => this.resume());
-        this.pauseMenu.onScreenshot.add(() => this.takeScreenshot());
+        this.pauseMenu.onResume.add(async () => this.resume());
+        this.pauseMenu.onScreenshot.add(async () => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
             this.engine.onEndFrameObservable.addOnce(async () => {
                 const save = await this.generateSaveData();
@@ -332,19 +342,25 @@ export class CosmosJourneyer {
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.createManualSave();
-            if (saveSuccess)
+            if (saveSuccess) {
                 this.notificationManager.create("general", "success", i18n.t("notifications:saveOk"), 2000);
-            else this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
+            } else {
+                this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
+            }
         });
 
         this.initializeDesktopUpdates();
 
         window.addEventListener("blur", () => {
-            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) {
+                this.pause();
+            }
         });
 
         window.addEventListener("mouseleave", () => {
-            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) this.pause();
+            if (!this.mainMenu.isVisible() && !this.starSystemView.isLoadingSystem()) {
+                this.pause();
+            }
         });
 
         window.addEventListener("resize", () => {
@@ -352,28 +368,40 @@ export class CosmosJourneyer {
         });
 
         window.addEventListener("beforeunload", async () => {
-            if (this.mainMenu.isVisible()) return; // don't autosave if the main menu is visible: the player is not in the game yet
+            if (this.mainMenu.isVisible()) {
+                return;
+            } // don't autosave if the main menu is visible: the player is not in the game yet
             await this.createAutoSave();
         });
 
         GeneralInputs.map.toggleStarMap.on("complete", async () => {
-            if (this.mainMenu.isVisible()) return;
+            if (this.mainMenu.isVisible()) {
+                return;
+            }
             await this.toggleStarMap();
         });
 
         GeneralInputs.map.screenshot.on("complete", async () => {
-            if (this.mainMenu.isVisible()) return;
+            if (this.mainMenu.isVisible()) {
+                return;
+            }
             await this.takeScreenshot();
         });
 
         GeneralInputs.map.videoCapture.on("complete", async () => {
-            if (this.mainMenu.isVisible()) return;
+            if (this.mainMenu.isVisible()) {
+                return;
+            }
             await this.takeVideoCapture();
         });
 
         GeneralInputs.map.togglePause.on("complete", () => {
-            if (this.mainMenu.isVisible()) return;
-            if (!this.isPaused()) this.pause();
+            if (this.mainMenu.isVisible()) {
+                return;
+            }
+            if (!this.isPaused()) {
+                this.pause();
+            }
         });
 
         window.CosmosJourneyer = this;
@@ -525,8 +553,12 @@ export class CosmosJourneyer {
     }
 
     public pause(): void {
-        if (this.isPaused()) return;
-        if (this.mainMenu.isVisible()) return;
+        if (this.isPaused()) {
+            return;
+        }
+        if (this.mainMenu.isVisible()) {
+            return;
+        }
         this.state = "paused";
 
         document.exitPointerLock();
@@ -540,7 +572,9 @@ export class CosmosJourneyer {
     }
 
     public async resume(): Promise<void> {
-        if (!this.isPaused()) return;
+        if (!this.isPaused()) {
+            return;
+        }
         this.state = "running";
         this.soundPlayer.playNow("click");
         this.pauseMenu.setVisibility(false);
@@ -564,10 +598,11 @@ export class CosmosJourneyer {
         const controller = new DesktopUpdateController(
             api,
             {
-                getPresentationContext: () => this.getUpdatePresentationContext(),
-                canBackupCurrentCommander: () => this.canPersistCurrentCommander(),
-                downloadCommanderBackup: (context) => this.downloadUpdateCommanderBackup(context),
-                prepareImmediateInstall: () => this.prepareImmediateUpdateInstall(),
+                getPresentationContext: (): UpdatePresentationContext => this.getUpdatePresentationContext(),
+                canBackupCurrentCommander: (): boolean => this.canPersistCurrentCommander(),
+                downloadCommanderBackup: async (context): Promise<boolean> =>
+                    this.downloadUpdateCommanderBackup(context),
+                prepareImmediateInstall: async (): Promise<boolean> => this.prepareImmediateUpdateInstall(),
             },
             this.notificationManager,
             this.soundPlayer,
@@ -644,7 +679,9 @@ export class CosmosJourneyer {
      * Inits the current star system
      */
     public async init(skipMainMenu = false): Promise<void> {
-        if (!skipMainMenu) await this.mainMenu.init();
+        if (!skipMainMenu) {
+            await this.mainMenu.init();
+        }
         this.starSystemView.initStarSystem(Date.now() / 1000);
 
         this.engine.runRenderLoop(() => {
@@ -675,17 +712,23 @@ export class CosmosJourneyer {
             this.soundPlayer.update();
             this.tts.update();
 
-            if (this.isPaused()) return;
+            if (this.isPaused()) {
+                return;
+            }
             this.activeView.render();
         });
         this.state = "running";
     }
 
     private maybeStartPlanetaryLandingTutorial(): void {
-        if (!this.canStartPlanetaryLandingTutorial()) return;
+        if (!this.canStartPlanetaryLandingTutorial()) {
+            return;
+        }
 
         const shipControls = this.starSystemView.getSpaceshipControls();
-        if (this.starSystemView.getActiveControls() !== shipControls) return;
+        if (this.starSystemView.getActiveControls() !== shipControls) {
+            return;
+        }
 
         const shipPosition = shipControls.getTransform().getAbsolutePosition();
         const nearestCelestialBody = this.starSystemView.getStarSystem().getNearestCelestialBody(shipPosition);
@@ -696,7 +739,9 @@ export class CosmosJourneyer {
         const altitudeAboveSurface =
             Vector3.Distance(shipPosition, nearestCelestialBody.getTransform().getAbsolutePosition()) -
             nearestCelestialBody.getBoundingRadius();
-        if (altitudeAboveSurface > CosmosJourneyer.PLANETARY_LANDING_TUTORIAL_ALTITUDE_THRESHOLD) return;
+        if (altitudeAboveSurface > CosmosJourneyer.PLANETARY_LANDING_TUTORIAL_ALTITUDE_THRESHOLD) {
+            return;
+        }
 
         void this.tutorialLayer.setTutorial(new PlanetaryLandingTutorial());
         this.tutorialLayer.onQuitTutorial.addOnce(() => {
@@ -928,7 +973,9 @@ export class CosmosJourneyer {
     }
 
     public async createManualSave(): Promise<boolean> {
-        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return false; // don't save in tutorial
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) {
+            return false;
+        } // don't save in tutorial
         if (this.player.uuid === Settings.SHARED_POSITION_SAVE_UUID) {
             this.player.uuid = crypto.randomUUID();
             this.player.setName(
@@ -954,15 +1001,21 @@ export class CosmosJourneyer {
      * Generate save file data and store it in the autosaves hashmap in local storage
      */
     public async createAutoSave(): Promise<void> {
-        if (!this.isAutoSaveEnabled) return;
-        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) return; // don't autosave in tutorial
+        if (!this.isAutoSaveEnabled) {
+            return;
+        }
+        if (this.player.uuid === Settings.TUTORIAL_SAVE_UUID) {
+            return;
+        } // don't autosave in tutorial
 
         const saveData = await this.generateSaveData();
 
         // use player uuid as key to avoid overwriting other cmdr's autosave
         const uuid = saveData.player.uuid;
 
-        if (uuid === Settings.SHARED_POSITION_SAVE_UUID) return; // don't autosave shared position
+        if (uuid === Settings.SHARED_POSITION_SAVE_UUID) {
+            return;
+        } // don't autosave shared position
         await this.backend.save.addAutoSave(uuid, saveData);
 
         this.autoSaveTimerSeconds = 0;
@@ -984,7 +1037,7 @@ export class CosmosJourneyer {
         });
     }
 
-    public loadTutorial(tutorial: Tutorial) {
+    public loadTutorial(tutorial: Tutorial): void {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
             const saveResult = tutorial.getSaveData(this.backend.universe);
@@ -1124,7 +1177,7 @@ export class CosmosJourneyer {
         }
     }
 
-    public async loadLocation(location: UniverseCoordinates) {
+    public async loadLocation(location: UniverseCoordinates): Promise<void> {
         if (location.type === "relative") {
             await this.loadRelativeLocation(location);
         } else if (location.type === "atStation") {
@@ -1132,7 +1185,7 @@ export class CosmosJourneyer {
         }
     }
 
-    public async loadRelativeLocation(location: RelativeCoordinates) {
+    public async loadRelativeLocation(location: RelativeCoordinates): Promise<void> {
         const controls = this.starSystemView.getActiveControls();
         if (controls === null) {
             console.warn("No controls!");
@@ -1186,7 +1239,7 @@ export class CosmosJourneyer {
         this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
     }
 
-    public async loadAtStationLocation(location: AtStationCoordinates) {
+    public async loadAtStationLocation(location: AtStationCoordinates): Promise<void> {
         const controls = this.starSystemView.getActiveControls();
         if (controls === null) {
             console.warn("No controls!");

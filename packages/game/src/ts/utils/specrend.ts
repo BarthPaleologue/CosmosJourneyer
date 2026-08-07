@@ -355,7 +355,9 @@ function gamma_correct(cs: ColourSystem, c: number): number {
 function norm_rgb(r: number, g: number, b: number): [number, number, number] {
     let greatest = Math.max(r, Math.max(g, b));
 
-    if (greatest === 0) greatest = 1;
+    if (greatest === 0) {
+        greatest = 1;
+    }
 
     return [r / greatest, g / greatest, b / greatest];
 }
@@ -535,7 +537,7 @@ function bb_spectrum(wavelength: number): number {
       10000 K      0.2807 0.2884 0.4310   0.602 0.693 1.000
 */
 
-export function demonstrate() {
+export function demonstrate(): void {
     const cs = HDTVsystem;
 
     console.log("Temperature       x      y      z       R     G     B");

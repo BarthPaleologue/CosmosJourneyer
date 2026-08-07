@@ -86,7 +86,7 @@ export class Spaceship implements Transformable, Targetable {
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
 
-    private landingComputer: LandingComputer | null;
+    private readonly landingComputer: LandingComputer | null;
 
     private readonly altimeter: Altimeter;
 
@@ -115,7 +115,7 @@ export class Spaceship implements Transformable, Targetable {
 
     private readonly internals: SpaceshipInternals;
 
-    private mainThrusters: Thruster[] = [];
+    private readonly mainThrusters: Thruster[] = [];
 
     private isFuelScooping = false;
 
@@ -153,7 +153,7 @@ export class Spaceship implements Transformable, Targetable {
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
         physicsEngine: PhysicsEngineV2,
-    ) {
+    ): Promise<Spaceship> {
         const enableWarpDriveSound = await soundPlayer.createInstance("enable_warp_drive", {
             mask: AudioMasks.STAR_MAP_VIEW,
         });
@@ -291,11 +291,11 @@ export class Spaceship implements Transformable, Targetable {
         this.scene = scene;
     }
 
-    public getInternals() {
+    public getInternals(): SpaceshipInternals {
         return this.internals;
     }
 
-    public setClosestWalkableObject(object: Transformable & HasBoundingSphere) {
+    public setClosestWalkableObject(object: Transformable & HasBoundingSphere): void {
         this.closestWalkableObject = object;
     }
 
@@ -315,15 +315,15 @@ export class Spaceship implements Transformable, Targetable {
         return this.altimeter;
     }
 
-    public setNearestOrbitalObject(orbitalObject: OrbitalObject) {
+    public setNearestOrbitalObject(orbitalObject: OrbitalObject): void {
         this.nearestOrbitalObject = orbitalObject;
     }
 
-    public setNearestCelestialBody(celestialBody: CelestialBody) {
+    public setNearestCelestialBody(celestialBody: CelestialBody): void {
         this.nearestCelestialBody = celestialBody;
     }
 
-    public enableWarpDrive() {
+    public enableWarpDrive(): void {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
             return;
@@ -340,7 +340,7 @@ export class Spaceship implements Transformable, Targetable {
         this.onWarpDriveEnabled.notifyObservers();
     }
 
-    public disableWarpDrive() {
+    public disableWarpDrive(): void {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
             return;
@@ -352,7 +352,7 @@ export class Spaceship implements Transformable, Targetable {
         this.onWarpDriveDisabled.notifyObservers(false);
     }
 
-    public emergencyStopWarpDrive() {
+    public emergencyStopWarpDrive(): void {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
             return;
@@ -367,7 +367,7 @@ export class Spaceship implements Transformable, Targetable {
     /**
      * Sets the warp drive state to idle throttle and minimum speed after an hyperspace jump
      */
-    public completeHyperspaceJump() {
+    public completeHyperspaceJump(): void {
         this.idleThrottle();
 
         const warpDrive = this.getInternals().getWarpDrive();
@@ -378,17 +378,20 @@ export class Spaceship implements Transformable, Targetable {
         warpDrive.completeHyperspaceJump();
     }
 
-    public toggleWarpDrive() {
+    public toggleWarpDrive(): void {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
             return;
         }
 
-        if (!warpDrive.isEnabled()) this.enableWarpDrive();
-        else this.disableWarpDrive();
+        if (!warpDrive.isEnabled()) {
+            this.enableWarpDrive();
+        } else {
+            this.disableWarpDrive();
+        }
     }
 
-    public setMainEngineThrottle(throttle: number) {
+    public setMainEngineThrottle(throttle: number): void {
         this.mainEngineThrottle = throttle;
         for (const thruster of this.mainThrusters) {
             thruster.setThrottle(this.mainEngineThrottle);
@@ -426,7 +429,7 @@ export class Spaceship implements Transformable, Targetable {
         return warpDrive !== null && warpDrive.isEnabled() ? warpDrive.getThrottle() : this.mainEngineThrottle;
     }
 
-    public increaseMainEngineThrottle(delta: number) {
+    public increaseMainEngineThrottle(delta: number): void {
         this.mainEngineThrottle = Math.max(-1, Math.min(1, this.mainEngineThrottle + delta));
     }
 
@@ -438,7 +441,7 @@ export class Spaceship implements Transformable, Targetable {
         return this.nearestOrbitalObject;
     }
 
-    public engageSurfaceLanding(landingTarget: TransformNode) {
+    public engageSurfaceLanding(landingTarget: TransformNode): void {
         this.state = "landing";
         this.landingComputer?.setTarget({
             kind: "celestial_body",
@@ -448,11 +451,11 @@ export class Spaceship implements Transformable, Targetable {
         this.onPlanetaryLandingEngaged.notifyObservers();
     }
 
-    public isAutoPiloted() {
+    public isAutoPiloted(): boolean {
         return this.landingComputer?.isActive() ?? false;
     }
 
-    public engageLandingOnPad(landingPad: ILandingPad) {
+    public engageLandingOnPad(landingPad: ILandingPad): void {
         this.targetLandingPad = landingPad;
     }
 
@@ -460,7 +463,7 @@ export class Spaceship implements Transformable, Targetable {
         return this.targetLandingPad;
     }
 
-    private completeLanding() {
+    private completeLanding(): void {
         this.setMainEngineThrottle(0);
 
         this.state = "landed";
@@ -474,7 +477,7 @@ export class Spaceship implements Transformable, Targetable {
         this.onLandingObservable.notifyObservers();
     }
 
-    public cancelLanding() {
+    public cancelLanding(): void {
         this.state = "flying";
 
         this.getTransform().setParent(null);
@@ -486,7 +489,7 @@ export class Spaceship implements Transformable, Targetable {
         this.onLandingCancelled.notifyObservers();
     }
 
-    public spawnOnPad(landingPad: ILandingPad) {
+    public spawnOnPad(landingPad: ILandingPad): void {
         this.getTransform().setParent(null);
         this.engageLandingOnPad(landingPad);
         this.getTransform().rotationQuaternion = Quaternion.Identity();
@@ -508,7 +511,7 @@ export class Spaceship implements Transformable, Targetable {
         return this.isLanded() && this.targetLandingPad !== null;
     }
 
-    public takeOff() {
+    public takeOff(): void {
         this.targetLandingPad = null;
 
         this.getTransform().setParent(null);
@@ -526,11 +529,17 @@ export class Spaceship implements Transformable, Targetable {
         this.onTakeOff.notifyObservers();
     }
 
-    private handleFuelScoop(deltaSeconds: number) {
+    private handleFuelScoop(deltaSeconds: number): void {
         const fuelScoop = this.getInternals().getFuelScoop();
-        if (fuelScoop === null) return;
-        if (this.nearestCelestialBody === null) return;
-        if (!["star", "gasPlanet"].includes(this.nearestCelestialBody.model.type)) return;
+        if (fuelScoop === null) {
+            return;
+        }
+        if (this.nearestCelestialBody === null) {
+            return;
+        }
+        if (!["star", "gasPlanet"].includes(this.nearestCelestialBody.model.type)) {
+            return;
+        }
 
         const distanceToBody = Vector3.Distance(
             this.getTransform().getAbsolutePosition(),
@@ -585,7 +594,7 @@ export class Spaceship implements Transformable, Targetable {
         this.refuel(fuelScoop.fuelPerSecond * fuelAvailability * deltaSeconds);
     }
 
-    private updateWarpDrive(deltaSeconds: number) {
+    private updateWarpDrive(deltaSeconds: number): void {
         const warpDrive = this.getInternals().getWarpDrive();
         if (warpDrive === null) {
             return;
@@ -652,15 +661,15 @@ export class Spaceship implements Transformable, Targetable {
 
         warpDrive.update(warpInfluences, shipPosition, shipForward, deltaSeconds);
 
-        if (warpDrive.isEnabled())
+        if (warpDrive.isEnabled()) {
             this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));
-        else {
+        } else {
             this.spaceDots.setThrottle(0);
             this.spaceDots.setSteering(0, 0);
         }
     }
 
-    private updatePhysicsState() {
+    private updatePhysicsState(): void {
         const currentMotionType = this.aggregate.body.getMotionType();
         const warpDrive = this.getInternals().getWarpDrive();
         switch (this.state) {
@@ -688,7 +697,7 @@ export class Spaceship implements Transformable, Targetable {
         }
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         this.getTransform().computeWorldMatrix(true);
         const thrusters = this.getInternals().getThrusters();
         this.mainEngineTargetSpeed = this.mainEngineThrottle * (thrusters?.maxSpeed ?? 0);
@@ -787,7 +796,7 @@ export class Spaceship implements Transformable, Targetable {
         }
     }
 
-    private applyMainEngineForces(forwardSpeed: number, linearVelocity: Vector3, forwardDirection: Vector3) {
+    private applyMainEngineForces(forwardSpeed: number, linearVelocity: Vector3, forwardDirection: Vector3): void {
         if (this.mainEngineThrottle !== 0) {
             const throttleVolume = Math.abs(this.mainEngineThrottle) * this.thrusterSoundMaxVolume;
             this.soundInstances.thruster.setVolume(throttleVolume);
@@ -817,7 +826,7 @@ export class Spaceship implements Transformable, Targetable {
         }
     }
 
-    private tryAutoLand() {
+    private tryAutoLand(): void {
         const targetLandingPad = this.targetLandingPad;
         const landingComputer = this.landingComputer;
         if (targetLandingPad === null || landingComputer === null) {
@@ -885,11 +894,11 @@ export class Spaceship implements Transformable, Targetable {
         return amount - fuelLeftToRefuel;
     }
 
-    public getMainThrusters() {
+    public getMainThrusters(): Thruster[] {
         return this.mainThrusters;
     }
 
-    public static CreateDefault(
+    public static async CreateDefault(
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
@@ -905,7 +914,7 @@ export class Spaceship implements Transformable, Targetable {
         );
     }
 
-    public static Deserialize(
+    public static async Deserialize(
         serializedSpaceship: DeepReadonly<SerializedSpaceship>,
         unfitComponents: Set<SerializedComponent>,
         scene: Scene,
@@ -930,7 +939,7 @@ export class Spaceship implements Transformable, Targetable {
         }
     }
 
-    public dispose(soundPlayer: ISoundPlayer) {
+    public dispose(soundPlayer: ISoundPlayer): void {
         soundPlayer.freeInstance(this.soundInstances.enableWarpDrive);
         soundPlayer.freeInstance(this.soundInstances.disableWarpDrive);
         soundPlayer.freeInstance(this.soundInstances.acceleratingWarpDrive);

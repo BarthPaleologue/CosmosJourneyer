@@ -192,7 +192,10 @@ export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3" | 
  * @param name - The instance attribute name.
  * @param options - Optional target options.
  */
-export function instanceAttribute(name: InstanceAttributeName, options?: Partial<TargetOptions>) {
+export function instanceAttribute(
+    name: InstanceAttributeName,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
     const attribute = new InputBlock(name);
     attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
     attribute.setAsAttribute(name);
@@ -291,7 +294,7 @@ export function textureSample(
     texture: NodeMaterialConnectionPoint,
     uv: NodeMaterialConnectionPoint,
     options?: Partial<TextureBlockOptions>,
-) {
+): TextureBlock {
     const textureBlock = new TextureBlock("texture");
     textureBlock.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
     textureBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
@@ -340,7 +343,7 @@ export function textureTriPlanarSample(
     position: NodeMaterialConnectionPoint,
     normal: NodeMaterialConnectionPoint,
     options?: Partial<TriPlanarSampleOptions>,
-) {
+): TriPlanarBlock {
     const triPlanarBlock = new TriPlanarBlock("TriPlanar");
 
     triPlanarBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
@@ -368,7 +371,7 @@ export function triPlanarMapping(
     position: NodeMaterialConnectionPoint,
     normal: NodeMaterialConnectionPoint,
     options?: Partial<TriPlanarSampleOptions>,
-) {
+): TriPlanarBlock {
     const triPlanarBlock = new TriPlanarBlock("TriPlanar");
 
     textures[0]?.connectTo(triPlanarBlock.source);
@@ -511,7 +514,7 @@ export function atan2(
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sin, options);
 }
 
@@ -520,7 +523,7 @@ export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Cos, options);
 }
 
@@ -529,7 +532,7 @@ export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpti
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function acos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function acos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.ArcCos, options);
 }
 
@@ -538,7 +541,7 @@ export function acos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpt
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sqrt, options);
 }
 
@@ -547,7 +550,7 @@ export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpt
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sign, options);
 }
 
@@ -556,7 +559,7 @@ export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOpt
  * @param x - The input value.
  * @param options - Optional target options.
  */
-export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const negateBlock = new NegateBlock("negate");
     negateBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -693,7 +696,7 @@ export function pow(
     value: NodeMaterialConnectionPoint,
     power: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const powBlock = new PowBlock("pow");
     powBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -723,7 +726,7 @@ export function normalize(
 /**
  * Returns whether the current fragment is front-facing.
  */
-export function getFrontFacing() {
+export function getFrontFacing(): NodeMaterialConnectionPoint {
     const frontFacingBlock = new FrontFacingBlock("frontFacing");
     frontFacingBlock.target = NodeMaterialBlockTargets.Fragment;
     return frontFacingBlock.output;
@@ -826,14 +829,14 @@ export function swizzle(
 
 /**
  * Returns a constant color input block.
- * @param color - The color value.
+ * @param value - The color value.
  * @param options - Optional target options.
  */
-export function color(color: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function color(value: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const colorBlock = new InputBlock("color");
     colorBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     colorBlock.isConstant = true;
-    colorBlock.value = color;
+    colorBlock.value = value;
 
     return colorBlock.output;
 }
@@ -852,7 +855,7 @@ export function sampleGradient(
     const gradientBlock = new GradientBlock("Gradient");
     gradientBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    gradientBlock.colorSteps = gradientSteps.map(([value, color]) => new GradientBlockColorStep(value, color));
+    gradientBlock.colorSteps = gradientSteps.map(([value, stepColor]) => new GradientBlockColorStep(value, stepColor));
     t.connectTo(gradientBlock.gradient);
 
     return gradientBlock.output;
@@ -894,14 +897,17 @@ export function hslToRgb(
 
 /**
  * Converts a Babylon.js vector to a node material input block.
- * @param vec - The Babylon.js vector.
+ * @param inputVector - The Babylon.js vector.
  * @param options - Optional target options.
  */
-export function vec(vec: Vector2 | Vector3 | Vector4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function vec(
+    inputVector: Vector2 | Vector3 | Vector4,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
     const vector = new InputBlock("Mesh UV scale factor");
     vector.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     vector.isConstant = true;
-    vector.value = vec;
+    vector.value = inputVector;
 
     return vector.output;
 }
@@ -987,7 +993,10 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
  * @param inputColor - The input color.
  * @param options - Optional target options.
  */
-export function splitRgba(inputColor: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function splitRgba(
+    inputColor: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): ColorSplitterBlock {
     const splitBlock = new ColorSplitterBlock("splitColor");
     splitBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1033,7 +1042,7 @@ export function step(
     edge: NodeMaterialConnectionPoint,
     x: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const stepBlock = new StepBlock("step");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1058,7 +1067,7 @@ export function smoothstep(
     edge1: NodeMaterialConnectionPoint,
     x: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const stepBlock = new SmoothStepBlock("smoothstep");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1074,7 +1083,7 @@ export function smoothstep(
  * @param input - The input value.
  * @param options - Optional target options.
  */
-export function abs(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function abs(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const absBlock = new TrigonometryBlock("abs");
     absBlock.operation = TrigonometryBlockOperations.Abs;
     absBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
@@ -1096,7 +1105,7 @@ export function mix(
     y: NodeMaterialConnectionPoint,
     a: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const mixBlock = new LerpBlock("mix");
     mixBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1118,7 +1127,7 @@ export function add(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const addBlock = new AddBlock("add");
     addBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1138,7 +1147,7 @@ export function sub(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const subBlock = new SubtractBlock("sub");
     subBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1158,7 +1167,7 @@ export function mod(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const modBlock = new ModBlock("mod");
     modBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1173,7 +1182,10 @@ export function mod(
  * @param input - The input value.
  * @param options - Optional target options.
  */
-export function oneMinus(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function oneMinus(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
     const oneMinusBlock = new OneMinusBlock("oneMinus");
     oneMinusBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1191,7 +1203,7 @@ export function cross(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const crossBlock = new CrossBlock("cross");
     crossBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1211,7 +1223,7 @@ export function dot(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const dotBlock = new DotBlock("dot");
     dotBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1235,7 +1247,7 @@ export function rotateAround(
     axis: NodeMaterialConnectionPoint,
     theta: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const cosTheta = cos(theta, options);
     const sinTheta = sin(theta, options);
     const oneMinusCosTheta = sub(float(1, options), cosTheta, options);
@@ -1258,7 +1270,7 @@ export function min(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const minBlock = new MinBlock("min");
     minBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1279,7 +1291,7 @@ export function max(
     left: NodeMaterialConnectionPoint,
     right: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
-) {
+): NodeMaterialConnectionPoint {
     const maxBlock = new MaxBlock("max");
     maxBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
@@ -1296,7 +1308,10 @@ export function max(
  * @returns The hashed value.
  * @see https://www.shadertoy.com/view/4djSRW
  */
-export function hash11(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>) {
+export function hash11(
+    input: NodeMaterialConnectionPoint,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
     const a = fract(mul(input, f(0.1031, options), options), options);
     const b = mul(a, add(a, f(33.33, options), options), options);
     const c = mul(b, add(b, b, options), options);
@@ -1435,7 +1450,7 @@ export function pbr(
  * @param value - The test value.
  * @param cutoff - The cutoff threshold.
  */
-export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint) {
+export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint): DiscardBlock {
     const discardBlock = new DiscardBlock("discard");
     discardBlock.target = NodeMaterialBlockTargets.Fragment;
 

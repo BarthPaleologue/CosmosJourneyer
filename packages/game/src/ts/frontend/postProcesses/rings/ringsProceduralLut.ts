@@ -80,7 +80,7 @@ export class RingsProceduralPatternLut {
         return this.lut;
     }
 
-    dispose() {
+    dispose(): void {
         this.lut.dispose();
     }
 }

@@ -41,12 +41,12 @@ export function makeD3PieChart<T>(
     <svg viewBox="-250 -250 800 500">
         ${arcs
             .map(
-                ({ path, data, color }, i) => `
+                ({ path, data: datum, color }, i) => `
         <g class="pie-slice-group">
             <path d="${path}" fill="${color}" class="pie-slice"></path>
 
             <rect x="250" y="${(i - arcs.length / 2) * 40}" width="30" height="30" fill="${color}"></rect>
-            <text x="290" y="${(i - arcs.length / 2) * 40 + 24}" font-size="24">${extractLegend(data)}</text>
+            <text x="290" y="${(i - arcs.length / 2) * 40 + 24}" font-size="24">${extractLegend(datum)}</text>
         </g>`,
             )
             .join("")}

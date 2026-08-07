@@ -181,7 +181,9 @@ export class StarMapView implements View {
 
             const jumpRange = warpDrive.rangeLY;
 
-            if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) return;
+            if (starSystemCoordinatesEquals(this.selectedSystemCoordinates, this.currentSystemCoordinates)) {
+                return;
+            }
             this.soundPlayer.playNow("click");
             this.stellarPathfinder.init(this.currentSystemCoordinates, this.selectedSystemCoordinates, jumpRange);
         });
@@ -232,9 +234,15 @@ export class StarMapView implements View {
             const pathfinderMaxIterations = 50_000;
             const pathfinderStepsPerFrame = 10;
             for (let i = 0; i < pathfinderStepsPerFrame; i++) {
-                if (!this.stellarPathfinder.hasBeenInit()) break;
-                if (this.stellarPathfinder.hasFoundPath()) break;
-                if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) break;
+                if (!this.stellarPathfinder.hasBeenInit()) {
+                    break;
+                }
+                if (this.stellarPathfinder.hasFoundPath()) {
+                    break;
+                }
+                if (this.stellarPathfinder.getNbIterations() >= pathfinderMaxIterations) {
+                    break;
+                }
 
                 this.stellarPathfinder.update();
 
@@ -284,7 +292,9 @@ export class StarMapView implements View {
 
         this.scene.onAfterRenderObservable.add(() => {
             const activeCamera = this.scene.activeCamera;
-            if (activeCamera === null) throw new Error("No active camera!");
+            if (activeCamera === null) {
+                throw new Error("No active camera!");
+            }
             this.starMapUI.update(activeCamera.globalPosition);
         });
 
@@ -302,7 +312,7 @@ export class StarMapView implements View {
         return GreasedLineTools.SegmentizeLineBySegmentCount(points, points.length - 1);
     }
 
-    private drawCurrentItinerary(path: DeepReadonly<Itinerary>) {
+    private drawCurrentItinerary(path: DeepReadonly<Itinerary>): void {
         if (this.currentItineraryLine !== null) {
             this.currentItineraryLine.dispose(undefined, true);
         }
@@ -319,7 +329,7 @@ export class StarMapView implements View {
         );
     }
 
-    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]) {
+    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]): void {
         if (this.visitedSystemsLines !== null) {
             this.visitedSystemsLines.dispose(undefined, true);
             this.visitedSystemsLines = null;
@@ -347,7 +357,7 @@ export class StarMapView implements View {
         );
     }
 
-    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean) {
+    public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean): void {
         this.currentSystemCoordinates = starSystemCoordinates;
         this.selectedSystemCoordinates = starSystemCoordinates;
 
@@ -355,7 +365,7 @@ export class StarMapView implements View {
         this.focusOnCurrentSystem(skipAnimation);
     }
 
-    public focusOnCurrentSystem(skipAnimation = false) {
+    public focusOnCurrentSystem(skipAnimation = false): void {
         if (this.currentSystemCoordinates === null) {
             console.warn("No current system seed!");
             return;
@@ -363,7 +373,7 @@ export class StarMapView implements View {
         this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
-    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false) {
+    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false): void {
         const starSystemPosition = wrapVector3(this.universeBackend.getSystemGalacticPosition(starSystemCoordinates));
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(
@@ -400,8 +410,9 @@ export class StarMapView implements View {
             .add(transformToStarDir.scaleInPlace(distance));
 
         // if the transform is already in the right position, do not animate
-        if (skipAnimation) this.controls.getTransform().position = targetPosition;
-        else if (targetPosition.subtract(this.controls.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
+        if (skipAnimation) {
+            this.controls.getTransform().position = targetPosition;
+        } else if (targetPosition.subtract(this.controls.getTransform().getAbsolutePosition()).lengthSquared() > 0.1) {
             this.translationAnimation = CustomAnimation.FromTo(
                 this.controls.getTransform().position.clone(),
                 targetPosition,
@@ -412,8 +423,9 @@ export class StarMapView implements View {
         }
 
         const targetRadius = 10;
-        if (skipAnimation) this.controls.thirdPersonCamera.radius = targetRadius;
-        else {
+        if (skipAnimation) {
+            this.controls.thirdPersonCamera.radius = targetRadius;
+        } else {
             this.radiusAnimation = CustomAnimation.FromTo(
                 this.controls.thirdPersonCamera.radius,
                 targetRadius,
@@ -425,19 +437,20 @@ export class StarMapView implements View {
 
         this.selectedSystemCoordinates = starSystemCoordinates;
         const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
-        if (starSystemModel === null)
+        if (starSystemModel === null) {
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
+        }
         this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);
     }
 
-    public render() {
+    public render(): void {
         this.scene.render();
     }
 
-    public attachControl() {
+    public attachControl(): void {
         this.scene.attachControl();
         this.starMapUI.htmlRoot.classList.remove("hidden");
         if (this.player.currentItinerary !== null) {
@@ -454,7 +467,7 @@ export class StarMapView implements View {
         }
     }
 
-    public detachControl() {
+    public detachControl(): void {
         this.scene.detachControl();
         this.starMapUI.htmlRoot.classList.add("hidden");
     }

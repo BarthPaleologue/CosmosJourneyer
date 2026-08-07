@@ -100,7 +100,7 @@ export class EngineBay implements StationSection {
         this.engineShape = assets.objects.stationEngine.shape;
     }
 
-    update(cameraWorldPosition: Vector3) {
+    update(cameraWorldPosition: Vector3): void {
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
         if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
             this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH, this.scene);
@@ -130,7 +130,7 @@ export class EngineBay implements StationSection {
         return [];
     }
 
-    dispose() {
+    dispose(): void {
         this.skirt.dispose();
         this.skirtMaterial.dispose();
         this.skirtAggregate?.dispose();

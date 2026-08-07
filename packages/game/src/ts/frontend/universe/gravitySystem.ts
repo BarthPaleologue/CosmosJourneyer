@@ -31,7 +31,7 @@ type CelestialBody = {
 export class GravitySystem {
     private readonly scene: Scene;
 
-    private forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
+    private readonly forceCache: WeakMap<PhysicsBody, Vector3> = new WeakMap();
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -59,7 +59,7 @@ export class GravitySystem {
         return this.filterPhysicsBodies(this.scene.meshes).concat(this.filterPhysicsBodies(this.scene.transformNodes));
     }
 
-    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>) {
+    private computeGravity(body: PhysicsBody, celestialBodies: ReadonlyArray<CelestialBody>): Vector3 {
         const objectMass = body.getMassProperties().mass;
         if (objectMass === undefined || objectMass === 0) {
             return Vector3.Zero();
@@ -69,7 +69,6 @@ export class GravitySystem {
         for (const celestialBody of celestialBodies) {
             const scaledDirection = celestialBody.position.subtract(body.transformNode.getAbsolutePosition());
             const distance = scaledDirection.length();
-            //TODO: when 2.0 comes along, use the correct formula
             //const forceMagnitude = (G * body.mass * objectMass) / (distance * distance);
             const forceMagnitude = distance < celestialBody.radius + 200e3 ? 9.81 * objectMass : 0;
             if (forceMagnitude <= 1e-6) {

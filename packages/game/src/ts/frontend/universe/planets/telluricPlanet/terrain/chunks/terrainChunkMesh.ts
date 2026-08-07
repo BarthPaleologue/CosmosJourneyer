@@ -126,7 +126,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given scattered point buffer.
      * @param forgeOutput the vertex data and scattered point buffer to initialize the chunk with
      */
-    public init(forgeOutput: ChunkForgeCompletedOutput) {
+    public init(forgeOutput: ChunkForgeCompletedOutput): void {
         if (this.hasBeenDisposed()) {
             console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
             return;
@@ -210,8 +210,10 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * When the chunk has a Havok body, parenting is ignored so this method must be called to compensate.
      * If the chunk has no Havok body, this method does nothing
      */
-    public updatePosition() {
-        if (this.physicsBody === null) return;
+    public updatePosition(): void {
+        if (this.physicsBody === null) {
+            return;
+        }
         this.getTransform().setAbsolutePosition(
             Vector3.TransformCoordinates(this.positionOnSphere, this.parent.getWorldMatrix()),
         );
@@ -225,7 +227,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * Returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      * @returns true if the chunk is ready to be enabled (i.e if the chunk has recieved its vertex data)
      */
-    public isLoaded() {
+    public isLoaded(): boolean {
         return this.loaded;
     }
 
@@ -277,11 +279,11 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         return physicsBody;
     }
 
-    public hasBeenDisposed() {
+    public hasBeenDisposed(): boolean {
         return this.disposed;
     }
 
-    public dispose() {
+    public dispose(): void {
         this.scatteringSystem.clearChunk(this.mesh.name);
         this.physicsBody?.dispose();
         this.physicsShape?.dispose();
@@ -289,7 +291,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.disposed = true;
     }
 
-    computeCulling(camera: Camera) {
+    computeCulling(camera: Camera): void {
         if (!this.isLoaded()) {
             return;
         }

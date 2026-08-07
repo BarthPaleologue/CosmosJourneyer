@@ -106,7 +106,12 @@ export class RingsUniforms {
         return new RingsUniforms(model, { type: "textured", texture }, fadeOutDistance, scene);
     }
 
-    public static New(model: DeepReadonly<RingsModel>, textures: Textures, fadeOutDistance: number, scene: Scene) {
+    public static New(
+        model: DeepReadonly<RingsModel>,
+        textures: Textures,
+        fadeOutDistance: number,
+        scene: Scene,
+    ): RingsUniforms {
         switch (model.type) {
             case "procedural":
                 return RingsUniforms.NewProcedural(model, textures.pools.ringsPatternLut, fadeOutDistance, scene);
@@ -117,19 +122,19 @@ export class RingsUniforms {
         }
     }
 
-    public setUniforms(effect: Effect) {
+    public setUniforms(effect: Effect): void {
         effect.setFloat(RingsUniformNames.RING_INNER_RADIUS, this.model.innerRadius);
         effect.setFloat(RingsUniformNames.RING_OUTER_RADIUS, this.model.outerRadius);
         effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, this.fadeOutDistance);
     }
 
-    public static SetEmptyUniforms(effect: Effect) {
+    public static SetEmptyUniforms(effect: Effect): void {
         effect.setFloat(RingsUniformNames.RING_INNER_RADIUS, 0);
         effect.setFloat(RingsUniformNames.RING_OUTER_RADIUS, 0);
         effect.setFloat(RingsUniformNames.RING_FADE_OUT_DISTANCE, 0);
     }
 
-    public setSamplers(effect: Effect) {
+    public setSamplers(effect: Effect): void {
         if (this.patternLut.type === "procedural" && this.patternLut.lut.canBeSampled()) {
             effect.setTexture(RingsSamplerNames.RING_PATTERN_LUT, this.patternLut.lut.getTexture());
         } else if (this.patternLut.type === "textured") {
@@ -139,11 +144,11 @@ export class RingsUniforms {
         }
     }
 
-    public static SetEmptySamplers(effect: Effect, fallbackTexture: Texture) {
+    public static SetEmptySamplers(effect: Effect, fallbackTexture: Texture): void {
         effect.setTexture(RingsSamplerNames.RING_PATTERN_LUT, fallbackTexture);
     }
 
-    public dispose(texturePool: ItemPool<RingsProceduralPatternLut>) {
+    public dispose(texturePool: ItemPool<RingsProceduralPatternLut>): void {
         if (this.patternLut.type === "procedural") {
             texturePool.release(this.patternLut.lut);
         }

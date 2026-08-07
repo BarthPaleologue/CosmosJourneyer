@@ -100,8 +100,8 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         targetCursorLayer.update(camera);
     });
 
-    scene.onBeforeCameraRenderObservable.add((camera) => {
-        depthRendererManager.setActiveCamera(camera);
+    scene.onBeforeCameraRenderObservable.add((cam) => {
+        depthRendererManager.setActiveCamera(cam);
     });
 
     return scene;

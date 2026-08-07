@@ -19,7 +19,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-export function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer): Promise<boolean> {
+export async function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer): Promise<boolean> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">

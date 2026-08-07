@@ -274,7 +274,7 @@ export class HelixHabitat implements Transformable {
         thicknessFactor: number,
         maxRadius: number,
         minRadius: number,
-    ) {
+    ): void {
         for (const radius of [maxRadius, minRadius]) {
             for (let ring = 0; ring < thicknessFactor; ring++) {
                 const yOffset = yBase + ring * this.deltaRadius - helixThickness / 2 + this.deltaRadius / 2;
@@ -291,7 +291,7 @@ export class HelixHabitat implements Transformable {
         angle: number,
         yBase: number,
         helixThickness: number,
-    ) {
+    ): void {
         for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
             const position = new Vector3(this.radius * Math.cos(angle), yBase + yOffset, this.radius * Math.sin(angle));
 
@@ -334,7 +334,7 @@ export class HelixHabitat implements Transformable {
         return lightPoints;
     }
 
-    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -383,7 +383,7 @@ export class HelixHabitat implements Transformable {
         return this.root;
     }
 
-    dispose() {
+    dispose(): void {
         this.root.dispose();
 
         this.attachment.dispose();

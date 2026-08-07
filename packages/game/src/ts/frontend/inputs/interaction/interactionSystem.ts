@@ -51,11 +51,11 @@ export class InteractionSystem {
 
     private currentTarget: PhysicsBody | null = null;
 
-    private interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
+    private readonly interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
 
     private longPressTimer: number | null = null;
 
-    private longPressThreshold = 0.3;
+    private readonly longPressThreshold = 0.3;
 
     private shouldCancelShortPress = false;
 
@@ -112,7 +112,7 @@ export class InteractionSystem {
         this.cameraInteractionRanges.set(camera, interactionRange);
     }
 
-    private async performFirstAction() {
+    private async performFirstAction(): Promise<void> {
         const interactions = this.getCurrentInteractions();
         if (interactions === null || interactions[0] === undefined) {
             return;
@@ -121,7 +121,7 @@ export class InteractionSystem {
         await interactions[0].perform();
     }
 
-    private async chooseAction() {
+    private async chooseAction(): Promise<void> {
         const interactions = this.getCurrentInteractions();
         if (interactions === null || interactions.length < 2) {
             return;
@@ -166,7 +166,7 @@ export class InteractionSystem {
         return this.currentTarget;
     }
 
-    private updateLongPressTimer(deltaSeconds: number) {
+    private updateLongPressTimer(deltaSeconds: number): void {
         if (this.longPressTimer === null) {
             return;
         }
@@ -187,7 +187,7 @@ export class InteractionSystem {
         void this.chooseAction();
     }
 
-    private pickWithRay(ray: Ray) {
+    private pickWithRay(ray: Ray): void {
         const start = ray.origin;
         const end = start.add(ray.direction.scale(ray.length));
         this.physicsEngine.raycastToRef(start, end, this.raycastResult, {
@@ -203,7 +203,7 @@ export class InteractionSystem {
         this.currentTarget = physicsBody;
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         const activeCamera = this.scene.activeCamera;
         if (activeCamera === null) {
             console.warn("No active camera in scene");

@@ -73,7 +73,7 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
         return getOrbitalObjectTypeToI18nString(this.model);
     }
 
-    dispose() {
+    dispose(): void {
         this.transform.dispose();
     }
 }

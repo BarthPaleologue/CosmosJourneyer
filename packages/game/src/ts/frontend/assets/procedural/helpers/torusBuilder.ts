@@ -46,7 +46,7 @@ export function CreateTorusVertexData(options: {
     backUVs?: Vector4;
     majorLpExponent?: number;
     minorLpExponent?: number;
-}) {
+}): VertexData {
     const indices: number[] = [];
     const positions: number[] = [];
     const normals: number[] = [];

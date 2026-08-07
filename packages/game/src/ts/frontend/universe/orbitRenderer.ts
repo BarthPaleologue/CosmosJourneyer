@@ -38,7 +38,7 @@ export class OrbitRenderer {
         this.createOrbitMeshFromPoints = createOrbitMeshFromPoints;
     }
 
-    setOrbitalObjects(orbitalObjects: ReadonlyArray<OrbitalObject>, scene: Scene) {
+    setOrbitalObjects(orbitalObjects: ReadonlyArray<OrbitalObject>, scene: Scene): void {
         this.reset();
 
         for (const orbitalObject of orbitalObjects) {
@@ -54,7 +54,7 @@ export class OrbitRenderer {
         this.setVisibility(this.isVisible());
     }
 
-    private createOrbitMesh(orbitalObject: OrbitalObject, parents: ReadonlyArray<OrbitalObject>, scene: Scene) {
+    private createOrbitMesh(orbitalObject: OrbitalObject, parents: ReadonlyArray<OrbitalObject>, scene: Scene): void {
         const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0);
 
         const orbit = orbitalObject.model.orbit;
@@ -87,7 +87,7 @@ export class OrbitRenderer {
         return this.orbitMeshes.get(orbitalObject);
     }
 
-    setVisibility(visible: boolean) {
+    setVisibility(visible: boolean): void {
         this._isVisible = visible;
         for (const orbitMesh of this.orbitMeshes.values()) {
             orbitMesh.setEnabled(visible);
@@ -98,8 +98,10 @@ export class OrbitRenderer {
         return this._isVisible;
     }
 
-    update(referencePlaneRotation: Matrix) {
-        if (!this._isVisible) return;
+    update(referencePlaneRotation: Matrix): void {
+        if (!this._isVisible) {
+            return;
+        }
         for (const [orbitalObject, parents] of this.orbitalObjectToParents) {
             const orbitMesh = this.orbitMeshes.get(orbitalObject);
             if (orbitMesh === undefined) {
@@ -119,7 +121,7 @@ export class OrbitRenderer {
         }
     }
 
-    private reset() {
+    private reset(): void {
         this.orbitMeshes.forEach((orbitMesh) => {
             orbitMesh.dispose(false, true);
         });

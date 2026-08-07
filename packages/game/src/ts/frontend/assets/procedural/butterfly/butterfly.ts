@@ -19,7 +19,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { type Scene } from "@babylonjs/core/scene";
 
-export function createButterfly(scene: Scene) {
+export function createButterfly(scene: Scene): Mesh {
     const positions = new Float32Array(6 * 3);
     const indices = new Uint32Array(4 * 3);
     const uvs = new Float32Array(6 * 2);

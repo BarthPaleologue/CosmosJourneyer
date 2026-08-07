@@ -20,7 +20,7 @@ import "@babylonjs/core/Audio/audioSceneComponent";
 
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
 import { CreateStreamingSoundAsync, type AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
-import type { IStreamingSoundOptions } from "@babylonjs/core/AudioV2/abstractAudio/streamingSound";
+import type { IStreamingSoundOptions, StreamingSound } from "@babylonjs/core/AudioV2/abstractAudio/streamingSound";
 
 import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
@@ -61,11 +61,11 @@ export async function loadMusics(
     const loadSoundAsync = async (
         name: string,
         url: string,
-        audioEngine: AudioEngineV2,
+        engine: AudioEngineV2,
         options?: Partial<IStreamingSoundOptions>,
-    ) => {
+    ): Promise<StreamingSound> => {
         progressMonitor.startTask();
-        const sound = await CreateStreamingSoundAsync(name, url, options, audioEngine);
+        const sound = await CreateStreamingSoundAsync(name, url, options, engine);
         progressMonitor.completeTask();
         return sound;
     };

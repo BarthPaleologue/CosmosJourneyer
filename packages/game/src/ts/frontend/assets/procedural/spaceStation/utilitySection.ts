@@ -46,7 +46,7 @@ export class UtilitySection implements StationSection {
     private readonly metalSectionMaterial: Material;
 
     private readonly tanks: Array<AbstractMesh> = [];
-    private tankBodies: Array<PhysicsBody> = [];
+    private readonly tankBodies: Array<PhysicsBody> = [];
     private readonly tankShape: PhysicsShape;
 
     private readonly lights: Array<PointLight> = [];
@@ -135,7 +135,7 @@ export class UtilitySection implements StationSection {
         }
     }
 
-    update(cameraWorldPosition: Vector3) {
+    update(cameraWorldPosition: Vector3): void {
         const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
 
         const toggleDistance = 20e3;
@@ -174,7 +174,7 @@ export class UtilitySection implements StationSection {
         return this.lights;
     }
 
-    dispose() {
+    dispose(): void {
         for (const light of this.lights) {
             light.dispose();
         }

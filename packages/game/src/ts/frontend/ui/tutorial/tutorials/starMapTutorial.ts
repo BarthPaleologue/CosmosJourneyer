@@ -54,11 +54,11 @@ export class StarMapTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return i18n.t("tutorials:starMap:title");
     }
 
-    getDescription() {
+    getDescription(): string {
         return i18n.t("tutorials:starMap:description");
     }
 

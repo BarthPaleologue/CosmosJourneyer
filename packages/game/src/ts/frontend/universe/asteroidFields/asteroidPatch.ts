@@ -116,7 +116,7 @@ export class AsteroidPatch {
                 instance.physicsBody !== null &&
                 instance.physicsBody !== undefined
             ) {
-                const body = this.instancePhysicsBodies.find((body) => body === instance.physicsBody);
+                const body = this.instancePhysicsBodies.find((physicsBody) => physicsBody === instance.physicsBody);
                 if (body !== undefined) {
                     body.dispose();
                     this.instancePhysicsBodies.splice(this.instancePhysicsBodies.indexOf(body), 1);
@@ -129,7 +129,9 @@ export class AsteroidPatch {
         });
 
         for (let i = 0; i < AsteroidPatch.BATCH_SIZE; i++) {
-            if (this.nbInstances === this.positions.length) break;
+            if (this.nbInstances === this.positions.length) {
+                break;
+            }
 
             const typeIndex = this.typeIndices[this.nbInstances];
             if (typeIndex === undefined) {
@@ -163,13 +165,13 @@ export class AsteroidPatch {
         return this.nbInstances;
     }
 
-    public setEnabled(enabled: boolean) {
+    public setEnabled(enabled: boolean): void {
         this.instances.forEach((instance) => {
             instance.setEnabled(enabled);
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.clearInstances();
         this.positions.length = 0;
         this.rotations.length = 0;

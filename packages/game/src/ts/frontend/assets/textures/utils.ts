@@ -29,10 +29,10 @@ export async function loadTextureAsync(
 ): Promise<Texture> {
     progressMonitor.startTask();
     const texture = await new Promise<Texture>((resolve) => {
-        const texture = new Texture(url, scene, false, false, undefined, () => {
-            resolve(texture);
+        const createdTexture = new Texture(url, scene, false, false, undefined, () => {
+            resolve(createdTexture);
         });
-        texture.name = name;
+        createdTexture.name = name;
     });
 
     progressMonitor.completeTask();
@@ -47,11 +47,11 @@ export async function loadCubeTextureAsync(
 ): Promise<CubeTexture> {
     progressMonitor.startTask();
     const texture = await new Promise<CubeTexture>((resolve) => {
-        const texture = CubeTexture.CreateFromPrefilteredData(url, scene);
-        texture.onLoadObservable.add(() => {
-            resolve(texture);
+        const createdTexture = CubeTexture.CreateFromPrefilteredData(url, scene);
+        createdTexture.onLoadObservable.add(() => {
+            resolve(createdTexture);
         });
-        texture.name = name;
+        createdTexture.name = name;
     });
 
     progressMonitor.completeTask();

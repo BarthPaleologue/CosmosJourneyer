@@ -43,20 +43,28 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
     }
 
     equals(other: MissionNode): boolean {
-        if (!(other instanceof MissionSequenceNode)) return false;
-        if (this.children.length !== other.children.length) return false;
+        if (!(other instanceof MissionSequenceNode)) {
+            return false;
+        }
+        if (this.children.length !== other.children.length) {
+            return false;
+        }
         for (const [i, thisChild] of this.children.entries()) {
             const otherChild = other.children[i];
             if (otherChild === undefined) {
                 continue;
             }
-            if (!thisChild.equals(otherChild)) return false;
+            if (!thisChild.equals(otherChild)) {
+                return false;
+            }
         }
         return true;
     }
 
-    updateState(context: MissionContext) {
-        if (this.hasCompletedLock) return;
+    updateState(context: MissionContext): void {
+        if (this.hasCompletedLock) {
+            return;
+        }
         const activeChild = this.children[this.activeChildIndex];
         if (activeChild === undefined) {
             return;
@@ -74,7 +82,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
      * Set the active child index. Useful when deserializing an ongoing mission.
      * @param index The index of the child to set as active.
      */
-    setActiveChildIndex(index: number) {
+    setActiveChildIndex(index: number): void {
         if (index < 0 || index >= this.children.length) {
             throw new Error(
                 `Invalid index ${index} for mission sequence node. Must be between 0 and ${this.children.length - 1}`,
@@ -92,9 +100,13 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
     ): string {
-        if (this.hasCompletedLock) return "Mission completed";
+        if (this.hasCompletedLock) {
+            return "Mission completed";
+        }
         const activeChild = this.children[this.activeChildIndex];
-        if (activeChild === undefined) return "Mission error: activeChildIndex out of bounds";
+        if (activeChild === undefined) {
+            return "Mission error: activeChildIndex out of bounds";
+        }
         return activeChild.describeNextTask(context, keyboardLayout, universeBackend);
     }
 

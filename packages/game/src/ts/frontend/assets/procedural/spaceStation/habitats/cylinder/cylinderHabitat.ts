@@ -156,7 +156,7 @@ export class CylinderHabitat implements Transformable {
         return this.lights;
     }
 
-    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -177,7 +177,7 @@ export class CylinderHabitat implements Transformable {
         return this.root;
     }
 
-    dispose() {
+    dispose(): void {
         this.root.dispose();
         this.cylinder.dispose();
 

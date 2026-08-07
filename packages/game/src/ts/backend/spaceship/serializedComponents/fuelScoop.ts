@@ -25,7 +25,7 @@ export const SerializedFuelScoopSchema = z.object({
 
 export type SerializedFuelScoop = z.infer<typeof SerializedFuelScoopSchema>;
 
-export function getFuelScoopSpec(fuelScoop: SerializedFuelScoop) {
+export function getFuelScoopSpec(fuelScoop: SerializedFuelScoop): { fuelPerSecond: number } {
     return {
         fuelPerSecond: fuelScoop.size + fuelScoop.quality / 10,
     };

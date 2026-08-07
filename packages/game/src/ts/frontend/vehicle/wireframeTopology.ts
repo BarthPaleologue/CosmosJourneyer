@@ -43,7 +43,7 @@ export class WireframeTopology {
      * @param vertexA The handle to the first vertex to connect.
      * @param vertexB The handle to the second vertex to connect.
      */
-    connect(vertexA: VertexHandle, vertexB: VertexHandle) {
+    connect(vertexA: VertexHandle, vertexB: VertexHandle): void {
         const a = Math.min(vertexA, vertexB);
         const b = Math.max(vertexA, vertexB);
         this.edges.set(this.getEdgeKey(a, b), [a, b]);
@@ -64,7 +64,9 @@ export class WireframeTopology {
 
     private getIndex(indexOf: Map<VertexHandle, number>, key: VertexHandle): Result<number, string> {
         const i = indexOf.get(key);
-        if (i === undefined) return err(`Missing index for vertex ${key}`);
+        if (i === undefined) {
+            return err(`Missing index for vertex ${key}`);
+        }
         return ok(i);
     }
 
@@ -127,14 +129,20 @@ export class WireframeTopology {
             setA.add(b);
             setB.add(a);
 
-            if (!adj.has(a)) adj.set(a, setA);
-            if (!adj.has(b)) adj.set(b, setB);
+            if (!adj.has(a)) {
+                adj.set(a, setA);
+            }
+            if (!adj.has(b)) {
+                adj.set(b, setB);
+            }
         }
 
         const triangles: number[] = [];
         for (const [u, nu] of adj) {
             for (const v of nu) {
-                if (v <= u) continue;
+                if (v <= u) {
+                    continue;
+                }
                 const result = this.addTrianglesForVertex(indexOf, adj, nu, u, v, triangles);
                 if (!result.success) {
                     return err(result.error);
@@ -154,10 +162,16 @@ export class WireframeTopology {
         triangles: number[],
     ): Result<void, string> {
         const nv = adj.get(v);
-        if (!nv) return err(`Adjacency missing for vertex ${v}`);
+        if (!nv) {
+            return err(`Adjacency missing for vertex ${v}`);
+        }
         for (const w of nv) {
-            if (w <= v) continue;
-            if (!nu.has(w)) continue;
+            if (w <= v) {
+                continue;
+            }
+            if (!nu.has(w)) {
+                continue;
+            }
             const triangle = this.resolveTriangleIndices(indexOf, u, v, w);
             if (!triangle.success) {
                 return err(triangle.error);

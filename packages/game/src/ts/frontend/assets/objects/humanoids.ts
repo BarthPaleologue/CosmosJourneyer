@@ -194,44 +194,72 @@ export async function loadHumanoidPrefabs(
             };
 
             const walkAnim = findAnimation("Walking Forward");
-            if (!walkAnim.success) return walkAnim;
+            if (!walkAnim.success) {
+                return walkAnim;
+            }
 
             const walkBackAnim = findAnimation("Walking Backward");
-            if (!walkBackAnim.success) return walkBackAnim;
+            if (!walkBackAnim.success) {
+                return walkBackAnim;
+            }
             const idleAnim = findAnimation("Standing Idle");
-            if (!idleAnim.success) return idleAnim;
+            if (!idleAnim.success) {
+                return idleAnim;
+            }
 
             const sambaAnim = findAnimation("Samba Dancing");
-            if (!sambaAnim.success) return sambaAnim;
+            if (!sambaAnim.success) {
+                return sambaAnim;
+            }
 
             const runningAnim = findAnimation("Running");
-            if (!runningAnim.success) return runningAnim;
+            if (!runningAnim.success) {
+                return runningAnim;
+            }
             const fallingIdleAnim = findAnimation("Falling Idle");
-            if (!fallingIdleAnim.success) return fallingIdleAnim;
+            if (!fallingIdleAnim.success) {
+                return fallingIdleAnim;
+            }
 
             const skyDivingAnim = findAnimation("Sky Diving");
-            if (!skyDivingAnim.success) return skyDivingAnim;
+            if (!skyDivingAnim.success) {
+                return skyDivingAnim;
+            }
 
             const swimmingIdleAnim = findAnimation("Swimming Idle");
-            if (!swimmingIdleAnim.success) return swimmingIdleAnim;
+            if (!swimmingIdleAnim.success) {
+                return swimmingIdleAnim;
+            }
 
             const swimmingForwardAnim = findAnimation("Swimming Forward");
-            if (!swimmingForwardAnim.success) return swimmingForwardAnim;
+            if (!swimmingForwardAnim.success) {
+                return swimmingForwardAnim;
+            }
 
             const jumpingAnim = findAnimation("Jumping");
-            if (!jumpingAnim.success) return jumpingAnim;
+            if (!jumpingAnim.success) {
+                return jumpingAnim;
+            }
 
             const sittingOnGroundIdleAnim = findAnimation("Sitting On Ground Idle");
-            if (!sittingOnGroundIdleAnim.success) return sittingOnGroundIdleAnim;
+            if (!sittingOnGroundIdleAnim.success) {
+                return sittingOnGroundIdleAnim;
+            }
 
             const sittingOnSeatIdleAnim = findAnimation("Sitting On Seat Idle");
-            if (!sittingOnSeatIdleAnim.success) return sittingOnSeatIdleAnim;
+            if (!sittingOnSeatIdleAnim.success) {
+                return sittingOnSeatIdleAnim;
+            }
 
             const standingIdleToSittingOnSeatAnim = findAnimation("Stand To Sit");
-            if (!standingIdleToSittingOnSeatAnim.success) return standingIdleToSittingOnSeatAnim;
+            if (!standingIdleToSittingOnSeatAnim.success) {
+                return standingIdleToSittingOnSeatAnim;
+            }
 
             const sittingOnSeatToStandingIdleAnim = findAnimation("Sit To Stand");
-            if (!sittingOnSeatToStandingIdleAnim.success) return sittingOnSeatToStandingIdleAnim;
+            if (!sittingOnSeatToStandingIdleAnim.success) {
+                return sittingOnSeatToStandingIdleAnim;
+            }
 
             const skeleton = entries.skeletons[0];
             if (skeleton === undefined) {
@@ -299,44 +327,72 @@ export async function loadHumanoidPrefabs(
             };
 
             const walkAnim = findAnimation("Walking Forward");
-            if (!walkAnim.success) return walkAnim;
+            if (!walkAnim.success) {
+                return walkAnim;
+            }
 
             const walkBackAnim = findAnimation("Walking Backward");
-            if (!walkBackAnim.success) return walkBackAnim;
+            if (!walkBackAnim.success) {
+                return walkBackAnim;
+            }
             const idleAnim = findAnimation("Standing Idle");
-            if (!idleAnim.success) return idleAnim;
+            if (!idleAnim.success) {
+                return idleAnim;
+            }
 
             const sambaAnim = findAnimation("Samba Dancing");
-            if (!sambaAnim.success) return sambaAnim;
+            if (!sambaAnim.success) {
+                return sambaAnim;
+            }
 
             const runningAnim = findAnimation("Running");
-            if (!runningAnim.success) return runningAnim;
+            if (!runningAnim.success) {
+                return runningAnim;
+            }
             const fallingIdleAnim = findAnimation("Falling Idle");
-            if (!fallingIdleAnim.success) return fallingIdleAnim;
+            if (!fallingIdleAnim.success) {
+                return fallingIdleAnim;
+            }
 
             const skyDivingAnim = findAnimation("Sky Diving");
-            if (!skyDivingAnim.success) return skyDivingAnim;
+            if (!skyDivingAnim.success) {
+                return skyDivingAnim;
+            }
 
             const swimmingIdleAnim = findAnimation("Swimming Idle");
-            if (!swimmingIdleAnim.success) return swimmingIdleAnim;
+            if (!swimmingIdleAnim.success) {
+                return swimmingIdleAnim;
+            }
 
             const swimmingForwardAnim = findAnimation("Swimming Forward");
-            if (!swimmingForwardAnim.success) return swimmingForwardAnim;
+            if (!swimmingForwardAnim.success) {
+                return swimmingForwardAnim;
+            }
 
             const jumpingAnim = findAnimation("Jumping");
-            if (!jumpingAnim.success) return jumpingAnim;
+            if (!jumpingAnim.success) {
+                return jumpingAnim;
+            }
 
             const sittingOnGroundIdleAnim = findAnimation("Sitting On Ground Idle");
-            if (!sittingOnGroundIdleAnim.success) return sittingOnGroundIdleAnim;
+            if (!sittingOnGroundIdleAnim.success) {
+                return sittingOnGroundIdleAnim;
+            }
 
             const sittingOnSeatIdleAnim = findAnimation("Sitting On Seat Idle");
-            if (!sittingOnSeatIdleAnim.success) return sittingOnSeatIdleAnim;
+            if (!sittingOnSeatIdleAnim.success) {
+                return sittingOnSeatIdleAnim;
+            }
 
             const standingIdleToSittingOnSeatAnim = findAnimation("Stand To Sit");
-            if (!standingIdleToSittingOnSeatAnim.success) return standingIdleToSittingOnSeatAnim;
+            if (!standingIdleToSittingOnSeatAnim.success) {
+                return standingIdleToSittingOnSeatAnim;
+            }
 
             const sittingOnSeatToStandingIdleAnim = findAnimation("Sit To Stand");
-            if (!sittingOnSeatToStandingIdleAnim.success) return sittingOnSeatToStandingIdleAnim;
+            if (!sittingOnSeatToStandingIdleAnim.success) {
+                return sittingOnSeatToStandingIdleAnim;
+            }
 
             const skeleton = entries.skeletons[0];
             if (skeleton === undefined) {

@@ -157,10 +157,14 @@ export class SaveBackendMultiFile implements ISaveBackend {
     private async loadSaveFile(filePath: string): Promise<Save | null> {
         try {
             const content = await this.fileSystem.readFile(filePath);
-            if (content === null) return null;
+            if (content === null) {
+                return null;
+            }
 
             const saveJson = jsonSafeParse(content);
-            if (!saveJson) throw new Error("Invalid JSON");
+            if (!saveJson) {
+                throw new Error("Invalid JSON");
+            }
 
             const saveResult = safeParseSave(saveJson, this.universeBackend);
             if (!saveResult.success) {
@@ -377,7 +381,9 @@ export class SaveBackendMultiFile implements ISaveBackend {
         const autoDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}/auto`;
         const autoFiles = await this.fileSystem.listDirectory(autoDir);
 
-        if (!autoFiles) return;
+        if (!autoFiles) {
+            return;
+        }
 
         // Load all auto saves to get their timestamps
         const autoSaves: Array<{ uuid: string; timestamp: number }> = [];

@@ -19,7 +19,6 @@ pub fn mountain_layer(
                 simplex411(&(coords * local_frequency), seed, &mut local_gradient);
             local_gradient *= local_frequency;
 
-            // TODO: ne pas hardcoder
             let sharpness = 4.0;
             local_elevation = 1.0 - s_abs(local_elevation, sharpness, &mut local_gradient);
 

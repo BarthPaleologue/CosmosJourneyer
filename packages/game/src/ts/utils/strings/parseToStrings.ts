@@ -90,11 +90,21 @@ export function parseSecondsPrecise(seconds: number): string {
     const nbSeconds = Math.floor(secondsLeft);
 
     const result: string[] = [];
-    if (nbYears > 0) result.push(i18n.t("units:years", { count: nbYears }));
-    if (nbDays > 0) result.push(i18n.t("units:days", { count: nbDays }));
-    if (nbHours > 0) result.push(i18n.t("units:hours", { count: nbHours }));
-    if (nbMinutes > 0) result.push(i18n.t("units:minutes", { count: nbMinutes }));
-    if (nbSeconds > 0) result.push(i18n.t("units:seconds", { count: nbSeconds }));
+    if (nbYears > 0) {
+        result.push(i18n.t("units:years", { count: nbYears }));
+    }
+    if (nbDays > 0) {
+        result.push(i18n.t("units:days", { count: nbDays }));
+    }
+    if (nbHours > 0) {
+        result.push(i18n.t("units:hours", { count: nbHours }));
+    }
+    if (nbMinutes > 0) {
+        result.push(i18n.t("units:minutes", { count: nbMinutes }));
+    }
+    if (nbSeconds > 0) {
+        result.push(i18n.t("units:seconds", { count: nbSeconds }));
+    }
 
     return result.join(" ");
 }

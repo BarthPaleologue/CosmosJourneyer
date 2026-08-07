@@ -87,12 +87,12 @@ export function getGreasedLinePathFromSystemSegments(
     let lastDrawnSystem: DeepReadonly<StarSystemCoordinates> | null = null;
     let currentRun: DeepReadonly<StarSystemCoordinates>[] = [];
 
-    const pushPoint = (system: DeepReadonly<StarSystemCoordinates>, width: number) => {
+    const pushPoint = (system: DeepReadonly<StarSystemCoordinates>, width: number): void => {
         points.push(wrapVector3(getSystemGalacticPosition(system)));
         widths.push(width, width);
     };
 
-    const pushVisibleRun = () => {
+    const pushVisibleRun = (): void => {
         if (currentRun.length < 2) {
             currentRun = [];
             return;
@@ -110,7 +110,7 @@ export function getGreasedLinePathFromSystemSegments(
         currentRun = [];
     };
 
-    const pushInvisibleConnectorTo = (system: DeepReadonly<StarSystemCoordinates>) => {
+    const pushInvisibleConnectorTo = (system: DeepReadonly<StarSystemCoordinates>): void => {
         if (lastDrawnSystem !== null && !starSystemCoordinatesEquals(lastDrawnSystem, system)) {
             pushPoint(lastDrawnSystem, 0);
             pushPoint(system, 0);

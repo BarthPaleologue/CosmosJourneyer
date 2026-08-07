@@ -57,7 +57,7 @@ export async function loadAsteroidModels(
     return Promise.all(asteroidPromises);
 }
 
-export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number>) {
+export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number>): Mesh[] {
     const asteroids: Array<Mesh> = [];
     for (const scaling of scalings) {
         const asteroidClone = asteroid.clone(`asteroidClone${asteroids.length}`);
@@ -71,7 +71,7 @@ export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number
     return asteroids;
 }
 
-export function processAsteroids(container: AssetContainer, scalings: ReadonlyArray<number>) {
+export function processAsteroids(container: AssetContainer, scalings: ReadonlyArray<number>): Mesh[] {
     const asteroids: Array<Mesh> = [];
 
     const asteroid = container.meshes[1];
@@ -87,8 +87,8 @@ export function processAsteroids(container: AssetContainer, scalings: ReadonlyAr
 
     asteroids.push(...diversifyAsteroid(asteroid, scalings));
 
-    for (const asteroid of asteroids) {
-        asteroid.setEnabled(false);
+    for (const asteroidInstance of asteroids) {
+        asteroidInstance.setEnabled(false);
     }
 
     container.addAllToScene();

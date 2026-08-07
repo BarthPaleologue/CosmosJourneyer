@@ -37,7 +37,7 @@ export class StarMapControls implements Controls {
     readonly thirdPersonCamera: ArcRotateCamera;
 
     private speed = 10;
-    private inertia = Vector3.Zero();
+    private readonly inertia = Vector3.Zero();
 
     private readonly scene: Scene;
 
@@ -72,7 +72,7 @@ export class StarMapControls implements Controls {
         return false;
     }
 
-    public update(deltaSeconds: number) {
+    public update(deltaSeconds: number): void {
         const inertiaFactor = 0.15;
         const [xMove, zMove] = StarMapInputs.map.move.value;
         this.inertia.x = lerpSmooth(this.inertia.x, xMove, inertiaFactor, deltaSeconds);
@@ -99,7 +99,7 @@ export class StarMapControls implements Controls {
         return this.speed;
     }
 
-    dispose() {
+    dispose(): void {
         this.transform.dispose();
         this.thirdPersonCamera.dispose();
     }

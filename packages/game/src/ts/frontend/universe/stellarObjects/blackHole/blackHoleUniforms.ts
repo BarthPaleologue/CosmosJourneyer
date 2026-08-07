@@ -70,7 +70,7 @@ export class BlackHoleUniforms {
         this.diskRotation.transposeToRef(this.inverseDiskRotation);
     }
 
-    public setUniforms(effect: Effect, blackHoleTransform: TransformNode, floatingOriginOffset: Vector3) {
+    public setUniforms(effect: Effect, blackHoleTransform: TransformNode, floatingOriginOffset: Vector3): void {
         effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, this.backgroundTexture.getReflectionTextureMatrix());
         effect.setFloat(BlackHoleUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
         effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
@@ -86,7 +86,7 @@ export class BlackHoleUniforms {
         effect.setMatrix(BlackHoleUniformNames.INVERSE_DISK_ROTATION, this.inverseDiskRotation);
     }
 
-    public setSamplers(effect: Effect) {
+    public setSamplers(effect: Effect): void {
         effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, this.backgroundTexture);
     }
 }

@@ -9,8 +9,8 @@ import { type DesktopUpdateState } from "./updateContract.js";
 class MockUpdater extends EventEmitter {
     public autoDownload = true;
     public autoInstallOnAppQuit = true;
-    public readonly checkForUpdates = vi.fn<() => Promise<null>>(() => Promise.resolve(null));
-    public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(() =>
+    public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => Promise.resolve(null));
+    public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(async () =>
         Promise.resolve(["update"]),
     );
     public readonly quitAndInstall = vi.fn();
@@ -68,7 +68,7 @@ describe("DesktopAutoUpdateService", () => {
     it("returns to the available state when the player cancels a download", async () => {
         const updater = new MockUpdater();
         updater.downloadUpdate.mockImplementationOnce(
-            (token) =>
+            async (token) =>
                 new Promise((_resolve, reject) => {
                     token?.once("cancel", () => {
                         reject(new Error("Cancelled"));

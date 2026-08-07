@@ -166,7 +166,7 @@ export class StarSystemView implements View {
      */
     private characterControls: CharacterControls | null = null;
 
-    private vehicleControls: VehicleControls;
+    private readonly vehicleControls: VehicleControls;
 
     /**
      * A debug helper to display the orbits of the orbital objects
@@ -333,8 +333,11 @@ export class StarSystemView implements View {
 
         StarSystemInputs.map.toggleOrbitsAndAxis.on("complete", () => {
             const enabled = !this.orbitRenderer.isVisible();
-            if (enabled) this.soundPlayer.playNow("enable_orbit_display");
-            else this.soundPlayer.playNow("disable_orbit_display");
+            if (enabled) {
+                this.soundPlayer.playNow("enable_orbit_display");
+            } else {
+                this.soundPlayer.playNow("disable_orbit_display");
+            }
             this.orbitRenderer.setVisibility(enabled);
             this.axisRenderer.setVisibility(enabled);
         });
@@ -424,7 +427,7 @@ export class StarSystemView implements View {
                     getInteractions: () => [
                         {
                             label: i18n.t("interactions:drive", { vehicle: "Wolf Mk2" }),
-                            perform: async () => {
+                            perform: async (): Promise<void> => {
                                 await this.switchToVehicleControls();
                             },
                         },
@@ -500,7 +503,7 @@ export class StarSystemView implements View {
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystemModel
      */
-    public async loadStarSystem(starSystemModel: DeepReadonly<StarSystemModel>) {
+    public async loadStarSystem(starSystemModel: DeepReadonly<StarSystemModel>): Promise<StarSystemController> {
         if (this._isLoadingSystem) {
             throw new Error("Cannot load a new star system while the current one is loading");
         }
@@ -578,7 +581,9 @@ export class StarSystemView implements View {
         const celestialBodies = starSystem.getCelestialBodies();
 
         const firstBody = celestialBodies[0];
-        if (firstBody === undefined) throw new Error("No bodies in star system");
+        if (firstBody === undefined) {
+            throw new Error("No bodies in star system");
+        }
 
         const activeControls = this.activeControls;
         if (activeControls === null) {
@@ -587,8 +592,11 @@ export class StarSystemView implements View {
         }
 
         let controllerDistanceFactor = 4;
-        if (firstBody instanceof BlackHole) controllerDistanceFactor = 50;
-        else if (firstBody instanceof NeutronStar) controllerDistanceFactor = 100_000;
+        if (firstBody instanceof BlackHole) {
+            controllerDistanceFactor = 50;
+        } else if (firstBody instanceof NeutronStar) {
+            controllerDistanceFactor = 100_000;
+        }
 
         const previousSystem = this.player.visitedSystemHistory.at(-1);
         if (previousSystem === undefined) {
@@ -651,7 +659,7 @@ export class StarSystemView implements View {
         targetCursorLayer: TargetCursorLayer,
         starSystem: StarSystemController,
         spaceship: Spaceship,
-    ) {
+    ): void {
         const targetables: Array<Targetable> = [spaceship];
         targetables.push(...getSystemTargetables(starSystem));
 
@@ -662,9 +670,11 @@ export class StarSystemView implements View {
     /**
      * Instantiates the incoming player's spaceship before atomically replacing the current player and controls.
      */
-    public async resetPlayer(nextPlayer: Player) {
+    public async resetPlayer(nextPlayer: Player): Promise<void> {
         const spaceshipSerialized = nextPlayer.serializedSpaceships[0];
-        if (spaceshipSerialized === undefined) throw new Error("No spaceship serialized in player");
+        if (spaceshipSerialized === undefined) {
+            throw new Error("No spaceship serialized in player");
+        }
 
         const spaceship = await Spaceship.Deserialize(
             spaceshipSerialized,
@@ -702,7 +712,7 @@ export class StarSystemView implements View {
                 return [
                     {
                         label: i18n.t("interactions:pilot"),
-                        perform: async () => {
+                        perform: async (): Promise<void> => {
                             const shipControls = this.getSpaceshipControls();
                             const characterControls = this.getCharacterControls();
 
@@ -794,7 +804,7 @@ export class StarSystemView implements View {
         return null;
     }
 
-    private async jumpToSystem(target: SystemTarget) {
+    private async jumpToSystem(target: SystemTarget): Promise<void> {
         const shipControls = this.getSpaceshipControls();
         const spaceship = shipControls.getSpaceship();
         const warpDrive = spaceship.getInternals().getWarpDrive();
@@ -873,7 +883,9 @@ export class StarSystemView implements View {
         this.onBeforeJump.notifyObservers();
 
         // then, initiate hyper space jump
-        if (!warpDrive.isEnabled()) spaceship.enableWarpDrive();
+        if (!warpDrive.isEnabled()) {
+            spaceship.enableWarpDrive();
+        }
         spaceship.hyperSpaceTunnel.setEnabled(true);
         spaceship.spaceDots.getTransform().setEnabled(false);
         spaceship.soundInstances.hyperSpace.setVolume(0.5);
@@ -917,20 +929,26 @@ export class StarSystemView implements View {
         }
     }
 
-    public isJumpingBetweenSystems() {
+    public isJumpingBetweenSystems(): boolean {
         return this.jumpLock;
     }
 
-    public isLoadingSystem() {
+    public isLoadingSystem(): boolean {
         return this._isLoadingSystem;
     }
 
-    private updateBeforeRender(deltaSeconds: number) {
-        if (this._isLoadingSystem) return;
+    private updateBeforeRender(deltaSeconds: number): void {
+        if (this._isLoadingSystem) {
+            return;
+        }
 
         const starSystem = this.getStarSystem();
-        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
-        if (this.characterControls === null) throw new Error("Character controls is null");
+        if (this.spaceshipControls === null) {
+            throw new Error("Spaceship controls is null");
+        }
+        if (this.characterControls === null) {
+            throw new Error("Character controls is null");
+        }
 
         if (this.activeControls !== null && this.activeControls.getActiveCamera() !== this.scene.activeCamera) {
             this.scene.activeCamera?.detachControl();
@@ -1029,7 +1047,9 @@ export class StarSystemView implements View {
 
         const newlyCompletedMissions: Mission[] = [];
         this.player.currentMissions.forEach((mission) => {
-            if (mission.isCompleted()) return;
+            if (mission.isCompleted()) {
+                return;
+            }
             mission.update(missionContext);
             if (mission.isCompleted()) {
                 this.player.earn(mission.getReward());
@@ -1098,8 +1118,10 @@ export class StarSystemView implements View {
      * @returns the spaceship controls
      * @throws Error if the spaceship controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    public getSpaceshipControls() {
-        if (this.spaceshipControls === null) throw new Error("Spaceship controls is null");
+    public getSpaceshipControls(): ShipControls {
+        if (this.spaceshipControls === null) {
+            throw new Error("Spaceship controls is null");
+        }
         return this.spaceshipControls;
     }
 
@@ -1108,8 +1130,10 @@ export class StarSystemView implements View {
      * @returns the character controls
      * @throws Error if the character controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    public getCharacterControls() {
-        if (this.characterControls === null) throw new Error("Character controls is null");
+    public getCharacterControls(): CharacterControls {
+        if (this.characterControls === null) {
+            throw new Error("Character controls is null");
+        }
         return this.characterControls;
     }
 
@@ -1118,15 +1142,17 @@ export class StarSystemView implements View {
      * @returns the default controls
      * @throws Error if the default controls is null (the assets are not initialized, you must call `initAssets` before)
      */
-    public getDefaultControls() {
-        if (this.defaultControls === null) throw new Error("Default controls is null");
+    public getDefaultControls(): DefaultControls {
+        if (this.defaultControls === null) {
+            throw new Error("Default controls is null");
+        }
         return this.defaultControls;
     }
 
     /**
      * Switches the active controller to the spaceship controls
      */
-    public async switchToSpaceshipControls() {
+    public async switchToSpaceshipControls(): Promise<void> {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
 
@@ -1159,7 +1185,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the character controls
      */
-    public async switchToCharacterControls() {
+    public async switchToCharacterControls(): Promise<void> {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
 
@@ -1188,7 +1214,7 @@ export class StarSystemView implements View {
     /**
      * Switches the active controller to the default controls
      */
-    public async switchToDefaultControls(showHelpNotification: boolean) {
+    public async switchToDefaultControls(showHelpNotification: boolean): Promise<void> {
         const shipControls = this.getSpaceshipControls();
         const characterControls = this.getCharacterControls();
         const defaultControls = this.getDefaultControls();
@@ -1243,7 +1269,7 @@ export class StarSystemView implements View {
         }
     }
 
-    async switchToVehicleControls() {
+    async switchToVehicleControls(): Promise<void> {
         const characterControls = this.getCharacterControls();
         const vehicleTransform = this.vehicleControls.getTransform();
 
@@ -1263,7 +1289,7 @@ export class StarSystemView implements View {
         await this.setActiveControls(this.vehicleControls);
     }
 
-    public getActiveControls() {
+    public getActiveControls(): Controls | null {
         return this.activeControls;
     }
 
@@ -1285,7 +1311,7 @@ export class StarSystemView implements View {
         return raycastResult.hitPointWorld.add(raycastResult.hitNormalWorld.scale(1.0));
     }
 
-    private async setActiveControls(controls: Controls) {
+    private async setActiveControls(controls: Controls): Promise<void> {
         this.activeControls = controls;
         this.scene.activeCameras?.forEach((camera) => {
             camera.detachControl();
@@ -1304,7 +1330,7 @@ export class StarSystemView implements View {
         }
     }
 
-    private setActiveCamera(camera: Camera) {
+    private setActiveCamera(camera: Camera): void {
         this.scene.activeCamera = camera;
         this.scene.activeCameras = [camera];
         camera.attachControl(true);
@@ -1313,7 +1339,7 @@ export class StarSystemView implements View {
     /**
      * Stops the background sounds of the spaceship
      */
-    public stopBackgroundSounds() {
+    public stopBackgroundSounds(): void {
         const spaceship = this.getSpaceshipControls().getSpaceship();
         spaceship.soundInstances.acceleratingWarpDrive.setVolume(0);
         spaceship.soundInstances.deceleratingWarpDrive.setVolume(0);
@@ -1325,23 +1351,25 @@ export class StarSystemView implements View {
      * @returns the star system
      * @throws Error if the star system is null
      */
-    public getStarSystem() {
-        if (this.starSystem === null) throw new Error("Star system not initialized");
+    public getStarSystem(): StarSystemController {
+        if (this.starSystem === null) {
+            throw new Error("Star system not initialized");
+        }
         return this.starSystem;
     }
 
-    public hideHtmlUI() {
+    public hideHtmlUI(): void {
         this.spaceShipLayer.setVisibility(false);
         this.targetCursorLayer.setEnabled(false);
         this.spaceStationLayer.setVisibility(false);
     }
 
-    public setUIEnabled(enabled: boolean) {
+    public setUIEnabled(enabled: boolean): void {
         this.isUiEnabled = enabled;
         this.notificationManager.setVisible(enabled);
     }
 
-    public setTarget(target: (Transformable & HasBoundingSphere & TypedObject) | null) {
+    public setTarget(target: (Transformable & HasBoundingSphere & TypedObject) | null): void {
         if (this.targetCursorLayer.getTarget() === target) {
             this.spaceShipLayer.setTarget(null);
             this.targetCursorLayer.setTarget(null);
@@ -1349,7 +1377,9 @@ export class StarSystemView implements View {
             return;
         }
 
-        if (target === null) return;
+        if (target === null) {
+            return;
+        }
 
         this.spaceShipLayer.setTarget(target.getTransform());
         this.targetCursorLayer.setTarget(target);
@@ -1361,7 +1391,7 @@ export class StarSystemView implements View {
      * This target will display the name of the target system and its distance.
      * @param targetSeed the seed of the target system
      */
-    public setSystemAsTarget(targetSeed: StarSystemCoordinates) {
+    public setSystemAsTarget(targetSeed: StarSystemCoordinates): void {
         let target = this.getStarSystem()
             .getSystemTargets()
             .find((systemTarget) => starSystemCoordinatesEquals(systemTarget.systemCoordinates, targetSeed));
@@ -1380,20 +1410,20 @@ export class StarSystemView implements View {
         }
     }
 
-    public render() {
+    public render(): void {
         this.scene.render();
     }
 
-    public attachControl() {
+    public attachControl(): void {
         this.scene.attachControl();
     }
 
-    public detachControl() {
+    public detachControl(): void {
         this.scene.detachControl();
         this.hideHtmlUI();
     }
 
-    public getMainScene() {
+    public getMainScene(): Scene {
         return this.scene;
     }
 }

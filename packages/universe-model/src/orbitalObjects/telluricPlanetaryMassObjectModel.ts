@@ -34,7 +34,6 @@ export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = 
 
     /**
      * The temperature range of the object in Kelvin
-     * TODO: remove when the temperature gets calculated dynamically
      * @deprecated
      */
     temperature: {

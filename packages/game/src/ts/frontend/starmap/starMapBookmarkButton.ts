@@ -21,7 +21,9 @@ export class StarMapBookmarkButton {
         this.player = player;
 
         this.rootNode.addEventListener("click", () => {
-            if (this.selectedSystemCoordinates === null) return;
+            if (this.selectedSystemCoordinates === null) {
+                return;
+            }
             soundPlayer.playNow("click");
 
             const currentSystemSeed = this.selectedSystemCoordinates;
@@ -42,7 +44,7 @@ export class StarMapBookmarkButton {
         });
     }
 
-    setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates) {
+    setSelectedSystemSeed(starSystemCoordinates: StarSystemCoordinates): void {
         this.selectedSystemCoordinates = starSystemCoordinates;
         this.isSelectedSystemBookmarked =
             this.player.systemBookmarks.find((bookmark) =>

@@ -67,13 +67,10 @@ export function generateTelluricSatelliteModel(
         throw new Error("Satellite is not around telluric or gas planet. Something is missing!");
     }
 
-    //TODO: make mass dependent on more physical properties like density
     let mass;
     if (isSatelliteOfTelluric) {
-        //FIXME: when scaled Earth radius gets to 1:1 scale, change this value by a localized constant
         mass = MoonMass * (radius / 1_735e3) ** 3;
     } else {
-        //FIXME: when scaled Earth radius gets to 1:1 scale, change this value by a localized constant
         mass = EarthMass * (radius / 6_371e3) ** 3;
     }
 

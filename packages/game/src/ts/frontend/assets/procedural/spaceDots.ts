@@ -110,7 +110,7 @@ export class SpaceDots implements Transformable {
         return this.mesh;
     }
 
-    public dispose() {
+    public dispose(): void {
         this.material.dispose();
         this.mesh.dispose(false, true);
     }

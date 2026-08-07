@@ -145,20 +145,20 @@ export class ObjectTargetCursor {
         this.maxDistance = object.targetInfo.maxDistance;
     }
 
-    setTarget(isTarget: boolean) {
+    setTarget(isTarget: boolean): void {
         this.isTarget = isTarget;
         this.cursor.classList.toggle("target", isTarget);
     }
 
-    setPinned(isPinned: boolean) {
+    setPinned(isPinned: boolean): void {
         this.isPinned = isPinned;
     }
 
-    setInformationEnabled(enabled: boolean) {
+    setInformationEnabled(enabled: boolean): void {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera) {
+    update(camera: Camera): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -195,14 +195,21 @@ export class ObjectTargetCursor {
         );
 
         let size = 100 * (screenSize * 1.3);
-        if (this.minSize > 0) size = Math.max(size, this.minSize);
-        if (this.maxSize > 0) size = Math.min(size, this.maxSize);
+        if (this.minSize > 0) {
+            size = Math.max(size, this.minSize);
+        }
+        if (this.maxSize > 0) {
+            size = Math.min(size, this.maxSize);
+        }
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);
 
         this.alpha = 1.0;
-        if (this.minDistance > 0) this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned)
+        if (this.minDistance > 0) {
+            this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
+        }
+        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned) {
             this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
+        }
 
         this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
         this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
@@ -218,11 +225,11 @@ export class ObjectTargetCursor {
         this.lastDistance = distance;
     }
 
-    isVisible() {
+    isVisible(): boolean {
         return this.alpha > 0 && this.isOnScreen;
     }
 
-    dispose() {
+    dispose(): void {
         this.htmlRoot.remove();
     }
 }

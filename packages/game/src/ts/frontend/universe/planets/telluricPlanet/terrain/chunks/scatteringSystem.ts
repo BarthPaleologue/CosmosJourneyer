@@ -190,7 +190,7 @@ export class ScatteringSystem implements IScatteringSystem {
         this.chunkToScatteredAssets.delete(chunkId);
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const patches of this.chunkToScatteredAssets.values()) {
             for (const { mesh, bodies } of Object.values(patches)) {
                 for (const body of bodies) {

@@ -48,7 +48,7 @@ export class CloudsLut {
         return this.hasGeneratedTexture;
     }
 
-    setModel(model: DeepReadonly<CloudsModel>) {
+    setModel(model: DeepReadonly<CloudsModel>): void {
         this.lut.setFloat("worleyFrequency", model.frequency);
         this.lut.setFloat("detailFrequency", model.detailFrequency);
         this.hasGeneratedTexture = false;
@@ -59,7 +59,7 @@ export class CloudsLut {
         return this.lut;
     }
 
-    dispose() {
+    dispose(): void {
         this.lut.dispose();
     }
 }

@@ -18,11 +18,19 @@
 export type StellarType = "O" | "B" | "A" | "F" | "G" | "K" | "M";
 
 export function getStellarTypeFromTemperature(temperature: number): StellarType {
-    if (temperature < 3500) return "M";
-    else if (temperature < 5000) return "K";
-    else if (temperature < 6000) return "G";
-    else if (temperature < 7500) return "F";
-    else if (temperature < 10000) return "A";
-    else if (temperature < 30000) return "B";
-    else return "O";
+    if (temperature < 3500) {
+        return "M";
+    } else if (temperature < 5000) {
+        return "K";
+    } else if (temperature < 6000) {
+        return "G";
+    } else if (temperature < 7500) {
+        return "F";
+    } else if (temperature < 10000) {
+        return "A";
+    } else if (temperature < 30000) {
+        return "B";
+    } else {
+        return "O";
+    }
 }

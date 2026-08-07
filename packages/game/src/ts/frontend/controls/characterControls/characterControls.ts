@@ -108,11 +108,11 @@ export class CharacterControls implements Controls {
         this.expectedCameraRadius = this.thirdPersonCamera.radius;
     }
 
-    public setFirstPersonCameraActive() {
+    public setFirstPersonCameraActive(): void {
         this.activeCamera = this.firstPersonCamera;
     }
 
-    public setThirdPersonCameraActive() {
+    public setThirdPersonCameraActive(): void {
         this.activeCamera = this.thirdPersonCamera;
     }
 
@@ -274,7 +274,7 @@ export class CharacterControls implements Controls {
         );
     }
 
-    dispose() {
+    dispose(): void {
         this.avatar.dispose();
         this.headTransform.dispose();
         this.firstPersonCamera.dispose();

@@ -110,7 +110,6 @@ export function generateStarSystemModel(
         throw new Error("No stellar objects were generated for the star system");
     }
 
-    //Fixme: planets need to work with black holes as well at some point
     const nbPlanets =
         firstStellarObject.type === "blackHole" ? 0 : randRangeInt(0, 7, systemRng, GenerationSteps.NB_PLANETS);
     for (let i = 0; i < nbPlanets; i++) {
@@ -120,14 +119,14 @@ export function generateStarSystemModel(
         const planetName = `${systemName} ${romanNumeral(i + 1)}`;
         const parentIds = stellarObjects.map((object) => object.id);
 
-        const seed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * SeedHalfRange;
+        const planetSeed = centeredRand(systemRng, GenerationSteps.PLANETS + i) * SeedHalfRange;
 
         switch (bodyType) {
             case "telluricPlanet":
                 planets.push(
                     generateTelluricPlanetModel(
                         createOrbitalObjectId(parentIds, "telluricPlanet", i),
-                        seed,
+                        planetSeed,
                         planetName,
                         stellarObjects,
                     ),
@@ -137,7 +136,7 @@ export function generateStarSystemModel(
                 planets.push(
                     generateGasPlanetModel(
                         createOrbitalObjectId(parentIds, "gasPlanet", i),
-                        seed,
+                        planetSeed,
                         planetName,
                         stellarObjects,
                     ),
@@ -322,11 +321,18 @@ export function generateStarSystemModel(
  * @param index Index of the stellar object
  * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
  */
-function getBodyTypeOfStellarObject(rng: (index: number) => number, index: number) {
+function getBodyTypeOfStellarObject(
+    rng: (index: number) => number,
+    index: number,
+): "star" | "blackHole" | "neutronStar" {
     // percentages are taken from https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
     const sample = rng(GenerationSteps.STARS + index);
-    if (sample < 0.0006) return "blackHole";
-    if (sample < 0.0026) return "neutronStar";
+    if (sample < 0.0006) {
+        return "blackHole";
+    }
+    if (sample < 0.0026) {
+        return "neutronStar";
+    }
 
     return "star";
 }

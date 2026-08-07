@@ -57,10 +57,10 @@ export class PlanetaryLandingTutorial implements Tutorial {
         return safeParseSave(saveData, universeBackend);
     }
 
-    getTitle() {
+    getTitle(): string {
         return i18n.t("tutorials:planetaryLanding:title");
     }
-    getDescription() {
+    getDescription(): string {
         return i18n.t("tutorials:planetaryLanding:description");
     }
     async getContentPanelsHtml(): Promise<string[]> {

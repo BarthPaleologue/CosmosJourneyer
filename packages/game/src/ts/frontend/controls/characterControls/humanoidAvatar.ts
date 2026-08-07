@@ -318,7 +318,7 @@ export class HumanoidAvatar implements Transformable {
         return this.groundedState;
     }
 
-    private handleGroundedState() {
+    private handleGroundedState(): void {
         const forward = this.getTransform().forward;
         const up = this.getTransform().up;
 
@@ -338,7 +338,7 @@ export class HumanoidAvatar implements Transformable {
         this.aggregate.body.setLinearVelocity(newLinearVelocity);
     }
 
-    private handleSwimmingState() {
+    private handleSwimmingState(): void {
         const forward = this.getTransform().forward;
         this.aggregate.body.setLinearVelocity(forward.scale(this.swimSpeed * this.swimmingForwardAnim.weight));
     }
@@ -441,19 +441,19 @@ export class HumanoidAvatar implements Transformable {
         }
     }
 
-    public dance() {
+    public dance(): void {
         this.groundedState.currentAnimation = this.danceAnim;
     }
 
-    public sitOnGround() {
+    public sitOnGround(): void {
         this.groundedState.currentAnimation = this.sittingOnGroundIdleAnim;
     }
 
-    public sitOnSeat() {
+    public sitOnSeat(): void {
         this.currentAnimationState = this.seatedState;
     }
 
-    public jump() {
+    public jump(): void {
         if (this.currentAnimationState !== this.groundedState) {
             return;
         }
@@ -469,7 +469,7 @@ export class HumanoidAvatar implements Transformable {
         );
     }
 
-    public lookAt(target: Vector3 | null) {
+    public lookAt(target: Vector3 | null): void {
         if (target === null) {
             this.isLookingAtTarget = false;
             return;
@@ -485,7 +485,7 @@ export class HumanoidAvatar implements Transformable {
         return result;
     }
 
-    public dispose() {
+    public dispose(): void {
         const { animations } = this.instance;
         for (const group of [
             animations.idle,

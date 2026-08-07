@@ -30,7 +30,7 @@ export class HyperSpaceTunnel implements Transformable {
 
     readonly warpConeMaterial: ShaderMaterial;
 
-    private tunnelDiameter = 160;
+    private readonly tunnelDiameter = 160;
 
     private elapsedSeconds = 0;
 
@@ -77,11 +77,11 @@ export class HyperSpaceTunnel implements Transformable {
         this.hyperTunnel.material = this.warpConeMaterial;
     }
 
-    setParent(parent: TransformNode) {
+    setParent(parent: TransformNode): void {
         this.parent = parent;
     }
 
-    setEnabled(enabled: boolean) {
+    setEnabled(enabled: boolean): void {
         this.hyperTunnel.setEnabled(enabled);
     }
 
@@ -89,12 +89,14 @@ export class HyperSpaceTunnel implements Transformable {
         return this.hyperTunnel;
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         this.warpConeMaterial.setFloat("time", this.elapsedSeconds);
 
-        if (this.parent === null) return;
+        if (this.parent === null) {
+            return;
+        }
 
         this.hyperTunnel.position = this.parent.getAbsolutePosition();
 
@@ -108,7 +110,9 @@ export class HyperSpaceTunnel implements Transformable {
         const targetForward = this.parent.forward;
         const currentForward = this.getTransform().forward;
 
-        if (targetForward.equalsWithEpsilon(currentForward, 0.001)) return;
+        if (targetForward.equalsWithEpsilon(currentForward, 0.001)) {
+            return;
+        }
 
         const rotationAxis = Vector3.Cross(currentForward, targetForward);
         const theta = Math.acos(clamp(Vector3.Dot(currentForward, targetForward), -1, 1));
@@ -116,7 +120,7 @@ export class HyperSpaceTunnel implements Transformable {
         rotate(this.hyperTunnel, rotationAxis, theta);
     }
 
-    dispose() {
+    dispose(): void {
         this.hyperTunnel.dispose();
     }
 }

@@ -43,7 +43,11 @@ export function getProjectedDiameter01(
  * @param threshold The size threshold
  * @returns Whether the object is bigger than the threshold
  */
-export function isSizeOnScreenEnough(object: HasBoundingSphere & Transformable, camera: Camera, threshold = 0.005) {
+export function isSizeOnScreenEnough(
+    object: HasBoundingSphere & Transformable,
+    camera: Camera,
+    threshold = 0.005,
+): boolean {
     const angularSize = getProjectedDiameter01(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),

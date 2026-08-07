@@ -108,7 +108,7 @@ export class AtmosphereUniforms {
         this.lightIntensity = 15;
     }
 
-    setUniforms(effect: Effect) {
+    setUniforms(effect: Effect): void {
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RADIUS, this.atmosphereRadius);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_HEIGHT, this.rayleighHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, this.rayleighScatteringCoefficients);

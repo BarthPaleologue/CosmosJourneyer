@@ -105,7 +105,7 @@ export class StarMap {
     /** Scratch buffer for computing a sector's world position (reused to avoid allocations in the hot loop). */
     private readonly sectorWorldPositionScratch = new Vector3();
 
-    private starSectorSize = Settings.STAR_SECTOR_SIZE;
+    private readonly starSectorSize = Settings.STAR_SECTOR_SIZE;
 
     constructor(universeBackend: UniverseBackend, textures: StarMapTextures, scene: Scene) {
         this.scene = scene;
@@ -202,7 +202,7 @@ export class StarMap {
         return JSON.stringify(coordinates);
     }
 
-    private createInstance(data: BuildData) {
+    private createInstance(data: BuildData): void {
         const starSystemCoordinates = data.coordinates;
         const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
         if (starSystemModel === null) {
@@ -210,7 +210,6 @@ export class StarMap {
             return;
         }
 
-        //TODO: when implementing binary star systems, this will need to be updated to display all stellar objects and not just the first one
         const stellarObjectModel = starSystemModel.stellarObjects[0];
 
         const instanceName = `${starSystemModel.name} Billboard instance`;
@@ -277,7 +276,7 @@ export class StarMap {
         }
     }
 
-    private disposeStarSector(starSector: StarSectorView) {
+    private disposeStarSector(starSector: StarSectorView): void {
         for (const starInstance of starSector.starInstances) {
             this.fadeOutThenRecycle(starInstance, this.recycledStars);
         }
@@ -288,7 +287,7 @@ export class StarMap {
         this.loadedStarSectors.delete(starSector.getKey());
     }
 
-    public update(camera: Camera) {
+    public update(camera: Camera): void {
         const cameraPosition = camera.getWorldMatrix().getTranslation();
 
         const currentStarSectorCoordinates = new Vector3(
@@ -333,7 +332,7 @@ export class StarMap {
         z: number,
         currentStarSectorCoordinates: Vector3,
         camera: Camera,
-    ) {
+    ): void {
         if (x * x + y * y + z * z > this.starSectorLoadRadius * this.starSectorLoadRadius) {
             return;
         }
@@ -361,7 +360,7 @@ export class StarMap {
         this.starBuildStack.push(...starSector.generate());
     }
 
-    private fadeIn(instance: InstancedMesh) {
+    private fadeIn(instance: InstancedMesh): void {
         instance.animations = [this.fadeInAnimation];
         instance
             .getScene()
@@ -370,7 +369,7 @@ export class StarMap {
             });
     }
 
-    private startShimmering(mesh: AbstractMesh) {
+    private startShimmering(mesh: AbstractMesh): void {
         mesh.animations = [this.shimmerAnimation];
         mesh.getScene().beginAnimation(
             mesh,
@@ -381,7 +380,7 @@ export class StarMap {
         );
     }
 
-    private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: Array<InstancedMesh>) {
+    private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: Array<InstancedMesh>): void {
         instance.animations = [this.fadeOutAnimation];
         instance
             .getScene()

@@ -49,7 +49,7 @@ export async function enablePhysics(
     return getPhysicsEngineV2(scene);
 }
 
-export function enablePointerLock(engine: AbstractEngine) {
+export function enablePointerLock(engine: AbstractEngine): void {
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
@@ -102,7 +102,7 @@ export function enableShadows(
     shadowGenerator.normalBias *= 50;
     shadowGenerator.debug = options?.debug ?? false;
 
-    const applyShadowsToMesh = (mesh: AbstractMesh) => {
+    const applyShadowsToMesh = (mesh: AbstractMesh): void => {
         if (mesh.infiniteDistance) {
             return;
         }
@@ -184,6 +184,6 @@ export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
     }
 }
 
-export function addToWindow(name: string, value: unknown) {
+export function addToWindow(name: string, value: unknown): void {
     (window as typeof window & { [name]: unknown })[name] = value;
 }

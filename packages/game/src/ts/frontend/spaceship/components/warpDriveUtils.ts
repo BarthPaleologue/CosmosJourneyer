@@ -29,7 +29,7 @@ export function canEngageWarpDrive(
     shipAltimeter: Altimeter,
     currentVelocity: number,
     nearestOrbitalObject: OrbitalObject,
-) {
+): boolean {
     const shipPosition = shipTransform.getAbsolutePosition();
     const nearestObjectPosition = nearestOrbitalObject.getTransform().getAbsolutePosition();
 

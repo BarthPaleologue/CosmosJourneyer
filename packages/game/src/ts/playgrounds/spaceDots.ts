@@ -27,7 +27,7 @@ const DEFAULT_YAW = 0;
 const DEFAULT_PITCH = 0;
 const DEFAULT_ROLL = 0;
 
-export function createSpaceDotsScene(
+export async function createSpaceDotsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     progressMonitor: ILoadingProgressMonitor,

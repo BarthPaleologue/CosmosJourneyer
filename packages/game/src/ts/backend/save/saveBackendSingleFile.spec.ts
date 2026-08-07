@@ -36,12 +36,12 @@ class MockSaveBackend implements IFile {
         }
     }
 
-    public write(content: string): Promise<boolean> {
+    public async write(content: string): Promise<boolean> {
         this.mockData = content;
         return Promise.resolve(true);
     }
 
-    public read(): Promise<string | null> {
+    public async read(): Promise<string | null> {
         return Promise.resolve(this.mockData);
     }
 }
@@ -106,7 +106,7 @@ describe("SaveManager", () => {
         },
     } as const satisfies Record<string, CmdrSaves>;
 
-    const createTestSave = (timestamp: number) => {
+    const createTestSave = (timestamp: number): Save => {
         return {
             uuid: crypto.randomUUID(),
             timestamp,

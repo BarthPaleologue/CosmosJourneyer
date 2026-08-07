@@ -107,13 +107,13 @@ export const SpaceElevatorDesignators = [
  * @param rng The noise based rng with a range of [0, 1]
  * @param sampleIndex The index of the sample to generate
  */
-export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number) {
+export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number): string {
     const designator = SpaceStationDesignators[Math.floor(rng(sampleIndex) * SpaceStationDesignators.length)];
     const name = IllustriousFigures[Math.floor(rng(sampleIndex + 1) * IllustriousFigures.length)]?.lastName;
     return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${designator}`;
 }
 
-export function generateSpaceElevatorName(rng: (index: number) => number, sampleIndex: number) {
+export function generateSpaceElevatorName(rng: (index: number) => number, sampleIndex: number): string {
     const designator = SpaceElevatorDesignators[Math.floor(rng(sampleIndex) * SpaceElevatorDesignators.length)];
     const name = IllustriousFigures[Math.floor(rng(sampleIndex + 1) * IllustriousFigures.length)]?.lastName;
     return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${designator}`;

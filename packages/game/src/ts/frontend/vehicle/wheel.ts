@@ -138,7 +138,7 @@ export class Wheel {
             : null;
     }
 
-    dispose() {
+    dispose(): void {
         this.axle.body.dispose();
         this.axle.shape.dispose();
         this.axle.mesh.dispose();
@@ -151,7 +151,13 @@ export class Wheel {
     }
 }
 
-function AddAxlePhysics(mesh: TransformNode, mass: number, bounce: number, friction: number, scene: Scene) {
+function AddAxlePhysics(
+    mesh: TransformNode,
+    mass: number,
+    bounce: number,
+    friction: number,
+    scene: Scene,
+): { physicsBody: PhysicsBody; physicsShape: PhysicsShape } {
     const aggregate = new PhysicsAggregate(
         mesh,
         PhysicsShapeType.BOX,
@@ -176,7 +182,7 @@ function AddWheelPhysics(
     bounce: number,
     friction: number,
     scene: Scene,
-) {
+): { physicsBody: PhysicsBody; physicsShape: PhysicsShape } {
     const aggregate = new PhysicsAggregate(
         mesh,
         PhysicsShapeType.CYLINDER,
@@ -200,7 +206,7 @@ function AttachWheelToAxle(
     axle: { mesh: TransformNode; body: PhysicsBody },
     wheel: { mesh: Mesh; body: PhysicsBody },
     scene: Scene,
-) {
+): Physics6DoFConstraint {
     const motorJoint = new Physics6DoFConstraint(
         {},
         [
@@ -228,7 +234,12 @@ function AttachWheelToAxle(
     return motorJoint;
 }
 
-function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, steerable = false) {
+function AttachAxleToFrame(
+    axle: PhysicsBody,
+    frame: PhysicsBody,
+    scene: Scene,
+    steerable = false,
+): Physics6DoFConstraint {
     const frameInverseWorldMatrix = frame.transformNode.getWorldMatrix().clone().invert();
 
     const axlePosition = axle.transformNode.position;
@@ -289,7 +300,7 @@ function AttachAxleToFrame(axle: PhysicsBody, frame: PhysicsBody, scene: Scene, 
     return joint;
 }
 
-export function CreateAxle(position: Vector3, radius: number, scene: Scene) {
+export function CreateAxle(position: Vector3, radius: number, scene: Scene): TransformNode {
     const axleMesh = new TransformNode("Axle", scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
     axleMesh.position.copyFrom(position);
@@ -306,7 +317,7 @@ export function CreateWheel(
         tire: Material;
     },
     scene: Scene,
-) {
+): Mesh {
     const rimRadius = radius * 0.6;
     const tireRadius = radius - rimRadius;
 

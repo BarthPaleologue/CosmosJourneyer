@@ -46,7 +46,7 @@ export class DesktopAutoUpdateService {
         return this.state;
     }
 
-    public downloadUpdate(): Promise<void> {
+    public async downloadUpdate(): Promise<void> {
         if (this.state.type !== "available" && this.state.type !== "downloadError") {
             return Promise.resolve();
         }

@@ -62,7 +62,7 @@ export function createPanelsFromFrame(
     scene: Scene,
 ): Mesh | null {
     const vertexCount = positions.length / 3;
-    const getVec3 = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
+    const getVec3 = (i: number): Vector3 => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
     // Undirected adjacency
     const adjacency: Array<Set<number>> = Array.from({ length: vertexCount }, () => new Set<number>());
@@ -133,7 +133,7 @@ export function createPanelsFromFrame(
     }
 
     // Face tracing by rightmost turns
-    const directedEdgeKey = (u: number, v: number) => `${u}>${v}`;
+    const directedEdgeKey = (u: number, v: number): string => `${u}>${v}`;
     const visitedDirected = new Set<string>();
     const candidateLoops: number[][] = [];
     const maxSteps = 4 * edges.length;
@@ -150,7 +150,9 @@ export function createPanelsFromFrame(
             [b, a],
         ] as const) {
             const startKey = directedEdgeKey(u0, v0);
-            if (visitedDirected.has(startKey)) continue;
+            if (visitedDirected.has(startKey)) {
+                continue;
+            }
 
             const loop = traceFace(
                 u0,
@@ -170,8 +172,12 @@ export function createPanelsFromFrame(
     // Normalize a loop to a canonical key for deduplication
     function normalizeLoop(loop: number[]): number[] | null {
         let ring = loop;
-        if (ring.length >= 2 && ring[0] === ring[ring.length - 1]) ring = ring.slice(0, -1);
-        if (ring.length < 3) return null;
+        if (ring.length >= 2 && ring[0] === ring[ring.length - 1]) {
+            ring = ring.slice(0, -1);
+        }
+        if (ring.length < 3) {
+            return null;
+        }
 
         // rotate so the smallest index is first, and choose lexicographically smaller of forward/reverse
         let minI = 0;
@@ -206,10 +212,14 @@ export function createPanelsFromFrame(
     // Deduplicate closed loops
     const uniqueLoops = new Map<string, number[]>();
     for (const L of candidateLoops) {
-        if (L.length < 4 || L[0] !== L[L.length - 1]) continue; // must be closed
+        if (L.length < 4 || L[0] !== L[L.length - 1]) {
+            continue;
+        } // must be closed
         const ring = L.slice(0, -1);
         const keyArr = normalizeLoop(ring);
-        if (!keyArr) continue;
+        if (!keyArr) {
+            continue;
+        }
         uniqueLoops.set(keyArr.join(","), keyArr);
     }
 
@@ -252,7 +262,9 @@ export function createPanelsFromFrame(
         let maxDistance = 0;
         for (const p of points) {
             const d = Math.abs(Vector3.Dot(p.subtract(faceCentroid), normal));
-            if (d > maxDistance) maxDistance = d;
+            if (d > maxDistance) {
+                maxDistance = d;
+            }
         }
         if (maxDistance > PLANARITY_EPS) {
             continue;
@@ -283,10 +295,14 @@ export function createPanelsFromFrame(
         panels.push(panel);
     }
 
-    if (panels.length === 0) return null;
+    if (panels.length === 0) {
+        return null;
+    }
 
     const merged = Mesh.MergeMeshes(panels, true, true, undefined, false, true);
-    if (!merged) return null;
+    if (!merged) {
+        return null;
+    }
     merged.name = name;
     return merged;
 }
@@ -321,7 +337,9 @@ function traceFace(
         }
 
         const order = clockwiseNeighbors[v];
-        if (!order || order.length === 0) break;
+        if (!order || order.length === 0) {
+            break;
+        }
         const idx = neighborToIndex[v]?.get(u);
         if (idx === undefined) {
             break;
@@ -334,7 +352,9 @@ function traceFace(
             break;
         }
 
-        if (visitedDirected.has(directedEdgeKey(v, w)) && w !== u0) break;
+        if (visitedDirected.has(directedEdgeKey(v, w)) && w !== u0) {
+            break;
+        }
         u = v;
         v = w;
     }

@@ -19,7 +19,7 @@ import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
-export function sheerAlongY(mesh: Mesh, amountY: number) {
+export function sheerAlongY(mesh: Mesh, amountY: number): void {
     // 1. get positions
     const positions = mesh.getVerticesData(VertexBuffer.PositionKind, true);
     if (positions === null) {
@@ -37,8 +37,12 @@ export function sheerAlongY(mesh: Mesh, amountY: number) {
             continue;
         }
 
-        if (z < minZ) minZ = z;
-        if (z > maxZ) maxZ = z;
+        if (z < minZ) {
+            minZ = z;
+        }
+        if (z > maxZ) {
+            maxZ = z;
+        }
     }
     const height = maxZ - minZ;
     if (height === 0) {

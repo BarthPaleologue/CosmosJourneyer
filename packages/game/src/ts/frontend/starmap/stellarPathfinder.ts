@@ -47,9 +47,9 @@ export class StellarPathfinder {
         position: Vector3;
     } | null = null;
 
-    private coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
+    private readonly coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
 
-    private openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
+    private readonly openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
     private closedList: Node[] = [];
 
     private jumpRange = 10;
@@ -59,7 +59,7 @@ export class StellarPathfinder {
 
     private lastExploredNode: Node | null = null;
 
-    private universeBackend: UniverseBackend;
+    private readonly universeBackend: UniverseBackend;
 
     public constructor(universeBackend: UniverseBackend) {
         this.universeBackend = universeBackend;
@@ -75,7 +75,7 @@ export class StellarPathfinder {
         startSystemCoordinates: StarSystemCoordinates,
         targetSystemCoordinates: StarSystemCoordinates,
         jumpRange: number,
-    ) {
+    ): void {
         this.coordinatesToPrevious.clear();
         this.openList.clear();
         this.closedList = [];
@@ -134,7 +134,7 @@ export class StellarPathfinder {
      * Update the pathfinder to find the next step in the path.
      * Executes one A* iteration.
      */
-    public update() {
+    public update(): void {
         if (this.startSystem === null || this.targetSystem === null) {
             throw new Error("Cannot update pathfinder without initializing it first");
         }

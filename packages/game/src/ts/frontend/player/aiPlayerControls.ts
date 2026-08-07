@@ -37,7 +37,7 @@ export class AiPlayerControls {
         scene: Scene,
         assets: RenderingAssets,
         soundPlayer: ISoundPlayer,
-    ) {
+    ): Promise<AiPlayerControls> {
         const player = Player.Default(universeBackend);
         player.setName("AI");
 
@@ -63,7 +63,7 @@ export class AiPlayerControls {
         this.spaceshipControls = new AiSpaceshipControls(spaceship, scene);
     }
 
-    dispose(soundPlayer: ISoundPlayer) {
+    dispose(soundPlayer: ISoundPlayer): void {
         this.spaceshipControls.dispose(soundPlayer);
     }
 }

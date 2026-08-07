@@ -57,7 +57,6 @@ export function generateTelluricPlanetModel(
 
     const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
 
-    //TODO: make mass dependent on more physical properties like density
     const mass = EarthMass * (radius / 6_371e3) ** 3;
 
     const orbitRadiuses: Array<number> = [];
@@ -98,7 +97,9 @@ export function generateTelluricPlanetModel(
     };
 
     let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
-    if (radius <= 0.3 * ScaledEarthRadius) pressure = 0;
+    if (radius <= 0.3 * ScaledEarthRadius) {
+        pressure = 0;
+    }
 
     const atmosphere: AtmosphereModel | null =
         pressure > 0

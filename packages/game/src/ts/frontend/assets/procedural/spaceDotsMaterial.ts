@@ -195,29 +195,29 @@ export class SpaceDotsMaterial {
         this.uTranslationOffset.value = this.translationOffset;
     }
 
-    public setThrottle(throttle: number) {
+    public setThrottle(throttle: number): void {
         this.throttle = throttle;
         this.uThrottle.value = throttle;
     }
 
-    public setWarpFrame(forward: Vector3) {
+    public setWarpFrame(forward: Vector3): void {
         this.uWarpForward.value = forward;
     }
 
-    public setSteeringFrame(up: Vector3) {
+    public setSteeringFrame(up: Vector3): void {
         this.uSteeringUp.value = up;
     }
 
-    public setRollCompensationAngle(angle: number) {
+    public setRollCompensationAngle(angle: number): void {
         this.uRollCompensationAngle.value = angle;
     }
 
-    public setSteeringBend(yaw: number, pitch: number) {
+    public setSteeringBend(yaw: number, pitch: number): void {
         this.uBendYaw.value = yaw;
         this.uBendPitch.value = -pitch;
     }
 
-    public dispose() {
+    public dispose(): void {
         this.material.dispose();
     }
 }

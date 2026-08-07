@@ -22,7 +22,7 @@ export function getTemperatureRange(
     effectiveTemperature: number,
     greenHouseOffset: number,
     atmospherePressure: number,
-) {
+): { min: number; max: number } {
     const heatRedistribution = clamp(atmospherePressure / (2 * EarthSeaLevelPressure), 0, 1);
     const meanSurfaceTemperature = effectiveTemperature + greenHouseOffset;
 

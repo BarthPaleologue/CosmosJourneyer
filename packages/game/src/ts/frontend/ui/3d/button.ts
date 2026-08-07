@@ -72,7 +72,7 @@ export class Button implements Transformable, Interactive {
         return [
             {
                 label: this.interaction.label,
-                perform: async () => {
+                perform: async (): Promise<void> => {
                     this.startPressAnimation();
                     await this.interaction.perform();
                 },
@@ -80,7 +80,7 @@ export class Button implements Transformable, Interactive {
         ];
     }
 
-    private startPressAnimation() {
+    private startPressAnimation(): void {
         if (this.isBeingPressed) {
             return;
         }

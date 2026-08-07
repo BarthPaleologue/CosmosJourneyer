@@ -19,7 +19,7 @@ import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-export function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): Promise<{
+export async function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): Promise<{
     encyclopaediaUrlBase: string;
     accountId: string;
     password: string;

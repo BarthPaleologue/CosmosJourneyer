@@ -19,7 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { WireframeTopology } from "./wireframeTopology";
 
-const asTriples = (arr: Uint32Array) =>
+const asTriples = (arr: Uint32Array): string[] =>
     Array.from({ length: Math.floor(arr.length / 3) }, (_, i) => {
         const v1 = arr[3 * i];
         const v2 = arr[3 * i + 1];
@@ -95,15 +95,15 @@ describe("WireframeTopology", () => {
         }
         const edges = edgesResult.value;
 
-        const asPairsNormalized = (a: Uint32Array) =>
+        const asPairsNormalized = (a: Uint32Array): number[][] =>
             Array.from({ length: a.length / 2 }, (_, i) => {
-                const v1 = a[2 * i];
-                const v2 = a[2 * i + 1];
-                if (v1 === undefined || v2 === undefined) {
+                const edgeV1 = a[2 * i];
+                const edgeV2 = a[2 * i + 1];
+                if (edgeV1 === undefined || edgeV2 === undefined) {
                     throw new Error("Invalid edge indices");
                 }
 
-                const p = [v1, v2];
+                const p = [edgeV1, edgeV2];
                 p.sort((x, y) => x - y);
                 return p;
             });

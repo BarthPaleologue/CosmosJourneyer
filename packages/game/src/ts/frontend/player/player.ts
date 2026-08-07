@@ -124,7 +124,7 @@ export class Player {
      * @param objectId The object to add to the list of visited objects.
      * @returns True if the object was added, false if it was already in the list.
      */
-    addVisitedObjectIfNew(objectId: UniverseObjectId) {
+    addVisitedObjectIfNew(objectId: UniverseObjectId): boolean {
         if (this.hasVisitedObject(objectId)) {
             return false;
         }
@@ -206,7 +206,7 @@ export class Player {
      * Performs a deep copy of the player
      * @param player the player to copy from
      */
-    public copyFrom(player: Player, universeBackend: UniverseBackend) {
+    public copyFrom(player: Player, universeBackend: UniverseBackend): void {
         this.uuid = player.uuid;
         this.setName(player.getName());
         this.setBalance(player.getBalance());
@@ -237,7 +237,7 @@ export class Player {
         this.tutorials = structuredClone(player.tutorials);
     }
 
-    public setName(name: string) {
+    public setName(name: string): void {
         this.#name = name;
         this.onNameChangedObservable.notifyObservers(name);
     }
@@ -246,7 +246,7 @@ export class Player {
         return this.#name;
     }
 
-    public setBalance(balance: number) {
+    public setBalance(balance: number): void {
         this.#balance = balance;
         this.onBalanceChangedObservable.notifyObservers(balance);
     }

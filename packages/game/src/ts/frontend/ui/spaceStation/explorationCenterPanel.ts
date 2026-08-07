@@ -94,7 +94,9 @@ export class ExplorationCenterPanel {
             this.soundPlayer.playNow("click");
 
             const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
-            if (connectionInfo === null) return;
+            if (connectionInfo === null) {
+                return;
+            }
         });
         encyclopaediaContainer.appendChild(addEncyclopaediaInstanceButton);
 
@@ -178,14 +180,16 @@ export class ExplorationCenterPanel {
         horizontalContainer.appendChild(this.discoveryDetails.htmlRoot);
     }
 
-    private filterDiscoveryListByQuery(query: string) {
+    private filterDiscoveryListByQuery(query: string): void {
         for (const listItem of this.discoveryList.children) {
-            if (!(listItem instanceof HTMLDivElement)) continue;
+            if (!(listItem instanceof HTMLDivElement)) {
+                continue;
+            }
             listItem.hidden = !listItem.innerHTML.toLowerCase().includes(query);
         }
     }
 
-    async populate(universeBackend: UniverseBackend) {
+    async populate(universeBackend: UniverseBackend): Promise<void> {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 

@@ -18,9 +18,9 @@
 // based on the solution of https://stackoverflow.com/questions/42919469/efficient-way-to-implement-priority-queue-in-javascript
 
 const topIndex = 0;
-const parentIndex = (i: number) => ((i + 1) >>> 1) - 1;
-const leftIndex = (i: number) => (i << 1) + 1;
-const rightIndex = (i: number) => (i + 1) << 1;
+const parentIndex = (i: number): number => ((i + 1) >>> 1) - 1;
+const leftIndex = (i: number): number => (i << 1) + 1;
+const rightIndex = (i: number): number => (i + 1) << 1;
 
 /**
  * Priority queue implementation using a binary heap

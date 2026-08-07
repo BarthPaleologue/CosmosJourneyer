@@ -20,7 +20,7 @@ import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type Scene } from "@babylonjs/core/scene";
 
-export function createEmptyTexture(scene: Scene) {
+export function createEmptyTexture(scene: Scene): RawTexture {
     const emptyTextureData = new Uint8Array([0, 0, 0, 0]); // RGBA
     return new RawTexture(
         emptyTextureData,

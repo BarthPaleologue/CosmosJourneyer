@@ -91,7 +91,7 @@ export class UniverseBackend {
             return densityRng(densitySampleStep++);
         });
 
-        this.universeDensity = (x: number, y: number, z: number) =>
+        this.universeDensity = (x: number, y: number, z: number): number =>
             (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
 
         this.fallbackSystem = fallbackSystem;
@@ -112,7 +112,7 @@ export class UniverseBackend {
      * Adds the given system to the database
      * @param system The system to register
      */
-    public registerCustomSystem(system: StarSystemModel) {
+    public registerCustomSystem(system: StarSystemModel): void {
         const sectorKey = this.starSectorToString(
             system.coordinates.starSectorX,
             system.coordinates.starSectorY,
@@ -155,7 +155,7 @@ export class UniverseBackend {
     public registerSinglePlugin(
         coordinates: StarSystemCoordinates,
         plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ) {
+    ): void {
         this.coordinatesToSinglePlugins.set(serializeStarSystemCoordinates(coordinates), plugin);
     }
 
@@ -167,7 +167,7 @@ export class UniverseBackend {
     public registerGeneralPlugin(
         predicate: (systemModel: StarSystemModel) => boolean,
         plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ) {
+    ): void {
         this.generalPlugins.push({ predicate, plugin });
     }
 
@@ -221,7 +221,18 @@ export class UniverseBackend {
         );
     }
 
-    private getGeneratedSystemCoordinatesInStarSector(sectorX: number, sectorY: number, sectorZ: number) {
+    private getGeneratedSystemCoordinatesInStarSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number,
+    ): {
+        starSectorX: number;
+        starSectorY: number;
+        starSectorZ: number;
+        localX: number;
+        localY: number;
+        localZ: number;
+    }[] {
         const localPositions = this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
 
         return localPositions.map((localPosition) => {
@@ -344,7 +355,12 @@ export class UniverseBackend {
      * @param index The index of the generated system in the star sector.
      * @returns The system model of the system generated given the seed, or null if the system is not found.
      */
-    public getSystemModelFromSeed(starSectorX: number, starSectorY: number, starSectorZ: number, index: number) {
+    public getSystemModelFromSeed(
+        starSectorX: number,
+        starSectorY: number,
+        starSectorZ: number,
+        index: number,
+    ): DeepReadonly<StarSystemModel> | null {
         const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
         return this.getSystemModelFromCoordinates(coordinates);
     }

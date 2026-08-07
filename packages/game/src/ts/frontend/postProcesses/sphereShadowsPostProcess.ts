@@ -88,15 +88,15 @@ export class SphereShadowsPostProcess extends PostProcess {
         });
     }
 
-    public addShadowCaster(shadowCaster: Transformable & HasBoundingSphere) {
+    public addShadowCaster(shadowCaster: Transformable & HasBoundingSphere): void {
         this.sphereShadowCasters.push(shadowCaster);
     }
 
-    public addStellarLights(light: ReadonlyArray<DirectionalLight>) {
+    public addStellarLights(light: ReadonlyArray<DirectionalLight>): void {
         this.stellarLights.push(...light);
     }
 
-    public reset() {
+    public reset(): void {
         this.sphereShadowCasters.length = 0;
         this.stellarLights.length = 0;
     }

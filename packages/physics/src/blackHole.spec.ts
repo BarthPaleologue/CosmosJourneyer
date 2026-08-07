@@ -34,8 +34,10 @@ const cygnusX1Spin = 0.95; // Dimensionless spin parameter a* ≳ 0.95
 const sagittariusAMass = 4.297e6 * SolarMass; // Gravity Collaboration 2019, 4.297 ± 0.012 × 10^6 M☉
 const sagittariusASpin = 0.1; // Low spin estimates from GRAVITY+EHT joint analyses
 
-const rotationPeriodFromSpin = (mass: number, dimensionlessSpin: number) => {
-    if (dimensionlessSpin === 0) return Infinity;
+const rotationPeriodFromSpin = (mass: number, dimensionlessSpin: number): number => {
+    if (dimensionlessSpin === 0) {
+        return Infinity;
+    }
 
     const estimatedRadius = Math.pow(mass / SolarMass, 0.78) * SolarRadius;
     return (((4 * Math.PI) / 5) * estimatedRadius ** 2 * C) / (dimensionlessSpin * G * mass);

@@ -222,8 +222,8 @@ export class RingHabitat implements Transformable {
             arm.rotationQuaternion = rotation;
             arm.parent = this.getTransform();
 
-            const lightYStep = 350;
-            for (let lightY = lightYStep; lightY <= this.radius - lightYStep; lightY += lightYStep) {
+            const armLightYStep = 350;
+            for (let lightY = armLightYStep; lightY <= this.radius - armLightYStep; lightY += armLightYStep) {
                 for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
                     const phi = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
                     const position = new Vector3(
@@ -260,7 +260,7 @@ export class RingHabitat implements Transformable {
         return this.lights;
     }
 
-    update(cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
@@ -301,7 +301,7 @@ export class RingHabitat implements Transformable {
         return this.root;
     }
 
-    dispose() {
+    dispose(): void {
         this.root.dispose();
         this.attachment.dispose();
         this.attachmentAggregate?.dispose();

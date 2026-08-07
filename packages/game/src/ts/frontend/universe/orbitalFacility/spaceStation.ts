@@ -169,7 +169,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         }
     }
 
-    private generate(assets: RenderingAssets) {
+    private generate(assets: RenderingAssets): void {
         for (const section of this.model.sections) {
             const newSection = this.getSectionFromModel(section, assets);
             const lastNode = this.sections.at(-1);
@@ -182,7 +182,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         }
     }
 
-    private placeNode(node: TransformNode, parent: TransformNode) {
+    private placeNode(node: TransformNode, parent: TransformNode): void {
         // Make sure bounds are current
         parent.computeWorldMatrix(true);
         node.computeWorldMatrix(true);
@@ -195,7 +195,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number) {
+    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {
         for (const section of this.sections) {
             section.update(cameraWorldPosition, deltaSeconds);
         }
@@ -205,7 +205,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         return this.root;
     }
 
-    dispose() {
+    dispose(): void {
         this.lightContainer.dispose();
         for (const section of this.sections) {
             section.dispose();

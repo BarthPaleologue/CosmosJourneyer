@@ -19,7 +19,7 @@ export function createHelixVertexData(
     turnCount: number,
     pitch: number,
     tessellation: number,
-) {
+): VertexData {
     const indices: number[] = [];
     const positions: number[] = [];
     const normals: number[] = [];
@@ -79,7 +79,9 @@ export function createHelixVertexData(
             uvs.push(i / tessellation, 1);
             uvs.push(i / tessellation, 0);
 
-            if (turnIndex === 0 && i === 0) continue;
+            if (turnIndex === 0 && i === 0) {
+                continue;
+            }
 
             const stride = 8;
             const spiralIndexOffset = turnIndex * stride * tessellation;
@@ -137,7 +139,7 @@ export function createHelix(
     turnCount: number,
     pitch: number,
     scene: Scene,
-) {
+): Mesh {
     const vertexData = createHelixVertexData(radius, thickness, height, turnCount, pitch, tessellation);
     const ring = new Mesh(name, scene);
     vertexData.applyToMesh(ring);

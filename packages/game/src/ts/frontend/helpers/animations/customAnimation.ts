@@ -46,8 +46,8 @@ export class CustomAnimation<T> {
 
         const sampler: AnimationSampler<T> =
             easing === undefined
-                ? (progress) => linearInterpolation(from, to, progress)
-                : (progress) => {
+                ? (progress): T => linearInterpolation(from, to, progress)
+                : (progress): T => {
                       const easedProgress = easing(progress);
                       return linearInterpolation(from, to, easedProgress);
                   };
@@ -55,7 +55,7 @@ export class CustomAnimation<T> {
         return new CustomAnimation(sampler, durationSeconds);
     }
 
-    update(deltaSeconds: number) {
+    update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
     }
 
@@ -75,7 +75,7 @@ export class CustomAnimation<T> {
         return this.elapsedSeconds >= this.durationSeconds;
     }
 
-    reset() {
+    reset(): void {
         this.elapsedSeconds = 0;
     }
 }

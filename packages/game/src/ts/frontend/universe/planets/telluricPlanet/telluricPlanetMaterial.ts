@@ -214,7 +214,7 @@ export class TelluricPlanetMaterial {
             snow: TerrainTextures;
             noise: Texture;
         },
-    ) {
+    ): TriPlanarMaterialSamples {
         const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
             normalStrength,
         });
@@ -381,11 +381,11 @@ export class TelluricPlanetMaterial {
         return mixTriPlanarSamples(rockSamples, flatSamples, flatnessFactor);
     }
 
-    get() {
+    get(): NodeMaterial {
         return this.material;
     }
 
-    dispose() {
+    dispose(): void {
         this.material.dispose();
     }
 }

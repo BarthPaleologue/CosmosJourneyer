@@ -19,7 +19,7 @@ import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
 import { CollisionMask } from "@/settings";
 
-export function filterVehicleShape(shape: PhysicsShape, vehiclePartsMask: number) {
+export function filterVehicleShape(shape: PhysicsShape, vehiclePartsMask: number): void {
     shape.filterMembershipMask = vehiclePartsMask | CollisionMask.DYNAMIC_OBJECTS;
     shape.filterCollideMask = CollisionMask.EVERYTHING & ~vehiclePartsMask;
 }

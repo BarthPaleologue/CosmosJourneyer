@@ -35,7 +35,7 @@ export class SystemTarget implements Targetable {
         this.transform.position.copyFrom(referencePlanePosition);
     }
 
-    updatePosition(referencePlaneRotation: Matrix, referencePosition: Vector3) {
+    updatePosition(referencePlaneRotation: Matrix, referencePosition: Vector3): void {
         Vector3.TransformCoordinatesToRef(this.referencePlanePosition, referencePlaneRotation, this.transform.position);
         this.transform.position.addInPlace(referencePosition);
         this.transform.computeWorldMatrix(true);

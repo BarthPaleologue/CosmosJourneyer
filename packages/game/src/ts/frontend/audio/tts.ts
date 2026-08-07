@@ -46,7 +46,7 @@ export class Tts implements ITts {
     private readonly voiceLines: SpeakerVoiceLines;
 
     private isPlaying = false;
-    private soundQueue: Set<AbstractSound> = new Set();
+    private readonly soundQueue: Set<AbstractSound> = new Set();
 
     constructor(voiceLines: SpeakerVoiceLines) {
         this.voiceLines = voiceLines;
@@ -92,11 +92,11 @@ export class Tts implements ITts {
         }
     }
 
-    public sayNow(speaker: Speaker, line: VoiceLine) {
+    public sayNow(speaker: Speaker, line: VoiceLine): void {
         this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line).play();
     }
 
-    public enqueueSay(speaker: Speaker, line: VoiceLine) {
+    public enqueueSay(speaker: Speaker, line: VoiceLine): void {
         this.soundQueue.add(this.getLineFromVoiceLines(this.getVoiceLinesFromSpeaker(speaker), line));
     }
 

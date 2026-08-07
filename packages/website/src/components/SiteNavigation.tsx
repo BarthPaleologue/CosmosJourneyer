@@ -1,6 +1,8 @@
+import type { ReactElement } from "react";
+
 import { siteConfig } from "@/siteConfig";
 
-export const SiteNavigation = () => (
+export const SiteNavigation = (): ReactElement => (
     <nav className="siteNav" aria-label="Main navigation">
         <a className="siteMark" href="#top" aria-label="Cosmos Journeyer home">
             <span>CJ</span>

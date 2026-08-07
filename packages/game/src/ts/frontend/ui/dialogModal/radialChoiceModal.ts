@@ -23,7 +23,7 @@ export type RadialChoiceModalOptions = {
     useVirtualCursor: boolean;
 };
 
-export function radialChoiceModal<T>(
+export async function radialChoiceModal<T>(
     choices: ReadonlyArray<T>,
     toString: (value: T) => string,
     soundPlayer: ISoundPlayer,
@@ -52,7 +52,7 @@ export function radialChoiceModal<T>(
     const useVirtualCursor = options?.useVirtualCursor ?? document.pointerLockElement !== null;
     overlay.style.cursor = useVirtualCursor ? "none" : "default";
 
-    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+    const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
 
     const circleSize = 500;
     const center = circleSize / 2;
@@ -108,7 +108,7 @@ export function radialChoiceModal<T>(
 
     const getChoice = (index: number): T => choices[index] ?? defaultChoice;
 
-    const getPointerOffsetFromCenter = (clientX: number, clientY: number) => {
+    const getPointerOffsetFromCenter = (clientX: number, clientY: number): { x: number; y: number } => {
         const rect = circle.getBoundingClientRect();
         return {
             x: clientX - (rect.left + rect.width / 2),
@@ -116,7 +116,7 @@ export function radialChoiceModal<T>(
         };
     };
 
-    const setSelectedIndex = (index: number) => {
+    const setSelectedIndex = (index: number): void => {
         selectedIndex = (index + choices.length) % choices.length;
         segments.forEach(({ path, label }, idx) => {
             const isActive = idx === selectedIndex;
@@ -127,7 +127,7 @@ export function radialChoiceModal<T>(
         currentLabel.textContent = toString(getChoice(selectedIndex));
     };
 
-    const setSelectedFromPointer = (clientX: number, clientY: number) => {
+    const setSelectedFromPointer = (clientX: number, clientY: number): void => {
         const { x: pointerX, y: pointerY } = getPointerOffsetFromCenter(clientX, clientY);
         let closestIndex = selectedIndex;
         let closestDistanceSq = Number.POSITIVE_INFINITY;
@@ -145,7 +145,7 @@ export function radialChoiceModal<T>(
         }
     };
 
-    const cleanup = () => {
+    const cleanup = (): void => {
         overlay.removeEventListener("keydown", handleKeydown);
         overlay.removeEventListener("click", handleOverlayClick);
         overlay.removeEventListener("mousemove", handleMouseMove);
@@ -159,7 +159,7 @@ export function radialChoiceModal<T>(
 
     let hasSettled = false;
 
-    const finish = (result: T | null) => {
+    const finish = (result: T | null): void => {
         if (hasSettled) {
             return;
         }
@@ -169,11 +169,11 @@ export function radialChoiceModal<T>(
         resolveChoice(result);
     };
 
-    const handleOverlayClick = () => {
+    const handleOverlayClick = (): void => {
         finish(getChoice(selectedIndex));
     };
 
-    const handleKeydown = (event: KeyboardEvent) => {
+    const handleKeydown = (event: KeyboardEvent): void => {
         event.stopPropagation();
         if (event.key === "Escape") {
             event.preventDefault();
@@ -181,16 +181,16 @@ export function radialChoiceModal<T>(
         }
     };
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = (event: MouseEvent): void => {
         setSelectedFromPointer(event.clientX, event.clientY);
     };
 
-    const polarToCartesian = (angle: number, radius: number) => ({
+    const polarToCartesian = (angle: number, radius: number): { x: number; y: number } => ({
         x: center + Math.cos(angle) * radius,
         y: center + Math.sin(angle) * radius,
     });
 
-    const segmentPath = (start: number, end: number) => {
+    const segmentPath = (start: number, end: number): string => {
         const outerStart = polarToCartesian(start, outerRadius);
         const outerEnd = polarToCartesian(end, outerRadius);
         const innerStart = polarToCartesian(end, innerRadius);
@@ -320,7 +320,7 @@ export function radialChoiceModal<T>(
 
     svg.appendChild(strokeOverlay);
 
-    let detachVirtualCursorListeners = () => {};
+    let detachVirtualCursorListeners = (): void => {};
 
     if (useVirtualCursor) {
         const virtualCursor = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -333,18 +333,18 @@ export function radialChoiceModal<T>(
         cursor.style.zIndex = "1001";
         overlay.appendChild(cursor);
 
-        const updateCursorPosition = (nextX: number, nextY: number) => {
+        const updateCursorPosition = (nextX: number, nextY: number): void => {
             virtualCursor.x = clamp(nextX, 0, window.innerWidth);
             virtualCursor.y = clamp(nextY, 0, window.innerHeight);
             cursor.style.transform = `translate(calc(${virtualCursor.x}px - 50%), calc(${virtualCursor.y}px - 50%))`;
             setSelectedFromPointer(virtualCursor.x, virtualCursor.y);
         };
 
-        const handleVirtualMouseMove = (event: MouseEvent) => {
+        const handleVirtualMouseMove = (event: MouseEvent): void => {
             updateCursorPosition(virtualCursor.x + event.movementX, virtualCursor.y + event.movementY);
         };
 
-        const handleVirtualClick = (event: MouseEvent) => {
+        const handleVirtualClick = (event: MouseEvent): void => {
             if (event.button !== 0) {
                 return;
             }
@@ -353,7 +353,7 @@ export function radialChoiceModal<T>(
             finish(getChoice(selectedIndex));
         };
 
-        const handleResize = () => {
+        const handleResize = (): void => {
             updateCursorPosition(virtualCursor.x, virtualCursor.y);
         };
 
@@ -362,7 +362,7 @@ export function radialChoiceModal<T>(
         window.addEventListener("mousedown", handleVirtualClick, true);
         window.addEventListener("resize", handleResize);
 
-        detachVirtualCursorListeners = () => {
+        detachVirtualCursorListeners = (): void => {
             window.removeEventListener("mousemove", handleVirtualMouseMove, true);
             window.removeEventListener("mousedown", handleVirtualClick, true);
             window.removeEventListener("resize", handleResize);

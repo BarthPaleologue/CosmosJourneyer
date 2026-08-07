@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export function clamp(value: number, min: number, max: number) {
+export function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
 }
 
@@ -31,11 +31,11 @@ export function smoothstep(edge0: number, edge1: number, x: number): number {
     return t * t * (3 - 2 * t);
 }
 
-export function triangleWave(x: number) {
+export function triangleWave(x: number): number {
     return 2 * Math.abs(x - Math.floor(x + 0.5));
 }
 
-export function remap(value: number, from1: number, to1: number, from2: number, to2: number) {
+export function remap(value: number, from1: number, to1: number, from2: number, to2: number): number {
     return from2 + ((value - from1) * (to2 - from2)) / (to1 - from1);
 }
 
@@ -53,7 +53,7 @@ export function gcd(a: number, b: number): number {
  * @param maxIterations The maximum number of iterations to perform for the search
  * @returns The value that minimizes the function
  */
-export function findMinimumNewtonRaphson(f: (x: number) => number, startingPoint: number, maxIterations = 100) {
+export function findMinimumNewtonRaphson(f: (x: number) => number, startingPoint: number, maxIterations = 100): number {
     const delta = 1e-4;
     const tolerance = 1e-8;
 
@@ -83,7 +83,7 @@ export function lerp(a: number, b: number, t: number): number {
     return a + (b - a) * t;
 }
 
-export function mod(value: number, modulus: number) {
+export function mod(value: number, modulus: number): number {
     return ((value % modulus) + modulus) % modulus;
 }
 
@@ -109,6 +109,6 @@ export function lerpAngle(a: number, b: number, t: number): number {
  * @returns The interpolated value
  * @see https://x.com/FreyaHolmer/status/1757836988495847568
  */
-export function lerpSmooth(a: number, b: number, halfLifeSeconds: number, deltaSeconds: number) {
+export function lerpSmooth(a: number, b: number, halfLifeSeconds: number, deltaSeconds: number): number {
     return b + (a - b) * 2 ** (-deltaSeconds / halfLifeSeconds);
 }

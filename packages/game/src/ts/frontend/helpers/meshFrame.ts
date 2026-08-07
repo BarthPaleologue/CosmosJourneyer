@@ -26,24 +26,28 @@ export function createEdgeTubeFrame(
     edges: Uint32Array,
     radius: number,
     scene: Scene,
-) {
-    const edgeKey = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
+): Mesh | null {
+    const edgeKey = (a: number, b: number): string => (a < b ? `${a}_${b}` : `${b}_${a}`);
     const seen = new Set<string>();
     const tubes: Array<Mesh> = [];
     const tessellation = 12;
     const overlap = 0;
 
-    const getVec = (i: number) => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
+    const getVec = (i: number): Vector3 => new Vector3(positions[3 * i], positions[3 * i + 1], positions[3 * i + 2]);
 
     const usedVerts = new Set<number>();
 
     for (let i = 0; i < edges.length; i += 2) {
         const a = edges[i];
         const b = edges[i + 1];
-        if (a === undefined || b === undefined) continue;
+        if (a === undefined || b === undefined) {
+            continue;
+        }
 
         const k = edgeKey(a, b);
-        if (seen.has(k)) continue;
+        if (seen.has(k)) {
+            continue;
+        }
         seen.add(k);
 
         usedVerts.add(a);
@@ -68,14 +72,18 @@ export function createEdgeTubeFrame(
         const x = positions[3 * vi];
         const y = positions[3 * vi + 1];
         const z = positions[3 * vi + 2];
-        if (x === undefined || y === undefined || z === undefined) continue;
+        if (x === undefined || y === undefined || z === undefined) {
+            continue;
+        }
         const joint = MeshBuilder.CreateSphere(`j_${vi}`, { diameter: radius * 2, segments: 12 }, scene);
         joint.position.set(x, y, z);
         tubes.push(joint);
     }
 
     const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
-    if (!merged) return null;
+    if (!merged) {
+        return null;
+    }
     merged.name = name;
     return merged;
 }

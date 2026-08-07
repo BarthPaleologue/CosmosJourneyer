@@ -132,8 +132,10 @@ export class TutorialLayer implements IDisposable {
         });
     }
 
-    public async setTutorial(tutorial: Tutorial) {
-        if (this.isEnabled()) this.setEnabled(false);
+    public async setTutorial(tutorial: Tutorial): Promise<void> {
+        if (this.isEnabled()) {
+            this.setEnabled(false);
+        }
         this.title.innerText = tutorial.getTitle();
         this.tutorialPanelsHtml = [];
         this.currentPanelIndex = 0;
@@ -143,22 +145,22 @@ export class TutorialLayer implements IDisposable {
         this.updatePanelState();
     }
 
-    public quitTutorial() {
+    public quitTutorial(): void {
         this.setEnabled(false);
         this.soundPlayer.playNow("click");
         this.onQuitTutorial.notifyObservers();
     }
 
-    public setEnabled(enabled: boolean) {
+    public setEnabled(enabled: boolean): void {
         this.panel.classList.toggle("hidden", !enabled);
         TutorialControlsInputs.setEnabled(enabled);
     }
 
-    public isEnabled() {
+    public isEnabled(): boolean {
         return !this.panel.classList.contains("hidden");
     }
 
-    private updatePanelState() {
+    private updatePanelState(): void {
         this.contentContainer.innerHTML =
             this.tutorialPanelsHtml[this.currentPanelIndex] ?? "ERROR: panels out of bounds";
 

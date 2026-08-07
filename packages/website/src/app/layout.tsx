@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 import { siteConfig } from "@/siteConfig";
 import "@/styles/site.css";
@@ -91,7 +91,7 @@ interface RootLayoutProps {
     children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps): ReactElement {
     return (
         <html lang="en">
             <body>{children}</body>

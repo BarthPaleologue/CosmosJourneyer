@@ -40,11 +40,11 @@ try {
     await crashReporter.reportCrash({ type: "startup", value: error });
 }
 
-async function simpleInit(engine: CosmosJourneyer) {
+async function simpleInit(engine: CosmosJourneyer): Promise<void> {
     await engine.init(false);
 }
 
-async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
+async function initWithSaveString(engine: CosmosJourneyer, saveString: string): Promise<void> {
     const jsonString = decodeBase64(saveString);
     const json = jsonSafeParse(jsonString);
     if (json === null) {
@@ -65,7 +65,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string) {
     engine.starSystemView.setUIEnabled(true);
 }
 
-async function startCosmosJourneyer() {
+async function startCosmosJourneyer(): Promise<void> {
     const engine = await CosmosJourneyer.CreateAsync();
 
     const urlParams = new URLSearchParams(window.location.search);

@@ -162,11 +162,11 @@ export class SpaceElevatorClimber implements Targetable {
         return i18n.t("objectTypes:spaceElevatorClimber");
     }
 
-    getTransform() {
+    getTransform(): TransformNode {
         return this.transform;
     }
 
-    dispose() {
+    dispose(): void {
         this.metalSectionMaterial.dispose();
         this.transform.dispose();
     }

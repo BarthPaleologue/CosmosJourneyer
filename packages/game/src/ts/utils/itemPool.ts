@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export class ItemPool<TItem> {
-    private pool: Array<TItem> = [];
+    private readonly pool: Array<TItem> = [];
 
     private readonly makeItem: () => TItem;
 

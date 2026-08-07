@@ -30,7 +30,9 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
         excludedMeshes: ReadonlyArray<AbstractMesh>,
         scene: Scene,
     ) {
-        if (scene.activeCamera === null) throw new Error("no camera");
+        if (scene.activeCamera === null) {
+            throw new Error("no camera");
+        }
         super(
             `${starMesh.name}VolumetricLight`,
             1,

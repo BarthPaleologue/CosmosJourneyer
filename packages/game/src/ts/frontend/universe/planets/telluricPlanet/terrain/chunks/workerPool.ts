@@ -34,13 +34,13 @@ export class WorkerPool<TTask, TWorkerInput> {
     ) {
         this.taskQueue = new PriorityQueue<TTask>(comparator);
         for (const worker of workers) {
-            worker.onerror = (event) => {
+            worker.onerror = (event): void => {
                 console.error("Worker error", event);
                 this.busyWorkers.delete(worker);
                 this.finishedWorkers.add(worker);
             };
 
-            worker.onmessageerror = (event) => {
+            worker.onmessageerror = (event): void => {
                 console.error("Worker message error", event);
                 this.busyWorkers.delete(worker);
                 this.finishedWorkers.add(worker);
@@ -79,7 +79,7 @@ export class WorkerPool<TTask, TWorkerInput> {
 
         const serializedTask = this.serializeTask(task);
 
-        worker.onmessage = (event: MessageEvent<unknown>) => {
+        worker.onmessage = (event: MessageEvent<unknown>): void => {
             this.handleWorkerResult(event);
 
             const nextTask = this.nextTask();
@@ -94,7 +94,7 @@ export class WorkerPool<TTask, TWorkerInput> {
         worker.postMessage(serializedTask);
     }
 
-    public submitTask(task: TTask) {
+    public submitTask(task: TTask): void {
         this.taskQueue.push(task);
     }
 
@@ -102,11 +102,11 @@ export class WorkerPool<TTask, TWorkerInput> {
         return this.taskQueue.pop();
     }
 
-    public reset() {
+    public reset(): void {
         this.taskQueue.clear();
 
         for (const busyWorker of this.busyWorkers) {
-            busyWorker.onmessage = () => {
+            busyWorker.onmessage = (): void => {
                 this.busyWorkers.delete(busyWorker);
                 this.finishedWorkers.add(busyWorker);
             };

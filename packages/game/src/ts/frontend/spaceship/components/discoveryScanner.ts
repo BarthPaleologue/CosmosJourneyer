@@ -42,7 +42,7 @@ export class DiscoveryScanner {
         this.relativeRange = spec.relativeRange;
     }
 
-    serialize() {
+    serialize(): { type: "discoveryScanner"; size: number; quality: number } {
         return {
             type: this.type,
             size: this.size,
@@ -51,7 +51,11 @@ export class DiscoveryScanner {
     }
 }
 
-export function isScannerInRange(scanner: DiscoveryScanner, playerPosition: Vector3, celestialBody: CelestialBody) {
+export function isScannerInRange(
+    scanner: DiscoveryScanner,
+    playerPosition: Vector3,
+    celestialBody: CelestialBody,
+): boolean {
     let baseDistanceMultiplier: number;
     const type = celestialBody.type;
     switch (type) {

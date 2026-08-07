@@ -75,6 +75,12 @@ const typeScriptWorkspaceRules = {
     rules: {
         "import-x/no-cycle": "error",
         "import-x/no-duplicates": ["error", { "prefer-inline": true }],
+        "import-x/no-extraneous-dependencies": "error",
+
+        "no-warning-comments": ["warn", { terms: ["todo", "fixme", "xxx", "hack"] }],
+
+        // enforce braces around control flow statements
+        curly: "error",
 
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         "@typescript-eslint/no-inferrable-types": "error",
@@ -82,6 +88,16 @@ const typeScriptWorkspaceRules = {
         "@typescript-eslint/strict-boolean-expressions": "error",
 
         "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+
+        "@typescript-eslint/consistent-type-exports": "error",
+
+        "@typescript-eslint/prefer-readonly": "error",
+
+        "@typescript-eslint/no-shadow": "error",
+
+        "@typescript-eslint/promise-function-async": "error",
+
+        "@typescript-eslint/explicit-function-return-type": "error",
 
         "@typescript-eslint/no-misused-promises": [
             "error",

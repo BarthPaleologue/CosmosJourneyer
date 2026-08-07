@@ -43,7 +43,7 @@ export function generateNeutronStarModel(
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
-    const mass = 1.9885e30; //TODO: compute mass from physical properties
+    const mass = 1.9885e30;
 
     const rotation: Rotation = {
         axialTilt: 0,
@@ -59,7 +59,6 @@ export function generateNeutronStarModel(
 
     const dipoleTilt = randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT);
 
-    // Todo: do not hardcode
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
     const parentIds = parentBodies.map((body) => body.id);

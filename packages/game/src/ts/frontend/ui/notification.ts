@@ -130,7 +130,7 @@ export class Notification {
         this.htmlRoot.style.animation = `popOut ${this.removalDurationSeconds}s ease-in-out`;
     }
 
-    hasRemovalStarted() {
+    hasRemovalStarted(): boolean {
         return this.isBeingRemoved;
     }
 

@@ -100,7 +100,7 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         }
     }
 
-    dispose() {
+    dispose(): void {
         for (const face of this.faces) {
             face.dispose();
         }

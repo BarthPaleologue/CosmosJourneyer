@@ -46,7 +46,7 @@ describe("UniverseBackend", () => {
     describe("registerSinglePlugin", () => {
         it("should modify a system at specific coordinates", () => {
             const coordinates: StarSystemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
-            const plugin = (system: StarSystemModel) => {
+            const plugin = (system: StarSystemModel): StarSystemModel => {
                 system.name = "Modified System";
                 return system;
             };

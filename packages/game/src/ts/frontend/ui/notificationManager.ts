@@ -71,7 +71,9 @@ export class NotificationManager implements INotificationManager {
     }
 
     setVisible(visible: boolean): void {
-        if (this.isVisible === visible) return;
+        if (this.isVisible === visible) {
+            return;
+        }
 
         this.isVisible = visible;
         if (visible) {

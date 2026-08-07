@@ -75,7 +75,7 @@ export async function createGravitySystemScene(
     );
     sphere2Aggregate.body.disablePreStep = false;
 
-    const randomDirection = () => {
+    const randomDirection = (): Vector3 => {
         const theta = Math.random() * 2 * Math.PI;
         const phi = Math.acos(2 * Math.random() - 1);
         const x = Math.sin(phi) * Math.cos(theta);

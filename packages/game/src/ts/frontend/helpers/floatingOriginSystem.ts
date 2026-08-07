@@ -33,7 +33,7 @@ export class FloatingOriginSystem {
         this.scene = scene;
     }
 
-    public update(observerPosition: Vector3) {
+    public update(observerPosition: Vector3): void {
         if (observerPosition.lengthSquared() < this.rebasingThresholdSquared) {
             return;
         }
@@ -64,7 +64,7 @@ export class FloatingOriginSystem {
         return ref.copyFrom(this.originOffset);
     }
 
-    public reset() {
+    public reset(): void {
         this.originOffset.setAll(0);
     }
 }

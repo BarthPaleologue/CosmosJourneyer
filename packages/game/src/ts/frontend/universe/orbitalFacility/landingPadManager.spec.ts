@@ -62,13 +62,13 @@ class MockLandingPad implements ILandingPad {
     }
 
     // Implement other required LandingPad methods with minimal functionality
-    getTransform() {
+    getTransform(): TransformNode {
         return this.transform;
     }
-    dispose() {
+    dispose(): void {
         this.transform.dispose();
     }
-    getBoundingRadius() {
+    getBoundingRadius(): number {
         return 0;
     }
 }

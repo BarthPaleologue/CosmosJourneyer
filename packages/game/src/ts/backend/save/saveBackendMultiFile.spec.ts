@@ -28,8 +28,8 @@ import { type CmdrSaves, type Save } from "./saveFileData";
  * Mock implementation of IFileSystem for testing
  */
 class MockFileSystem implements IFileSystem {
-    private files = new Map<string, string>();
-    private directories = new Set<string>();
+    private readonly files = new Map<string, string>();
+    private readonly directories = new Set<string>();
 
     constructor() {
         // Always have root directories
@@ -38,7 +38,7 @@ class MockFileSystem implements IFileSystem {
         this.directories.add("/corrupted");
     }
 
-    public createDirectory(path: string): Promise<boolean> {
+    public async createDirectory(path: string): Promise<boolean> {
         // Create all parent directories
         const parts = path.split("/").filter(Boolean);
         let currentPath = "";
@@ -49,7 +49,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(true);
     }
 
-    public deleteDirectory(path: string): Promise<boolean> {
+    public async deleteDirectory(path: string): Promise<boolean> {
         // Delete directory and all files within it
         for (const filePath of this.files.keys()) {
             if (filePath.startsWith(path + "/")) {
@@ -67,7 +67,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(true);
     }
 
-    public listDirectory(path: string): Promise<string[] | null> {
+    public async listDirectory(path: string): Promise<string[] | null> {
         if (!this.directories.has(path)) {
             return Promise.resolve(null);
         }
@@ -107,7 +107,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(Array.from(items).sort());
     }
 
-    public directoryExists(path: string): Promise<boolean> {
+    public async directoryExists(path: string): Promise<boolean> {
         return Promise.resolve(this.directories.has(path));
     }
 
@@ -122,16 +122,16 @@ class MockFileSystem implements IFileSystem {
         return true;
     }
 
-    public readFile(path: string): Promise<string | null> {
+    public async readFile(path: string): Promise<string | null> {
         const content = this.files.get(path);
         return Promise.resolve(content ?? null);
     }
 
-    public deleteFile(path: string): Promise<boolean> {
+    public async deleteFile(path: string): Promise<boolean> {
         return Promise.resolve(this.files.delete(path));
     }
 
-    public fileExists(path: string): Promise<boolean> {
+    public async fileExists(path: string): Promise<boolean> {
         return Promise.resolve(this.files.has(path));
     }
 
@@ -160,7 +160,7 @@ describe("SaveBackendMultiFile", () => {
     const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
     const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";
 
-    const createTestSave = (timestamp: number, uuid?: string) => {
+    const createTestSave = (timestamp: number, uuid?: string): Save => {
         return {
             uuid: uuid ?? crypto.randomUUID(),
             timestamp,
