@@ -135,32 +135,61 @@ export class WireframeTopology {
         for (const [u, nu] of adj) {
             for (const v of nu) {
                 if (v <= u) continue;
-                const nv = adj.get(v);
-                if (!nv) return err(`Adjacency missing for vertex ${v}`);
-                for (const w of nv) {
-                    if (w <= v) continue;
-                    if (nu.has(w)) {
-                        const indexU = this.getIndex(indexOf, u);
-                        if (!indexU.success) {
-                            return indexU;
-                        }
-
-                        const indexV = this.getIndex(indexOf, v);
-                        if (!indexV.success) {
-                            return indexV;
-                        }
-
-                        const indexW = this.getIndex(indexOf, w);
-                        if (!indexW.success) {
-                            return indexW;
-                        }
-
-                        triangles.push(indexU.value, indexV.value, indexW.value);
-                    }
+                const result = this.addTrianglesForVertex(indexOf, adj, nu, u, v, triangles);
+                if (!result.success) {
+                    return err(result.error);
                 }
             }
         }
 
         return ok(new Uint32Array(triangles));
+    }
+
+    private addTrianglesForVertex(
+        indexOf: Map<VertexHandle, number>,
+        adj: Map<VertexHandle, Set<VertexHandle>>,
+        nu: Set<VertexHandle>,
+        u: VertexHandle,
+        v: VertexHandle,
+        triangles: number[],
+    ): Result<void, string> {
+        const nv = adj.get(v);
+        if (!nv) return err(`Adjacency missing for vertex ${v}`);
+        for (const w of nv) {
+            if (w <= v) continue;
+            if (!nu.has(w)) continue;
+            const triangle = this.resolveTriangleIndices(indexOf, u, v, w);
+            if (!triangle.success) {
+                return err(triangle.error);
+            }
+
+            triangles.push(triangle.value[0], triangle.value[1], triangle.value[2]);
+        }
+
+        return ok(undefined);
+    }
+
+    private resolveTriangleIndices(
+        indexOf: Map<VertexHandle, number>,
+        u: VertexHandle,
+        v: VertexHandle,
+        w: VertexHandle,
+    ): Result<[number, number, number], string> {
+        const indexU = this.getIndex(indexOf, u);
+        if (!indexU.success) {
+            return indexU;
+        }
+
+        const indexV = this.getIndex(indexOf, v);
+        if (!indexV.success) {
+            return indexV;
+        }
+
+        const indexW = this.getIndex(indexOf, w);
+        if (!indexW.success) {
+            return indexW;
+        }
+
+        return ok([indexU.value, indexV.value, indexW.value]);
     }
 }

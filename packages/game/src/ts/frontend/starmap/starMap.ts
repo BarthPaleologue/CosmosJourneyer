@@ -99,6 +99,12 @@ export class StarMap {
     private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
     private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
 
+    /** Scratch buffer for computing a sector's coordinates (reused to avoid allocations in the hot loop). */
+    private readonly sectorCoordinatesScratch = new Vector3();
+
+    /** Scratch buffer for computing a sector's world position (reused to avoid allocations in the hot loop). */
+    private readonly sectorWorldPositionScratch = new Vector3();
+
     private starSectorSize = Settings.STAR_SECTOR_SIZE;
 
     constructor(universeBackend: UniverseBackend, textures: StarMapTextures, scene: Scene) {
@@ -310,39 +316,49 @@ export class StarMap {
         }
 
         // then generate missing sectors
-        const tempVector1 = new Vector3();
-        const tempVector2 = new Vector3();
         for (let x = -this.starSectorLoadRadius; x <= this.starSectorLoadRadius; x++) {
             for (let y = -this.starSectorLoadRadius; y <= this.starSectorLoadRadius; y++) {
                 for (let z = -this.starSectorLoadRadius; z <= this.starSectorLoadRadius; z++) {
-                    if (x * x + y * y + z * z > this.starSectorLoadRadius * this.starSectorLoadRadius) {
-                        continue;
-                    }
-
-                    const coordinates = tempVector1.copyFromFloats(x, y, z).addInPlace(currentStarSectorCoordinates);
-                    const sectorKey = vector3ToString(coordinates);
-
-                    if (this.loadedStarSectors.has(sectorKey)) {
-                        continue;
-                    }
-
-                    // don't generate star sectors that are not in the frustum
-                    const bb = StarSectorView.GetBoundingBox(
-                        coordinates.scaleToRef(this.starSectorSize, tempVector2),
-                        this.starSectorSize,
-                    );
-                    if (!camera.isInFrustum(bb)) {
-                        continue;
-                    }
-
-                    const starSector = new StarSectorView(coordinates, this.starSectorSize, this.universeBackend);
-                    this.loadedStarSectors.set(starSector.getKey(), starSector);
-                    this.starBuildStack.push(...starSector.generate());
+                    this.loadStarSectorIfNeeded(x, y, z, currentStarSectorCoordinates, camera);
                 }
             }
         }
 
         this.buildNextStars(this.starBuildBatchSize);
+    }
+
+    private loadStarSectorIfNeeded(
+        x: number,
+        y: number,
+        z: number,
+        currentStarSectorCoordinates: Vector3,
+        camera: Camera,
+    ) {
+        if (x * x + y * y + z * z > this.starSectorLoadRadius * this.starSectorLoadRadius) {
+            return;
+        }
+
+        const coordinates = this.sectorCoordinatesScratch
+            .copyFromFloats(x, y, z)
+            .addInPlace(currentStarSectorCoordinates);
+        const sectorKey = vector3ToString(coordinates);
+
+        if (this.loadedStarSectors.has(sectorKey)) {
+            return;
+        }
+
+        // don't generate star sectors that are not in the frustum
+        const bb = StarSectorView.GetBoundingBox(
+            coordinates.scaleToRef(this.starSectorSize, this.sectorWorldPositionScratch),
+            this.starSectorSize,
+        );
+        if (!camera.isInFrustum(bb)) {
+            return;
+        }
+
+        const starSector = new StarSectorView(coordinates, this.starSectorSize, this.universeBackend);
+        this.loadedStarSectors.set(starSector.getKey(), starSector);
+        this.starBuildStack.push(...starSector.generate());
     }
 
     private fadeIn(instance: InstancedMesh) {

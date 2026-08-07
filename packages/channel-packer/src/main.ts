@@ -278,21 +278,30 @@ function drawRowPreviews(appState: AppState, uiRefs: UiRefs): void {
                 const outputIndex = (y * RowPreviewResolution + x) * 4;
                 const value = sourcePixels[packedIndex] ?? 0;
 
-                if (channel === "a") {
-                    outputPixels[outputIndex] = 255;
-                    outputPixels[outputIndex + 1] = 255;
-                    outputPixels[outputIndex + 2] = 255;
-                    outputPixels[outputIndex + 3] = value;
-                } else {
-                    outputPixels[outputIndex] = value;
-                    outputPixels[outputIndex + 1] = value;
-                    outputPixels[outputIndex + 2] = value;
-                    outputPixels[outputIndex + 3] = 255;
-                }
+                writePreviewPixel(outputPixels, outputIndex, value, channel);
             }
         }
 
         context.putImageData(imageData, 0, 0);
+    }
+}
+
+function writePreviewPixel(
+    outputPixels: Uint8ClampedArray,
+    outputIndex: number,
+    value: number,
+    channel: ColorChannel,
+): void {
+    if (channel === "a") {
+        outputPixels[outputIndex] = 255;
+        outputPixels[outputIndex + 1] = 255;
+        outputPixels[outputIndex + 2] = 255;
+        outputPixels[outputIndex + 3] = value;
+    } else {
+        outputPixels[outputIndex] = value;
+        outputPixels[outputIndex + 1] = value;
+        outputPixels[outputIndex + 2] = value;
+        outputPixels[outputIndex + 3] = 255;
     }
 }
 

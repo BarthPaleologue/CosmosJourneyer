@@ -160,29 +160,15 @@ export class SolarSection implements StationSection {
                     secondaryArmLength / 2 + attachmentRadius * Math.cos(Math.PI / attachmentTessellation),
                 );
 
-                const lightYStepArm = 200;
-                for (
-                    let lightY = lightYStepArm;
-                    lightY <= secondaryArmLength - lightYStepArm;
-                    lightY += lightYStepArm
-                ) {
-                    for (let sideIndex = 0; sideIndex < secondaryArmTessellation; sideIndex += 2) {
-                        const theta =
-                            ((2 * Math.PI) / secondaryArmTessellation) * sideIndex + Math.PI / secondaryArmTessellation;
-                        const position = new Vector3(
-                            (secondaryArmRadius + lightRadius) *
-                                Math.cos(theta) *
-                                Math.cos(Math.PI / secondaryArmTessellation),
-                            lightY,
-                            (secondaryArmRadius + lightRadius) *
-                                Math.sin(theta) *
-                                Math.cos(Math.PI / secondaryArmTessellation),
-                        );
-                        position.rotateByQuaternionToRef(rotation, position);
-
-                        lightPoints.push({ position, rotation });
-                    }
-                }
+                lightPoints.push(
+                    ...this.getSecondaryArmLightPoints(
+                        rotation,
+                        secondaryArmLength,
+                        secondaryArmRadius,
+                        lightRadius,
+                        secondaryArmTessellation,
+                    ),
+                );
 
                 this.generateSpikePattern(
                     secondaryArm,
@@ -217,6 +203,32 @@ export class SolarSection implements StationSection {
             this.lights.push(light);
         }
         lightInstances.thinInstanceSetBuffer("matrix", lightInstanceBuffer, 16, true);
+    }
+
+    private getSecondaryArmLightPoints(
+        rotation: Quaternion,
+        armLength: number,
+        armRadius: number,
+        lightRadius: number,
+        armTessellation: number,
+    ): Array<{ position: Vector3; rotation: Quaternion }> {
+        const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
+        const lightYStep = 200;
+        for (let lightY = lightYStep; lightY <= armLength - lightYStep; lightY += lightYStep) {
+            for (let sideIndex = 0; sideIndex < armTessellation; sideIndex += 2) {
+                const theta = ((2 * Math.PI) / armTessellation) * sideIndex + Math.PI / armTessellation;
+                const position = new Vector3(
+                    (armRadius + lightRadius) * Math.cos(theta) * Math.cos(Math.PI / armTessellation),
+                    lightY,
+                    (armRadius + lightRadius) * Math.sin(theta) * Math.cos(Math.PI / armTessellation),
+                );
+                position.rotateByQuaternionToRef(rotation, position);
+
+                lightPoints.push({ position, rotation });
+            }
+        }
+
+        return lightPoints;
     }
 
     private generateSpikePattern(
