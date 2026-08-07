@@ -51,7 +51,7 @@
         "@babylonjs/inspector": "^9.19.0",
         "@babylonjs/loaders": "^9.19.0",
         "@babylonjs/materials": "^9.19.0",
-        "@babylonjs/node-editor": "^9.19.0",
+        "@babylonjs/node-editor": "^9.20.0",
         "@brianchirls/game-input": "^0.1.1",
         "@cosmos-journeyer/physics": "workspace:^",
         "@cosmos-journeyer/typescript": "workspace:^",
