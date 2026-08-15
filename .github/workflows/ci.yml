@@ -20,6 +20,7 @@ jobs:
         timeout-minutes: 40
         outputs:
             desktop-packaging-changed: ${{ steps.desktop-packaging-changes.outputs.desktop-packaging }}
+            git-lfs-cache-key: ${{ steps.git-lfs-cache-key.outputs.key }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v7
@@ -48,8 +49,9 @@ jobs:
               uses: actions/cache@v6
               with:
                   path: .git/lfs
-                  key: git-lfs-${{ runner.os }}-${{ steps.git-lfs-cache-key.outputs.key }}
-                  restore-keys: git-lfs-${{ runner.os }}-
+                  key: git-lfs-${{ steps.git-lfs-cache-key.outputs.key }}
+                  restore-keys: git-lfs-
+                  enableCrossOsArchive: true
 
             - name: Pull Git LFS assets
               run: git lfs pull
@@ -130,7 +132,18 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v7
               with:
-                  lfs: true
+                  lfs: false
+
+            - name: Restore Git LFS objects
+              uses: actions/cache/restore@v6
+              with:
+                  path: .git/lfs
+                  key: git-lfs-${{ needs.checks.outputs.git-lfs-cache-key }}
+                  restore-keys: git-lfs-
+                  enableCrossOsArchive: true
+
+            - name: Pull missing Git LFS assets
+              run: git lfs pull
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
