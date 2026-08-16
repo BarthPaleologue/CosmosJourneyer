@@ -18,9 +18,13 @@ jobs:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v7
+            - name: Checkout repository
+              uses: actions/checkout@v7
               with:
-                  lfs: true
+                  lfs: false
+
+            - name: Setup Git LFS assets
+              uses: ./.github/actions/setup-lfs
 
             - name: Setup Node.js with pnpm
               uses: pnpm/action-setup@v6
