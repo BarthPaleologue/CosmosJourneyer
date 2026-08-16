@@ -43,7 +43,7 @@
         "@types/node": "^26.1.2",
         "concurrently": "^10.0.4",
         "cross-env": "^10.1.0",
-        "electron": "^42.5.1",
+        "electron": "^43.2.0",
         "electron-builder": "^26.15.3",
         "eslint": "catalog:",
         "oxfmt": "catalog:",
