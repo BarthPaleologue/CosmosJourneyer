@@ -32,27 +32,15 @@ jobs:
               with:
                   filters: |
                       desktop-packaging:
+                          - ".github/actions/setup-lfs/**"
                           - ".github/workflows/ci.yml"
                           - "package.json"
                           - "pnpm-lock.yaml"
                           - "pnpm-workspace.yaml"
                           - "packages/desktop-electron/**"
 
-            - name: Compute Git LFS cache key
-              id: git-lfs-cache-key
-              run: |
-                  git lfs ls-files --long | sort | sha256sum | cut -d " " -f 1 > /tmp/git-lfs-cache-key
-                  echo "key=$(cat /tmp/git-lfs-cache-key)" >> "$GITHUB_OUTPUT"
-
-            - name: Cache Git LFS objects
-              uses: actions/cache@v6
-              with:
-                  path: .git/lfs
-                  key: git-lfs-${{ runner.os }}-${{ steps.git-lfs-cache-key.outputs.key }}
-                  restore-keys: git-lfs-${{ runner.os }}-
-
-            - name: Pull Git LFS assets
-              run: git lfs pull
+            - name: Setup Git LFS assets
+              uses: ./.github/actions/setup-lfs
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
@@ -72,7 +60,7 @@ jobs:
                   targets: wasm32-unknown-unknown
 
             - name: Setup wasm-pack
-              uses: taiki-e/install-action@v2.85.5
+              uses: taiki-e/install-action@v2.85.13
               with:
                   tool: wasm-pack
 
@@ -130,7 +118,10 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v7
               with:
-                  lfs: true
+                  lfs: false
+
+            - name: Setup Git LFS assets
+              uses: ./.github/actions/setup-lfs
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
@@ -150,7 +141,7 @@ jobs:
                   targets: wasm32-unknown-unknown
 
             - name: Setup wasm-pack
-              uses: taiki-e/install-action@v2.85.5
+              uses: taiki-e/install-action@v2.85.13
               with:
                   tool: wasm-pack
 

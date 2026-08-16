@@ -1,0 +1,29 @@
+name: Setup Git LFS cache
+description: Restore cached Git LFS objects and download only missing assets.
+
+outputs:
+    cache-key:
+        description: Cache key derived from the Git LFS object IDs in the checkout.
+        value: ${{ steps.git-lfs-cache-key.outputs.key }}
+
+runs:
+    using: composite
+    steps:
+        - name: Compute Git LFS cache key
+          id: git-lfs-cache-key
+          shell: bash
+          run: |
+              key="$(git lfs ls-files --long | LC_ALL=C sort | git hash-object --stdin)"
+              echo "key=$key" >> "$GITHUB_OUTPUT"
+
+        - name: Cache Git LFS objects
+          uses: actions/cache@v6
+          with:
+              path: .git/lfs
+              key: git-lfs-${{ steps.git-lfs-cache-key.outputs.key }}
+              restore-keys: git-lfs-
+              enableCrossOsArchive: true
+
+        - name: Pull missing Git LFS assets
+          shell: bash
+          run: git lfs pull

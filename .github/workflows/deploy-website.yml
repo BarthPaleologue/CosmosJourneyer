@@ -28,7 +28,10 @@ jobs:
               uses: actions/checkout@v7
               with:
                   ref: ${{ github.sha }}
-                  lfs: true
+                  lfs: false
+
+            - name: Setup Git LFS assets
+              uses: ./.github/actions/setup-lfs
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
