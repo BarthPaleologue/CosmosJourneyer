@@ -40,10 +40,10 @@
         "electron-updater": "^6.8.9"
     },
     "devDependencies": {
-        "@types/node": "^26.1.2",
-        "concurrently": "^10.0.4",
+        "@types/node": "^26.2.0",
+        "concurrently": "^10.0.5",
         "cross-env": "^10.1.0",
-        "electron": "^43.2.0",
+        "electron": "^43.4.0",
         "electron-builder": "^26.15.3",
         "eslint": "catalog:",
         "oxfmt": "catalog:",
