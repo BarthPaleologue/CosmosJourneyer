@@ -1,0 +1,96 @@
+---
+- name: Configure the production firewall
+  hosts: production
+  become: true
+  gather_facts: false
+
+  vars:
+      firewall_default_incoming_policy: deny
+      firewall_default_outgoing_policy: allow
+      firewall_allowed_tcp_ports:
+          - port: "22"
+            comment: SSH
+          - port: "80"
+            comment: HTTP
+          - port: "443"
+            comment: HTTPS
+
+  tasks:
+      - name: Install UFW
+        ansible.builtin.apt:
+            name: ufw
+            state: present
+
+      - name: Allow required TCP services
+        community.general.ufw:
+            rule: allow
+            port: "{{ item.port }}"
+            proto: tcp
+            comment: "{{ item.comment }}"
+        loop: "{{ firewall_allowed_tcp_ports }}"
+        loop_control:
+            label: "{{ item.port }}/tcp"
+
+      - name: Deny incoming traffic by default
+        community.general.ufw:
+            default: "{{ firewall_default_incoming_policy }}"
+            direction: incoming
+
+      - name: Allow outgoing traffic by default
+        community.general.ufw:
+            default: "{{ firewall_default_outgoing_policy }}"
+            direction: outgoing
+
+      - name: Enable UFW
+        community.general.ufw:
+            state: enabled
+
+      - name: Read the effective firewall configuration
+        ansible.builtin.command: /usr/sbin/ufw status verbose
+        register: ufw_status
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Confirm that the firewall policy is effective
+        ansible.builtin.assert:
+            that:
+                - "'Status: active' in ufw_status.stdout"
+                - >-
+                    'Default: ' + firewall_default_incoming_policy + ' (incoming), '
+                    + firewall_default_outgoing_policy + ' (outgoing)' in ufw_status.stdout
+            fail_msg: "The effective UFW configuration does not match the declared production policy."
+        when: not ansible_check_mode
+
+      - name: Confirm that every required TCP service is allowed
+        ansible.builtin.assert:
+            that:
+                - ufw_status.stdout is regex('(?m)^' + item.port + '/tcp[ ]+ALLOW IN')
+            fail_msg: "The effective UFW configuration does not allow {{ item.port }}/tcp."
+        loop: "{{ firewall_allowed_tcp_ports }}"
+        loop_control:
+            label: "{{ item.port }}/tcp"
+        when: not ansible_check_mode
+
+      - name: Refuse undeclared incoming firewall rules
+        ansible.builtin.assert:
+            that:
+                - item is regex(declared_tcp_rule_pattern)
+            fail_msg: >-
+                The effective UFW configuration contains an undeclared incoming allow rule:
+                {{ item }}
+        vars:
+            declared_tcp_rule_pattern: >-
+                ^({{ firewall_allowed_tcp_ports | map(attribute='port') | join('|') }})/tcp(?: \(v6\))?[ ]+ALLOW IN
+        loop: "{{ ufw_status.stdout_lines | select('search', 'ALLOW IN') }}"
+        loop_control:
+            label: "{{ item }}"
+        when: not ansible_check_mode
+
+      - name: Open a fresh SSH connection through the firewall
+        ansible.builtin.meta: reset_connection
+
+      - name: Confirm that SSH remains reachable through the firewall
+        ansible.builtin.wait_for_connection:
+            delay: 0
+            timeout: 20
+        when: not ansible_check_mode

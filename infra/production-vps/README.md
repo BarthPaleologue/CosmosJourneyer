@@ -8,7 +8,15 @@ deployed separately by GitHub Actions.
 The production inventory uses the `ubuntu` administrative account and the SSH host key already recorded by the
 operator. No private key or password belongs in this directory.
 
-Keep an existing SSH session open during the first application. From this directory, first preview the change:
+Keep an existing SSH session open during the first application. Run the following commands from this directory.
+
+Install the pinned Ansible collection:
+
+```sh
+ansible-galaxy collection install -r requirements.yml
+```
+
+Then preview the change:
 
 ```sh
 ansible-playbook site.yml --check --diff
@@ -30,3 +38,9 @@ first value encountered for most settings, while cloud-init currently enables pa
 
 If access fails despite the preflight checks, use the provider console, move the managed file out of
 `/etc/ssh/sshd_config.d`, validate with `sshd -t`, and reload the `ssh` service.
+
+## Firewall
+
+UFW denies incoming traffic by default and explicitly allows SSH, HTTP and HTTPS over TCP. Outgoing traffic remains
+allowed. Firewall rules are installed before UFW is enabled, and the playbook confirms both the effective policy and a
+fresh SSH connection after activation.
