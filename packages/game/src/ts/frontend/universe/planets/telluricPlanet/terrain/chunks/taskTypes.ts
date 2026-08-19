@@ -20,9 +20,9 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
-import type { ChunkId } from "./chunkForge";
 import { type FaceIndex } from "./faceIndex";
 import { ScatteredInstanceBuffersSchema } from "./scatteringSystem";
+import type { ChunkId } from "./terrainSystem";
 
 export type BuildTask = {
     chunkId: ChunkId;

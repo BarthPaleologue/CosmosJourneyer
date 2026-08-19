@@ -23,8 +23,8 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystemCpu";
 import { SphericalHeightFieldTerrain } from "@/frontend/universe/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
 
 import { Settings } from "@/settings";
@@ -41,11 +41,11 @@ export async function createSphericalHeightFieldTerrainScene(
 
     await enablePhysics(scene);
 
-    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
-    if (!chunkForgeResult.success) {
-        throw chunkForgeResult.error;
+    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    if (!terrainSystemResult.success) {
+        throw terrainSystemResult.error;
     }
-    const chunkForge = chunkForgeResult.value;
+    const terrainSystem = terrainSystemResult.value;
 
     const scatteringSystem = new ScatteringSystemMock();
 
@@ -81,19 +81,19 @@ export async function createSphericalHeightFieldTerrainScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-        terrain.updateLOD(camera, chunkForge, scatteringSystem);
-        chunkForge.update();
+        terrain.updateLOD(camera, terrainSystem, scatteringSystem);
+        terrainSystem.update();
         terrain.computeCulling(camera);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
             controls.update(0);
-            terrain.updateLOD(camera, chunkForge, scatteringSystem);
-            chunkForge.update();
+            terrain.updateLOD(camera, terrainSystem, scatteringSystem);
+            terrainSystem.update();
             terrain.computeCulling(camera);
 
-            if (chunkForge.isIdle() && terrain.isIdle()) {
+            if (terrainSystem.isIdle() && terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

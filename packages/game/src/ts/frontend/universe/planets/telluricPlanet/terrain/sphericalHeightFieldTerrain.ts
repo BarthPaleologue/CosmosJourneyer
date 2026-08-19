@@ -26,10 +26,10 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 import type { Cullable } from "@/frontend/helpers/cullable";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
-import type { ChunkForge } from "./chunks/chunkForge";
 import type { LodUpdateContext } from "./chunks/lodUpdateContext";
 import type { IScatteringSystem } from "./chunks/scatteringSystem";
 import { TerrainFaceQuadTree } from "./chunks/terrainFaceQuadTree";
+import type { ITerrainSystem } from "./chunks/terrainSystem";
 
 export class SphericalHeightFieldTerrain implements Transformable, Cullable {
     private readonly transform: TransformNode;
@@ -59,10 +59,10 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         ];
     }
 
-    public updateLOD(camera: Camera, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
+    public updateLOD(camera: Camera, terrainSystem: ITerrainSystem, scatteringSystem: IScatteringSystem): void {
         const lodContext = this.createLodUpdateContext(camera);
         for (const face of this.faces) {
-            face.updateLOD(lodContext, chunkForge, scatteringSystem);
+            face.updateLOD(lodContext, terrainSystem, scatteringSystem);
         }
     }
 

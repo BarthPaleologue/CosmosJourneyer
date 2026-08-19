@@ -70,7 +70,7 @@ import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoun
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
-import { type ChunkForge } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForge";
+import { type ITerrainSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystem";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -191,11 +191,8 @@ export class StarSystemView implements View {
      */
     readonly loader: StarSystemLoader = new StarSystemLoader();
 
-    /**
-     * The chunk forge used to generate surface chunks for telluric planets. It is constant for the whole game.
-     * @private
-     */
-    private readonly chunkForge: ChunkForge;
+    /** The system used to generate surface chunks for telluric planets. It is constant for the whole game. */
+    private readonly terrainSystem: ITerrainSystem;
 
     /**
      * An observable that notifies when the star system is initialized.
@@ -257,7 +254,7 @@ export class StarSystemView implements View {
      * @param tts The text-to-speech system
      * @param notificationManager The notification manager
      * @param assets The rendering assets
-     * @param chunkForge The chunk forge used to generate surface chunks for telluric planets
+     * @param terrainSystem The system used to generate surface chunks for telluric planets
      * @param progressMonitor The loading progress monitor to report star system loading progress
      */
     constructor(
@@ -271,7 +268,7 @@ export class StarSystemView implements View {
         tts: ITts,
         notificationManager: INotificationManager,
         assets: RenderingAssets,
-        chunkForge: ChunkForge,
+        terrainSystem: ITerrainSystem,
         progressMonitor: ILoadingProgressMonitor,
     ) {
         this.player = player;
@@ -291,7 +288,7 @@ export class StarSystemView implements View {
         this.tts = tts;
         this.notificationManager = notificationManager;
         this.assets = assets;
-        this.chunkForge = chunkForge;
+        this.terrainSystem = terrainSystem;
         this.progressMonitor = progressMonitor;
 
         this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
@@ -511,7 +508,7 @@ export class StarSystemView implements View {
 
         if (this.starSystem !== null) {
             this.spaceshipControls?.setClosestLandableFacility(null);
-            this.chunkForge.reset();
+            this.terrainSystem.reset();
             this.postProcessManager.reset();
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
@@ -540,12 +537,12 @@ export class StarSystemView implements View {
     }
 
     /**
-     * Initializes the star system. It initializes the positions of the orbital objects, the UI, the chunk forge and the post processes
+     * Initializes the star system. It initializes the positions of the orbital objects, the UI and the post processes
      * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
      */
     public initStarSystem(timestampSeconds: number): void {
         const starSystem = this.getStarSystem();
-        starSystem.initPositions(2, this.chunkForge, timestampSeconds);
+        starSystem.initPositions(2, timestampSeconds);
 
         const spaceship = this.getSpaceshipControls().getSpaceship();
 
@@ -965,11 +962,11 @@ export class StarSystemView implements View {
             return;
         }
 
-        this.chunkForge.update();
+        this.terrainSystem.update();
 
         activeControls.update(deltaSeconds);
 
-        starSystem.update(deltaSeconds, this.chunkForge);
+        starSystem.update(deltaSeconds, this.terrainSystem);
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
             activeControls.getTransform().getAbsolutePosition(),

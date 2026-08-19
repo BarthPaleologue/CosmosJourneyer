@@ -21,18 +21,18 @@ import { LRUMap } from "@/utils/dataStructures/lruMap";
 
 import { Settings } from "@/settings";
 
-import { type ChunkForge, type ChunkForgeOutput, type ChunkId } from "./chunkForge";
 import { ReturnedChunkDataSchema, type BuildTask } from "./taskTypes";
+import { type ITerrainSystem, type TerrainSystemOutput, type ChunkId } from "./terrainSystem";
 import { type TransferBuildData } from "./workerDataTypes";
 import { WorkerPool } from "./workerPool";
 
-export class ChunkForgeWorkers implements ChunkForge {
+export class TerrainSystemCpu implements ITerrainSystem {
     /** the number vertices per row of the chunk (total number of vertices = nbVerticesPerRow * nbVerticesPerRow) */
     private readonly nbVerticesPerRow: number;
 
     private readonly workerPool: WorkerPool<BuildTask, TransferBuildData>;
 
-    private readonly output = new LRUMap<ChunkId, ChunkForgeOutput>(Settings.MAX_CACHED_CHUNKS);
+    private readonly output = new LRUMap<ChunkId, TerrainSystemOutput>(Settings.MAX_CACHED_CHUNKS);
 
     private constructor(workers: ReadonlyArray<Worker>, nbVerticesPerRow: number) {
         this.workerPool = new WorkerPool(
@@ -48,7 +48,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         this.nbVerticesPerRow = nbVerticesPerRow;
     }
 
-    public static async New(nbVerticesPerRow: number): Promise<Result<ChunkForgeWorkers, Error>> {
+    public static async New(nbVerticesPerRow: number): Promise<Result<TerrainSystemCpu, Error>> {
         const nbMaxWorkers = Math.max(1, navigator.hardwareConcurrency - 1); // -1 because the main thread is also used
 
         const workerResults = await Promise.all(
@@ -72,7 +72,7 @@ export class ChunkForgeWorkers implements ChunkForge {
             return err(new Error(`Failed to create workers: ${errors.map((e) => e.message).join(", ")}`));
         }
 
-        return ok(new ChunkForgeWorkers(availableWorkers, nbVerticesPerRow));
+        return ok(new TerrainSystemCpu(availableWorkers, nbVerticesPerRow));
     }
 
     private static async CreateBuildWorker(): Promise<Result<Worker, Error>> {
@@ -116,7 +116,7 @@ export class ChunkForgeWorkers implements ChunkForge {
         this.workerPool.submitTask(task);
     }
 
-    public getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined {
+    public getOutput(chunkId: ChunkId): TerrainSystemOutput | undefined {
         return this.output.get(chunkId);
     }
 
@@ -154,7 +154,7 @@ export class ChunkForgeWorkers implements ChunkForge {
     }
 
     /**
-     * Updates the state of the forge : dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
+     * Updates the state of the system: dispatch tasks to workers, remove useless chunks, apply vertexData to new chunks
      */
     public update(): void {
         this.workerPool.update();

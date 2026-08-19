@@ -37,11 +37,11 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 
 import { CollisionMask, Settings } from "@/settings";
 
-import type { ChunkForgeCompletedOutput, ChunkId } from "./chunkForge";
 import { type ChunkIndices } from "./chunkIndices";
 import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
+import type { TerrainSystemCompletedOutput, ChunkId } from "./terrainSystem";
 
 type ChunkLodMetrics = {
     readonly centerPlanetSpace: Vector3;
@@ -124,22 +124,22 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
     /**
      * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given scattered point buffer.
-     * @param forgeOutput the vertex data and scattered point buffer to initialize the chunk with
+     * @param terrainBuffers the vertex data and scattered point buffer to initialize the chunk with
      */
-    public init(forgeOutput: ChunkForgeCompletedOutput): void {
+    public init(terrainBuffers: TerrainSystemCompletedOutput): void {
         if (this.hasBeenDisposed()) {
             console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
             return;
         }
 
         const vertexData = new VertexData();
-        vertexData.positions = forgeOutput.positions;
-        vertexData.normals = forgeOutput.normals;
-        vertexData.indices = forgeOutput.indices;
+        vertexData.positions = terrainBuffers.positions;
+        vertexData.normals = terrainBuffers.normals;
+        vertexData.indices = terrainBuffers.indices;
         vertexData.applyToMesh(this.mesh, false);
         this.mesh.freezeNormals();
 
-        this.lodMetrics = this.computeLodMetrics(forgeOutput.positions);
+        this.lodMetrics = this.computeLodMetrics(terrainBuffers.positions);
 
         if (this.sideLength / (Settings.VERTEX_RESOLUTION - 1) <= Settings.MAX_DISTANCE_BETWEEN_PHYSICS_VERTICES) {
             const scene = this.mesh.getScene();
@@ -159,7 +159,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         this.mesh.computeWorldMatrix(true);
 
-        this.scatteringSystem.scatterInChunk(this.mesh, forgeOutput.scatteredInstances);
+        this.scatteringSystem.scatterInChunk(this.mesh, terrainBuffers.scatteredInstances);
     }
 
     private computeLodMetrics(positions: Float32Array): ChunkLodMetrics {

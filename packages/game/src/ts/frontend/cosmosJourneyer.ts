@@ -28,7 +28,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
-import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
@@ -63,12 +62,13 @@ import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystemCpu";
 import { type View } from "@/frontend/view";
 
 import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
 import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
@@ -479,7 +479,7 @@ export class CosmosJourneyer {
         mainHavokPlugin.setVelocityLimits(10_000, 10_000);
         starSystemViewScene.enablePhysics(Vector3.Zero(), mainHavokPlugin);
 
-        const starSystemViewPhysicsEngine = starSystemViewScene.getPhysicsEngine() as PhysicsEngineV2;
+        const starSystemViewPhysicsEngine = getPhysicsEngineV2(starSystemViewScene);
 
         const loadingProgressMonitor = new LoadingProgressMonitor();
         loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
@@ -496,12 +496,14 @@ export class CosmosJourneyer {
         const soundPlayer = new SoundPlayer(starSystemViewAssets.audio.sounds);
         const tts = new Tts(starSystemViewAssets.audio.speakerVoiceLines);
         const notificationManager = new NotificationManager(soundPlayer);
-        const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
-        if (!chunkForgeResult.success) {
-            await alertModal(`Failed to initialize the terrain engine: ${chunkForgeResult.error.message}`, soundPlayer);
-            throw chunkForgeResult.error;
+        const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+        if (!terrainSystemResult.success) {
+            await alertModal(
+                `Failed to initialize the terrain engine: ${terrainSystemResult.error.message}`,
+                soundPlayer,
+            );
+            throw terrainSystemResult.error;
         }
-        const chunkForge = chunkForgeResult.value;
 
         // Init star system view
         const starSystemView = new StarSystemView(
@@ -515,7 +517,7 @@ export class CosmosJourneyer {
             tts,
             notificationManager,
             starSystemViewAssets.rendering,
-            chunkForge,
+            terrainSystemResult.value,
             loadingProgressMonitor,
         );
 

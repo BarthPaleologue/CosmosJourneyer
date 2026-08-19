@@ -49,8 +49,8 @@ import { GravitySystem } from "./gravitySystem";
 import { KeplerianOrbitalSimulation, type OrbitalTransform } from "./keplerianOrbitalSimulation";
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
-import { type ChunkForge } from "./planets/telluricPlanet/terrain/chunks/chunkForge";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { type ITerrainSystem } from "./planets/telluricPlanet/terrain/chunks/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
 import { type StarSystemLoader } from "./starSystemLoader";
 
@@ -309,10 +309,9 @@ export class StarSystemController {
      * Inits the post processes and moves the system forward in time to the current time (it is additive)
      * Uses updateOrbitalSimulation to avoid feeding large deltaSeconds to ship systems.
      * @param nbWarmUpUpdates Number of additional small updates to stabilize the simulation
-     * @param chunkForge The chunk forge used for terrain generation
      * @param timestampSeconds The timestamp to which we want to advance the simulation (in seconds)
      */
-    public initPositions(nbWarmUpUpdates: number, chunkForge: ChunkForge, timestampSeconds: number): void {
+    public initPositions(nbWarmUpUpdates: number, timestampSeconds: number): void {
         this.updateOrbitalSimulation(this.stellarObjects[0], timestampSeconds);
 
         // Perform warm-up updates with small time steps
@@ -377,9 +376,9 @@ export class StarSystemController {
      * Updates the system and all its orbital objects forward in time by the given delta time.
      * The nearest object is kept in place and the other objects are updated accordingly.
      * @param deltaSeconds The time elapsed since the last update
-     * @param chunkForge The chunk forge used to update the LOD of the telluric planets
+     * @param terrainSystem The system used to update the LOD of the telluric planets
      */
-    public update(deltaSeconds: number, chunkForge: ChunkForge): void {
+    public update(deltaSeconds: number, terrainSystem: ITerrainSystem): void {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             console.warn("No camera!");
@@ -409,7 +408,7 @@ export class StarSystemController {
         for (const object of this.getPlanetaryMassObjects()) {
             object.computeCulling(camera);
             if (object.type === "telluricPlanet" || object.type === "telluricSatellite") {
-                object.updateLOD(camera, chunkForge, this.scatteringSystem);
+                object.updateLOD(camera, terrainSystem, this.scatteringSystem);
             }
         }
 

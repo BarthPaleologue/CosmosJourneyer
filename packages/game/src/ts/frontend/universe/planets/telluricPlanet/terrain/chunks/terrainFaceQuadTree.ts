@@ -30,7 +30,6 @@ import { type Cullable } from "@/frontend/helpers/cullable";
 
 import { Settings } from "@/settings";
 
-import { type ChunkForge } from "./chunkForge";
 import { getChunkChildIndices, type ChunkIndices } from "./chunkIndices";
 import { type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
@@ -38,6 +37,7 @@ import type { IScatteringSystem } from "./scatteringSystem";
 import { type BuildTask } from "./taskTypes";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
 import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
+import { type ITerrainSystem } from "./terrainSystem";
 
 const splitScreenSpaceErrorThreshold = 32;
 const mergeScreenSpaceErrorThreshold = 16;
@@ -111,22 +111,26 @@ export class TerrainFaceQuadTree implements Cullable {
     /**
      * Update tree to create matching LOD relative to the observer's position
      * @param lodContext Shared LOD state computed once for the terrain update
-     * @param chunkForge
+     * @param terrainSystem
      */
-    public updateLOD(lodContext: LodUpdateContext, chunkForge: ChunkForge, scatteringSystem: IScatteringSystem): void {
+    public updateLOD(
+        lodContext: LodUpdateContext,
+        terrainSystem: ITerrainSystem,
+        scatteringSystem: IScatteringSystem,
+    ): void {
         this.root ??= this.createNode(
             {
                 lod: 0,
                 x: 0,
                 y: 0,
             },
-            chunkForge,
+            terrainSystem,
             scatteringSystem,
         );
 
-        this.uploadCompletedChunks(chunkForge);
+        this.uploadCompletedChunks(terrainSystem);
 
-        this.updateLODRecursively(lodContext, chunkForge, scatteringSystem, this.root);
+        this.updateLODRecursively(lodContext, terrainSystem, scatteringSystem, this.root);
         this.root.updateVisibility();
 
         for (const chunk of this.root.getChunks()) {
@@ -134,7 +138,7 @@ export class TerrainFaceQuadTree implements Cullable {
         }
     }
 
-    private uploadCompletedChunks(chunkForge: ChunkForge): void {
+    private uploadCompletedChunks(terrainSystem: ITerrainSystem): void {
         if (this.root === null) {
             return;
         }
@@ -152,7 +156,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 break;
             }
 
-            const chunkOutput = chunkForge.getOutput(chunk.id);
+            const chunkOutput = terrainSystem.getOutput(chunk.id);
             if (chunkOutput === undefined || chunkOutput.status !== "completed") {
                 continue;
             }
@@ -165,12 +169,12 @@ export class TerrainFaceQuadTree implements Cullable {
     /**
      * Recursive function used internally to update LOD
      * @param lodContext Shared LOD state computed once for the terrain update
-     * @param chunkForge
+     * @param terrainSystem
      * @param node The node to update recursively
      */
     private updateLODRecursively(
         lodContext: LodUpdateContext,
-        chunkForge: ChunkForge,
+        terrainSystem: ITerrainSystem,
         scatteringSystem: IScatteringSystem,
         node: TerrainQuadTreeNode,
     ): void {
@@ -192,7 +196,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 return;
             }
 
-            node.setChildren(this.createChildren(node.chunk.indices, chunkForge, scatteringSystem));
+            node.setChildren(this.createChildren(node.chunk.indices, terrainSystem, scatteringSystem));
         }
 
         const updatedChildren = node.getChildren();
@@ -201,26 +205,26 @@ export class TerrainFaceQuadTree implements Cullable {
         }
 
         for (const child of updatedChildren) {
-            this.updateLODRecursively(lodContext, chunkForge, scatteringSystem, child);
+            this.updateLODRecursively(lodContext, terrainSystem, scatteringSystem, child);
         }
     }
 
     private createChildren(
         parentIndices: ChunkIndices,
-        chunkForge: ChunkForge,
+        terrainSystem: ITerrainSystem,
         scatteringSystem: IScatteringSystem,
     ): TerrainQuadTreeChildren {
         return [
-            this.createNode(getChunkChildIndices(parentIndices, 0), chunkForge, scatteringSystem),
-            this.createNode(getChunkChildIndices(parentIndices, 1), chunkForge, scatteringSystem),
-            this.createNode(getChunkChildIndices(parentIndices, 2), chunkForge, scatteringSystem),
-            this.createNode(getChunkChildIndices(parentIndices, 3), chunkForge, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 0), terrainSystem, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 1), terrainSystem, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 2), terrainSystem, scatteringSystem),
+            this.createNode(getChunkChildIndices(parentIndices, 3), terrainSystem, scatteringSystem),
         ];
     }
 
     private createNode(
         indices: ChunkIndices,
-        chunkForge: ChunkForge,
+        terrainSystem: ITerrainSystem,
         scatteringSystem: IScatteringSystem,
     ): TerrainQuadTreeNode {
         const chunk = new TerrainChunkMesh(
@@ -233,7 +237,7 @@ export class TerrainFaceQuadTree implements Cullable {
             this.scene,
         );
 
-        const chunkOutput = chunkForge.getOutput(chunk.id);
+        const chunkOutput = terrainSystem.getOutput(chunk.id);
         if (chunkOutput === undefined) {
             const buildTask: BuildTask = {
                 chunkId: chunk.id,
@@ -243,7 +247,7 @@ export class TerrainFaceQuadTree implements Cullable {
                 faceIndex: this.faceIndex,
             };
 
-            chunkForge.addTask(buildTask);
+            terrainSystem.addTask(buildTask);
         }
 
         return new TerrainQuadTreeNode(chunk);

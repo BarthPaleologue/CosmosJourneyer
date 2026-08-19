@@ -20,11 +20,11 @@ import { type BuildTask } from "./taskTypes";
 
 export type ChunkId = string;
 
-type ChunkForgePendingOutput = {
+type TerrainSystemPendingOutput = {
     status: "pending";
 };
 
-export type ChunkForgeCompletedOutput = {
+export type TerrainSystemCompletedOutput = {
     status: "completed";
     positions: Float32Array;
     normals: Float32Array;
@@ -32,11 +32,11 @@ export type ChunkForgeCompletedOutput = {
     scatteredInstances: ScatteredInstanceBuffers;
 };
 
-export type ChunkForgeOutput = ChunkForgePendingOutput | ChunkForgeCompletedOutput;
+export type TerrainSystemOutput = TerrainSystemPendingOutput | TerrainSystemCompletedOutput;
 
-export interface ChunkForge {
+export interface ITerrainSystem {
     addTask(task: BuildTask): void;
-    getOutput(chunkId: ChunkId): ChunkForgeOutput | undefined;
+    getOutput(chunkId: ChunkId): TerrainSystemOutput | undefined;
     update(): void;
     reset(): void;
 }
