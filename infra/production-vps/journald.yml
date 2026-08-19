@@ -1,0 +1,76 @@
+---
+- name: Bound production journal disk usage
+  hosts: production
+  become: true
+  gather_facts: false
+  tags: journald
+
+  vars:
+      journald_retention_path: /etc/systemd/journald.conf.d/99-cosmos-journeyer-retention.conf
+
+  tasks:
+      - name: Create the journald configuration directory
+        ansible.builtin.file:
+            path: "{{ journald_retention_path | dirname }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+      - name: Install the journald retention policy
+        ansible.builtin.template:
+            src: templates/journald-retention.conf.j2
+            dest: "{{ journald_retention_path }}"
+            owner: root
+            group: root
+            mode: "0644"
+        register: journald_retention_policy
+        notify: Restart journald
+
+      - name: Apply the journald retention policy
+        ansible.builtin.meta: flush_handlers
+        when: not ansible_check_mode
+
+      - name: Rotate the active journal before reclaiming space
+        ansible.builtin.command: /usr/bin/journalctl --rotate
+        when:
+            - journald_retention_policy.changed
+            - not ansible_check_mode
+
+      - name: Remove archived journals above the retention limit
+        ansible.builtin.command: >-
+            /usr/bin/journalctl --vacuum-size={{ journald_system_max_use }}
+        when:
+            - journald_retention_policy.changed
+            - not ansible_check_mode
+
+      - name: Read the effective journald configuration
+        ansible.builtin.command: >-
+            /usr/bin/systemd-analyze cat-config --tldr systemd/journald.conf
+        register: journald_effective_config
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Confirm that the journal disk limit is effective
+        ansible.builtin.assert:
+            that:
+                - "'SystemMaxUse=' + journald_system_max_use in journald_effective_config.stdout_lines"
+            fail_msg: "The effective journald configuration does not contain the declared disk limit."
+        when: not ansible_check_mode
+
+      - name: Report journal disk usage
+        ansible.builtin.command: /usr/bin/journalctl --disk-usage
+        register: journald_disk_usage
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Show journal disk usage
+        ansible.builtin.debug:
+            var: journald_disk_usage.stdout
+        when: not ansible_check_mode
+
+  handlers:
+      - name: Restart journald
+        ansible.builtin.systemd_service:
+            name: systemd-journald
+            state: restarted

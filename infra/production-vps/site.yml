@@ -10,3 +10,6 @@
 
 - name: Configure production TLS automation
   ansible.builtin.import_playbook: tls.yml
+
+- name: Configure production journal retention
+  ansible.builtin.import_playbook: journald.yml

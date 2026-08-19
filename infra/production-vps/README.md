@@ -69,3 +69,16 @@ ansible-playbook site.yml --tags tls -e tls_bootstrap_certificate=true
 
 Normal playbook runs never contact Let's Encrypt to issue a missing certificate. They do keep renewal and monitoring
 active when certificate material exists.
+
+## Journal retention
+
+The journald drop-in bounds persistent system journal storage with `SystemMaxUse`. When this policy changes, the
+playbook restarts journald, rotates the active journal and vacuums only archived entries above the declared limit.
+Subsequent runs do not repeat the vacuum unless the policy changes.
+
+Apply or inspect this scope independently with:
+
+```sh
+ansible-playbook site.yml --tags journald --check --diff
+ansible-playbook site.yml --tags journald --diff
+```

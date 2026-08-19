@@ -15,3 +15,5 @@ tls_contact_email: barth.paleologue@cosmosjourneyer.com
 tls_expiry_threshold_days: 21
 tls_smtp_host: mx1.mail.ovh.net
 tls_bootstrap_certificate: false
+
+journald_system_max_use: 500M
