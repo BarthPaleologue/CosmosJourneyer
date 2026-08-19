@@ -1,0 +1,71 @@
+# Managed by Ansible. Local changes will be overwritten.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ production_server_names | join(' ') }};
+
+    location ^~ /.well-known/acme-challenge/ {
+        root {{ acme_webroot_path }};
+        default_type text/plain;
+        try_files $uri =404;
+    }
+
+{% if nginx_tls_certificate.stat.exists and nginx_tls_private_key.stat.exists %}
+    location / {
+        return 301 https://$host$request_uri;
+    }
+{% else %}
+    location / {
+        return 503;
+    }
+{% endif %}
+}
+
+{% if nginx_tls_certificate.stat.exists and nginx_tls_private_key.stat.exists %}
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    server_name {{ production_server_names | join(' ') }};
+
+    root {{ website_base_path }}/current;
+    index index.html;
+
+    ssl_certificate /etc/letsencrypt/live/{{ production_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ production_domain }}/privkey.pem;
+
+    # Ansible owns the nginx TLS policy; Certbot only owns certificate material.
+    ssl_session_cache shared:cosmos_tls:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305";
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location = /play {
+        return 301 /game/;
+    }
+
+    location = /play/ {
+        return 301 /game/;
+    }
+
+    location = /game {
+        return 301 /game/;
+    }
+
+    location = /game/ {
+        rewrite ^ /game/index.html last;
+    }
+
+    location /game/ {
+        alias {{ game_base_path }}/current/;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+}
+{% endif %}
