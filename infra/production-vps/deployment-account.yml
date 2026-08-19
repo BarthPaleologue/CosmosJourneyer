@@ -109,6 +109,7 @@
 
       - name: Confirm that the deployment account can write release directories
         ansible.builtin.command: "/usr/bin/test -w {{ item }}/releases"
+        become: true
         become_user: "{{ deployment_user }}"
         changed_when: false
         loop: "{{ deployment_base_paths }}"
@@ -116,6 +117,7 @@
 
       - name: Attempt non-interactive sudo as the deployment account
         ansible.builtin.command: /usr/bin/sudo --non-interactive /usr/bin/true
+        become: true
         become_user: "{{ deployment_user }}"
         register: deployment_sudo_attempt
         changed_when: false

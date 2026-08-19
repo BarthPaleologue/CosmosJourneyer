@@ -3,6 +3,12 @@
 This directory contains the declarative configuration for the production VPS. Application artifacts are built and
 deployed separately by GitHub Actions.
 
+## Continuous validation
+
+The `Production infrastructure` GitHub workflow runs syntax validation and the `ansible-lint` production profile for
+pull requests that change this directory. Tooling and collection versions are pinned. The workflow has read-only
+repository permissions, receives no production secret and never connects to the VPS.
+
 ## SSH hardening
 
 The production inventory uses the `ubuntu` administrative account and the SSH host key already recorded by the

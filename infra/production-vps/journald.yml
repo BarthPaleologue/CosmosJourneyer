@@ -33,6 +33,7 @@
 
       - name: Rotate the active journal before reclaiming space
         ansible.builtin.command: /usr/bin/journalctl --rotate
+        changed_when: true
         when:
             - journald_retention_policy.changed
             - not ansible_check_mode
@@ -40,6 +41,7 @@
       - name: Remove archived journals above the retention limit
         ansible.builtin.command: >-
             /usr/bin/journalctl --vacuum-size={{ journald_system_max_use }}
+        changed_when: true
         when:
             - journald_retention_policy.changed
             - not ansible_check_mode
