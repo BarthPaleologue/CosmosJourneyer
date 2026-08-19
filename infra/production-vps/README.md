@@ -53,3 +53,19 @@ application release directories and `current`/`previous` links remain owned by t
 The site template enables HTTPS only when both the existing certificate and private key are present. This allows nginx
 to start on a fresh VPS before the separate TLS bootstrap runs. A candidate configuration is checked with `nginx -t`;
 if validation fails, the playbook restores the previous configuration instead of leaving an invalid file on disk.
+
+## TLS
+
+Certbot is installed from its official snap. Ansible manages the ACME webroot, nginx reload hook, systemd renewal
+failure notification, daily certificate check and operational documentation. Certbot remains the sole owner of issued
+certificates, renewal state and private keys.
+
+Certificate issuance is deliberately opt-in. After a normal playbook run on a fresh server whose DNS already points to
+the VPS, run:
+
+```sh
+ansible-playbook site.yml --tags tls -e tls_bootstrap_certificate=true
+```
+
+Normal playbook runs never contact Let's Encrypt to issue a missing certificate. They do keep renewal and monitoring
+active when certificate material exists.

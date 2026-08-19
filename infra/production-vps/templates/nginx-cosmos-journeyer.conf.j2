@@ -31,8 +31,8 @@ server {
     root {{ website_base_path }}/current;
     index index.html;
 
-    ssl_certificate /etc/letsencrypt/live/{{ production_domain }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ production_domain }}/privkey.pem;
+    ssl_certificate {{ tls_certificate_path }};
+    ssl_certificate_key {{ tls_private_key_path }};
 
     # Ansible owns the nginx TLS policy; Certbot only owns certificate material.
     ssl_session_cache shared:cosmos_tls:10m;

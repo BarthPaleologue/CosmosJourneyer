@@ -6,14 +6,6 @@
   tags: nginx
 
   vars:
-      production_domain: cosmosjourneyer.com
-      production_server_names:
-          - cosmosjourneyer.com
-          - www.cosmosjourneyer.com
-      website_base_path: /var/www/cosmos_journeyer/website
-      game_base_path: /var/www/cosmos_journeyer/game
-      acme_webroot_path: /var/www/letsencrypt
-      nginx_site_path: /etc/nginx/sites-enabled/cosmos_journeyer
       nginx_backup_path: /var/backups/cosmos-journeyer/nginx/cosmos_journeyer.conf
       nginx_check_mode_site_path: /tmp/cosmos-journeyer-nginx-site-preview.conf
 
@@ -50,12 +42,12 @@
 
       - name: Read the TLS certificate state
         ansible.builtin.stat:
-            path: "/etc/letsencrypt/live/{{ production_domain }}/fullchain.pem"
+            path: "{{ tls_certificate_path }}"
         register: nginx_tls_certificate
 
       - name: Read the TLS private key state
         ansible.builtin.stat:
-            path: "/etc/letsencrypt/live/{{ production_domain }}/privkey.pem"
+            path: "{{ tls_private_key_path }}"
         register: nginx_tls_private_key
 
       - name: Read the current nginx site state

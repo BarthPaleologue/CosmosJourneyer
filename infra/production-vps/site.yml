@@ -7,3 +7,6 @@
 
 - name: Configure production web server
   ansible.builtin.import_playbook: nginx.yml
+
+- name: Configure production TLS automation
+  ansible.builtin.import_playbook: tls.yml

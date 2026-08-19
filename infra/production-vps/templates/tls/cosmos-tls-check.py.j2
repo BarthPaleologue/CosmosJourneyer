@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+
+import datetime
+import socket
+import ssl
+import subprocess
+import sys
+
+CERTIFICATE = "{{ tls_certificate_path }}"
+DOMAIN = "{{ production_domain }}"
+THRESHOLD_SECONDS = {{ tls_expiry_threshold_days }} * 24 * 60 * 60
+
+local_check = subprocess.run(
+    ["/usr/bin/openssl", "x509", "-checkend", str(THRESHOLD_SECONDS), "-noout", "-in", CERTIFICATE],
+    check=False,
+)
+local_details = subprocess.run(
+    ["/usr/bin/openssl", "x509", "-noout", "-dates", "-serial", "-in", CERTIFICATE],
+    check=False,
+    capture_output=True,
+    text=True,
+).stdout.strip()
+
+try:
+    context = ssl.create_default_context()
+    with socket.create_connection((DOMAIN, 443), timeout=20) as connection:
+        with context.wrap_socket(connection, server_hostname=DOMAIN) as tls:
+            remote_certificate = tls.getpeercert()
+
+    expires_at = ssl.cert_time_to_seconds(remote_certificate["notAfter"])
+    remaining = expires_at - datetime.datetime.now(datetime.UTC).timestamp()
+    remote_ok = remaining > THRESHOLD_SECONDS
+    remote_details = f"notAfter={remote_certificate['notAfter']}; remaining_days={remaining / 86400:.1f}"
+except Exception as error:
+    remote_ok = False
+    remote_details = f"TLS connection failed: {error}"
+
+print(f"local: {local_details}")
+print(f"remote: {remote_details}")
+
+if local_check.returncode != 0 or not remote_ok:
+    print(
+        "TLS certificate is missing, invalid, or expires within {{ tls_expiry_threshold_days }} days",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)

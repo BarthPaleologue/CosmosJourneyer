@@ -1,0 +1,17 @@
+---
+production_domain: cosmosjourneyer.com
+production_server_names:
+    - "{{ production_domain }}"
+    - "www.{{ production_domain }}"
+
+website_base_path: /var/www/cosmos_journeyer/website
+game_base_path: /var/www/cosmos_journeyer/game
+acme_webroot_path: /var/www/letsencrypt
+
+nginx_site_path: /etc/nginx/sites-enabled/cosmos_journeyer
+tls_certificate_path: "/etc/letsencrypt/live/{{ production_domain }}/fullchain.pem"
+tls_private_key_path: "/etc/letsencrypt/live/{{ production_domain }}/privkey.pem"
+tls_contact_email: barth.paleologue@cosmosjourneyer.com
+tls_expiry_threshold_days: 21
+tls_smtp_host: mx1.mail.ovh.net
+tls_bootstrap_certificate: false
