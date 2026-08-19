@@ -1,0 +1,7 @@
+[Unit]
+Description=Check CosmosJourneyer local and public TLS certificates
+OnFailure=cosmos-tls-alert@%n.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/cosmos-tls-check

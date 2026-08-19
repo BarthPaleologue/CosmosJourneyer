@@ -1,0 +1,12 @@
+[Unit]
+Description=Send CosmosJourneyer TLS alert for %i
+After=network-online.target
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Restart=on-failure
+RestartSec=5min
+ExecStart=/usr/local/sbin/cosmos-tls-alert %i

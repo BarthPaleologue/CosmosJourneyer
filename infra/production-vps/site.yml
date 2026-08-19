@@ -1,0 +1,18 @@
+---
+- name: Configure production SSH
+  ansible.builtin.import_playbook: ssh.yml
+
+- name: Configure production firewall
+  ansible.builtin.import_playbook: firewall.yml
+
+- name: Configure production deployment account
+  ansible.builtin.import_playbook: deployment-account.yml
+
+- name: Configure production web server
+  ansible.builtin.import_playbook: nginx.yml
+
+- name: Configure production TLS automation
+  ansible.builtin.import_playbook: tls.yml
+
+- name: Configure production journal retention
+  ansible.builtin.import_playbook: journald.yml

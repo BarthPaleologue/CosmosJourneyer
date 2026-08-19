@@ -1,0 +1,237 @@
+---
+- name: Configure the production web server
+  hosts: production
+  become: true
+  gather_facts: false
+  tags: nginx
+
+  vars:
+      nginx_backup_path: /var/backups/cosmos-journeyer/nginx/cosmos_journeyer.conf
+      nginx_check_mode_site_path: /tmp/cosmos-journeyer-nginx-site-preview.conf
+
+  tasks:
+      - name: Read the installed package state
+        ansible.builtin.package_facts:
+            manager: auto
+
+      - name: Install nginx
+        ansible.builtin.apt:
+            name: nginx
+            state: present
+
+      - name: Create the permanent ACME challenge directory
+        ansible.builtin.file:
+            path: "{{ acme_webroot_path }}/.well-known/acme-challenge"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+      - name: Read the TLS certificate state
+        ansible.builtin.stat:
+            path: "{{ tls_certificate_path }}"
+        register: nginx_tls_certificate
+
+      - name: Read the TLS private key state
+        ansible.builtin.stat:
+            path: "{{ tls_private_key_path }}"
+        register: nginx_tls_private_key
+
+      - name: Read the current nginx site state
+        ansible.builtin.stat:
+            path: "{{ nginx_site_path }}"
+        register: nginx_site_before
+
+      - name: Create the nginx backup directory
+        ansible.builtin.file:
+            path: "{{ nginx_backup_path | dirname }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0700"
+
+      - name: Detect whether the nginx site would change
+        ansible.builtin.template:
+            src: templates/nginx-cosmos-journeyer.conf.j2
+            dest: >-
+                {{ nginx_site_path
+                if 'nginx' in ansible_facts.packages or not ansible_check_mode
+                else nginx_check_mode_site_path }}
+            owner: root
+            group: root
+            mode: "0644"
+        check_mode: true
+        diff: "{{ ansible_check_mode and 'nginx' not in ansible_facts.packages }}"
+        register: nginx_site_candidate
+
+      - name: Explain deferred nginx runtime validation on a fresh server
+        ansible.builtin.debug:
+            msg: >-
+                nginx is not installed yet. Check mode rendered the proposed site diff,
+                but nginx validation and service management require a real apply.
+        when:
+            - ansible_check_mode
+            - "'nginx' not in ansible_facts.packages"
+
+      - name: Back up the current nginx site outside sites-enabled
+        ansible.builtin.copy:
+            src: "{{ nginx_site_path }}"
+            dest: "{{ nginx_backup_path }}"
+            owner: root
+            group: root
+            mode: "0600"
+            remote_src: true
+        register: nginx_site_backup
+        when:
+            - nginx_site_before.stat.exists
+            - nginx_site_candidate.changed
+            - not ansible_check_mode
+
+      - name: Install and validate the nginx site
+        when: "'nginx' in ansible_facts.packages or not ansible_check_mode"
+        block:
+            - name: Install the nginx site configuration
+              ansible.builtin.template:
+                  src: templates/nginx-cosmos-journeyer.conf.j2
+                  dest: "{{ nginx_site_path }}"
+                  owner: root
+                  group: root
+                  mode: "0644"
+              notify: Validate and reload nginx
+
+            - name: Validate the complete nginx configuration
+              ansible.builtin.command: /usr/sbin/nginx -t
+              changed_when: false
+        rescue:
+            - name: Restore the previous nginx site configuration
+              ansible.builtin.copy:
+                  src: "{{ nginx_backup_path }}"
+                  dest: "{{ nginx_site_path }}"
+                  owner: root
+                  group: root
+                  mode: "0644"
+                  remote_src: true
+              when: nginx_site_backup is not skipped
+
+            - name: Remove an invalid site created on a fresh server
+              ansible.builtin.file:
+                  path: "{{ nginx_site_path }}"
+                  state: absent
+              when:
+                  - not nginx_site_before.stat.exists
+                  - nginx_site_candidate.changed
+
+            - name: Confirm that the restored nginx configuration is valid # noqa: no-handler
+              ansible.builtin.command: /usr/sbin/nginx -t
+              changed_when: false
+              when: nginx_site_candidate.changed
+
+            - name: Report the rejected nginx configuration # noqa: no-handler
+              ansible.builtin.fail:
+                  msg: >-
+                      The candidate nginx configuration was invalid and
+                      {{ 'the previous configuration was restored'
+                      if nginx_site_before.stat.exists
+                      else 'the newly created site was removed' }}.
+              when: nginx_site_candidate.changed
+
+            - name: Report an unrelated invalid nginx configuration
+              ansible.builtin.fail:
+                  msg: >-
+                      The complete nginx configuration is invalid even though the managed site did not change.
+                      No rollback was needed; inspect the other nginx configuration files.
+              when: not nginx_site_candidate.changed
+
+      - name: Disable the package default site
+        ansible.builtin.file:
+            path: /etc/nginx/sites-enabled/default
+            state: absent
+        notify: Validate and reload nginx
+        when: "'nginx' in ansible_facts.packages or not ansible_check_mode"
+
+      - name: Enable and start nginx
+        ansible.builtin.service:
+            name: nginx
+            enabled: true
+            state: started
+        when: "'nginx' in ansible_facts.packages or not ansible_check_mode"
+
+      - name: Apply the validated nginx configuration
+        ansible.builtin.meta: flush_handlers
+        when: not ansible_check_mode
+
+      - name: Read the deployed website state
+        ansible.builtin.stat:
+            path: "{{ website_base_path }}/current/index.html"
+        register: deployed_website
+
+      - name: Read the deployed game state
+        ansible.builtin.stat:
+            path: "{{ game_base_path }}/current/index.html"
+        register: deployed_game
+
+      - name: Confirm the HTTP to HTTPS redirect
+        ansible.builtin.uri:
+            url: "http://{{ production_domain }}/"
+            follow_redirects: none
+            status_code: 301
+            timeout: 10
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+
+      - name: Confirm the public website is reachable over HTTPS
+        ansible.builtin.uri:
+            url: "https://{{ production_domain }}/"
+            status_code: 200
+            timeout: 10
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+            - deployed_website.stat.exists
+
+      - name: Confirm the legacy play URL redirects to the game
+        ansible.builtin.uri:
+            url: "https://{{ production_domain }}/play"
+            follow_redirects: none
+            status_code: 301
+            timeout: 10
+        register: legacy_play_redirect
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+
+      - name: Confirm the legacy play redirect destination
+        ansible.builtin.assert:
+            that:
+                - legacy_play_redirect.location == 'https://' + production_domain + '/game/'
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+
+      - name: Confirm the public game is reachable over HTTPS
+        ansible.builtin.uri:
+            url: "https://{{ production_domain }}/game/"
+            status_code: 200
+            timeout: 10
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+            - deployed_game.stat.exists
+
+  handlers:
+      - name: Validate the complete nginx configuration before reload
+        ansible.builtin.command: /usr/sbin/nginx -t
+        changed_when: false
+        listen: Validate and reload nginx
+
+      - name: Reload nginx
+        ansible.builtin.service:
+            name: nginx
+            state: reloaded
+        listen: Validate and reload nginx

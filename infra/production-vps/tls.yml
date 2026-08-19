@@ -1,0 +1,256 @@
+---
+- name: Configure production TLS automation
+  hosts: production
+  become: true
+  gather_facts: false
+  tags: tls
+
+  vars:
+      tls_python_scripts:
+          - src: templates/tls/cosmos-tls-check.py.j2
+            dest: /usr/local/sbin/cosmos-tls-check
+          - src: templates/tls/cosmos-tls-alert.py.j2
+            dest: /usr/local/sbin/cosmos-tls-alert
+      tls_systemd_unit_names:
+          - cosmos-tls-alert@.service
+          - cosmos-tls-check.service
+          - cosmos-tls-check.timer
+
+  tasks:
+      - name: Install TLS runtime dependencies
+        ansible.builtin.apt:
+            name:
+                - openssl
+                - python3
+                - snapd
+            state: present
+
+      - name: Install Certbot from its official snap
+        community.general.snap:
+            name: certbot
+            channel: stable
+            classic: true
+            state: present
+
+      - name: Expose Certbot on the standard executable path
+        ansible.builtin.file:
+            src: /snap/bin/certbot
+            dest: /usr/bin/certbot
+            state: link
+            owner: root
+            group: root
+            force: true
+
+      - name: Create Certbot renewal hook directories
+        ansible.builtin.file:
+            path: "/etc/letsencrypt/renewal-hooks/{{ item }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+        loop:
+            - pre
+            - deploy
+            - post
+
+      - name: Install the nginx renewal hook
+        ansible.builtin.copy:
+            src: tls/reload-nginx
+            dest: /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
+            owner: root
+            group: root
+            mode: "0755"
+
+      - name: Install the TLS Python scripts
+        ansible.builtin.template:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            owner: root
+            group: root
+            mode: "0755"
+        loop: "{{ tls_python_scripts }}"
+        loop_control:
+            label: "{{ item.dest }}"
+
+      - name: Validate the TLS Python scripts
+        ansible.builtin.command:
+            argv:
+                - /usr/bin/python3
+                - -c
+                - import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text())
+                - "{{ item.dest }}"
+        loop: "{{ tls_python_scripts }}"
+        loop_control:
+            label: "{{ item.dest }}"
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Validate the nginx renewal hook
+        ansible.builtin.command:
+            argv:
+                - /bin/sh
+                - -n
+                - /etc/letsencrypt/renewal-hooks/deploy/reload-nginx
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Install the TLS systemd units
+        ansible.builtin.copy:
+            src: "tls/{{ item }}"
+            dest: "/etc/systemd/system/{{ item }}"
+            owner: root
+            group: root
+            mode: "0644"
+        loop: "{{ tls_systemd_unit_names }}"
+        register: tls_systemd_unit_installation
+        notify: Reload systemd
+
+      - name: Create the Certbot service override directory
+        ansible.builtin.file:
+            path: /etc/systemd/system/snap.certbot.renew.service.d
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+      - name: Alert when Certbot renewal fails
+        ansible.builtin.copy:
+            src: tls/certbot-alert.conf
+            dest: /etc/systemd/system/snap.certbot.renew.service.d/alert.conf
+            owner: root
+            group: root
+            mode: "0644"
+        notify: Reload systemd
+
+      - name: Install the TLS operations documentation
+        ansible.builtin.template:
+            src: templates/tls/operations.md.j2
+            dest: /etc/nginx/COSMOSJOURNEYER-TLS.md
+            owner: root
+            group: root
+            mode: "0644"
+
+      - name: Validate the TLS systemd units
+        ansible.builtin.command:
+            argv:
+                - /usr/bin/systemd-analyze
+                - verify
+                - "/etc/systemd/system/{{ item }}"
+        loop: "{{ tls_systemd_unit_names }}"
+        loop_control:
+            label: "{{ item }}"
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Apply the systemd unit changes
+        ansible.builtin.meta: flush_handlers
+        when: not ansible_check_mode
+
+      - name: Read the current TLS certificate state
+        ansible.builtin.stat:
+            path: "{{ tls_certificate_path }}"
+        register: nginx_tls_certificate
+
+      - name: Issue the initial TLS certificate when explicitly requested
+        ansible.builtin.command:
+            argv:
+                - /usr/bin/certbot
+                - certonly
+                - --webroot
+                - --webroot-path
+                - "{{ acme_webroot_path }}"
+                - --non-interactive
+                - --agree-tos
+                - --email
+                - "{{ tls_contact_email }}"
+                - --cert-name
+                - "{{ production_domain }}"
+                - --domains
+                - "{{ production_server_names | join(',') }}"
+                - --key-type
+                - ecdsa
+        register: certificate_bootstrap
+        changed_when: true
+        when:
+            - tls_bootstrap_certificate | bool
+            - not nginx_tls_certificate.stat.exists
+
+      - name: Read the resulting TLS certificate state
+        ansible.builtin.stat:
+            path: "{{ tls_certificate_path }}"
+        register: nginx_tls_certificate
+
+      - name: Read the resulting TLS private key state
+        ansible.builtin.stat:
+            path: "{{ tls_private_key_path }}"
+        register: nginx_tls_private_key
+
+      - name: Enable HTTPS in nginx after initial issuance # noqa: no-handler
+        ansible.builtin.template:
+            src: templates/nginx-cosmos-journeyer.conf.j2
+            dest: "{{ nginx_site_path }}"
+            owner: root
+            group: root
+            mode: "0644"
+        notify: Validate and reload nginx
+        when: certificate_bootstrap is changed
+
+      - name: Apply HTTPS after initial issuance
+        ansible.builtin.meta: flush_handlers
+        when:
+            - not ansible_check_mode
+            - certificate_bootstrap is changed
+
+      - name: Enable the Certbot renewal timer
+        ansible.builtin.systemd_service:
+            name: snap.certbot.renew.timer
+            enabled: true
+            state: started
+
+      - name: Configure the daily TLS check timer
+        ansible.builtin.systemd_service:
+            name: cosmos-tls-check.timer
+            enabled: "{{ nginx_tls_certificate.stat.exists and nginx_tls_private_key.stat.exists }}"
+            state: >-
+                {{ ('restarted' if tls_systemd_unit_installation.changed else 'started')
+                if nginx_tls_certificate.stat.exists and nginx_tls_private_key.stat.exists
+                else 'stopped' }}
+
+      - name: Confirm Certbot uses the permanent ACME webroot
+        ansible.builtin.command:
+            argv:
+                - /usr/bin/grep
+                - --fixed-strings
+                - --line-regexp
+                - "webroot_path = {{ acme_webroot_path }},"
+                - "/etc/letsencrypt/renewal/{{ production_domain }}.conf"
+        changed_when: false
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+
+      - name: Run the TLS check now
+        ansible.builtin.command: /usr/local/sbin/cosmos-tls-check
+        changed_when: false
+        when:
+            - not ansible_check_mode
+            - nginx_tls_certificate.stat.exists
+            - nginx_tls_private_key.stat.exists
+
+  handlers:
+      - name: Reload systemd units
+        ansible.builtin.systemd_service:
+            daemon_reload: true
+        listen: Reload systemd
+
+      - name: Validate nginx before TLS reload
+        ansible.builtin.command: /usr/sbin/nginx -t
+        changed_when: false
+        listen: Validate and reload nginx
+
+      - name: Reload nginx after TLS changes
+        ansible.builtin.service:
+            name: nginx
+            state: reloaded
+        listen: Validate and reload nginx

@@ -1,0 +1,74 @@
+#!/usr/bin/python3
+
+import datetime
+import re
+import smtplib
+import socket
+import ssl
+import subprocess
+import sys
+from email.message import EmailMessage
+
+RECIPIENT = "{{ tls_contact_email }}"
+SMTP_HOST = "{{ tls_smtp_host }}"
+
+if len(sys.argv) != 2 or not re.fullmatch(r"[A-Za-z0-9_.@:-]+", sys.argv[1]):
+    raise SystemExit("usage: cosmos-tls-alert SYSTEMD_UNIT")
+
+unit = sys.argv[1]
+hostname = socket.getfqdn()
+sender = f"certbot-alert@{hostname}"
+timestamp = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+journal = subprocess.run(
+    ["/usr/bin/journalctl", "-u", unit, "-n", "80", "--no-pager"],
+    check=False,
+    capture_output=True,
+    text=True,
+).stdout
+
+certificate = subprocess.run(
+    [
+        "/usr/bin/openssl",
+        "x509",
+        "-in",
+        "{{ tls_certificate_path }}",
+        "-noout",
+        "-subject",
+        "-issuer",
+        "-dates",
+        "-serial",
+    ],
+    check=False,
+    capture_output=True,
+    text=True,
+).stdout
+
+message = EmailMessage()
+message["From"] = f"Cosmos TLS monitor <{sender}>"
+message["To"] = RECIPIENT
+message["Subject"] = f"[CosmosJourneyer] ALERTE TLS: {unit} en echec"
+message.set_content(
+    f"""Une alerte TLS a ete declenchee sur {hostname}.
+
+Date: {timestamp}
+Unite: {unit}
+
+Certificat local:
+{certificate or "(indisponible)"}
+
+Derniers journaux:
+{journal or "(aucun journal disponible)"}
+
+Documentation:
+  /etc/nginx/COSMOSJOURNEYER-TLS.md
+"""
+)
+
+with smtplib.SMTP(SMTP_HOST, 25, timeout=20) as smtp:
+    smtp.ehlo()
+    smtp.starttls(context=ssl.create_default_context())
+    smtp.ehlo()
+    smtp.send_message(message, from_addr=sender, to_addrs=[RECIPIENT])
+
+print(f"TLS alert sent to {RECIPIENT} for {unit}")

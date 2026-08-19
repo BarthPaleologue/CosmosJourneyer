@@ -1,0 +1,69 @@
+# CosmosJourneyer TLS operations
+
+This document describes the TLS renewal contract for {{ production_server_names | join(' and ') }}. The source of
+truth is the production VPS configuration in `infra/production-vps`.
+
+## Invariants
+
+1. The ACME webroot is permanent and independent from application releases: `{{ acme_webroot_path }}`.
+2. Certbot records that exact webroot in `/etc/letsencrypt/renewal/{{ production_domain }}.conf`.
+3. Port 80 serves `/.well-known/acme-challenge/` directly from that webroot before the HTTPS redirect. The redirect must
+   remain inside `location /`; a server-level `return` intercepts ACME challenges.
+4. The webroot must never move under an application release or `current` symlink.
+5. Certbot owns all certificate material under `/etc/letsencrypt`; Ansible never templates private keys or certificates.
+6. A successful renewal runs `/etc/letsencrypt/renewal-hooks/deploy/reload-nginx`, which validates nginx before reload.
+
+## Initial issuance
+
+DNS for every production name must already point to this VPS. Bootstrap the certificate explicitly:
+
+```sh
+ansible-playbook site.yml --tags tls -e tls_bootstrap_certificate=true
+```
+
+Normal playbook executions never request a new certificate when one is missing.
+
+## Checks
+
+Validate nginx and simulate renewal without Certbot's random sleep:
+
+```sh
+nginx -t
+certbot renew --dry-run --no-random-sleep-on-renew
+```
+
+Before a renewal test, place a temporary token under `{{ acme_webroot_path }}/.well-known/acme-challenge/` and confirm
+both production names return it over plain HTTP without a redirect or 404. Remove the token after the test.
+
+Inspect the certificate actually served:
+
+```sh
+openssl s_client -connect {{ production_domain }}:443 -servername {{ production_domain }} </dev/null 2>/dev/null \
+  | openssl x509 -noout -subject -issuer -dates -serial
+```
+
+## Monitoring and alerting
+
+Certbot renewal failures trigger `cosmos-tls-alert@snap.certbot.renew.service`. The daily
+`cosmos-tls-check.timer` compares the local and publicly served certificates and fails when either is invalid or expires
+within {{ tls_expiry_threshold_days }} days. Failures send an email to {{ tls_contact_email }}.
+
+The notifier sends directly to `{{ tls_smtp_host }}` over STARTTLS because the VPS has no local mail transfer agent.
+
+Useful commands:
+
+```sh
+systemctl status cosmos-tls-check.timer
+journalctl -u cosmos-tls-check.service
+journalctl -u snap.certbot.renew.service
+systemctl list-dependencies snap.certbot.renew.service
+```
+
+## Incident recovery
+
+1. Confirm DNS still points every production name to this VPS.
+2. Confirm the HTTP ACME challenge path is publicly reachable.
+3. Run the simulated renewal.
+4. Run the real renewal only if the certificate is expired or near expiry.
+5. Confirm the public certificate serial and dates.
+6. Inspect Certbot and nginx journals before changing paths.

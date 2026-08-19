@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily CosmosJourneyer TLS certificate check
+
+[Timer]
+OnCalendar=*-*-* 08:15:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=cosmos-tls-check.service
+
+[Install]
+WantedBy=timers.target
