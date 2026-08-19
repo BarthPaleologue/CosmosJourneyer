@@ -1,0 +1,92 @@
+---
+- name: Harden the production SSH server
+  hosts: production
+  become: true
+  gather_facts: false
+
+  vars:
+      ssh_hardening_path: /etc/ssh/sshd_config.d/00-cosmos-journeyer-hardening.conf
+      ssh_hardening_settings:
+          PermitRootLogin: "no"
+          PasswordAuthentication: "no"
+          KbdInteractiveAuthentication: "no"
+          PermitEmptyPasswords: "no"
+          PubkeyAuthentication: "yes"
+          LoginGraceTime: "30"
+          MaxAuthTries: "3"
+          X11Forwarding: "no"
+          AllowAgentForwarding: "no"
+          AllowTcpForwarding: "no"
+          PermitTunnel: "no"
+          PermitUserEnvironment: "no"
+
+  tasks:
+      - name: Confirm that the administrative account has authorized keys
+        ansible.builtin.stat:
+            path: /home/{{ ansible_user }}/.ssh/authorized_keys
+        register: ssh_authorized_keys
+
+      - name: Refuse to disable passwords without an authorized key
+        ansible.builtin.assert:
+            that:
+                - ssh_authorized_keys.stat.exists
+                - ssh_authorized_keys.stat.isreg
+                - ssh_authorized_keys.stat.size > 0
+            fail_msg: >-
+                Refusing to disable SSH password authentication because
+                /home/{{ ansible_user }}/.ssh/authorized_keys is missing or empty.
+
+      - name: Install the SSH hardening configuration
+        ansible.builtin.template:
+            src: templates/ssh-hardening.conf.j2
+            dest: "{{ ssh_hardening_path }}"
+            owner: root
+            group: root
+            mode: "0644"
+            backup: true
+            validate: /usr/sbin/sshd -t -f %s
+        notify: Validate and reload SSH
+
+      - name: Read the effective SSH server configuration
+        ansible.builtin.command: /usr/sbin/sshd -T
+        register: ssh_effective_config
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Confirm that every hardening setting is effective
+        ansible.builtin.assert:
+            that:
+                - expected_setting in ssh_effective_config.stdout_lines
+            fail_msg: >-
+                The SSH configuration is valid, but {{ expected_setting }} did not take effect.
+        vars:
+            expected_setting: "{{ item.key | lower }} {{ item.value }}"
+        loop: "{{ ssh_hardening_settings | dict2items }}"
+        loop_control:
+            label: "{{ expected_setting }}"
+        when: not ansible_check_mode
+
+      - name: Apply the validated SSH configuration
+        ansible.builtin.meta: flush_handlers
+        when: not ansible_check_mode
+
+      - name: Open a fresh SSH connection
+        ansible.builtin.meta: reset_connection
+
+      - name: Confirm that SSH remains reachable
+        ansible.builtin.wait_for_connection:
+            delay: 0
+            timeout: 20
+        when: not ansible_check_mode
+
+  handlers:
+      - name: Validate the complete SSH configuration
+        ansible.builtin.command: /usr/sbin/sshd -t
+        changed_when: false
+        listen: Validate and reload SSH
+
+      - name: Reload the SSH server
+        ansible.builtin.service:
+            name: ssh
+            state: reloaded
+        listen: Validate and reload SSH

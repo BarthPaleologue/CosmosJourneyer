@@ -1,0 +1,7 @@
+# Managed by Ansible. Local changes will be overwritten.
+# This file must sort before cloud-init's 50-cloud-init.conf because sshd uses
+# the first value it encounters for each setting.
+
+{% for option, value in ssh_hardening_settings.items() %}
+{{ option }} {{ value }}
+{% endfor %}

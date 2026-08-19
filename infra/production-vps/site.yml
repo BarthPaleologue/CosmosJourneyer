@@ -1,0 +1,3 @@
+---
+- name: Configure production SSH
+  ansible.builtin.import_playbook: ssh.yml
