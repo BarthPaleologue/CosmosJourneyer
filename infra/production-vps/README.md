@@ -54,6 +54,17 @@ The site template enables HTTPS only when both the existing certificate and priv
 to start on a fresh VPS before the separate TLS bootstrap runs. A candidate configuration is checked with `nginx -t`;
 if validation fails, the playbook restores the previous configuration instead of leaving an invalid file on disk.
 
+## Deployment account
+
+GitHub Actions connects as the password-locked `cosmos-deploy` system user with a dedicated SSH key. The account has no
+supplementary groups or sudo access. Its write access is limited to the website and game trees under
+`/var/www/cosmos_journeyer`; the common parent remains owned by root. Key-level SSH options also disable PTY allocation,
+forwarding and user SSH startup files.
+
+The workflows already derive the login from the `production` environment's `VPS_USERNAME` secret. Rotate
+`VPS_SSH_KEY` and set `VPS_USERNAME=cosmos-deploy` only after the matching public key has been applied and a direct SSH
+login has succeeded.
+
 ## TLS
 
 Certbot is installed from its official snap. Ansible manages the ACME webroot, nginx reload hook, systemd renewal

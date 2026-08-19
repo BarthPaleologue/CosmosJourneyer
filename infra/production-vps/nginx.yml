@@ -19,19 +19,6 @@
             name: nginx
             state: present
 
-      - name: Create deployment directories
-        ansible.builtin.file:
-            path: "{{ item }}"
-            state: directory
-            owner: "{{ ansible_user }}"
-            group: "{{ ansible_user }}"
-            mode: "0755"
-        loop:
-            - "{{ website_base_path }}"
-            - "{{ website_base_path }}/releases"
-            - "{{ game_base_path }}"
-            - "{{ game_base_path }}/releases"
-
       - name: Create the permanent ACME challenge directory
         ansible.builtin.file:
             path: "{{ acme_webroot_path }}/.well-known/acme-challenge"

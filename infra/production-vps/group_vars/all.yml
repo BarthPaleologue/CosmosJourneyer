@@ -4,8 +4,12 @@ production_server_names:
     - "{{ production_domain }}"
     - "www.{{ production_domain }}"
 
-website_base_path: /var/www/cosmos_journeyer/website
-game_base_path: /var/www/cosmos_journeyer/game
+deployment_root_path: /var/www/cosmos_journeyer
+website_base_path: "{{ deployment_root_path }}/website"
+game_base_path: "{{ deployment_root_path }}/game"
+deployment_base_paths:
+    - "{{ website_base_path }}"
+    - "{{ game_base_path }}"
 acme_webroot_path: /var/www/letsencrypt
 
 nginx_site_path: /etc/nginx/sites-enabled/cosmos_journeyer
@@ -17,3 +21,5 @@ tls_smtp_host: mx1.mail.ovh.net
 tls_bootstrap_certificate: false
 
 journald_system_max_use: 500M
+
+deployment_user: cosmos-deploy

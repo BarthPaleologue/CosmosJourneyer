@@ -1,0 +1,1 @@
+no-agent-forwarding,no-port-forwarding,no-X11-forwarding,no-pty,no-user-rc ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVUTy+h6Z1u0+X7qLgSBT3QLRm3SWyABfC85t/W1MxV cosmos-journeyer-github-actions

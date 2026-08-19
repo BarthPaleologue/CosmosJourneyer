@@ -1,0 +1,130 @@
+---
+- name: Configure the production deployment account
+  hosts: production
+  become: true
+  gather_facts: false
+  tags: deployment-account
+
+  tasks:
+      - name: Read the current deployment account state
+        ansible.builtin.command: "/usr/bin/getent passwd {{ deployment_user }}"
+        register: deployment_user_state
+        changed_when: false
+        failed_when: false
+        check_mode: false
+
+      - name: Install deployment runtime dependencies
+        ansible.builtin.apt:
+            name: rsync
+            state: present
+
+      - name: Create the deployment group
+        ansible.builtin.group:
+            name: "{{ deployment_user }}"
+            system: true
+            state: present
+
+      - name: Create the password-locked deployment user
+        ansible.builtin.user:
+            name: "{{ deployment_user }}"
+            comment: Cosmos Journeyer deployment
+            group: "{{ deployment_user }}"
+            groups: []
+            append: false
+            home: "/home/{{ deployment_user }}"
+            shell: /bin/bash
+            system: true
+            create_home: true
+            password_lock: true
+            state: present
+
+      - name: Create the deployment SSH directory
+        ansible.builtin.file:
+            path: "/home/{{ deployment_user }}/.ssh"
+            state: directory
+            owner: "{{ deployment_user }}"
+            group: "{{ deployment_user }}"
+            mode: "0700"
+        when: not ansible_check_mode or deployment_user_state.rc == 0
+
+      - name: Install the dedicated GitHub Actions public key
+        ansible.builtin.copy:
+            src: deployment/authorized_keys
+            dest: "/home/{{ deployment_user }}/.ssh/authorized_keys"
+            owner: "{{ deployment_user }}"
+            group: "{{ deployment_user }}"
+            mode: "0600"
+        when: not ansible_check_mode or deployment_user_state.rc == 0
+
+      - name: Protect the deployment root from new sibling directories
+        ansible.builtin.file:
+            path: "{{ deployment_root_path }}"
+            state: directory
+            owner: root
+            group: root
+            mode: "0755"
+
+      - name: Create deployment-owned application directories
+        ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            owner: "{{ deployment_user }}"
+            group: "{{ deployment_user }}"
+            mode: "0755"
+        loop: "{{ deployment_base_paths }}"
+        when: not ansible_check_mode or deployment_user_state.rc == 0
+
+      - name: Create deployment-owned release directories
+        ansible.builtin.file:
+            path: "{{ item }}/releases"
+            state: directory
+            owner: "{{ deployment_user }}"
+            group: "{{ deployment_user }}"
+            mode: "0755"
+        loop: "{{ deployment_base_paths }}"
+        when: not ansible_check_mode or deployment_user_state.rc == 0
+
+      - name: Transfer existing application releases to the deployment account
+        ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            owner: "{{ deployment_user }}"
+            group: "{{ deployment_user }}"
+            recurse: true
+        loop: "{{ deployment_base_paths }}"
+        when: not ansible_check_mode or deployment_user_state.rc == 0
+
+      - name: Read deployment account group membership
+        ansible.builtin.command: "/usr/bin/id --name --groups {{ deployment_user }}"
+        register: deployment_user_groups
+        changed_when: false
+        when: not ansible_check_mode
+
+      - name: Confirm that the deployment account has no supplementary groups
+        ansible.builtin.assert:
+            that:
+                - deployment_user_groups.stdout.split() == [deployment_user]
+            fail_msg: "The deployment account belongs to an unexpected supplementary group."
+        when: not ansible_check_mode
+
+      - name: Confirm that the deployment account can write release directories
+        ansible.builtin.command: "/usr/bin/test -w {{ item }}/releases"
+        become_user: "{{ deployment_user }}"
+        changed_when: false
+        loop: "{{ deployment_base_paths }}"
+        when: not ansible_check_mode
+
+      - name: Attempt non-interactive sudo as the deployment account
+        ansible.builtin.command: /usr/bin/sudo --non-interactive /usr/bin/true
+        become_user: "{{ deployment_user }}"
+        register: deployment_sudo_attempt
+        changed_when: false
+        failed_when: false
+        when: not ansible_check_mode
+
+      - name: Confirm that the deployment account cannot use sudo
+        ansible.builtin.assert:
+            that:
+                - deployment_sudo_attempt.rc != 0
+            fail_msg: "The deployment account unexpectedly has non-interactive sudo access."
+        when: not ansible_check_mode
