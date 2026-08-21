@@ -91,7 +91,7 @@ export async function createSphericalHeightFieldTerrainScene(
         const tangentX = Vector3.Cross(Vector3.UpReadOnly, centerDirection).normalize();
         const tangentY = Vector3.Cross(centerDirection, tangentX).normalize();
         const gridRadius = 2;
-        const cubeSize = telluricPlanetModel.radius * 0.005;
+        const cubeSize = telluricPlanetModel.radius * 0.00005;
         const angularSpacing = (cubeSize / telluricPlanetModel.radius) * 2.5;
         const surfaceDirections: ReadonlyArray<Vector3> = Array.from(
             { length: (gridRadius * 2 + 1) ** 2 },
