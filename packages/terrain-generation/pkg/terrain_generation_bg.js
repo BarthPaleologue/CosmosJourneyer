@@ -365,6 +365,25 @@ export function clamp(x, min, max) {
 }
 
 /**
+ * Computes the heights at the given coordinates and fills the buffer
+ * * `data` - The data needed to guide the build process
+ * * `coordinates` - The coordinates to sample at
+ * * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+ * @param {TerrainSettings} terrain_settings
+ * @param {Float64Array} coordinates
+ * @param {Float32Array} heights
+ */
+export function compute_heights(terrain_settings, coordinates, heights) {
+    _assertClass(terrain_settings, TerrainSettings);
+    const ptr0 = passArrayF64ToWasm0(coordinates, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    var ptr1 = passArrayF32ToWasm0(heights, wasm.__wbindgen_malloc);
+    var len1 = WASM_VECTOR_LEN;
+    wasm.compute_heights(terrain_settings.__wbg_ptr, ptr0, len0, ptr1, len1, heights);
+}
+
+/**
  * @param {number} a
  * @param {number} b
  * @returns {number}
@@ -453,6 +472,14 @@ function getFloat32ArrayMemory0() {
     return cachedFloat32ArrayMemory0;
 }
 
+let cachedFloat64ArrayMemory0 = null;
+function getFloat64ArrayMemory0() {
+    if (cachedFloat64ArrayMemory0 === null || cachedFloat64ArrayMemory0.byteLength === 0) {
+        cachedFloat64ArrayMemory0 = new Float64Array(wasm.memory.buffer);
+    }
+    return cachedFloat64ArrayMemory0;
+}
+
 function getStringFromWasm0(ptr, len) {
     return decodeText(ptr >>> 0, len);
 }
@@ -483,6 +510,13 @@ function passArray16ToWasm0(arg, malloc) {
 function passArrayF32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4, 4) >>> 0;
     getFloat32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArrayF64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getFloat64ArrayMemory0().set(arg, ptr / 8);
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }

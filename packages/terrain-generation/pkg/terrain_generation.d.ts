@@ -78,6 +78,15 @@ export function build_chunk_vertex_data(data: BuildData, positions: Float32Array
 
 export function clamp(x: number, min: number, max: number): number;
 
+/**
+ * Computes the heights at the given coordinates and fills the buffer
+ * * `data` - The data needed to guide the build process
+ * * `coordinates` - The coordinates to sample at
+ * * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+ */
+export function compute_heights(terrain_settings: TerrainSettings, coordinates: Float64Array, heights: Float32Array): void;
+
 export function gcd(a: number, b: number): number;
 
 /**

@@ -11,6 +11,7 @@ use crate::landscape::make_terrain_function::TerrainFunction;
 use crate::return_data::ReturnData;
 use crate::terrain_settings::TerrainSettings;
 use crate::utils::direction::Direction;
+use crate::utils::spherical_coordinates::geographic_coordinates_to_cartesian;
 use crate::utils::triangle::scatter_in_triangle;
 use crate::utils::vector3::Vector3;
 use landscape::make_terrain_function::make_terrain_function;
@@ -253,4 +254,50 @@ pub fn build_chunk_vertex_data(
     ReturnData {
         nb_instances_created: instance_index,
     }
+}
+
+#[wasm_bindgen]
+/// Computes the heights at the given coordinates and fills the buffer
+/// * `data` - The data needed to guide the build process
+/// * `coordinates` - The coordinates to sample at
+/// * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+/// * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+pub fn compute_heights(
+    terrain_settings: &TerrainSettings,
+    coordinates: &[f64],
+    heights: &mut [f32],
+) {
+    let seed = terrain_settings.seed;
+
+    TERRAIN_CACHE.with(|cache| {
+        let mut cache_mut = cache.borrow_mut();
+        if cache_mut
+            .as_ref()
+            .map(|state| state.settings == *terrain_settings)
+            .unwrap_or(false)
+        {
+            // cache is already initialized with the current terrain settings
+        } else {
+            *cache_mut = Some(TerrainCache {
+                settings: *terrain_settings,
+                function: make_terrain_function(*terrain_settings),
+            });
+        }
+
+        let terrain_function = &mut cache_mut
+            .as_mut()
+            .expect("terrain function cache should be initialized")
+            .function;
+
+        let (pairs, _) = coordinates.as_chunks::<2>();
+
+        for (i, &[latitude, longitude]) in pairs.iter().enumerate() {
+            let cartesian_location = geographic_coordinates_to_cartesian(latitude, longitude);
+
+            let mut gradient = Vector3::zero();
+            let elevation = terrain_function(&cartesian_location, seed, &mut gradient);
+
+            heights[i] = elevation;
+        }
+    });
 }
