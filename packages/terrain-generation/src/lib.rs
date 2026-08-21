@@ -9,6 +9,7 @@ use crate::build_data::BuildData;
 use crate::chunk_skirt::append_chunk_skirt;
 use crate::landscape::make_terrain_function::TerrainFunction;
 use crate::return_data::ReturnData;
+use crate::terrain_settings::TerrainSettings;
 use crate::utils::direction::Direction;
 use crate::utils::triangle::scatter_in_triangle;
 use crate::utils::vector3::Vector3;
@@ -23,7 +24,7 @@ extern "C" {
 }
 
 struct TerrainCache {
-    seed: f32,
+    settings: TerrainSettings,
     function: Box<TerrainFunction>,
 }
 
@@ -100,13 +101,13 @@ pub fn build_chunk_vertex_data(
         let mut cache_mut = cache.borrow_mut();
         if cache_mut
             .as_ref()
-            .map(|state| state.seed == seed)
+            .map(|state| state.settings == data.terrain_settings)
             .unwrap_or(false)
         {
-            // cache is already initialised with the current seed
+            // cache is already initialised with the current terrain settings
         } else {
             *cache_mut = Some(TerrainCache {
-                seed,
+                settings: data.terrain_settings,
                 function: make_terrain_function(data.terrain_settings),
             });
         }

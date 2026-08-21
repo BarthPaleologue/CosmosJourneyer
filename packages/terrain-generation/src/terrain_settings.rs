@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 #[wasm_bindgen]
 pub struct TerrainSettings {
     pub planet_diameter: f32,
