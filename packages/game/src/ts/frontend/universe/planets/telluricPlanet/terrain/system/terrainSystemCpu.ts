@@ -21,6 +21,7 @@ import { Settings } from "@/settings";
 
 import {
     type BuildChunkWorkerPayload,
+    type ComputeHeightsWorkerPayload,
     type TerrainSystemWorkerOutput,
     type TerrainSystemWorkerTask,
 } from "../workers/terrainSystemWorkerProtocol";
@@ -29,13 +30,16 @@ import {
     type ITerrainSystem,
     type TaskId,
     type TerrainSystemChunkOutput,
+    type TerrainSystemHeightsOutput,
     makeTaskId,
 } from "./terrainSystem";
-import { type BuildChunkInput } from "./terrainTaskInputs";
+import { type BuildChunkInput, type ComputeHeightsInput } from "./terrainTaskInputs";
 import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 import { WorkerPool } from "./workerPool";
 
-type QueuedTask = { type: "buildChunk"; id: TaskId; input: BuildChunkInput };
+type QueuedTask =
+    | { type: "buildChunk"; id: TaskId; input: BuildChunkInput }
+    | { type: "computeHeights"; id: TaskId; input: ComputeHeightsInput };
 
 export class TerrainSystemCpu implements ITerrainSystem {
     /** the number vertices per row of the chunk (total number of vertices = nbVerticesPerRow * nbVerticesPerRow) */
@@ -48,17 +52,27 @@ export class TerrainSystemCpu implements ITerrainSystem {
     private constructor(workers: ReadonlyArray<Worker>, nbVerticesPerRow: number) {
         this.workerPool = new WorkerPool(
             workers,
-            ({ id, input }) => ({
-                taskId: id,
-                payload: this.serializeBuildChunkInput(input),
-            }),
+            ({ id, type, input }) => {
+                switch (type) {
+                    case "buildChunk":
+                        return {
+                            taskId: id,
+                            payload: this.serializeBuildChunkInput(input),
+                        };
+                    case "computeHeights":
+                        return {
+                            taskId: id,
+                            payload: this.serializeComputeHeightsInput(input),
+                        };
+                }
+            },
             (event) => {
                 this.handleWorkerResult(event);
             },
             ({ id }) => {
                 this.taskRegistry.failTask(id);
             },
-            (a, b) => a.input.depth < b.input.depth,
+            (a, b) => this.compareTasks(a, b),
         );
         this.nbVerticesPerRow = nbVerticesPerRow;
     }
@@ -139,6 +153,17 @@ export class TerrainSystemCpu implements ITerrainSystem {
         return this.taskRegistry.getChunkOutput(chunkId);
     }
 
+    public requestHeights(input: ComputeHeightsInput): TaskId {
+        const id = makeTaskId(crypto.randomUUID());
+        this.taskRegistry.registerHeightTask(id);
+        this.workerPool.submitTask({ type: "computeHeights", id, input });
+        return id;
+    }
+
+    public getHeightsOutput(taskId: TaskId): TerrainSystemHeightsOutput | undefined {
+        return this.taskRegistry.getHeightsOutput(taskId);
+    }
+
     private serializeBuildChunkInput(input: BuildChunkInput): BuildChunkWorkerPayload {
         return {
             type: "buildChunk",
@@ -150,10 +175,42 @@ export class TerrainSystemCpu implements ITerrainSystem {
         };
     }
 
+    private serializeComputeHeightsInput(input: ComputeHeightsInput): ComputeHeightsWorkerPayload {
+        const coordinates = new Float64Array(input.coordinates.length * 2);
+        for (const [index, coordinate] of input.coordinates.entries()) {
+            coordinates[index * 2] = coordinate.latitudeRadians;
+            coordinates[index * 2 + 1] = coordinate.longitudeRadians;
+        }
+
+        return {
+            type: "computeHeights",
+            planetModel: input.planetModel,
+            coordinates,
+        };
+    }
+
+    private compareTasks(a: QueuedTask, b: QueuedTask): boolean {
+        if (a.type === "buildChunk" && b.type === "buildChunk") {
+            return a.input.depth < b.input.depth;
+        } else if (a.type === "computeHeights" && b.type === "computeHeights") {
+            return false;
+        } else if (a.type === "buildChunk" && b.type === "computeHeights") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private handleWorkerResult({ data }: MessageEvent<TerrainSystemWorkerOutput>): void {
         const taskId = makeTaskId(data.taskId);
 
-        this.taskRegistry.completeChunkTask(taskId, data);
+        switch (data.type) {
+            case "createChunkOutput":
+                this.taskRegistry.completeChunkTask(taskId, data);
+                break;
+            case "computeHeightsOutput":
+                this.taskRegistry.completeHeightTask(taskId, data.heights);
+        }
     }
 
     /**

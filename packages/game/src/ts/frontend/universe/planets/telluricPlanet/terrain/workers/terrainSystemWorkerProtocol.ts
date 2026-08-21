@@ -31,9 +31,15 @@ export type BuildChunkWorkerPayload = {
     faceIndex: FaceIndex;
 };
 
+export type ComputeHeightsWorkerPayload = {
+    type: "computeHeights";
+    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    coordinates: Float64Array;
+};
+
 export type TerrainSystemWorkerTask = {
     taskId: TaskId;
-    payload: BuildChunkWorkerPayload;
+    payload: BuildChunkWorkerPayload | ComputeHeightsWorkerPayload;
 };
 
 type CreateChunkOutput = {
@@ -45,4 +51,10 @@ type CreateChunkOutput = {
     scatteredInstances: ScatteredInstanceBuffers;
 };
 
-export type TerrainSystemWorkerOutput = CreateChunkOutput;
+type ComputeHeightsOutput = {
+    type: "computeHeightsOutput";
+    taskId: TaskId;
+    heights: Float32Array<ArrayBuffer>;
+};
+
+export type TerrainSystemWorkerOutput = CreateChunkOutput | ComputeHeightsOutput;

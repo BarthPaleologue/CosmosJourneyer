@@ -16,9 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createChunkBuffers } from "../chunks/createChunkBuffers";
+import { computeHeights } from "../computeHeights";
 import type { TaskId } from "../system/terrainSystem";
 import {
     type BuildChunkWorkerPayload,
+    type ComputeHeightsWorkerPayload,
     type TerrainSystemWorkerTask,
     type TerrainSystemWorkerOutput,
 } from "./terrainSystemWorkerProtocol";
@@ -29,9 +31,18 @@ type ReturnPayload = {
 };
 
 self.onmessage = ({ data }: MessageEvent<TerrainSystemWorkerTask>): void => {
-    const { output, transfer } = handleBuildChunkTask(data.taskId, data.payload);
+    const { output, transfer } = handleTask(data);
     self.postMessage(output satisfies TerrainSystemWorkerOutput, { transfer });
 };
+
+function handleTask(task: TerrainSystemWorkerTask): ReturnPayload {
+    switch (task.payload.type) {
+        case "buildChunk":
+            return handleBuildChunkTask(task.taskId, task.payload);
+        case "computeHeights":
+            return handleComputeHeightsTask(task.taskId, task.payload);
+    }
+}
 
 function handleBuildChunkTask(taskId: TaskId, task: BuildChunkWorkerPayload): ReturnPayload {
     const { positions, indices, normals, scatteredInstances } = createChunkBuffers(task);
@@ -56,6 +67,19 @@ function handleBuildChunkTask(taskId: TaskId, task: BuildChunkWorkerPayload): Re
             scatteredInstances,
         },
         transfer,
+    };
+}
+
+function handleComputeHeightsTask(taskId: TaskId, task: ComputeHeightsWorkerPayload): ReturnPayload {
+    const heights = computeHeights(task);
+
+    return {
+        output: {
+            type: "computeHeightsOutput",
+            taskId,
+            heights,
+        },
+        transfer: [heights.buffer],
     };
 }
 

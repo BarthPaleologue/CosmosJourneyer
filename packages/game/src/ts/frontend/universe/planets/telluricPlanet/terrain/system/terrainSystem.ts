@@ -18,7 +18,7 @@
 import type { Brand } from "@cosmos-journeyer/typescript";
 
 import type { ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
-import { type BuildChunkInput } from "./terrainTaskInputs";
+import { type BuildChunkInput, type ComputeHeightsInput } from "./terrainTaskInputs";
 
 export type TaskId = Brand<string, "TaskId">;
 
@@ -48,11 +48,20 @@ export type TerrainSystemChunkComputedOutput = {
     buffers: TerrainBuffers;
 };
 
+export type TerrainSystemHeightsComputedOutput = {
+    status: "heightComputed";
+    heights: Float32Array<ArrayBuffer>;
+};
+
 export type TerrainSystemChunkOutput = TerrainSystemPendingOutput | TerrainSystemChunkComputedOutput;
+
+export type TerrainSystemHeightsOutput = TerrainSystemPendingOutput | TerrainSystemHeightsComputedOutput;
 
 export interface ITerrainSystem {
     requestChunk(chunkId: ChunkId, input: BuildChunkInput): void;
     getChunkOutput(chunkId: ChunkId): TerrainSystemChunkOutput | undefined;
+    requestHeights(input: ComputeHeightsInput): TaskId;
+    getHeightsOutput(taskId: TaskId): TerrainSystemHeightsOutput | undefined;
     update(): void;
     reset(): void;
 }

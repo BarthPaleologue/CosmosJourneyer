@@ -19,3 +19,12 @@ test("The spherical height field terrain playground physics are correct", async 
         urlParams: { seed: "261", freeze: 10, physicsViewer: "", startingDistance: 1136.5e3 },
     });
 });
+
+test("The spherical height field terrain playground places cubes using sampled terrain heights", async ({ page }) => {
+    await renderAndSnap(page, {
+        shotName: "sampled-surface-cubes-baseline",
+        scene: "sphericalHeightFieldTerrain",
+        flagToWait: "frozen",
+        urlParams: { seed: "261", freeze: 10, sampledSurfaceCubes: "" },
+    });
+});

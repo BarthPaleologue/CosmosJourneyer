@@ -17,19 +17,28 @@
 
 import { LRUMap } from "@/utils/dataStructures/lruMap";
 
-import type { ChunkId, TaskId, TerrainBuffers, TerrainSystemChunkOutput } from "./terrainSystem";
+import type {
+    ChunkId,
+    TaskId,
+    TerrainBuffers,
+    TerrainSystemChunkOutput,
+    TerrainSystemHeightsOutput,
+} from "./terrainSystem";
 
-type PendingChunkTask = { chunkId: ChunkId };
+type PendingTask = { type: "buildChunk"; chunkId: ChunkId } | { type: "computeHeights" };
 
 export class TerrainTaskRegistry {
-    private readonly pendingTasks = new Map<TaskId, PendingChunkTask>();
+    private readonly pendingTasks = new Map<TaskId, PendingTask>();
 
     private readonly pendingChunkBuilds = new Map<ChunkId, TaskId>();
 
     private readonly completedChunks: LRUMap<ChunkId, TerrainBuffers>;
 
+    private readonly completedHeightTasks: LRUMap<TaskId, Float32Array<ArrayBuffer>>;
+
     public constructor(maxCachedChunks: number) {
         this.completedChunks = new LRUMap(maxCachedChunks);
+        this.completedHeightTasks = new LRUMap(maxCachedChunks);
     }
 
     public registerChunkTask(chunkId: ChunkId, taskId: TaskId): boolean {
@@ -37,14 +46,18 @@ export class TerrainTaskRegistry {
             return false;
         }
 
-        this.pendingTasks.set(taskId, { chunkId });
+        this.pendingTasks.set(taskId, { type: "buildChunk", chunkId });
         this.pendingChunkBuilds.set(chunkId, taskId);
         return true;
     }
 
+    public registerHeightTask(taskId: TaskId): void {
+        this.pendingTasks.set(taskId, { type: "computeHeights" });
+    }
+
     public completeChunkTask(taskId: TaskId, buffers: TerrainBuffers): boolean {
         const pendingTask = this.pendingTasks.get(taskId);
-        if (pendingTask === undefined) {
+        if (pendingTask?.type !== "buildChunk") {
             return false;
         }
 
@@ -58,6 +71,17 @@ export class TerrainTaskRegistry {
         return true;
     }
 
+    public completeHeightTask(taskId: TaskId, heights: Float32Array<ArrayBuffer>): boolean {
+        const pendingTask = this.pendingTasks.get(taskId);
+        if (pendingTask?.type !== "computeHeights") {
+            return false;
+        }
+
+        this.pendingTasks.delete(taskId);
+        this.completedHeightTasks.set(taskId, heights);
+        return true;
+    }
+
     public failTask(taskId: TaskId): boolean {
         const pendingTask = this.pendingTasks.get(taskId);
         if (pendingTask === undefined) {
@@ -65,7 +89,7 @@ export class TerrainTaskRegistry {
         }
 
         this.pendingTasks.delete(taskId);
-        if (this.pendingChunkBuilds.get(pendingTask.chunkId) === taskId) {
+        if (pendingTask.type === "buildChunk" && this.pendingChunkBuilds.get(pendingTask.chunkId) === taskId) {
             this.pendingChunkBuilds.delete(pendingTask.chunkId);
         }
         return true;
@@ -80,9 +104,19 @@ export class TerrainTaskRegistry {
         return this.pendingChunkBuilds.has(chunkId) ? { status: "pending" } : undefined;
     }
 
+    public getHeightsOutput(taskId: TaskId): TerrainSystemHeightsOutput | undefined {
+        const heights = this.completedHeightTasks.get(taskId);
+        if (heights !== undefined) {
+            return { status: "heightComputed", heights };
+        }
+
+        return this.pendingTasks.get(taskId)?.type === "computeHeights" ? { status: "pending" } : undefined;
+    }
+
     public reset(): void {
         this.pendingTasks.clear();
         this.pendingChunkBuilds.clear();
         this.completedChunks.clear();
+        this.completedHeightTasks.clear();
     }
 }

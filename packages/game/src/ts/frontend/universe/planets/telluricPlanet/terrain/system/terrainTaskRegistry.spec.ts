@@ -94,4 +94,23 @@ describe("TerrainTaskRegistry", () => {
         expect(registry.getChunkOutput(chunkId)).toBeUndefined();
         expect(registry.registerChunkTask(chunkId, makeTaskId("retry"))).toBe(true);
     });
+
+    it("caches height results until they are evicted", () => {
+        const registry = new TerrainTaskRegistry(1);
+        const taskId = makeTaskId("heightTask");
+        const heights = new Float32Array([42]);
+
+        registry.registerHeightTask(taskId);
+        expect(registry.getHeightsOutput(taskId)).toEqual({ status: "pending" });
+
+        registry.completeHeightTask(taskId, heights);
+        expect(registry.getHeightsOutput(taskId)).toEqual({ status: "heightComputed", heights });
+        expect(registry.getHeightsOutput(taskId)).toEqual({ status: "heightComputed", heights });
+
+        const nextTaskId = makeTaskId("nextHeightTask");
+        registry.registerHeightTask(nextTaskId);
+        registry.completeHeightTask(nextTaskId, new Float32Array([84]));
+
+        expect(registry.getHeightsOutput(taskId)).toBeUndefined();
+    });
 });

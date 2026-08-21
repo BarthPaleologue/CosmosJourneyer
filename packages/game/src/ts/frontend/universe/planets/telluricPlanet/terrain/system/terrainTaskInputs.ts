@@ -27,3 +27,13 @@ export type BuildChunkInput = {
     faceIndex: FaceIndex;
     position: Vector3;
 };
+
+export type GeographicCoordinates = {
+    readonly latitudeRadians: number;
+    readonly longitudeRadians: number;
+};
+
+export type ComputeHeightsInput = {
+    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    coordinates: ReadonlyArray<GeographicCoordinates>;
+};

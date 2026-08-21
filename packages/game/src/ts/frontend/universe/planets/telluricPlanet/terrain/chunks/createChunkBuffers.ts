@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Quaternion, Vector3 } from "@babylonjs/core/pure";
-import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
+import { build_chunk_vertex_data, BuildData } from "terrain-generation";
 
 import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
 import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "@/frontend/helpers/instancing";
@@ -26,6 +26,7 @@ import { smoothstep } from "@/utils/math";
 import { Settings } from "@/settings";
 
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
+import { createTerrainSettings } from "../createTerrainSettings";
 import type { TerrainBuffers } from "../system/terrainSystem";
 import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
 import type { ScatteredInstanceBuffers } from "./scatteringSystem";
@@ -57,19 +58,7 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
 
     let scattered_point_buffer = new Float32Array(6 * max_nb_instances);
 
-    const terrain_settings = new TerrainSettings();
-    terrain_settings.planet_diameter = planetModel.radius * 2;
-    terrain_settings.seed = planetModel.seed;
-
-    terrain_settings.continent_base_height = planetModel.terrainSettings.continent_base_height;
-    terrain_settings.continents_fragmentation = planetModel.terrainSettings.continents_fragmentation;
-    terrain_settings.continents_frequency = planetModel.terrainSettings.continents_frequency;
-
-    terrain_settings.max_mountain_height = planetModel.terrainSettings.max_mountain_height;
-    terrain_settings.mountains_frequency = planetModel.terrainSettings.mountains_frequency;
-
-    terrain_settings.bumps_frequency = planetModel.terrainSettings.bumps_frequency;
-    terrain_settings.max_bump_height = planetModel.terrainSettings.max_bump_height;
+    const terrainSettings = createTerrainSettings(planetModel);
 
     const buildData: BuildData = new BuildData(
         task.depth,
@@ -78,7 +67,7 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
         task.position[1],
         task.position[2],
         task.nbVerticesPerSide,
-        terrain_settings,
+        terrainSettings,
     );
 
     const result = build_chunk_vertex_data(
