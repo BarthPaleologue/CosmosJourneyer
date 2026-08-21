@@ -18,26 +18,22 @@
 import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
-import { z } from "zod";
 
-import type { ChunkId } from "./chunkForge";
-import { type FaceIndex } from "./faceIndex";
-import { ScatteredInstanceBuffersSchema } from "./scatteringSystem";
+import { type FaceIndex } from "../chunks/faceIndex";
 
-export type BuildTask = {
-    chunkId: ChunkId;
+export type BuildChunkInput = {
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
     depth: number;
     faceIndex: FaceIndex;
     position: Vector3;
 };
 
-export const ReturnedChunkDataSchema = z.object({
-    chunkId: z.string(),
-    positions: z.instanceof(Float32Array),
-    normals: z.instanceof(Float32Array),
-    indices: z.instanceof(Uint16Array),
-    scatteredInstances: ScatteredInstanceBuffersSchema,
-});
+export type GeographicCoordinates = {
+    readonly latitudeRadians: number;
+    readonly longitudeRadians: number;
+};
 
-export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;
+export type ComputeHeightsInput = {
+    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    coordinates: ReadonlyArray<GeographicCoordinates>;
+};

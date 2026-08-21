@@ -9,7 +9,9 @@ use crate::build_data::BuildData;
 use crate::chunk_skirt::append_chunk_skirt;
 use crate::landscape::make_terrain_function::TerrainFunction;
 use crate::return_data::ReturnData;
+use crate::terrain_settings::TerrainSettings;
 use crate::utils::direction::Direction;
+use crate::utils::spherical_coordinates::geographic_coordinates_to_cartesian;
 use crate::utils::triangle::scatter_in_triangle;
 use crate::utils::vector3::Vector3;
 use landscape::make_terrain_function::make_terrain_function;
@@ -23,7 +25,7 @@ extern "C" {
 }
 
 struct TerrainCache {
-    seed: f32,
+    settings: TerrainSettings,
     function: Box<TerrainFunction>,
 }
 
@@ -46,7 +48,7 @@ pub fn build_chunk_vertex_data(
     scattered_points_buffer: &mut [f32],
     scatter_per_square_meter: f32,
 ) -> ReturnData {
-    let planet_diameter = data.planet_diameter;
+    let planet_diameter = data.terrain_settings.planet_diameter;
     let depth = data.chunk_depth;
     let direction = data.chunk_tree_direction;
     let chunk_cube_position = Vector3::new(
@@ -55,7 +57,7 @@ pub fn build_chunk_vertex_data(
         data.chunk_cube_position_z,
     );
 
-    let seed = data.planet_seed;
+    let seed = data.terrain_settings.seed;
 
     let chunk_size = planet_diameter / i32::pow(2, depth) as f32;
     let planet_radius = planet_diameter / 2.0;
@@ -100,13 +102,13 @@ pub fn build_chunk_vertex_data(
         let mut cache_mut = cache.borrow_mut();
         if cache_mut
             .as_ref()
-            .map(|state| state.seed == seed)
+            .map(|state| state.settings == data.terrain_settings)
             .unwrap_or(false)
         {
-            // cache is already initialised with the current seed
+            // cache is already initialised with the current terrain settings
         } else {
             *cache_mut = Some(TerrainCache {
-                seed,
+                settings: data.terrain_settings,
                 function: make_terrain_function(data.terrain_settings),
             });
         }
@@ -164,12 +166,8 @@ pub fn build_chunk_vertex_data(
                 // apply terrain function to the current vertex (use normalized coordinates for scale invariance)
                 let unit_sphere_coords = vertex_position.normalize_to_new();
                 let mut vertex_gradient = Vector3::zero();
-                terrain_function(
-                    &unit_sphere_coords,
-                    seed,
-                    &mut vertex_position,
-                    &mut vertex_gradient,
-                );
+                let elevation = terrain_function(&unit_sphere_coords, seed, &mut vertex_gradient);
+                vertex_position += &unit_sphere_coords * elevation;
                 vertex_gradient /= planet_radius;
 
                 // Resource: https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
@@ -256,4 +254,50 @@ pub fn build_chunk_vertex_data(
     ReturnData {
         nb_instances_created: instance_index,
     }
+}
+
+#[wasm_bindgen]
+/// Computes the heights at the given coordinates and fills the buffer
+/// * `data` - The data needed to guide the build process
+/// * `coordinates` - The coordinates to sample at
+/// * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+/// * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+pub fn compute_heights(
+    terrain_settings: &TerrainSettings,
+    coordinates: &[f64],
+    heights: &mut [f32],
+) {
+    let seed = terrain_settings.seed;
+
+    TERRAIN_CACHE.with(|cache| {
+        let mut cache_mut = cache.borrow_mut();
+        if cache_mut
+            .as_ref()
+            .map(|state| state.settings == *terrain_settings)
+            .unwrap_or(false)
+        {
+            // cache is already initialized with the current terrain settings
+        } else {
+            *cache_mut = Some(TerrainCache {
+                settings: *terrain_settings,
+                function: make_terrain_function(*terrain_settings),
+            });
+        }
+
+        let terrain_function = &mut cache_mut
+            .as_mut()
+            .expect("terrain function cache should be initialized")
+            .function;
+
+        let (pairs, _) = coordinates.as_chunks::<2>();
+
+        for (i, &[latitude, longitude]) in pairs.iter().enumerate() {
+            let cartesian_location = geographic_coordinates_to_cartesian(latitude, longitude);
+
+            let mut gradient = Vector3::zero();
+            let elevation = terrain_function(&cartesian_location, seed, &mut gradient);
+
+            heights[i] = elevation;
+        }
+    });
 }

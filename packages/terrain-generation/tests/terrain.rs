@@ -23,7 +23,8 @@ fn see_terrain_function() {
             let mut sample_point = Vector3::new(x, y, 0.0) * 0.05;
             let unit_sample_point = sample_point.clone();
             let mut gradient = Vector3::new(0.0, 0.0, 0.0);
-            terrain(&unit_sample_point, SEED, &mut sample_point, &mut gradient);
+            let elevation = terrain(&unit_sample_point, SEED, &mut gradient);
+            sample_point += &unit_sample_point * elevation;
 
             (sample_point.length() - unit_sample_point.length()) / 10e3
         },
@@ -42,12 +43,8 @@ fn see_terrain_function() {
             let mut gradient_sphere = Vector3::new(0.0, 0.0, 0.0);
 
             let base_elevation = sample_point_sphere.length();
-            terrain(
-                &unit_sample_point,
-                SEED,
-                &mut sample_point_sphere,
-                &mut gradient_sphere,
-            );
+            let elevation = terrain(&unit_sample_point, SEED, &mut gradient_sphere);
+            sample_point_sphere += &unit_sample_point * elevation;
 
             (sample_point_sphere.length() - base_elevation) / 200e3
         },
@@ -70,7 +67,8 @@ fn terrain_function() {
     let unit_sample_point = &sample_point / elevation;
     let mut gradient = Vector3::zero();
 
-    terrain(&unit_sample_point, SEED, &mut sample_point, &mut gradient);
+    let terrain_height = terrain(&unit_sample_point, SEED, &mut gradient);
+    sample_point += &unit_sample_point * terrain_height;
     gradient /= PLANET_RADIUS;
 
     assert!(sample_point.length() >= elevation);
@@ -96,7 +94,8 @@ fn terrain_function() {
 
             let mut gradient = Vector3::zero();
 
-            terrain(&unit_sphere_coords, SEED, &mut sample_point, &mut gradient);
+            let terrain_height = terrain(&unit_sphere_coords, SEED, &mut gradient);
+            sample_point += &unit_sphere_coords * terrain_height;
 
             gradient /= PLANET_RADIUS;
 

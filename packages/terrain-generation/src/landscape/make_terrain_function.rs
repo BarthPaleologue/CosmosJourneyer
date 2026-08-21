@@ -6,7 +6,7 @@ use crate::terrain_settings::TerrainSettings;
 use crate::utils::math::{multiply, smoothstep};
 use crate::utils::vector3::Vector3;
 
-pub type TerrainFunction = dyn Fn(&Vector3, f32, &mut Vector3, &mut Vector3);
+pub type TerrainFunction = dyn Fn(&Vector3, f32, &mut Vector3) -> f32;
 
 pub fn make_terrain_function(settings: TerrainSettings) -> Box<TerrainFunction> {
     let continents = continent_layer(
@@ -35,10 +35,7 @@ pub fn make_terrain_function(settings: TerrainSettings) -> Box<TerrainFunction> 
     );*/
 
     Box::new(
-        move |unit_sample_point: &Vector3,
-              seed: f32,
-              out_position: &mut Vector3,
-              out_gradient: &mut Vector3| {
+        move |unit_sample_point: &Vector3, seed: f32, out_gradient: &mut Vector3| {
             let mut elevation = 0.0;
 
             // Continent Generation
@@ -100,7 +97,7 @@ pub fn make_terrain_function(settings: TerrainSettings) -> Box<TerrainFunction> 
             elevation += bumpy_elevation * settings.max_bump_height;
             *out_gradient += bumpy_gradient * settings.max_bump_height;
 
-            *out_position += unit_sample_point * elevation;
+            elevation
         },
     )
 }

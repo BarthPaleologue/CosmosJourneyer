@@ -8,16 +8,18 @@ const PLANET_RADIUS: f32 = 10_000.0;
 const RESOLUTION: usize = 8;
 
 fn make_build_data() -> BuildData {
+    let mut terrain_settings = TerrainSettings::new();
+    terrain_settings.planet_diameter = PLANET_RADIUS * 2.0;
+    terrain_settings.seed = 42.0;
+
     BuildData {
-        planet_diameter: PLANET_RADIUS * 2.0,
         chunk_depth: 0,
         chunk_tree_direction: Direction::Forward,
         chunk_cube_position_x: 0.0,
         chunk_cube_position_y: 0.0,
         chunk_cube_position_z: -PLANET_RADIUS,
-        planet_seed: 42.0,
         resolution: RESOLUTION as u32,
-        terrain_settings: TerrainSettings::new(),
+        terrain_settings,
     }
 }
 
@@ -102,7 +104,9 @@ fn chunk_skirt_triangles_face_toward_chunk_interior_on_all_edges() {
             let quad_centroid = (&(&(&top_a + &top_b) + &bottom_a) + &bottom_b) / 4.0;
             let outward_reference = &quad_centroid - &inner_vertex;
 
-            for triangle in indices[next_index_offset..next_index_offset + 6].chunks_exact(3) {
+            let (triangles, _) = indices[next_index_offset..next_index_offset + 6].as_chunks::<3>();
+
+            for triangle in triangles {
                 let p1 = get_vertex(&positions, triangle[0] as usize);
                 let p2 = get_vertex(&positions, triangle[1] as usize);
                 let p3 = get_vertex(&positions, triangle[2] as usize);

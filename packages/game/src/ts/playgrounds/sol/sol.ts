@@ -26,7 +26,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 
@@ -57,11 +57,11 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
-    if (!chunkForgeResult.success) {
-        throw chunkForgeResult.error;
+    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    if (!terrainSystemResult.success) {
+        throw terrainSystemResult.error;
     }
-    const chunkForge = chunkForgeResult.value;
+    const terrainSystem = terrainSystemResult.value;
 
     const starSystemLoader = new StarSystemLoader();
     const starSystemController = await StarSystemController.CreateAsync(
@@ -71,7 +71,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         scene,
         progressMonitor,
     );
-    starSystemController.initPositions(2, chunkForge, Date.now() / 1000);
+    starSystemController.initPositions(2, Date.now() / 1000);
 
     const sun = starSystemController.getStellarObjects()[0];
 
@@ -94,9 +94,9 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
 
-        chunkForge.update();
+        terrainSystem.update();
         postProcessManager.update(deltaSeconds);
-        starSystemController.update(deltaSeconds, chunkForge);
+        starSystemController.update(deltaSeconds, terrainSystem);
         targetCursorLayer.update(camera);
     });
 

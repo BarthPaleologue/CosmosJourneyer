@@ -5,6 +5,8 @@ pub const OCEAN_DEPTH: f32 = 7e3;
 
 #[allow(dead_code)]
 pub const SETTINGS: TerrainSettings = TerrainSettings {
+    planet_diameter: PLANET_RADIUS * 2.0,
+    seed: SEED,
     continents_frequency: 1.0,
     bumps_frequency: 10.0,
     mountains_frequency: 20.0,

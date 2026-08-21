@@ -2,74 +2,68 @@
 /* eslint-disable */
 
 export class BuildData {
-  free(): void;
-  [Symbol.dispose](): void;
-  constructor(planet_diameter: number, chunk_depth: number, chunk_tree_direction: Direction, chunk_cube_position_x: number, chunk_cube_position_y: number, chunk_cube_position_z: number, planet_seed: number, resolution: number, terrain_settings: TerrainSettings);
-  /**
-   * The diameter of the planet
-   */
-  planet_diameter: number;
-  /**
-   * The depth of the chunk to generate in the quadtree (starts at 0!)
-   */
-  chunk_depth: number;
-  /**
-   * The direction of the quadtree in space
-   */
-  chunk_tree_direction: Direction;
-  /**
-   * The x position of the chunk on the cube sphere
-   */
-  chunk_cube_position_x: number;
-  /**
-   * The y position of the chunk on the cube sphere
-   */
-  chunk_cube_position_y: number;
-  /**
-   * The z position of the chunk on the cube sphere
-   */
-  chunk_cube_position_z: number;
-  /**
-   * The seed of the planet we are generating
-   */
-  planet_seed: number;
-  /**
-   * The resolution of each chunk (x*x vertices)
-   */
-  resolution: number;
-  /**
-   * The settings guiding the terrain generation
-   */
-  terrain_settings: TerrainSettings;
+    free(): void;
+    [Symbol.dispose](): void;
+    constructor(chunk_depth: number, chunk_tree_direction: Direction, chunk_cube_position_x: number, chunk_cube_position_y: number, chunk_cube_position_z: number, resolution: number, terrain_settings: TerrainSettings);
+    /**
+     * The x position of the chunk on the cube sphere
+     */
+    chunk_cube_position_x: number;
+    /**
+     * The y position of the chunk on the cube sphere
+     */
+    chunk_cube_position_y: number;
+    /**
+     * The z position of the chunk on the cube sphere
+     */
+    chunk_cube_position_z: number;
+    /**
+     * The depth of the chunk to generate in the quadtree (starts at 0!)
+     */
+    chunk_depth: number;
+    /**
+     * The direction of the quadtree in space
+     */
+    chunk_tree_direction: Direction;
+    /**
+     * The resolution of each chunk (x*x vertices)
+     */
+    resolution: number;
+    /**
+     * The settings guiding the terrain generation
+     */
+    terrain_settings: TerrainSettings;
 }
 
 export enum Direction {
-  Up = 0,
-  Down = 1,
-  Left = 2,
-  Right = 3,
-  Forward = 4,
-  Backward = 5,
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3,
+    Forward = 4,
+    Backward = 5,
 }
 
 export class ReturnData {
-  private constructor();
-  free(): void;
-  [Symbol.dispose](): void;
-  nb_instances_created: number;
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    nb_instances_created: number;
 }
 
 export class TerrainSettings {
-  free(): void;
-  [Symbol.dispose](): void;
-  constructor();
-  continents_frequency: number;
-  bumps_frequency: number;
-  mountains_frequency: number;
-  continents_fragmentation: number;
-  continent_base_height: number;
-  max_mountain_height: number;
-  max_bump_height: number;
+    free(): void;
+    [Symbol.dispose](): void;
+    constructor();
+    bumps_frequency: number;
+    continent_base_height: number;
+    continents_fragmentation: number;
+    continents_frequency: number;
+    max_bump_height: number;
+    max_mountain_height: number;
+    mountains_frequency: number;
+    planet_diameter: number;
+    seed: number;
 }
 
 /**
@@ -84,6 +78,15 @@ export function build_chunk_vertex_data(data: BuildData, positions: Float32Array
 
 export function clamp(x: number, min: number, max: number): number;
 
+/**
+ * Computes the heights at the given coordinates and fills the buffer
+ * * `data` - The data needed to guide the build process
+ * * `coordinates` - The coordinates to sample at
+ * * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+ */
+export function compute_heights(terrain_settings: TerrainSettings, coordinates: Float64Array, heights: Float32Array): void;
+
 export function gcd(a: number, b: number): number;
 
 /**
@@ -93,7 +96,7 @@ export function gcd(a: number, b: number): number;
  * * @param b the second value
  * * @param k the smoothness factor (should be > 1)
  * * @returns the smooth maximum between a and b
- * 
+ *
  */
 export function s_max(a: number, b: number, k: number): number;
 
@@ -104,6 +107,6 @@ export function s_max(a: number, b: number, k: number): number;
  * * @param b the second value
  * * @param k the smoothness factor
  * * @returns the smooth minimum between a and b
- * 
+ *
  */
 export function s_min(a: number, b: number, k: number): number;

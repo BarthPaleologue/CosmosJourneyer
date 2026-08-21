@@ -42,9 +42,9 @@ import { CollisionMask, Settings } from "@/settings";
 
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
-import { type ChunkForge } from "./terrain/chunks/chunkForge";
 import type { ScatteringSystem } from "./terrain/chunks/scatteringSystem";
 import { SphericalHeightFieldTerrain } from "./terrain/sphericalHeightFieldTerrain";
+import { type ITerrainSystem } from "./terrain/system/terrainSystem";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
@@ -167,10 +167,10 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
     /**
      * Update terrain of the sphere relative to the observer position
      * @param camera
-     * @param chunkForge
+     * @param terrainSystem
      */
-    public updateLOD(camera: Camera, chunkForge: ChunkForge, scatteringSystem: ScatteringSystem): void {
-        this.terrain.updateLOD(camera, chunkForge, scatteringSystem);
+    public updateLOD(camera: Camera, terrainSystem: ITerrainSystem, scatteringSystem: ScatteringSystem): void {
+        this.terrain.updateLOD(camera, terrainSystem, scatteringSystem);
     }
 
     public getRadius(): number {

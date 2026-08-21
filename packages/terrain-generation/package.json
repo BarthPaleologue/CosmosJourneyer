@@ -1,6 +1,6 @@
 {
     "name": "terrain-generation",
-    "version": "1.8.0",
+    "version": "2.0.0",
     "private": false,
     "description": "Rust-powered terrain generation for Cosmos Journeyer compiled to WebAssembly for fast planetary rendering.",
     "keywords": [

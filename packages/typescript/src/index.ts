@@ -50,3 +50,7 @@ export type StrictEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => 
 
 /** Turns "should be true" into a compilation error when it's not. */
 export type Assert<T extends true> = T;
+
+declare const brand: unique symbol;
+
+export type Brand<T, Name extends string> = T & { readonly [brand]: Name };

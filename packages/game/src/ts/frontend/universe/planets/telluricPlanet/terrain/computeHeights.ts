@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,16 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import { compute_heights } from "terrain-generation";
 
-import { type FaceIndex } from "./faceIndex";
+import { createTerrainSettings } from "./createTerrainSettings";
+import type { ComputeHeightsWorkerPayload } from "./workers/terrainSystemWorkerProtocol";
 
-export type TransferBuildData = {
-    chunkId: string;
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
-    position: [number, number, number];
-    nbVerticesPerSide: number;
-    depth: number;
-    faceIndex: FaceIndex;
-};
+export function computeHeights(task: ComputeHeightsWorkerPayload): Float32Array<ArrayBuffer> {
+    const pointCount = Math.floor(task.coordinates.length / 2);
+    const heights = new Float32Array(pointCount);
+
+    const terrainSettings = createTerrainSettings(task.planetModel);
+
+    compute_heights(terrainSettings, task.coordinates, heights);
+
+    terrainSettings.free();
+
+    return heights;
+}

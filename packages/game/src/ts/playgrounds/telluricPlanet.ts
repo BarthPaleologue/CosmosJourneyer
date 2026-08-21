@@ -28,8 +28,8 @@ import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
@@ -47,11 +47,11 @@ export async function createTelluricPlanetScene(
 
     await enablePhysics(scene);
 
-    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
-    if (!chunkForgeResult.success) {
-        throw chunkForgeResult.error;
+    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    if (!terrainSystemResult.success) {
+        throw terrainSystemResult.error;
     }
-    const chunkForge = chunkForgeResult.value;
+    const terrainSystem = terrainSystemResult.value;
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -141,8 +141,8 @@ export async function createTelluricPlanetScene(
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
         celestialBodyUberShader?.update(deltaSeconds);
-        planet.updateLOD(camera, chunkForge, scatteringSystem);
-        chunkForge.update();
+        planet.updateLOD(camera, terrainSystem, scatteringSystem);
+        terrainSystem.update();
         planet.computeCulling(camera);
 
         stellarLightSystem.update(camera, planet);
@@ -151,11 +151,11 @@ export async function createTelluricPlanetScene(
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
             controls.update(0);
-            planet.updateLOD(camera, chunkForge, scatteringSystem);
-            chunkForge.update();
+            planet.updateLOD(camera, terrainSystem, scatteringSystem);
+            terrainSystem.update();
             planet.computeCulling(camera);
 
-            if (chunkForge.isIdle() && planet.terrain.isIdle()) {
+            if (terrainSystem.isIdle() && planet.terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }

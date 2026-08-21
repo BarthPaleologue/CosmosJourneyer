@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,32 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
+import { Axis, Quaternion, Vector3 } from "@babylonjs/core/pure";
+import { build_chunk_vertex_data, BuildData } from "terrain-generation";
 
 import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
+import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "@/frontend/helpers/instancing";
 
 import { smoothstep } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "../../../../../helpers/instancing";
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
-import type { ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
-import { type ReturnedChunkData } from "../chunks/taskTypes";
-import { type TransferBuildData } from "../chunks/workerDataTypes";
+import { createTerrainSettings } from "../createTerrainSettings";
+import type { TerrainBuffers } from "../system/terrainSystem";
+import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
+import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 
 const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
 
-function handle_build(data: TransferBuildData): void {
-    const nbVerticesPerSide = data.nbVerticesPerSide;
+export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffers {
+    const nbVerticesPerSide = task.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
 
-    const planetModel = data.planetModel;
+    const planetModel = task.planetModel;
     const planetDiameter = planetModel.radius * 2;
 
-    const size = planetDiameter / 2 ** data.depth;
+    const size = planetDiameter / 2 ** task.depth;
     const space_between_vertices = size / nbSubdivisions;
     const scatter_per_square_meter =
         space_between_vertices < Settings.MIN_DISTANCE_BETWEEN_VERTICES ? MaxScatterDensity : 0;
@@ -49,48 +49,35 @@ function handle_build(data: TransferBuildData): void {
     const skirtVertexCount = shouldGenerateSkirt ? 4 * nbVerticesPerSide : 0;
     const skirtIndexCount = shouldGenerateSkirt ? 4 * nbSubdivisions * 2 * 3 : 0;
 
-    const verticesPositions = new Float32Array((nbVerticesPerSide * nbVerticesPerSide + skirtVertexCount) * 3);
+    const positions = new Float32Array((nbVerticesPerSide * nbVerticesPerSide + skirtVertexCount) * 3);
     const indices = new Uint16Array(nbSubdivisions * nbSubdivisions * 2 * 3 + skirtIndexCount);
-    const normals = new Float32Array(verticesPositions.length);
+    const normals = new Float32Array(positions.length);
 
     const flat_area = size * size;
     const max_nb_instances = Math.floor(flat_area * scatter_per_square_meter * 2.0);
 
     let scattered_point_buffer = new Float32Array(6 * max_nb_instances);
 
-    const terrain_settings = new TerrainSettings();
-    terrain_settings.continent_base_height = planetModel.terrainSettings.continent_base_height;
-    terrain_settings.continents_fragmentation = planetModel.terrainSettings.continents_fragmentation;
-    terrain_settings.continents_frequency = planetModel.terrainSettings.continents_frequency;
-
-    terrain_settings.max_mountain_height = planetModel.terrainSettings.max_mountain_height;
-    terrain_settings.mountains_frequency = planetModel.terrainSettings.mountains_frequency;
-
-    terrain_settings.bumps_frequency = planetModel.terrainSettings.bumps_frequency;
-    terrain_settings.max_bump_height = planetModel.terrainSettings.max_bump_height;
+    const terrainSettings = createTerrainSettings(planetModel);
 
     const buildData: BuildData = new BuildData(
-        planetDiameter,
-        data.depth,
-        data.faceIndex,
-        data.position[0],
-        data.position[1],
-        data.position[2],
-        planetModel.seed,
-        data.nbVerticesPerSide,
-        terrain_settings,
+        task.depth,
+        task.faceIndex,
+        task.position[0],
+        task.position[1],
+        task.position[2],
+        task.nbVerticesPerSide,
+        terrainSettings,
     );
 
     const result = build_chunk_vertex_data(
         buildData,
-        verticesPositions,
+        positions,
         indices,
         normals,
         scattered_point_buffer,
         scatter_per_square_meter,
     );
-
-    const transfer: Array<Transferable> = [verticesPositions.buffer, indices.buffer, normals.buffer];
 
     scattered_point_buffer = scattered_point_buffer.subarray(0, result.nb_instances_created * 6);
 
@@ -107,7 +94,7 @@ function handle_build(data: TransferBuildData): void {
         });
 
         if (planetModel.atmosphere !== null && planetModel.ocean !== null) {
-            const gravityUp = new Vector3(data.position[0], data.position[1], data.position[2]).normalize();
+            const gravityUp = new Vector3(task.position[0], task.position[1], task.position[2]).normalize();
             const chunkPosition = gravityUp.scale(planetModel.radius);
             const grassLayer: ScatteringLayer = (position, normal) => {
                 const flatness = normal.dot(gravityUp);
@@ -189,53 +176,19 @@ function handle_build(data: TransferBuildData): void {
             scatteredInstances.grass = grassBuffer;
             scatteredInstances.tree = treeBuffer;
             scatteredInstances.butterfly = butterflyBuffer;
-            transfer.push(
-                rockBuffer.matrices.buffer,
-                rockBuffer.positions.buffer,
-                rockBuffer.rotations.buffer,
-                rockBuffer.scales.buffer,
-                grassBuffer.matrices.buffer,
-                grassBuffer.positions.buffer,
-                grassBuffer.rotations.buffer,
-                grassBuffer.scales.buffer,
-                treeBuffer.matrices.buffer,
-                treeBuffer.positions.buffer,
-                treeBuffer.rotations.buffer,
-                treeBuffer.scales.buffer,
-                butterflyBuffer.matrices.buffer,
-                butterflyBuffer.positions.buffer,
-                butterflyBuffer.rotations.buffer,
-                butterflyBuffer.scales.buffer,
-            );
         } else {
             const [rockBuffer] = filterPoints(scattered_point_buffer, [rockLayer]);
             scatteredInstances.rock = rockBuffer;
-            transfer.push(
-                rockBuffer.matrices.buffer,
-                rockBuffer.positions.buffer,
-                rockBuffer.rotations.buffer,
-                rockBuffer.scales.buffer,
-            );
         }
     }
 
-    self.postMessage(
-        {
-            chunkId: data.chunkId,
-            positions: verticesPositions,
-            indices: indices,
-            normals: normals,
-            scatteredInstances,
-        } satisfies ReturnedChunkData,
-        { transfer },
-    );
-
     buildData.free();
     result.free();
+
+    return {
+        positions,
+        normals,
+        indices,
+        scatteredInstances,
+    };
 }
-
-self.onmessage = (e: MessageEvent<TransferBuildData>): void => {
-    handle_build(e.data);
-};
-
-self.postMessage("ready");

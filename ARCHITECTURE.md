@@ -26,7 +26,7 @@ graph TD
         D --> E[StarSystemController<br><sub>Everything owned by the current star system</sub>]
         D --> F[PostProcessManager]
         D --> G[Axis & Orbit Renderers]
-        D --> H[ChunkForge<br><sub>Creates the surface of telluric planets</sub>]
+        D --> H[Terrain System<br><sub>Creates the surface of telluric planets</sub>]
 
         E --> I[StarSystemModel<br><sub>The blueprint used to instantiate<br>the current star system</sub>]
 

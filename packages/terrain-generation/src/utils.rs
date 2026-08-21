@@ -3,6 +3,7 @@ pub mod erosion;
 pub mod math;
 pub mod random;
 pub mod simplex;
+pub mod spherical_coordinates;
 pub mod triangle;
 pub mod vector3;
 

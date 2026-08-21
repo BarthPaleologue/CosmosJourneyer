@@ -1,90 +1,3 @@
-let wasm;
-export function __wbg_set_wasm(val) {
-    wasm = val;
-}
-
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-}
-
-function getArrayU8FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-let cachedFloat32ArrayMemory0 = null;
-function getFloat32ArrayMemory0() {
-    if (cachedFloat32ArrayMemory0 === null || cachedFloat32ArrayMemory0.byteLength === 0) {
-        cachedFloat32ArrayMemory0 = new Float32Array(wasm.memory.buffer);
-    }
-    return cachedFloat32ArrayMemory0;
-}
-
-function getStringFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return decodeText(ptr, len);
-}
-
-let cachedUint16ArrayMemory0 = null;
-function getUint16ArrayMemory0() {
-    if (cachedUint16ArrayMemory0 === null || cachedUint16ArrayMemory0.byteLength === 0) {
-        cachedUint16ArrayMemory0 = new Uint16Array(wasm.memory.buffer);
-    }
-    return cachedUint16ArrayMemory0;
-}
-
-let cachedUint8ArrayMemory0 = null;
-function getUint8ArrayMemory0() {
-    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
-        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
-    }
-    return cachedUint8ArrayMemory0;
-}
-
-function passArray16ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 2, 2) >>> 0;
-    getUint16ArrayMemory0().set(arg, ptr / 2);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-
-function passArrayF32ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 4, 4) >>> 0;
-    getFloat32ArrayMemory0().set(arg, ptr / 4);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-
-let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-cachedTextDecoder.decode();
-const MAX_SAFARI_DECODE_BYTES = 2146435072;
-let numBytesDecoded = 0;
-function decodeText(ptr, len) {
-    numBytesDecoded += len;
-    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
-        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-        cachedTextDecoder.decode();
-        numBytesDecoded = len;
-    }
-    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
-}
-
-let WASM_VECTOR_LEN = 0;
-
-const BuildDataFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_builddata_free(ptr >>> 0, 1));
-
-const ReturnDataFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_returndata_free(ptr >>> 0, 1));
-
-const TerrainSettingsFinalization = (typeof FinalizationRegistry === 'undefined')
-    ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_terrainsettings_free(ptr >>> 0, 1));
-
 export class BuildData {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -97,49 +10,21 @@ export class BuildData {
         wasm.__wbg_builddata_free(ptr, 0);
     }
     /**
-     * The diameter of the planet
-     * @returns {number}
+     * @param {number} chunk_depth
+     * @param {Direction} chunk_tree_direction
+     * @param {number} chunk_cube_position_x
+     * @param {number} chunk_cube_position_y
+     * @param {number} chunk_cube_position_z
+     * @param {number} resolution
+     * @param {TerrainSettings} terrain_settings
      */
-    get planet_diameter() {
-        const ret = wasm.__wbg_get_builddata_planet_diameter(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * The diameter of the planet
-     * @param {number} arg0
-     */
-    set planet_diameter(arg0) {
-        wasm.__wbg_set_builddata_planet_diameter(this.__wbg_ptr, arg0);
-    }
-    /**
-     * The depth of the chunk to generate in the quadtree (starts at 0!)
-     * @returns {number}
-     */
-    get chunk_depth() {
-        const ret = wasm.__wbg_get_builddata_chunk_depth(this.__wbg_ptr);
-        return ret >>> 0;
-    }
-    /**
-     * The depth of the chunk to generate in the quadtree (starts at 0!)
-     * @param {number} arg0
-     */
-    set chunk_depth(arg0) {
-        wasm.__wbg_set_builddata_chunk_depth(this.__wbg_ptr, arg0);
-    }
-    /**
-     * The direction of the quadtree in space
-     * @returns {Direction}
-     */
-    get chunk_tree_direction() {
-        const ret = wasm.__wbg_get_builddata_chunk_tree_direction(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * The direction of the quadtree in space
-     * @param {Direction} arg0
-     */
-    set chunk_tree_direction(arg0) {
-        wasm.__wbg_set_builddata_chunk_tree_direction(this.__wbg_ptr, arg0);
+    constructor(chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, resolution, terrain_settings) {
+        _assertClass(terrain_settings, TerrainSettings);
+        var ptr0 = terrain_settings.__destroy_into_raw();
+        const ret = wasm.builddata_new(chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, resolution, ptr0);
+        this.__wbg_ptr = ret;
+        BuildDataFinalization.register(this, this.__wbg_ptr, this);
+        return this;
     }
     /**
      * The x position of the chunk on the cube sphere
@@ -150,26 +35,12 @@ export class BuildData {
         return ret;
     }
     /**
-     * The x position of the chunk on the cube sphere
-     * @param {number} arg0
-     */
-    set chunk_cube_position_x(arg0) {
-        wasm.__wbg_set_builddata_chunk_cube_position_x(this.__wbg_ptr, arg0);
-    }
-    /**
      * The y position of the chunk on the cube sphere
      * @returns {number}
      */
     get chunk_cube_position_y() {
         const ret = wasm.__wbg_get_builddata_chunk_cube_position_y(this.__wbg_ptr);
         return ret;
-    }
-    /**
-     * The y position of the chunk on the cube sphere
-     * @param {number} arg0
-     */
-    set chunk_cube_position_y(arg0) {
-        wasm.__wbg_set_builddata_chunk_cube_position_y(this.__wbg_ptr, arg0);
     }
     /**
      * The z position of the chunk on the cube sphere
@@ -180,26 +51,20 @@ export class BuildData {
         return ret;
     }
     /**
-     * The z position of the chunk on the cube sphere
-     * @param {number} arg0
-     */
-    set chunk_cube_position_z(arg0) {
-        wasm.__wbg_set_builddata_chunk_cube_position_z(this.__wbg_ptr, arg0);
-    }
-    /**
-     * The seed of the planet we are generating
+     * The depth of the chunk to generate in the quadtree (starts at 0!)
      * @returns {number}
      */
-    get planet_seed() {
-        const ret = wasm.__wbg_get_builddata_planet_seed(this.__wbg_ptr);
-        return ret;
+    get chunk_depth() {
+        const ret = wasm.__wbg_get_builddata_chunk_depth(this.__wbg_ptr);
+        return ret >>> 0;
     }
     /**
-     * The seed of the planet we are generating
-     * @param {number} arg0
+     * The direction of the quadtree in space
+     * @returns {Direction}
      */
-    set planet_seed(arg0) {
-        wasm.__wbg_set_builddata_planet_seed(this.__wbg_ptr, arg0);
+    get chunk_tree_direction() {
+        const ret = wasm.__wbg_get_builddata_chunk_tree_direction(this.__wbg_ptr);
+        return ret;
     }
     /**
      * The resolution of each chunk (x*x vertices)
@@ -210,19 +75,54 @@ export class BuildData {
         return ret >>> 0;
     }
     /**
-     * The resolution of each chunk (x*x vertices)
-     * @param {number} arg0
-     */
-    set resolution(arg0) {
-        wasm.__wbg_set_builddata_resolution(this.__wbg_ptr, arg0);
-    }
-    /**
      * The settings guiding the terrain generation
      * @returns {TerrainSettings}
      */
     get terrain_settings() {
         const ret = wasm.__wbg_get_builddata_terrain_settings(this.__wbg_ptr);
         return TerrainSettings.__wrap(ret);
+    }
+    /**
+     * The x position of the chunk on the cube sphere
+     * @param {number} arg0
+     */
+    set chunk_cube_position_x(arg0) {
+        wasm.__wbg_set_builddata_chunk_cube_position_x(this.__wbg_ptr, arg0);
+    }
+    /**
+     * The y position of the chunk on the cube sphere
+     * @param {number} arg0
+     */
+    set chunk_cube_position_y(arg0) {
+        wasm.__wbg_set_builddata_chunk_cube_position_y(this.__wbg_ptr, arg0);
+    }
+    /**
+     * The z position of the chunk on the cube sphere
+     * @param {number} arg0
+     */
+    set chunk_cube_position_z(arg0) {
+        wasm.__wbg_set_builddata_chunk_cube_position_z(this.__wbg_ptr, arg0);
+    }
+    /**
+     * The depth of the chunk to generate in the quadtree (starts at 0!)
+     * @param {number} arg0
+     */
+    set chunk_depth(arg0) {
+        wasm.__wbg_set_builddata_chunk_depth(this.__wbg_ptr, arg0);
+    }
+    /**
+     * The direction of the quadtree in space
+     * @param {Direction} arg0
+     */
+    set chunk_tree_direction(arg0) {
+        wasm.__wbg_set_builddata_chunk_tree_direction(this.__wbg_ptr, arg0);
+    }
+    /**
+     * The resolution of each chunk (x*x vertices)
+     * @param {number} arg0
+     */
+    set resolution(arg0) {
+        wasm.__wbg_set_builddata_resolution(this.__wbg_ptr, arg0);
     }
     /**
      * The settings guiding the terrain generation
@@ -232,25 +132,6 @@ export class BuildData {
         _assertClass(arg0, TerrainSettings);
         var ptr0 = arg0.__destroy_into_raw();
         wasm.__wbg_set_builddata_terrain_settings(this.__wbg_ptr, ptr0);
-    }
-    /**
-     * @param {number} planet_diameter
-     * @param {number} chunk_depth
-     * @param {Direction} chunk_tree_direction
-     * @param {number} chunk_cube_position_x
-     * @param {number} chunk_cube_position_y
-     * @param {number} chunk_cube_position_z
-     * @param {number} planet_seed
-     * @param {number} resolution
-     * @param {TerrainSettings} terrain_settings
-     */
-    constructor(planet_diameter, chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, planet_seed, resolution, terrain_settings) {
-        _assertClass(terrain_settings, TerrainSettings);
-        var ptr0 = terrain_settings.__destroy_into_raw();
-        const ret = wasm.builddata_new(planet_diameter, chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, planet_seed, resolution, ptr0);
-        this.__wbg_ptr = ret >>> 0;
-        BuildDataFinalization.register(this, this.__wbg_ptr, this);
-        return this;
     }
 }
 if (Symbol.dispose) BuildData.prototype[Symbol.dispose] = BuildData.prototype.free;
@@ -269,7 +150,6 @@ export const Direction = Object.freeze({
 
 export class ReturnData {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(ReturnData.prototype);
         obj.__wbg_ptr = ptr;
         ReturnDataFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -303,7 +183,6 @@ if (Symbol.dispose) ReturnData.prototype[Symbol.dispose] = ReturnData.prototype.
 
 export class TerrainSettings {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(TerrainSettings.prototype);
         obj.__wbg_ptr = ptr;
         TerrainSettingsFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -319,63 +198,12 @@ export class TerrainSettings {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_terrainsettings_free(ptr, 0);
     }
-    constructor() {
-        const ret = wasm.terrainsettings_new();
-        this.__wbg_ptr = ret >>> 0;
-        TerrainSettingsFinalization.register(this, this.__wbg_ptr, this);
-        return this;
-    }
-    /**
-     * @returns {number}
-     */
-    get continents_frequency() {
-        const ret = wasm.__wbg_get_terrainsettings_continents_frequency(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set continents_frequency(arg0) {
-        wasm.__wbg_set_terrainsettings_continents_frequency(this.__wbg_ptr, arg0);
-    }
     /**
      * @returns {number}
      */
     get bumps_frequency() {
         const ret = wasm.__wbg_get_terrainsettings_bumps_frequency(this.__wbg_ptr);
         return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set bumps_frequency(arg0) {
-        wasm.__wbg_set_terrainsettings_bumps_frequency(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @returns {number}
-     */
-    get mountains_frequency() {
-        const ret = wasm.__wbg_get_terrainsettings_mountains_frequency(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set mountains_frequency(arg0) {
-        wasm.__wbg_set_terrainsettings_mountains_frequency(this.__wbg_ptr, arg0);
-    }
-    /**
-     * @returns {number}
-     */
-    get continents_fragmentation() {
-        const ret = wasm.__wbg_get_terrainsettings_continents_fragmentation(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set continents_fragmentation(arg0) {
-        wasm.__wbg_set_terrainsettings_continents_fragmentation(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
@@ -385,23 +213,18 @@ export class TerrainSettings {
         return ret;
     }
     /**
-     * @param {number} arg0
+     * @returns {number}
      */
-    set continent_base_height(arg0) {
-        wasm.__wbg_set_terrainsettings_continent_base_height(this.__wbg_ptr, arg0);
+    get continents_fragmentation() {
+        const ret = wasm.__wbg_get_terrainsettings_continents_fragmentation(this.__wbg_ptr);
+        return ret;
     }
     /**
      * @returns {number}
      */
-    get max_mountain_height() {
-        const ret = wasm.__wbg_get_terrainsettings_max_mountain_height(this.__wbg_ptr);
+    get continents_frequency() {
+        const ret = wasm.__wbg_get_terrainsettings_continents_frequency(this.__wbg_ptr);
         return ret;
-    }
-    /**
-     * @param {number} arg0
-     */
-    set max_mountain_height(arg0) {
-        wasm.__wbg_set_terrainsettings_max_mountain_height(this.__wbg_ptr, arg0);
     }
     /**
      * @returns {number}
@@ -411,10 +234,92 @@ export class TerrainSettings {
         return ret;
     }
     /**
+     * @returns {number}
+     */
+    get max_mountain_height() {
+        const ret = wasm.__wbg_get_terrainsettings_max_mountain_height(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {number}
+     */
+    get mountains_frequency() {
+        const ret = wasm.__wbg_get_terrainsettings_mountains_frequency(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {number}
+     */
+    get planet_diameter() {
+        const ret = wasm.__wbg_get_terrainsettings_planet_diameter(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {number}
+     */
+    get seed() {
+        const ret = wasm.__wbg_get_terrainsettings_seed(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @param {number} arg0
+     */
+    set bumps_frequency(arg0) {
+        wasm.__wbg_set_terrainsettings_bumps_frequency(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set continent_base_height(arg0) {
+        wasm.__wbg_set_terrainsettings_continent_base_height(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set continents_fragmentation(arg0) {
+        wasm.__wbg_set_terrainsettings_continents_fragmentation(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set continents_frequency(arg0) {
+        wasm.__wbg_set_terrainsettings_continents_frequency(this.__wbg_ptr, arg0);
+    }
+    /**
      * @param {number} arg0
      */
     set max_bump_height(arg0) {
         wasm.__wbg_set_terrainsettings_max_bump_height(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set max_mountain_height(arg0) {
+        wasm.__wbg_set_terrainsettings_max_mountain_height(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set mountains_frequency(arg0) {
+        wasm.__wbg_set_terrainsettings_mountains_frequency(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set planet_diameter(arg0) {
+        wasm.__wbg_set_terrainsettings_planet_diameter(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set seed(arg0) {
+        wasm.__wbg_set_terrainsettings_seed(this.__wbg_ptr, arg0);
+    }
+    constructor() {
+        const ret = wasm.terrainsettings_new();
+        this.__wbg_ptr = ret;
+        TerrainSettingsFinalization.register(this, this.__wbg_ptr, this);
+        return this;
     }
 }
 if (Symbol.dispose) TerrainSettings.prototype[Symbol.dispose] = TerrainSettings.prototype.free;
@@ -457,6 +362,25 @@ export function build_chunk_vertex_data(data, positions, indices, normals, scatt
 export function clamp(x, min, max) {
     const ret = wasm.clamp(x, min, max);
     return ret;
+}
+
+/**
+ * Computes the heights at the given coordinates and fills the buffer
+ * * `data` - The data needed to guide the build process
+ * * `coordinates` - The coordinates to sample at
+ * * `heights` - A mutable reference to the buffer that will be filled with coordinate heights
+ * * `scattered_points_buffer` - A mutable reference to the buffer that will be filled with scattered point positions and normals
+ * @param {TerrainSettings} terrain_settings
+ * @param {Float64Array} coordinates
+ * @param {Float32Array} heights
+ */
+export function compute_heights(terrain_settings, coordinates, heights) {
+    _assertClass(terrain_settings, TerrainSettings);
+    const ptr0 = passArrayF64ToWasm0(coordinates, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    var ptr1 = passArrayF32ToWasm0(heights, wasm.__wbindgen_malloc);
+    var len1 = WASM_VECTOR_LEN;
+    wasm.compute_heights(terrain_settings.__wbg_ptr, ptr0, len0, ptr1, len1, heights);
 }
 
 /**
@@ -504,15 +428,12 @@ export function s_min(a, b, k) {
     const ret = wasm.s_min(a, b, k);
     return ret;
 }
-
-export function __wbg___wbindgen_copy_to_typed_array_db832bc4df7216c1(arg0, arg1, arg2) {
+export function __wbg___wbindgen_copy_to_typed_array_c7f28e53671b41e8(arg0, arg1, arg2) {
     new Uint8Array(arg2.buffer, arg2.byteOffset, arg2.byteLength).set(getArrayU8FromWasm0(arg0, arg1));
-};
-
-export function __wbg___wbindgen_throw_dd24417ed36fc46e(arg0, arg1) {
+}
+export function __wbg___wbindgen_throw_bb96b2010945f0bc(arg0, arg1) {
     throw new Error(getStringFromWasm0(arg0, arg1));
-};
-
+}
 export function __wbindgen_init_externref_table() {
     const table = wasm.__wbindgen_externrefs;
     const offset = table.grow(4);
@@ -521,4 +442,103 @@ export function __wbindgen_init_externref_table() {
     table.set(offset + 1, null);
     table.set(offset + 2, true);
     table.set(offset + 3, false);
-};
+}
+const BuildDataFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_builddata_free(ptr, 1));
+const ReturnDataFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_returndata_free(ptr, 1));
+const TerrainSettingsFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_terrainsettings_free(ptr, 1));
+
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+}
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+
+let cachedFloat32ArrayMemory0 = null;
+function getFloat32ArrayMemory0() {
+    if (cachedFloat32ArrayMemory0 === null || cachedFloat32ArrayMemory0.byteLength === 0) {
+        cachedFloat32ArrayMemory0 = new Float32Array(wasm.memory.buffer);
+    }
+    return cachedFloat32ArrayMemory0;
+}
+
+let cachedFloat64ArrayMemory0 = null;
+function getFloat64ArrayMemory0() {
+    if (cachedFloat64ArrayMemory0 === null || cachedFloat64ArrayMemory0.byteLength === 0) {
+        cachedFloat64ArrayMemory0 = new Float64Array(wasm.memory.buffer);
+    }
+    return cachedFloat64ArrayMemory0;
+}
+
+function getStringFromWasm0(ptr, len) {
+    return decodeText(ptr >>> 0, len);
+}
+
+let cachedUint16ArrayMemory0 = null;
+function getUint16ArrayMemory0() {
+    if (cachedUint16ArrayMemory0 === null || cachedUint16ArrayMemory0.byteLength === 0) {
+        cachedUint16ArrayMemory0 = new Uint16Array(wasm.memory.buffer);
+    }
+    return cachedUint16ArrayMemory0;
+}
+
+let cachedUint8ArrayMemory0 = null;
+function getUint8ArrayMemory0() {
+    if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+        cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
+    }
+    return cachedUint8ArrayMemory0;
+}
+
+function passArray16ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 2, 2) >>> 0;
+    getUint16ArrayMemory0().set(arg, ptr / 2);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArrayF32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4, 4) >>> 0;
+    getFloat32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArrayF64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getFloat64ArrayMemory0().set(arg, ptr / 8);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+cachedTextDecoder.decode();
+const MAX_SAFARI_DECODE_BYTES = 2146435072;
+let numBytesDecoded = 0;
+function decodeText(ptr, len) {
+    numBytesDecoded += len;
+    if (numBytesDecoded >= MAX_SAFARI_DECODE_BYTES) {
+        cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+        cachedTextDecoder.decode();
+        numBytesDecoded = len;
+    }
+    return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
+}
+
+let WASM_VECTOR_LEN = 0;
+
+
+let wasm;
+export function __wbg_set_wasm(val) {
+    wasm = val;
+}

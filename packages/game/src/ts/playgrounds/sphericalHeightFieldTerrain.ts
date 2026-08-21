@@ -15,7 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { DirectionalLight, PBRMetallicRoughnessMaterial, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import {
+    DirectionalLight,
+    MeshBuilder,
+    PBRMetallicRoughnessMaterial,
+    Quaternion,
+    Scene,
+    Vector3,
+    type AbstractEngine,
+} from "@babylonjs/core";
 import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
@@ -23,9 +31,9 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { ChunkForgeWorkers } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/chunkForgeWorkers";
 import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
 import { SphericalHeightFieldTerrain } from "@/frontend/universe/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { Settings } from "@/settings";
 
@@ -41,11 +49,11 @@ export async function createSphericalHeightFieldTerrainScene(
 
     await enablePhysics(scene);
 
-    const chunkForgeResult = await ChunkForgeWorkers.New(Settings.VERTEX_RESOLUTION);
-    if (!chunkForgeResult.success) {
-        throw chunkForgeResult.error;
+    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    if (!terrainSystemResult.success) {
+        throw terrainSystemResult.error;
     }
-    const chunkForge = chunkForgeResult.value;
+    const terrainSystem = terrainSystemResult.value;
 
     const scatteringSystem = new ScatteringSystemMock();
 
@@ -78,22 +86,108 @@ export async function createSphericalHeightFieldTerrainScene(
 
     const terrain = new SphericalHeightFieldTerrain(telluricPlanetModel, terrainMaterial, scene);
 
+    if (urlParams.has("sampledSurfaceCubes")) {
+        const centerDirection = new Vector3(0, 1, -2).normalize();
+        const tangentX = Vector3.Cross(Vector3.UpReadOnly, centerDirection).normalize();
+        const tangentY = Vector3.Cross(centerDirection, tangentX).normalize();
+        const gridRadius = 2;
+        const cubeSize = telluricPlanetModel.radius * 0.005;
+        const angularSpacing = (cubeSize / telluricPlanetModel.radius) * 2.5;
+        const surfaceDirections: ReadonlyArray<Vector3> = Array.from(
+            { length: (gridRadius * 2 + 1) ** 2 },
+            (_, index) => {
+                const x = (index % (gridRadius * 2 + 1)) - gridRadius;
+                const y = Math.floor(index / (gridRadius * 2 + 1)) - gridRadius;
+                return centerDirection
+                    .add(tangentX.scale(x * angularSpacing))
+                    .addInPlace(tangentY.scale(y * angularSpacing))
+                    .normalize();
+            },
+        );
+        const heightTaskId = terrainSystem.requestHeights({
+            planetModel: telluricPlanetModel,
+            coordinates: surfaceDirections.map((direction) => ({
+                latitudeRadians: Math.asin(direction.y),
+                longitudeRadians: Math.atan2(direction.z, direction.x),
+            })),
+        });
+
+        const sampledHeights = await new Promise<Float32Array<ArrayBuffer>>((resolve, reject) => {
+            const observer = engine.onBeginFrameObservable.add(() => {
+                terrainSystem.update();
+
+                const output = terrainSystem.getHeightsOutput(heightTaskId);
+                if (output?.status !== "heightComputed") {
+                    return;
+                }
+
+                engine.onBeginFrameObservable.remove(observer);
+                if (output.heights.length !== surfaceDirections.length) {
+                    reject(new Error("Terrain height sampling returned an unexpected number of heights"));
+                    return;
+                }
+
+                resolve(output.heights);
+            });
+        });
+
+        const cubeMaterial = new PBRMetallicRoughnessMaterial("sampledSurfaceCubesMaterial", scene);
+        cubeMaterial.baseColor.set(1, 0, 0);
+        cubeMaterial.emissiveColor.set(0.2, 0, 0);
+        cubeMaterial.metallic = 0;
+        cubeMaterial.roughness = 0.7;
+
+        surfaceDirections.forEach((surfaceDirection, index) => {
+            const sampledHeight = sampledHeights[index];
+            if (sampledHeight === undefined) {
+                return;
+            }
+
+            const surfacePosition = surfaceDirection.scale(telluricPlanetModel.radius + sampledHeight);
+            const cube = MeshBuilder.CreateBox(`sampledSurfaceCube-${index}`, { size: cubeSize }, scene);
+            cube.position.copyFrom(surfacePosition).addInPlace(surfaceDirection.scale(cubeSize / 2));
+            cube.rotationQuaternion = Quaternion.FromUnitVectorsToRef(
+                Vector3.UpReadOnly,
+                surfaceDirection,
+                Quaternion.Identity(),
+            );
+            cube.material = cubeMaterial;
+        });
+
+        const centerIndex = Math.floor(surfaceDirections.length / 2);
+        const centerHeight = sampledHeights[centerIndex];
+        if (centerHeight === undefined) {
+            throw new Error("Terrain height sampling returned no center height");
+        }
+        const centerSurfacePosition = centerDirection.scale(telluricPlanetModel.radius + centerHeight);
+        controls
+            .getTransform()
+            .setAbsolutePosition(
+                centerSurfacePosition.add(centerDirection.scale(cubeSize * 5)).add(tangentY.scale(cubeSize * -16)),
+            );
+        lookAt(
+            controls.getTransform(),
+            centerSurfacePosition.add(centerDirection.scale(cubeSize / 2)),
+            scene.useRightHandedSystem,
+        );
+    }
+
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
         controls.update(deltaSeconds);
-        terrain.updateLOD(camera, chunkForge, scatteringSystem);
-        chunkForge.update();
+        terrain.updateLOD(camera, terrainSystem, scatteringSystem);
+        terrainSystem.update();
         terrain.computeCulling(camera);
     });
 
     await new Promise<void>((resolve) => {
         const observer = engine.onBeginFrameObservable.add(() => {
             controls.update(0);
-            terrain.updateLOD(camera, chunkForge, scatteringSystem);
-            chunkForge.update();
+            terrain.updateLOD(camera, terrainSystem, scatteringSystem);
+            terrainSystem.update();
             terrain.computeCulling(camera);
 
-            if (chunkForge.isIdle() && terrain.isIdle()) {
+            if (terrainSystem.isIdle() && terrain.isIdle()) {
                 engine.onBeginFrameObservable.remove(observer);
                 resolve();
             }
