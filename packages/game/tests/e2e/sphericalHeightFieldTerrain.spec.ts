@@ -25,6 +25,6 @@ test("The spherical height field terrain playground places cubes using sampled t
         shotName: "sampled-surface-cubes-baseline",
         scene: "sphericalHeightFieldTerrain",
         flagToWait: "frozen",
-        urlParams: { seed: "261", freeze: 10, sampledSurfaceCubes: "" },
+        urlParams: { seed: "960", freeze: 10, sampledSurfaceCubes: "" },
     });
 });

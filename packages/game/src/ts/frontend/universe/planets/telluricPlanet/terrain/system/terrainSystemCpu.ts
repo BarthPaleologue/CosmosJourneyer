@@ -78,11 +78,12 @@ export class TerrainSystemCpu implements ITerrainSystem {
     }
 
     public static async New(nbVerticesPerRow: number): Promise<Result<TerrainSystemCpu, Error>> {
-        const nbMaxWorkers = Math.max(1, navigator.hardwareConcurrency - 1); // -1 because the main thread is also used
+        const nbWorkers = Math.max(1, navigator.hardwareConcurrency - 1); // -1 because the main thread is also used
 
-        const workerResults = await Promise.all(
-            Array.from({ length: nbMaxWorkers }, async () => this.CreateBuildWorker()),
-        );
+        const workerResults: Array<Result<Worker, Error>> = [];
+        for (let workerIndex = 0; workerIndex < nbWorkers; workerIndex++) {
+            workerResults.push(await this.CreateBuildWorker());
+        }
 
         const errors: Array<Error> = [];
         const availableWorkers: Array<Worker> = [];
