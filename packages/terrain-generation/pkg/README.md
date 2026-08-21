@@ -22,17 +22,17 @@ distribution via the `npm:` protocol so that only maintainers need the Rust tool
 import { build_chunk_vertex_data, BuildData, TerrainSettings } from "terrain-generation";
 
 const terrainSettings = new TerrainSettings();
+terrainSettings.planet_diameter = 12000;
+terrainSettings.seed = 12_345;
 terrainSettings.continent_base_height = 0.45;
 terrainSettings.continents_frequency = 1.25;
 
 const buildData = new BuildData(
-    /* planetDiameter */ 12000,
     /* depth */ 5,
     /* faceIndex */ 3,
     /* originX */ 0,
     /* originY */ 0,
     /* originZ */ 0,
-    /* seed */ 12_345,
     /* verticesPerSide */ 65,
     terrainSettings,
 );

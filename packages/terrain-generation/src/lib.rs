@@ -46,7 +46,7 @@ pub fn build_chunk_vertex_data(
     scattered_points_buffer: &mut [f32],
     scatter_per_square_meter: f32,
 ) -> ReturnData {
-    let planet_diameter = data.planet_diameter;
+    let planet_diameter = data.terrain_settings.planet_diameter;
     let depth = data.chunk_depth;
     let direction = data.chunk_tree_direction;
     let chunk_cube_position = Vector3::new(
@@ -55,7 +55,7 @@ pub fn build_chunk_vertex_data(
         data.chunk_cube_position_z,
     );
 
-    let seed = data.planet_seed;
+    let seed = data.terrain_settings.seed;
 
     let chunk_size = planet_diameter / i32::pow(2, depth) as f32;
     let planet_radius = planet_diameter / 2.0;

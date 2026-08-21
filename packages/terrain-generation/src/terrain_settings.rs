@@ -1,8 +1,10 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy)]
 #[wasm_bindgen]
 pub struct TerrainSettings {
+    pub planet_diameter: f32,
+    pub seed: f32,
     pub continents_frequency: f32,
     pub bumps_frequency: f32,
     pub mountains_frequency: f32,
@@ -23,6 +25,8 @@ impl TerrainSettings {
 impl Default for TerrainSettings {
     fn default() -> Self {
         Self {
+            planet_diameter: 1000e3,
+            seed: 0.0,
             continents_frequency: 1.0,
             bumps_frequency: 1.0,
             mountains_frequency: 1.0,

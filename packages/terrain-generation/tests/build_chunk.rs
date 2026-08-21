@@ -13,13 +13,11 @@ const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD: f32 = 32768.0;
 
 fn make_build_data() -> BuildData {
     BuildData {
-        planet_diameter: PLANET_RADIUS * 2.0,
         chunk_depth: 0,
         chunk_tree_direction: Direction::Forward,
         chunk_cube_position_x: 0.0,
         chunk_cube_position_y: 0.0,
         chunk_cube_position_z: -PLANET_RADIUS,
-        planet_seed: SEED,
         resolution: 64,
         terrain_settings: SETTINGS,
     }
@@ -33,7 +31,8 @@ pub fn build_chunk_data() {
 
     let nb_subdivisions = build_data.resolution - 1;
 
-    let size = build_data.planet_diameter / i32::pow(2, build_data.chunk_depth) as f32;
+    let size =
+        build_data.terrain_settings.planet_diameter / i32::pow(2, build_data.chunk_depth) as f32;
     let space_between_vertices = size / nb_subdivisions as f32;
     println!("space_between_vertices: {}", space_between_vertices);
     let scatter_per_square_meter = if space_between_vertices < 3.0 {
@@ -133,7 +132,7 @@ pub fn build_chunk_data() {
             let position = Vector3::new(pos_x, pos_y, pos_z + build_data.chunk_cube_position_z);
             let elevation = position.length();
 
-            let elevation01 = (elevation - (build_data.planet_diameter / 2.0))
+            let elevation01 = (elevation - (build_data.terrain_settings.planet_diameter / 2.0))
                 / (build_data.terrain_settings.continent_base_height
                     + build_data.terrain_settings.max_mountain_height
                     + build_data.terrain_settings.max_bump_height);

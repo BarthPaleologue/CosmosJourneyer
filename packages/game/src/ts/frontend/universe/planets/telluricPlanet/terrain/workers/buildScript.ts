@@ -59,6 +59,9 @@ function handle_build(data: TransferBuildData): void {
     let scattered_point_buffer = new Float32Array(6 * max_nb_instances);
 
     const terrain_settings = new TerrainSettings();
+    terrain_settings.planet_diameter = planetModel.radius * 2;
+    terrain_settings.seed = planetModel.seed;
+
     terrain_settings.continent_base_height = planetModel.terrainSettings.continent_base_height;
     terrain_settings.continents_fragmentation = planetModel.terrainSettings.continents_fragmentation;
     terrain_settings.continents_frequency = planetModel.terrainSettings.continents_frequency;
@@ -70,13 +73,11 @@ function handle_build(data: TransferBuildData): void {
     terrain_settings.max_bump_height = planetModel.terrainSettings.max_bump_height;
 
     const buildData: BuildData = new BuildData(
-        planetDiameter,
         data.depth,
         data.faceIndex,
         data.position[0],
         data.position[1],
         data.position[2],
-        planetModel.seed,
         data.nbVerticesPerSide,
         terrain_settings,
     );

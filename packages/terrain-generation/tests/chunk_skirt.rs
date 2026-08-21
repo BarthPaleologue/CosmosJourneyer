@@ -8,16 +8,18 @@ const PLANET_RADIUS: f32 = 10_000.0;
 const RESOLUTION: usize = 8;
 
 fn make_build_data() -> BuildData {
+    let mut terrain_settings = TerrainSettings::new();
+    terrain_settings.planet_diameter = PLANET_RADIUS * 2.0;
+    terrain_settings.seed = 42.0;
+
     BuildData {
-        planet_diameter: PLANET_RADIUS * 2.0,
         chunk_depth: 0,
         chunk_tree_direction: Direction::Forward,
         chunk_cube_position_x: 0.0,
         chunk_cube_position_y: 0.0,
         chunk_cube_position_z: -PLANET_RADIUS,
-        planet_seed: 42.0,
         resolution: RESOLUTION as u32,
-        terrain_settings: TerrainSettings::new(),
+        terrain_settings,
     }
 }
 

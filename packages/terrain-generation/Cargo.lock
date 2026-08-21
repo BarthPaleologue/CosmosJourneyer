@@ -2112,7 +2112,7 @@ dependencies = [
 
 [[package]]
 name = "terrain-generation"
-version = "1.8.0"
+version = "2.0.0"
 dependencies = [
  "chrono",
  "console_error_panic_hook",

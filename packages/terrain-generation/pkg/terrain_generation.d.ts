@@ -4,7 +4,7 @@
 export class BuildData {
     free(): void;
     [Symbol.dispose](): void;
-    constructor(planet_diameter: number, chunk_depth: number, chunk_tree_direction: Direction, chunk_cube_position_x: number, chunk_cube_position_y: number, chunk_cube_position_z: number, planet_seed: number, resolution: number, terrain_settings: TerrainSettings);
+    constructor(chunk_depth: number, chunk_tree_direction: Direction, chunk_cube_position_x: number, chunk_cube_position_y: number, chunk_cube_position_z: number, resolution: number, terrain_settings: TerrainSettings);
     /**
      * The x position of the chunk on the cube sphere
      */
@@ -25,14 +25,6 @@ export class BuildData {
      * The direction of the quadtree in space
      */
     chunk_tree_direction: Direction;
-    /**
-     * The diameter of the planet
-     */
-    planet_diameter: number;
-    /**
-     * The seed of the planet we are generating
-     */
-    planet_seed: number;
     /**
      * The resolution of each chunk (x*x vertices)
      */
@@ -70,6 +62,8 @@ export class TerrainSettings {
     max_bump_height: number;
     max_mountain_height: number;
     mountains_frequency: number;
+    planet_diameter: number;
+    seed: number;
 }
 
 /**

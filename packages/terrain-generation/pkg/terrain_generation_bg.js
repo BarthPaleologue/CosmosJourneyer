@@ -10,20 +10,18 @@ export class BuildData {
         wasm.__wbg_builddata_free(ptr, 0);
     }
     /**
-     * @param {number} planet_diameter
      * @param {number} chunk_depth
      * @param {Direction} chunk_tree_direction
      * @param {number} chunk_cube_position_x
      * @param {number} chunk_cube_position_y
      * @param {number} chunk_cube_position_z
-     * @param {number} planet_seed
      * @param {number} resolution
      * @param {TerrainSettings} terrain_settings
      */
-    constructor(planet_diameter, chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, planet_seed, resolution, terrain_settings) {
+    constructor(chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, resolution, terrain_settings) {
         _assertClass(terrain_settings, TerrainSettings);
         var ptr0 = terrain_settings.__destroy_into_raw();
-        const ret = wasm.builddata_new(planet_diameter, chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, planet_seed, resolution, ptr0);
+        const ret = wasm.builddata_new(chunk_depth, chunk_tree_direction, chunk_cube_position_x, chunk_cube_position_y, chunk_cube_position_z, resolution, ptr0);
         this.__wbg_ptr = ret;
         BuildDataFinalization.register(this, this.__wbg_ptr, this);
         return this;
@@ -66,22 +64,6 @@ export class BuildData {
      */
     get chunk_tree_direction() {
         const ret = wasm.__wbg_get_builddata_chunk_tree_direction(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * The diameter of the planet
-     * @returns {number}
-     */
-    get planet_diameter() {
-        const ret = wasm.__wbg_get_builddata_planet_diameter(this.__wbg_ptr);
-        return ret;
-    }
-    /**
-     * The seed of the planet we are generating
-     * @returns {number}
-     */
-    get planet_seed() {
-        const ret = wasm.__wbg_get_builddata_planet_seed(this.__wbg_ptr);
         return ret;
     }
     /**
@@ -134,20 +116,6 @@ export class BuildData {
      */
     set chunk_tree_direction(arg0) {
         wasm.__wbg_set_builddata_chunk_tree_direction(this.__wbg_ptr, arg0);
-    }
-    /**
-     * The diameter of the planet
-     * @param {number} arg0
-     */
-    set planet_diameter(arg0) {
-        wasm.__wbg_set_builddata_planet_diameter(this.__wbg_ptr, arg0);
-    }
-    /**
-     * The seed of the planet we are generating
-     * @param {number} arg0
-     */
-    set planet_seed(arg0) {
-        wasm.__wbg_set_builddata_planet_seed(this.__wbg_ptr, arg0);
     }
     /**
      * The resolution of each chunk (x*x vertices)
@@ -280,6 +248,20 @@ export class TerrainSettings {
         return ret;
     }
     /**
+     * @returns {number}
+     */
+    get planet_diameter() {
+        const ret = wasm.__wbg_get_terrainsettings_planet_diameter(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+     * @returns {number}
+     */
+    get seed() {
+        const ret = wasm.__wbg_get_terrainsettings_seed(this.__wbg_ptr);
+        return ret;
+    }
+    /**
      * @param {number} arg0
      */
     set bumps_frequency(arg0) {
@@ -320,6 +302,18 @@ export class TerrainSettings {
      */
     set mountains_frequency(arg0) {
         wasm.__wbg_set_terrainsettings_mountains_frequency(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set planet_diameter(arg0) {
+        wasm.__wbg_set_terrainsettings_planet_diameter(this.__wbg_ptr, arg0);
+    }
+    /**
+     * @param {number} arg0
+     */
+    set seed(arg0) {
+        wasm.__wbg_set_terrainsettings_seed(this.__wbg_ptr, arg0);
     }
     constructor() {
         const ret = wasm.terrainsettings_new();
