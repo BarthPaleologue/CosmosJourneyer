@@ -164,12 +164,8 @@ pub fn build_chunk_vertex_data(
                 // apply terrain function to the current vertex (use normalized coordinates for scale invariance)
                 let unit_sphere_coords = vertex_position.normalize_to_new();
                 let mut vertex_gradient = Vector3::zero();
-                terrain_function(
-                    &unit_sphere_coords,
-                    seed,
-                    &mut vertex_position,
-                    &mut vertex_gradient,
-                );
+                let elevation = terrain_function(&unit_sphere_coords, seed, &mut vertex_gradient);
+                vertex_position += &unit_sphere_coords * elevation;
                 vertex_gradient /= planet_radius;
 
                 // Resource: https://math.stackexchange.com/questions/1071662/surface-normal-to-point-on-displaced-sphere
