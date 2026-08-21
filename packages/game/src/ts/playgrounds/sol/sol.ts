@@ -26,7 +26,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystemCpu";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 

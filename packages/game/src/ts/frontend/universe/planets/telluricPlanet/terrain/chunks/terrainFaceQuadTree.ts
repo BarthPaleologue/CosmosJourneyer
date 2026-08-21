@@ -30,14 +30,14 @@ import { type Cullable } from "@/frontend/helpers/cullable";
 
 import { Settings } from "@/settings";
 
+import { type ITerrainSystem } from "../system/terrainSystem";
+import { type BuildChunkInput } from "../system/terrainTaskInputs";
 import { getChunkChildIndices, type ChunkIndices } from "./chunkIndices";
 import { type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
 import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
-import { type ITerrainSystem } from "./terrainSystem";
-import { type BuildChunkInput } from "./terrainTaskInputs";
 
 const splitScreenSpaceErrorThreshold = 32;
 const mergeScreenSpaceErrorThreshold = 16;

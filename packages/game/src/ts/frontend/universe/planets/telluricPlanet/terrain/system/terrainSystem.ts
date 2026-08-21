@@ -17,7 +17,7 @@
 
 import type { Brand } from "@cosmos-journeyer/typescript";
 
-import type { ScatteredInstanceBuffers } from "./scatteringSystem";
+import type { ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
 import { type BuildChunkInput } from "./terrainTaskInputs";
 
 export type TaskId = Brand<string, "TaskId">;

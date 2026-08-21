@@ -70,7 +70,7 @@ import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoun
 import { type Targetable } from "@/frontend/universe/architecture/targetable";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
-import { type ITerrainSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystem";
+import { type ITerrainSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";

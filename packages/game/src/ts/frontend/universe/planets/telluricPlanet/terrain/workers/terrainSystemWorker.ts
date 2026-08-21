@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createChunkBuffers } from "../chunks/createChunkBuffers";
-import type { TaskId } from "../chunks/terrainSystem";
+import type { TaskId } from "../system/terrainSystem";
 import {
     type BuildChunkWorkerPayload,
     type TerrainSystemWorkerTask,

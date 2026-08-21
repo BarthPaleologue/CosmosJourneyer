@@ -19,7 +19,7 @@ import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
-import { type FaceIndex } from "./faceIndex";
+import { type FaceIndex } from "../chunks/faceIndex";
 
 export type BuildChunkInput = {
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;

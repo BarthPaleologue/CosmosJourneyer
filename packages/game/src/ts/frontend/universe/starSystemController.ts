@@ -50,7 +50,7 @@ import { KeplerianOrbitalSimulation, type OrbitalTransform } from "./keplerianOr
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { type ITerrainSystem } from "./planets/telluricPlanet/terrain/chunks/terrainSystem";
+import { type ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
 import { type StarSystemLoader } from "./starSystemLoader";
 

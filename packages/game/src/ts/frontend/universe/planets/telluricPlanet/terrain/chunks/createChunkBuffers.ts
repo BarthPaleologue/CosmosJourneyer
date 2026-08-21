@@ -26,9 +26,9 @@ import { smoothstep } from "@/utils/math";
 import { Settings } from "@/settings";
 
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
+import type { TerrainBuffers } from "../system/terrainSystem";
 import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
 import type { ScatteredInstanceBuffers } from "./scatteringSystem";
-import type { TerrainBuffers } from "./terrainSystem";
 
 const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
 

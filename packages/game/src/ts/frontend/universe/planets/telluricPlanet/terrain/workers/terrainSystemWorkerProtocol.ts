@@ -20,7 +20,7 @@ import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-j
 
 import { type FaceIndex } from "../chunks/faceIndex";
 import { type ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
-import type { TaskId } from "../chunks/terrainSystem";
+import type { TaskId } from "../system/terrainSystem";
 
 export type BuildChunkWorkerPayload = {
     type: "buildChunk";

@@ -29,7 +29,7 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 import type { LodUpdateContext } from "./chunks/lodUpdateContext";
 import type { IScatteringSystem } from "./chunks/scatteringSystem";
 import { TerrainFaceQuadTree } from "./chunks/terrainFaceQuadTree";
-import type { ITerrainSystem } from "./chunks/terrainSystem";
+import type { ITerrainSystem } from "./system/terrainSystem";
 
 export class SphericalHeightFieldTerrain implements Transformable, Cullable {
     private readonly transform: TransformNode;

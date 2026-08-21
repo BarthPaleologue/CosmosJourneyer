@@ -30,7 +30,7 @@ import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObj
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { NotificationManagerMock, type INotificationManager } from "@/frontend/ui/notificationManager";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystemCpu";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

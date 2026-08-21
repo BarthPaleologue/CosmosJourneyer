@@ -37,11 +37,11 @@ import { type Transformable } from "@/frontend/universe/architecture/transformab
 
 import { CollisionMask, Settings } from "@/settings";
 
+import { makeChunkId, type ChunkId, type TerrainBuffers } from "../system/terrainSystem";
 import { type ChunkIndices } from "./chunkIndices";
 import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
-import { makeChunkId, type ChunkId, type TerrainBuffers } from "./terrainSystem";
 
 type ChunkLodMetrics = {
     readonly centerPlanetSpace: Vector3;

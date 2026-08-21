@@ -43,8 +43,8 @@ import { CollisionMask, Settings } from "@/settings";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import type { ScatteringSystem } from "./terrain/chunks/scatteringSystem";
-import { type ITerrainSystem } from "./terrain/chunks/terrainSystem";
 import { SphericalHeightFieldTerrain } from "./terrain/sphericalHeightFieldTerrain";
+import { type ITerrainSystem } from "./terrain/system/terrainSystem";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;

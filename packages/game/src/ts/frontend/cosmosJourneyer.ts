@@ -62,7 +62,7 @@ import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/terrainSystemCpu";
+import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { type View } from "@/frontend/view";
 
 import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
