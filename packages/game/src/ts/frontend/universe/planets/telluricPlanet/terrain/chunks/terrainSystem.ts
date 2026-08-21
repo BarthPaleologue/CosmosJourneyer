@@ -20,16 +20,19 @@ import { type BuildTask } from "./taskTypes";
 
 export type ChunkId = string;
 
+export type TerrainBuffers = {
+    positions: Float32Array<ArrayBuffer>;
+    normals: Float32Array<ArrayBuffer>;
+    indices: Uint16Array<ArrayBuffer>;
+    scatteredInstances: ScatteredInstanceBuffers;
+};
+
 type TerrainSystemPendingOutput = {
     status: "pending";
 };
 
-export type TerrainSystemCompletedOutput = {
+export type TerrainSystemCompletedOutput = TerrainBuffers & {
     status: "completed";
-    positions: Float32Array;
-    normals: Float32Array;
-    indices: Uint16Array;
-    scatteredInstances: ScatteredInstanceBuffers;
 };
 
 export type TerrainSystemOutput = TerrainSystemPendingOutput | TerrainSystemCompletedOutput;
