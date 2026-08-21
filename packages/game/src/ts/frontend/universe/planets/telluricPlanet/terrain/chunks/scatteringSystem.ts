@@ -23,29 +23,22 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import { z } from "zod";
 
 import type { Objects } from "@/frontend/assets/objects";
 import { createInstancePatch } from "@/frontend/helpers/instancing";
 import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 
-export const AssetTypeSchema = z.enum(["grass", "rock", "tree", "butterfly"]);
+export type AssetType = "grass" | "rock" | "tree" | "butterfly";
 
-export type AssetType = z.infer<typeof AssetTypeSchema>;
+type InstanceBuffers = {
+    matrices: Float32Array;
+    positions: Float32Array;
+    rotations: Float32Array;
+    scales: Float32Array;
+    count: number;
+};
 
-const InstanceBuffersSchema = z.object({
-    matrices: z.instanceof(Float32Array),
-    positions: z.instanceof(Float32Array),
-    rotations: z.instanceof(Float32Array),
-    scales: z.instanceof(Float32Array),
-    count: z.number(),
-});
-
-type InstanceBuffers = z.infer<typeof InstanceBuffersSchema>;
-
-export const ScatteredInstanceBuffersSchema = z.partialRecord(AssetTypeSchema, InstanceBuffersSchema);
-
-export type ScatteredInstanceBuffers = z.infer<typeof ScatteredInstanceBuffersSchema>;
+export type ScatteredInstanceBuffers = Partial<Record<AssetType, InstanceBuffers>>;
 
 type ScatteredInstances = {
     mesh: Mesh;

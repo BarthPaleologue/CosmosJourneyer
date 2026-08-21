@@ -15,16 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
 import { type FaceIndex } from "./faceIndex";
 
-export type TransferBuildData = {
-    chunkId: string;
+export type BuildChunkInput = {
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
-    position: [number, number, number];
-    nbVerticesPerSide: number;
     depth: number;
     faceIndex: FaceIndex;
+    position: Vector3;
 };

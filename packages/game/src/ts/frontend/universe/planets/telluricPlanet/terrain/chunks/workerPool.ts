@@ -17,31 +17,36 @@
 
 import { PriorityQueue } from "@/utils/priorityQueue";
 
-export class WorkerPool<TTask, TWorkerInput> {
+export class WorkerPool<TTask, TWorkerInput, TWorkerOutput> {
     private readonly availableWorkers: Set<Worker> = new Set();
     private readonly busyWorkers: Set<Worker> = new Set();
     private readonly finishedWorkers: Set<Worker> = new Set();
+    private readonly activeTasks = new Map<Worker, TTask>();
     private readonly taskQueue: PriorityQueue<TTask>;
 
     private readonly serializeTask: (task: TTask) => TWorkerInput;
-    private readonly handleWorkerResult: (event: MessageEvent<unknown>) => void;
+    private readonly handleWorkerResult: (event: MessageEvent<TWorkerOutput>) => void;
+    private readonly handleTaskFailure: (task: TTask) => void;
 
     public constructor(
         workers: ReadonlyArray<Worker>,
         serializeTask: (task: TTask) => TWorkerInput,
-        handleWorkerResult: (event: MessageEvent<unknown>) => void,
+        handleWorkerResult: (event: MessageEvent<TWorkerOutput>) => void,
+        handleTaskFailure: (task: TTask) => void,
         comparator: (a: TTask, b: TTask) => boolean,
     ) {
         this.taskQueue = new PriorityQueue<TTask>(comparator);
         for (const worker of workers) {
             worker.onerror = (event): void => {
                 console.error("Worker error", event);
+                this.failActiveTask(worker);
                 this.busyWorkers.delete(worker);
                 this.finishedWorkers.add(worker);
             };
 
             worker.onmessageerror = (event): void => {
                 console.error("Worker message error", event);
+                this.failActiveTask(worker);
                 this.busyWorkers.delete(worker);
                 this.finishedWorkers.add(worker);
             };
@@ -51,6 +56,7 @@ export class WorkerPool<TTask, TWorkerInput> {
 
         this.serializeTask = serializeTask;
         this.handleWorkerResult = handleWorkerResult;
+        this.handleTaskFailure = handleTaskFailure;
     }
 
     public isIdle(): boolean {
@@ -76,10 +82,12 @@ export class WorkerPool<TTask, TWorkerInput> {
     private dispatchTask(worker: Worker, task: TTask): void {
         this.availableWorkers.delete(worker);
         this.busyWorkers.add(worker);
+        this.activeTasks.set(worker, task);
 
         const serializedTask = this.serializeTask(task);
 
-        worker.onmessage = (event: MessageEvent<unknown>): void => {
+        worker.onmessage = (event: MessageEvent<TWorkerOutput>): void => {
+            this.activeTasks.delete(worker);
             this.handleWorkerResult(event);
 
             const nextTask = this.nextTask();
@@ -92,6 +100,16 @@ export class WorkerPool<TTask, TWorkerInput> {
             }
         };
         worker.postMessage(serializedTask);
+    }
+
+    private failActiveTask(worker: Worker): void {
+        const task = this.activeTasks.get(worker);
+        if (task === undefined) {
+            return;
+        }
+
+        this.activeTasks.delete(worker);
+        this.handleTaskFailure(task);
     }
 
     public submitTask(task: TTask): void {
@@ -107,6 +125,7 @@ export class WorkerPool<TTask, TWorkerInput> {
 
         for (const busyWorker of this.busyWorkers) {
             busyWorker.onmessage = (): void => {
+                this.activeTasks.delete(busyWorker);
                 this.busyWorkers.delete(busyWorker);
                 this.finishedWorkers.add(busyWorker);
             };

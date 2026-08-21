@@ -15,10 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ScatteredInstanceBuffers } from "./scatteringSystem";
-import { type BuildTask } from "./taskTypes";
+import type { Brand } from "@cosmos-journeyer/typescript";
 
-export type ChunkId = string;
+import type { ScatteredInstanceBuffers } from "./scatteringSystem";
+import { type BuildChunkInput } from "./terrainTaskInputs";
+
+export type TaskId = Brand<string, "TaskId">;
+
+export type ChunkId = Brand<string, "ChunkId">;
+
+export function makeTaskId(taskId: string): TaskId {
+    return taskId as TaskId;
+}
+
+export function makeChunkId(chunkId: string): ChunkId {
+    return chunkId as ChunkId;
+}
+
+type TerrainSystemPendingOutput = {
+    status: "pending";
+};
 
 export type TerrainBuffers = {
     positions: Float32Array<ArrayBuffer>;
@@ -27,19 +43,16 @@ export type TerrainBuffers = {
     scatteredInstances: ScatteredInstanceBuffers;
 };
 
-type TerrainSystemPendingOutput = {
-    status: "pending";
+export type TerrainSystemChunkComputedOutput = {
+    status: "chunkComputed";
+    buffers: TerrainBuffers;
 };
 
-export type TerrainSystemCompletedOutput = TerrainBuffers & {
-    status: "completed";
-};
-
-export type TerrainSystemOutput = TerrainSystemPendingOutput | TerrainSystemCompletedOutput;
+export type TerrainSystemChunkOutput = TerrainSystemPendingOutput | TerrainSystemChunkComputedOutput;
 
 export interface ITerrainSystem {
-    addTask(task: BuildTask): void;
-    getOutput(chunkId: ChunkId): TerrainSystemOutput | undefined;
+    requestChunk(chunkId: ChunkId, input: BuildChunkInput): void;
+    getChunkOutput(chunkId: ChunkId): TerrainSystemChunkOutput | undefined;
     update(): void;
     reset(): void;
 }

@@ -41,7 +41,7 @@ import { type ChunkIndices } from "./chunkIndices";
 import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
-import type { TerrainSystemCompletedOutput, ChunkId } from "./terrainSystem";
+import { makeChunkId, type ChunkId, type TerrainBuffers } from "./terrainSystem";
 
 type ChunkLodMetrics = {
     readonly centerPlanetSpace: Vector3;
@@ -51,6 +51,7 @@ type ChunkLodMetrics = {
 
 export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Cullable {
     readonly id: ChunkId;
+
     private readonly mesh: Mesh;
     public readonly indices: DeepReadonly<ChunkIndices>;
     public readonly positionOnCube: Vector3;
@@ -83,7 +84,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
-        this.id = `${parentTransform.name}->f${faceIndex}->l${indices.lod}-x${indices.x}-y${indices.y}`;
+        this.id = makeChunkId(`${parentTransform.name}->f${faceIndex}->l${indices.lod}-x${indices.x}-y${indices.y}`);
 
         this.indices = structuredClone(indices);
 
@@ -126,7 +127,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
      * Initializes the chunk with the given vertex data. Scatters instances on the chunk based on the given scattered point buffer.
      * @param terrainBuffers the vertex data and scattered point buffer to initialize the chunk with
      */
-    public init(terrainBuffers: TerrainSystemCompletedOutput): void {
+    public init(terrainBuffers: TerrainBuffers): void {
         if (this.hasBeenDisposed()) {
             console.error(`Tried to init ${this.mesh.name} but it has been disposed`);
             return;

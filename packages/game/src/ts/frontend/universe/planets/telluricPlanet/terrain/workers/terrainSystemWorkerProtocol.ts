@@ -15,29 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
-import { z } from "zod";
 
-import { type FaceIndex } from "./faceIndex";
-import { ScatteredInstanceBuffersSchema } from "./scatteringSystem";
-import type { ChunkId } from "./terrainSystem";
+import { type FaceIndex } from "../chunks/faceIndex";
+import { type ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
+import type { TaskId } from "../chunks/terrainSystem";
 
-export type BuildTask = {
-    chunkId: ChunkId;
+export type BuildChunkWorkerPayload = {
+    type: "buildChunk";
     planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    position: [number, number, number];
+    nbVerticesPerSide: number;
     depth: number;
     faceIndex: FaceIndex;
-    position: Vector3;
 };
 
-export const ReturnedChunkDataSchema = z.object({
-    chunkId: z.string(),
-    positions: z.instanceof(Float32Array),
-    normals: z.instanceof(Float32Array),
-    indices: z.instanceof(Uint16Array),
-    scatteredInstances: ScatteredInstanceBuffersSchema,
-});
+export type TerrainSystemWorkerTask = {
+    taskId: TaskId;
+    payload: BuildChunkWorkerPayload;
+};
 
-export type ReturnedChunkData = z.infer<typeof ReturnedChunkDataSchema>;
+type CreateChunkOutput = {
+    type: "createChunkOutput";
+    taskId: TaskId;
+    positions: Float32Array<ArrayBuffer>;
+    normals: Float32Array<ArrayBuffer>;
+    indices: Uint16Array<ArrayBuffer>;
+    scatteredInstances: ScatteredInstanceBuffers;
+};
+
+export type TerrainSystemWorkerOutput = CreateChunkOutput;

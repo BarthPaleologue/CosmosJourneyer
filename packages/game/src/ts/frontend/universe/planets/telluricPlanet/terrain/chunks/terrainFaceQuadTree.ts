@@ -34,10 +34,10 @@ import { getChunkChildIndices, type ChunkIndices } from "./chunkIndices";
 import { type FaceIndex } from "./faceIndex";
 import { type LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
-import { type BuildTask } from "./taskTypes";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
 import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
 import { type ITerrainSystem } from "./terrainSystem";
+import { type BuildChunkInput } from "./terrainTaskInputs";
 
 const splitScreenSpaceErrorThreshold = 32;
 const mergeScreenSpaceErrorThreshold = 16;
@@ -156,12 +156,15 @@ export class TerrainFaceQuadTree implements Cullable {
                 break;
             }
 
-            const chunkOutput = terrainSystem.getOutput(chunk.id);
-            if (chunkOutput === undefined || chunkOutput.status !== "completed") {
+            const chunkOutput = terrainSystem.getChunkOutput(chunk.id);
+            if (chunkOutput === undefined) {
+                this.requestChunkBuild(chunk, terrainSystem);
+                continue;
+            } else if (chunkOutput.status !== "chunkComputed") {
                 continue;
             }
 
-            chunk.init(chunkOutput);
+            chunk.init(chunkOutput.buffers);
             remainingGpuUploads--;
         }
     }
@@ -237,20 +240,20 @@ export class TerrainFaceQuadTree implements Cullable {
             this.scene,
         );
 
-        const chunkOutput = terrainSystem.getOutput(chunk.id);
-        if (chunkOutput === undefined) {
-            const buildTask: BuildTask = {
-                chunkId: chunk.id,
-                planetModel: this.planetModel,
-                position: chunk.positionOnCube,
-                depth: chunk.indices.lod,
-                faceIndex: this.faceIndex,
-            };
-
-            terrainSystem.addTask(buildTask);
-        }
+        this.requestChunkBuild(chunk, terrainSystem);
 
         return new TerrainQuadTreeNode(chunk);
+    }
+
+    private requestChunkBuild(chunk: TerrainChunkMesh, terrainSystem: ITerrainSystem): void {
+        const input: BuildChunkInput = {
+            planetModel: this.planetModel,
+            position: chunk.positionOnCube,
+            depth: chunk.indices.lod,
+            faceIndex: this.faceIndex,
+        };
+
+        terrainSystem.requestChunk(chunk.id, input);
     }
 
     public isIdle(): boolean {

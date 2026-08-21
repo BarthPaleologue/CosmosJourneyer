@@ -26,13 +26,13 @@ import { smoothstep } from "@/utils/math";
 import { Settings } from "@/settings";
 
 import { BeachElevationSpan } from "../../telluricPlanetMaterial";
+import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
 import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 import type { TerrainBuffers } from "./terrainSystem";
-import type { TransferBuildData } from "./workerDataTypes";
 
 const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
 
-export function createChunkBuffers(task: TransferBuildData): TerrainBuffers {
+export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffers {
     const nbVerticesPerSide = task.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;
 

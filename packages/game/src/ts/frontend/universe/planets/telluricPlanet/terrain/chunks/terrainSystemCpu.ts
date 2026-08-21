@@ -17,33 +17,48 @@
 
 import { err, ok, type Result } from "@cosmos-journeyer/typescript";
 
-import { LRUMap } from "@/utils/dataStructures/lruMap";
-
 import { Settings } from "@/settings";
 
-import { ReturnedChunkDataSchema, type BuildTask } from "./taskTypes";
-import { type ITerrainSystem, type TerrainSystemOutput, type ChunkId } from "./terrainSystem";
-import { type TransferBuildData } from "./workerDataTypes";
+import {
+    type BuildChunkWorkerPayload,
+    type TerrainSystemWorkerOutput,
+    type TerrainSystemWorkerTask,
+} from "../workers/terrainSystemWorkerProtocol";
+import {
+    type ChunkId,
+    type ITerrainSystem,
+    type TaskId,
+    type TerrainSystemChunkOutput,
+    makeTaskId,
+} from "./terrainSystem";
+import { type BuildChunkInput } from "./terrainTaskInputs";
+import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 import { WorkerPool } from "./workerPool";
+
+type QueuedTask = { type: "buildChunk"; id: TaskId; input: BuildChunkInput };
 
 export class TerrainSystemCpu implements ITerrainSystem {
     /** the number vertices per row of the chunk (total number of vertices = nbVerticesPerRow * nbVerticesPerRow) */
     private readonly nbVerticesPerRow: number;
 
-    private readonly workerPool: WorkerPool<BuildTask, TransferBuildData>;
+    private readonly workerPool: WorkerPool<QueuedTask, TerrainSystemWorkerTask, TerrainSystemWorkerOutput>;
 
-    private readonly output = new LRUMap<ChunkId, TerrainSystemOutput>(Settings.MAX_CACHED_CHUNKS);
+    private readonly taskRegistry = new TerrainTaskRegistry(Settings.MAX_CACHED_CHUNKS);
 
     private constructor(workers: ReadonlyArray<Worker>, nbVerticesPerRow: number) {
         this.workerPool = new WorkerPool(
             workers,
-            (task) => {
-                return this.serializeBuildTask(task);
-            },
+            ({ id, input }) => ({
+                taskId: id,
+                payload: this.serializeBuildChunkInput(input),
+            }),
             (event) => {
                 this.handleWorkerResult(event);
             },
-            (task1, task2) => task1.depth < task2.depth,
+            ({ id }) => {
+                this.taskRegistry.failTask(id);
+            },
+            (a, b) => a.input.depth < b.input.depth,
         );
         this.nbVerticesPerRow = nbVerticesPerRow;
     }
@@ -76,7 +91,7 @@ export class TerrainSystemCpu implements ITerrainSystem {
     }
 
     private static async CreateBuildWorker(): Promise<Result<Worker, Error>> {
-        const worker = new Worker(new URL("../workers/buildScript", import.meta.url), {
+        const worker = new Worker(new URL("../workers/terrainSystemWorker", import.meta.url), {
             type: "module",
         });
 
@@ -111,46 +126,34 @@ export class TerrainSystemCpu implements ITerrainSystem {
         });
     }
 
-    public addTask(task: BuildTask): void {
-        this.output.set(task.chunkId, { status: "pending" });
-        this.workerPool.submitTask(task);
+    public requestChunk(chunkId: ChunkId, input: BuildChunkInput): void {
+        const id = makeTaskId(crypto.randomUUID());
+        if (!this.taskRegistry.registerChunkTask(chunkId, id)) {
+            return;
+        }
+
+        this.workerPool.submitTask({ type: "buildChunk", id, input });
     }
 
-    public getOutput(chunkId: ChunkId): TerrainSystemOutput | undefined {
-        return this.output.get(chunkId);
+    public getChunkOutput(chunkId: ChunkId): TerrainSystemChunkOutput | undefined {
+        return this.taskRegistry.getChunkOutput(chunkId);
     }
 
-    private serializeBuildTask(task: BuildTask): TransferBuildData {
+    private serializeBuildChunkInput(input: BuildChunkInput): BuildChunkWorkerPayload {
         return {
-            chunkId: task.chunkId,
-            planetModel: task.planetModel,
+            type: "buildChunk",
+            planetModel: input.planetModel,
             nbVerticesPerSide: this.nbVerticesPerRow,
-            depth: task.depth,
-            faceIndex: task.faceIndex,
-            position: [task.position.x, task.position.y, task.position.z],
+            depth: input.depth,
+            faceIndex: input.faceIndex,
+            position: [input.position.x, input.position.y, input.position.z],
         };
     }
 
-    private handleWorkerResult(e: MessageEvent): void {
-        const dataResult = ReturnedChunkDataSchema.safeParse(e.data);
-        if (!dataResult.success) {
-            return;
-        }
+    private handleWorkerResult({ data }: MessageEvent<TerrainSystemWorkerOutput>): void {
+        const taskId = makeTaskId(data.taskId);
 
-        const data = dataResult.data;
-
-        const existingOutput = this.output.get(data.chunkId);
-        if (existingOutput === undefined) {
-            return;
-        }
-
-        this.output.set(data.chunkId, {
-            status: "completed",
-            positions: data.positions,
-            normals: data.normals,
-            indices: data.indices,
-            scatteredInstances: data.scatteredInstances,
-        });
+        this.taskRegistry.completeChunkTask(taskId, data);
     }
 
     /**
@@ -166,6 +169,6 @@ export class TerrainSystemCpu implements ITerrainSystem {
 
     public reset(): void {
         this.workerPool.reset();
-        this.output.clear();
+        this.taskRegistry.reset();
     }
 }
