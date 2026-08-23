@@ -29,8 +29,8 @@ export type BuildChunkInput = {
 };
 
 export type GeographicCoordinates = {
-    readonly latitudeRadians: number;
-    readonly longitudeRadians: number;
+    readonly latitude: number;
+    readonly longitude: number;
 };
 
 export type ComputeHeightsInput = {
