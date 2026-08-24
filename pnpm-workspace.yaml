@@ -12,18 +12,18 @@ allowBuilds:
 
 catalog:
     "@eslint/js": ^10.0.1
-    "@next/eslint-plugin-next": ^16.3.1
-    eslint: ^10.8.1
+    "@next/eslint-plugin-next": ^16.3.2
+    eslint: ^10.9.0
     eslint-import-resolver-typescript: ^4.4.5
     eslint-plugin-import-x: ^4.17.1
     http-server: ^14.1.1
     jsdom: ^29.1.1
-    oxfmt: ^0.63.0
+    oxfmt: ^0.64.0
     typedoc: ^0.28.20
     typedoc-github-theme: ^0.4.0
     typedoc-plugin-missing-exports: ^4.1.4
     typescript: ^6.0.3
     typescript-eslint: ^8.67.0
-    vite: ^8.2.1
-    vitest: ^4.1.10
+    vite: ^8.2.2
+    vitest: ^4.1.11
     zod: ^4.4.3
