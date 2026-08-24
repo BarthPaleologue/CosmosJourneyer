@@ -17,7 +17,7 @@ catalog:
     eslint-import-resolver-typescript: ^4.4.5
     eslint-plugin-import-x: ^4.17.1
     http-server: ^14.1.1
-    jsdom: ^29.1.1
+    jsdom: ^30.0.1
     oxfmt: ^0.64.0
     typedoc: ^0.28.20
     typedoc-github-theme: ^0.4.0
