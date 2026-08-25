@@ -26,6 +26,7 @@ import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
 import i18n from "@/i18n";
 
+import { getBoundingRadius } from "../helpers/boundingRadius";
 import { ObjectTargetCursorType } from "../universe/architecture/targetable";
 import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
 import type { Door } from "./door";
@@ -88,8 +89,7 @@ export class Vehicle implements Targetable {
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
 
-        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
-        this.boundingRadius = boundingMax.subtract(boundingMin).length() / 2;
+        this.boundingRadius = getBoundingRadius(this.getTransform());
 
         this.targetInfo = {
             name,
