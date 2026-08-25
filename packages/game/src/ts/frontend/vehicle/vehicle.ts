@@ -24,6 +24,7 @@ import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physic
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
+import { getBoundingRadius } from "../helpers/boundingRadius";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
 
@@ -85,8 +86,7 @@ export class Vehicle {
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
 
-        const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
-        this.boundingRadius = boundingMax.subtract(boundingMin).length() / 2;
+        this.boundingRadius = getBoundingRadius(this.getTransform());
     }
 
     getSteeringMode(): SteeringMode {
