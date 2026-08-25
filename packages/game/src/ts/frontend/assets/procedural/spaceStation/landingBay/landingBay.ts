@@ -263,7 +263,7 @@ export class LandingBay {
                         color: new Color3(1, 1, 0.8),
                         upDirection: landingPadUp,
                         range: 50 * landingPad.getPadSize(),
-                        lampSize: 1 * landingPad.getPadSize(),
+                        lampSize: landingPad.getPadSize(),
                         postHeight: 10 * landingPad.getPadSize(),
                         postDiameter: 0.4 * landingPad.getPadSize(),
                     });
