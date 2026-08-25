@@ -43,7 +43,7 @@ describe("getCoolGasGiantRadiusFromMass", () => {
     it("increases from sub-saturn masses up to about jovian masses", () => {
         const r01 = getCoolGasGiantRadiusFromMass(0.1 * JupiterMass);
         const r03 = getCoolGasGiantRadiusFromMass(0.3 * JupiterMass);
-        const r1 = getCoolGasGiantRadiusFromMass(1 * JupiterMass);
+        const r1 = getCoolGasGiantRadiusFromMass(JupiterMass);
 
         expect(r03).toBeGreaterThan(r01);
         expect(r1).toBeGreaterThan(r03);
