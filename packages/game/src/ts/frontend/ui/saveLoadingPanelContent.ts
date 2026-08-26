@@ -13,6 +13,7 @@ import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 
 import { downloadBlob } from "@/utils/downloadBlob";
 import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
+import { renderMarkdownInline } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
@@ -53,7 +54,7 @@ export class SaveLoadingPanelContent {
 
         const migrationNotice = document.createElement("p");
         migrationNotice.classList.add("saveMigrationNotice");
-        migrationNotice.innerHTML = i18n.t("sidePanel:saveMigrationNotice");
+        migrationNotice.innerHTML = renderMarkdownInline(i18n.t("sidePanel:saveMigrationNotice"));
         this.htmlRoot.appendChild(migrationNotice);
 
         const dropFileZone = document.createElement("div");

@@ -18,6 +18,8 @@
 import i18next, { init, t, type Resource, type ResourceKey, type ResourceLanguage } from "i18next";
 import { z } from "zod";
 
+import { renderMarkdownInline } from "./utils/markdown";
+
 /**
  * Load all the resources from the locales folder and return them in the i18next format.
  * This takes place at build time, so the resources are bundled with the application.
@@ -88,9 +90,7 @@ export async function initI18n(): Promise<void> {
             throw new Error("data-i18n attribute is null");
         }
 
-        // this should be safe as we are not doing any interpolation
-        // (as long as the translation are reviewed before being merged of course)
-        element.innerHTML = t(key);
+        element.innerHTML = renderMarkdownInline(t(key));
     });
 }
 

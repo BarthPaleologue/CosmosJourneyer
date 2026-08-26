@@ -64,6 +64,7 @@
         "fast-simplex-noise": "^4.0.0",
         "fflate": "^0.8.3",
         "i18next": "^26.4.0",
+        "markdown-it": "^15.0.0",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
         "terrain-generation": "workspace:^",

@@ -27,6 +27,7 @@ import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { renderMarkdownBlock } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
@@ -72,15 +73,18 @@ export class PlanetaryLandingTutorial implements Tutorial {
             <img src="${welcomeImageSrc}" alt="Planetary landing welcome image">
             <p>${i18n.t("tutorials:planetaryLanding:welcome")}</p>
             
-            ${i18n.t("tutorials:common:navigationInfo", {
-                // This displays a small internationalized text to explain the keys to navigate the tutorial
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:navigationInfo", {
+                    // Interpolations are controlled display labels produced by the input binding API.
+                    nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                    previousKeys: pressInteractionToStrings(
+                        TutorialControlsInputs.map.prevPanel,
+                        keyboardLayoutMap,
+                    ).join(` ${i18n.t("common:or")} `),
+                }),
+            )}
         </div>`;
 
         const gettingCloseToSurfacePanel = `
@@ -106,13 +110,14 @@ export class PlanetaryLandingTutorial implements Tutorial {
 
             <p>${i18n.t("tutorials:planetaryLanding:howToLiftoff", { keyLiftoff: spaceshipUpKeys })}</p>
             
-            <p>${i18n.t("tutorials:common:tutorialEnding", {
-                // This displays a small internationalized text to explain the keys to end the tutorial
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
-                </p>
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:tutorialEnding", {
+                    // Interpolations are controlled display labels produced by the input binding API.
+                    keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                }),
+            )}
         </div>`;
 
         return [presentationPanelHtml, gettingCloseToSurfacePanel, howToLandPanel];

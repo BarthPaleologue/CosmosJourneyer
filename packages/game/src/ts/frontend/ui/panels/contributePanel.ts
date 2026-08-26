@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { renderMarkdownInline } from "@/utils/markdown";
+
 import i18n from "@/i18n";
 
 export class ContributePanel {
@@ -39,7 +41,7 @@ export class ContributePanel {
         panel.appendChild(bugReportsHeader);
 
         const bugReportsText = document.createElement("p");
-        bugReportsText.innerHTML = i18n.t("sidePanel:bugReportsText");
+        bugReportsText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:bugReportsText"));
         panel.appendChild(bugReportsText);
 
         // Translation section
@@ -48,7 +50,7 @@ export class ContributePanel {
         panel.appendChild(translationHeader);
 
         const translationText = document.createElement("p");
-        translationText.innerHTML = i18n.t("sidePanel:translationText");
+        translationText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:translationText"));
         panel.appendChild(translationText);
 
         // Know how to code section
@@ -57,7 +59,7 @@ export class ContributePanel {
         panel.appendChild(codeHeader);
 
         const codeText = document.createElement("p");
-        codeText.innerHTML = i18n.t("sidePanel:knowHowToCodeText");
+        codeText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:knowHowToCodeText"));
         panel.appendChild(codeText);
 
         // Support financially section
@@ -66,7 +68,7 @@ export class ContributePanel {
         panel.appendChild(supportHeader);
 
         const supportText = document.createElement("p");
-        supportText.innerHTML = i18n.t("sidePanel:supportFinanciallyText");
+        supportText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:supportFinanciallyText"));
         panel.appendChild(supportText);
 
         return panel;

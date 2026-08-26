@@ -27,6 +27,7 @@ import { SpaceShipControlsInputs } from "@/frontend//spaceship/spaceShipControls
 import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { renderMarkdownBlock } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
@@ -62,14 +63,17 @@ export class FlightTutorial implements Tutorial {
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
-            ${i18n.t("tutorials:common:navigationInfo", {
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:navigationInfo", {
+                    nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                    previousKeys: pressInteractionToStrings(
+                        TutorialControlsInputs.map.prevPanel,
+                        keybordLayoutMap,
+                    ).join(` ${i18n.t("common:or")} `),
+                }),
+            )}
         </div>`;
 
         const rotationPanelHtml = `
@@ -125,11 +129,13 @@ export class FlightTutorial implements Tutorial {
             <img src="${congratsImageSrc}" alt="Congratulations!">
             <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
-            ${i18n.t("tutorials:common:tutorialEnding", {
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:tutorialEnding", {
+                    keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                }),
+            )}
         </div>`;
 
         return [
