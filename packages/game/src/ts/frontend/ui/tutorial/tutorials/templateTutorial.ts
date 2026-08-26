@@ -24,6 +24,7 @@ import { type UniverseBackend } from "@/backend/universe/universeBackend";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { renderMarkdownBlock } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
@@ -55,25 +56,30 @@ export class TemplateTutorial implements Tutorial {
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
             <p>Welcome, Commander! This is a tutorial about tutorials! Now this is meta.</p>
             
-            ${i18n.t("tutorials:common:navigationInfo", {
-                // This displays a small internationalized text to explain the keys to navigate the tutorial
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:navigationInfo", {
+                    // Interpolations are controlled display labels produced by the input binding API.
+                    nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                    previousKeys: pressInteractionToStrings(
+                        TutorialControlsInputs.map.prevPanel,
+                        keyboardLayoutMap,
+                    ).join(` ${i18n.t("common:or")} `),
+                }),
+            )}
         </div>`;
 
         const endPanelHtml = `
         <div class="tutorialContent">
-            ${i18n.t("tutorials:common:tutorialEnding", {
-                // This displays a small internationalized text to explain the keys to end the tutorial
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:tutorialEnding", {
+                    // Interpolations are controlled display labels produced by the input binding API.
+                    keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                }),
+            )}
         </div>`;
 
         return [welcomePanelHtml, endPanelHtml];

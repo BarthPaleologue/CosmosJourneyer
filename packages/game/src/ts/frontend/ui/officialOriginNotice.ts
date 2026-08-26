@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { renderMarkdownInline } from "@/utils/markdown";
+
 import i18n from "@/i18n";
 
 export function isOfficialGameLocation(location: Pick<Location, "hostname" | "protocol">): boolean {
@@ -36,6 +38,6 @@ export function createOfficialOriginNotice(
 
     const notice = document.createElement("aside");
     notice.classList.add("officialOriginNotice");
-    notice.innerHTML = i18n.t("common:unofficialOriginNotice");
+    notice.innerHTML = renderMarkdownInline(i18n.t("common:unofficialOriginNotice"));
     return notice;
 }

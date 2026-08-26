@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { renderMarkdownInline } from "@/utils/markdown";
+
 import i18n from "@/i18n";
 
 export class AboutPanel {
@@ -50,7 +52,7 @@ export class AboutPanel {
         const emailText = document.createElement("p");
         emailText.className = "aboutText";
         emailText.style.whiteSpace = "pre-line"; // necessary to display \n in the text
-        emailText.innerHTML = i18n.t("sidePanel:emailContact");
+        emailText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:emailContact"));
         panel.appendChild(emailText);
 
         // Special thanks section

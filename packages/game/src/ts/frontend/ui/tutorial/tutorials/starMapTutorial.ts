@@ -33,6 +33,7 @@ import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
+import { escapeMarkdown, renderMarkdownBlock, renderMarkdownInline } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
@@ -69,15 +70,18 @@ export class StarMapTutorial implements Tutorial {
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:starMap:welcome")}</p>
             
-            ${i18n.t("tutorials:common:navigationInfo", {
-                // This displays a small internationalized text to explain the keys to navigate the tutorial
-                nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-                previousKeys: pressInteractionToStrings(TutorialControlsInputs.map.prevPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:navigationInfo", {
+                    // Interpolations are controlled display labels produced by the input binding API.
+                    nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                        ` ${i18n.t("common:or")} `,
+                    ),
+                    previousKeys: pressInteractionToStrings(
+                        TutorialControlsInputs.map.prevPanel,
+                        keyboardLayoutMap,
+                    ).join(` ${i18n.t("common:or")} `),
+                }),
+            )}
         </div>`;
 
         const toggleStarMapKeys = pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayoutMap).join(
@@ -86,8 +90,8 @@ export class StarMapTutorial implements Tutorial {
 
         const howToOpenPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:open1")}</p> 
-            <p>${i18n.t("tutorials:starMap:open2", { keys: toggleStarMapKeys })}</p> 
+            <p>${i18n.t("tutorials:starMap:open1")}</p>
+            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:open2", { keys: escapeMarkdown(toggleStarMapKeys) }))}</p>
             <img src="${openImgSrc}" alt="Star map opening" class="tutorialImage">
             <p>${i18n.t("tutorials:starMap:open3")}</p>
         </div>`;
@@ -106,7 +110,7 @@ export class StarMapTutorial implements Tutorial {
 
         const howToUseStarMapPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:controls1", { keys })}</p>
+            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:controls1", { keys: escapeMarkdown(keys) }))}</p>
             <img src="${controlsImgSrc}" alt="Star map controls" class="tutorialImage">
             <p>${i18n.t("tutorials:starMap:controls2")}</p>
         </div>`;
@@ -133,7 +137,7 @@ export class StarMapTutorial implements Tutorial {
         const howToInterstellarTravelPanelHtml = `
         <div class="tutorialContent">
             <p>${i18n.t("tutorials:starMap:travel1")}</p>
-            <p>${i18n.t("tutorials:starMap:travel2", { keys: jumpKeys })}</p>
+            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:travel2", { keys: escapeMarkdown(jumpKeys) }))}</p>
             <img src="${jumpImgSrc}" alt="Interstellar jump" class="tutorialImage">
             <p>${i18n.t("tutorials:starMap:travel3")}</p>
         </div>`;
@@ -142,12 +146,16 @@ export class StarMapTutorial implements Tutorial {
         <div class="tutorialContent">
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
             <p>${i18n.t("tutorials:starMap:congratulations")}</p>
-            ${i18n.t("tutorials:common:tutorialEnding", {
-                // This displays a small internationalized text to explain the keys to end the tutorial
-                keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
-                ),
-            })}
+            ${renderMarkdownBlock(
+                i18n.t("tutorials:common:tutorialEnding", {
+                    // Key labels come from the controlled input binding display API; escape them before Markdown interpolation.
+                    keyQuit: escapeMarkdown(
+                        pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
+                            ` ${i18n.t("common:or")} `,
+                        ),
+                    ),
+                }),
+            )}
         </div>`;
 
         return [
