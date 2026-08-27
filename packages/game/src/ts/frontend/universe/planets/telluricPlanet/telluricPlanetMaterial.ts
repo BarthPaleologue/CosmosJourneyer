@@ -65,6 +65,8 @@ import {
 } from "@/utils/bslExtensions";
 import { lerp } from "@/utils/math";
 
+import { BeachElevationSpan } from "./terrain/terrainConstants";
+
 type WorldType =
     /** World with atmosphere and liquid water */
     | "wet"
@@ -72,8 +74,6 @@ type WorldType =
     | "dry"
     /** World without atmosphere */
     | "airless";
-
-export const BeachElevationSpan = 100;
 
 export class TelluricPlanetMaterial {
     private readonly material: NodeMaterial;
