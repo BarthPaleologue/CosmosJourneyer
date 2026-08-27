@@ -2,9 +2,14 @@ import MarkdownItRenderer from "markdown-it";
 
 const markdownRenderer = new MarkdownItRenderer({
     html: false,
-    linkify: false,
+    linkify: true,
     typographer: false,
     breaks: false,
+});
+
+markdownRenderer.linkify.set({
+    fuzzyLink: false,
+    fuzzyEmail: true,
 });
 
 markdownRenderer.disable("image");
