@@ -20,7 +20,7 @@ import {
     generateTelluricPlanetModel,
     generateTelluricSatelliteModel,
 } from "@cosmos-journeyer/universe-generation";
-import { type StarSystemCoordinates, type StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 export function getEclipseTestSystemModel(): StarSystemModel {
     const systemName = "Eclipse Test";

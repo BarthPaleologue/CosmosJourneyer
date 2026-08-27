@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getWaterSaturationPressure } from "@cosmos-journeyer/physics";
-import { type CloudsModel } from "@cosmos-journeyer/universe-model";
+import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
 export function generateCloudsModel(
     planetRadius: number,

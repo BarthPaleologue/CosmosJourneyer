@@ -16,8 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export function lookAt(transformNode: TransformNode, target: Vector3, useRightHandedSystem: boolean): void {
     transformNode.lookAt(target);

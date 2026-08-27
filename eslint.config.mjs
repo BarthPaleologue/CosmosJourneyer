@@ -74,7 +74,8 @@ const typeScriptWorkspaceRules = {
     },
     rules: {
         "import-x/no-cycle": "error",
-        "import-x/no-duplicates": ["error", { "prefer-inline": true }],
+        "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"],
+        "import-x/no-duplicates": "error",
         "import-x/no-extraneous-dependencies": "error",
         "import-x/no-mutable-exports": "error",
         "import-x/no-relative-packages": "error",
@@ -116,7 +117,7 @@ const typeScriptWorkspaceRules = {
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/strict-boolean-expressions": "error",
 
-        "@typescript-eslint/consistent-type-imports": ["error", { fixStyle: "inline-type-imports" }],
+        "@typescript-eslint/consistent-type-imports": "error",
 
         "@typescript-eslint/consistent-type-exports": "error",
 

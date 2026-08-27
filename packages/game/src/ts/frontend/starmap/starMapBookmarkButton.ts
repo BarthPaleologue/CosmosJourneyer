@@ -1,10 +1,11 @@
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-import { type Player } from "../player/player";
+import type { Player } from "../player/player";
 
 export class StarMapBookmarkButton {
     readonly rootNode: HTMLElement;

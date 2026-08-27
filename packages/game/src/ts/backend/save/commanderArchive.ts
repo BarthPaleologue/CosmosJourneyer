@@ -15,15 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { z } from "zod";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { jsonSafeParse } from "@/utils/json";
 
-import { safeParseSave, type CmdrSaves } from "./saveFileData";
+import { safeParseSave } from "./saveFileData";
+import type { CmdrSaves } from "./saveFileData";
 
 const MANIFEST_FILE_NAME = "manifest.json";
 

@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { arc, interpolateViridis, pie, scaleSequential, type PieArcDatum } from "d3";
+import { arc, interpolateViridis, pie, scaleSequential } from "d3";
+import type { PieArcDatum } from "d3";
 
 export function makeD3PieChart<T>(
     data: DeepReadonly<T[]>,

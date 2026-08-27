@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3, Scene, TransformNode, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { Color3, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";

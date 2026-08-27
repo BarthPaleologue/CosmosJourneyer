@@ -15,17 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { MissionType } from "@/backend/missions/missionSerialized";
+import type { MissionSerialized } from "@/backend/missions/missionSerialized";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import i18n from "@/i18n";
 
-import { type MissionContext } from "./missionContext";
+import type { MissionContext } from "./missionContext";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
-import { type MissionNode } from "./nodes/missionNode";
+import type { MissionNode } from "./nodes/missionNode";
 
 /**
  * General mission abstraction. The mission can have any arbitrary task tree and reward.

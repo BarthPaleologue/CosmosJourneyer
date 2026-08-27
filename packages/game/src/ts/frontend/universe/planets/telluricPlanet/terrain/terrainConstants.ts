@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,18 +15,4 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { HasSeed } from "../hasSeed";
-import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
-import type { RingsModel } from "../ringsModel";
-
-export type StarModel = OrbitalObjectModelBase<"star"> &
-    HasSeed & {
-        readonly radius: number;
-
-        /**
-         * Black body temperature of the object in Kelvin
-         */
-        blackBodyTemperature: number;
-
-        readonly rings: RingsModel | null;
-    };
+export const BeachElevationSpan = 100;

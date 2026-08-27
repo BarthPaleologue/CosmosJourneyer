@@ -18,45 +18,41 @@
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type AbstractMesh, type TransformNode } from "@babylonjs/core/Meshes";
+import type { AbstractMesh, TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import {
-    PhysicsMotionType,
-    PhysicsShapeType,
-    type IPhysicsCollisionEvent,
-} from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import type { IPhysicsCollisionEvent } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import { C } from "@cosmos-journeyer/physics";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import {
-    getDefaultSerializedSpaceship,
-    type SerializedSpaceship,
-    type ShipType,
-} from "@/backend/spaceship/serializedSpaceship";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import type { SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
 
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { type ISoundInstance } from "@/frontend/audio/soundInstance";
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundInstance } from "@/frontend/audio/soundInstance";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type CelestialBody, type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { SpaceDots } from "../assets/procedural/spaceDots";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../universe/architecture/targetable";
+import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
 import { Altimeter } from "./altimeter";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
-import { type WarpInfluence } from "./components/warpInfluence";
+import type { WarpInfluence } from "./components/warpInfluence";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 import { SpaceshipInternals } from "./spaceshipInternals";
 import { Thruster } from "./thruster";

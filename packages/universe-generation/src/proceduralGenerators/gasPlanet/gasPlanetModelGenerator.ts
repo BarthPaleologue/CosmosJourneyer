@@ -21,13 +21,8 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    getCelestialBodyRadius,
-    type GasPlanetModel,
-    type Orbit,
-    type Rotation,
-    type StellarObjectModel,
-} from "@cosmos-journeyer/universe-model";
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type { GasPlanetModel, Orbit, Rotation, StellarObjectModel } from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { getGasPlanetOrbitRadius, sampleGasPlanetMass } from "./gasPlanetModelHelpers";

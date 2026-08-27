@@ -17,15 +17,15 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
 import type { RGBColor } from "@/utils/colors";
-import { type ItemPool } from "@/utils/itemPool";
+import type { ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import { type StarMaterialLut } from "./starMaterialLut";
+import type { StarMaterialLut } from "./starMaterialLut";
 
 import starMaterialFragment from "@shaders/starMaterial/fragment.glsl";
 import starMaterialVertex from "@shaders/starMaterial/vertex.glsl";

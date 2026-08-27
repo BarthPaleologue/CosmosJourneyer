@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
 
@@ -28,7 +28,7 @@ import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import { type Controls } from "../";
+import type { Controls } from "../";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {

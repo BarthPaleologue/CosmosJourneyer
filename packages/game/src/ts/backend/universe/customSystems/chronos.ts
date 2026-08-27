@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { degreesToRadians, getShadowRadius, solarMassToKg } from "@cosmos-journeyer/physics";
-import {
-    type StarSystemModel,
-    type BlackHoleModel,
-    type DarkKnightModel,
-    type SpaceStationModel,
-    type StarSystemCoordinates,
-    getCelestialBodyRadius,
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type {
+    StarSystemModel,
+    BlackHoleModel,
+    DarkKnightModel,
+    SpaceStationModel,
+    StarSystemCoordinates,
 } from "@cosmos-journeyer/universe-model";
 
 import { CropType } from "@/utils/agriculture";

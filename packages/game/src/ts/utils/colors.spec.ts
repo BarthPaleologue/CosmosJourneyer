@@ -17,7 +17,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { hsvToRgb, type HSVColor } from "./colors";
+import { hsvToRgb } from "./colors";
+import type { HSVColor } from "./colors";
 
 describe("color utilities", () => {
     describe("hsvToRgb", () => {

@@ -15,17 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Effect } from "@babylonjs/core/Materials/effect";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Effect } from "@babylonjs/core/Materials/effect";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type CloudsModel } from "@cosmos-journeyer/universe-model";
+import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
-import { type ItemPool } from "@/utils/itemPool";
+import type { ItemPool } from "@/utils/itemPool";
 
-import { type CloudsLut } from "./cloudsLut";
+import type { CloudsLut } from "./cloudsLut";
 
 export const CloudsUniformNames = {
     LAYER_RADIUS: "clouds_layerRadius",

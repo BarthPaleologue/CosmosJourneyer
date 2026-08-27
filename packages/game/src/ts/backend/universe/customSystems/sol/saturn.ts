@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { degreesToRadians, durationToSeconds, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
-import { type GasPlanetModel, type OrbitalObjectId } from "@cosmos-journeyer/universe-model";
+import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {

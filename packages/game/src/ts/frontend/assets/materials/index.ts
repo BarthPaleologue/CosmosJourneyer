@@ -20,7 +20,7 @@ import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 
@@ -30,7 +30,7 @@ import { RockMaterial } from "../procedural/rock/rockMaterial";
 import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
 import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
-import { type Textures } from "../textures";
+import type { Textures } from "../textures";
 import { CrateMaterial } from "./crate";
 
 export type Materials = {

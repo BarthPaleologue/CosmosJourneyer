@@ -15,17 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { jsonSafeParse } from "@/utils/json";
 
 import { Settings } from "@/settings";
 
 import type { ISaveBackend } from "./saveBackend";
-import { safeParseSave, type CmdrSaves, type Save } from "./saveFileData";
-import { saveLoadingErrorToI18nString, type SaveLoadingError } from "./saveLoadingError";
+import { safeParseSave } from "./saveFileData";
+import type { CmdrSaves, Save } from "./saveFileData";
+import { saveLoadingErrorToI18nString } from "./saveLoadingError";
+import type { SaveLoadingError } from "./saveLoadingError";
 
 /**
  * Interface defining the file system operations for save data.

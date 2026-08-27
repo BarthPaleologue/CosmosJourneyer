@@ -27,8 +27,8 @@ import {
     Quaternion,
     Scene,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";

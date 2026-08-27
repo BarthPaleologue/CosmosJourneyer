@@ -21,14 +21,14 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateCylinder, Mesh } from "@babylonjs/core/Meshes";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Scene } from "@babylonjs/core/scene";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { Scene } from "@babylonjs/core/scene";
 import { getRadiatorAreaForHeat } from "@cosmos-journeyer/physics";
 import type { FusionSectionModel } from "@cosmos-journeyer/universe-model";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 

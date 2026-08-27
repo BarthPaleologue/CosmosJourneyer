@@ -18,10 +18,12 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { CreateScreenshotAsync } from "@babylonjs/core/Misc/screenshotTools";
-import { err, ok, type Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import { RelativeCoordinatesSchema, type RelativeCoordinates } from "@/backend/save/universeCoordinates";
+import { RelativeCoordinatesSchema } from "@/backend/save/universeCoordinates";
+import type { RelativeCoordinates } from "@/backend/save/universeCoordinates";
 
 import packageInfo from "../../../../package.json";
 

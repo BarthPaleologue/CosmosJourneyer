@@ -1,6 +1,6 @@
-import { type HasBoundingSphere } from "./hasBoundingSphere";
-import { type Transformable } from "./transformable";
-import { type TypedObject } from "./typedObject";
+import type { HasBoundingSphere } from "./hasBoundingSphere";
+import type { Transformable } from "./transformable";
+import type { TypedObject } from "./typedObject";
 
 export const ObjectTargetCursorType = {
     CELESTIAL_BODY: "CELESTIAL_BODY",

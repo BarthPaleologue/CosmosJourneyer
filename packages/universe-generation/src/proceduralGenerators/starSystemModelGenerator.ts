@@ -21,17 +21,18 @@ import { wheelOfFortune } from "#/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "#/utils/strings/alphabets";
 import { romanNumeral } from "#/utils/strings/romanNumerals";
 import { generateStarName } from "#/utils/strings/starNameGenerator";
-import { assertUnreachable, isNonEmptyArray, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type StarSystemCoordinates,
-    type AnomalyModel,
-    type AnomalyType,
-    type OrbitalFacilityModel,
-    type PlanetModel,
-    type StellarObjectModel,
-    type TelluricSatelliteModel,
-    type StarSystemModel,
-    createOrbitalObjectId,
+import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { createOrbitalObjectId } from "@cosmos-journeyer/universe-model";
+import type {
+    StarSystemCoordinates,
+    AnomalyModel,
+    AnomalyType,
+    OrbitalFacilityModel,
+    PlanetModel,
+    StellarObjectModel,
+    TelluricSatelliteModel,
+    StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 

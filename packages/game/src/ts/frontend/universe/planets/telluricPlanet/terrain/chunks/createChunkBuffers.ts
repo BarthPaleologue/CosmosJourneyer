@@ -19,15 +19,16 @@ import { Axis, Quaternion, Vector3 } from "@babylonjs/core/pure";
 import { build_chunk_vertex_data, BuildData } from "terrain-generation";
 
 import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
-import { filterPoints, MaxScatterDensity, type ScatteringLayer } from "@/frontend/helpers/instancing";
+import { filterPoints, MaxScatterDensity } from "@/frontend/helpers/instancing";
+import type { ScatteringLayer } from "@/frontend/helpers/instancing";
 
 import { smoothstep } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import { BeachElevationSpan } from "../../telluricPlanetMaterial";
 import { createTerrainSettings } from "../createTerrainSettings";
 import type { TerrainBuffers } from "../system/terrainSystem";
+import { BeachElevationSpan } from "../terrainConstants";
 import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
 import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 

@@ -1,4 +1,5 @@
-import { createPackerEngine, ImageCache, PackerError, type DecodedImage, type FileSignature } from "./packerCore";
+import { createPackerEngine, ImageCache, PackerError } from "./packerCore";
+import type { DecodedImage, FileSignature } from "./packerCore";
 import type { PackRequest, PackedTexture, PreviewResponse } from "./types";
 
 export { ImageCache, PackerError };

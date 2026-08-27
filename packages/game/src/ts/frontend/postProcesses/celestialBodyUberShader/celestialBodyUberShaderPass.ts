@@ -15,42 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { type Scene } from "@babylonjs/core/scene";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type AnomalyModel, type DarkKnightModel } from "@cosmos-journeyer/universe-model";
+import type { Scene } from "@babylonjs/core/scene";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { AnomalyModel, DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { type AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import {
-    CloudsSamplerNames,
-    CloudsUniformNames,
-    type CloudsUniforms,
-} from "@/frontend/postProcesses/clouds/cloudsUniforms";
-import { type OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { RingsSamplerNames, RingsUniformNames, type RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
+import { CloudsSamplerNames, CloudsUniformNames } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import type { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
+import type { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
+import { RingsSamplerNames, RingsUniformNames } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
 import {
     setSphereShadowCasterUniforms,
     SphereShadowCasterUniformNames,
-    type SphereShadowCaster,
 } from "@/frontend/postProcesses/uniforms/sphereShadowCasterUniforms";
+import type { SphereShadowCaster } from "@/frontend/postProcesses/uniforms/sphereShadowCasterUniforms";
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
 } from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
-import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+import type { UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
 
-import { type MatterJetsSettings } from "./matterJetsSettings";
+import type { MatterJetsSettings } from "./matterJetsSettings";
 
 import celestialBodyUberShaderFragment from "@shaders/celestialBodyUberShaderFragment.glsl";
 

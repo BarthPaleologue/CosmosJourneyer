@@ -17,10 +17,13 @@
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { loadMusics, type Musics } from "./musics";
-import { loadSounds, type Sounds } from "./sounds";
-import { loadVoiceLines, type SpeakerVoiceLines } from "./voiceLines";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadMusics } from "./musics";
+import type { Musics } from "./musics";
+import { loadSounds } from "./sounds";
+import type { Sounds } from "./sounds";
+import { loadVoiceLines } from "./voiceLines";
+import type { SpeakerVoiceLines } from "./voiceLines";
 
 export type AudioAssets = {
     readonly sounds: Sounds;

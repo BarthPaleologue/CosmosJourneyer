@@ -22,13 +22,13 @@ import {
     Quaternion,
     Scene,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";

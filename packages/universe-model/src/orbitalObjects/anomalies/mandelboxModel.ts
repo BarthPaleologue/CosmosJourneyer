@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { RGBColor } from "../../common";
-import { type OrbitalObjectModelBase } from "../orbitalObjectModelBase";
+import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
 export type MandelboxModel = OrbitalObjectModelBase<"mandelbox"> & {
     radius: number;

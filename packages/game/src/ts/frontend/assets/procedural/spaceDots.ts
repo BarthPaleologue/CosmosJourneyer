@@ -26,7 +26,8 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 
 import { lerpSmooth } from "@/utils/math";
 
-import { SpaceDotsMaterial, type SpaceDotsMaterialOptions } from "./spaceDotsMaterial";
+import { SpaceDotsMaterial } from "./spaceDotsMaterial";
+import type { SpaceDotsMaterialOptions } from "./spaceDotsMaterial";
 
 export type SpaceDotsOptions = SpaceDotsMaterialOptions;
 

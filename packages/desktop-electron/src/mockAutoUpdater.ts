@@ -1,9 +1,9 @@
 import { EventEmitter } from "node:events";
 
-import { type App } from "electron";
-import { type CancellationToken, type ProgressInfo, type UpdateInfo } from "electron-updater";
+import type { App } from "electron";
+import type { CancellationToken, ProgressInfo, UpdateInfo } from "electron-updater";
 
-import { type AutoUpdaterClient } from "./autoUpdate.js";
+import type { AutoUpdaterClient } from "./autoUpdate.js";
 
 const mockDownloadStepIntervalMs = 250;
 const mockDownloadStepCount = 20;

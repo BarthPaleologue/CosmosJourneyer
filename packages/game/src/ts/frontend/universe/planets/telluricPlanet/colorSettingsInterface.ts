@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Color3 } from "@babylonjs/core/Maths/math.color";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 export type ColorMode = "default" | "moisture" | "temperature" | "normal" | "height";

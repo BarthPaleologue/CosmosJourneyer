@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import { type z } from "zod";
+import type { z } from "zod";
 
 import i18n from "@/i18n";
 

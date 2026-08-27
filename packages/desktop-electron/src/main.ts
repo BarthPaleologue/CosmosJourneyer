@@ -4,8 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import type * as ElectronModule from "electron";
 
-import { createDesktopAutoUpdateService, type DesktopAutoUpdateService } from "./autoUpdate.js";
-import { createDevWatcher, type DevWatcher } from "./devWatcher.js";
+import { createDesktopAutoUpdateService } from "./autoUpdate.js";
+import type { DesktopAutoUpdateService } from "./autoUpdate.js";
+import { createDevWatcher } from "./devWatcher.js";
+import type { DevWatcher } from "./devWatcher.js";
 import { createDevelopmentAutoUpdater } from "./mockAutoUpdater.js";
 import { appHost, appScheme, createHandleAppProtocol } from "./protocol.js";
 import { updateIpcChannels } from "./updateContract.js";

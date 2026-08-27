@@ -19,33 +19,28 @@ import "@babylonjs/core/Lights/Clustered/clusteredLightingSceneComponent";
 import "@babylonjs/core/Loading/loadingScreen";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    starSystemCoordinatesEquals,
-    type StarSystemCoordinates,
-    type StarSystemModel,
-    getUniverseObjectId,
-    type UniverseObjectId,
-} from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type ITts } from "@/frontend/audio/tts";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -56,8 +51,8 @@ import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { getRotationQuaternion, lookAt, setRotationQuaternion, setUpVector } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { type Mission } from "@/frontend/missions/mission";
-import { type MissionContext } from "@/frontend/missions/missionContext";
+import type { Mission } from "@/frontend/missions/mission";
+import type { MissionContext } from "@/frontend/missions/missionContext";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
@@ -66,17 +61,17 @@ import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Targetable } from "@/frontend/universe/architecture/targetable";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { Targetable } from "@/frontend/universe/architecture/targetable";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
-import { type ITerrainSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystem";
+import type { ITerrainSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import { SystemTarget } from "@/frontend/universe/systemTarget";
-import { type View } from "@/frontend/view";
+import type { View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
@@ -92,12 +87,12 @@ import { setCollisionsEnabled } from "./helpers/havok";
 import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
 import { getGuidanceMissionTargetables, getSystemTargetables } from "./helpers/targeting";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
-import { type Player } from "./player/player";
+import type { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
 import { InteractionLayer } from "./ui/interactionLayer";
-import { type INotificationManager } from "./ui/notificationManager";
-import { type Transformable } from "./universe/architecture/transformable";
-import { type TypedObject } from "./universe/architecture/typedObject";
+import type { INotificationManager } from "./ui/notificationManager";
+import type { Transformable } from "./universe/architecture/transformable";
+import type { TypedObject } from "./universe/architecture/typedObject";
 import { CreateLinesHelper } from "./universe/lineRendering";
 import { VehicleControls } from "./vehicle/vehicleControls";
 import { VehicleInputs } from "./vehicle/vehicleControlsInputs";

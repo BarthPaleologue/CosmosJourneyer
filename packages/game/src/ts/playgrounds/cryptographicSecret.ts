@@ -15,10 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3, type AbstractEngine } from "@babylonjs/core";
+import { FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { decryptFunction } from "@/frontend/helpers/cipher";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";

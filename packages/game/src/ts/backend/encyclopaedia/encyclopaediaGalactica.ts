@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Result } from "@cosmos-journeyer/typescript";
-import { UniverseObjectIdSchema, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { UniverseObjectIdSchema } from "@cosmos-journeyer/universe-model";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { z } from "zod";
 
 export const SpaceDiscoveryDataSchema = z.object({

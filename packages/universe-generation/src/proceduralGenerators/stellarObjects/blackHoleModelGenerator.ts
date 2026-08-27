@@ -19,13 +19,8 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    getCelestialBodyRadius,
-    type CelestialBodyModel,
-    type Orbit,
-    type BlackHoleModel,
-    type Rotation,
-} from "@cosmos-journeyer/universe-model";
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type { CelestialBodyModel, Orbit, BlackHoleModel, Rotation } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 
 export function generateBlackHoleModel(

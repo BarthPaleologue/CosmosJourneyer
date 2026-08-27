@@ -18,7 +18,7 @@
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type SpeakerVoiceLines, type VoiceLines } from "@/frontend/assets/audio/voiceLines";
+import type { SpeakerVoiceLines, VoiceLines } from "@/frontend/assets/audio/voiceLines";
 
 export type Speaker = "Charlotte";
 

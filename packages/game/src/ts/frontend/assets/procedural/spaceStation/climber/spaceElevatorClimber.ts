@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Material } from "@babylonjs/core/Materials/material";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
+import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
+import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
 
 import i18n from "@/i18n";
 
-import { type SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
+import type { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { ClimberRingMaterial } from "./climberRingMaterial";
 

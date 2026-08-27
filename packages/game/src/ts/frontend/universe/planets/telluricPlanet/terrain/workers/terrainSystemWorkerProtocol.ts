@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
-import { type FaceIndex } from "../chunks/faceIndex";
-import { type ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
+import type { FaceIndex } from "../chunks/faceIndex";
+import type { ScatteredInstanceBuffers } from "../chunks/scatteringSystem";
 import type { TaskId } from "../system/terrainSystem";
 
 export type BuildChunkWorkerPayload = {

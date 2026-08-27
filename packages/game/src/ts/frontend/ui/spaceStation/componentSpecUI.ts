@@ -17,16 +17,19 @@
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import {
-    getDiscoveryScannerSpec,
-    type SerializedDiscoveryScanner,
-} from "@/backend/spaceship/serializedComponents/discoveryScanner";
-import { getFuelScoopSpec, type SerializedFuelScoop } from "@/backend/spaceship/serializedComponents/fuelScoop";
-import { getFuelTankSpecs, type SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
+import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getDiscoveryScannerSpec } from "@/backend/spaceship/serializedComponents/discoveryScanner";
+import type { SerializedDiscoveryScanner } from "@/backend/spaceship/serializedComponents/discoveryScanner";
+import { getFuelScoopSpec } from "@/backend/spaceship/serializedComponents/fuelScoop";
+import type { SerializedFuelScoop } from "@/backend/spaceship/serializedComponents/fuelScoop";
+import { getFuelTankSpecs } from "@/backend/spaceship/serializedComponents/fuelTank";
+import type { SerializedFuelTank } from "@/backend/spaceship/serializedComponents/fuelTank";
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
-import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
-import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
+import { getThrustersSpec } from "@/backend/spaceship/serializedComponents/thrusters";
+import type { SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
+import { getWarpDriveSpec } from "@/backend/spaceship/serializedComponents/warpDrive";
+import type { SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

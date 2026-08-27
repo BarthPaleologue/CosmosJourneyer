@@ -15,18 +15,19 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Effect } from "@babylonjs/core/Materials/effect";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Scene } from "@babylonjs/core/scene";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type ProceduralRingsModel, type RingsModel, type TexturedRingsModel } from "@cosmos-journeyer/universe-model";
+import type { Effect } from "@babylonjs/core/Materials/effect";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { ProceduralRingsModel, RingsModel, TexturedRingsModel } from "@cosmos-journeyer/universe-model";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
-import { type Textures } from "@/frontend/assets/textures";
+import type { Textures } from "@/frontend/assets/textures";
 
-import { type ItemPool } from "@/utils/itemPool";
+import type { ItemPool } from "@/utils/itemPool";
 
-import { type RingsProceduralPatternLut } from "./ringsProceduralLut";
+import type { RingsProceduralPatternLut } from "./ringsProceduralLut";
 
 export const RingsUniformNames = {
     RING_INNER_RADIUS: "rings_inner_radius",

@@ -18,9 +18,10 @@
 import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type Sounds } from "@/frontend/assets/audio/sounds";
+import type { Sounds } from "@/frontend/assets/audio/sounds";
 
-import { SoundInstance, SoundInstanceMock, type ISoundInstance, type SoundInstanceOptions } from "./soundInstance";
+import { SoundInstance, SoundInstanceMock } from "./soundInstance";
+import type { ISoundInstance, SoundInstanceOptions } from "./soundInstance";
 
 export type SoundType =
     | "click"

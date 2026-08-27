@@ -17,7 +17,8 @@
 
 import { HydroponicToConventionalRatio, IndividualAverageDailyIntake, SeedHalfRange } from "#/constants";
 import { getFactionFromCoordinates } from "#/society/factions";
-import { CropTypes, getEdibleEnergyPerAreaPerDay, type CropType } from "#/utils/agriculture";
+import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
+import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { randomPieChart, wheelOfFortune } from "#/utils/random";
@@ -29,15 +30,16 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    getCelestialBodyRadius,
-    type PlanetModel,
-    type Orbit,
-    type SpaceElevatorModel,
-    type ElevatorSectionModel,
-    type StarSystemModel,
-    type Rotation,
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type {
+    PlanetModel,
+    Orbit,
+    SpaceElevatorModel,
+    ElevatorSectionModel,
+    StarSystemModel,
+    Rotation,
 } from "@cosmos-journeyer/universe-model";
 
 import { generateFusionSectionModel } from "./sections/fusion";

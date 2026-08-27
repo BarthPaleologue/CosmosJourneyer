@@ -18,7 +18,8 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { getComponentTypeI18n, type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";

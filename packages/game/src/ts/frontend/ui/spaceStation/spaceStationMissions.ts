@@ -17,15 +17,15 @@
 
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
+import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
-import { type Player } from "@/frontend/player/player";
+import type { Player } from "@/frontend/player/player";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { parseDistance } from "@/utils/strings/parseToStrings";

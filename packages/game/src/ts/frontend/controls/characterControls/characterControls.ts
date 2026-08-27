@@ -18,19 +18,19 @@
 import "@babylonjs/core/Collisions/collisionCoordinator";
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Axis, Quaternion, Space } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 
 import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import { type Controls } from "../";
+import type { Controls } from "../";
 import { CharacterInputs } from "./characterControlsInputs";
 import type { HumanoidAvatar } from "./humanoidAvatar";
 

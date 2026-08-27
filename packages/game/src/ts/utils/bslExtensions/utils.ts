@@ -17,20 +17,8 @@
 
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import {
-    abs,
-    add,
-    f,
-    mod,
-    mul,
-    normalize,
-    remap,
-    splitVec,
-    sub,
-    vec,
-    vec3,
-    type TargetOptions,
-} from "babylonjs-shading-language";
+import { abs, add, f, mod, mul, normalize, remap, splitVec, sub, vec, vec3 } from "babylonjs-shading-language";
+import type { TargetOptions } from "babylonjs-shading-language";
 
 export function triangleWave3d(
     input: NodeMaterialConnectionPoint,

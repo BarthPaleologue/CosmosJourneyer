@@ -15,21 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
 import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
-import { type UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+import type { UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
 
-import { BlackHoleSamplerNames, BlackHoleUniformNames, type BlackHoleUniforms } from "./blackHoleUniforms";
+import { BlackHoleSamplerNames, BlackHoleUniformNames } from "./blackHoleUniforms";
+import type { BlackHoleUniforms } from "./blackHoleUniforms";
 
 import blackHoleFragment from "@shaders/blackhole.glsl";
 

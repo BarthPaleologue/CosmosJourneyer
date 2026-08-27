@@ -29,12 +29,9 @@ import type { Controls } from "../controls";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic } from "../helpers/animations/interpolations";
 import { toggleDoor } from "./door";
-import {
-    type ThirdPersonCameraPreset,
-    type ThirdPersonCameraPresetNames,
-    thirdPersonCameraPresets,
-} from "./thirdPersonCameraPresets";
-import { type Vehicle } from "./vehicle";
+import { thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
+import type { ThirdPersonCameraPreset, ThirdPersonCameraPresetNames } from "./thirdPersonCameraPresets";
+import type { Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
 
 type CameraPresetInput = (typeof VehicleInputs.map)["resetCamera"];

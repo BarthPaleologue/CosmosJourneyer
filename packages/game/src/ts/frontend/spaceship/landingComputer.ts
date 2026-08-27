@@ -16,14 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { EarthG } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
 

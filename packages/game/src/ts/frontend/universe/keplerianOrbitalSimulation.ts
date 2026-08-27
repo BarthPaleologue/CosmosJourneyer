@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type OrbitalObjectId } from "@cosmos-journeyer/universe-model";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import type { OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 import { computeAbsoluteOrientation, getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
 
-import { type OrbitalObject } from "./architecture/orbitalObject";
+import type { OrbitalObject } from "./architecture/orbitalObject";
 
 export type OrbitalTransform = {
     readonly position: Vector3;

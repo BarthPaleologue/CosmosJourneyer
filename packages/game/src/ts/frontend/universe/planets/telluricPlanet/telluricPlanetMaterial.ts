@@ -21,7 +21,8 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { celsiusToKelvin } from "@cosmos-journeyer/physics";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 import {
     abs,
@@ -57,13 +58,11 @@ import {
 
 import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
 
-import {
-    mixTriPlanarSamples,
-    triangleWave3d,
-    triPlanarMaterial,
-    type TriPlanarMaterialSamples,
-} from "@/utils/bslExtensions";
+import { mixTriPlanarSamples, triangleWave3d, triPlanarMaterial } from "@/utils/bslExtensions";
+import type { TriPlanarMaterialSamples } from "@/utils/bslExtensions";
 import { lerp } from "@/utils/math";
+
+import { BeachElevationSpan } from "./terrain/terrainConstants";
 
 type WorldType =
     /** World with atmosphere and liquid water */
@@ -72,8 +71,6 @@ type WorldType =
     | "dry"
     /** World without atmosphere */
     | "airless";
-
-export const BeachElevationSpan = 100;
 
 export class TelluricPlanetMaterial {
     private readonly material: NodeMaterial;

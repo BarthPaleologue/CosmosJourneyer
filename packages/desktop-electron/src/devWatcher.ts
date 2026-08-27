@@ -1,4 +1,5 @@
-import { watch, type FSWatcher } from "node:fs";
+import { watch } from "node:fs";
+import type { FSWatcher } from "node:fs";
 
 import type * as ElectronModule from "electron";
 

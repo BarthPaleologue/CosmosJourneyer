@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import { type Effect } from "@babylonjs/core/Materials/effect";
+import type { Effect } from "@babylonjs/core/Materials/effect";
 
 export const StellarObjectUniformNames = {
     STAR_DIRECTIONS: "star_directions",

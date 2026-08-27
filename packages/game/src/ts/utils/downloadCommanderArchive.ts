@@ -1,7 +1,7 @@
-import { type DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import { createCommanderArchive, createCommanderArchiveFileName } from "@/backend/save/commanderArchive";
-import { type CmdrSaves } from "@/backend/save/saveFileData";
+import type { CmdrSaves } from "@/backend/save/saveFileData";
 
 import { downloadBlob } from "./downloadBlob";
 

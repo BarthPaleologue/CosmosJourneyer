@@ -17,38 +17,39 @@
 
 import "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManagerSceneComponent";
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { BloomEffect } from "@babylonjs/core/PostProcesses/bloomEffect";
 import { FxaaPostProcess } from "@babylonjs/core/PostProcesses/fxaaPostProcess";
-import { type PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
+import type { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderEffect";
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
-import { type PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
+import type { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import type { Scene } from "@babylonjs/core/scene";
-import { arraysEqual, assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type JuliaSetModel,
-    type MandelboxModel,
-    type MandelbulbModel,
-    type MengerSpongeModel,
-    type SierpinskiPyramidModel,
+import { arraysEqual, assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type {
+    JuliaSetModel,
+    MandelboxModel,
+    MandelbulbModel,
+    MengerSpongeModel,
+    SierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-model";
 
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { type GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import { type TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { type BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import type { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
+import type { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
-import { type NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { type Star } from "@/frontend/universe/stellarObjects/star/star";
+import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import type { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
@@ -58,9 +59,9 @@ import { CelestialBodyUberShaderPass } from "./celestialBodyUberShader/celestial
 import { getMatterJetsVisibilityRadius } from "./celestialBodyUberShader/matterJetsSettings";
 import { ColorCorrection } from "./colorCorrection";
 import { LensFlarePostProcess } from "./lensFlarePostProcess";
-import { type RingsUniforms } from "./rings/ringsUniform";
+import type { RingsUniforms } from "./rings/ringsUniform";
 import { SphereShadowsPostProcess } from "./sphereShadowsPostProcess";
-import { type UpdatablePostProcess } from "./updatablePostProcess";
+import type { UpdatablePostProcess } from "./updatablePostProcess";
 import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
 type RenderableBodyEntry = {

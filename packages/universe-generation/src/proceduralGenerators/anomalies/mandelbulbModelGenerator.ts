@@ -20,13 +20,8 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
-import { type DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type MandelbulbModel,
-    type OrbitalObjectModel,
-    type Orbit,
-    type Rotation,
-} from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { MandelbulbModel, OrbitalObjectModel, Orbit, Rotation } from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange } from "extended-random";
 
 export function generateMandelbulbModel(

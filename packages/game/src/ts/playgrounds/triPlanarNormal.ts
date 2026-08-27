@@ -23,7 +23,7 @@ import {
     NodeMaterial,
     Vector3,
 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture, Control, Rectangle, Slider, StackPanel, TextBlock } from "@babylonjs/gui";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
@@ -44,7 +44,7 @@ import {
     vertexAttribute,
 } from "babylonjs-shading-language";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadTextureAsync } from "@/frontend/assets/textures/utils";
 
 import { getTriPlanarBlending, getTriPlanarUVs, unpackNormal, whiteoutBlend } from "@/utils/bslExtensions";

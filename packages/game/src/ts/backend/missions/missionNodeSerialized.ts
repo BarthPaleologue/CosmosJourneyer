@@ -17,15 +17,12 @@
 
 import { z } from "zod";
 
-import {
-    MissionAsteroidFieldNodeSerializedSchema,
-    type MissionAsteroidFieldNodeSerialized,
-} from "./missionAsteroidFieldNodeSerialized";
-import { MissionFlyByNodeSerializedSchema, type MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
-import {
-    MissionTerminatorLandingNodeSerializedSchema,
-    type MissionTerminatorLandingNodeSerialized,
-} from "./missionTerminatorLandingNodeSerialized";
+import { MissionAsteroidFieldNodeSerializedSchema } from "./missionAsteroidFieldNodeSerialized";
+import type { MissionAsteroidFieldNodeSerialized } from "./missionAsteroidFieldNodeSerialized";
+import { MissionFlyByNodeSerializedSchema } from "./missionFlyByNodeSerialized";
+import type { MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
+import { MissionTerminatorLandingNodeSerializedSchema } from "./missionTerminatorLandingNodeSerialized";
+import type { MissionTerminatorLandingNodeSerialized } from "./missionTerminatorLandingNodeSerialized";
 
 function preprocessLegacyMissionNodeType(type: unknown): unknown {
     if (typeof type !== "number") {

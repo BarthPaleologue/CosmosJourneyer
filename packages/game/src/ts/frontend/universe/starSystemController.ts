@@ -15,21 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Color3, Matrix, Quaternion } from "@babylonjs/core/Maths/math";
+import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
+import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
-import {
-    type OrbitalObjectId,
-    type StarSystemCoordinates,
-    type StarSystemModel,
-} from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { SystemTarget } from "@/frontend/universe/systemTarget";
 
@@ -37,22 +34,23 @@ import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
-import {
-    type Anomaly,
-    type CelestialBody,
-    type OrbitalFacility,
-    type OrbitalObject,
-    type Planet,
-    type StellarObject,
+import type {
+    Anomaly,
+    CelestialBody,
+    OrbitalFacility,
+    OrbitalObject,
+    Planet,
+    StellarObject,
 } from "./architecture/orbitalObject";
 import { GravitySystem } from "./gravitySystem";
-import { KeplerianOrbitalSimulation, type OrbitalTransform } from "./keplerianOrbitalSimulation";
+import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
+import type { OrbitalTransform } from "./keplerianOrbitalSimulation";
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { type ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
+import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
-import { type StarSystemLoader } from "./starSystemLoader";
+import type { StarSystemLoader } from "./starSystemLoader";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.

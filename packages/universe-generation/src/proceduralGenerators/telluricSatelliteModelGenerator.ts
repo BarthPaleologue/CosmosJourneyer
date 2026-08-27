@@ -30,16 +30,16 @@ import {
     MoonMass,
 } from "@cosmos-journeyer/physics";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
-import {
-    getCelestialBodyRadius,
-    type AtmosphereModel,
-    type CloudsModel,
-    type PlanetModel,
-    type StellarObjectModel,
-    type OceanModel,
-    type Orbit,
-    type TelluricSatelliteModel,
-    type Rotation,
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type {
+    AtmosphereModel,
+    CloudsModel,
+    PlanetModel,
+    StellarObjectModel,
+    OceanModel,
+    Orbit,
+    TelluricSatelliteModel,
+    Rotation,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom } from "extended-random";
 

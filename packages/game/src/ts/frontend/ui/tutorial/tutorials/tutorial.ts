@@ -17,9 +17,9 @@
 
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import { type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { Save } from "@/backend/save/saveFileData";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 export interface Tutorial {
     getTitle(): string;

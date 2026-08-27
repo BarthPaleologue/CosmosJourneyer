@@ -17,7 +17,8 @@
 
 import type { Material } from "@babylonjs/core/Materials/material";
 import { Mesh } from "@babylonjs/core/Meshes";
-import { PhysicsShapeConvexHull, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";

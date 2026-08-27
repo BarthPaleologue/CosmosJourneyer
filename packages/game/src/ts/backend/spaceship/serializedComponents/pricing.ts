@@ -17,7 +17,7 @@
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type SerializedComponent } from "./component";
+import type { SerializedComponent } from "./component";
 
 export function getComponentValue(serializedComponent: SerializedComponent): number {
     switch (serializedComponent.type) {

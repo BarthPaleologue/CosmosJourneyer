@@ -19,12 +19,12 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 
-import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { type Player } from "@/frontend/player/player";
+import type { Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
 
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
@@ -32,7 +32,7 @@ import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrin
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { type INotificationManager } from "../notificationManager";
+import type { INotificationManager } from "../notificationManager";
 
 export class DiscoveryDetails {
     readonly htmlRoot: HTMLElement;

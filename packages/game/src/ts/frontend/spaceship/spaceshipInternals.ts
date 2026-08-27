@@ -15,16 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import { type SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
-import { type SerializedSpaceship, type ShipType } from "@/backend/spaceship/serializedSpaceship";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import type { SerializedOptionalComponent } from "@/backend/spaceship/serializedComponents/optionalComponents";
+import type { SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
 
 import { DiscoveryScanner } from "./components/discoveryScanner";
 import { FuelScoop } from "./components/fuelScoop";
 import { FuelTank } from "./components/fuelTank";
-import { type OptionalComponent } from "./components/optionalComponents";
+import type { OptionalComponent } from "./components/optionalComponents";
 import { Thrusters } from "./components/thrusters";
 import { WarpDrive } from "./components/warpDrive";
 import { ComponentSlot } from "./componentSlot";

@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, type Result } from "@cosmos-journeyer/typescript";
+import { err } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { jsonSafeParse } from "@/utils/json";
 
-import { safeParseSave, type Save } from "./saveFileData";
-import { type SaveLoadingError } from "./saveLoadingError";
+import { safeParseSave } from "./saveFileData";
+import type { Save } from "./saveFileData";
+import type { SaveLoadingError } from "./saveLoadingError";
 
 export async function parseSaveFile(
     rawSaveFile: File,

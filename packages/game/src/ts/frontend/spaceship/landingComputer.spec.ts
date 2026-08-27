@@ -1,12 +1,12 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { type PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import type { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 

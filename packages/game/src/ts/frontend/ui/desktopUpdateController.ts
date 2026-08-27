@@ -1,15 +1,12 @@
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import { type DesktopUpdateApi, type DesktopUpdateState } from "@/utils/desktopUpdateApi";
+import type { DesktopUpdateApi, DesktopUpdateState } from "@/utils/desktopUpdateApi";
 
 import i18n from "@/i18n";
 
-import {
-    type CommanderBackupTarget,
-    DesktopUpdateModal,
-    type DesktopUpdateModalAction,
-} from "./dialogModal/desktopUpdateModal";
-import { type INotificationManager } from "./notificationManager";
+import { DesktopUpdateModal } from "./dialogModal/desktopUpdateModal";
+import type { CommanderBackupTarget, DesktopUpdateModalAction } from "./dialogModal/desktopUpdateModal";
+import type { INotificationManager } from "./notificationManager";
 
 export type UpdatePresentationContext = "gameplay" | "mainMenu" | "pauseMenu";
 

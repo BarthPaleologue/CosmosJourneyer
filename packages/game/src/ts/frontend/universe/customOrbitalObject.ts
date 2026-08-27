@@ -16,12 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalObjectModelBase } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectModelBase } from "@cosmos-journeyer/universe-model";
 
-import { type OrbitalObjectBase } from "./architecture/orbitalObjectBase";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "./architecture/targetable";
+import type { OrbitalObjectBase } from "./architecture/orbitalObjectBase";
+import { ObjectTargetCursorType } from "./architecture/targetable";
+import type { Targetable, TargetInfo } from "./architecture/targetable";
 
 export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targetable {
     private readonly _transform: TransformNode;

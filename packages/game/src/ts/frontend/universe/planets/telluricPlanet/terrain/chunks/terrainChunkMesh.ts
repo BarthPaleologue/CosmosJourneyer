@@ -17,30 +17,34 @@
 
 import "@babylonjs/core/Engines/Extensions/engine.query";
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { type Material } from "@babylonjs/core/Materials/material";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { VertexData, type TransformNode } from "@babylonjs/core/Meshes";
+import { VertexData } from "@babylonjs/core/Meshes";
+import type { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-import { type Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
-import { type Cullable } from "@/frontend/helpers/cullable";
+import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { CollisionMask, Settings } from "@/settings";
 
-import { makeChunkId, type ChunkId, type TerrainBuffers } from "../system/terrainSystem";
-import { type ChunkIndices } from "./chunkIndices";
-import { getQuaternionFromFaceIndex, type FaceIndex } from "./faceIndex";
-import { type LodUpdateContext } from "./lodUpdateContext";
+import { makeChunkId } from "../system/terrainSystem";
+import type { ChunkId, TerrainBuffers } from "../system/terrainSystem";
+import type { ChunkIndices } from "./chunkIndices";
+import { getQuaternionFromFaceIndex } from "./faceIndex";
+import type { FaceIndex } from "./faceIndex";
+import type { LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
 
 type ChunkLodMetrics = {

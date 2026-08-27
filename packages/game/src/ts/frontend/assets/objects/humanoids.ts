@@ -22,10 +22,11 @@ import type { Skeleton } from "@babylonjs/core/Bones/skeleton";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type Scene } from "@babylonjs/core/scene";
-import { err, ok, type Result } from "@cosmos-journeyer/typescript";
+import type { Scene } from "@babylonjs/core/scene";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";
 
 import astronautHumanoidPath from "@assets/character/astronaut.glb";

@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     f,
@@ -41,7 +41,7 @@ import {
     vertexAttribute,
 } from "babylonjs-shading-language";
 
-import { type PBRTextures } from "@/frontend/assets/textures/materials";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class HelixHabitatMaterial extends NodeMaterial {
     constructor(

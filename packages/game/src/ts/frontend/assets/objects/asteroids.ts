@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AssetContainer } from "@babylonjs/core/assetContainer";
+import type { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { PhysicsShapeMesh, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-import { type Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";
 
 import asteroidPath from "@assets/asteroid/asteroid.glb";

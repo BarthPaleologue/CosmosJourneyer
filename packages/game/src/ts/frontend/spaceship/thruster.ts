@@ -18,9 +18,9 @@
 import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 
 import type { Transformable } from "../universe/architecture/transformable";

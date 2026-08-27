@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getThrustersSpec, type SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
+import { getThrustersSpec } from "@/backend/spaceship/serializedComponents/thrusters";
+import type { SerializedThrusters } from "@/backend/spaceship/serializedComponents/thrusters";
 
 export class Thrusters {
     readonly type;

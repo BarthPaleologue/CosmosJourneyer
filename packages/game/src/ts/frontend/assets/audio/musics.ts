@@ -19,10 +19,11 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
-import { CreateStreamingSoundAsync, type AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import { CreateStreamingSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
+import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import type { IStreamingSoundOptions, StreamingSound } from "@babylonjs/core/AudioV2/abstractAudio/streamingSound";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
 import wanderingPath from "@assets/sound/music/455855__andrewkn__wandering.mp3";
 import atlanteanTwilightPath from "@assets/sound/music/Atlantean_Twilight.mp3";

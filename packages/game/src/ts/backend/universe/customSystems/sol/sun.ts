@@ -1,5 +1,5 @@
 import { degreesToRadians, durationToSeconds } from "@cosmos-journeyer/physics";
-import { type StarModel } from "@cosmos-journeyer/universe-model";
+import type { StarModel } from "@cosmos-journeyer/universe-model";
 
 export function getSunModel(): StarModel {
     return {

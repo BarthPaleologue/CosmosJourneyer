@@ -2,7 +2,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { clamp, lerp, remap } from "@/utils/math";
-import { distanceToRingVolume, getNearestPointOnRingVolume, type RingVolume } from "@/utils/ringVolume";
+import { distanceToRingVolume, getNearestPointOnRingVolume } from "@/utils/ringVolume";
+import type { RingVolume } from "@/utils/ringVolume";
 
 type SolidVolume = {
     readonly center: Vector3;

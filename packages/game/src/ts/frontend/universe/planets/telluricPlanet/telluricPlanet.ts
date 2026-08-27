@@ -15,28 +15,29 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type TelluricPlanetModel, type TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type Cullable } from "@/frontend/helpers/cullable";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { Cullable } from "@/frontend/helpers/cullable";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { type CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
+import type { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
-import { type RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
+import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { defaultTargetInfoCelestialBody, type TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
+import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
-import { type ItemPool } from "@/utils/itemPool";
+import type { ItemPool } from "@/utils/itemPool";
 
 import { CollisionMask, Settings } from "@/settings";
 
@@ -44,7 +45,7 @@ import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { TelluricPlanetMaterial } from "./telluricPlanetMaterial";
 import type { ScatteringSystem } from "./terrain/chunks/scatteringSystem";
 import { SphericalHeightFieldTerrain } from "./terrain/sphericalHeightFieldTerrain";
-import { type ITerrainSystem } from "./terrain/system/terrainSystem";
+import type { ITerrainSystem } from "./terrain/system/terrainSystem";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
     readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -25,7 +25,8 @@ import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScre
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { ObjectTargetCursorType, type Targetable } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../universe/architecture/targetable";
+import type { Targetable } from "../universe/architecture/targetable";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;

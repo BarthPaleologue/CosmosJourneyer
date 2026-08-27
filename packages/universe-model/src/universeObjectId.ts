@@ -18,14 +18,14 @@
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import { type OrbitalObjectModel } from "./orbitalObjects/index";
+import type { OrbitalObjectModel } from "./orbitalObjects/index";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjects/orbitalObjectId";
 import {
     serializeStarSystemCoordinates,
     starSystemCoordinatesEquals,
     StarSystemCoordinatesSchema,
 } from "./starSystemCoordinates";
-import { type StarSystemModel } from "./starSystemModel";
+import type { StarSystemModel } from "./starSystemModel";
 
 export const UniverseObjectIdSchema = z.object({
     idInSystem: OrbitalObjectIdSchema,

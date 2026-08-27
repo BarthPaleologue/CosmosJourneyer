@@ -16,9 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getSchwarzschildRadius } from "@cosmos-journeyer/physics";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
-import { type CelestialBodyModel } from "./index";
+import type { CelestialBodyModel } from "./index";
 
 export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): number {
     switch (body.type) {

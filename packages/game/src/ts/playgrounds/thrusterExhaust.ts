@@ -24,11 +24,11 @@ import {
     MeshBuilder,
     PBRMetallicRoughnessMaterial,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { ThrusterExhaust } from "@/frontend/spaceship/thrusterExhaust";
 
 function createSlider(

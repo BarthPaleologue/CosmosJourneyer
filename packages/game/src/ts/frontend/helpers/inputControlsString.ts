@@ -1,4 +1,4 @@
-import { type AxisComposite, type ButtonInputControl, type StickInputControl } from "@brianchirls/game-input/browser";
+import type { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 

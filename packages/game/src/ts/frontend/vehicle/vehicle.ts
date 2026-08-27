@@ -26,7 +26,8 @@ import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
 import i18n from "@/i18n";
 
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../universe/architecture/targetable";
+import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
 

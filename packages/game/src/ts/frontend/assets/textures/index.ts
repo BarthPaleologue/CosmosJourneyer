@@ -18,19 +18,26 @@
 import "@babylonjs/core/Helpers/sceneHelpers";
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 
-import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Scene } from "@babylonjs/core/scene";
+import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadEnvironmentTextures } from "./environment";
-import { loadGasPlanetTextures, type GasPlanetTextures } from "./gasPlanet";
-import { loadMaterialTextures, type AllMaterialTextures } from "./materials";
-import { loadNoiseTextures, type NoiseTextures } from "./noises";
-import { loadParticleTextures, type ParticleTextures } from "./particles";
-import { loadRingsTextures, type RingsTextures } from "./rings";
-import { loadTerrainTextures, type AllTerrainTextures } from "./terrains";
-import { createTexturePools, type TexturePools } from "./texturePools";
+import { loadGasPlanetTextures } from "./gasPlanet";
+import type { GasPlanetTextures } from "./gasPlanet";
+import { loadMaterialTextures } from "./materials";
+import type { AllMaterialTextures } from "./materials";
+import { loadNoiseTextures } from "./noises";
+import type { NoiseTextures } from "./noises";
+import { loadParticleTextures } from "./particles";
+import type { ParticleTextures } from "./particles";
+import { loadRingsTextures } from "./rings";
+import type { RingsTextures } from "./rings";
+import { loadTerrainTextures } from "./terrains";
+import type { AllTerrainTextures } from "./terrains";
+import { createTexturePools } from "./texturePools";
+import type { TexturePools } from "./texturePools";
 import { loadTextureAsync } from "./utils";
 
 import empty from "@assets/oneBlackPixel.webp";

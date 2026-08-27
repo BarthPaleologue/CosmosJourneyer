@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type IDisposable, type Scene } from "@babylonjs/core/scene";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { IDisposable, Scene } from "@babylonjs/core/scene";
 
-import { type Asteroid } from "@/frontend/assets/objects/asteroids";
+import type { Asteroid } from "@/frontend/assets/objects/asteroids";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
-import { type RingVolume } from "@/utils/ringVolume";
+import type { RingVolume } from "@/utils/ringVolume";
 
 import { AsteroidPatch } from "./asteroidPatch";
 

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Tools } from "@babylonjs/core/Misc/tools";
+import { degreesToRadians } from "@cosmos-journeyer/physics";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
@@ -59,7 +59,7 @@ export const Settings = {
      */
     HYDROPONIC_TO_CONVENTIONAL_RATIO: 3.5,
 
-    FOV: Tools.ToRadians(60),
+    FOV: degreesToRadians(60),
 
     CHARACTER_FIRST_PERSON_INTERACTION_RANGE: 5,
     CHARACTER_THIRD_PERSON_INTERACTION_RANGE: 8,

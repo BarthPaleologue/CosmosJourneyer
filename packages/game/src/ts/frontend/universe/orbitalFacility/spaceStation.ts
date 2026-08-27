@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import { type Scene } from "@babylonjs/core/scene";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { Scene } from "@babylonjs/core/scene";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SpaceStationModel, StationSectionModel } from "@cosmos-journeyer/universe-model";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
@@ -33,14 +35,16 @@ import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay
 import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
 import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { ObjectTargetCursorType, type Targetable, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager, type ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
+import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import { type OrbitalFacilityBase } from "./orbitalFacility";
+import type { OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";
 
 export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {

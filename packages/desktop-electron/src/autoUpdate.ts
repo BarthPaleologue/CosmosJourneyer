@@ -1,6 +1,7 @@
-import { autoUpdater, CancellationToken, type ProgressInfo, type UpdateInfo } from "electron-updater";
+import { autoUpdater, CancellationToken } from "electron-updater";
+import type { ProgressInfo, UpdateInfo } from "electron-updater";
 
-import { type DesktopUpdateState } from "./updateContract.js";
+import type { DesktopUpdateState } from "./updateContract.js";
 
 const updateCheckIntervalMs = 4 * 60 * 60 * 1_000;
 

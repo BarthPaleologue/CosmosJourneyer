@@ -28,16 +28,16 @@ import {
     hasLiquidWater,
 } from "@cosmos-journeyer/physics";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    getCelestialBodyRadius,
-    type AtmosphereModel,
-    type CloudsModel,
-    type OceanModel,
-    type Orbit,
-    type RingsModel,
-    type Rotation,
-    type StellarObjectModel,
-    type TelluricPlanetModel,
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type {
+    AtmosphereModel,
+    CloudsModel,
+    OceanModel,
+    Orbit,
+    RingsModel,
+    Rotation,
+    StellarObjectModel,
+    TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
 import { normalRandom, uniformRandBool } from "extended-random";
 

@@ -16,26 +16,27 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { Quaternion, type Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type ITts } from "@/frontend/audio/tts";
-import { type Controls } from "@/frontend/controls";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ITts } from "@/frontend/audio/tts";
+import type { Controls } from "@/frontend/controls";
 import { createCameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import { type ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
@@ -45,15 +46,12 @@ import i18n from "@/i18n";
 
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic, slerpSmoothToRef } from "../helpers/animations/interpolations";
-import { type INotificationManager } from "../ui/notificationManager";
+import type { INotificationManager } from "../ui/notificationManager";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
-import {
-    type ThirdPersonCameraPreset,
-    type ThirdPersonCameraPresetNames,
-    thirdPersonCameraPresets,
-} from "./thirdPersonCameraPresets";
+import { thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
+import type { ThirdPersonCameraPreset, ThirdPersonCameraPresetNames } from "./thirdPersonCameraPresets";
 
 type CameraPresetInput = (typeof SpaceShipControlsInputs.map)["resetCamera"];
 

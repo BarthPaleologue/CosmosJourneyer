@@ -17,7 +17,7 @@
 
 import { SpotLight } from "@babylonjs/core/Lights/spotLight";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import { type Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";

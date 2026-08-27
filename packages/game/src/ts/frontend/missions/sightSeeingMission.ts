@@ -17,10 +17,10 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import { type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
@@ -28,7 +28,7 @@ import { Mission } from "./mission";
 import { MissionAsteroidFieldNode } from "./nodes/actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
-import { type MissionNode } from "./nodes/missionNode";
+import type { MissionNode } from "./nodes/missionNode";
 
 /**
  * Sightseeing mission types are a subset of mission types.

@@ -19,18 +19,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import {
-    starSystemCoordinatesEquals,
-    type StarSystemCoordinates,
-    universeObjectIdEquals,
-    type UniverseObjectId,
-} from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import {
-    LandMissionState,
-    type MissionTerminatorLandingNodeSerialized,
-} from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { LandMissionState } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
+import type { MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
@@ -40,8 +34,8 @@ import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
-import { type MissionContext } from "../../../missionContext";
-import { type MissionNode } from "../../missionNode";
+import type { MissionContext } from "../../../missionContext";
+import type { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
 
 /**

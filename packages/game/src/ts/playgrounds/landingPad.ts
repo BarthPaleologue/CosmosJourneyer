@@ -15,23 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    ClusteredLightContainer,
-    Color3,
-    GlowLayer,
-    HemisphericLight,
-    Scene,
-    Vector3,
-    type AbstractEngine,
-} from "@babylonjs/core";
+import { ClusteredLightContainer, Color3, GlowLayer, HemisphericLight, Scene, Vector3 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 import { LandingPadMaterial } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadMaterial";
-import {
-    ProceduralSpotLightInstances,
-    type ProceduralSpotLightInstanceData,
-} from "@/frontend/assets/procedural/spotLight";
+import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
+import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
 import { loadConcreteTextures } from "@/frontend/assets/textures/materials/concrete";
 import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareTextDecalTexture";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";

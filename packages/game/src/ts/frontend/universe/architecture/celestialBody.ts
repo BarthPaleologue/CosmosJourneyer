@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
 
-import { type CanHaveRings } from "./canHaveRings";
-import { type OrbitalObjectBase } from "./orbitalObjectBase";
-import { type Targetable } from "./targetable";
+import type { CanHaveRings } from "./canHaveRings";
+import type { OrbitalObjectBase } from "./orbitalObjectBase";
+import type { Targetable } from "./targetable";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings)

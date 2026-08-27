@@ -24,7 +24,7 @@ import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
 import { PlanetaryLandingTutorial } from "./tutorials/planetaryLandingTutorial";
 import { StarMapTutorial } from "./tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./tutorials/stationLandingTutorial";
-import { type Tutorial } from "./tutorials/tutorial";
+import type { Tutorial } from "./tutorials/tutorial";
 
 export class TutorialsPanelContent {
     readonly htmlRoot: HTMLElement;

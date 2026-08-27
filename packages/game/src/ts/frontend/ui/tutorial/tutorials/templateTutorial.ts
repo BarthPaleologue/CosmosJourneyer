@@ -17,9 +17,10 @@
 
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import { safeParseSave, type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { safeParseSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
@@ -29,7 +30,7 @@ import { renderMarkdownBlock } from "@/utils/markdown";
 import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
-import { type Tutorial } from "./tutorial";
+import type { Tutorial } from "./tutorial";
 
 import saveData from "@assets/tutorials/flightTutorial/save.json";
 import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";

@@ -5,7 +5,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { safeParseSave } from "../saveFileData";
-import { type SaveV2 } from "./saveV2";
+import type { SaveV2 } from "./saveV2";
 
 test("Loading a correct save file", () => {
     const universeBackend = new UniverseBackend(getLoneStarSystem());

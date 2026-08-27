@@ -1,15 +1,16 @@
-import { assertUnreachable, err, ok, type DeepReadonly, type Result } from "@cosmos-journeyer/typescript";
-import {
-    type GasPlanetModel,
-    type TelluricPlanetModel,
-    type TelluricSatelliteModel,
-    type UniverseObjectId,
-    serializeUniverseObjectId,
+import { assertUnreachable, err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
+import { serializeUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type {
+    GasPlanetModel,
+    TelluricPlanetModel,
+    TelluricSatelliteModel,
+    UniverseObjectId,
 } from "@cosmos-journeyer/universe-model";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
+import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     /**

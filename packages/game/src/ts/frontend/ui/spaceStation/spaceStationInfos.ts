@@ -18,11 +18,12 @@
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { factionToString } from "@cosmos-journeyer/universe-generation";
-import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import type { OrbitalFacilityModel, OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
 
 import { makeD3PieChart } from "@/frontend/helpers/d3PieChart";
 
-import { cropTypeToString, type CropType } from "@/utils/agriculture";
+import { cropTypeToString } from "@/utils/agriculture";
+import type { CropType } from "@/utils/agriculture";
 
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,
