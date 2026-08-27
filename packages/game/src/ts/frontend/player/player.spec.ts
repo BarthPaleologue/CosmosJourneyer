@@ -15,13 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import type { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { FlyByState } from "@/backend/missions/missionFlyByNodeSerialized";
-import { MissionType, type MissionSerialized } from "@/backend/missions/missionSerialized";
-import { SerializedPlayerSchema, type SerializedPlayer } from "@/backend/player/serializedPlayer";
+import { MissionType } from "@/backend/missions/missionSerialized";
+import type { MissionSerialized } from "@/backend/missions/missionSerialized";
+import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
+import type { SerializedPlayer } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";

@@ -26,11 +26,11 @@ import {
     PhysicsShapeType,
     Scene,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";

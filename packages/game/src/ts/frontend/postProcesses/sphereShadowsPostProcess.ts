@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";

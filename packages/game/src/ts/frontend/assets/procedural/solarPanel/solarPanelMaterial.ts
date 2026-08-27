@@ -17,7 +17,7 @@
 
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import {
     float,
     mul,

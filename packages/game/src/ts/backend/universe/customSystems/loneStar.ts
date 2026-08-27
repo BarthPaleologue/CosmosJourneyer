@@ -17,7 +17,7 @@
 
 import { SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
-import { type StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 export function getLoneStarSystem(): StarSystemModel {
     const systemModel: StarSystemModel = {

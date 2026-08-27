@@ -23,10 +23,10 @@ import {
     PhysicsShapeType,
     Scene,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";

@@ -28,28 +28,30 @@ import type { GreasedLineBaseMesh } from "@babylonjs/core/Meshes/GreasedLine/gre
 import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
-import { type EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { ItinerarySchema, type Itinerary } from "@/backend/player/serializedPlayer";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { ItinerarySchema } from "@/backend/player/serializedPlayer";
+import type { Itinerary } from "@/backend/player/serializedPlayer";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { lookAt } from "@/frontend/helpers/transform";
-import { type Player } from "@/frontend/player/player";
+import type { Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
-import { type View } from "@/frontend/view";
+import type { View } from "@/frontend/view";
 
 import { lerp } from "@/utils/math";
 
-import { type StarMapTextures } from "../assets/textures/starMap";
+import type { StarMapTextures } from "../assets/textures/starMap";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutQuadratic } from "../helpers/animations/interpolations";
-import { type INotificationManager } from "../ui/notificationManager";
+import type { INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";

@@ -16,22 +16,23 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
-import { type Material } from "@babylonjs/core/Materials/material";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { PhysicsShapeSphere, type PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-import { type Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Scene } from "@babylonjs/core/scene";
 import type { UtilitySectionModel } from "@cosmos-journeyer/universe-model";
 
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { CollisionMask, Settings } from "@/settings";

@@ -3,7 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import basicSsl from "@vitejs/plugin-basic-ssl";
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig } from "vite";
+import type { PluginOption } from "vite";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
 

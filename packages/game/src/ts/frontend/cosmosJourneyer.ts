@@ -21,33 +21,37 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudioEngine";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type StarSystemCoordinates, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
-import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
+import { createUrlFromSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
-import {
-    type AtStationCoordinates,
-    type RelativeCoordinates,
-    type UniverseCoordinates,
+import type {
+    AtStationCoordinates,
+    RelativeCoordinates,
+    UniverseCoordinates,
 } from "@/backend/save/universeCoordinates";
 
-import { loadAssets, type Assets } from "@/frontend/assets/assets";
+import { loadAssets } from "@/frontend/assets/assets";
+import type { Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock, type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer, SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
@@ -56,14 +60,15 @@ import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { DesktopUpdateController, type UpdatePresentationContext } from "@/frontend/ui/desktopUpdateController";
+import { DesktopUpdateController } from "@/frontend/ui/desktopUpdateController";
+import type { UpdatePresentationContext } from "@/frontend/ui/desktopUpdateController";
 import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
 import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
-import { type View } from "@/frontend/view";
+import type { View } from "@/frontend/view";
 
 import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
 import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
@@ -73,16 +78,18 @@ import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
-import { LoadingProgressMonitor, type ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { loadStarMapTextures } from "./assets/textures/starMap";
 import { lookAt } from "./helpers/transform";
-import { NotificationManager, type INotificationManager } from "./ui/notificationManager";
+import { NotificationManager } from "./ui/notificationManager";
+import type { INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
 import { PlanetaryLandingTutorial } from "./ui/tutorial/tutorials/planetaryLandingTutorial";
 import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
-import { type Tutorial } from "./ui/tutorial/tutorials/tutorial";
+import type { Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
 type EngineState = "uninitialized" | "running" | "paused";
 

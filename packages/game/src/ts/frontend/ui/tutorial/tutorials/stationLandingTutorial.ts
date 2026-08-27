@@ -17,9 +17,10 @@
 
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import { safeParseSave, type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { safeParseSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
@@ -30,7 +31,7 @@ import { renderMarkdownBlock } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
-import { type Tutorial } from "./tutorial";
+import type { Tutorial } from "./tutorial";
 
 import saveData from "@assets/tutorials/stationLandingTutorial/save.json";
 import station1ImageSrc from "@assets/tutorials/stationLandingTutorial/station1.webp";

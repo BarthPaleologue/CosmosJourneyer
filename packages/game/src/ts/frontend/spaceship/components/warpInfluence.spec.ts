@@ -1,11 +1,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { describe, expect, it } from "vitest";
 
-import {
-    computeMaxTargetSpeedFromWarpInfluences,
-    type RingWarpInfluence,
-    type SolidWarpInfluence,
-} from "./warpInfluence";
+import { computeMaxTargetSpeedFromWarpInfluences } from "./warpInfluence";
+import type { RingWarpInfluence, SolidWarpInfluence } from "./warpInfluence";
 
 const minWarpSpeed = 30_000;
 const maxWarpSpeed = 1_000_000;

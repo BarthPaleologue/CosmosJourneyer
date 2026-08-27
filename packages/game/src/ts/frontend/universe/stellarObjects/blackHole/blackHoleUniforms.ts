@@ -15,13 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Effect } from "@babylonjs/core/Materials/effect";
-import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import type { Effect } from "@babylonjs/core/Materials/effect";
+import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { G, getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type BlackHoleModel } from "@cosmos-journeyer/universe-model";
+import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
 import { computeSpinAxisOrientation } from "@/frontend/helpers/orbit";
 

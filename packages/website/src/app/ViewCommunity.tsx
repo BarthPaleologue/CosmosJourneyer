@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 
-import { FAQ, type FAQItem } from "@/components/FAQ";
+import { FAQ } from "@/components/FAQ";
+import type { FAQItem } from "@/components/FAQ";
 import { siteConfig } from "@/siteConfig";
 
 const featuredCommunityLinks = [

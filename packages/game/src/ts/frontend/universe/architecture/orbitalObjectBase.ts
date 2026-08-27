@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalObjectModel, type OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectModel, OrbitalObjectType } from "@cosmos-journeyer/universe-model";
 
-import { type Transformable } from "./transformable";
+import type { Transformable } from "./transformable";
 
 export interface OrbitalObjectBase<T extends OrbitalObjectType> extends Transformable {
     type: DeepReadonly<T>;

@@ -19,12 +19,14 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { generateStarSystemModel } from "@cosmos-journeyer/universe-generation";
 import {
     starSystemCoordinatesEquals,
-    type StarSystemCoordinates,
-    type UniverseObjectId,
-    type OrbitalObjectModel,
     getObjectModelById,
-    type StarSystemModel,
     serializeStarSystemCoordinates,
+} from "@cosmos-journeyer/universe-model";
+import type {
+    StarSystemCoordinates,
+    UniverseObjectId,
+    OrbitalObjectModel,
+    StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 import { centeredRand } from "extended-random";
 import { makeNoise3D } from "fast-simplex-noise/lib/3d";

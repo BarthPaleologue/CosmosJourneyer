@@ -22,11 +22,11 @@ import {
     degreesToRadians,
     durationToSeconds,
 } from "@cosmos-journeyer/physics";
-import {
-    type GasPlanetModel,
-    type TelluricPlanetModel,
-    type TelluricSatelliteModel,
-    type StarSystemModel,
+import type {
+    GasPlanetModel,
+    TelluricPlanetModel,
+    TelluricSatelliteModel,
+    StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 
 import { getJupiterModel } from "./jupiter";

@@ -15,25 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type OrbitalFacilityModel,
-    type StarSystemModel,
-    getUniverseObjectId,
-    type UniverseObjectId,
-} from "@cosmos-journeyer/universe-model";
+import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { OrbitalFacilityModel, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
-import { type Player } from "@/frontend/player/player";
+import type { Player } from "@/frontend/player/player";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 
-import { type Mission } from "./mission";
+import type { Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**

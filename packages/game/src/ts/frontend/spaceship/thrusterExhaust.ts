@@ -17,13 +17,14 @@
 
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
-import { type ThrusterExhaustCrossSection, ThrusterExhaustMaterial } from "./thrusterExhaustMaterial";
+import { ThrusterExhaustMaterial } from "./thrusterExhaustMaterial";
+import type { ThrusterExhaustCrossSection } from "./thrusterExhaustMaterial";
 
 export interface ThrusterExhaustOptions {
     readonly crossSection?: ThrusterExhaustCrossSection;

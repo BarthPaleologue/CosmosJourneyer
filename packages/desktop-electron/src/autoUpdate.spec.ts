@@ -4,7 +4,7 @@ import type { CancellationToken, ProgressInfo, UpdateInfo } from "electron-updat
 import { describe, expect, it, vi } from "vitest";
 
 import { DesktopAutoUpdateService } from "./autoUpdate.js";
-import { type DesktopUpdateState } from "./updateContract.js";
+import type { DesktopUpdateState } from "./updateContract.js";
 
 class MockUpdater extends EventEmitter {
     public autoDownload = true;

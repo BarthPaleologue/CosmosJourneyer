@@ -18,11 +18,8 @@
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    serializeStarSystemCoordinates,
-    starSystemCoordinatesEquals,
-    type StarSystemCoordinates,
-} from "@cosmos-journeyer/universe-model";
+import { serializeStarSystemCoordinates, starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 

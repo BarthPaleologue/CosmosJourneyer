@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Mission } from "@/frontend/missions/mission";
-import { type Player } from "@/frontend/player/player";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Mission } from "@/frontend/missions/mission";
+import type { Player } from "@/frontend/player/player";
 
 import { Settings } from "@/settings";
 

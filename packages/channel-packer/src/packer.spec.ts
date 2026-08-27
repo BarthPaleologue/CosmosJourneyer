@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createPackerEngine, ImageCache, type DecodedImage, type FileSignature } from "./packerCore";
+import { createPackerEngine, ImageCache } from "./packerCore";
+import type { DecodedImage, FileSignature } from "./packerCore";
 import type { ChannelAssignment, ColorChannel, PackRequest, PackedTexture } from "./types";
 
 interface TestInput {

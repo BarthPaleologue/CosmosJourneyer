@@ -26,11 +26,11 @@ import {
     Quaternion,
     Vector3,
 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
 import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
 import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";

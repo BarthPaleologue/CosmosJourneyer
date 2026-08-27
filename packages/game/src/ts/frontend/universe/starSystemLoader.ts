@@ -16,23 +16,19 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Scene } from "@babylonjs/core/scene";
-import {
-    assertUnreachable,
-    isNonEmptyArray,
-    type DeepReadonly,
-    type NonEmptyArray,
-} from "@cosmos-journeyer/typescript";
-import {
-    type AnomalyModel,
-    type PlanetModel,
-    type StellarObjectModel,
-    type TelluricSatelliteModel,
-    type StarSystemModel,
+import type { Scene } from "@babylonjs/core/scene";
+import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
+import type {
+    AnomalyModel,
+    PlanetModel,
+    StellarObjectModel,
+    TelluricSatelliteModel,
+    StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
@@ -41,7 +37,7 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { wait } from "@/utils/wait";
 
-import { type Anomaly, type OrbitalFacility, type Planet, type StellarObject } from "./architecture/orbitalObject";
+import type { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
 import { DarkKnight } from "./darkKnight";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
 import { SpaceElevator } from "./orbitalFacility/spaceElevator";

@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 export function getProjectedDiameter01(
     position: Vector3,

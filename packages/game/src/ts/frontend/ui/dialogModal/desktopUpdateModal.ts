@@ -1,6 +1,6 @@
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import { type DesktopUpdateState } from "@/utils/desktopUpdateApi";
+import type { DesktopUpdateState } from "@/utils/desktopUpdateApi";
 
 import i18n from "@/i18n";
 

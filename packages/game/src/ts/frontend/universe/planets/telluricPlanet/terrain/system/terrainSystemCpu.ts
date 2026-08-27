@@ -15,25 +15,26 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, ok, type Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
 
 import { Settings } from "@/settings";
 
-import {
-    type BuildChunkWorkerPayload,
-    type ComputeHeightsWorkerPayload,
-    type TerrainSystemWorkerOutput,
-    type TerrainSystemWorkerTask,
+import type {
+    BuildChunkWorkerPayload,
+    ComputeHeightsWorkerPayload,
+    TerrainSystemWorkerOutput,
+    TerrainSystemWorkerTask,
 } from "../workers/terrainSystemWorkerProtocol";
-import {
-    type ChunkId,
-    type ITerrainSystem,
-    type TaskId,
-    type TerrainSystemChunkOutput,
-    type TerrainSystemHeightsOutput,
-    makeTaskId,
+import { makeTaskId } from "./terrainSystem";
+import type {
+    ChunkId,
+    ITerrainSystem,
+    TaskId,
+    TerrainSystemChunkOutput,
+    TerrainSystemHeightsOutput,
 } from "./terrainSystem";
-import { type BuildChunkInput, type ComputeHeightsInput } from "./terrainTaskInputs";
+import type { BuildChunkInput, ComputeHeightsInput } from "./terrainTaskInputs";
 import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 import { WorkerPool } from "./workerPool";
 

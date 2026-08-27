@@ -17,7 +17,7 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { type Targetable } from "@/frontend/universe/architecture/targetable";
+import type { Targetable } from "@/frontend/universe/architecture/targetable";
 
 export const LandingPadSize = {
     SMALL: 1,

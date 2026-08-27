@@ -17,7 +17,8 @@
 
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { decryptFunction, encryptFunction, type EncryptedCodePayload } from "./cipher";
+import { decryptFunction, encryptFunction } from "./cipher";
+import type { EncryptedCodePayload } from "./cipher";
 
 describe("cipher", () => {
     const passphrase = "correct horse battery staple";

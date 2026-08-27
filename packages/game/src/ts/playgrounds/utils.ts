@@ -17,20 +17,10 @@
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
-import {
-    CascadedShadowGenerator,
-    HavokPlugin,
-    MeshBuilder,
-    ReflectionProbe,
-    Vector3,
-    type AbstractEngine,
-    type AbstractMesh,
-    type Camera,
-    type DirectionalLight,
-    type PhysicsEngineV2,
-    type Scene,
-} from "@babylonjs/core";
-import HavokPhysics, { type HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { CascadedShadowGenerator, HavokPlugin, MeshBuilder, ReflectionProbe, Vector3 } from "@babylonjs/core";
+import type { AbstractEngine, AbstractMesh, Camera, DirectionalLight, PhysicsEngineV2, Scene } from "@babylonjs/core";
+import HavokPhysics from "@babylonjs/havok";
+import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { SkyMaterial } from "@babylonjs/materials";
 import * as QRCode from "qrcode";
 

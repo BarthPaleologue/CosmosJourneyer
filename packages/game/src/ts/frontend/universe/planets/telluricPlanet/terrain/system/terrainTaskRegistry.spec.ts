@@ -17,7 +17,8 @@
 
 import { describe, expect, it } from "vitest";
 
-import { makeChunkId, makeTaskId, type TerrainBuffers } from "./terrainSystem";
+import { makeChunkId, makeTaskId } from "./terrainSystem";
+import type { TerrainBuffers } from "./terrainSystem";
 import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 
 function makeBuffers(value: number): TerrainBuffers {

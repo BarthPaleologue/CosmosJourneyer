@@ -1,12 +1,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { describe, expect, it } from "vitest";
 
-import {
-    distanceToRingVolume,
-    getNearestPointOnRingVolume,
-    isPositionInsideRingVolume,
-    type RingVolume,
-} from "./ringVolume";
+import { distanceToRingVolume, getNearestPointOnRingVolume, isPositionInsideRingVolume } from "./ringVolume";
+import type { RingVolume } from "./ringVolume";
 
 const ring: RingVolume = {
     center: Vector3.Zero(),

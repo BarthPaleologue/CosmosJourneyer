@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type MissionContext } from "../missionContext";
-import { type MissionNode } from "./missionNode";
+import type { MissionContext } from "../missionContext";
+import type { MissionNode } from "./missionNode";
 
 /**
  * Describes any node in the mission tree.

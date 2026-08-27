@@ -1,8 +1,9 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
-import { starSystemCoordinatesEquals, type StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
@@ -12,7 +13,7 @@ import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import i18n from "@/i18n";
 
-import { type MissionContext } from "./missionContext";
+import type { MissionContext } from "./missionContext";
 
 export function getGoToSystemInstructions(
     missionContext: MissionContext,

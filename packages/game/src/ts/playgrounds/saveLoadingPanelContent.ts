@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FreeCamera, Vector3 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
@@ -24,7 +24,7 @@ import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";

@@ -1,7 +1,8 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { describe, expect, it } from "vitest";
 
-import { AttitudePDController, type AngularMassProperties } from "./attitudePdController";
+import { AttitudePDController } from "./attitudePdController";
+import type { AngularMassProperties } from "./attitudePdController";
 
 const expectVectorClose = (actual: Vector3, expected: Vector3, precision = 6): void => {
     expect(actual.x).toBeCloseTo(expected.x, precision);

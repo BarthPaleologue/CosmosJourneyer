@@ -17,7 +17,7 @@
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
 import { DiscoveryScanner } from "./discoveryScanner";
 import { FuelScoop } from "./fuelScoop";

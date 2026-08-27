@@ -16,14 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ClusteredLightContainer, Color3, FreeCamera, GlowLayer, MeshBuilder, Vector3 } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import {
-    ProceduralSpotLightInstances,
-    type ProceduralSpotLightInstanceData,
-} from "@/frontend/assets/procedural/spotLight";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
+import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
 
 export async function createSpotLightsScene(
     engine: AbstractEngine,

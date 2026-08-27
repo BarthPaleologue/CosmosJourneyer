@@ -19,21 +19,22 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type StarSystemModel, getUniverseObjectId, type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { type ISaveBackend } from "@/backend/save/saveBackend";
+import type { ISaveBackend } from "@/backend/save/saveBackend";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import {
     positionNearObjectAsteroidField,
     positionNearObjectWithStarVisible,
 } from "@/frontend/helpers/positionNearObject";
-import { type StarSystemView } from "@/frontend/starSystemView";
+import type { StarSystemView } from "@/frontend/starSystemView";
 
 import i18n from "@/i18n";
 
@@ -41,7 +42,7 @@ import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutQuadratic } from "../helpers/animations/interpolations";
 import { createOfficialOriginNotice } from "./officialOriginNotice";
-import { type SidePanels } from "./sidePanels";
+import type { SidePanels } from "./sidePanels";
 
 export class MainMenu {
     readonly scene: Scene;

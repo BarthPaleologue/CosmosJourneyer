@@ -26,8 +26,8 @@ import {
     PhysicsShapeType,
     Scene,
     Vector3,
-    type AbstractEngine,
 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";

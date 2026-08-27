@@ -15,16 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "../../loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
 import { loadConcreteTextures } from "./concrete";
-import { loadCrateTextures, type CrateTextures } from "./crate";
-import { loadSolarPanelTextures, type SolarPanelTextures } from "./solarPanel";
-import { loadStyroFoamTextures, type StyroFoamTextures } from "./styrofoam";
-import { loadTireTextures, type TireTextures } from "./tire";
+import { loadCrateTextures } from "./crate";
+import type { CrateTextures } from "./crate";
+import { loadSolarPanelTextures } from "./solarPanel";
+import type { SolarPanelTextures } from "./solarPanel";
+import { loadStyroFoamTextures } from "./styrofoam";
+import type { StyroFoamTextures } from "./styrofoam";
+import { loadTireTextures } from "./tire";
+import type { TireTextures } from "./tire";
 
 import metalPanelsMetallicRoughness from "@assets/metalPanelMaterial/metallicRoughness.webp";
 import metalPanelsAlbedo from "@assets/metalPanelMaterial/sci-fi-panel1-albedo.webp";

@@ -1,5 +1,5 @@
-import { type ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
-import { type Nullable } from "@babylonjs/core/types";
+import type { ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
+import type { Nullable } from "@babylonjs/core/types";
 
 import i18next from "@/i18n";
 

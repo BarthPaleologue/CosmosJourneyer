@@ -1,6 +1,6 @@
 import { perHaToPerM2 } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import { type CropType } from "@cosmos-journeyer/universe-model";
+import type { CropType } from "@cosmos-journeyer/universe-model";
 
 export type { CropType };
 

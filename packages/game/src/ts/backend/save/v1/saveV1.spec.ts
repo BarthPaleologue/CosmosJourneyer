@@ -5,7 +5,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { safeParseSave } from "../saveFileData";
-import { type SaveV1 } from "./saveV1";
+import type { SaveV1 } from "./saveV1";
 
 test("Loading a correct save file", () => {
     const saveFileString: DeepPartial<SaveV1> = {

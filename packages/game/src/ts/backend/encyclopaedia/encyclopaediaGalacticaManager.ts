@@ -1,7 +1,8 @@
-import { ok, type Result } from "@cosmos-journeyer/typescript";
-import { type UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { type EncyclopaediaGalactica, type SpaceDiscoveryData } from "./encyclopaediaGalactica";
+import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
     readonly backends: EncyclopaediaGalactica[] = [];

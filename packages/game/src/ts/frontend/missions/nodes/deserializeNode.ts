@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
-import { type MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { type MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
-import {
-    type MissionAndNodeSerialized,
-    type MissionNodeSerialized,
-    type MissionOrNodeSerialized,
-    type MissionSequenceNodeSerialized,
-    type MissionXorNodeSerialized,
+import type { MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
+import type { MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
+import type {
+    MissionAndNodeSerialized,
+    MissionNodeSerialized,
+    MissionOrNodeSerialized,
+    MissionSequenceNodeSerialized,
+    MissionXorNodeSerialized,
 } from "@/backend/missions/missionNodeSerialized";
-import { type MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { MissionAsteroidFieldNode } from "./actions/sightseeing/missionAsteroidFieldNode";
 import { MissionFlyByNode } from "./actions/sightseeing/missionFlyByNode";
@@ -36,7 +37,7 @@ import { MissionAndNode } from "./logic/missionAndNode";
 import { MissionOrNode } from "./logic/missionOrNode";
 import { MissionSequenceNode } from "./logic/missionSequenceNode";
 import { MissionXorNode } from "./logic/missionXorNode";
-import { type MissionNode } from "./missionNode";
+import type { MissionNode } from "./missionNode";
 
 /**
  * Deserialize recursively a mission node.

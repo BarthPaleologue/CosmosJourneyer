@@ -16,15 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
-import { type Camera } from "@babylonjs/core/Cameras/camera";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { type Scene } from "@babylonjs/core/scene";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Controls } from "@/frontend/controls";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Controls } from "@/frontend/controls";
 
-import { type Spaceship } from "./spaceship";
+import type { Spaceship } from "./spaceship";
 
 export class AiSpaceshipControls implements Controls {
     readonly spaceship: Spaceship;

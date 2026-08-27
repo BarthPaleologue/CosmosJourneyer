@@ -16,12 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VolumetricLightScatteringPostProcess } from "@babylonjs/core/PostProcesses/volumetricLightScatteringPostProcess";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type VolumetricLightUniforms } from "./volumetricLightUniforms";
+import type { VolumetricLightUniforms } from "./volumetricLightUniforms";
 
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
     constructor(

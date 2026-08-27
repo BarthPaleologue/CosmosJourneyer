@@ -33,14 +33,14 @@ import {
     SolarRadius,
     SolarTemperature,
 } from "@cosmos-journeyer/physics";
-import {
-    type StarSystemModel,
-    type StarSystemCoordinates,
-    type StarModel,
-    type GasPlanetModel,
-    type TelluricPlanetModel,
-    type SpaceStationModel,
-    type TelluricSatelliteModel,
+import type {
+    StarSystemModel,
+    StarSystemCoordinates,
+    StarModel,
+    GasPlanetModel,
+    TelluricPlanetModel,
+    SpaceStationModel,
+    TelluricSatelliteModel,
 } from "@cosmos-journeyer/universe-model";
 
 import { CropType } from "@/utils/agriculture";

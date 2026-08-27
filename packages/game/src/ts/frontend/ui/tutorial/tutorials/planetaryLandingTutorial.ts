@@ -15,12 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AxisComposite } from "@brianchirls/game-input/browser";
+import type { AxisComposite } from "@brianchirls/game-input/browser";
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import { safeParseSave, type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { safeParseSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -32,7 +33,7 @@ import { renderMarkdownBlock } from "@/utils/markdown";
 import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
-import { type Tutorial } from "./tutorial";
+import type { Tutorial } from "./tutorial";
 
 import welcomeImageSrc from "@assets/tutorials/planetaryLandingTutorial/cover.webp";
 import gettingCloseToSurfaceImageSrc from "@assets/tutorials/planetaryLandingTutorial/gettingCloseToSurface.png";

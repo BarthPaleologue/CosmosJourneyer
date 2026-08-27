@@ -21,8 +21,9 @@ import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { SaveBackendSingleFile, type IFile } from "./saveBackendSingleFile";
-import { type CmdrSaves, type Save } from "./saveFileData";
+import { SaveBackendSingleFile } from "./saveBackendSingleFile";
+import type { IFile } from "./saveBackendSingleFile";
+import type { CmdrSaves, Save } from "./saveFileData";
 
 /**
  * Mock implementation of SaveBackend for testing

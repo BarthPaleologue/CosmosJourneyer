@@ -19,13 +19,8 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
-import { type DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type OrbitalObjectModel,
-    type Orbit,
-    type NeutronStarModel,
-    type Rotation,
-} from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { OrbitalObjectModel, Orbit, NeutronStarModel, Rotation } from "@cosmos-journeyer/universe-model";
 import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 /**

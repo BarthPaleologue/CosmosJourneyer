@@ -18,11 +18,11 @@
 import { createChunkBuffers } from "../chunks/createChunkBuffers";
 import { computeHeights } from "../computeHeights";
 import type { TaskId } from "../system/terrainSystem";
-import {
-    type BuildChunkWorkerPayload,
-    type ComputeHeightsWorkerPayload,
-    type TerrainSystemWorkerTask,
-    type TerrainSystemWorkerOutput,
+import type {
+    BuildChunkWorkerPayload,
+    ComputeHeightsWorkerPayload,
+    TerrainSystemWorkerOutput,
+    TerrainSystemWorkerTask,
 } from "./terrainSystemWorkerProtocol";
 
 type ReturnPayload = {

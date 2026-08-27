@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { err, ok, type Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { Result } from "@cosmos-journeyer/typescript";
 
 type VertexHandle = number;
 

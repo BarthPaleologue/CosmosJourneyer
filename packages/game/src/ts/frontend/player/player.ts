@@ -17,24 +17,18 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type StarSystemCoordinates,
-    type UniverseObjectId,
-    serializeUniverseObjectId,
-} from "@cosmos-journeyer/universe-model";
+import { serializeUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type CompletedTutorials, type Itinerary, type SerializedPlayer } from "@/backend/player/serializedPlayer";
-import { type SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
-import {
-    getDefaultSerializedSpaceship,
-    SerializedSpaceshipSchema,
-    type SerializedSpaceship,
-} from "@/backend/spaceship/serializedSpaceship";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import type { CompletedTutorials, Itinerary, SerializedPlayer } from "@/backend/player/serializedPlayer";
+import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
+import { getDefaultSerializedSpaceship, SerializedSpaceshipSchema } from "@/backend/spaceship/serializedSpaceship";
+import type { SerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Mission } from "@/frontend/missions/mission";
-import { type Spaceship } from "@/frontend/spaceship/spaceship";
+import type { Spaceship } from "@/frontend/spaceship/spaceship";
 
 import { jsonSafeParse } from "@/utils/json";
 

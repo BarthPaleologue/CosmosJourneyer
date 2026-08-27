@@ -17,12 +17,12 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
 import { createOfficialOriginNotice } from "./officialOriginNotice";
-import { type SidePanels } from "./sidePanels";
+import type { SidePanels } from "./sidePanels";
 
 export class PauseMenu {
     private readonly rootNode: HTMLElement;

@@ -29,8 +29,10 @@ import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Door } from "./door";
 import { filterVehicleShape } from "./filterVehicleShape";
 import { HingedDoor } from "./hingedDoor";
-import { Vehicle, type FixedVehiclePart } from "./vehicle";
-import { CreateAxle, CreateWheel, Wheel, type WheelModel } from "./wheel";
+import { Vehicle } from "./vehicle";
+import type { FixedVehiclePart } from "./vehicle";
+import { CreateAxle, CreateWheel, Wheel } from "./wheel";
+import type { WheelModel } from "./wheel";
 
 type FixationModel = {
     rotation?: {

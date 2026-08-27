@@ -10,7 +10,8 @@ import {
     getAssignedInputCount,
     releaseFileKeyIfUnused,
 } from "./app/state";
-import { createUi, setHoveredDropTarget, syncUi, type UiRefs } from "./app/ui";
+import { createUi, setHoveredDropTarget, syncUi } from "./app/ui";
+import type { UiRefs } from "./app/ui";
 import { ImageCache, generatePreview, savePackedPng, synchronizeCache } from "./packer";
 import type { AppState, ColorChannel } from "./types";
 

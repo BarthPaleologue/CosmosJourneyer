@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type StarSystemCoordinates, type StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "./customSystems/loneStar";

@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { getWarpDriveSpec, type SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
+import { getWarpDriveSpec } from "@/backend/spaceship/serializedComponents/warpDrive";
+import type { SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
 import { clamp, lerpSmooth, remap } from "@/utils/math";
 
-import { computeMaxTargetSpeedFromWarpInfluences, type WarpInfluence } from "./warpInfluence";
+import { computeMaxTargetSpeedFromWarpInfluences } from "./warpInfluence";
+import type { WarpInfluence } from "./warpInfluence";
 
 type WarpDriveState = "disabled" | "enabled" | "disengaging";
 

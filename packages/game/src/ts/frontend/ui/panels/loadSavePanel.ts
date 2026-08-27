@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { ISaveBackend } from "@/backend/save/saveBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import i18n from "@/i18n";
 
-import { type INotificationManager } from "../notificationManager";
+import type { INotificationManager } from "../notificationManager";
 import { SaveLoadingPanelContent } from "../saveLoadingPanelContent";
 
 export class LoadSavePanel {

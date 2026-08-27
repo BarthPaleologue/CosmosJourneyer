@@ -21,17 +21,20 @@ import "@babylonjs/loaders";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { type PhysicsShape, PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
-import { type Scene } from "@babylonjs/core/scene";
+import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { type ILoadingProgressMonitor } from "../loadingProgressMonitor";
-import { type Materials } from "../materials";
+import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import type { Materials } from "../materials";
 import { createButterfly } from "../procedural/butterfly/butterfly";
 import { createGrassBlade } from "../procedural/grass/grassBlade";
-import { loadAsteroids, type Asteroid } from "./asteroids";
-import { loadHumanoidPrefabs, type HumanoidPrefabs } from "./humanoids";
+import { loadAsteroids } from "./asteroids";
+import type { Asteroid } from "./asteroids";
+import { loadHumanoidPrefabs } from "./humanoids";
+import type { HumanoidPrefabs } from "./humanoids";
 import { loadRock } from "./rock";
 import { loadAssetInContainerAsync } from "./utils";
 

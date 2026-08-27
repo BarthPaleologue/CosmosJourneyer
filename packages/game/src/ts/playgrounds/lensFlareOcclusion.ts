@@ -15,18 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import {
-    Color3,
-    FreeCamera,
-    MeshBuilder,
-    Scene,
-    StandardMaterial,
-    TransformNode,
-    Vector3,
-    type AbstractEngine,
-} from "@babylonjs/core";
+import { Color3, FreeCamera, MeshBuilder, Scene, StandardMaterial, TransformNode, Vector3 } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 

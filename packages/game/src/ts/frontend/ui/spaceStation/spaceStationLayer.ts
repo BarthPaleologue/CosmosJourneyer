@@ -16,20 +16,21 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalFacilityModel, type OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { OrbitalFacilityModel, OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
 
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Player } from "@/frontend/player/player";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { type INotificationManager } from "../notificationManager";
+import type { INotificationManager } from "../notificationManager";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
 import { generateInfoHTML } from "./spaceStationInfos";

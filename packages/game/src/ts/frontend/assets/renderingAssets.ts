@@ -15,12 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { initMaterials, type Materials } from "./materials";
-import { loadObjects, type Objects } from "./objects";
-import { loadTextures, type Textures } from "./textures";
+import type { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { initMaterials } from "./materials";
+import type { Materials } from "./materials";
+import { loadObjects } from "./objects";
+import type { Objects } from "./objects";
+import { loadTextures } from "./textures";
+import type { Textures } from "./textures";
 
 export type RenderingAssets = {
     readonly textures: Textures;

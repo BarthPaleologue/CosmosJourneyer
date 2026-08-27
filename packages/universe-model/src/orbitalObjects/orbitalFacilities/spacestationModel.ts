@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type HasSeed } from "../hasSeed";
-import { type OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
+import type { HasSeed } from "../hasSeed";
+import type { OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
 import type { StationSectionModel } from "./sections";
 
 export type SpaceStationModel = OrbitalFacilityModelBase<"spaceStation"> &

@@ -19,15 +19,17 @@ import { Material } from "@babylonjs/core/Materials/material";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { CreateDecal, type Mesh } from "@babylonjs/core/Meshes";
+import { CreateDecal } from "@babylonjs/core/Meshes";
+import type { Mesh } from "@babylonjs/core/Meshes";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { type ILandingPad, type LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
+import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
+import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";

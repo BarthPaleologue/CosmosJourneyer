@@ -4,15 +4,12 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 
-import { type DesktopUpdateApi, type DesktopUpdateState } from "@/utils/desktopUpdateApi";
+import type { DesktopUpdateApi, DesktopUpdateState } from "@/utils/desktopUpdateApi";
 
 import i18n, { initI18n } from "@/i18n";
 
-import {
-    DesktopUpdateController,
-    type DesktopUpdatePlayerActions,
-    type UpdatePresentationContext,
-} from "./desktopUpdateController";
+import { DesktopUpdateController } from "./desktopUpdateController";
+import type { DesktopUpdatePlayerActions, UpdatePresentationContext } from "./desktopUpdateController";
 import { NotificationManagerMock } from "./notificationManager";
 
 class DesktopUpdateApiMock implements DesktopUpdateApi {

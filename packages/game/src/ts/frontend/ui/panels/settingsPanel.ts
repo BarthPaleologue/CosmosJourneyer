@@ -38,7 +38,7 @@ import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
 import i18n from "@/i18n";
 
-import { type MusicConductor } from "../../audio/musicConductor";
+import type { MusicConductor } from "../../audio/musicConductor";
 
 export class SettingsPanel {
     readonly htmlRoot: HTMLElement;

@@ -22,26 +22,29 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Scene } from "@babylonjs/core/scene";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { Scene } from "@babylonjs/core/scene";
 import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type OrbitalFacilityModel, type LandingBayModel } from "@cosmos-journeyer/universe-model";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { OrbitalFacilityModel, LandingBayModel } from "@cosmos-journeyer/universe-model";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
-import { type RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
-import { ObjectTargetCursorType, type TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
+import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import i18n from "@/i18n";
 
-import { ProceduralSpotLightInstances, type ProceduralSpotLightInstanceData } from "../../spotLight";
+import { ProceduralSpotLightInstances } from "../../spotLight";
+import type { ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";

@@ -20,17 +20,14 @@ import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import {
     starSystemCoordinatesEquals,
-    type StarSystemCoordinates,
     universeObjectIdEquals,
-    type UniverseObjectId,
     getObjectModelById,
 } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import {
-    AsteroidFieldMissionState,
-    type MissionAsteroidFieldNodeSerialized,
-} from "@/backend/missions/missionAsteroidFieldNodeSerialized";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { AsteroidFieldMissionState } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
+import type { MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
@@ -40,8 +37,8 @@ import { parseDistance } from "@/utils/strings/parseToStrings";
 import i18n from "@/i18n";
 
 import { getGoToSystemInstructions } from "../../../common";
-import { type MissionContext } from "../../../missionContext";
-import { type MissionNode } from "../../missionNode";
+import type { MissionContext } from "../../../missionContext";
+import type { MissionNode } from "../../missionNode";
 import type { MissionNodeBase } from "../../missionNodeBase";
 
 /**

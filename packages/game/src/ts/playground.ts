@@ -19,7 +19,8 @@ import "@styles/index.css";
 
 import "@babylonjs/node-editor";
 
-import { Engine, PhysicsViewer, Tools, type Scene } from "@babylonjs/core";
+import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
+import type { Scene } from "@babylonjs/core";
 import { Inspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";

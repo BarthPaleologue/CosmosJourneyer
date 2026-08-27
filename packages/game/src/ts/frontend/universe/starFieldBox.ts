@@ -17,16 +17,16 @@
 
 import { BackgroundMaterial } from "@babylonjs/core/Materials/Background/backgroundMaterial";
 import type { Material } from "@babylonjs/core/Materials/material";
-import { type CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix } from "@babylonjs/core/Maths/math.vector";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { RenderingManager } from "@babylonjs/core/Rendering/renderingManager";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;

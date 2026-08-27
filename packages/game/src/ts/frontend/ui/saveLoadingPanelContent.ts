@@ -2,13 +2,15 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import { parseCommanderArchive } from "@/backend/save/commanderArchive";
-import { type ISaveBackend } from "@/backend/save/saveBackend";
+import type { ISaveBackend } from "@/backend/save/saveBackend";
 import { parseSaveFile } from "@/backend/save/saveFile";
-import { createUrlFromSave, type Save } from "@/backend/save/saveFileData";
-import { saveLoadingErrorToI18nString, type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { createUrlFromSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
+import { saveLoadingErrorToI18nString } from "@/backend/save/saveLoadingError";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 
 import { downloadBlob } from "@/utils/downloadBlob";
@@ -17,7 +19,7 @@ import { renderMarkdownInline } from "@/utils/markdown";
 
 import i18n from "@/i18n";
 
-import { type INotificationManager } from "./notificationManager";
+import type { INotificationManager } from "./notificationManager";
 
 import collapseIconPath from "@assets/icons/collapse.webp";
 import downloadIconPath from "@assets/icons/download.webp";

@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Effect } from "@babylonjs/core/Materials/effect";
+import type { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import { type HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 export const maxShadowCastingSpheres = 8;
 

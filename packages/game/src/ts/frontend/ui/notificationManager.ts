@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { ISoundPlayer } from "../audio/soundPlayer";
-import { Notification, type NotificationIntent, type NotificationOrigin } from "./notification";
+import { Notification } from "./notification";
+import type { NotificationIntent, NotificationOrigin } from "./notification";
 
 export interface INotificationManager {
     update(deltaSeconds: number): void;

@@ -15,29 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type Camera } from "@babylonjs/core/Cameras/camera";
-import { type Material } from "@babylonjs/core/Materials/material";
-import { type TransformNode } from "@babylonjs/core/Meshes";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Camera } from "@babylonjs/core/Cameras/camera";
+import type { Material } from "@babylonjs/core/Materials/material";
+import type { TransformNode } from "@babylonjs/core/Meshes";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import {
-    type TelluricPlanetModel,
-    type TelluricSatelliteModel,
-    type TerrainSettings,
-} from "@cosmos-journeyer/universe-model";
+import type { TelluricPlanetModel, TelluricSatelliteModel, TerrainSettings } from "@cosmos-journeyer/universe-model";
 
-import { type Cullable } from "@/frontend/helpers/cullable";
+import type { Cullable } from "@/frontend/helpers/cullable";
 
 import { Settings } from "@/settings";
 
-import { type ITerrainSystem } from "../system/terrainSystem";
-import { type BuildChunkInput } from "../system/terrainTaskInputs";
-import { getChunkChildIndices, type ChunkIndices } from "./chunkIndices";
-import { type FaceIndex } from "./faceIndex";
-import { type LodUpdateContext } from "./lodUpdateContext";
+import type { ITerrainSystem } from "../system/terrainSystem";
+import type { BuildChunkInput } from "../system/terrainTaskInputs";
+import { getChunkChildIndices } from "./chunkIndices";
+import type { ChunkIndices } from "./chunkIndices";
+import type { FaceIndex } from "./faceIndex";
+import type { LodUpdateContext } from "./lodUpdateContext";
 import type { IScatteringSystem } from "./scatteringSystem";
 import { TerrainChunkMesh } from "./terrainChunkMesh";
-import { TerrainQuadTreeNode, type TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
+import { TerrainQuadTreeNode } from "./terrainQuadTreeNode";
+import type { TerrainQuadTreeChildren } from "./terrainQuadTreeNode";
 
 const splitScreenSpaceErrorThreshold = 32;
 const mergeScreenSpaceErrorThreshold = 16;

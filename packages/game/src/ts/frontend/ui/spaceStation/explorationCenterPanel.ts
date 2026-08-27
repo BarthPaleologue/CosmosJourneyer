@@ -17,18 +17,18 @@
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
-import { type EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { type Player } from "@/frontend/player/player";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 
 import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
-import { type INotificationManager } from "../notificationManager";
+import type { INotificationManager } from "../notificationManager";
 import { DiscoveryDetails } from "./discoveryDetails";
 
 const ExplorationCenterFilter = {

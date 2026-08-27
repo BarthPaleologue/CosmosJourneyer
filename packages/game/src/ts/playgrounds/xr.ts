@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ArcRotateCamera, DirectionalLight, type TransformNode } from "@babylonjs/core";
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { ArcRotateCamera, DirectionalLight } from "@babylonjs/core";
+import type { TransformNode } from "@babylonjs/core";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import {
@@ -26,9 +27,9 @@ import {
     generateMengerSpongeModel,
     generateSierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-generation";
-import { type ProceduralRingsModel } from "@cosmos-journeyer/universe-model";
+import type { ProceduralRingsModel } from "@cosmos-journeyer/universe-model";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";

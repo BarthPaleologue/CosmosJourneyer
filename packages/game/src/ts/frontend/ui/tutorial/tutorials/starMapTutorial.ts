@@ -19,9 +19,10 @@ import type AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import { safeParseSave, type Save } from "@/backend/save/saveFileData";
-import { type SaveLoadingError } from "@/backend/save/saveLoadingError";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import { safeParseSave } from "@/backend/save/saveFileData";
+import type { Save } from "@/backend/save/saveFileData";
+import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import {
     axisCompositeToString,
@@ -38,7 +39,7 @@ import { escapeMarkdown, renderMarkdownBlock, renderMarkdownInline } from "@/uti
 import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
-import { type Tutorial } from "./tutorial";
+import type { Tutorial } from "./tutorial";
 
 import controlsImgSrc from "@assets/tutorials/starMapTutorial/controls.webp";
 import coverImgSrc from "@assets/tutorials/starMapTutorial/cover.webp";

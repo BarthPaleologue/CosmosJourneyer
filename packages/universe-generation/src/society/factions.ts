@@ -1,4 +1,5 @@
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Faction, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 

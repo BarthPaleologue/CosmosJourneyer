@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { type AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { StarSystemCoordinatesSchema } from "@cosmos-journeyer/universe-model";
 
@@ -23,7 +23,7 @@ import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaed
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";

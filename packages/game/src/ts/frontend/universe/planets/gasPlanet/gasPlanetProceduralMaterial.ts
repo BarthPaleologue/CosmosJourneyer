@@ -19,9 +19,9 @@ import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type GasPlanetProceduralColorPalette } from "@cosmos-journeyer/universe-model";
+import type { GasPlanetProceduralColorPalette } from "@cosmos-journeyer/universe-model";
 
 import {
     setStellarObjectUniforms,

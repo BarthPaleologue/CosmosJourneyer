@@ -18,12 +18,10 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import {
-    getDiscoveryScannerSpec,
-    type SerializedDiscoveryScanner,
-} from "@/backend/spaceship/serializedComponents/discoveryScanner";
+import { getDiscoveryScannerSpec } from "@/backend/spaceship/serializedComponents/discoveryScanner";
+import type { SerializedDiscoveryScanner } from "@/backend/spaceship/serializedComponents/discoveryScanner";
 
-import { type CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
+import type { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 
 export class DiscoveryScanner {
     readonly type;

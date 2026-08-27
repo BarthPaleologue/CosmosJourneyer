@@ -17,9 +17,9 @@
 
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ProceduralTexture } from "@babylonjs/core/Materials/Textures/Procedurals/proceduralTexture";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { type CloudsModel } from "@cosmos-journeyer/universe-model";
+import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
 import flatCloudLUT from "@shaders/textures/flatCloudLUT.glsl";
 

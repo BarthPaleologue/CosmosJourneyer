@@ -2,14 +2,14 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes";
+import type { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { type NoiseTextures } from "@/frontend/assets/textures/noises";
+import type { NoiseTextures } from "@/frontend/assets/textures/noises";
 import { rotate } from "@/frontend/helpers/transform";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { clamp } from "@/utils/math";
 

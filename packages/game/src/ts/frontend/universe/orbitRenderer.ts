@@ -15,15 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, Vector3, type Matrix } from "@babylonjs/core/Maths/math";
-import { type Mesh } from "@babylonjs/core/Meshes";
-import { type Scene } from "@babylonjs/core/scene";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
+import type { Matrix } from "@babylonjs/core/Maths/math";
+import type { Mesh } from "@babylonjs/core/Meshes";
+import type { Scene } from "@babylonjs/core/scene";
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 
 import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
-import { type CreateLinesMeshFunction } from "./lineRendering";
+import type { CreateLinesMeshFunction } from "./lineRendering";
 
 export class OrbitRenderer {
     private readonly orbitMeshes: Map<OrbitalObject, Mesh> = new Map();

@@ -16,11 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
-import { type Scene } from "@babylonjs/core/scene";
+import type { Scene } from "@babylonjs/core/scene";
 
-import { loadAudioAssets, type AudioAssets } from "./audio";
-import { type ILoadingProgressMonitor } from "./loadingProgressMonitor";
-import { loadRenderingAssets, type RenderingAssets } from "./renderingAssets";
+import { loadAudioAssets } from "./audio";
+import type { AudioAssets } from "./audio";
+import type { ILoadingProgressMonitor } from "./loadingProgressMonitor";
+import { loadRenderingAssets } from "./renderingAssets";
+import type { RenderingAssets } from "./renderingAssets";
 
 export type Assets = {
     readonly audio: Readonly<AudioAssets>;

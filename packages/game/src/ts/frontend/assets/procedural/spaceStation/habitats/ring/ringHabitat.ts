@@ -20,19 +20,19 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
-import { type PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { type Scene } from "@babylonjs/core/scene";
+import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import type { Scene } from "@babylonjs/core/scene";
 import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
 import type { RingHabitatModel } from "@cosmos-journeyer/universe-model";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
-import { type Textures } from "@/frontend/assets/textures";
+import type { Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import { type Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { Settings } from "@/settings";
 

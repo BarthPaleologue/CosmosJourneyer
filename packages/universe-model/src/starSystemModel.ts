@@ -17,16 +17,16 @@
 
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 
-import {
-    type AnomalyModel,
-    type OrbitalFacilityModel,
-    type OrbitalObjectModel,
-    type PlanetModel,
-    type StellarObjectModel,
+import type {
+    AnomalyModel,
+    OrbitalFacilityModel,
+    OrbitalObjectModel,
+    PlanetModel,
+    StellarObjectModel,
 } from "./orbitalObjects/index";
-import { type OrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
-import { type TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
-import { type StarSystemCoordinates } from "./starSystemCoordinates";
+import type { OrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
+import type { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
+import type { StarSystemCoordinates } from "./starSystemCoordinates";
 
 /**
  * Data model for a star system. It holds all the information necessary to generate and render a star system.

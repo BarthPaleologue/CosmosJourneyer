@@ -16,9 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import { type OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
 import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
 

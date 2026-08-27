@@ -18,11 +18,11 @@
 import type { Assert, DeepMutable, DeepReadonly, Result, StrictEqual } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { encodeBase64 } from "@/utils/base64";
 
-import { type SaveLoadingError } from "./saveLoadingError";
+import type { SaveLoadingError } from "./saveLoadingError";
 import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
 
 export const SaveSchema = SaveSchemaV2;

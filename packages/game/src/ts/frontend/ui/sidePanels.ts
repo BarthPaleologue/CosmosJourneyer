@@ -1,12 +1,12 @@
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import { type ISaveBackend } from "@/backend/save/saveBackend";
-import { type UniverseBackend } from "@/backend/universe/universeBackend";
+import type { ISaveBackend } from "@/backend/save/saveBackend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { type ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import { type MusicConductor } from "../audio/musicConductor";
-import { type INotificationManager } from "./notificationManager";
+import type { MusicConductor } from "../audio/musicConductor";
+import type { INotificationManager } from "./notificationManager";
 import { AboutPanel } from "./panels/aboutPanel";
 import { ContributePanel } from "./panels/contributePanel";
 import { CreditsPanel } from "./panels/creditsPanel";

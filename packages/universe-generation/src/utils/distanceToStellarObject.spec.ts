@@ -18,7 +18,8 @@
 import { ScaledEarthRadius } from "#/constants";
 import { astronomicalUnitToMeters, EarthMass, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getObjectModelById, type StarSystemModel } from "@cosmos-journeyer/universe-model";
+import { getObjectModelById } from "@cosmos-journeyer/universe-model";
+import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
 
 import { getDistancesToStellarObjects } from "./distanceToStellarObject";
