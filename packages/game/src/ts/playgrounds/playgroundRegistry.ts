@@ -45,6 +45,7 @@ import { createLandingPadScene } from "./landingPad";
 import { createLensFlareOcclusionScene } from "./lensFlareOcclusion";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
+import { createQrScanScene } from "./qrScan";
 import { createRingsScene } from "./rings";
 import { createRoverScene } from "./rover";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
@@ -126,6 +127,7 @@ export class PlaygroundRegistry {
         ["sphericalHeightFieldTerrain", createSphericalHeightFieldTerrainScene],
         ["cryptographicSecret", createCryptographicSecretScene],
         ["customSystem", createCustomSystemScene],
+        ["qrScan", createQrScanScene],
     ]);
 
     register(
