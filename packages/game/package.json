@@ -65,6 +65,7 @@
         "fflate": "^0.8.3",
         "i18next": "^26.4.0",
         "jsqr": "^1.4.0",
+        "manifold-3d": "3.4.0",
         "markdown-it": "^15.0.1",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
