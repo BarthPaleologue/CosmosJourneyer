@@ -33,6 +33,7 @@ import { renderMarkdownInline } from "@/utils/markdown";
 import type { ILoadingProgressMonitor } from "../assets/loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "../assets/objects/utils";
 import type { Transformable } from "../universe/architecture/transformable";
+import { Uplink } from "./uplink";
 
 export type PersistentEntityContent = Transformable;
 
@@ -47,7 +48,7 @@ export async function initContent(
         case "diaryDiscussion":
             return initDiaryDiscussion(content, scene);
         case "uplink":
-            return initUplink(content, scene);
+            return new Uplink(content, scene);
         default:
             return assertUnreachable(content);
     }
