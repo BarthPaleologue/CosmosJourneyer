@@ -71,6 +71,7 @@ import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createThrusterExhaustScene } from "./thrusterExhaust";
 import { createTriPlanarNormalScene } from "./triPlanarNormal";
 import { createTutorialScene } from "./tutorial";
+import { createUplinkScene } from "./uplink";
 import { createXrScene } from "./xr";
 
 export class PlaygroundRegistry {
@@ -130,6 +131,7 @@ export class PlaygroundRegistry {
         ["customSystem", createCustomSystemScene],
         ["qrScan", createQrScanScene],
         ["diary", createDiaryScene],
+        ["uplink", createUplinkScene],
     ]);
 
     register(
