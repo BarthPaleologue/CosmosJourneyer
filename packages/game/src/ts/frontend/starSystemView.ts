@@ -46,6 +46,7 @@ import { CharacterInputs } from "@/frontend/controls/characterControls/character
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
@@ -236,6 +237,8 @@ export class StarSystemView implements View {
 
     private readonly depthRendererManager: DepthRendererManager;
 
+    private readonly clusteredLightingSystem: ClusteredLightingSystem;
+
     /**
      * Creates an empty star system view with a scene, a gui and a physics engine
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
@@ -276,6 +279,7 @@ export class StarSystemView implements View {
         this.scene = scene;
         this.scene.skipPointerMovePicking = true;
         this.scene.autoClear = false;
+        this.clusteredLightingSystem = new ClusteredLightingSystem(this.scene);
 
         this.physicsEngine = physicsEngine;
 
@@ -505,6 +509,9 @@ export class StarSystemView implements View {
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.terrainSystem.reset();
             this.postProcessManager.reset();
+            for (const facility of this.starSystem.getOrbitalFacilities()) {
+                this.clusteredLightingSystem.unregisterRegion(facility);
+            }
             this.starSystem.dispose();
             this.targetCursorLayer.reset();
             this.spaceStationLayer.reset();
@@ -517,6 +524,10 @@ export class StarSystemView implements View {
             this.scene,
             this.progressMonitor,
         );
+
+        for (const facility of this.starSystem.getOrbitalFacilities()) {
+            this.clusteredLightingSystem.registerRegion(facility);
+        }
 
         const shipMesh = this.spaceshipControls?.getSpaceship();
         if (shipMesh !== undefined) {
@@ -756,11 +767,14 @@ export class StarSystemView implements View {
                 this.notificationManager,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.clusteredLightingSystem.registerRegion(spaceship);
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
+            this.clusteredLightingSystem.unregisterRegion(oldSpaceship);
             this.spaceshipControls.reset();
             this.spaceshipControls.setSpaceship(spaceship);
             oldSpaceship.dispose(this.soundPlayer);
+            this.clusteredLightingSystem.registerRegion(spaceship);
         }
 
         if (this.characterControls === null) {

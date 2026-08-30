@@ -25,6 +25,7 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
@@ -49,6 +50,8 @@ export async function createFlightDemoScene(
     const notificationManager = new NotificationManagerMock();
 
     const ship = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(ship.getSpaceship());
 
     const camera = ship.getActiveCamera();
     camera.minZ = 0.1;

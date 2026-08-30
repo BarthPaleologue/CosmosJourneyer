@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
+import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh, TransformNode } from "@babylonjs/core/Meshes";
@@ -39,6 +39,7 @@ import { AudioMasks } from "@/frontend/audio/audioMasks";
 import type { ISoundInstance } from "@/frontend/audio/soundInstance";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
+import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -68,7 +69,7 @@ type SoundInstances = {
     thruster: ISoundInstance;
 };
 
-export class Spaceship implements Transformable, Targetable {
+export class Spaceship implements Transformable, Targetable, ClusteredLightingRegion {
     readonly shipType: ShipType;
 
     readonly id: string;
@@ -139,8 +140,6 @@ export class Spaceship implements Transformable, Targetable {
     readonly onAutoPilotEngaged = new Observable<void>();
 
     readonly boundingExtent: Vector3;
-
-    readonly lightContainer: ClusteredLightContainer;
 
     public static async New(
         serializedSpaceShip: DeepReadonly<SerializedSpaceship>,
@@ -238,12 +237,9 @@ export class Spaceship implements Transformable, Targetable {
         this.aggregate.body.setCollisionCallbackEnabled(true);
         this.collisionObservable = this.aggregate.body.getCollisionObservable();
 
-        this.lightContainer = new ClusteredLightContainer("spaceshipLightContainer", [], scene);
-
         for (const child of this.frame.getChildMeshes()) {
             if (child.name.includes("mainThruster")) {
                 const mainThruster = new Thruster(child, this.frame.forward.negate(), this.aggregate);
-                this.lightContainer.addLight(mainThruster.light);
                 this.mainThrusters.push(mainThruster);
                 continue;
             }
@@ -301,6 +297,10 @@ export class Spaceship implements Transformable, Targetable {
 
     public getBoundingRadius(): number {
         return this.boundingExtent.length() / 2;
+    }
+
+    public getLights(): ReadonlyArray<Light> {
+        return this.mainThrusters.map((thruster) => thruster.light);
     }
 
     public getTypeName(): string {
@@ -947,8 +947,6 @@ export class Spaceship implements Transformable, Targetable {
             thruster.dispose();
         });
         this.mainThrusters.length = 0;
-        this.lightContainer.dispose();
-
         this.spaceDots.dispose();
         this.hyperSpaceTunnel.dispose();
         this.aggregate.dispose();

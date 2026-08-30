@@ -28,6 +28,7 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
@@ -91,6 +92,8 @@ export async function createSpaceStationScene(
     );
 
     const spaceStation = new SpaceStation(spaceStationModel, assets, scene);
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(spaceStation);
 
     const landingBay = spaceStation.landingBays[0];
     if (landingBay === undefined) {

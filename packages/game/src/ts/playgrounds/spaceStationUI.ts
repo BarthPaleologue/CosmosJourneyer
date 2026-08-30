@@ -26,6 +26,7 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { Player } from "@/frontend/player/player";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
@@ -72,6 +73,8 @@ export async function createSpaceStationUIScene(
         soundPlayer,
         getPhysicsEngineV2(scene),
     );
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(spaceship);
     player.instancedSpaceships.push(spaceship);
 
     const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);

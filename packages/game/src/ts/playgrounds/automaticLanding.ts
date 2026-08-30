@@ -34,6 +34,7 @@ import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -60,6 +61,8 @@ export async function createAutomaticLandingScene(
     const soundPlayer = new SoundPlayerMock();
 
     const ship = await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene));
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(ship);
 
     const initShipTransform = (): void => {
         ship.getTransform().position.copyFromFloats(

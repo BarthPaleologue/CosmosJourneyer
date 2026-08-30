@@ -28,6 +28,7 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
@@ -93,6 +94,8 @@ export async function createSpaceElevatorScene(
     );
 
     const spaceElevator = new SpaceElevator(spaceElevatorModel, assets, scene);
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(spaceElevator);
 
     const landingBay = spaceElevator.landingBays[0];
     if (landingBay === undefined) {
