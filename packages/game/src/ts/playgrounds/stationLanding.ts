@@ -127,10 +127,12 @@ export async function createStationLandingScene(
     new DirectionalLight("sun", new Vector3(-1, -1, 1).normalize(), scene);
     new GlowLayer("glow", scene);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    clusteredLightingSystem.update(camera);
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         shipControls.update(deltaSeconds);
         spaceStation.update([], camera.globalPosition, deltaSeconds);
+        clusteredLightingSystem.update(camera);
     });
 
     return scene;

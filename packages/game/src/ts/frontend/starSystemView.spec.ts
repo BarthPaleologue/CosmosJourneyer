@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -178,6 +179,51 @@ describe("StarSystemView", () => {
         expect(clusteredLightingSystem.registerRegion).toHaveBeenCalledWith(newFacility);
         expect(clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder[0]).toBeLessThan(
             oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+        );
+    });
+
+    it("updates clustered lighting after star system positions", () => {
+        const camera = {};
+        const expectedError = new Error("Stop after clustered lighting update");
+        const starSystem = {
+            gravitySystem: { getLastComputedForce: (): Vector3 => Vector3.Down() },
+            update: vi.fn(),
+        };
+        const clusteredLightingSystem = {
+            update: vi.fn((): never => {
+                throw expectedError;
+            }),
+        };
+        const activeControls = {
+            getActiveCamera: (): object => camera,
+            update: vi.fn(),
+        };
+        const context = {
+            _isLoadingSystem: false,
+            activeControls,
+            characterControls: {
+                avatar: {
+                    aggregate: { body: {} },
+                    getTransform: () => ({ up: Vector3.Up() }),
+                },
+            },
+            clusteredLightingSystem,
+            getStarSystem: () => starSystem,
+            scene: { activeCamera: camera },
+            spaceshipControls: {},
+            starSystem,
+            terrainSystem: { update: vi.fn() },
+        } as unknown as StarSystemView;
+        const starSystemViewPrototype = StarSystemView.prototype as unknown as {
+            updateBeforeRender(this: StarSystemView, deltaSeconds: number): void;
+        };
+
+        expect(() => {
+            starSystemViewPrototype.updateBeforeRender.call(context, 1);
+        }).toThrow(expectedError);
+        expect(clusteredLightingSystem.update).toHaveBeenCalledWith(camera);
+        expect(starSystem.update.mock.invocationCallOrder[0]).toBeLessThan(
+            clusteredLightingSystem.update.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
         );
     });
 });

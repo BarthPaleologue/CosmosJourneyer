@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
@@ -31,6 +32,7 @@ import { ClusteredLightingSystem } from "./clusteredLightingSystem";
 describe("ClusteredLightingSystem", () => {
     let engine: NullEngine;
     let scene: Scene;
+    let camera: FreeCamera;
     let system: ClusteredLightingSystem | null;
 
     beforeEach(() => {
@@ -42,6 +44,8 @@ describe("ClusteredLightingSystem", () => {
         caps.blendFloat = true;
 
         scene = new Scene(engine);
+        camera = new FreeCamera("camera", Vector3.Zero(), scene);
+        camera.fov = 1;
         system = new ClusteredLightingSystem(scene);
     });
 
@@ -59,8 +63,10 @@ describe("ClusteredLightingSystem", () => {
         return container;
     };
 
-    const createRegion = (name: string, lights: ReadonlyArray<Light>): ClusteredLightingRegion => {
+    const createRegion = (name: string, lights: ReadonlyArray<Light>, distance = 0): ClusteredLightingRegion => {
         const transform = new TransformNode(`${name}Transform`, scene);
+        transform.position.x = distance;
+        transform.computeWorldMatrix(true);
         return {
             getTransform: () => transform,
             getBoundingRadius: () => 1,
@@ -69,35 +75,111 @@ describe("ClusteredLightingSystem", () => {
     };
 
     const createLight = (name: string): PointLight => {
-        const light = new PointLight(name, Vector3.Zero(), scene, true);
-        light.setEnabled(false);
-        return light;
+        return new PointLight(name, Vector3.Zero(), scene, true);
     };
 
-    it("registers every light and enables it", () => {
+    const setRegionDistance = (region: ClusteredLightingRegion, distance: number): void => {
+        region.getTransform().position.x = distance;
+        region.getTransform().computeWorldMatrix(true);
+    };
+
+    it("registers a region inactive", () => {
         const lights = [createLight("first"), createLight("second")];
         const region = createRegion("station", lights);
 
         system?.registerRegion(region);
 
-        expect(getContainer().lights).toEqual(lights);
-        expect(lights.every((light) => light.isEnabled())).toBe(true);
+        expect(getContainer().lights).toEqual([]);
+        expect(lights.every((light) => !light.isEnabled())).toBe(true);
     });
 
-    it("does not register a region twice", () => {
+    it("activates a nearby region without duplicating its lights", () => {
         const light = createLight("light");
         const region = createRegion("station", [light]);
 
         system?.registerRegion(region);
         system?.registerRegion(region);
+        system?.update(camera);
+        system?.update(camera);
 
         expect(getContainer().lights).toEqual([light]);
+        expect(light.isEnabled()).toBe(true);
     });
 
-    it("unregisters every light, disables it, and ignores repeated unregisters", () => {
+    it("deactivates a region that becomes too small on screen", () => {
         const lights = [createLight("first"), createLight("second")];
         const region = createRegion("station", lights);
         system?.registerRegion(region);
+        system?.update(camera);
+
+        setRegionDistance(region, 1_000);
+        system?.update(camera);
+
+        expect(getContainer().lights).toEqual([]);
+        expect(lights.every((light) => !light.isEnabled())).toBe(true);
+    });
+
+    it("applies hysteresis around the activation threshold", () => {
+        const light = createLight("light");
+        const region = createRegion("station", [light], 1_000);
+        system?.registerRegion(region);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(false);
+
+        setRegionDistance(region, 100);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(true);
+
+        setRegionDistance(region, 450);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(true);
+
+        setRegionDistance(region, 1_000);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(false);
+
+        setRegionDistance(region, 450);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(false);
+
+        setRegionDistance(region, 100);
+        system?.update(camera);
+        expect(light.isEnabled()).toBe(true);
+    });
+
+    it("activates only regions that are large enough on screen", () => {
+        const nearLight = createLight("nearLight");
+        const farLight = createLight("farLight");
+        const nearRegion = createRegion("near", [nearLight], 100);
+        const farRegion = createRegion("far", [farLight], 1_000);
+        system?.registerRegion(nearRegion);
+        system?.registerRegion(farRegion);
+
+        system?.update(camera);
+        expect(getContainer().lights).toEqual([nearLight]);
+
+        setRegionDistance(nearRegion, 1_000);
+        setRegionDistance(farRegion, 100);
+        system?.update(camera);
+        expect(getContainer().lights).toEqual([farLight]);
+    });
+
+    it("activates a region when the camera is inside its bounding sphere", () => {
+        const light = createLight("light");
+        const region = createRegion("station", [light]);
+        system?.registerRegion(region);
+
+        system?.update(camera);
+
+        expect(getContainer().lights).toEqual([light]);
+        expect(light.isEnabled()).toBe(true);
+    });
+
+    it("unregisters an active region and ignores repeated unregisters", () => {
+        const lights = [createLight("first"), createLight("second")];
+        const region = createRegion("station", lights);
+        system?.registerRegion(region);
+        system?.update(camera);
 
         system?.unregisterRegion(region);
         system?.unregisterRegion(region);
@@ -106,13 +188,30 @@ describe("ClusteredLightingSystem", () => {
         expect(lights.every((light) => !light.isEnabled())).toBe(true);
     });
 
-    it("can register a region again after unregistering it", () => {
+    it("unregisters an inactive region without touching the container", () => {
+        const light = createLight("light");
+        const region = createRegion("station", [light], 1_000);
+
+        system?.registerRegion(region);
+        system?.unregisterRegion(region);
+
+        expect(getContainer().lights).toEqual([]);
+        expect(light.isEnabled()).toBe(false);
+    });
+
+    it("can reactivate a region after unregistering and registering it again", () => {
         const light = createLight("light");
         const region = createRegion("station", [light]);
 
         system?.registerRegion(region);
+        system?.update(camera);
         system?.unregisterRegion(region);
         system?.registerRegion(region);
+
+        expect(getContainer().lights).toEqual([]);
+        expect(light.isEnabled()).toBe(false);
+
+        system?.update(camera);
 
         expect(getContainer().lights).toEqual([light]);
         expect(light.isEnabled()).toBe(true);
@@ -122,6 +221,7 @@ describe("ClusteredLightingSystem", () => {
         const light = createLight("light");
         const region = createRegion("station", [light]);
         system?.registerRegion(region);
+        system?.update(camera);
 
         system?.dispose();
         system = null;
@@ -138,6 +238,7 @@ describe("ClusteredLightingSystem", () => {
 
         system?.registerRegion(createRegion("station", [stationLight]));
         system?.registerRegion(createRegion("spaceship", [spaceshipLight]));
+        system?.update(camera);
 
         const containers = scene.lights.filter((light) => light instanceof ClusteredLightContainer);
         expect(containers).toHaveLength(1);

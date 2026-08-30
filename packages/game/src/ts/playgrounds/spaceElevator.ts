@@ -146,8 +146,9 @@ export async function createSpaceElevatorScene(
     lookAt(defaultControls.getTransform(), spaceElevator.getTransform().position, scene.useRightHandedSystem);
 
     defaultControls.getTransform().setParent(spaceElevator.getTransform());
+    clusteredLightingSystem.update(camera);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         elapsedSeconds += deltaSeconds;
 
@@ -167,6 +168,7 @@ export async function createSpaceElevatorScene(
             transform.computeWorldMatrix(true);
         }
         spaceElevator.update([planetImpostor], cameraWorldPosition, deltaSeconds);
+        clusteredLightingSystem.update(camera);
     });
 
     return scene;

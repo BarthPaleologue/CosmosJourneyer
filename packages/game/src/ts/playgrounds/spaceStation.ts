@@ -108,7 +108,8 @@ export async function createSpaceStationScene(
 
     new GlowLayer("glow", scene);
 
-    scene.onBeforePhysicsObservable.add(() => {
+    clusteredLightingSystem.update(camera);
+    scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
         defaultControls.update(deltaSeconds);
@@ -116,6 +117,7 @@ export async function createSpaceStationScene(
         const cameraWorldPosition = camera.globalPosition;
 
         spaceStation.update([], cameraWorldPosition, deltaSeconds);
+        clusteredLightingSystem.update(camera);
     });
 
     return scene;

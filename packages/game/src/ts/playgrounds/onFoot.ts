@@ -260,6 +260,7 @@ export async function createOnFootScene(
         }
     });
 
+    clusteredLightingSystem.update(activeControls.getActiveCamera());
     scene.onBeforeRenderObservable.add(() => {
         if (activeControls.getActiveCamera() !== scene.activeCamera) {
             scene.activeCamera?.detachControl();
@@ -275,6 +276,7 @@ export async function createOnFootScene(
         shipControls.update(deltaSeconds);
         interactionSystem.update(deltaSeconds);
         interactionLayer.update(deltaSeconds);
+        clusteredLightingSystem.update(activeControls.getActiveCamera());
     });
 
     return scene;

@@ -21,6 +21,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
+export const DefaultMinProjectedDiameter = 0.005;
+
 export function getProjectedDiameter01(
     position: Vector3,
     radius: number,
@@ -46,7 +48,7 @@ export function getProjectedDiameter01(
 export function isSizeOnScreenEnough(
     object: HasBoundingSphere & Transformable,
     camera: Camera,
-    threshold = 0.005,
+    threshold = DefaultMinProjectedDiameter,
 ): boolean {
     const angularSize = getProjectedDiameter01(
         object.getTransform().getAbsolutePosition(),
