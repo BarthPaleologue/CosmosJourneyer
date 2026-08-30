@@ -90,9 +90,11 @@ export async function createFlightDemoScene(
 
     enableShadows(sun, new DepthRendererManager(scene), { maxZ: 3e3 });
 
+    clusteredLightingSystem.update(camera);
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         ship.update(deltaSeconds);
+        clusteredLightingSystem.update(camera);
     });
 
     return scene;

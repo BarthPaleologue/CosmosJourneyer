@@ -976,6 +976,7 @@ export class StarSystemView implements View {
         activeControls.update(deltaSeconds);
 
         starSystem.update(deltaSeconds, this.terrainSystem);
+        this.clusteredLightingSystem.update(activeControls.getActiveCamera());
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
             activeControls.getTransform().getAbsolutePosition(),

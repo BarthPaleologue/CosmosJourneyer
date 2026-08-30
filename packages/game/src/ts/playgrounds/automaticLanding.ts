@@ -118,12 +118,14 @@ export async function createAutomaticLandingScene(
 
     engageLanding();
 
+    clusteredLightingSystem.update(camera);
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
 
         ship.update(deltaSeconds);
 
         defaultControls.update(deltaSeconds);
+        clusteredLightingSystem.update(camera);
     });
 
     document.addEventListener("keydown", (event) => {
