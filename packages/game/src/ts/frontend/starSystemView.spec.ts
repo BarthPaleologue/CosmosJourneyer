@@ -22,6 +22,7 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { StarSystemController } from "@/frontend/universe/starSystemController";
 
 import { StarSystemView } from "./starSystemView";
 
@@ -56,9 +57,14 @@ describe("StarSystemView", () => {
             reset: vi.fn(),
             setSpaceship: vi.fn(),
         };
+        const clusteredLightingSystem = {
+            registerRegion: vi.fn(),
+            unregisterRegion: vi.fn(),
+        };
         const context = {
             assets: {},
             characterControls: {},
+            clusteredLightingSystem,
             defaultControls: { getCameras: () => [] },
             interactionSystem: { register: vi.fn() },
             physicsEngine: {},
@@ -87,6 +93,8 @@ describe("StarSystemView", () => {
         expect(player.instancedSpaceships).toEqual([spaceship]);
         expect(nextPlayer.serializedSpaceships).toEqual([nextSpaceshipSerialized]);
         expect(spaceshipControls.setSpaceship).toHaveBeenCalledWith(spaceship);
+        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledWith(oldSpaceship);
+        expect(clusteredLightingSystem.registerRegion).toHaveBeenCalledWith(spaceship);
         expect(oldSpaceship.dispose).toHaveBeenCalled();
     });
 
@@ -128,5 +136,48 @@ describe("StarSystemView", () => {
         expect(player.serializedSpaceships).toEqual([currentSpaceshipSerialized]);
         expect(player.instancedSpaceships).toEqual([]);
         expect(nextPlayer.serializedSpaceships).toEqual([nextSpaceshipSerialized]);
+    });
+
+    it("rewires facility lights before disposing the previous star system", async () => {
+        const oldFacility = {};
+        const newFacility = {};
+        const oldStarSystem = {
+            dispose: vi.fn(),
+            getOrbitalFacilities: (): ReadonlyArray<object> => [oldFacility],
+        };
+        const newStarSystem = {
+            getOrbitalFacilities: () => [newFacility],
+            stellarLightSystem: { addShadowCaster: vi.fn() },
+        } as unknown as StarSystemController;
+        vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(newStarSystem);
+
+        const clusteredLightingSystem = {
+            registerRegion: vi.fn(),
+            unregisterRegion: vi.fn(),
+        };
+        const context = {
+            _isLoadingSystem: false,
+            assets: {},
+            characterControls: null,
+            clusteredLightingSystem,
+            loader: {},
+            postProcessManager: { reset: vi.fn() },
+            progressMonitor: {},
+            scene: {},
+            spaceStationLayer: { reset: vi.fn() },
+            spaceshipControls: null,
+            starSystem: oldStarSystem,
+            targetCursorLayer: { reset: vi.fn() },
+            terrainSystem: { reset: vi.fn() },
+        } as unknown as StarSystemView;
+
+        await StarSystemView.prototype.loadStarSystem.call(context, {} as never);
+
+        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledWith(oldFacility);
+        expect(oldStarSystem.dispose).toHaveBeenCalledOnce();
+        expect(clusteredLightingSystem.registerRegion).toHaveBeenCalledWith(newFacility);
+        expect(clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder[0]).toBeLessThan(
+            oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+        );
     });
 });

@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
-import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
@@ -66,8 +65,6 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     readonly targetInfo: TargetInfo;
 
     private readonly landingPadManager: LandingPadManager;
-
-    private readonly lightContainer: ClusteredLightContainer;
 
     constructor(model: DeepReadonly<SpaceStationModel>, assets: RenderingAssets, scene: Scene) {
         this.model = model;
@@ -119,11 +116,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
             minDistance: this.getBoundingRadius() * 6.0,
             maxDistance: 0.0,
         };
-
-        this.lightContainer = new ClusteredLightContainer(`${this.name}_lightContainer`, this.getLights(), scene);
     }
 
-    getLights(): Array<Light> {
+    getLights(): ReadonlyArray<Light> {
         return this.sections.flatMap((section) => section.getLights());
     }
 
@@ -210,7 +205,6 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     dispose(): void {
-        this.lightContainer.dispose();
         for (const section of this.sections) {
             section.dispose();
         }

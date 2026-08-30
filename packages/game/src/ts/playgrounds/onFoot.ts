@@ -43,6 +43,7 @@ import type { Controls } from "@/frontend/controls";
 import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
 import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
@@ -153,6 +154,8 @@ export async function createOnFootScene(
 
     const soundPlayer = new SoundPlayerMock();
     const spaceship = await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene));
+    const clusteredLightingSystem = new ClusteredLightingSystem(scene);
+    clusteredLightingSystem.registerRegion(spaceship);
     spaceship.getTransform().position.copyFromFloats(16, 5, 16);
 
     const tts = new TtsMock();

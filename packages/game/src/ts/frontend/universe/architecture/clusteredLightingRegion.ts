@@ -15,15 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import type { Light } from "@babylonjs/core/Lights/light";
 
-import type { Cullable } from "@/frontend/helpers/cullable";
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
-import type { OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
-import type { Targetable } from "@/frontend/universe/architecture/targetable";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import type { HasBoundingSphere } from "./hasBoundingSphere";
+import type { Transformable } from "./transformable";
 
-export interface OrbitalFacilityBase<T extends OrbitalObjectType>
-    extends OrbitalObjectBase<T>, ManagesLandingPads, Cullable, Targetable, ClusteredLightingRegion {
-    getSubTargets(): ReadonlyArray<Targetable>;
+export interface ClusteredLightingRegion extends Transformable, HasBoundingSphere {
+    getLights(): ReadonlyArray<Light>;
 }
