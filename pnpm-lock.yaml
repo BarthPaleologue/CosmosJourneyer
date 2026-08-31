@@ -12,6 +12,9 @@ catalogs:
     '@next/eslint-plugin-next':
       specifier: ^16.3.3
       version: 16.3.3
+    '@types/node':
+      specifier: ^26.4.0
+      version: 26.4.0
     eslint:
       specifier: ^10.9.1
       version: 10.9.1
@@ -145,7 +148,7 @@ importers:
         version: 6.8.9
     devDependencies:
       '@types/node':
-        specifier: ^26.4.0
+        specifier: 'catalog:'
         version: 26.4.0
       concurrently:
         specifier: ^10.0.5
@@ -159,6 +162,31 @@ importers:
       electron-builder:
         specifier: ^26.15.3
         version: 26.15.3(electron-builder-squirrel-windows@26.15.3)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.9.1(jiti@2.7.0)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.65.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.4.0)(jsdom@30.0.1(@noble/hashes@2.3.0))(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))
+
+  packages/gaia-explorer:
+    dependencies:
+      '@cosmos-journeyer/typescript':
+        specifier: workspace:^
+        version: link:../typescript
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.4.0
       eslint:
         specifier: 'catalog:'
         version: 10.9.1(jiti@2.7.0)
@@ -400,7 +428,7 @@ importers:
         version: 0.35.4(@types/node@26.4.0)
     devDependencies:
       '@types/node':
-        specifier: ^26.4.0
+        specifier: 'catalog:'
         version: 26.4.0
       '@types/react':
         specifier: ^19.2.18
@@ -8764,7 +8792,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.4
       pathe: 2.0.3
-      picomatch: 4.0.5
+      picomatch: 4.0.7
       std-env: 4.2.0
       tinybench: 2.9.0
       tinyexec: 1.3.0
