@@ -176,7 +176,8 @@ export async function createRoverScene(
     setRoverActive();
 
     interactionSystem.register({
-        getPhysicsAggregate: () => rover.frame,
+        getTransform: () => rover.getTransform(),
+        getPhysicsShape: () => rover.frame.shape,
         getInteractions: () => [
             {
                 label: "Drive",
@@ -220,7 +221,8 @@ export async function createRoverScene(
             scene,
         );
         interactionSystem.register({
-            getPhysicsAggregate: () => boxAggregate,
+            getTransform: () => box,
+            getPhysicsShape: () => boxAggregate.shape,
             getInteractions: () => [
                 {
                     label: "spin",
