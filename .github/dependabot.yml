@@ -1,84 +1,40 @@
 version: 2
+
+multi-ecosystem-groups:
+  weekly-dependencies:
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "Europe/Paris"
+    patterns:
+      - "*"
+    multi-ecosystem-group: "weekly-dependencies"
     cooldown:
       semver-major-days: 14
-    groups:
-      babylonjs:
-        applies-to: "version-updates"
-        patterns:
-          - "@babylonjs/*"
-        exclude-patterns:
-          - "@babylonjs/havok"
-
-      production-minor-patch:
-        applies-to: "version-updates"
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
-
-      development-minor-patch:
-        applies-to: "version-updates"
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
 
   - package-ecosystem: "uv"
     directory: "/packages/gaia-explorer"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "Europe/Paris"
+    patterns:
+      - "*"
+    multi-ecosystem-group: "weekly-dependencies"
     cooldown:
       semver-major-days: 14
-    groups:
-      minor-patch:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
 
   - package-ecosystem: "cargo"
     directory: "/packages/terrain-generation"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "Europe/Paris"
+    patterns:
+      - "*"
+    multi-ecosystem-group: "weekly-dependencies"
     cooldown:
       semver-major-days: 14
-    groups:
-      minor-patch:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "Europe/Paris"
-    groups:
-      minor-patch:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
+    patterns:
+      - "*"
+    multi-ecosystem-group: "weekly-dependencies"
