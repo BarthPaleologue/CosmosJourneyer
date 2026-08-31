@@ -1,44 +1,37 @@
-# GaiaExplorer
+# Gaia Explorer
 
-GaiaExplorer is a lightweight Python project built with [uv](https://github.com/astral-sh/uv) that queries the ESA Gaia archive and transforms the returned stars into voxel-friendly spatial cubes.
+Source-only TypeScript library for querying the official [Gaia TAP service](https://gea.esac.esa.int/tap-server/tap), enriching its results through the official [SIMBAD TAP service](https://simbad.cds.unistra.fr/simbad/sim-tap), and transforming the resulting stellar data.
 
-## Features
+The package is consumed directly from `src/index.ts` by workspace tooling. It intentionally exposes no compiled build or executable: consumers compose the library operations needed by their universe-generation workflow.
 
-- Live ADQL queries against Gaia DR3 via [astroquery](https://astroquery.readthedocs.io/) and [Astropy](https://www.astropy.org/).
-- Configurable cubic grid resolution and exploration range in light years.
-- Automatic bucketing of stars into spatial cubes with deterministic identifiers.
-- Normalization of stellar positions inside each cube for easy rendering.
-- Dual output format: human-readable JSON and a compact gzip-compressed companion.
+Gaia uses asynchronous TAP jobs by default, while SIMBAD uses synchronous TAP queries. Both clients provide their official endpoint out of the box and accept an alternative endpoint, timeout, `fetch` implementation, and logger:
 
-## Usage
+```ts
+import { createGaiaClient, createSimbadClient } from "@cosmos-journeyer/gaia-explorer";
 
-```bash
-uv run gaia-explorer \
-  --output-json ./out/gaia_grid.json \
-  --cube-ly 5.0 \
-  --rmax-ly 50.0
+const logger = (message: string): void => console.info(message);
+const gaia = createGaiaClient({ logger });
+const simbad = createSimbadClient({ logger });
+
+const gaiaRows = await gaia.query({ radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 });
+if (!gaiaRows.success) {
+    console.error(gaiaRows.error);
+} else {
+    const metadata = await simbad.query(gaiaRows.value);
+    // Compose temperature resolution, classification, spatial binning and output as needed.
+}
 ```
 
-### Important arguments
-
-- `--cube-ly`: edge length of each cube in light years.
-- `--rmax-ly`: heliocentric radius (in light years) used to fetch stars from Gaia.
-- `--range-ly`: optional half-width of the explored cube (defaults to the query radius).
-- `--parallax-over-error-min`: minimum Gaia parallax signal-to-noise ratio (defaults to 10).
-- `--ruwe-max`: discard stars with RUWE larger than this value (defaults to 1.4).
-- `--temperature-min`: optionally drop cool stars below a given effective temperature.
-- `--limit`: apply an explicit `LIMIT` to the Gaia query when experimenting.
-
-Outputs are written to `out/` inside this project. The binary output is written next to the JSON file using the same base name with the `.json.gz` suffix unless `--binary-output` is provided.
-
-After generating a dataset you can validate it locally:
-
-```bash
-uv run gaia-explorer-validate
-```
-
-The validator checks that every star has a temperature and `nature`, that temperatures sit within plausible bounds, and that classifications use the supported categories.
+The offline integration test in `src/library.integration.spec.ts` demonstrates the complete public API path from the two catalog queries to a validated spatial dataset.
 
 ## Development
 
-This project follows uv's standard layout. Install uv and run `uv run gaia-explorer --help` to see the complete CLI reference. Because the tool queries the Gaia archive directly, make sure the execution environment has Internet access.
+Consumers that call Gaia or SIMBAD require Internet access; tests are offline and deterministic.
+
+```sh
+pnpm install
+pnpm --filter @cosmos-journeyer/gaia-explorer test:unit
+pnpm --filter @cosmos-journeyer/gaia-explorer typecheck
+pnpm --filter @cosmos-journeyer/gaia-explorer lint
+pnpm --filter @cosmos-journeyer/gaia-explorer format:check
+```

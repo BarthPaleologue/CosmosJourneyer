@@ -9,6 +9,7 @@ const projectConfigs = [
     "./packages/channel-packer/tsconfig.json",
     "./packages/desktop-electron/tsconfig.json",
     "./packages/game/tsconfig.json",
+    "./packages/gaia-explorer/tsconfig.json",
     "./packages/physics/tsconfig.json",
     "./packages/typescript/tsconfig.json",
     "./packages/universe-generation/tsconfig.json",

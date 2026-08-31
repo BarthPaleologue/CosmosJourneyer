@@ -40,7 +40,7 @@
         "electron-updater": "^6.8.9"
     },
     "devDependencies": {
-        "@types/node": "^26.4.0",
+        "@types/node": "catalog:",
         "concurrently": "^10.0.5",
         "cross-env": "^10.1.0",
         "electron": "^43.5.0",
