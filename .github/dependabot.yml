@@ -15,12 +15,8 @@ updates:
       - "*"
     multi-ecosystem-group: "weekly-dependencies"
     allow:
-      - dependency-type: "all"
-        update-types:
-          - "minor"
-          - "patch"
-    cooldown:
-      semver-major-days: 14
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "uv"
     directory: "/packages/gaia-explorer"
@@ -28,12 +24,8 @@ updates:
       - "*"
     multi-ecosystem-group: "weekly-dependencies"
     allow:
-      - dependency-type: "all"
-        update-types:
-          - "minor"
-          - "patch"
-    cooldown:
-      semver-major-days: 14
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "cargo"
     directory: "/packages/terrain-generation"
@@ -41,12 +33,8 @@ updates:
       - "*"
     multi-ecosystem-group: "weekly-dependencies"
     allow:
-      - dependency-type: "all"
-        update-types:
-          - "minor"
-          - "patch"
-    cooldown:
-      semver-major-days: 14
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -54,7 +42,5 @@ updates:
       - "*"
     multi-ecosystem-group: "weekly-dependencies"
     allow:
-      - dependency-type: "all"
-        update-types:
-          - "minor"
-          - "patch"
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
