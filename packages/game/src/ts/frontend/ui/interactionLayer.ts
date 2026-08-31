@@ -19,7 +19,7 @@ import "@babylonjs/core/Rendering/edgesRenderer";
 import "@babylonjs/core/Rendering/outlineRenderer";
 
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import { Settings } from "@/settings";
 
@@ -35,8 +35,8 @@ export class InteractionLayer {
 
     private readonly interactionSystem: InteractionSystem;
 
-    private bodyToFadeIn: PhysicsBody | null = null;
-    private readonly bodiesToFadeOut = new Set<PhysicsBody>();
+    private bodyToFadeIn: TransformNode | null = null;
+    private readonly bodiesToFadeOut = new Set<TransformNode>();
 
     private readonly overlayColor = { r: 0.5, g: 0.5, b: 1 };
     private readonly overlayAlpha = 0.2;
@@ -140,7 +140,7 @@ export class InteractionLayer {
         if (this.bodyToFadeIn === null) {
             return;
         }
-        const transform = this.bodyToFadeIn.transformNode;
+        const transform = this.bodyToFadeIn;
         if (!(transform instanceof AbstractMesh)) {
             return;
         }
@@ -165,10 +165,9 @@ export class InteractionLayer {
     }
 
     private updateFadeOut(deltaSeconds: number): void {
-        for (const body of this.bodiesToFadeOut) {
-            const transform = body.transformNode;
+        for (const transform of this.bodiesToFadeOut) {
             if (!(transform instanceof AbstractMesh)) {
-                this.bodiesToFadeOut.delete(body);
+                this.bodiesToFadeOut.delete(transform);
                 continue;
             }
 
@@ -177,7 +176,7 @@ export class InteractionLayer {
             if (transform.overlayAlpha <= 0) {
                 transform.renderOverlay = false;
                 transform.disableEdgesRendering();
-                this.bodiesToFadeOut.delete(body);
+                this.bodiesToFadeOut.delete(transform);
             }
         }
     }

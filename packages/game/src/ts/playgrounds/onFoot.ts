@@ -220,7 +220,8 @@ export async function createOnFootScene(
     document.body.appendChild(interactionLayer.root);
 
     interactionSystem.register({
-        getPhysicsAggregate: () => spaceship.aggregate,
+        getTransform: () => spaceship.getTransform(),
+        getPhysicsShape: () => spaceship.aggregate.shape,
         getInteractions: () => [
             {
                 label: "Pilot",
@@ -234,7 +235,8 @@ export async function createOnFootScene(
     });
 
     interactionSystem.register({
-        getPhysicsAggregate: () => roverResult.value.frame,
+        getTransform: () => rover.getTransform(),
+        getPhysicsShape: () => rover.frame.shape,
         getInteractions: () => [
             {
                 label: "Drive",

@@ -127,7 +127,8 @@ export async function createQrScanScene(
     document.body.appendChild(interactionLayer.root);
 
     interactionSystem.register({
-        getPhysicsAggregate: () => qrAggregate,
+        getTransform: () => qrAggregate.transformNode,
+        getPhysicsShape: () => qrAggregate.shape,
         getInteractions: () => [
             {
                 label: i18n.t("interactions:scan"),
