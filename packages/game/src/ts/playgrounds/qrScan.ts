@@ -42,7 +42,7 @@ import { InteractionLayer } from "@/frontend/ui/interactionLayer";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
-import i18n, { initI18n } from "@/i18n";
+import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
@@ -54,7 +54,7 @@ export async function createQrScanScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await initI18n();
+    const t = await initI18n();
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
     enablePointerLock(engine);
 
@@ -117,9 +117,14 @@ export async function createQrScanScene(
     enableShadows(light, new DepthRendererManager(scene));
 
     const soundPlayer = new SoundPlayerMock();
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        return Promise.resolve(interactions[0] ?? null);
-    });
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        async (interactions) => {
+            return Promise.resolve(interactions[0] ?? null);
+        },
+        t,
+    );
     interactionSystem.enableForCamera(characterControls.firstPersonCamera, 5);
     interactionSystem.enableForCamera(characterControls.thirdPersonCamera, 7);
 
@@ -127,10 +132,11 @@ export async function createQrScanScene(
     document.body.appendChild(interactionLayer.root);
 
     interactionSystem.register({
-        getPhysicsAggregate: () => qrAggregate,
+        getTransform: () => qrAggregate.transformNode,
+        getPhysicsShape: () => qrAggregate.shape,
         getInteractions: () => [
             {
-                label: i18n.t("interactions:scan"),
+                label: t("interactions:scan"),
                 perform: async (): Promise<void> => {
                     const camera = scene.activeCamera;
                     if (camera === null) {
@@ -140,7 +146,7 @@ export async function createQrScanScene(
                     const decodedText = await decodeQrCodeFromScreenshot(engine, camera);
                     scene.activeCamera?.detachControl();
                     document.exitPointerLock();
-                    await alertModal(decodedText ?? "No QR code found in the screenshot.", soundPlayer);
+                    await alertModal(decodedText ?? "No QR code found in the screenshot.", soundPlayer, t);
                     scene.activeCamera?.attachControl();
                 },
             },

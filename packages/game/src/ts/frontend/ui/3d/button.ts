@@ -23,8 +23,6 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { Interaction, Interactive } from "@/frontend/inputs/interaction/interactionSystem";
@@ -60,8 +58,8 @@ export class Button implements Transformable, Interactive {
         return this.mesh;
     }
 
-    public getPhysicsAggregate(): { body: PhysicsBody; shape: PhysicsShape } {
-        return this.aggregate;
+    public getPhysicsShape() {
+        return this.aggregate.shape;
     }
 
     public getInteractions(): Array<Interaction> {

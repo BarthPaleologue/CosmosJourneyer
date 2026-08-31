@@ -440,7 +440,8 @@ export class StarSystemView implements View {
                 this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
 
                 this.interactionSystem.register({
-                    getPhysicsAggregate: () => rover.frame,
+                    getTransform: () => rover.getTransform(),
+                    getPhysicsShape: () => rover.frame.shape,
                     getInteractions: () => [
                         {
                             label: this.t("interactions:drive", { vehicle: "Wolf Mk2" }),
@@ -736,7 +737,8 @@ export class StarSystemView implements View {
         this.targetCursorLayer.addObjects([spaceship]);
 
         this.interactionSystem.register({
-            getPhysicsAggregate: () => spaceship.aggregate,
+            getTransform: () => spaceship.getTransform(),
+            getPhysicsShape: () => spaceship.aggregate.shape,
             getInteractions: () => {
                 return [
                     {
