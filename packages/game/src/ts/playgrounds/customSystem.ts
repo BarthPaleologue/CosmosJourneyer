@@ -35,7 +35,7 @@ import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TerrainSystemGpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemGpu";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
@@ -80,7 +80,7 @@ export async function createCustomSystemScene(
     const havokPlugin = await enablePhysics(scene);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
-    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    const terrainSystemResult = TerrainSystemGpu.New(engine, Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
     }
