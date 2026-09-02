@@ -268,9 +268,6 @@ importers:
       squirrel-noise:
         specifier: ^1.0.0
         version: 1.0.0
-      terrain-generation:
-        specifier: workspace:^
-        version: link:../terrain-generation
       zod:
         specifier: 'catalog:'
         version: 4.5.4
@@ -320,9 +317,6 @@ importers:
       vite-plugin-glsl:
         specifier: ^1.6.1
         version: 1.6.1(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))
-      vite-plugin-wasm:
-        specifier: ^3.6.0
-        version: 3.6.0(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.4.0)(jsdom@30.0.1(@noble/hashes@2.3.0))(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))
@@ -341,8 +335,6 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.4.0)(jsdom@30.0.1(@noble/hashes@2.3.0))(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))
-
-  packages/terrain-generation: {}
 
   packages/typescript:
     devDependencies:
@@ -4186,11 +4178,6 @@ packages:
         optional: true
       esbuild:
         optional: true
-
-  vite-plugin-wasm@3.6.0:
-    resolution: {integrity: sha512-mL/QPziiIA4RAA6DkaZZzOstdwbW5jO4Vz7Zenj0wieKWBlNvIvX5L5ljum9lcUX0ShNfBgCNLKTjNkRVVqcsw==}
-    peerDependencies:
-      vite: ^2 || ^3 || ^4 || ^5 || ^6 || ^7 || ^8
 
   vite@8.2.2:
     resolution: {integrity: sha512-cFKLV/PRgAUlIRm5WjMjJ86jrftzpqcgH+Us+DS8mI3CDNiH30Whrz8uHL3+MOLPAgqbMBAqWdAHAphOAM+z/Q==}
@@ -8758,10 +8745,6 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   vite-plugin-glsl@1.6.1(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)):
-    dependencies:
-      vite: 8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)
-
-  vite-plugin-wasm@3.6.0(vite@8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)):
     dependencies:
       vite: 8.2.2(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)
 
