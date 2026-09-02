@@ -19,7 +19,7 @@ import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGener
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
-import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
+import { degreesToRadians, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { GasPlanetModel, Orbit, Rotation, StellarObjectModel } from "@cosmos-journeyer/universe-model";
@@ -113,8 +113,12 @@ export function generateGasPlanetModel(
         rotation,
         mass,
         atmosphere: {
-            pressure: EarthSeaLevelPressure,
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.5,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
         },
         rings,
         colorPalette: {

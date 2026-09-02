@@ -15,17 +15,22 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./blackHole";
-export * from "./atmosphere/constants";
-export * from "./atmosphere/gas";
-export * from "./atmosphere/rayleighScattering";
-export * from "./atmosphere/scaleHeight";
-export * from "./constants";
-export * from "./gravity";
-export * from "./orbit";
-export * from "./physics";
-export * from "./solarPanels";
-export * from "./stellarTypes";
-export * from "./thermodynamics";
-export * from "./unitConversions";
-export * from "./gasGiants";
+const UniversalGasConstant = 8.314_462_618;
+
+/** Computes the pressure scale height in metres. */
+export function computeAtmospherePressureScaleHeight(
+    temperature: number,
+    gravity: number,
+    meanMolecularWeight: number,
+): number {
+    return (UniversalGasConstant * temperature) / (meanMolecularWeight * gravity);
+}
+
+/** Computes the height at which a target pressure is reached. */
+export function getHeightForPressure(
+    targetPressure: number,
+    reference: Readonly<{ pressure: number; height: number }>,
+    scaleHeight: number,
+): number {
+    return reference.height - scaleHeight * Math.log(targetPressure / reference.pressure);
+}

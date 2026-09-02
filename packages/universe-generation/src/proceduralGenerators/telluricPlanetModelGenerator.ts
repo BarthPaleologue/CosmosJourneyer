@@ -102,14 +102,6 @@ export function generateTelluricPlanetModel(
         pressure = 0;
     }
 
-    const atmosphere: AtmosphereModel | null =
-        pressure > 0
-            ? {
-                  pressure,
-                  greenHouseEffectFactor: 0.5,
-              }
-            : null;
-
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
             temperature: body.blackBodyTemperature,
@@ -145,6 +137,26 @@ export function generateTelluricPlanetModel(
     if (ocean === null) {
         oceanCoverage /= 1.3;
     }
+
+    const atmosphere: AtmosphereModel | null =
+        pressure > 0
+            ? {
+                  seaLevelPressure: pressure,
+                  greenHouseEffectFactor: 0.5,
+                  gasMix:
+                      ocean === null
+                          ? [
+                                ["CO2", 0.95],
+                                ["N2", 0.04],
+                                ["Ar", 0.01],
+                            ]
+                          : [
+                                ["N2", 0.78],
+                                ["O2", 0.21],
+                                ["Ar", 0.01],
+                            ],
+              }
+            : null;
 
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =

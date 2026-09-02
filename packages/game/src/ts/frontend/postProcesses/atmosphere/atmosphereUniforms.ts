@@ -17,6 +17,16 @@
 
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import {
+    computeAtmospherePressureScaleHeight,
+    computeGravityAcceleration,
+    computeMeanMolecularWeight,
+    computeRayleighBetaRGB,
+    getHeightForPressure,
+    PresetBands,
+} from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { AtmosphereModel } from "@cosmos-journeyer/universe-model";
 
 import { Settings } from "@/settings";
 
@@ -86,11 +96,20 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, atmosphereThickness: number) {
+    constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
+        const meanMolecularWeight = computeMeanMolecularWeight(model.gasMix);
+        const gravity = computeGravityAcceleration(mass, planetBoundingRadius);
+        const rayleighScaleHeight = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
+        const atmosphereThickness = getHeightForPressure(
+            3.2e-2,
+            { pressure: model.seaLevelPressure, height: 0 },
+            rayleighScaleHeight,
+        );
+
         this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
-        this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
+        this.rayleighHeight = rayleighScaleHeight;
+        this.rayleighScatteringCoefficients = Vector3.FromArray(
+            computeRayleighBetaRGB(model.gasMix, model.seaLevelPressure, temperature, PresetBands.PHOTOPIC),
         );
 
         // https://playerunknownproductions.net/news/atmospheric-scattering

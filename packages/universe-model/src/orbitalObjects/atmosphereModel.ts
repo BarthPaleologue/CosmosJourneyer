@@ -15,14 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { GasMix } from "@cosmos-journeyer/physics";
+
 export type AtmosphereModel = {
     /**
-     * The pressure of the atmosphere in Pa
+     * The pressure of the atmosphere in Pa at sea level.
+     * For gas giants, this is 100000 Pa by definition.
      */
-    pressure: number;
+    seaLevelPressure: number;
 
     /**
      * The amount of greenhouse gases in the atmosphere (between 0 and 1)
      */
     greenHouseEffectFactor: number;
+
+    /** The gases and their mole/volume fractions. Fractions are normalized when used. */
+    gasMix: GasMix;
 };
