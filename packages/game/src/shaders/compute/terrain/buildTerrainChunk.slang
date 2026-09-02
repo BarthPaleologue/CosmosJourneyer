@@ -53,6 +53,10 @@ float3 displacedPosition(float x, float y) {
         params[12],
         params[13],
         params[14],
+        params[15],
+        params[16],
+        params[17],
+        params[18],
     };
     return unitPosition * (params[3] + terrainElevation(unitPosition, settings));
 }
@@ -65,14 +69,10 @@ float3 displacedPosition(float x, float y) {
 
     float x = float(id.x);
     float y = float(id.y);
-    float xLeft = max(x - 1.0, 0.0);
-    float xRight = min(x + 1.0, float(rowVertexCount - 1));
-    float yDown = max(y - 1.0, 0.0);
-    float yUp = min(y + 1.0, float(rowVertexCount - 1));
     float3 absolutePosition = displacedPosition(x, y);
     float3 chunkSpherePosition = normalize(float3(params[4], params[5], params[6])) * params[3];
-    float3 tangentX = displacedPosition(xRight, y) - displacedPosition(xLeft, y);
-    float3 tangentY = displacedPosition(x, yUp) - displacedPosition(x, yDown);
+    float3 tangentX = displacedPosition(x + 1.0, y) - displacedPosition(x - 1.0, y);
+    float3 tangentY = displacedPosition(x, y + 1.0) - displacedPosition(x, y - 1.0);
     float3 normal = normalize(cross(tangentY, tangentX));
     if (dot(normal, absolutePosition) < 0.0) {
         normal = -normal;

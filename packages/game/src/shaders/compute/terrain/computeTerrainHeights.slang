@@ -23,6 +23,10 @@
         params[6],
         params[7],
         params[8],
+        params[9],
+        params[10],
+        params[11],
+        params[12],
     };
     heights[id.x] = terrainElevation(unitPosition, settings);
 }
