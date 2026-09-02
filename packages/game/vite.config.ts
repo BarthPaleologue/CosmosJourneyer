@@ -4,9 +4,8 @@ import { fileURLToPath } from "url";
 
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig } from "vite";
-import type { Plugin } from "vite";
+import type { PluginOption } from "vite";
 import glsl from "vite-plugin-glsl";
-import wasm from "vite-plugin-wasm";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,12 +65,7 @@ export default defineConfig(({ mode }) => {
                 name: "cosmos-journeyer",
             }),
             glsl(),
-            wasm() as Plugin,
-        ],
-        worker: {
-            format: "es",
-            plugins: () => [wasm() as Plugin],
-        },
+        ] as Array<PluginOption>,
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],
         build: {
             outDir: "dist",
