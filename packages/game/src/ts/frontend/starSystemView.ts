@@ -690,7 +690,7 @@ export class StarSystemView implements View {
 
         this.postProcessManager.reset();
 
-        const maxZ = Settings.EARTH_RADIUS * 1e5;
+        const maxZ = 0;
 
         if (this.defaultControls === null) {
             this.defaultControls = new DefaultControls(this.scene);
