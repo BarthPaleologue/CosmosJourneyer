@@ -282,10 +282,10 @@ void main() {
     vec4 screenColor = texelFetch(textureSampler, texelCoord, 0);
     float depth = texelFetch(depthSampler, texelCoord, 0).r;
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);
-    vec3 viewDir = normalize(pixelWorldPosition - camera_position);
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);
+    vec3 viewDir = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
-    float sceneDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float sceneDistance = length(pixelWorldPosition - camera_position);
     float centralBodyDistance = computeCentralBodyDistance(viewDir, sceneDistance);
 
     vec4 baseColor = screenColor;

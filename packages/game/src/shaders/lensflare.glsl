@@ -25,15 +25,15 @@ uniform float aspectRatio;
 
 float projectDepth(vec3 worldPosition) {
     vec4 clip = camera_projection * camera_view * vec4(worldPosition, 1.0);
-#ifdef USE_REVERSE_DEPTHBUFFER
-    return (-clip.z + camera_near) / (camera_near + camera_far);
+#ifdef IS_NDC_HALF_ZRANGE
+    return clip.z / clip.w;
 #else
-    return (clip.z + camera_near) / (camera_near + camera_far);
+    return (clip.z / clip.w) * 0.5 + 0.5;
 #endif
 }
 
 float sampleVisibilityAtUV(vec2 sampleUV, float depthEpsilon) {
-    vec3 sampleWorldPosition = worldFromUV(sampleUV, camera_inverseProjection, camera_inverseView);
+    vec3 sampleWorldPosition = worldFromUV(sampleUV, 1.0, camera_inverseProjectionView);
     vec3 sampleRay = normalize(sampleWorldPosition - camera_position);
     float sphereEnterDistance;
     float sphereExitDistance;
@@ -49,7 +49,11 @@ float sampleVisibilityAtUV(vec2 sampleUV, float depthEpsilon) {
     }
 
     float sampleDepth = texture(depthSampler, sampleUV).r;
-    if (sampleDepth >= 0.9999) {
+#ifdef USE_REVERSE_DEPTHBUFFER
+    if (sampleDepth <= 0.0000001) {
+#else
+    if (sampleDepth >= 0.9999999) {
+#endif
         return 1.0;
     }
 
@@ -57,9 +61,9 @@ float sampleVisibilityAtUV(vec2 sampleUV, float depthEpsilon) {
     vec3 sphereHitPosition = camera_position + sampleRay * sphereHitDistance;
     float sphereHitDepth = projectDepth(sphereHitPosition);
 #ifdef USE_REVERSE_DEPTHBUFFER
-    return sampleDepth < sphereHitDepth - depthEpsilon ? 0.0 : 1.0;
-#else
     return sampleDepth > sphereHitDepth + depthEpsilon ? 0.0 : 1.0;
+#else
+    return sampleDepth < sphereHitDepth - depthEpsilon ? 0.0 : 1.0;
 #endif
 }
 
@@ -73,7 +77,7 @@ float computeOcclusionVisibility() {
 
     vec2 innerRadius = radius * 0.4;
     vec2 outerRadius = radius * 0.8;
-    float depthEpsilon = max(abs(frontDepth - clipPosition.z) * 2.0, 0.0025);
+    float depthEpsilon = max(abs(frontDepth - clipPosition.z) * 2.0, 0.0000001);
     vec2 sampleOffsets[13];
     sampleOffsets[0] = vec2(0.0);
     sampleOffsets[1] = vec2(-innerRadius.x, 0.0);
@@ -186,7 +190,7 @@ void main() {
         return;
     }
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, 1.0, camera_inverseProjectionView);
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);
 
     vec3 objectDirection = normalize(object_position - camera_position);
