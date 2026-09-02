@@ -19,8 +19,9 @@ import "@styles/index.css";
 
 import "@babylonjs/node-editor";
 
-import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
+import { PhysicsViewer, Tools, WebGPUEngine } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Inspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
@@ -31,6 +32,8 @@ import { renderQrCodeOverlay } from "./playgrounds/utils";
 
 declare const __DEV_SERVER_IP__: string | undefined;
 
+NodeMaterial.UseNativeShaderLanguageOfEngine = true;
+
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
 
@@ -39,7 +42,16 @@ canvas.height = window.innerHeight;
 
 const loadingScreen = new LoadingScreen(canvas);
 
-const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true });
+const engine = new WebGPUEngine(canvas, {
+    antialias: true,
+    useHighPrecisionMatrix: true,
+    doNotHandleContextLost: true,
+    twgslOptions: {
+        wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+        jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
+    },
+});
+await engine.initAsync();
 engine.useReverseDepthBuffer = true;
 engine.loadingScreen = loadingScreen;
 engine.displayLoadingUI();
