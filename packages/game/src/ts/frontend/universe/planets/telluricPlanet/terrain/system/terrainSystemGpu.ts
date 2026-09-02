@@ -15,6 +15,7 @@ import { Settings } from "@/settings";
 
 import { createScatteredInstances } from "../chunks/createScatteredInstances";
 import { assembleTerrainBuffers } from "./assembleTerrainBuffers";
+import { createTerrainComputeSettings } from "./terrainComputeSettings";
 import { makeTaskId } from "./terrainSystem";
 import type {
     ChunkId,
@@ -164,7 +165,11 @@ export class TerrainSystemGpu implements ITerrainSystem {
         const normals = this.createBuffer(byteLength);
         const radius = task.input.planetModel.radius;
         const chunkSize = (radius * 2) / 2 ** task.input.depth;
-        const settings = task.input.planetModel.terrainSettings;
+        const settings = createTerrainComputeSettings(
+            task.input.planetModel.seed,
+            task.input.planetModel.terrainSettings,
+            task.input.planetModel.atmosphere !== null,
+        );
         const paramsData = new Float32Array([
             this.rowVertexCount,
             chunkSize,
@@ -173,14 +178,7 @@ export class TerrainSystemGpu implements ITerrainSystem {
             task.input.position.x,
             task.input.position.y,
             task.input.position.z,
-            task.input.planetModel.seed,
-            settings.continent_base_height,
-            settings.continents_fragmentation,
-            settings.continents_frequency,
-            settings.max_mountain_height,
-            settings.mountains_frequency,
-            settings.max_bump_height,
-            settings.bumps_frequency,
+            ...settings,
             0,
         ]);
         const params = this.createBuffer(paramsData.byteLength, paramsData);
@@ -249,21 +247,12 @@ export class TerrainSystemGpu implements ITerrainSystem {
             coordinatesData[index * 2] = coordinate.latitudeRadians;
             coordinatesData[index * 2 + 1] = coordinate.longitudeRadians;
         }
-        const settings = task.input.planetModel.terrainSettings;
-        const paramsData = new Float32Array([
-            pointCount,
+        const settings = createTerrainComputeSettings(
             task.input.planetModel.seed,
-            settings.continent_base_height,
-            settings.continents_fragmentation,
-            settings.continents_frequency,
-            settings.max_mountain_height,
-            settings.mountains_frequency,
-            settings.max_bump_height,
-            settings.bumps_frequency,
-            0,
-            0,
-            0,
-        ]);
+            task.input.planetModel.terrainSettings,
+            task.input.planetModel.atmosphere !== null,
+        );
+        const paramsData = new Float32Array([pointCount, ...settings, 0, 0, 0]);
         const coordinates = this.createBuffer(coordinatesData.byteLength, coordinatesData);
         const heights = this.createBuffer(pointCount * Float32Array.BYTES_PER_ELEMENT);
         const params = this.createBuffer(paramsData.byteLength, paramsData);
