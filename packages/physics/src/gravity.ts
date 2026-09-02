@@ -15,17 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./blackHole";
-export * from "./atmosphere/constants";
-export * from "./atmosphere/gas";
-export * from "./atmosphere/rayleighScattering";
-export * from "./atmosphere/scaleHeight";
-export * from "./constants";
-export * from "./gravity";
-export * from "./orbit";
-export * from "./physics";
-export * from "./solarPanels";
-export * from "./stellarTypes";
-export * from "./thermodynamics";
-export * from "./unitConversions";
-export * from "./gasGiants";
+import { G } from "./constants";
+
+/** Computes gravitational acceleration in m/s² at a distance from a mass. */
+export function computeGravityAcceleration(mass: number, distance: number): number {
+    return (G * mass) / distance ** 2;
+}

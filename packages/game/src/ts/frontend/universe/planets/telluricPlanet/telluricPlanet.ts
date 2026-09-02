@@ -109,9 +109,13 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
         this.aggregate.body.disablePreStep = false;
 
         if (this.model.atmosphere !== null) {
-            const atmosphereThickness =
-                Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / Settings.EARTH_RADIUS);
-            this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+            this.atmosphereUniforms = new AtmosphereUniforms(
+                this.getBoundingRadius(),
+                this.model.mass,
+                // eslint-disable-next-line @typescript-eslint/no-deprecated -- Atmosphere rendering still consumes legacy model temperatures.
+                this.model.temperature.max,
+                this.model.atmosphere,
+            );
         } else {
             this.atmosphereUniforms = null;
         }

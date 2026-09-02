@@ -15,17 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./blackHole";
-export * from "./atmosphere/constants";
-export * from "./atmosphere/gas";
-export * from "./atmosphere/rayleighScattering";
-export * from "./atmosphere/scaleHeight";
-export * from "./constants";
-export * from "./gravity";
-export * from "./orbit";
-export * from "./physics";
-export * from "./solarPanels";
-export * from "./stellarTypes";
-export * from "./thermodynamics";
-export * from "./unitConversions";
-export * from "./gasGiants";
+export type WavelengthTriplet = readonly [number, number, number];
+
+export const PresetBands = {
+    /** Default photopic RGB band centres in metres. */
+    PHOTOPIC: [650e-9, 550e-9, 450e-9],
+} as const satisfies Record<string, WavelengthTriplet>;

@@ -23,7 +23,6 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
 
@@ -101,8 +100,12 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
 
         this.mesh.material = this.material;
 
-        const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / EarthRadius);
-        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
+        this.atmosphereUniforms = new AtmosphereUniforms(
+            this.getBoundingRadius(),
+            this.model.mass,
+            273,
+            this.model.atmosphere,
+        );
 
         if (this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
