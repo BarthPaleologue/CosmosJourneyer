@@ -16,8 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export * from "./blackHole";
+export * from "./atmosphere/constants";
+export * from "./atmosphere/gas";
+export * from "./atmosphere/rayleighScattering";
+export * from "./atmosphere/scaleHeight";
 export * from "./color";
 export * from "./constants";
+export * from "./gravity";
 export * from "./orbit";
 export * from "./physics";
 export * from "./solarPanels";
