@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { degreesToRadians, EarthRadius } from "@cosmos-journeyer/physics";
 
 export const Settings = {
     UNIVERSE_SEED: Math.PI,
 
     POWER_PLAY_SEED: 77,
 
-    EARTH_RADIUS: 1000e3, // target is 6000e3
+    EARTH_RADIUS: EarthRadius,
 
     VERTEX_RESOLUTION: 64,
     MIN_DISTANCE_BETWEEN_VERTICES: 1.5,

@@ -15,13 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CloudLayerHeight, ScaledEarthRadius } from "#/constants";
+import { CloudLayerHeight } from "#/constants";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
 import {
     computeEffectiveTemperature,
     degreesToRadians,
     EarthMass,
+    EarthRadius,
     EarthSeaLevelPressure,
     getOceanDepth,
     hasLiquidWater,
@@ -63,7 +64,7 @@ export function generateTelluricPlanetModel(
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * EarthRadius;
 
     const mass = EarthMass * (radius / 6_371e3) ** 3;
 
@@ -105,7 +106,7 @@ export function generateTelluricPlanetModel(
     };
 
     let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
-    if (radius <= 0.3 * ScaledEarthRadius) {
+    if (radius <= 0.3 * EarthRadius) {
         pressure = 0;
     }
 
@@ -160,16 +161,16 @@ export function generateTelluricPlanetModel(
             : null;
 
     const terrainSettings = {
-        continents_frequency: radius / ScaledEarthRadius,
+        continents_frequency: radius / EarthRadius,
         continents_fragmentation: oceanCoverage,
 
-        bumps_frequency: (30 * radius) / ScaledEarthRadius,
+        bumps_frequency: (30 * radius) / EarthRadius,
 
         max_bump_height: 1.5e3,
         max_mountain_height: 10e3,
         continent_base_height: ocean !== null ? ocean.depth : 0,
 
-        mountains_frequency: (60 * radius) / ScaledEarthRadius,
+        mountains_frequency: (60 * radius) / EarthRadius,
     };
 
     const rings: RingsModel | null = uniformRandBool(0.01, rng, GenerationSteps.RINGS)
