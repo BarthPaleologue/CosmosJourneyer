@@ -75,7 +75,7 @@ describe("StarSystemView", () => {
             setActiveControls: vi.fn(),
             soundPlayer: {},
             spaceshipControls,
-            targetCursorLayer: { addObjects: vi.fn() },
+            targetCursorLayer: { addTargets: vi.fn() },
             universeBackend,
             vehicleControls: { getCameras: () => [] },
         } as unknown as StarSystemView;

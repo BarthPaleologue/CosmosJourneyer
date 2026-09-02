@@ -32,8 +32,9 @@ import { initI18n } from "@/i18n";
 import { ConsoleDumper } from "./utils/consoleDumper";
 import { CrashReporter } from "./utils/crashReporter";
 
-const consoleDumper = new ConsoleDumper();
 const t = await initI18n();
+
+const consoleDumper = new ConsoleDumper();
 const crashReporter = new CrashReporter(consoleDumper, t);
 const soundPlayerMock = new SoundPlayerMock();
 

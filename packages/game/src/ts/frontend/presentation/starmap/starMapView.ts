@@ -154,7 +154,7 @@ export class StarMapView implements View {
 
         this.stellarPathfinder = new StellarPathfinder(universeBackend);
 
-        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer, t);
+        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer, this.t);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });

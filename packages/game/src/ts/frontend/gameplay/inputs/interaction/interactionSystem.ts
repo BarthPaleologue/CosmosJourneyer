@@ -61,6 +61,7 @@ export class InteractionSystem {
     private shouldCancelShortPress = false;
 
     private readonly choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>;
+    private readonly t: TFunction;
 
     readonly pressInteraction: PressInteraction;
 
@@ -69,7 +70,6 @@ export class InteractionSystem {
     private isMakingChoiceFlag = false;
 
     private readonly cameraInteractionRanges: Map<Camera, number>;
-    private readonly t: TFunction;
 
     constructor(
         mask: number,

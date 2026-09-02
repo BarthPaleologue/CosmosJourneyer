@@ -18,16 +18,19 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
+import {
+    getTargetCursorAppearance,
+    getTargetDisplayName,
+    getTargetTypeName,
+} from "@/frontend/presentation/targetPresentation";
 
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { ObjectTargetCursorType } from "../../simulation/architecture/targetable";
-import type { Targetable } from "../../simulation/architecture/targetable";
+import type { Target } from "../../gameplay/targetable";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -40,7 +43,7 @@ export class ObjectTargetCursor {
     readonly distanceText: HTMLParagraphElement;
     readonly etaText: HTMLParagraphElement;
 
-    readonly object: Targetable;
+    readonly object: Target;
     private readonly t: TFunction;
 
     private lastDistance = 0;
@@ -63,9 +66,10 @@ export class ObjectTargetCursor {
 
     private isOnScreen = false;
 
-    constructor(object: Targetable, t: TFunction) {
+    constructor(object: Target, t: TFunction) {
         this.t = t;
-        const name = object.targetInfo.name ?? object.getTypeName(t);
+        const name = getTargetDisplayName(object, t);
+        const appearance = getTargetCursorAppearance(object);
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
         this.htmlRoot.dataset["name"] = name + " Target Cursor Root";
@@ -73,46 +77,9 @@ export class ObjectTargetCursor {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
 
-        switch (object.targetInfo.type) {
-            case ObjectTargetCursorType.CELESTIAL_BODY:
-                this.cursor.classList.add("rounded");
-                this.minSize = 5;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.FACILITY:
-                this.cursor.classList.add("rotated");
-                this.minSize = 3;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.ANOMALY:
-                this.cursor.classList.add("rounded");
-                this.minSize = 2;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.LANDING_BAY:
-                this.cursor.classList.add("rotated");
-                this.minSize = 2;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.LANDING_PAD:
-                this.cursor.classList.add("rotated");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            case ObjectTargetCursorType.STAR_SYSTEM:
-                this.cursor.classList.add("rounded");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            case ObjectTargetCursorType.SPACESHIP:
-            case ObjectTargetCursorType.VEHICLE:
-                this.cursor.classList.add("rotated");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            default:
-                assertUnreachable(object.targetInfo.type);
-        }
+        this.cursor.classList.add(appearance.shape);
+        this.minSize = appearance.minSize;
+        this.maxSize = appearance.maxSize;
 
         this.textBlock = document.createElement("div");
         this.textBlock.classList.add("targetCursorText");
@@ -123,7 +90,7 @@ export class ObjectTargetCursor {
 
         this.typeText = document.createElement("p");
         this.typeText.classList.add("targetCursorType");
-        this.typeText.textContent = object.getTypeName(t);
+        this.typeText.textContent = getTargetTypeName(object, t);
 
         this.distanceText = document.createElement("p");
         this.distanceText.classList.add("targetCursorDistance");
@@ -146,8 +113,8 @@ export class ObjectTargetCursor {
 
         this.object = object;
 
-        this.minDistance = object.targetInfo.minDistance;
-        this.maxDistance = object.targetInfo.maxDistance;
+        this.minDistance = appearance.minDistance;
+        this.maxDistance = appearance.maxDistance;
     }
 
     setTarget(isTarget: boolean): void {

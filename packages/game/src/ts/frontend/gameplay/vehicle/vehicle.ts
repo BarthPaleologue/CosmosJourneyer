@@ -21,12 +21,9 @@ import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEngine
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
-import type { TFunction } from "i18next";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
-import { ObjectTargetCursorType } from "../../simulation/architecture/targetable";
-import type { Targetable, TargetInfo } from "../../simulation/architecture/targetable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
 
@@ -40,7 +37,9 @@ export type FixedVehiclePart = {
     readonly mesh: AbstractMesh;
 };
 
-export class Vehicle implements Targetable {
+export class Vehicle {
+    readonly name: string;
+
     readonly frame: PhysicsAggregate;
 
     readonly doors: ReadonlyArray<Door>;
@@ -69,8 +68,6 @@ export class Vehicle implements Targetable {
 
     readonly allMeshes: ReadonlyArray<AbstractMesh>;
 
-    readonly targetInfo: TargetInfo;
-
     private readonly boundingRadius: number;
 
     constructor(
@@ -81,6 +78,7 @@ export class Vehicle implements Targetable {
         fixedParts: ReadonlyArray<FixedVehiclePart>,
         allMeshes: ReadonlyArray<AbstractMesh>,
     ) {
+        this.name = name;
         this.frame = frame;
         this.doors = [...doors];
         this.wheels = [...wheels];
@@ -89,13 +87,6 @@ export class Vehicle implements Targetable {
 
         const { min: boundingMin, max: boundingMax } = this.getTransform().getHierarchyBoundingVectors();
         this.boundingRadius = boundingMax.subtract(boundingMin).length() / 2;
-
-        this.targetInfo = {
-            name,
-            type: ObjectTargetCursorType.VEHICLE,
-            minDistance: this.boundingRadius * 10,
-            maxDistance: 0,
-        };
     }
 
     getSteeringMode(): SteeringMode {
@@ -181,10 +172,6 @@ export class Vehicle implements Targetable {
 
     getBoundingRadius(): number {
         return this.boundingRadius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return t("objectTypes:vehicle");
     }
 
     getFrameAggregate(): PhysicsAggregate {

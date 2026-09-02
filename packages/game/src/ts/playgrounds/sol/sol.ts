@@ -21,6 +21,7 @@ import type { AbstractEngine } from "@babylonjs/core";
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
 import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
+import { getSystemTargets } from "@/frontend/gameplay/targeting";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
@@ -89,7 +90,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     );
 
     const targetCursorLayer = new TargetCursorLayer(t);
-    targetCursorLayer.addObjects(starSystemController.getCelestialBodies());
+    targetCursorLayer.addTargets(getSystemTargets(starSystemController));
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

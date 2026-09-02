@@ -22,11 +22,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import { getSchwarzschildRadius, getShadowRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
-
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { AccretionDisk } from "./accretionDisk";
@@ -47,8 +42,6 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
 
     readonly blackHoleUniforms: BlackHoleUniforms;
 
-    readonly targetInfo: TargetInfo;
-
     readonly accretionDisk: AccretionDisk | null;
 
     constructor(model: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture, scene: Scene) {
@@ -63,16 +56,10 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
             this.model.accretionDiskRadius > 0 ? new AccretionDisk(this.model.blackBodyTemperature) : null;
 
         this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundTexture);
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {
         return this.transform;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public getRadius(): number {

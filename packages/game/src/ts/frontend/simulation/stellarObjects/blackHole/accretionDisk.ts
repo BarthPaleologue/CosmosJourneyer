@@ -19,9 +19,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import type { LightEmitter } from "../../../presentation/lightEmitter";
-
-export class AccretionDisk implements LightEmitter {
+export class AccretionDisk {
     private readonly emissiveColor: Color3;
     constructor(temperature: number) {
         const rgb = getRgbFromTemperature(temperature);

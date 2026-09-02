@@ -26,10 +26,8 @@ import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { ElevatorSectionModel, SpaceElevatorModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { SpaceElevatorClimber } from "@/frontend/presentation/assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import { CylinderHabitat } from "@/frontend/presentation/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
 import { HelixHabitat } from "@/frontend/presentation/assets/procedural/spaceStation/habitats/helix/helixHabitat";
@@ -40,8 +38,6 @@ import { SolarSection } from "@/frontend/presentation/assets/procedural/spaceSta
 import { TokamakSection } from "@/frontend/presentation/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/presentation/assets/procedural/spaceStation/utilitySection";
 import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
-import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 import { LandingPadManager } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingPadManager";
@@ -74,8 +70,6 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     private readonly boundingRadius: number;
 
     private elapsedSeconds = 0;
-
-    readonly targetInfo: TargetInfo;
 
     private readonly landingPadManager: LandingPadManager;
 
@@ -156,13 +150,6 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.FACILITY,
-            name: this.name,
-            minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0,
-        };
     }
 
     getLights(): ReadonlyArray<Light> {
@@ -173,16 +160,16 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         return this.landingPadManager;
     }
 
-    getSubTargets(): ReadonlyArray<Targetable> {
-        return [this.climber, ...this.landingBays, ...this.getLandingPadManager().getLandingPads()];
+    getClimber(): SpaceElevatorClimber {
+        return this.climber;
+    }
+
+    getLandingBays(): Array<LandingBay> {
+        return this.landingBays;
     }
 
     public getBoundingRadius(): number {
         return this.boundingRadius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {

@@ -45,12 +45,12 @@ export async function createStationLandingScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
+    const t = await initI18n();
     const scene = new Scene(engine, {
         useFloatingOrigin: true,
     });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
-    const t = await initI18n();
 
     await enablePhysics(scene);
 

@@ -20,10 +20,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { IDisposable } from "@babylonjs/core/scene";
 import type { TFunction } from "i18next";
 
-import type { HasBoundingSphere } from "../../simulation/architecture/hasBoundingSphere";
-import type { Targetable } from "../../simulation/architecture/targetable";
+import type { Target } from "../../gameplay/targetable";
 import type { Transformable } from "../../simulation/architecture/transformable";
-import type { TypedObject } from "../../simulation/architecture/typedObject";
 import { ObjectTargetCursor } from "./objectTargetCursor";
 
 export class TargetCursorLayer implements IDisposable {
@@ -31,11 +29,11 @@ export class TargetCursorLayer implements IDisposable {
 
     private readonly layerRoot: HTMLDivElement;
 
-    private target: (Transformable & HasBoundingSphere & TypedObject) | null = null;
+    private target: Target | null = null;
 
-    private readonly additionalPinnedTargets: Set<Targetable> = new Set();
+    private readonly additionalPinnedTargets: Set<Target> = new Set();
 
-    private closestToScreenCenterOrbitalObject: Targetable | null = null;
+    private closestToScreenCenterOrbitalObject: Target | null = null;
     private readonly t: TFunction;
 
     constructor(t: TFunction) {
@@ -54,7 +52,7 @@ export class TargetCursorLayer implements IDisposable {
         return this.layerRoot.style.display === "block";
     }
 
-    public addObjects(objects: ReadonlyArray<Targetable>): void {
+    public addTargets(objects: Iterable<Target>): void {
         for (const object of objects) {
             const overlay = new ObjectTargetCursor(object, this.t);
             this.targetCursors.push(overlay);
@@ -62,21 +60,24 @@ export class TargetCursorLayer implements IDisposable {
         }
     }
 
-    public removeObject(object: Targetable): void {
-        const targetCursor = this.targetCursors.find((cursor) => cursor.object === object);
+    public removeTarget(object: Target | Transformable): void {
+        const targetCursor = this.targetCursors.find(
+            (cursor) => cursor.object.getTransform() === object.getTransform(),
+        );
         if (targetCursor === undefined) {
             return;
         }
 
-        this.targetCursors = this.targetCursors.filter((cursor) => cursor.object !== object);
-        this.additionalPinnedTargets.delete(object);
+        const target = targetCursor.object;
+        this.targetCursors = this.targetCursors.filter((cursor) => cursor.object !== target);
+        this.additionalPinnedTargets.delete(target);
         targetCursor.dispose();
 
-        if (this.target === object) {
+        if (this.target === target) {
             this.target = null;
         }
 
-        if (this.closestToScreenCenterOrbitalObject === object) {
+        if (this.closestToScreenCenterOrbitalObject === target) {
             this.closestToScreenCenterOrbitalObject = null;
         }
     }
@@ -101,7 +102,7 @@ export class TargetCursorLayer implements IDisposable {
         this.closestToScreenCenterOrbitalObject = nearest;
     }
 
-    public getClosestToScreenCenterOrbitalObject(): Targetable | null {
+    public getClosestToScreenCenterOrbitalObject(): Target | null {
         return this.closestToScreenCenterOrbitalObject;
     }
 
@@ -109,12 +110,17 @@ export class TargetCursorLayer implements IDisposable {
         for (const targetCursor of this.targetCursors) {
             targetCursor.dispose();
         }
-        this.targetCursors = [];
+        this.targetCursors.length = 0;
         this.setTarget(null);
     }
 
-    public setTarget(object: (Transformable & HasBoundingSphere & TypedObject) | null, forcedValue?: boolean): void {
-        let shouldHide = this.target === object;
+    public setTarget(object: Target | Transformable | null, forcedValue?: boolean): void {
+        const target =
+            object === null
+                ? null
+                : (this.targetCursors.find((cursor) => cursor.object.getTransform() === object.getTransform())
+                      ?.object ?? null);
+        let shouldHide = this.target === target;
         if (forcedValue !== undefined) {
             shouldHide = !forcedValue;
         }
@@ -124,17 +130,22 @@ export class TargetCursorLayer implements IDisposable {
             return;
         }
 
-        this.target = object;
+        this.target = target;
     }
 
-    public getTarget(): (Transformable & HasBoundingSphere & TypedObject) | null {
+    public getTarget(): Target | null {
         return this.target;
     }
 
-    public setAdditionalPinnedTargets(objects: ReadonlyArray<Targetable>): void {
+    public setAdditionalPinnedTargets(objects: Iterable<Target>): void {
         this.additionalPinnedTargets.clear();
         for (const object of objects) {
-            this.additionalPinnedTargets.add(object);
+            const target = this.targetCursors.find(
+                (cursor) => cursor.object.getTransform() === object.getTransform(),
+            )?.object;
+            if (target !== undefined) {
+                this.additionalPinnedTargets.add(target);
+            }
         }
     }
 

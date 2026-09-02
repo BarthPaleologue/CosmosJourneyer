@@ -24,17 +24,13 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import type { Textures } from "@/frontend/presentation/assets/textures";
 import type { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/presentation/postProcesses/volumetricLight/volumetricLightUniforms";
-import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
@@ -42,11 +38,10 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
-import type { LightEmitter } from "../../../presentation/lightEmitter";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { StarMaterial } from "./starMaterial";
 
-export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
+export class Star implements CelestialBodyBase<"star">, Cullable {
     readonly mesh: Mesh;
 
     private readonly material: StarMaterial;
@@ -62,8 +57,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
     readonly model: DeepReadonly<StarModel>;
 
     readonly type = "star";
-
-    readonly targetInfo: TargetInfo;
 
     /**
      * New Star
@@ -108,8 +101,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {
@@ -118,10 +109,6 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
 
     getEmissiveColor(): Color3 {
         return this.emissiveColor;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public updateMaterial(deltaTime: number): void {

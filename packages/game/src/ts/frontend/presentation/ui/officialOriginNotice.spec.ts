@@ -3,17 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { createOfficialOriginNotice, isOfficialGameLocation } from "./officialOriginNotice";
 
-const t = await createInstance().init({
-    lng: "en-US",
-    resources: {
-        "en-US": {
-            common: {
-                unofficialOriginNotice: "Play at [cosmosjourneyer.com](https://cosmosjourneyer.com).",
-            },
-        },
-    },
-});
-
 describe("isOfficialGameLocation", () => {
     it.each([
         { protocol: "https:", hostname: "cosmosjourneyer.com" },
@@ -28,7 +17,17 @@ describe("isOfficialGameLocation", () => {
         expect(isOfficialGameLocation({ protocol: "https:", hostname: "barthpaleologue.github.io" })).toBe(false);
     });
 
-    it("renders the translated Markdown link safely", () => {
+    it("renders the translated Markdown link safely", async () => {
+        const t = await createInstance().init({
+            lng: "en-US",
+            resources: {
+                "en-US": {
+                    common: {
+                        unofficialOriginNotice: "Play at [cosmosjourneyer.com](https://cosmosjourneyer.com).",
+                    },
+                },
+            },
+        });
         const notice = createOfficialOriginNotice(t, { protocol: "https:", hostname: "example.com" });
         const link = notice?.querySelector("a");
 

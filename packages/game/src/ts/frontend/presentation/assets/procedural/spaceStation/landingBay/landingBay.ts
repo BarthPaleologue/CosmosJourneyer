@@ -32,14 +32,11 @@ import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalFacilityModel, LandingBayModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { createRing } from "@/frontend/presentation/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
-import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { ProceduralSpotLightInstances } from "../../spotLight";
@@ -49,9 +46,6 @@ import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";
 
 export class LandingBay {
-    private static readonly TARGET_CURSOR_MIN_DISTANCE = 8e3;
-    private static readonly TARGET_CURSOR_MAX_DISTANCE = 30e3;
-
     private readonly root: TransformNode;
 
     private readonly radius: number;
@@ -71,8 +65,6 @@ export class LandingBay {
 
     private readonly lights: Array<Light> = [];
 
-    readonly targetInfo: TargetInfo;
-
     constructor(
         model: LandingBayModel,
         stationModel: DeepReadonly<OrbitalFacilityModel>,
@@ -82,12 +74,6 @@ export class LandingBay {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.radius = 500;
-        this.targetInfo = {
-            type: ObjectTargetCursorType.LANDING_BAY,
-            minDistance: LandingBay.TARGET_CURSOR_MIN_DISTANCE,
-            maxDistance: LandingBay.TARGET_CURSOR_MAX_DISTANCE,
-        };
-
         const deltaRadius = this.radius / 3;
 
         this.metalSectionMaterial = new MetalSectionMaterial(
@@ -354,10 +340,6 @@ export class LandingBay {
 
     getBoundingRadius(): number {
         return this.radius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return t("objectTypes:landingBay");
     }
 
     dispose(): void {

@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -17,9 +17,9 @@
 
 import type { TFunction } from "i18next";
 
-export interface TypedObject {
-    /**
-     * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
-     */
-    getTypeName(t: TFunction): string;
+import { getOrbitalObjectTypeToI18nString } from "../helpers/orbitalObjectTypeToDisplay";
+import type { OrbitalObject } from "../simulation/architecture/orbitalObject";
+
+export function getOrbitalObjectCategoryName(orbitalObject: OrbitalObject, t: TFunction): string {
+    return getOrbitalObjectTypeToI18nString(orbitalObject.model, t);
 }

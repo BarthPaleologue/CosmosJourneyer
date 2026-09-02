@@ -37,14 +37,14 @@ export type SaveLoadingError =
 
 export function saveLoadingErrorToI18nString(error: SaveLoadingError, t: TFunction): string {
     switch (error.type) {
+        case "SAVE_NOT_FOUND":
+            return t("notifications:saveNotFound");
         case "INVALID_JSON":
             return t("notifications:invalidSaveFileJson");
         case "INVALID_SAVE":
             return t("notifications:invalidSaveFile");
         case "INVALID_STORAGE_FORMAT":
             return t("notifications:invalidStorageFormat");
-        case "SAVE_NOT_FOUND":
-            return t("notifications:saveNotFound");
         default:
             return assertUnreachable(error);
     }

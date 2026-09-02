@@ -39,10 +39,10 @@ export async function createFlightDemoScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
+    const t = await initI18n();
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "crosshair";
-    const t = await initI18n();
 
     await enablePhysics(scene);
 

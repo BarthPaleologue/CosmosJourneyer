@@ -17,7 +17,8 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 
-import type { Targetable } from "@/frontend/simulation/architecture/targetable";
+import type { HasBoundingSphere } from "../architecture/hasBoundingSphere";
+import type { Transformable } from "../architecture/transformable";
 
 export const LandingPadSize = {
     SMALL: 1,
@@ -30,7 +31,7 @@ export type LandingRequest = {
     minimumPadSize: LandingPadSize;
 };
 
-export interface ILandingPad extends Targetable {
+export interface ILandingPad extends Transformable, HasBoundingSphere {
     getPadSize(): LandingPadSize;
     getPadHeight(): number;
 }

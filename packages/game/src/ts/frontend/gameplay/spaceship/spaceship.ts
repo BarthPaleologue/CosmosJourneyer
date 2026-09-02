@@ -28,7 +28,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import { C } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { TFunction } from "i18next";
 
 import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
@@ -40,7 +39,6 @@ import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAs
 import { AudioMasks } from "@/frontend/presentation/audio/audioMasks";
 import type { ISoundInstance } from "@/frontend/presentation/audio/soundInstance";
 import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
-import type { ClusteredLightingRegion } from "@/frontend/presentation/clusteredLightingRegion";
 import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
 import type { CelestialBody, OrbitalObject } from "@/frontend/simulation/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/simulation/architecture/transformable";
@@ -49,8 +47,6 @@ import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingP
 import { CollisionMask } from "@/settings";
 
 import { SpaceDots } from "../../presentation/assets/procedural/spaceDots";
-import { ObjectTargetCursorType } from "../../simulation/architecture/targetable";
-import type { Targetable, TargetInfo } from "../../simulation/architecture/targetable";
 import { Altimeter } from "./altimeter";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import type { WarpInfluence } from "./components/warpInfluence";
@@ -69,7 +65,7 @@ type SoundInstances = {
     thruster: ISoundInstance;
 };
 
-export class Spaceship implements Transformable, Targetable, ClusteredLightingRegion {
+export class Spaceship implements Transformable {
     readonly shipType: ShipType;
 
     readonly id: string;
@@ -77,8 +73,6 @@ export class Spaceship implements Transformable, Targetable, ClusteredLightingRe
     readonly name: string;
 
     readonly frame: AbstractMesh;
-
-    readonly targetInfo: TargetInfo;
 
     readonly aggregate: PhysicsAggregate;
     private readonly collisionObservable: Observable<IPhysicsCollisionEvent>;
@@ -266,13 +260,6 @@ export class Spaceship implements Transformable, Targetable, ClusteredLightingRe
         this.hyperSpaceTunnel.setEnabled(false);
         this.internals = new SpaceshipInternals(serializedSpaceShip, unfitComponents);
 
-        this.targetInfo = {
-            name: this.name,
-            type: ObjectTargetCursorType.SPACESHIP,
-            minDistance: this.getBoundingRadius() * 15,
-            maxDistance: 0,
-        };
-
         this.soundInstances = soundInstances;
 
         this.soundInstances.thruster.play();
@@ -301,10 +288,6 @@ export class Spaceship implements Transformable, Targetable, ClusteredLightingRe
 
     public getLights(): ReadonlyArray<Light> {
         return this.mainThrusters.map((thruster) => thruster.light);
-    }
-
-    public getTypeName(t: TFunction): string {
-        return t("objectTypes:spaceship");
     }
 
     public getAltimeter(): Altimeter {
