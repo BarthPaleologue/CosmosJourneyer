@@ -28,6 +28,7 @@ import {
     getOceanDepth,
     hasLiquidWater,
 } from "@cosmos-journeyer/physics";
+import type { AerosolModel } from "@cosmos-journeyer/physics";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
@@ -40,7 +41,7 @@ import type {
     StellarObjectModel,
     TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, uniformRandBool } from "extended-random";
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
 import { generateSeededRingsModel } from "./ringsModelGenerator";
@@ -155,6 +156,7 @@ export function generateTelluricPlanetModel(
                                 ["O2", 0.21],
                                 ["Ar", 0.01],
                             ],
+                  aerosols: generateAerosols(ocean, rng),
               }
             : null;
 
@@ -200,5 +202,21 @@ export function generateTelluricPlanetModel(
         clouds,
         ocean,
         atmosphere,
+    };
+}
+
+function generateAerosols(
+    ocean: DeepReadonly<OceanModel> | null,
+    rng: ReturnType<typeof getRngFromSeed>,
+): AerosolModel {
+    if (ocean !== null) {
+        return { tau550: 0.05, settlingCoefficient: 0.15, particleRadius: 0.5e-6, angstromExponent: 0 };
+    }
+
+    return {
+        tau550: randRange(0.1, 2, rng, GenerationSteps.AEROSOL_TAU_550),
+        settlingCoefficient: randRange(0.15, 0.3, rng, GenerationSteps.AEROSOL_SETTLING_COEFFICIENT),
+        particleRadius: randRange(0.5e-6, 3e-6, rng, GenerationSteps.AEROSOL_PARTICLE_RADIUS),
+        angstromExponent: randRange(0, 1, rng, GenerationSteps.AEROSOL_ANGSTROM_EXPONENT),
     };
 }

@@ -18,6 +18,7 @@
 export * from "./blackHole";
 export * from "./atmosphere/constants";
 export * from "./atmosphere/gas";
+export * from "./atmosphere/mieScattering";
 export * from "./atmosphere/rayleighScattering";
 export * from "./atmosphere/scaleHeight";
 export * from "./constants";

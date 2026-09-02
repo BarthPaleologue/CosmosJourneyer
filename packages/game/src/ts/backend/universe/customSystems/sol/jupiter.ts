@@ -48,6 +48,12 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
                 ["H2", 0.9],
                 ["He", 0.1],
             ],
+            aerosols: {
+                tau550: 0.1,
+                settlingCoefficient: 1,
+                particleRadius: 7.5e-7,
+                angstromExponent: 0.3,
+            },
         },
         colorPalette: {
             type: "textured",
