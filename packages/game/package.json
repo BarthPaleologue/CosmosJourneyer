@@ -67,7 +67,6 @@
         "markdown-it": "^15.0.1",
         "qrcode": "^1.5.4",
         "squirrel-noise": "^1.0.0",
-        "terrain-generation": "workspace:^",
         "zod": "catalog:"
     },
     "devDependencies": {
@@ -86,7 +85,6 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vite-plugin-glsl": "^1.6.1",
-        "vite-plugin-wasm": "^3.6.0",
         "vitest": "catalog:"
     }
 }

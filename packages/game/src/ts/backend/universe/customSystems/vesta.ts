@@ -167,8 +167,14 @@ export function getVestaSystemModel(): StarSystemModel {
             depth: 10e3,
         },
         atmosphere: {
-            pressure: barToPascal(1.2),
+            seaLevelPressure: barToPascal(1.2),
             greenHouseEffectFactor: 1,
+            gasMix: [
+                ["N2", 0.78],
+                ["O2", 0.21],
+                ["Ar", 0.01],
+            ],
+            aerosols: { tau550: 0.05, settlingCoefficient: 0.15, particleRadius: 0.5e-6, angstromExponent: 0 },
         },
         clouds: {
             color: { r: 0.9, g: 0.9, b: 0.9 },
@@ -373,8 +379,13 @@ export function getVestaSystemModel(): StarSystemModel {
             p: 2,
         },
         atmosphere: {
-            pressure: barToPascal(1),
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 1,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
+            aerosols: { tau550: 0.1, settlingCoefficient: 0.5, particleRadius: 1.5e-7, angstromExponent: 0.8 },
         },
         colorPalette: {
             type: "procedural",

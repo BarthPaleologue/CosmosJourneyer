@@ -129,14 +129,12 @@ export class LensFlarePostProcess extends PostProcess {
                 tempViewProjection,
             );
             const fullViewProjection = scene.getTransformMatrix();
-            const computeDepthMetric = (camera: Camera, worldPosition: Vector3): number => {
+            const computeDepthMetric = (worldPosition: Vector3): number => {
                 Vector4.TransformCoordinatesToRef(worldPosition, fullViewProjection, tempClipSpacePosition);
                 const engine = scene.getEngine();
-                if (engine.useReverseDepthBuffer) {
-                    return (-tempClipSpacePosition.z + camera.minZ) / (camera.minZ + camera.maxZ);
-                }
+                const ndcDepth = tempClipSpacePosition.z / tempClipSpacePosition.w;
 
-                return (tempClipSpacePosition.z + camera.minZ) / (camera.minZ + camera.maxZ);
+                return engine.isNDCHalfZRange ? ndcDepth : ndcDepth * 0.5 + 0.5;
             };
             const absolutePosition = stellarTransform.getAbsolutePosition();
             Vector3.ProjectToRef(
@@ -146,7 +144,7 @@ export class LensFlarePostProcess extends PostProcess {
                 this.activeCamera.viewport,
                 this.clipPosition,
             );
-            this.clipPosition.z = computeDepthMetric(this.activeCamera, absolutePosition);
+            this.clipPosition.z = computeDepthMetric(absolutePosition);
             effect.setVector3(LensFlareUniformNames.CLIP_POSITION, this.clipPosition);
 
             const localForward = Vector3.Forward(scene.useRightHandedSystem);
@@ -172,7 +170,7 @@ export class LensFlarePostProcess extends PostProcess {
                 this.activeCamera.viewport,
                 this.frontClipPosition,
             );
-            this.frontClipPosition.z = computeDepthMetric(this.activeCamera, frontSurfacePosition);
+            this.frontClipPosition.z = computeDepthMetric(frontSurfacePosition);
 
             cameraUp.scaleToRef(boundingRadius, tempUpOffset);
             absolutePosition.addToRef(tempUpOffset, tempUpPosition);

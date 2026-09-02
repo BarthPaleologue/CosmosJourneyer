@@ -41,7 +41,10 @@ export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetT
 export type GasPlanetModel = OrbitalObjectModelBase<"gasPlanet"> &
     HasSeed & {
         radius: number;
-        atmosphere: AtmosphereModel;
+        atmosphere: AtmosphereModel & {
+            /** The visible surface of a gas giant is defined at one bar. */
+            seaLevelPressure: 100_000;
+        };
         rings: RingsModel | null;
         colorPalette: GasPlanetColorPalette;
     };

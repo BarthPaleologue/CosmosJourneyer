@@ -27,7 +27,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TerrainSystemGpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemGpu";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 
@@ -58,7 +58,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    const terrainSystemResult = TerrainSystemGpu.New(engine, Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
     }

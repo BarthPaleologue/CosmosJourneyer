@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ScaledEarthRadius } from "#/constants";
-import { astronomicalUnitToMeters, EarthMass, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, EarthMass, EarthRadius, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
@@ -85,12 +84,19 @@ describe("distanceToStellarObject", () => {
                     initialRotationAngle: 0,
                 },
                 seed: 0,
-                radius: ScaledEarthRadius * 10,
+                radius: EarthRadius * 10,
                 mass: EarthMass * 10000,
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,
-                    pressure: 1,
+                    seaLevelPressure: 100_000,
+                    gasMix: [["H2", 1]],
+                    aerosols: {
+                        tau550: 0.1,
+                        settlingCoefficient: 0.5,
+                        particleRadius: 1.5e-7,
+                        angstromExponent: 0.8,
+                    },
                 },
                 colorPalette: {
                     type: "textured",
@@ -107,7 +113,7 @@ describe("distanceToStellarObject", () => {
                 name: "Station",
                 orbit: {
                     p: 2,
-                    semiMajorAxis: ScaledEarthRadius * 30,
+                    semiMajorAxis: EarthRadius * 30,
                     parentIds: ["planet"],
                     argumentOfPeriapsis: 0,
                     inclination: 0,

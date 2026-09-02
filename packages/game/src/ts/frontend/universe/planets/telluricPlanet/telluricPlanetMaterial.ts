@@ -44,6 +44,7 @@ import {
     splitVec,
     sub,
     swizzle,
+    Target,
     textureTriPlanarSample,
     transformDirection,
     transformPosition,
@@ -92,27 +93,28 @@ export class TelluricPlanetMaterial {
         const normal = vertexAttribute("normal");
 
         // Node material hack: we store the chunk position in the instance color attribute of the mesh
-        const chunkPosition = splitVec(instanceAttribute("instanceColor")).xyzOut;
+        const chunkPosition = splitVec(instanceAttribute("instanceColor"), { target: Target.FRAG }).xyzOut;
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+        const normalW = transformDirection(world, normal, { target: Target.FRAG });
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
 
         const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const positionPlanetSpace = add(position, chunkPosition);
+        const positionPlanetSpace = add(position, chunkPosition, { target: Target.FRAG });
         const normalPlanetSpace = normal;
-        const gravityUpPlanetSpace = normalize(positionPlanetSpace);
+        const gravityUpPlanetSpace = normalize(positionPlanetSpace, { target: Target.FRAG });
 
         const northPlanetSpace = vec(Vector3.Up());
-        const cosLatitude = dot(gravityUpPlanetSpace, northPlanetSpace); // [-1, 1]
-        const equatorFactor = oneMinus(abs(cosLatitude)); // 1 at equator, 0 at poles
+        const cosLatitude = dot(gravityUpPlanetSpace, northPlanetSpace, { target: Target.FRAG }); // [-1, 1]
+        const equatorFactor = oneMinus(abs(cosLatitude, { target: Target.FRAG }), { target: Target.FRAG }); // 1 at equator, 0 at poles
         const elevationAboveSeaLevel = sub(
-            length(positionPlanetSpace),
+            length(positionPlanetSpace, { target: Target.FRAG }),
             f(planetModel.radius + (planetModel.ocean?.depth ?? 0)),
+            { target: Target.FRAG },
         );
 
         const poleTemperature = planetModel.temperature.min;
@@ -120,19 +122,25 @@ export class TelluricPlanetMaterial {
 
         const canHaveLiquidWater = planetModel.ocean !== null;
 
-        const seaLevelTemperature = mix(f(poleTemperature), f(equatorTemperature), equatorFactor);
+        const seaLevelTemperature = mix(f(poleTemperature), f(equatorTemperature), equatorFactor, {
+            target: Target.FRAG,
+        });
         const atmosphereStrength = 0.7; // will be a parameter
         const temperatureHeightFalloff = lerp(0.0, 0.0065, atmosphereStrength); // K per meter
-        const altitudeCooling = mul(elevationAboveSeaLevel, f(temperatureHeightFalloff));
-        const temperature = sub(seaLevelTemperature, altitudeCooling);
+        const altitudeCooling = mul(elevationAboveSeaLevel, f(temperatureHeightFalloff), { target: Target.FRAG });
+        const temperature = sub(seaLevelTemperature, altitudeCooling, { target: Target.FRAG });
 
         const samplePointPlanetSpace = triangleWave3d(positionPlanetSpace, new Vector3(-132.0, 17.0, 53.0), 2048.0);
 
         const cameraPosition = uniformCameraPosition();
-        const distanceToCamera = distance(swizzle(positionW, "xyz"), cameraPosition);
+        const distanceToCamera = distance(swizzle(positionW, "xyz", { target: Target.FRAG }), cameraPosition, {
+            target: Target.FRAG,
+        });
 
         // Fade normals in the distance to smooth visual noise
-        const normalStrength = oneMinus(smoothstep(f(300), f(350), distanceToCamera));
+        const normalStrength = oneMinus(smoothstep(f(300), f(350), distanceToCamera, { target: Target.FRAG }), {
+            target: Target.FRAG,
+        });
 
         let worldType: WorldType = "airless";
         if (canHaveLiquidWater) {

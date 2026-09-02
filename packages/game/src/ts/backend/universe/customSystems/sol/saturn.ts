@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, durationToSeconds, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
+import { degreesToRadians, durationToSeconds } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
@@ -42,8 +42,18 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             p: 2,
         },
         atmosphere: {
-            pressure: EarthSeaLevelPressure,
+            seaLevelPressure: 100_000,
             greenHouseEffectFactor: 0.5,
+            gasMix: [
+                ["H2", 0.9],
+                ["He", 0.1],
+            ],
+            aerosols: {
+                tau550: 0.1,
+                settlingCoefficient: 0.5,
+                particleRadius: 1.5e-7,
+                angstromExponent: 0.8,
+            },
         },
         colorPalette: {
             type: "textured",

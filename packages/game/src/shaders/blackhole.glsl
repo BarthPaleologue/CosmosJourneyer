@@ -227,13 +227,12 @@ float customLength(vec3 v) {
 void main() {
     vec4 screenColor = texture2D(textureSampler, vUV);// the current screen color
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-    vec3 rayDirWorld = normalize(pixelWorldPosition - camera_position);// normalized direction of the ray
-
     float depth = texture2D(depthSampler, vUV).r;// the depth corresponding to the pixel in the depth map
+    vec3 pixelWorldPosition = worldFromUV(vUV, depth, camera_inverseProjectionView);
+    vec3 rayDirWorld = normalize(worldFromUV(vUV, 1.0, camera_inverseProjectionView) - camera_position);
 
     // actual depth of the scene
-    float maximumDistance = length(pixelWorldPosition - camera_position) * remap(depth, 0.0, 1.0, camera_near, camera_far);
+    float maximumDistance = length(pixelWorldPosition - camera_position);
 
     float maxBendDistance = max(accretionDiskRadius * 3.0, schwarzschildRadius * 15.0);
 
@@ -330,16 +329,13 @@ void main() {
     // getting the screen coordinate of the end of the bended ray
     vec3 rayEndWorldPosition = blackHoleSpaceToWorld(rayPositionBlackHoleSpace);
     vec2 uv = uvFromWorld(rayEndWorldPosition, camera_projection, camera_view);
-    // check if there is an object occlusion
-    vec3 pixelWorldPositionEndRay = worldFromUV(uv, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
-
     float depthEndRay = texture2D(depthSampler, uv).r;// the depth corresponding to the pixel in the depth map
     for(int i = 0; i < 10; i++) {
         vec2 offset = (vec2(hash(float(i)), hash(float(i + 1))) - 0.5) * 0.01;
         depthEndRay = min(depthEndRay, texture2D(depthSampler, uv + offset).r);
     }
     // closest physical point from the camera in the direction of the pixel (occlusion)
-    vec3 closestPointEndRay = camera_position + normalize(pixelWorldPositionEndRay - camera_position) * remap(depthEndRay, 0.0, 1.0, camera_near, camera_far);
+    vec3 closestPointEndRay = worldFromUV(uv, depthEndRay, camera_inverseProjectionView);
 
     bool behindBH = dot(closestPointEndRay - camera_position, closestPointEndRay - worldPosition) >= 0.0;
     // checking for alignment: camera, object, blackhole in this order
