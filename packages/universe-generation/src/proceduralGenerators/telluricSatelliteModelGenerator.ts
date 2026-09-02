@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CloudLayerHeight, ScaledEarthRadius } from "#/constants";
+import { CloudLayerHeight } from "#/constants";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
@@ -23,6 +23,7 @@ import {
     computeEffectiveTemperature,
     degreesToRadians,
     EarthMass,
+    EarthRadius,
     EarthSeaLevelPressure,
     getOceanDepth,
     getOrbitalPeriod,
@@ -60,9 +61,9 @@ export function generateTelluricSatelliteModel(
 
     let radius: number;
     if (isSatelliteOfTelluric) {
-        radius = Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * EarthRadius;
     } else if (isSatelliteOfGas) {
-        radius = Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * EarthRadius;
     } else {
         throw new Error("Satellite is not around telluric or gas planet. Something is missing!");
     }
@@ -78,7 +79,7 @@ export function generateTelluricSatelliteModel(
         normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
         0,
     );
-    if (isSatelliteOfTelluric || radius <= 0.3 * ScaledEarthRadius) {
+    if (isSatelliteOfTelluric || radius <= 0.3 * EarthRadius) {
         pressure = 0;
     }
 
@@ -182,15 +183,15 @@ export function generateTelluricSatelliteModel(
             : null;
 
     const terrainSettings = {
-        continents_frequency: radius / ScaledEarthRadius,
+        continents_frequency: radius / EarthRadius,
         continents_fragmentation: oceanCoverage,
-        bumps_frequency: (30 * radius) / ScaledEarthRadius,
+        bumps_frequency: (30 * radius) / EarthRadius,
 
         max_bump_height: 1.5e3,
         max_mountain_height: 10e3,
         continent_base_height: 5e3 + (ocean?.depth ?? 0),
 
-        mountains_frequency: (60 * radius) / ScaledEarthRadius,
+        mountains_frequency: (60 * radius) / EarthRadius,
     };
 
     return {
