@@ -33,7 +33,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { lookAt } from "@/frontend/helpers/transform";
 import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
 import { SphericalHeightFieldTerrain } from "@/frontend/universe/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TerrainSystemGpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemGpu";
 
 import { Settings } from "@/settings";
 
@@ -54,7 +54,7 @@ export async function createSphericalHeightFieldTerrainScene(
 
     await enablePhysics(scene);
 
-    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    const terrainSystemResult = TerrainSystemGpu.New(engine, Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
     }

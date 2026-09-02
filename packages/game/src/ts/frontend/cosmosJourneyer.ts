@@ -73,7 +73,7 @@ import { MainMenu } from "@/frontend/ui/mainMenu";
 import { PauseMenu } from "@/frontend/ui/pauseMenu";
 import { SidePanels } from "@/frontend/ui/sidePanels";
 import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TerrainSystemGpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemGpu";
 import type { View } from "@/frontend/view";
 
 import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
@@ -541,7 +541,7 @@ export class CosmosJourneyer {
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
         const notificationManager = new NotificationManager(soundPlayer);
-        const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+        const terrainSystemResult = TerrainSystemGpu.New(engine, Settings.VERTEX_RESOLUTION);
         if (!terrainSystemResult.success) {
             return terrainSystemResult;
         }
