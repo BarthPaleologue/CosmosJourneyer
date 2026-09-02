@@ -28,12 +28,12 @@ import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generati
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { SphericalHeightFieldTerrain } from "@/frontend/universe/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { ScatteringSystemMock } from "@/frontend/simulation/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { SphericalHeightFieldTerrain } from "@/frontend/simulation/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { Settings } from "@/settings";
 

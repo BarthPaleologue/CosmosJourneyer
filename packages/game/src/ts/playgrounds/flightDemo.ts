@@ -21,15 +21,15 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
+import { ShipControls } from "@/frontend/gameplay/spaceship/shipControls";
+import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { TtsMock } from "@/frontend/presentation/audio/tts";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
 
 import { initI18n } from "@/i18n";
 

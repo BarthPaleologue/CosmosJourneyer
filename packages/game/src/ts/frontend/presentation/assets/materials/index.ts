@@ -1,0 +1,112 @@
+//  This file is part of Cosmos Journeyer
+//
+//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
+//
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import type { Material } from "@babylonjs/core/Materials/material";
+import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
+import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Scene } from "@babylonjs/core/scene";
+
+import { TireMaterial } from "@/frontend/gameplay/vehicle/tireMaterial";
+
+import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
+import { GrassMaterial } from "../procedural/grass/grassMaterial";
+import { RockMaterial } from "../procedural/rock/rockMaterial";
+import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
+import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landingPadMaterial";
+import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
+import type { Textures } from "../textures";
+import { CrateMaterial } from "./crate";
+
+export type Materials = {
+    readonly butterfly: Material;
+    readonly grass: Material;
+    readonly rock: Material;
+    readonly crate: CrateMaterial;
+    readonly solarPanel: SolarPanelMaterial;
+    readonly tree: PBRMetallicRoughnessMaterial;
+    readonly tank: Material;
+    readonly landingPad: Material;
+    readonly metalSection: Material;
+    readonly tire: TireMaterial;
+    readonly glass: PBRMaterial;
+};
+
+export function initMaterials(textures: Textures, scene: Scene): Materials {
+    const crateMaterial = new CrateMaterial(textures.materials.crate, scene);
+
+    const treeMaterial = new PBRMetallicRoughnessMaterial("treeMaterial", scene);
+    treeMaterial.backFaceCulling = false;
+    treeMaterial.baseTexture = textures.materials.tree.albedo;
+    treeMaterial.transparencyMode = 1;
+
+    const tankMaterial = new PBRMaterial("tankMaterial", scene);
+    tankMaterial.albedoColor.copyFromFloats(0.2, 0.2, 0.2);
+    tankMaterial.metallic = 1;
+    tankMaterial.roughness = 0.4;
+    tankMaterial.usePhysicalLightFalloff = false;
+
+    const metalSectionMaterial = new MetalSectionMaterial(
+        "metalSectionMaterial",
+        textures.materials.metalPanels,
+        scene,
+    );
+
+    const tireMaterial = new TireMaterial(textures.materials.tire, scene);
+
+    const glass = new PBRMaterial("glass", scene);
+    glass.reflectivityColor = new Color3(0.2, 0.2, 0.2);
+    glass.albedoColor = new Color3(0.95, 0.95, 0.95);
+    glass.metallic = 0;
+    glass.roughness = 0.05;
+    glass.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    glass.alpha = 0.1;
+    glass.indexOfRefraction = 1.5;
+    glass.backFaceCulling = false;
+
+    return {
+        butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
+        grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
+        rock: new RockMaterial(textures.terrains.rock, scene).get(),
+        crate: crateMaterial,
+        solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
+        tree: treeMaterial,
+        tank: tankMaterial,
+        landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
+        metalSection: metalSectionMaterial,
+        tire: tireMaterial,
+        glass: glass,
+    };
+}
+
+export function createDebugMaterial(
+    name: string,
+    diffuse: boolean,
+    wireframe: boolean,
+    scene: Scene,
+): StandardMaterial {
+    const mat = new StandardMaterial(`${name}DebugMaterial`, scene);
+    if (!diffuse) {
+        mat.emissiveColor = Color3.Random();
+        mat.disableLighting = true;
+    } else {
+        mat.diffuseColor = Color3.Random();
+    }
+    mat.wireframe = wireframe;
+    return mat;
+}

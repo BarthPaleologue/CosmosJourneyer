@@ -19,7 +19,7 @@ import { FreeCamera, HemisphericLight, MeshBuilder, Vector3 } from "@babylonjs/c
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
 
 export async function createDefaultScene(
     engine: AbstractEngine,

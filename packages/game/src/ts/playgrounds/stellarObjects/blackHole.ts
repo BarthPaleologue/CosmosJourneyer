@@ -20,14 +20,14 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { generateBlackHoleModel } from "@cosmos-journeyer/universe-generation";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadEnvironmentTextures } from "@/frontend/presentation/assets/textures/environment";
+import { StarFieldBox } from "@/frontend/presentation/starFieldBox";
+import { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@/frontend/simulation/stellarObjects/blackHole/blackHolePostProcess";
 
 import { enablePointerLock } from "../utils";
 

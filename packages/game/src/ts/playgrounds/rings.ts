@@ -21,13 +21,13 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import type { RingsModel } from "@cosmos-journeyer/universe-model";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
 
 import { ItemPool } from "@/utils/itemPool";
 

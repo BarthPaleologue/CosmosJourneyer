@@ -29,15 +29,15 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "extended-random";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
+import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { LandingPad } from "@/frontend/presentation/assets/procedural/spaceStation/landingPad/landingPad";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OrbitalObject } from "../universe/architecture/orbitalObject";
-import type { StarSystemController } from "../universe/starSystemController";
+import type { OrbitalObject } from "../simulation/architecture/orbitalObject";
+import type { StarSystemController } from "../simulation/starSystemController";
 
 export function getOrbitAxisObjectList(starSystem: StarSystemController): Array<OrbitalObject> {
     const out: Array<OrbitalObject> = [];

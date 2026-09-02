@@ -21,9 +21,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { Player } from "@/frontend/player/player";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
+import { Player } from "@/frontend/gameplay/player/player";
+import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
+import { StarSystemController } from "@/frontend/simulation/starSystemController";
 
 import { StarSystemView } from "./starSystemView";
 

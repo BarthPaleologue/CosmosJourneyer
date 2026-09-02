@@ -19,14 +19,14 @@ import { FreeCamera, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { FlightTutorial } from "@/frontend/ui/tutorial/tutorials/flightTutorial";
-import { FuelScoopTutorial } from "@/frontend/ui/tutorial/tutorials/fuelScoopTutorial";
-import { PlanetaryLandingTutorial } from "@/frontend/ui/tutorial/tutorials/planetaryLandingTutorial";
-import { StarMapTutorial } from "@/frontend/ui/tutorial/tutorials/starMapTutorial";
-import { StationLandingTutorial } from "@/frontend/ui/tutorial/tutorials/stationLandingTutorial";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { TutorialLayer } from "@/frontend/presentation/ui/tutorial/tutorialLayer";
+import { FlightTutorial } from "@/frontend/presentation/ui/tutorial/tutorials/flightTutorial";
+import { FuelScoopTutorial } from "@/frontend/presentation/ui/tutorial/tutorials/fuelScoopTutorial";
+import { PlanetaryLandingTutorial } from "@/frontend/presentation/ui/tutorial/tutorials/planetaryLandingTutorial";
+import { StarMapTutorial } from "@/frontend/presentation/ui/tutorial/tutorials/starMapTutorial";
+import { StationLandingTutorial } from "@/frontend/presentation/ui/tutorial/tutorials/stationLandingTutorial";
 
 import { initI18n } from "@/i18n";
 

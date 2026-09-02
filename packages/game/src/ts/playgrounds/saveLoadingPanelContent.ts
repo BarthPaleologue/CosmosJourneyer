@@ -24,11 +24,11 @@ import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { alertModal } from "@/frontend/ui/dialogModal";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { alertModal } from "@/frontend/presentation/ui/dialogModal";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
+import { SaveLoadingPanelContent } from "@/frontend/presentation/ui/saveLoadingPanelContent";
 
 import { initI18n } from "@/i18n";
 

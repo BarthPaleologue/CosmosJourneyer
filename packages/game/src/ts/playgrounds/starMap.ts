@@ -21,10 +21,10 @@ import { Scene } from "@babylonjs/core/scene";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
-import { StarMap } from "@/frontend/starmap/starMap";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "@/frontend/presentation/assets/textures/starMap";
+import { StarMap } from "@/frontend/presentation/starmap/starMap";
 
 export async function createStarMapScene(
     engine: AbstractEngine,

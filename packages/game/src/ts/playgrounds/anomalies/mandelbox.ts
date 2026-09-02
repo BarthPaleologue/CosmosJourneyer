@@ -19,10 +19,10 @@ import { ArcRotateCamera, DirectionalLight, Scene, Vector3 } from "@babylonjs/co
 import type { AbstractEngine } from "@babylonjs/core";
 import { generateMandelboxModel } from "@cosmos-journeyer/universe-generation";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { EmptyCelestialBody } from "@/frontend/simulation/emptyCelestialBody";
 
 export async function createMandelboxScene(
     engine: AbstractEngine,

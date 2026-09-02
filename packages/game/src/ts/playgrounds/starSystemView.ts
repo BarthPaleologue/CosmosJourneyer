@@ -22,16 +22,16 @@ import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopa
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/gameplay/player/player";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { Player } from "@/frontend/player/player";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { TtsMock } from "@/frontend/presentation/audio/tts";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
+import type { INotificationManager } from "@/frontend/presentation/ui/notificationManager";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import type { INotificationManager } from "@/frontend/ui/notificationManager";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

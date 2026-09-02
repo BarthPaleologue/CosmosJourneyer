@@ -20,15 +20,15 @@ import type { AbstractEngine } from "@babylonjs/core";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
-import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadTextures } from "@/frontend/presentation/assets/textures";
+import { LensFlarePostProcess } from "@/frontend/presentation/postProcesses/lensFlarePostProcess";
+import { VolumetricLight } from "@/frontend/presentation/postProcesses/volumetricLight/volumetricLight";
+import { StarFieldBox } from "@/frontend/presentation/starFieldBox";
+import { Star } from "@/frontend/simulation/stellarObjects/star/star";
 
 import { enablePhysics } from "../utils";
 

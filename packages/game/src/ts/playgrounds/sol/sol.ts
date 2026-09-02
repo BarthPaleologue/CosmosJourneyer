@@ -20,16 +20,16 @@ import type { AbstractEngine } from "@babylonjs/core";
 
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
-import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
-import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { PostProcessManager } from "@/frontend/presentation/postProcesses/postProcessManager";
+import { TargetCursorLayer } from "@/frontend/presentation/ui/targetCursorLayer";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { StarSystemController } from "@/frontend/simulation/starSystemController";
+import { StarSystemLoader } from "@/frontend/simulation/starSystemLoader";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

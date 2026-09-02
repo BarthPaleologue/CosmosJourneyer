@@ -29,12 +29,12 @@ import {
 } from "@cosmos-journeyer/universe-generation";
 import type { ProceduralRingsModel } from "@cosmos-journeyer/universe-model";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
+import { EmptyCelestialBody } from "@/frontend/simulation/emptyCelestialBody";
 
 import { ItemPool } from "@/utils/itemPool";
 

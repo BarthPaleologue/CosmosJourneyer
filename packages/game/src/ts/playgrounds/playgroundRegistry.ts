@@ -17,7 +17,7 @@
 
 import type { AbstractEngine, Scene } from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
 
 import { createJuliaSetScene } from "./anomalies/juliaSet";
 import { createMandelboxScene } from "./anomalies/mandelbox";

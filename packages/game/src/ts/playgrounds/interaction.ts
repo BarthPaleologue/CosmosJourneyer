@@ -29,18 +29,18 @@ import {
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 
-import { loadSounds } from "@/frontend/assets/audio/sounds";
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/gameplay/controls/characterControls/humanoidAvatar";
+import { InteractionSystem } from "@/frontend/gameplay/inputs/interaction/interactionSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
-import { Button } from "@/frontend/ui/3d/button";
-import { radialChoiceModal } from "@/frontend/ui/dialogModal";
-import { InteractionLayer } from "@/frontend/ui/interactionLayer";
+import { loadSounds } from "@/frontend/presentation/assets/audio/sounds";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadHumanoidPrefabs } from "@/frontend/presentation/assets/objects/humanoids";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { Button } from "@/frontend/presentation/ui/3d/button";
+import { radialChoiceModal } from "@/frontend/presentation/ui/dialogModal";
+import { InteractionLayer } from "@/frontend/presentation/ui/interactionLayer";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

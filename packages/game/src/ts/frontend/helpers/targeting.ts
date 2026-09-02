@@ -17,9 +17,9 @@
 
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 
-import type { Mission } from "../missions/mission";
-import type { Targetable } from "../universe/architecture/targetable";
-import type { StarSystemController } from "../universe/starSystemController";
+import type { Mission } from "../gameplay/missions/mission";
+import type { Targetable } from "../simulation/architecture/targetable";
+import type { StarSystemController } from "../simulation/starSystemController";
 
 export function getSystemTargetables(starSystem: StarSystemController): Array<Targetable> {
     const out: Array<Targetable> = [];

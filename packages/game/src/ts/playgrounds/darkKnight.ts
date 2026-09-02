@@ -19,12 +19,12 @@ import { Scene, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 import { generateDarkKnightModel } from "@cosmos-journeyer/universe-generation";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { DarkKnight } from "@/frontend/universe/darkKnight";
-import { StarFieldBox } from "@/frontend/universe/starFieldBox";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadEnvironmentTextures } from "@/frontend/presentation/assets/textures/environment";
+import { StarFieldBox } from "@/frontend/presentation/starFieldBox";
+import { DarkKnight } from "@/frontend/simulation/darkKnight";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,

@@ -22,14 +22,14 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
-import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
-import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { AxisRenderer } from "@/frontend/presentation/axisRenderer";
+import { CreateGreasedLineHelper } from "@/frontend/presentation/lineRendering";
+import { OrbitRenderer } from "@/frontend/presentation/orbitRenderer";
+import { CustomOrbitalObject } from "@/frontend/simulation/customOrbitalObject";
+import { KeplerianOrbitalSimulation } from "@/frontend/simulation/keplerianOrbitalSimulation";
 
 export async function createOrbitalDemoScene(
     engine: AbstractEngine,

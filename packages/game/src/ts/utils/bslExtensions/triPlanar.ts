@@ -36,7 +36,7 @@ import {
     vec3,
 } from "babylonjs-shading-language";
 
-import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
+import type { TerrainTextures } from "@/frontend/presentation/assets/textures/terrains";
 
 import { addN, unpackNormal } from "./utils";
 

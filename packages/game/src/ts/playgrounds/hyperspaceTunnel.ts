@@ -21,10 +21,10 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { HyperSpaceTunnel } from "@/frontend/presentation/assets/procedural/hyperSpaceTunnel";
+import { loadNoiseTextures } from "@/frontend/presentation/assets/textures/noises";
 
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,

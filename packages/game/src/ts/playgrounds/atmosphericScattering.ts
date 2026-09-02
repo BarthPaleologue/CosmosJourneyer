@@ -19,12 +19,12 @@ import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { AtmosphereUniforms } from "@/frontend/presentation/postProcesses/atmosphere/atmosphereUniforms";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 
 export async function createAtmosphericScatteringScene(
     engine: AbstractEngine,

@@ -30,14 +30,14 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/gameplay/controls/characterControls/humanoidAvatar";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { setUpVector } from "@/frontend/helpers/transform";
-import { GravitySystem } from "@/frontend/universe/gravitySystem";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadHumanoidPrefabs } from "@/frontend/presentation/assets/objects/humanoids";
+import { GravitySystem } from "@/frontend/simulation/gravitySystem";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 

@@ -44,8 +44,8 @@ import {
     vertexAttribute,
 } from "babylonjs-shading-language";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextureAsync } from "@/frontend/assets/textures/utils";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadTextureAsync } from "@/frontend/presentation/assets/textures/utils";
 
 import { getTriPlanarBlending, getTriPlanarUVs, unpackNormal, whiteoutBlend } from "@/utils/bslExtensions";
 

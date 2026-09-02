@@ -47,28 +47,28 @@ import type {
     UniverseCoordinates,
 } from "@/backend/save/universeCoordinates";
 
-import { loadAssets } from "@/frontend/assets/assets";
-import type { Assets } from "@/frontend/assets/assets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { Tts } from "@/frontend/audio/tts";
+import { GeneralInputs } from "@/frontend/gameplay/inputs/generalInputs";
+import { Player } from "@/frontend/gameplay/player/player";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
 import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
-import { GeneralInputs } from "@/frontend/inputs/generalInputs";
-import { Player } from "@/frontend/player/player";
-import { StarMapView } from "@/frontend/starmap/starMapView";
+import { loadAssets } from "@/frontend/presentation/assets/assets";
+import type { Assets } from "@/frontend/presentation/assets/assets";
+import { AudioMasks } from "@/frontend/presentation/audio/audioMasks";
+import { MusicConductor } from "@/frontend/presentation/audio/musicConductor";
+import { SoundPlayer, SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
+import { Tts } from "@/frontend/presentation/audio/tts";
+import { StarMapView } from "@/frontend/presentation/starmap/starMapView";
+import { DesktopUpdateController } from "@/frontend/presentation/ui/desktopUpdateController";
+import type { UpdatePresentationContext } from "@/frontend/presentation/ui/desktopUpdateController";
+import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/presentation/ui/dialogModal";
+import { MainMenu } from "@/frontend/presentation/ui/mainMenu";
+import { PauseMenu } from "@/frontend/presentation/ui/pauseMenu";
+import { SidePanels } from "@/frontend/presentation/ui/sidePanels";
+import { TutorialLayer } from "@/frontend/presentation/ui/tutorial/tutorialLayer";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemView } from "@/frontend/starSystemView";
-import { DesktopUpdateController } from "@/frontend/ui/desktopUpdateController";
-import type { UpdatePresentationContext } from "@/frontend/ui/desktopUpdateController";
-import { alertModal, promptModalBoolean, promptModalString } from "@/frontend/ui/dialogModal";
-import { MainMenu } from "@/frontend/ui/mainMenu";
-import { PauseMenu } from "@/frontend/ui/pauseMenu";
-import { SidePanels } from "@/frontend/ui/sidePanels";
-import { TutorialLayer } from "@/frontend/ui/tutorial/tutorialLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import type { View } from "@/frontend/view";
 
 import { getDesktopUpdateApi } from "@/utils/desktopUpdateApi";
@@ -78,18 +78,18 @@ import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { Settings } from "@/settings";
 
-import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
-import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "./assets/textures/starMap";
 import { lookAt } from "./helpers/transform";
-import { NotificationManager } from "./ui/notificationManager";
-import type { INotificationManager } from "./ui/notificationManager";
-import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
-import { FuelScoopTutorial } from "./ui/tutorial/tutorials/fuelScoopTutorial";
-import { PlanetaryLandingTutorial } from "./ui/tutorial/tutorials/planetaryLandingTutorial";
-import { StarMapTutorial } from "./ui/tutorial/tutorials/starMapTutorial";
-import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTutorial";
-import type { Tutorial } from "./ui/tutorial/tutorials/tutorial";
+import { LoadingProgressMonitor } from "./presentation/assets/loadingProgressMonitor";
+import type { ILoadingProgressMonitor } from "./presentation/assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "./presentation/assets/textures/starMap";
+import { NotificationManager } from "./presentation/ui/notificationManager";
+import type { INotificationManager } from "./presentation/ui/notificationManager";
+import { FlightTutorial } from "./presentation/ui/tutorial/tutorials/flightTutorial";
+import { FuelScoopTutorial } from "./presentation/ui/tutorial/tutorials/fuelScoopTutorial";
+import { PlanetaryLandingTutorial } from "./presentation/ui/tutorial/tutorials/planetaryLandingTutorial";
+import { StarMapTutorial } from "./presentation/ui/tutorial/tutorials/starMapTutorial";
+import { StationLandingTutorial } from "./presentation/ui/tutorial/tutorials/stationLandingTutorial";
+import type { Tutorial } from "./presentation/ui/tutorial/tutorials/tutorial";
 
 type EngineState = "uninitialized" | "running" | "paused";
 

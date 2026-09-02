@@ -20,15 +20,15 @@ import type { AbstractEngine } from "@babylonjs/core";
 
 import { getSaturnModel } from "@/backend/universe/customSystems/sol/saturn";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
+import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
 

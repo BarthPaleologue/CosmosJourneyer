@@ -23,12 +23,12 @@ import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaed
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
-import { StarMapView } from "@/frontend/starmap/starMapView";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
+import { Player } from "@/frontend/gameplay/player/player";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadStarMapTextures } from "@/frontend/presentation/assets/textures/starMap";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { StarMapView } from "@/frontend/presentation/starmap/starMapView";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
 
 import { jsonSafeParse } from "@/utils/json";
 

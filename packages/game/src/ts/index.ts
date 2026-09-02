@@ -20,9 +20,9 @@ import "@styles/index.css";
 import { safeParseSave } from "@/backend/save/saveFileData";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { CosmosJourneyer } from "@/frontend/cosmosJourneyer";
-import { alertModal } from "@/frontend/ui/dialogModal";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { alertModal } from "@/frontend/presentation/ui/dialogModal";
 
 import { decodeBase64 } from "@/utils/base64";
 import { jsonSafeParse } from "@/utils/json";

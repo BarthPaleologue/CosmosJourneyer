@@ -21,16 +21,16 @@ import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generati
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { TelluricPlanet } from "@/frontend/simulation/planets/telluricPlanet/telluricPlanet";
+import { ScatteringSystem } from "@/frontend/simulation/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

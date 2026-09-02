@@ -28,8 +28,8 @@ import {
 import type { AbstractEngine } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { ThrusterExhaust } from "@/frontend/spaceship/thrusterExhaust";
+import { ThrusterExhaust } from "@/frontend/gameplay/spaceship/thrusterExhaust";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
 
 function createSlider(
     title: string,

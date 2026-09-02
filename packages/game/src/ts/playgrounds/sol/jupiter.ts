@@ -20,14 +20,14 @@ import type { AbstractEngine } from "@babylonjs/core";
 
 import { getJupiterModel } from "@/backend/universe/customSystems/sol/jupiter";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadTextures } from "@/frontend/assets/textures";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
-import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadTextures } from "@/frontend/presentation/assets/textures";
+import { CelestialBodyUberShaderPass } from "@/frontend/presentation/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
 

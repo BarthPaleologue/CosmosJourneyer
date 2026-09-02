@@ -18,16 +18,16 @@
 import { ClusteredLightContainer, Color3, GlowLayer, HemisphericLight, Scene, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
-import { LandingPadMaterial } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadMaterial";
-import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
-import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
-import { loadConcreteTextures } from "@/frontend/assets/textures/materials/concrete";
-import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareTextDecalTexture";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { LandingPad } from "@/frontend/presentation/assets/procedural/spaceStation/landingPad/landingPad";
+import { LandingPadMaterial } from "@/frontend/presentation/assets/procedural/spaceStation/landingPad/landingPadMaterial";
+import { ProceduralSpotLightInstances } from "@/frontend/presentation/assets/procedural/spotLight";
+import type { ProceduralSpotLightInstanceData } from "@/frontend/presentation/assets/procedural/spotLight";
+import { loadConcreteTextures } from "@/frontend/presentation/assets/textures/materials/concrete";
+import { createSquareTextDecalTexture } from "@/frontend/presentation/assets/textures/squareTextDecalTexture";
+import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { enablePhysics } from "./utils";
 

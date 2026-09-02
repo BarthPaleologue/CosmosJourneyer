@@ -18,8 +18,8 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
 
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 export const DefaultMinProjectedDiameter = 0.005;
 

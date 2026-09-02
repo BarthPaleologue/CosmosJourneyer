@@ -20,8 +20,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { Player } from "@/frontend/gameplay/player/player";
 import { makeScreenshotPng } from "@/frontend/helpers/screenshot";
-import { Player } from "@/frontend/player/player";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
 

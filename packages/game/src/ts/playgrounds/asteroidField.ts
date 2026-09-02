@@ -26,12 +26,12 @@ import {
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadAsteroids } from "@/frontend/presentation/assets/objects/asteroids";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
+import { AsteroidPatch } from "@/frontend/simulation/asteroidFields/asteroidPatch";
 
 import { enablePhysics } from "./utils";
 

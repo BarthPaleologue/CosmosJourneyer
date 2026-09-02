@@ -25,16 +25,16 @@ import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
+import { ShipControls } from "@/frontend/gameplay/spaceship/shipControls";
+import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { TtsMock } from "@/frontend/presentation/audio/tts";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
+import { SpaceStation } from "@/frontend/simulation/orbitalFacility/spaceStation";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
