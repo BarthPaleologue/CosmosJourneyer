@@ -42,7 +42,9 @@ export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetT
 export type GasPlanetModel = OrbitalObjectModelBase<"gasPlanet"> &
     HasSeed & {
         radius: number;
-        atmosphere: AtmosphereModel;
+        atmosphere: AtmosphereModel & {
+            seaLevelPressure: 100_000;
+        };
         rings: RingsModel | null;
         colorPalette: GasPlanetColorPalette;
     };
