@@ -119,6 +119,12 @@ export function generateGasPlanetModel(
                 ["H2", 0.9],
                 ["He", 0.1],
             ],
+            aerosols: {
+                tau550: 0.1,
+                settlingCoefficient: 0.5,
+                particleRadius: 1.5e-7,
+                angstromExponent: 0.8,
+            },
         },
         rings,
         colorPalette: {

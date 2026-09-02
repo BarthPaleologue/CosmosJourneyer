@@ -64,6 +64,12 @@ export async function createAtmosphericScatteringScene(
             ["O2", 0.21],
             ["Ar", 0.01],
         ],
+        aerosols: {
+            tau550: 0.05,
+            settlingCoefficient: 0.15,
+            particleRadius: 0.5e-6,
+            angstromExponent: 0,
+        },
     };
     const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, EarthMass, 298, atmosphereModel);
 
