@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { GasMix } from "@cosmos-journeyer/physics";
+import type { AerosolModel, GasMix } from "@cosmos-journeyer/physics";
 
 export type AtmosphereModel = {
     /**
@@ -31,4 +31,7 @@ export type AtmosphereModel = {
 
     /** The gases and their mole/volume fractions. Fractions are normalized when used. */
     gasMix: GasMix;
+
+    /** Aerosols responsible for wavelength-dependent Mie scattering. */
+    aerosols: AerosolModel;
 };

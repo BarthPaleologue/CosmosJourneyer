@@ -22,6 +22,7 @@ import {
     computeGravityAcceleration,
     computeMeanMolecularWeight,
     computeRayleighBetaRGB,
+    computeSpectralMie,
     getHeightForPressure,
     PresetBands,
 } from "@cosmos-journeyer/physics";
@@ -73,7 +74,7 @@ export class AtmosphereUniforms {
     /**
      * Mie scattering asymmetry factor (between -1 and 1)
      */
-    mieAsymmetry: number;
+    mieAsymmetry: Vector3;
 
     /**
      * Height of the ozone layer in meters above the planet surface
@@ -112,12 +113,10 @@ export class AtmosphereUniforms {
             computeRayleighBetaRGB(model.gasMix, model.seaLevelPressure, temperature, PresetBands.PHOTOPIC),
         );
 
-        // https://playerunknownproductions.net/news/atmospheric-scattering
-        this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.mieScatteringCoefficients = new Vector3(0.00002, 0.00002, 0.00002).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
-        );
-        this.mieAsymmetry = 0.76;
+        const mie = computeSpectralMie(model.aerosols, rayleighScaleHeight, PresetBands.PHOTOPIC);
+        this.mieHeight = mie.aerosolScaleHeight;
+        this.mieScatteringCoefficients = Vector3.FromArray(mie.betaRGB);
+        this.mieAsymmetry = Vector3.FromArray(mie.gRGB);
 
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
@@ -133,7 +132,7 @@ export class AtmosphereUniforms {
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, this.rayleighScatteringCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HEIGHT, this.mieHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, this.mieScatteringCoefficients);
-        effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, this.mieAsymmetry);
+        effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, this.mieAsymmetry);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_HEIGHT, this.ozoneHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, this.ozoneAbsorptionCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_FALLOFF, this.ozoneFalloff);

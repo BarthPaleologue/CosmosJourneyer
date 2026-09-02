@@ -91,6 +91,12 @@ describe("distanceToStellarObject", () => {
                     greenHouseEffectFactor: 1,
                     seaLevelPressure: 100_000,
                     gasMix: [["H2", 1]],
+                    aerosols: {
+                        tau550: 0.1,
+                        settlingCoefficient: 0.5,
+                        particleRadius: 1.5e-7,
+                        angstromExponent: 0.8,
+                    },
                 },
                 colorPalette: {
                     type: "textured",

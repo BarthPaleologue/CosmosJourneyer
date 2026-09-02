@@ -136,6 +136,7 @@ export function getSolSystemModel(): StarSystemModel {
                 ["CO2", 0.96],
                 ["N2", 0.04],
             ],
+            aerosols: { tau550: 30, settlingCoefficient: 0.3, particleRadius: 1e-6, angstromExponent: 0.1 },
         },
         clouds: {
             layerRadius: 6_051.8e3 + 10e3,
@@ -204,6 +205,7 @@ export function getSolSystemModel(): StarSystemModel {
                 ["O2", 0.21],
                 ["Ar", 0.01],
             ],
+            aerosols: { tau550: 0.05, settlingCoefficient: 0.15, particleRadius: 0.5e-6, angstromExponent: 0 },
         },
         clouds: {
             layerRadius: 6_371e3 + 30e3,
@@ -320,6 +322,7 @@ export function getSolSystemModel(): StarSystemModel {
                 ["Ar", 0.01],
                 ["O2", 0.01],
             ],
+            aerosols: { tau550: 0.1, settlingCoefficient: 1, particleRadius: 1e-6, angstromExponent: 0.6 },
         },
         rings: null,
         clouds: null,
@@ -365,6 +368,7 @@ export function getSolSystemModel(): StarSystemModel {
                 ["He", 0.15],
                 ["CH4", 0.02],
             ],
+            aerosols: { tau550: 0.08, settlingCoefficient: 1, particleRadius: 1e-7, angstromExponent: 0.9 },
         },
         rings: {
             innerRadius: 50_724e3,
@@ -409,6 +413,7 @@ export function getSolSystemModel(): StarSystemModel {
                 ["He", 0.19],
                 ["CH4", 0.01],
             ],
+            aerosols: { tau550: 0.5, settlingCoefficient: 1, particleRadius: 2.4e-7, angstromExponent: 1 },
         },
         rings: null,
         seed: 0,

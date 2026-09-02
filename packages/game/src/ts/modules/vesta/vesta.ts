@@ -182,6 +182,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 ["O2", 0.21],
                 ["Ar", 0.01],
             ],
+            aerosols: { tau550: 0.05, settlingCoefficient: 0.15, particleRadius: 0.5e-6, angstromExponent: 0 },
         },
         clouds: {
             color: { r: 0.9, g: 0.9, b: 0.9 },
@@ -392,6 +393,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 ["H2", 0.9],
                 ["He", 0.1],
             ],
+            aerosols: { tau550: 0.1, settlingCoefficient: 0.5, particleRadius: 1.5e-7, angstromExponent: 0.8 },
         },
         colorPalette: {
             type: "procedural",
