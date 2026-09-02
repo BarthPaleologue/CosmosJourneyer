@@ -696,9 +696,11 @@ export class StarSystemView implements View {
             this.defaultControls = new DefaultControls(this.scene);
             this.defaultControls.speed = 0.2 * Settings.EARTH_RADIUS;
             this.defaultControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.defaultControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
         }
 
         this.vehicleControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+        this.vehicleControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
 
         if (nextPlayer !== this.player) {
             this.player.copyFrom(nextPlayer, this.universeBackend);
@@ -767,6 +769,7 @@ export class StarSystemView implements View {
                 this.notificationManager,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+            this.spaceshipControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
             this.clusteredLightingSystem.registerRegion(spaceship);
         } else {
             const oldSpaceship = this.spaceshipControls.getSpaceship();
@@ -785,6 +788,7 @@ export class StarSystemView implements View {
                 this.characterControls = new CharacterControls(humanoidAvatar, this.scene);
                 this.characterControls.getTransform().setEnabled(false);
                 this.characterControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
+                this.characterControls.getCameras().forEach((camera) => (camera.minZ = 0.1));
                 this.interactionSystem.enableForCamera(
                     this.characterControls.firstPersonCamera,
                     Settings.CHARACTER_FIRST_PERSON_INTERACTION_RANGE,
