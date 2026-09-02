@@ -10,6 +10,19 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let coordinate = coordinates[id.x];
     let cos_latitude = cos(coordinate.x);
     let unit_position = vec3<f32>(cos_latitude * cos(coordinate.y), sin(coordinate.x), cos_latitude * sin(coordinate.y));
-    var settings = array<f32, 8>(params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8]);
+    var settings = array<f32, 12>(
+        params[1],
+        params[2],
+        params[3],
+        params[4],
+        params[5],
+        params[6],
+        params[7],
+        params[8],
+        params[9],
+        params[10],
+        params[11],
+        params[12],
+    );
     heights[id.x] = terrain_elevation(unit_position, &settings);
 }
