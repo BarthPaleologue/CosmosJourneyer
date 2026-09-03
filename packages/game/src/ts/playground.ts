@@ -114,6 +114,7 @@ const maxFrameCounterValue = Number(maxFrameCounter);
 if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
     engine["getDeltaTime"] = (): number => 0; // Disable delta time to freeze the scene
     scene.useConstantAnimationDeltaTime = true;
+    scene.physicsEnabled = false;
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;
