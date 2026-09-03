@@ -70,6 +70,10 @@ export async function createStarMapViewScene(
     const urlParams = new URLSearchParams(window.location.search);
     const customSystemCoordinates = urlParams.get("systemCoordinates");
 
+    if (urlParams.get("freeze") !== null) {
+        starMap.setFadeDurations(0, 0);
+    }
+
     // If system parameter was provided, focus on the specified system
     if (customSystemCoordinates !== null) {
         const systemCoordinates = jsonSafeParse(decodeURIComponent(customSystemCoordinates));

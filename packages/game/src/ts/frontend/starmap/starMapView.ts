@@ -359,6 +359,10 @@ export class StarMapView implements View {
         );
     }
 
+    public setFadeDurations(fadeInDurationMs: number, fadeOutDurationMs: number): void {
+        this.starMap.setFadeDurations(fadeInDurationMs, fadeOutDurationMs);
+    }
+
     public setCurrentStarSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean): void {
         this.currentSystemCoordinates = starSystemCoordinates;
         this.selectedSystemCoordinates = starSystemCoordinates;
