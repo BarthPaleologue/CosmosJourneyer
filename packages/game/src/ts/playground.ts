@@ -113,6 +113,7 @@ const maxFrameCounter = urlParams.get("freeze");
 const maxFrameCounterValue = Number(maxFrameCounter);
 if (maxFrameCounter !== null && !isNaN(maxFrameCounterValue)) {
     engine["getDeltaTime"] = (): number => 0; // Disable delta time to freeze the scene
+    window.performance.now = (): number => 0; // Babylon advances skeletal animations on PrecisionDate.Now (wall clock); pin it so the frozen pose is deterministic
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
         frameCounter++;

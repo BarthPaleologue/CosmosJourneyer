@@ -52,7 +52,7 @@ export class StarMap {
     readonly onSystemHoverStart = new Observable<StarSystemCoordinates>();
     readonly onSystemHoverEnd = new Observable<StarSystemCoordinates>();
 
-    private readonly fadeOutAnimationDuration = 1000;
+    private fadeOutAnimationDuration = 1000;
     private readonly fadeOutAnimationFrameRate = 60;
     private readonly fadeOutAnimation = new Animation(
         "fadeIn",
@@ -62,7 +62,7 @@ export class StarMap {
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
 
-    private readonly fadeInAnimationDuration = 1000;
+    private fadeInAnimationDuration = 1000;
     private readonly fadeInAnimationFrameRate = 60;
     private readonly fadeInAnimation = new Animation(
         "fadeIn",
@@ -143,6 +143,31 @@ export class StarMap {
 
         this.blackHoleTemplate.material = blackHoleMaterial;
 
+        this.rebuildFadeKeys();
+
+        this.shimmerAnimation.setKeys([
+            {
+                frame: 0,
+                value: 1.0,
+            },
+            {
+                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate / 2,
+                value: 1.4,
+            },
+            {
+                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate,
+                value: 1.0,
+            },
+        ]);
+    }
+
+    public setFadeDurations(fadeInDurationMs: number, fadeOutDurationMs: number): void {
+        this.fadeInAnimationDuration = fadeInDurationMs;
+        this.fadeOutAnimationDuration = fadeOutDurationMs;
+        this.rebuildFadeKeys();
+    }
+
+    private rebuildFadeKeys(): void {
         this.fadeOutAnimation.setKeys([
             {
                 frame: 0,
@@ -162,21 +187,6 @@ export class StarMap {
             {
                 frame: this.fadeInAnimationDuration / this.fadeInAnimationFrameRate,
                 value: 1,
-            },
-        ]);
-
-        this.shimmerAnimation.setKeys([
-            {
-                frame: 0,
-                value: 1.0,
-            },
-            {
-                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate / 2,
-                value: 1.4,
-            },
-            {
-                frame: this.shimmerAnimationDuration / this.shimmerAnimationFrameRate,
-                value: 1.0,
             },
         ]);
     }
@@ -243,7 +253,12 @@ export class StarMap {
         initializedInstance.position.copyFrom(data.position);
 
         const objectColor = getRgbFromTemperature(stellarObjectModel.blackBodyTemperature);
-        initializedInstance.instancedBuffers["color"] = new Color4(objectColor.r, objectColor.g, objectColor.b, 0.0);
+        initializedInstance.instancedBuffers["color"] = new Color4(
+            objectColor.r,
+            objectColor.g,
+            objectColor.b,
+            this.fadeInAnimationDuration <= 0 ? 1 : 0,
+        );
 
         initializedInstance.setEnabled(true);
         initializedInstance.isPickable = true;
@@ -362,6 +377,10 @@ export class StarMap {
     }
 
     private fadeIn(instance: InstancedMesh): void {
+        if (this.fadeInAnimationDuration <= 0) {
+            return;
+        }
+
         instance.animations = [this.fadeInAnimation];
         instance
             .getScene()
@@ -382,6 +401,23 @@ export class StarMap {
     }
 
     private fadeOutThenRecycle(instance: InstancedMesh, recyclingList: Array<InstancedMesh>): void {
+        const recycle = (): void => {
+            instance.setEnabled(false);
+
+            const coordinatesKey = this.instanceToCoordinatesMap.get(instance);
+            if (coordinatesKey !== undefined) {
+                this.coordinatesToInstanceMap.delete(coordinatesKey);
+            }
+
+            this.instanceToCoordinatesMap.delete(instance);
+            recyclingList.push(instance);
+        };
+
+        if (this.fadeOutAnimationDuration <= 0) {
+            recycle();
+            return;
+        }
+
         instance.animations = [this.fadeOutAnimation];
         instance
             .getScene()
@@ -391,17 +427,7 @@ export class StarMap {
                 this.fadeOutAnimationDuration / this.fadeOutAnimationFrameRate,
                 false,
                 1,
-                () => {
-                    instance.setEnabled(false);
-
-                    const coordinatesKey = this.instanceToCoordinatesMap.get(instance);
-                    if (coordinatesKey !== undefined) {
-                        this.coordinatesToInstanceMap.delete(coordinatesKey);
-                    }
-
-                    this.instanceToCoordinatesMap.delete(instance);
-                    recyclingList.push(instance);
-                },
+                recycle,
             );
     }
 }
