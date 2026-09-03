@@ -172,7 +172,7 @@ vec4 raymarchNebula(vec3 rayOrigin, vec3 rayDirection, float maximumDistance) {
 }
 
 void main() {
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);
+    vec3 pixelWorldPosition = worldFromUV(vUV, 1.0, camera_inverseProjectionView);
     vec3 rayDirection = normalize(pixelWorldPosition - camera_position);
     vec4 fogData = raymarchNebula(camera_position, rayDirection, maxFogDistance);
     gl_FragColor = fogData;

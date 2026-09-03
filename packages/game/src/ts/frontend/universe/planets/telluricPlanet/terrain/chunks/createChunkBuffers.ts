@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Axis, Quaternion, Vector3 } from "@babylonjs/core/pure";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { build_chunk_vertex_data, BuildData } from "terrain-generation";
 
 import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";

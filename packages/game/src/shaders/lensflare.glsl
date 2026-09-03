@@ -33,7 +33,7 @@ float projectDepth(vec3 worldPosition) {
 }
 
 float sampleVisibilityAtUV(vec2 sampleUV, float depthEpsilon) {
-    vec3 sampleWorldPosition = worldFromUV(sampleUV, camera_inverseProjection, camera_inverseView);
+    vec3 sampleWorldPosition = worldFromUV(sampleUV, 1.0, camera_inverseProjectionView);
     vec3 sampleRay = normalize(sampleWorldPosition - camera_position);
     float sphereEnterDistance;
     float sphereExitDistance;
@@ -186,7 +186,7 @@ void main() {
         return;
     }
 
-    vec3 pixelWorldPosition = worldFromUV(vUV, camera_inverseProjection, camera_inverseView);// the pixel position in world space (near plane)
+    vec3 pixelWorldPosition = worldFromUV(vUV, 1.0, camera_inverseProjectionView);
     vec3 rayDir = normalize(pixelWorldPosition - camera_position);
 
     vec3 objectDirection = normalize(object_position - camera_position);

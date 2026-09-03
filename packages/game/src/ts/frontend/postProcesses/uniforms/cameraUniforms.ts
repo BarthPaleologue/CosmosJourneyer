@@ -24,9 +24,8 @@ import { OffsetViewToRef } from "@/frontend/helpers/floatingOrigin";
 export const CameraUniformNames = {
     CAMERA_POSITION: "camera_position",
     CAMERA_PROJECTION: "camera_projection",
-    CAMERA_INVERSE_PROJECTION: "camera_inverseProjection",
     CAMERA_VIEW: "camera_view",
-    CAMERA_INVERSE_VIEW: "camera_inverseView",
+    CAMERA_INVERSE_PROJECTION_VIEW: "camera_inverseProjectionView",
     CAMERA_NEAR: "camera_near",
     CAMERA_FAR: "camera_far",
     CAMERA_FOV: "camera_fov",
@@ -45,12 +44,11 @@ export function setCameraUniforms(effect: Effect, camera: Camera, floatingOrigin
         : camera.getWorldMatrix().getTranslationToRef(tempVector1);
     effect.setVector3(CameraUniformNames.CAMERA_POSITION, cameraPosition);
     effect.setMatrix(CameraUniformNames.CAMERA_PROJECTION, camera.getProjectionMatrix());
-    effect.setMatrix(
-        CameraUniformNames.CAMERA_INVERSE_PROJECTION,
-        camera.getProjectionMatrix().invertToRef(tempMatrix2),
-    );
     effect.setMatrix(CameraUniformNames.CAMERA_VIEW, view);
-    effect.setMatrix(CameraUniformNames.CAMERA_INVERSE_VIEW, view.invertToRef(tempMatrix3));
+    effect.setMatrix(
+        CameraUniformNames.CAMERA_INVERSE_PROJECTION_VIEW,
+        view.multiplyToRef(camera.getProjectionMatrix(), tempMatrix2).invertToRef(tempMatrix3),
+    );
     effect.setFloat(CameraUniformNames.CAMERA_NEAR, camera.minZ);
     effect.setFloat(CameraUniformNames.CAMERA_FAR, camera.maxZ);
     effect.setFloat(CameraUniformNames.CAMERA_FOV, camera.fov);
