@@ -107,8 +107,8 @@ export async function createSphericalHeightFieldTerrainScene(
         const heightTaskId = terrainSystem.requestHeights({
             planetModel: telluricPlanetModel,
             coordinates: surfaceDirections.map((direction) => ({
-                latitudeRadians: Math.asin(direction.y),
-                longitudeRadians: Math.atan2(direction.z, direction.x),
+                latitude: Math.asin(direction.y),
+                longitude: Math.atan2(direction.z, direction.x),
             })),
         });
 

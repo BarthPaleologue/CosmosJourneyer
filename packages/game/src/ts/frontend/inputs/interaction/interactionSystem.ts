@@ -15,16 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TransformNode } from "@babylonjs/core";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Ray } from "@babylonjs/core/Culling/ray.core";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import ReleaseInteraction from "@brianchirls/game-input/interactions/ReleaseInteraction";
+
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
@@ -35,8 +37,8 @@ export type Interaction = {
     perform: () => Promise<void>;
 };
 
-export interface Interactive {
-    getPhysicsAggregate(): { body: PhysicsBody; shape: PhysicsShape };
+export interface Interactive extends Transformable {
+    getPhysicsShape(): PhysicsShape;
     getInteractions(): Array<Interaction>;
 }
 
@@ -49,9 +51,9 @@ export class InteractionSystem {
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
-    private currentTarget: PhysicsBody | null = null;
+    private currentTarget: TransformNode | null = null;
 
-    private readonly interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
+    private readonly interactions: Map<TransformNode, () => Array<Interaction>> = new Map();
 
     private longPressTimer: number | null = null;
 
@@ -139,13 +141,14 @@ export class InteractionSystem {
     }
 
     public register(interactiveObject: Interactive): void {
-        const { body, shape } = interactiveObject.getPhysicsAggregate();
+        const shape = interactiveObject.getPhysicsShape();
         shape.filterMembershipMask |= this.mask;
 
-        this.interactions.set(body, () => interactiveObject.getInteractions());
+        const transform = interactiveObject.getTransform();
 
-        body.transformNode.onDisposeObservable.addOnce(() => {
-            this.interactions.delete(body);
+        this.interactions.set(transform, () => interactiveObject.getInteractions());
+        transform.onDisposeObservable.addOnce(() => {
+            this.interactions.delete(transform);
         });
     }
 
@@ -162,7 +165,7 @@ export class InteractionSystem {
         return [...interactionGetter()];
     }
 
-    public getCurrentTarget(): PhysicsBody | null {
+    public getCurrentTarget(): TransformNode | null {
         return this.currentTarget;
     }
 
@@ -200,7 +203,7 @@ export class InteractionSystem {
             return;
         }
 
-        this.currentTarget = physicsBody;
+        this.currentTarget = physicsBody.transformNode;
     }
 
     public update(deltaSeconds: number): void {

@@ -17,6 +17,8 @@
 
 import type { Scene } from "@babylonjs/core/scene";
 
+import { loadFonts } from "./fonts";
+import type { Fonts } from "./fonts";
 import type { ILoadingProgressMonitor } from "./loadingProgressMonitor";
 import { initMaterials } from "./materials";
 import type { Materials } from "./materials";
@@ -26,6 +28,7 @@ import { loadTextures } from "./textures";
 import type { Textures } from "./textures";
 
 export type RenderingAssets = {
+    readonly fonts: Fonts;
     readonly textures: Textures;
     readonly materials: Materials;
     readonly objects: Objects;
@@ -35,6 +38,7 @@ export async function loadRenderingAssets(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<RenderingAssets> {
+    const fontsPromise = loadFonts(progressMonitor);
     const texturesPromise = loadTextures(scene, progressMonitor);
 
     const textures = await texturesPromise;
@@ -44,6 +48,7 @@ export async function loadRenderingAssets(
     const objectsPromise = loadObjects(materials, scene, progressMonitor);
 
     return {
+        fonts: await fontsPromise,
         textures: textures,
         materials: materials,
         objects: await objectsPromise,

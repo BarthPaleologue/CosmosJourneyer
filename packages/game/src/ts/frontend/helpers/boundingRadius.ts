@@ -15,25 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { TransformNode } from "@babylonjs/core/pure";
 
-import type { FaceIndex } from "../chunks/faceIndex";
-
-export type BuildChunkInput = {
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
-    depth: number;
-    faceIndex: FaceIndex;
-    position: Vector3;
-};
-
-export type GeographicCoordinates = {
-    readonly latitude: number;
-    readonly longitude: number;
-};
-
-export type ComputeHeightsInput = {
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
-    coordinates: ReadonlyArray<GeographicCoordinates>;
-};
+export function getBoundingRadius(transform: TransformNode): number {
+    const { min: boundingMin, max: boundingMax } = transform.getHierarchyBoundingVectors();
+    return boundingMax.subtract(boundingMin).length() / 2;
+}

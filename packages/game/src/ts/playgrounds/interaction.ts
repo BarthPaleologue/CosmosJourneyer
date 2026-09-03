@@ -217,7 +217,8 @@ function spawnBoxAtPosition(
     boxAggregate.shape.filterMembershipMask = CollisionMask.DYNAMIC_OBJECTS;
 
     interactionSystem.register({
-        getPhysicsAggregate: () => boxAggregate,
+        getTransform: () => box,
+        getPhysicsShape: () => boxAggregate.shape,
         getInteractions: () => [
             {
                 label: "push",

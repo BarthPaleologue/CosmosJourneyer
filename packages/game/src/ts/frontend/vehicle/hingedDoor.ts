@@ -18,9 +18,7 @@
 import { PhysicsConstraintMotorType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
 import i18n from "@/i18n";
 
@@ -70,8 +68,12 @@ export class HingedDoor implements Door {
         return this.state;
     }
 
-    getPhysicsAggregate(): { body: PhysicsBody; shape: PhysicsShape } {
-        return this.doorAggregate;
+    getPhysicsShape() {
+        return this.doorAggregate.shape;
+    }
+
+    getTransform() {
+        return this.doorAggregate.transformNode;
     }
 
     getInteractions(): Array<Interaction> {

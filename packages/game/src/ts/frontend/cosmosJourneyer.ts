@@ -53,6 +53,7 @@ import { MusicConductor } from "@/frontend/audio/musicConductor";
 import { SoundPlayer, SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
+import { initializeCsg2 } from "@/frontend/helpers/csg2";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
 import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
@@ -468,9 +469,9 @@ export class CosmosJourneyer {
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
-        // Init Havok physics engine
-        const havokInstance = await HavokPhysics();
-        console.log(`Havok initialized`);
+        // Init geometry and physics engines
+        const [havokInstance] = await Promise.all([HavokPhysics(), initializeCsg2()]);
+        console.log(`Havok and CSG2 initialized`);
 
         const player = Player.Default(backend.universe);
 
