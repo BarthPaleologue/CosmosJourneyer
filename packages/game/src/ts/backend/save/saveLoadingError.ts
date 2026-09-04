@@ -22,6 +22,9 @@ import i18n from "@/i18n";
 
 export type SaveLoadingError =
     | {
+          type: "SAVE_NOT_FOUND";
+      }
+    | {
           type: "INVALID_JSON";
       }
     | {
@@ -41,6 +44,8 @@ export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
             return i18n.t("notifications:invalidSaveFile");
         case "INVALID_STORAGE_FORMAT":
             return i18n.t("notifications:invalidStorageFormat");
+        case "SAVE_NOT_FOUND":
+            return i18n.t("notifications:saveNotFound");
         default:
             return assertUnreachable(error);
     }
