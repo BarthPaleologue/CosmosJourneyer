@@ -27,11 +27,14 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { decodeBase64 } from "@/utils/base64";
 import { jsonSafeParse } from "@/utils/json";
 
+import { initI18n } from "@/i18n";
+
 import { ConsoleDumper } from "./utils/consoleDumper";
 import { CrashReporter } from "./utils/crashReporter";
 
 const consoleDumper = new ConsoleDumper();
-const crashReporter = new CrashReporter(consoleDumper);
+const t = await initI18n();
+const crashReporter = new CrashReporter(consoleDumper, t);
 const soundPlayerMock = new SoundPlayerMock();
 
 try {
@@ -49,14 +52,14 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string): 
     const json = jsonSafeParse(jsonString);
     if (json === null) {
         console.error(jsonString);
-        await alertModal("Error, this save file is not a valid json.", soundPlayerMock);
+        await alertModal("Error, this save file is not a valid json.", soundPlayerMock, t);
         await simpleInit(engine);
         return;
     }
 
     const result = safeParseSave(json, engine.backend.universe);
     if (!result.success) {
-        await alertModal("Error, this save file is invalid. See the console for more details.", soundPlayerMock);
+        await alertModal("Error, this save file is invalid. See the console for more details.", soundPlayerMock, t);
         await simpleInit(engine);
         return;
     }
@@ -66,7 +69,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string): 
 }
 
 async function startCosmosJourneyer(): Promise<void> {
-    const engine = await CosmosJourneyer.CreateAsync();
+    const engine = await CosmosJourneyer.CreateAsync(t);
 
     const urlParams = new URLSearchParams(window.location.search);
 

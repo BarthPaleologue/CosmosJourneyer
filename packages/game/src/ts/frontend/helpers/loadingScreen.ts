@@ -1,7 +1,6 @@
 import type { ILoadingScreen } from "@babylonjs/core/Loading/loadingScreen";
 import type { Nullable } from "@babylonjs/core/types";
-
-import i18next from "@/i18n";
+import type { TFunction } from "i18next";
 
 import loadingScreen1Url from "@assets/loadingScreens/loadingScreen1.webp";
 import loadingScreen2Url from "@assets/loadingScreens/loadingScreen2.webp";
@@ -36,13 +35,15 @@ export class LoadingScreen implements ILoadingScreen {
     private activeLoadingScreenImageLayerIndex = 0;
 
     private readonly canvas: HTMLCanvasElement;
+    private readonly t: TFunction;
 
     /**
      * Creates a new default loading screen
      * @param canvas defines the canvas used to render the scene
      */
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, t: TFunction) {
         this.canvas = canvas;
+        this.t = t;
     }
 
     /**
@@ -143,8 +144,8 @@ export class LoadingScreen implements ILoadingScreen {
         const percentage = startedCount === 0 ? 0 : (completedCount / startedCount) * 100;
         this.loadingUIText =
             startedCount === 0
-                ? i18next.t("common:loading")
-                : `${i18next.t("common:loading")} (${completedCount}/${startedCount})`;
+                ? this.t("common:loading")
+                : `${this.t("common:loading")} (${completedCount}/${startedCount})`;
         this.progressBar?.style.setProperty("--progress", `${percentage}%`);
     }
 

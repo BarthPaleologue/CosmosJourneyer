@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { renderMarkdownInline } from "@/utils/markdown";
+import type { TFunction } from "i18next";
 
-import i18n from "@/i18n";
+import { renderMarkdownInline } from "@/utils/markdown";
 
 export function isOfficialGameLocation(location: Pick<Location, "hostname" | "protocol">): boolean {
     return (
@@ -30,6 +30,7 @@ export function isOfficialGameLocation(location: Pick<Location, "hostname" | "pr
 }
 
 export function createOfficialOriginNotice(
+    t: TFunction,
     location: Pick<Location, "hostname" | "protocol"> = window.location,
 ): HTMLElement | null {
     if (isOfficialGameLocation(location)) {
@@ -38,6 +39,6 @@ export function createOfficialOriginNotice(
 
     const notice = document.createElement("aside");
     notice.classList.add("officialOriginNotice");
-    notice.innerHTML = renderMarkdownInline(i18n.t("common:unofficialOriginNotice"));
+    notice.innerHTML = renderMarkdownInline(t("common:unofficialOriginNotice"));
     return notice;
 }

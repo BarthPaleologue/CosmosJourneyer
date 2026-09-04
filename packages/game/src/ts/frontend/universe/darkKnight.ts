@@ -23,6 +23,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { DarkKnightModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import type { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
@@ -78,8 +79,8 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
         return this.radius;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     getTransform(): TransformNode {

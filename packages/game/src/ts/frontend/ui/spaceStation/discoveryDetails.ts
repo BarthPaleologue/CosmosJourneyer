@@ -18,6 +18,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -29,7 +30,6 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 
 import { parseDistance, parseSecondsPrecise } from "@/utils/strings/parseToStrings";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 import type { INotificationManager } from "../notificationManager";
@@ -62,15 +62,20 @@ export class DiscoveryDetails {
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
 
+    private readonly t: TFunction;
+
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalactica,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.soundPlayer = soundPlayer;
         this.notificationManager = notificationManager;
+
+        this.t = t;
 
         this.player = player;
         this.encyclopaedia = encyclopaedia;
@@ -79,7 +84,7 @@ export class DiscoveryDetails {
         this.htmlRoot.classList.add("flex-column", "discoveryDetails");
 
         this.placeHolderText = document.createElement("p");
-        this.placeHolderText.textContent = i18n.t("explorationCenter:detailsPlaceholder");
+        this.placeHolderText.textContent = this.t("explorationCenter:detailsPlaceholder");
 
         this.objectName = document.createElement("h2");
 
@@ -135,13 +140,14 @@ export class DiscoveryDetails {
             await alertModal(
                 "System could not be found for the discovery. More information in the console.",
                 this.soundPlayer,
+                this.t,
             );
             return;
         }
 
         const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
 
-        this.objectName.innerText = objectModel?.name ?? i18n.t("common:unknown");
+        this.objectName.innerText = objectModel?.name ?? this.t("common:unknown");
         this.htmlRoot.appendChild(this.objectName);
 
         if (objectModel === null) {
@@ -149,17 +155,18 @@ export class DiscoveryDetails {
             await alertModal(
                 "Object could not be found for the discovery. More information in the console.",
                 this.soundPlayer,
+                this.t,
             );
             return;
         }
 
-        this.objectType.innerText = i18n.t("orbitalObject:type", {
-            value: getOrbitalObjectTypeToI18nString(objectModel),
+        this.objectType.innerText = this.t("orbitalObject:type", {
+            value: getOrbitalObjectTypeToI18nString(objectModel, this.t),
         });
         this.htmlRoot.appendChild(this.objectType);
 
-        this.siderealDayDuration.innerText = i18n.t("orbitalObject:siderealDayDuration", {
-            value: parseSecondsPrecise(objectModel.rotation.siderealPeriod),
+        this.siderealDayDuration.innerText = this.t("orbitalObject:siderealDayDuration", {
+            value: parseSecondsPrecise(objectModel.rotation.siderealPeriod, this.t),
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
@@ -168,13 +175,13 @@ export class DiscoveryDetails {
         const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
 
         const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
-        this.orbitDuration.innerText = i18n.t("orbit:period", {
-            value: parseSecondsPrecise(orbitalPeriod),
+        this.orbitDuration.innerText = this.t("orbit:period", {
+            value: parseSecondsPrecise(orbitalPeriod, this.t),
         });
         this.htmlRoot.appendChild(this.orbitDuration);
 
-        this.orbitRadius.innerText = i18n.t("orbit:radius", {
-            value: parseDistance(objectModel.orbit.semiMajorAxis),
+        this.orbitRadius.innerText = this.t("orbit:radius", {
+            value: parseDistance(objectModel.orbit.semiMajorAxis, this.t),
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 
@@ -183,7 +190,7 @@ export class DiscoveryDetails {
             if (sellingPrice.success) {
                 this.htmlRoot.appendChild(this.sellDiscoveryButton);
 
-                this.sellDiscoveryButton.textContent = i18n.t("common:sellFor", {
+                this.sellDiscoveryButton.textContent = this.t("common:sellFor", {
                     price: `${sellingPrice.value.toLocaleString()}${Settings.CREDIT_SYMBOL}`,
                 });
             } else {
@@ -191,6 +198,7 @@ export class DiscoveryDetails {
                 await alertModal(
                     "Could not estimate the selling price. More information in the console.",
                     this.soundPlayer,
+                    this.t,
                 );
             }
         }

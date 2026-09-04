@@ -24,6 +24,7 @@ import {
 } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type Interaction from "@brianchirls/game-input/interactions/Interaction";
+import type { TFunction } from "i18next";
 
 import {
     axisCompositeToString,
@@ -36,24 +37,22 @@ import { InputMaps } from "@/frontend/inputs/inputMaps";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
-import i18n from "@/i18n";
-
 import type { MusicConductor } from "../../audio/musicConductor";
 
 export class SettingsPanel {
     readonly htmlRoot: HTMLElement;
 
-    constructor(musicConductor: MusicConductor) {
-        this.htmlRoot = this.createPanelHTML(musicConductor);
+    constructor(musicConductor: MusicConductor, t: TFunction) {
+        this.htmlRoot = this.createPanelHTML(musicConductor, t);
     }
 
-    private createPanelHTML(musicConductor: MusicConductor): HTMLElement {
+    private createPanelHTML(musicConductor: MusicConductor, t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.className = "sidePanel";
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:settings");
+        title.textContent = t("sidePanel:settings");
         panel.appendChild(title);
 
         // Audio settings section
@@ -61,7 +60,7 @@ export class SettingsPanel {
         audioSection.classList.add("settings-section");
 
         const volumeTitle = document.createElement("h3");
-        volumeTitle.textContent = i18n.t("sidePanel:audioSettings");
+        volumeTitle.textContent = t("sidePanel:audioSettings");
         volumeTitle.style.fontFamily = "Nasalization, sans-serif";
         audioSection.appendChild(volumeTitle);
 
@@ -72,7 +71,7 @@ export class SettingsPanel {
         sliderContainer.style.fontFamily = "Nasalization, sans-serif";
 
         const sliderLabel = document.createElement("label");
-        sliderLabel.textContent = i18n.t("sidePanel:musicVolume");
+        sliderLabel.textContent = t("sidePanel:musicVolume");
         sliderLabel.style.fontFamily = "Nasalization, sans-serif";
         sliderLabel.style.minWidth = "80px";
         sliderLabel.style.flexGrow = "1";

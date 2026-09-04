@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
@@ -27,8 +28,6 @@ import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsStrin
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { renderMarkdownBlock } from "@/utils/markdown";
 
-import i18n from "@/i18n";
-
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import type { Tutorial } from "./tutorial";
 
@@ -37,6 +36,11 @@ import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 
 export class TemplateTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
+        this.t = t;
+    }
 
     getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, universeBackend);
@@ -58,15 +62,15 @@ export class TemplateTutorial implements Tutorial {
             <p>Welcome, Commander! This is a tutorial about tutorials! Now this is meta.</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:navigationInfo", {
+                this.t("tutorials:common:navigationInfo", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                     previousKeys: pressInteractionToStrings(
                         TutorialControlsInputs.map.prevPanel,
                         keyboardLayoutMap,
-                    ).join(` ${i18n.t("common:or")} `),
+                    ).join(` ${this.t("common:or")} `),
                 }),
             )}
         </div>`;
@@ -74,10 +78,10 @@ export class TemplateTutorial implements Tutorial {
         const endPanelHtml = `
         <div class="tutorialContent">
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:tutorialEnding", {
+                this.t("tutorials:common:tutorialEnding", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                 }),
             )}

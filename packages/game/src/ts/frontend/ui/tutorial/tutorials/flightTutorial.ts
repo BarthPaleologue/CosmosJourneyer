@@ -17,6 +17,7 @@
 
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type { Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
@@ -29,8 +30,6 @@ import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/hel
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { renderMarkdownBlock } from "@/utils/markdown";
-
-import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import type { Tutorial } from "./tutorial";
@@ -46,16 +45,22 @@ import welcomeImageSrc from "@assets/tutorials/flightTutorial/welcome.webp";
 export class FlightTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
 
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
+        this.t = t;
+    }
+
     getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, universeBackend);
     }
 
     getTitle(): string {
-        return i18n.t("tutorials:flightTutorial:title");
+        return this.t("tutorials:flightTutorial:title");
     }
 
     getDescription(): string {
-        return i18n.t("tutorials:flightTutorial:description");
+        return this.t("tutorials:flightTutorial:description");
     }
 
     async getContentPanelsHtml(): Promise<string[]> {
@@ -63,27 +68,27 @@ export class FlightTutorial implements Tutorial {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>${i18n.t("tutorials:flightTutorial:welcome")}</p>
+            <p>${this.t("tutorials:flightTutorial:welcome")}</p>
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:navigationInfo", {
+                this.t("tutorials:common:navigationInfo", {
                     nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                     previousKeys: pressInteractionToStrings(
                         TutorialControlsInputs.map.prevPanel,
                         keybordLayoutMap,
-                    ).join(` ${i18n.t("common:or")} `),
+                    ).join(` ${this.t("common:or")} `),
                 }),
             )}
         </div>`;
 
         const rotationPanelHtml = `
         <div class="tutorialContent">
-            <h2>${i18n.t("tutorials:flightTutorial:spaceShipRotationTitle")}</h2>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText1")}</p>
+            <h2>${this.t("tutorials:flightTutorial:spaceShipRotationTitle")}</h2>
+            <p>${this.t("tutorials:flightTutorial:spaceShipRotationText1")}</p>
             <img src="${rotationImageSrc}" alt="Spaceship Rotation">
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText2")}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipRotationText3")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipRotationText2")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipRotationText3")}</p>
         </div>`;
 
         const control = SpaceShipControlsInputs.map.throttle.bindings[0]?.control;
@@ -94,46 +99,46 @@ export class FlightTutorial implements Tutorial {
 
         const thrustPanelHtml = `
         <div class="tutorialContent">
-            <h2>${i18n.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText1", {
+            <h2>${this.t("tutorials:flightTutorial:spaceShipThrustTitle")}</h2>
+            <p>${this.t("tutorials:flightTutorial:spaceShipThrustText1", {
                 keyIncrease: throttleStrings[1]?.[1],
                 keyDecrease: throttleStrings[0]?.[1],
                 keyKill: pressInteractionToStrings(SpaceShipControlsInputs.map.throttleToZero, keybordLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
+                    ` ${this.t("common:or")} `,
                 ),
             })}</p>
             <img src="${thrustImageSrc}" alt="Spaceship Thrust">
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipThrustText3")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipThrustText2")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipThrustText3")}</p>
         </div>`;
 
         const warpPanelHtml = `
         <div class="tutorialContent">
-            <h2>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveTitle")}</h2>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText1")}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText2", { keyToggle: pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keybordLayoutMap).join(` ${i18n.t("common:or")} `) })}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipWarpDriveText3")}</p>
+            <h2>${this.t("tutorials:flightTutorial:spaceShipWarpDriveTitle")}</h2>
+            <p>${this.t("tutorials:flightTutorial:spaceShipWarpDriveText1")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipWarpDriveText2", { keyToggle: pressInteractionToStrings(SpaceShipControlsInputs.map.toggleWarpDrive, keybordLayoutMap).join(` ${this.t("common:or")} `) })}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipWarpDriveText3")}</p>
             <img src="${warpImageSrc}" alt="Warp Drive">
         </div>`;
 
         const targetingPanelHtml = `
         <div class="tutorialContent">
-            <h2>${i18n.t("tutorials:flightTutorial:spaceShipTargetingTitle")}</h2>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText1")}</p>
+            <h2>${this.t("tutorials:flightTutorial:spaceShipTargetingTitle")}</h2>
+            <p>${this.t("tutorials:flightTutorial:spaceShipTargetingText1")}</p>
             <img src="${targetImageSrc}" alt="Spaceship Targeting">
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText2", { keyTarget: pressInteractionToStrings(StarSystemInputs.map.setTarget, keybordLayoutMap).join(` ${i18n.t("common:or")} `) })}</p>
-            <p>${i18n.t("tutorials:flightTutorial:spaceShipTargetingText3")}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipTargetingText2", { keyTarget: pressInteractionToStrings(StarSystemInputs.map.setTarget, keybordLayoutMap).join(` ${this.t("common:or")} `) })}</p>
+            <p>${this.t("tutorials:flightTutorial:spaceShipTargetingText3")}</p>
         </div>`;
 
         const congratsPanelHtml = `
         <div class="tutorialContent">
             <img src="${congratsImageSrc}" alt="Congratulations!">
-            <p>${i18n.t("tutorials:flightTutorial:congratulationsText1")}</p>
+            <p>${this.t("tutorials:flightTutorial:congratulationsText1")}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:tutorialEnding", {
+                this.t("tutorials:common:tutorialEnding", {
                     keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keybordLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                 }),
             )}

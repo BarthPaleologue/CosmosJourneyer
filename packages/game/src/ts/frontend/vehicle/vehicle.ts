@@ -21,10 +21,9 @@ import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEngine
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
+import type { TFunction } from "i18next";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
-
-import i18n from "@/i18n";
 
 import { ObjectTargetCursorType } from "../universe/architecture/targetable";
 import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
@@ -184,8 +183,8 @@ export class Vehicle implements Targetable {
         return this.boundingRadius;
     }
 
-    getTypeName(): string {
-        return i18n.t("objectTypes:vehicle");
+    getTypeName(t: TFunction): string {
+        return t("objectTypes:vehicle");
     }
 
     getFrameAggregate(): PhysicsAggregate {

@@ -28,6 +28,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { C } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
@@ -45,7 +46,6 @@ import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architect
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { SpaceDots } from "../assets/procedural/spaceDots";
@@ -303,8 +303,8 @@ export class Spaceship implements Transformable, Targetable, ClusteredLightingRe
         return this.mainThrusters.map((thruster) => thruster.light);
     }
 
-    public getTypeName(): string {
-        return i18n.t("objectTypes:spaceship");
+    public getTypeName(t: TFunction): string {
+        return t("objectTypes:spaceship");
     }
 
     public getAltimeter(): Altimeter {

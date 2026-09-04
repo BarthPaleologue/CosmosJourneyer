@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 
+import type { TFunction } from "i18next";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 
 import type { DesktopUpdateApi, DesktopUpdateState } from "@/utils/desktopUpdateApi";
 
-import i18n, { initI18n } from "@/i18n";
+import { initI18n } from "@/i18n";
 
 import { DesktopUpdateController } from "./desktopUpdateController";
 import type { DesktopUpdatePlayerActions, UpdatePresentationContext } from "./desktopUpdateController";
@@ -41,8 +42,10 @@ class DesktopUpdateApiMock implements DesktopUpdateApi {
 }
 
 describe("DesktopUpdateController", () => {
+    let t: TFunction;
+
     beforeAll(async () => {
-        await initI18n();
+        t = await initI18n();
     });
 
     beforeEach(() => {
@@ -64,6 +67,7 @@ describe("DesktopUpdateController", () => {
             createPlayerActions(() => "pauseMenu"),
             new NotificationManagerMock(),
             new SoundPlayerMock(),
+            t,
         );
 
         await controller.start();
@@ -84,6 +88,7 @@ describe("DesktopUpdateController", () => {
             playerActions,
             new NotificationManagerMock(),
             new SoundPlayerMock(),
+            t,
         );
 
         await controller.start();
@@ -96,7 +101,7 @@ describe("DesktopUpdateController", () => {
         expect(Array.from(document.querySelectorAll("button")).some((button) => button.title.length > 0)).toBe(true);
         expect(
             Array.from(document.querySelectorAll("button")).some(
-                (button) => button.textContent === i18n.t("desktopUpdate:downloadLatestCommanderBackup"),
+                (button) => button.textContent === t("desktopUpdate:downloadLatestCommanderBackup"),
             ),
         ).toBe(true);
         expect(document.querySelectorAll("menu")).toHaveLength(1);
@@ -115,6 +120,7 @@ describe("DesktopUpdateController", () => {
             playerActions,
             new NotificationManagerMock(),
             new SoundPlayerMock(),
+            t,
         );
         await controller.start();
 
@@ -132,7 +138,7 @@ describe("DesktopUpdateController", () => {
         expect(progressBar?.style.getPropertyValue("--progress")).toBe("42%");
         expect(progressBar?.getAttribute("aria-valuenow")).toBe("42");
         expect(document.querySelectorAll("button")).toHaveLength(1);
-        expect(document.querySelector("button")?.textContent).toBe(i18n.t("common:cancel"));
+        expect(document.querySelector("button")?.textContent).toBe(t("common:cancel"));
 
         const dialog = document.querySelector("dialog");
         const cancelEvent = new Event("cancel", { cancelable: true });
@@ -163,14 +169,15 @@ describe("DesktopUpdateController", () => {
             createPlayerActions(() => "mainMenu"),
             new NotificationManagerMock(),
             new SoundPlayerMock(),
+            t,
         );
 
         await controller.start();
 
         const paragraphs = document.querySelectorAll("dialog p");
         expect(paragraphs).toHaveLength(2);
-        expect(paragraphs[0]?.textContent).toBe(i18n.t("desktopUpdate:installationUnchangedAfterDownloadFailure"));
-        expect(paragraphs[1]?.textContent).toBe(i18n.t("desktopUpdate:downloadCanBeRetried"));
+        expect(paragraphs[0]?.textContent).toBe(t("desktopUpdate:installationUnchangedAfterDownloadFailure"));
+        expect(paragraphs[1]?.textContent).toBe(t("desktopUpdate:downloadCanBeRetried"));
     });
 });
 

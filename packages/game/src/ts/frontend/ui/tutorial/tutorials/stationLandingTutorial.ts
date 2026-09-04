@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
@@ -29,8 +30,6 @@ import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInpu
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { renderMarkdownBlock } from "@/utils/markdown";
 
-import i18n from "@/i18n";
-
 import type { Tutorial } from "./tutorial";
 
 import saveData from "@assets/tutorials/stationLandingTutorial/save.json";
@@ -42,16 +41,22 @@ import stationServicesImageSrc from "@assets/tutorials/stationLandingTutorial/st
 export class StationLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = station1ImageSrc;
 
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
+        this.t = t;
+    }
+
     getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, universeBackend);
     }
 
     getTitle(): string {
-        return i18n.t("tutorials:stationLanding:title");
+        return this.t("tutorials:stationLanding:title");
     }
 
     getDescription(): string {
-        return i18n.t("tutorials:stationLanding:description");
+        return this.t("tutorials:stationLanding:description");
     }
 
     async getContentPanelsHtml(): Promise<string[]> {
@@ -59,20 +64,20 @@ export class StationLandingTutorial implements Tutorial {
         const presentationPanelHtml = `
         <div class="tutorialContent">
             <img src="${station1ImageSrc}" alt="Space Station">
-            <p>${i18n.t("tutorials:stationLanding:welcome")}</p>
+            <p>${this.t("tutorials:stationLanding:welcome")}</p>
             
-            <p>${i18n.t("tutorials:stationLanding:whatAreStations")}</p>
+            <p>${this.t("tutorials:stationLanding:whatAreStations")}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:navigationInfo", {
+                this.t("tutorials:common:navigationInfo", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                     previousKeys: pressInteractionToStrings(
                         TutorialControlsInputs.map.prevPanel,
                         keyboardLayoutMap,
-                    ).join(` ${i18n.t("common:or")} `),
+                    ).join(` ${this.t("common:or")} `),
                 }),
             )}
         </div>`;
@@ -81,11 +86,11 @@ export class StationLandingTutorial implements Tutorial {
         <div class="tutorialContent">
             <img src="${stationLandingBayImageSrc}" alt="Space Station's landing bay">
             
-            <p>${i18n.t("tutorials:stationLanding:whereLandingBay")}</p>
+            <p>${this.t("tutorials:stationLanding:whereLandingBay")}</p>
             
-            <p>${i18n.t("tutorials:stationLanding:landingRequest", {
+            <p>${this.t("tutorials:stationLanding:landingRequest", {
                 keys: pressInteractionToStrings(SpaceShipControlsInputs.map.emitLandingRequest, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
+                    ` ${this.t("common:or")} `,
                 ),
             })}</p>
             
@@ -94,26 +99,26 @@ export class StationLandingTutorial implements Tutorial {
         const landingPanelHtml = `
         <div class="tutorialContent">
             <img src="${stationPadApproachImageSrc}" alt="Space Station">    
-            <p>${i18n.t("tutorials:stationLanding:requestAccepted")}</p>
+            <p>${this.t("tutorials:stationLanding:requestAccepted")}</p>
         
-            <p>${i18n.t("tutorials:stationLanding:beCareful")}</p>
+            <p>${this.t("tutorials:stationLanding:beCareful")}</p>
             
-            <p>${i18n.t("tutorials:stationLanding:autoLanding")}</p>
+            <p>${this.t("tutorials:stationLanding:autoLanding")}</p>
         </div>`;
 
         const stationServicesPanelHtml = `
         <div class="tutorialContent">
             <img src="${stationServicesImageSrc}" alt="Space Station">
             
-            <p>${i18n.t("tutorials:stationLanding:services1")}</p>
+            <p>${this.t("tutorials:stationLanding:services1")}</p>
             
-            <p>${i18n.t("tutorials:stationLanding:services2")}</p>
+            <p>${this.t("tutorials:stationLanding:services2")}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:tutorialEnding", {
+                this.t("tutorials:common:tutorialEnding", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                 }),
             )}

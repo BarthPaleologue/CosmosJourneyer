@@ -46,9 +46,9 @@ export async function createTutorialScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    await initI18n();
+    const t = await initI18n();
 
-    const tutorialLayer = new TutorialLayer(new SoundPlayerMock());
+    const tutorialLayer = new TutorialLayer(new SoundPlayerMock(), t);
     document.body.appendChild(tutorialLayer.root);
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -56,19 +56,19 @@ export async function createTutorialScene(
 
     switch (requestedTutorial) {
         case "flight":
-            await tutorialLayer.setTutorial(new FlightTutorial());
+            await tutorialLayer.setTutorial(new FlightTutorial(t));
             break;
         case "fuelScoop":
-            await tutorialLayer.setTutorial(new FuelScoopTutorial());
+            await tutorialLayer.setTutorial(new FuelScoopTutorial(t));
             break;
         case "stationLanding":
-            await tutorialLayer.setTutorial(new StationLandingTutorial());
+            await tutorialLayer.setTutorial(new StationLandingTutorial(t));
             break;
         case "planetaryLanding":
-            await tutorialLayer.setTutorial(new PlanetaryLandingTutorial());
+            await tutorialLayer.setTutorial(new PlanetaryLandingTutorial(t));
             break;
         case "starMap":
-            await tutorialLayer.setTutorial(new StarMapTutorial());
+            await tutorialLayer.setTutorial(new StarMapTutorial(t));
             break;
     }
 

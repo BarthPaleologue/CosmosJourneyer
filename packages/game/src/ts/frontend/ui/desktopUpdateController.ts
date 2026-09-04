@@ -1,8 +1,8 @@
+import type { TFunction } from "i18next";
+
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import type { DesktopUpdateApi, DesktopUpdateState } from "@/utils/desktopUpdateApi";
-
-import i18n from "@/i18n";
 
 import { DesktopUpdateModal } from "./dialogModal/desktopUpdateModal";
 import type { CommanderBackupTarget, DesktopUpdateModalAction } from "./dialogModal/desktopUpdateModal";
@@ -22,6 +22,7 @@ export class DesktopUpdateController {
     private readonly playerActions: DesktopUpdatePlayerActions;
     private readonly notificationManager: INotificationManager;
     private readonly modal: DesktopUpdateModal;
+    private readonly t: TFunction;
     private state: DesktopUpdateState = { type: "idle" };
     private dismissed = false;
 
@@ -30,11 +31,13 @@ export class DesktopUpdateController {
         playerActions: DesktopUpdatePlayerActions,
         notificationManager: INotificationManager,
         soundPlayer: ISoundPlayer,
+        t: TFunction,
     ) {
         this.api = api;
         this.playerActions = playerActions;
         this.notificationManager = notificationManager;
-        this.modal = new DesktopUpdateModal(soundPlayer, (action) => {
+        this.t = t;
+        this.modal = new DesktopUpdateModal(soundPlayer, t, (action) => {
             void this.handleAction(action);
         });
     }
@@ -113,7 +116,7 @@ export class DesktopUpdateController {
                     this.notificationManager.create(
                         "general",
                         "error",
-                        i18n.t("desktopUpdate:installBlockedBySafetySaveFailure"),
+                        this.t("desktopUpdate:installBlockedBySafetySaveFailure"),
                         5000,
                     );
                     this.modal.setBusy(false);
@@ -131,7 +134,7 @@ export class DesktopUpdateController {
                 this.modal.setBusy(true);
                 const backupStarted = await this.playerActions.downloadCommanderBackup(context);
                 if (!backupStarted) {
-                    this.notificationManager.create("general", "error", i18n.t("desktopUpdate:backupFailed"), 5000);
+                    this.notificationManager.create("general", "error", this.t("desktopUpdate:backupFailed"), 5000);
                 }
                 this.modal.setBusy(false);
                 return;

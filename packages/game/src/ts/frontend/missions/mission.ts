@@ -18,12 +18,11 @@
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
 import type { MissionSerialized } from "@/backend/missions/missionSerialized";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
-import i18n from "@/i18n";
 
 import type { MissionContext } from "./missionContext";
 import { deserializeMissionNode } from "./nodes/deserializeNode";
@@ -77,8 +76,9 @@ export class Mission {
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
-        return this.tree.describeNextTask(context, keyboardLayout, universeBackend);
+        return this.tree.describeNextTask(context, keyboardLayout, universeBackend, t);
     }
 
     /**
@@ -113,14 +113,14 @@ export class Mission {
     /**
      * Returns the localized string for the mission type
      */
-    getTypeString(): string {
+    getTypeString(t: TFunction): string {
         switch (this.missionType) {
             case MissionType.SIGHT_SEEING_FLY_BY:
-                return i18n.t("missions:sightseeing:flyBy");
+                return t("missions:sightseeing:flyBy");
             case MissionType.SIGHT_SEEING_TERMINATOR_LANDING:
-                return i18n.t("missions:sightseeing:terminatorLanding");
+                return t("missions:sightseeing:terminatorLanding");
             case MissionType.SIGHT_SEEING_ASTEROID_FIELD:
-                return i18n.t("missions:sightseeing:asteroidFieldTrek");
+                return t("missions:sightseeing:asteroidFieldTrek");
             default:
                 return assertUnreachable(this.missionType);
         }
@@ -129,8 +129,8 @@ export class Mission {
     /**
      * Returns a string describing the mission using the mission tree and the origin seed
      */
-    describe(universeBackend: UniverseBackend): string {
-        return this.tree.describe(this.missionGiver.systemCoordinates, universeBackend);
+    describe(universeBackend: UniverseBackend, t: TFunction): string {
+        return this.tree.describe(this.missionGiver.systemCoordinates, universeBackend, t);
     }
 
     /**

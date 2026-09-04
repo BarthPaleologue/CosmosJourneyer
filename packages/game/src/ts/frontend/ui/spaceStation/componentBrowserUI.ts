@@ -17,11 +17,11 @@
 
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
 import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 export class ComponentBrowserUI {
@@ -33,13 +33,17 @@ export class ComponentBrowserUI {
 
     readonly onComponentSelect = new Observable<SerializedComponent>();
 
-    constructor() {
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
         this.root = document.createElement("div");
         this.root.classList.add("componentBrowserUI", "flex-column");
         this.root.style.rowGap = "10px";
 
+        this.t = t;
+
         this.placeHolderText = document.createElement("p");
-        this.placeHolderText.innerText = i18n.t("spaceStation:noComponentSlotSelected");
+        this.placeHolderText.innerText = this.t("spaceStation:noComponentSlotSelected");
         this.placeHolderText.style.flexGrow = "1";
         this.placeHolderText.style.justifyContent = "center";
         this.placeHolderText.style.textAlign = "center";
@@ -73,7 +77,7 @@ export class ComponentBrowserUI {
         this.root.innerHTML = "";
 
         const sparePartsTitle = document.createElement("h2");
-        sparePartsTitle.innerText = i18n.t("spaceStation:yourSpareParts");
+        sparePartsTitle.innerText = this.t("spaceStation:yourSpareParts");
         this.root.appendChild(sparePartsTitle);
 
         const relevantSparePartsContainer = document.createElement("div");
@@ -92,7 +96,7 @@ export class ComponentBrowserUI {
         relevantSpareParts.forEach((sparePart) => {
             const componentButton = document.createElement("button");
             componentButton.className = "componentCategory";
-            componentButton.innerText = `${getComponentTypeI18n(sparePart.type)} ${sparePart.size}${Settings.QUALITY_CHARS.at(sparePart.quality)}`;
+            componentButton.innerText = `${getComponentTypeI18n(sparePart.type, this.t)} ${sparePart.size}${Settings.QUALITY_CHARS.at(sparePart.quality)}`;
             componentButton.addEventListener("click", () => {
                 this.select(sparePart);
             });
@@ -101,12 +105,12 @@ export class ComponentBrowserUI {
 
         if (relevantSpareParts.size === 0) {
             const noSpareParts = document.createElement("p");
-            noSpareParts.innerText = i18n.t("spaceStation:noOwnedSparePartsForSlot");
+            noSpareParts.innerText = this.t("spaceStation:noOwnedSparePartsForSlot");
             relevantSparePartsContainer.appendChild(noSpareParts);
         }
 
         const otherSparePartsTitle = document.createElement("h2");
-        otherSparePartsTitle.innerText = i18n.t("spaceStation:availableSpareParts");
+        otherSparePartsTitle.innerText = this.t("spaceStation:availableSpareParts");
         this.root.appendChild(otherSparePartsTitle);
 
         const otherSparePartsContainer = document.createElement("div");
@@ -118,7 +122,7 @@ export class ComponentBrowserUI {
                 const componentButton = document.createElement("button");
                 componentButton.className = "componentCategory";
                 componentButton.style.flex = "1";
-                componentButton.innerText = `${getComponentTypeI18n(componentType)} ${size}${Settings.QUALITY_CHARS.at(quality)}`;
+                componentButton.innerText = `${getComponentTypeI18n(componentType, this.t)} ${size}${Settings.QUALITY_CHARS.at(quality)}`;
                 componentButton.addEventListener("click", () => {
                     switch (componentType) {
                         case "warpDrive":
@@ -159,7 +163,7 @@ export class ComponentBrowserUI {
     ): HTMLElement {
         const categoryButton = document.createElement("button");
         categoryButton.className = "componentCategory";
-        categoryButton.innerText = getComponentTypeI18n(type);
+        categoryButton.innerText = getComponentTypeI18n(type, this.t);
         categoryButton.addEventListener("click", () => {
             this.browse(type, maxComponentSize, spareParts);
         });

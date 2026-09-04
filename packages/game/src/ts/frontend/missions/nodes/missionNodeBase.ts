@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -48,7 +49,7 @@ export interface MissionNodeBase<TSerialized> {
      * Describes the node recursively.
      * @param originSystemCoordinates The seed of the system where the mission has been given.
      */
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string;
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string;
 
     /**
      * Describes the next task to be done in the mission subtree.
@@ -59,6 +60,7 @@ export interface MissionNodeBase<TSerialized> {
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string;
 
     /**

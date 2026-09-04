@@ -59,6 +59,7 @@ import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+import { initI18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics } from "./utils";
@@ -67,6 +68,7 @@ export async function createOnFootScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
+    const t = await initI18n();
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
@@ -160,7 +162,7 @@ export async function createOnFootScene(
 
     const tts = new TtsMock();
     const notificationManager = new NotificationManagerMock();
-    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager, t);
 
     const roverResult = createWolfMk2(
         assets,
@@ -200,18 +202,23 @@ export async function createOnFootScene(
         }
     });
 
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        scene.activeCamera?.detachControl();
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
-            useVirtualCursor: engine.isPointerLock,
-        });
-        scene.activeCamera?.attachControl(true);
-        return choice;
-    });
+            scene.activeCamera?.detachControl();
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
+                useVirtualCursor: engine.isPointerLock,
+            });
+            scene.activeCamera?.attachControl(true);
+            return choice;
+        },
+        t,
+    );
     interactionSystem.enableForCamera(characterControls.firstPersonCamera, 5);
     interactionSystem.enableForCamera(characterControls.thirdPersonCamera, 10);
 

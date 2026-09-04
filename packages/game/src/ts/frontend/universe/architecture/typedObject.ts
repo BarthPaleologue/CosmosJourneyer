@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 export interface TypedObject {
     /**
      * Returns the type name of the object. This is used as a short identifier in the UI Overlay of the object
      */
-    getTypeName(): string;
+    getTypeName(t: TFunction): string;
 }

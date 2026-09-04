@@ -5,11 +5,10 @@ import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
 import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
-
-import i18n from "@/i18n";
 
 export class SystemTarget implements Targetable {
     readonly name: string;
@@ -55,7 +54,7 @@ export class SystemTarget implements Targetable {
         return 0;
     }
 
-    getTypeName(): string {
-        return i18n.t("objectTypes:starSystem");
+    getTypeName(t: TFunction): string {
+        return t("objectTypes:starSystem");
     }
 }

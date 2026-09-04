@@ -21,6 +21,7 @@ import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { LandMissionState } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
 import type { MissionTerminatorLandingNodeSerialized } from "@/backend/missions/missionTerminatorLandingNodeSerialized";
@@ -30,7 +31,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import i18n from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { getGoToSystemInstructions } from "../../../common";
@@ -147,7 +147,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         this.state = LandMissionState.TOO_FAR_IN_SYSTEM;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
         const distanceLy = Vector3.Distance(
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
@@ -157,10 +157,10 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
-        return i18n.t("missions:sightseeing:describeTerminatorLanding", {
+        return t("missions:sightseeing:describeTerminatorLanding", {
             objectName: objectModel.name,
             systemName: systemModel.name,
-            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy)) : i18n.t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
 
@@ -168,9 +168,10 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.isCompleted()) {
-            return i18n.t("missions:terminatorLanding:missionCompleted");
+            return t("missions:terminatorLanding:missionCompleted");
         }
 
         const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
@@ -185,13 +186,14 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
                     this.targetSystemCoordinates,
                     keyboardLayout,
                     universeBackend,
+                    t,
                 );
             case LandMissionState.TOO_FAR_IN_SYSTEM:
-                return i18n.t("missions:terminatorLanding:getCloserToTerminator", {
+                return t("missions:terminatorLanding:getCloserToTerminator", {
                     objectName: targetObject.name,
                 });
             case LandMissionState.LANDED:
-                return i18n.t("missions:terminatorLanding:missionCompleted");
+                return t("missions:terminatorLanding:missionCompleted");
             default:
                 return assertUnreachable(this.state);
         }

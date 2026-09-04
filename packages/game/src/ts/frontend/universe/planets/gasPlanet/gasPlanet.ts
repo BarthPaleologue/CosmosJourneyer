@@ -26,6 +26,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { EarthRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
@@ -136,8 +137,8 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         return this.model.radius;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {

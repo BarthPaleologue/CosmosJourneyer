@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { TFunction } from "i18next";
 
-import i18n from "@/i18n";
+import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 export async function promptModalString(
     prompt: string,
     defaultValue: string,
     soundPlayer: ISoundPlayer,
+    t: TFunction,
 ): Promise<string | null> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
@@ -30,8 +31,8 @@ export async function promptModalString(
             <p>${prompt}</p>
             <input type="text" value="${defaultValue}">
             <menu>
-                <button type="reset" value="cancel">${i18n.t("common:cancel")}</button>
-                <button type="submit" value="ok">${i18n.t("common:ok")}</button>
+                <button type="reset" value="cancel">${t("common:cancel")}</button>
+                <button type="submit" value="ok">${t("common:ok")}</button>
             </menu>
         </form>
     `;

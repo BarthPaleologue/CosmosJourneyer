@@ -18,7 +18,7 @@ export type ObjectTargetCursorType = (typeof ObjectTargetCursorType)[keyof typeo
 export type TargetInfo = {
     type: ObjectTargetCursorType;
 
-    name: string;
+    name?: string;
 
     /**
      * if distance < minDistance, the target cursor is hidden

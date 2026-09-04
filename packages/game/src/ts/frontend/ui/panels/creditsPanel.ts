@@ -15,27 +15,27 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18n from "@/i18n";
+import type { TFunction } from "i18next";
 
 export class CreditsPanel {
     readonly htmlRoot: HTMLElement;
 
-    constructor() {
-        this.htmlRoot = this.createPanelHTML();
+    constructor(t: TFunction) {
+        this.htmlRoot = this.createPanelHTML(t);
     }
 
-    private createPanelHTML(): HTMLElement {
+    private createPanelHTML(t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.className = "sidePanel";
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:credits");
+        title.textContent = t("sidePanel:credits");
         panel.appendChild(title);
 
         // Contributors section
         const contributorsHeader = document.createElement("h3");
-        contributorsHeader.textContent = i18n.t("sidePanel:contributors");
+        contributorsHeader.textContent = t("sidePanel:contributors");
         panel.appendChild(contributorsHeader);
 
         const contributorsDiv = document.createElement("div");
@@ -50,7 +50,7 @@ export class CreditsPanel {
 
         // Programming section
         const programmingHeader = document.createElement("h3");
-        programmingHeader.textContent = i18n.t("sidePanel:programming");
+        programmingHeader.textContent = t("sidePanel:programming");
         panel.appendChild(programmingHeader);
 
         const programmingCredits = [
@@ -75,7 +75,7 @@ export class CreditsPanel {
         });
 
         const charactersAndAnimationsHeader = document.createElement("h3");
-        charactersAndAnimationsHeader.textContent = i18n.t("sidePanel:charactersAndAnimations");
+        charactersAndAnimationsHeader.textContent = t("sidePanel:charactersAndAnimations");
         panel.appendChild(charactersAndAnimationsHeader);
 
         const charactersAndAnimationsCredits = [
@@ -91,7 +91,7 @@ export class CreditsPanel {
 
         // Materials & Textures section
         const materialsHeader = document.createElement("h3");
-        materialsHeader.textContent = i18n.t("sidePanel:materials");
+        materialsHeader.textContent = t("sidePanel:materials");
         panel.appendChild(materialsHeader);
 
         const materialsCredits = [
@@ -115,7 +115,7 @@ export class CreditsPanel {
 
         // Icons section
         const iconsHeader = document.createElement("h3");
-        iconsHeader.textContent = i18n.t("sidePanel:icons");
+        iconsHeader.textContent = t("sidePanel:icons");
         panel.appendChild(iconsHeader);
 
         const iconCredits = [
@@ -143,7 +143,7 @@ export class CreditsPanel {
 
         // Font section
         const fontHeader = document.createElement("h3");
-        fontHeader.textContent = i18n.t("sidePanel:font");
+        fontHeader.textContent = t("sidePanel:font");
         panel.appendChild(fontHeader);
 
         const fontCredit = document.createElement("p");
@@ -153,7 +153,7 @@ export class CreditsPanel {
 
         // Music section
         const musicHeader = document.createElement("h3");
-        musicHeader.textContent = i18n.t("sidePanel:music");
+        musicHeader.textContent = t("sidePanel:music");
         panel.appendChild(musicHeader);
 
         const musicCredits = [
@@ -179,7 +179,7 @@ export class CreditsPanel {
 
         // Sound effects section
         const soundEffectsHeader = document.createElement("h3");
-        soundEffectsHeader.textContent = i18n.t("sidePanel:soundEffects");
+        soundEffectsHeader.textContent = t("sidePanel:soundEffects");
         panel.appendChild(soundEffectsHeader);
 
         const soundEffectsCredits = [

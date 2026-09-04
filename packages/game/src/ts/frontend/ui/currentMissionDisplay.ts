@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -25,8 +27,6 @@ import type { Player } from "@/frontend/player/player";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 export class CurrentMissionDisplay {
     readonly rootNode: HTMLElement;
@@ -48,8 +48,12 @@ export class CurrentMissionDisplay {
 
     private readonly player: Player;
 
-    constructor(player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
+    private readonly t: TFunction;
+
+    constructor(player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer, t: TFunction) {
         this.player = player;
+
+        this.t = t;
 
         this.rootNode = document.createElement("div");
         this.rootNode.classList.add("currentMissionDisplay", "flex-column");
@@ -75,7 +79,7 @@ export class CurrentMissionDisplay {
         this.buttonContainer.appendChild(this.previousMissionButton);
 
         const previousSpan = document.createElement("span");
-        previousSpan.innerText = i18n.t("missions:common:previous");
+        previousSpan.innerText = this.t("missions:common:previous");
         this.previousMissionButton.appendChild(previousSpan);
 
         this.missionCounter = document.createElement("p");
@@ -85,7 +89,7 @@ export class CurrentMissionDisplay {
         this.buttonContainer.appendChild(this.nextMissionButton);
 
         const nextSpan = document.createElement("span");
-        nextSpan.innerText = i18n.t("missions:common:next");
+        nextSpan.innerText = this.t("missions:common:next");
         this.nextMissionButton.appendChild(nextSpan);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
@@ -180,7 +184,7 @@ export class CurrentMissionDisplay {
         this.updateMissionCounter();
         this.rootNode.classList.toggle("completed", this.activeMission.tree.isCompleted());
 
-        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend);
+        const nextTaskText = this.activeMission.describeNextTask(context, keyboardLayout, universeBackend, this.t);
         if (nextTaskText !== this.missionPanelNextTask.textContent) {
             this.missionPanelNextTask.textContent = nextTaskText;
         }
@@ -242,8 +246,8 @@ export class CurrentMissionDisplay {
 
     private setMission(mission: Mission, universeBackend: UniverseBackend): void {
         this.activeMission = mission;
-        this.missionPanelTitle.innerText = mission.getTypeString();
-        this.missionPanelDescription.innerText = mission.describe(universeBackend);
+        this.missionPanelTitle.innerText = mission.getTypeString(this.t);
+        this.missionPanelDescription.innerText = mission.describe(universeBackend, this.t);
 
         this.updateMissionCounter();
     }
@@ -266,8 +270,8 @@ export class CurrentMissionDisplay {
     private setNoMissionActive(): void {
         this.activeMission = null;
 
-        this.missionPanelTitle.innerText = i18n.t("missions:common:noActiveMission");
-        this.missionPanelDescription.innerText = i18n.t("missions:common:whereToGetMissions");
+        this.missionPanelTitle.innerText = this.t("missions:common:noActiveMission");
+        this.missionPanelDescription.innerText = this.t("missions:common:whereToGetMissions");
         this.missionCounter.innerText = "0/0";
 
         this.rootNode.classList.remove("completed");

@@ -16,11 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { MissionOrNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
-import i18n from "@/i18n";
 
 import type { MissionContext } from "../../missionContext";
 import type { MissionNode } from "../missionNode";
@@ -72,23 +71,24 @@ export class MissionOrNode implements MissionNodeBase<MissionOrNodeSerialized> {
         this.hasCompletedLock = this.children.some((child) => child.isCompleted());
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
         return this.children
-            .map((child) => child.describe(originSystemCoordinates, universeBackend))
-            .join(` ${i18n.t("common:or")} `);
+            .map((child) => child.describe(originSystemCoordinates, universeBackend, t))
+            .join(` ${t("common:or")} `);
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.hasCompletedLock) {
             return "Mission completed";
         }
         return this.children
-            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
-            .join(` ${i18n.t("common:or")} `);
+            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend, t))
+            .join(` ${t("common:or")} `);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

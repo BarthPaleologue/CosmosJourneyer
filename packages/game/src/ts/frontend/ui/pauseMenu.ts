@@ -16,10 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
 
 import { createOfficialOriginNotice } from "./officialOriginNotice";
 import type { SidePanels } from "./sidePanels";
@@ -45,7 +44,7 @@ export class PauseMenu {
     readonly onResume = new Observable<void>();
     readonly onVisibilityChanged = new Observable<void>();
 
-    constructor(sidePanels: SidePanels, soundPlayer: ISoundPlayer) {
+    constructor(sidePanels: SidePanels, soundPlayer: ISoundPlayer, t: TFunction) {
         this.sidePanels = sidePanels;
 
         this.mask = document.createElement("div");
@@ -55,7 +54,7 @@ export class PauseMenu {
         this.rootNode.id = "pauseMenu";
         this.rootNode.classList.add("leftSideMenu");
 
-        const officialOriginNotice = createOfficialOriginNotice();
+        const officialOriginNotice = createOfficialOriginNotice(t);
         if (officialOriginNotice !== null) {
             this.mask.appendChild(officialOriginNotice);
         }
@@ -64,7 +63,7 @@ export class PauseMenu {
             const button = document.createElement("li");
             button.id = id;
             button.classList.add("button");
-            button.innerText = i18n.t(i18nKey);
+            button.innerText = t(i18nKey);
             this.rootNode.appendChild(button);
             return button;
         };

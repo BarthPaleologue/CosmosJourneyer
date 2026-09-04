@@ -21,6 +21,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { ISaveBackend } from "@/backend/save/saveBackend";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
@@ -35,8 +36,6 @@ import {
     positionNearObjectWithStarVisible,
 } from "@/frontend/helpers/positionNearObject";
 import type { StarSystemView } from "@/frontend/starSystemView";
-
-import i18n from "@/i18n";
 
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
@@ -78,7 +77,7 @@ export class MainMenu {
 
     private readonly startAnimationDurationSeconds = 5;
 
-    private createMainMenuHTML(): {
+    private createMainMenuHTML(t: TFunction): {
         htmlRoot: HTMLElement;
         title: HTMLElement;
         version: HTMLElement;
@@ -114,36 +113,36 @@ export class MainMenu {
         menuItemsUl.className = "leftSideMenu";
 
         const continueButton = document.createElement("li");
-        continueButton.textContent = i18n.t("mainMenu:continue");
+        continueButton.textContent = t("mainMenu:continue");
         continueButton.style.display = "none";
         menuItemsUl.appendChild(continueButton);
 
         const startButton = document.createElement("li");
-        startButton.textContent = i18n.t("mainMenu:newJourney");
+        startButton.textContent = t("mainMenu:newJourney");
         menuItemsUl.appendChild(startButton);
 
         const loadSaveButton = document.createElement("li");
-        loadSaveButton.textContent = i18n.t("mainMenu:loadSave");
+        loadSaveButton.textContent = t("mainMenu:loadSave");
         menuItemsUl.appendChild(loadSaveButton);
 
         const settingsButton = document.createElement("li");
-        settingsButton.textContent = i18n.t("mainMenu:settings");
+        settingsButton.textContent = t("mainMenu:settings");
         menuItemsUl.appendChild(settingsButton);
 
         const tutorialsButton = document.createElement("li");
-        tutorialsButton.textContent = i18n.t("mainMenu:tutorials");
+        tutorialsButton.textContent = t("mainMenu:tutorials");
         menuItemsUl.appendChild(tutorialsButton);
 
         const contributeButton = document.createElement("li");
-        contributeButton.textContent = i18n.t("mainMenu:contribute");
+        contributeButton.textContent = t("mainMenu:contribute");
         menuItemsUl.appendChild(contributeButton);
 
         const creditsButton = document.createElement("li");
-        creditsButton.textContent = i18n.t("mainMenu:credits");
+        creditsButton.textContent = t("mainMenu:credits");
         menuItemsUl.appendChild(creditsButton);
 
         const aboutButton = document.createElement("li");
-        aboutButton.textContent = i18n.t("mainMenu:about");
+        aboutButton.textContent = t("mainMenu:about");
         menuItemsUl.appendChild(aboutButton);
 
         mainMenuDiv.appendChild(menuItemsUl);
@@ -170,6 +169,7 @@ export class MainMenu {
         saveBackend: ISaveBackend,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
+        t: TFunction,
     ) {
         this.sidePanels = sidePanels;
         this.saveBackend = saveBackend;
@@ -202,7 +202,7 @@ export class MainMenu {
         this.starSystemModel = system;
 
         // Create and append the main menu HTML structure
-        const elements = this.createMainMenuHTML();
+        const elements = this.createMainMenuHTML(t);
         this.htmlRoot = elements.htmlRoot;
         this.title = elements.title;
         this.version = elements.version;
@@ -216,7 +216,7 @@ export class MainMenu {
         this.aboutButton = elements.aboutButton;
         this.menuItems = elements.menuItems;
 
-        const officialOriginNotice = createOfficialOriginNotice();
+        const officialOriginNotice = createOfficialOriginNotice(t);
         if (officialOriginNotice !== null) {
             this.htmlRoot.appendChild(officialOriginNotice);
         }

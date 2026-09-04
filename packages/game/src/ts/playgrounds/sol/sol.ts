@@ -43,7 +43,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     await enablePhysics(scene);
 
-    await initI18n();
+    const t = await initI18n();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -88,7 +88,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         [starSystemController.starFieldBox.mesh],
     );
 
-    const targetCursorLayer = new TargetCursorLayer();
+    const targetCursorLayer = new TargetCursorLayer(t);
     targetCursorLayer.addObjects(starSystemController.getCelestialBodies());
 
     scene.onBeforeRenderObservable.add(() => {

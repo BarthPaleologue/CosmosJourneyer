@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18n from "@/i18n";
+import type { TFunction } from "i18next";
 
 import { TutorialsPanelContent } from "../tutorial/tutorialsPanelContent";
 
@@ -23,24 +23,24 @@ export class TutorialsPanel {
     readonly htmlRoot: HTMLElement;
     readonly content: TutorialsPanelContent;
 
-    constructor() {
-        this.content = new TutorialsPanelContent();
-        this.htmlRoot = this.createPanelHTML();
+    constructor(t: TFunction) {
+        this.content = new TutorialsPanelContent(t);
+        this.htmlRoot = this.createPanelHTML(t);
     }
 
-    private createPanelHTML(): HTMLElement {
+    private createPanelHTML(t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.classList.add("sidePanel", "tutorials");
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:tutorials");
+        title.textContent = t("sidePanel:tutorials");
         panel.appendChild(title);
 
         // Create warning paragraph
         const warningParagraph = document.createElement("p");
         warningParagraph.setAttribute("align", "center");
-        warningParagraph.textContent = i18n.t("sidePanel:tutorialsWarning");
+        warningParagraph.textContent = t("sidePanel:tutorialsWarning");
         panel.appendChild(warningParagraph);
 
         // Append the content

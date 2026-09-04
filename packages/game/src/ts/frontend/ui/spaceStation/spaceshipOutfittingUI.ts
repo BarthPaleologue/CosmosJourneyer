@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 
@@ -24,7 +26,6 @@ import { deserializeComponent } from "@/frontend/spaceship/components/component"
 import type { ComponentSlot } from "@/frontend/spaceship/componentSlot";
 import type { SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 import { promptModalBoolean } from "../dialogModal";
@@ -56,15 +57,19 @@ export class SpaceshipOutfittingUI {
 
     private activeSlot: ComponentSlot | null = null;
 
-    constructor(player: Player, soundPlayer: ISoundPlayer) {
+    private readonly t: TFunction;
+
+    constructor(player: Player, soundPlayer: ISoundPlayer, t: TFunction) {
         this.root = document.createElement("div");
         this.root.className = "spaceshipOutfittingUI";
+
+        this.t = t;
 
         this.componentList = document.createElement("div");
         this.componentList.className = "flex-column";
         this.root.appendChild(this.componentList);
 
-        this.componentBrowser = new ComponentBrowserUI();
+        this.componentBrowser = new ComponentBrowserUI(this.t);
         this.componentBrowser.onComponentSelect.add((component) => {
             this.selectedComponentSpec.displayComponent(component);
 
@@ -84,10 +89,10 @@ export class SpaceshipOutfittingUI {
         this.root.appendChild(this.rightPanel);
 
         const equippedComponentTitle = document.createElement("h3");
-        equippedComponentTitle.innerText = i18n.t("spaceStation:equippedComponent");
+        equippedComponentTitle.innerText = this.t("spaceStation:equippedComponent");
         this.rightPanel.appendChild(equippedComponentTitle);
 
-        this.equippedComponentSpec = new ComponentSpecUI(i18n.t("spaceStation:noComponentEquippedOnSlot"));
+        this.equippedComponentSpec = new ComponentSpecUI(this.t("spaceStation:noComponentEquippedOnSlot"), this.t);
         this.equippedComponentSpec.root.style.flexGrow = "1";
         this.equippedComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.equippedComponentSpec.root);
@@ -102,7 +107,7 @@ export class SpaceshipOutfittingUI {
 
         this.storeButton = document.createElement("button");
         this.storeButton.style.flexGrow = "1";
-        this.storeButton.innerText = i18n.t("spaceStation:storeButton");
+        this.storeButton.innerText = this.t("spaceStation:storeButton");
         this.storeButton.disabled = true;
         this.storeButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -123,7 +128,7 @@ export class SpaceshipOutfittingUI {
 
         this.sellButton = document.createElement("button");
         this.sellButton.style.flexGrow = "1";
-        this.sellButton.innerText = i18n.t("spaceStation:sellButton");
+        this.sellButton.innerText = this.t("spaceStation:sellButton");
         this.sellButton.disabled = true;
         this.sellButton.addEventListener("click", async () => {
             if (this.activeSlot === null) {
@@ -142,10 +147,11 @@ export class SpaceshipOutfittingUI {
 
             if (
                 !(await promptModalBoolean(
-                    i18n.t("spaceStation:sellConfirmation", {
+                    this.t("spaceStation:sellConfirmation", {
                         price: `${componentSellingPrice.toLocaleString()} ${Settings.CREDIT_SYMBOL}`,
                     }),
                     soundPlayer,
+                    this.t,
                 ))
             ) {
                 return;
@@ -160,10 +166,10 @@ export class SpaceshipOutfittingUI {
         rowContainer.appendChild(this.sellButton);
 
         const selectedComponentTitle = document.createElement("h3");
-        selectedComponentTitle.innerText = i18n.t("spaceStation:selectedComponent");
+        selectedComponentTitle.innerText = this.t("spaceStation:selectedComponent");
         this.rightPanel.appendChild(selectedComponentTitle);
 
-        this.selectedComponentSpec = new ComponentSpecUI(i18n.t("spaceStation:noComponentSelected"));
+        this.selectedComponentSpec = new ComponentSpecUI(this.t("spaceStation:noComponentSelected"), this.t);
         this.selectedComponentSpec.root.style.flexGrow = "1";
         this.selectedComponentSpec.root.style.flex = "1";
         this.rightPanel.appendChild(this.selectedComponentSpec.root);
@@ -178,7 +184,7 @@ export class SpaceshipOutfittingUI {
 
         this.buyEquipButton = document.createElement("button");
         this.buyEquipButton.style.flexGrow = "1";
-        this.buyEquipButton.innerText = i18n.t("spaceStation:buyEquipButton");
+        this.buyEquipButton.innerText = this.t("spaceStation:buyEquipButton");
         this.buyEquipButton.disabled = true;
         this.buyEquipButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -206,7 +212,7 @@ export class SpaceshipOutfittingUI {
 
         this.equipButton = document.createElement("button");
         this.equipButton.style.flexGrow = "1";
-        this.equipButton.innerText = i18n.t("spaceStation:equipButton");
+        this.equipButton.innerText = this.t("spaceStation:equipButton");
         this.equipButton.disabled = true;
         this.equipButton.addEventListener("click", () => {
             if (this.activeSlot === null) {
@@ -240,7 +246,7 @@ export class SpaceshipOutfittingUI {
         this.componentList.innerHTML = "";
 
         const primaryH2 = document.createElement("h2");
-        primaryH2.innerText = i18n.t("spaceStation:primarySlots");
+        primaryH2.innerText = this.t("spaceStation:primarySlots");
         this.componentList.appendChild(primaryH2);
 
         const warpDriveSlot = this.createComponentSlotUI(shipInternals.primary.warpDrive, player, soundPlayer);
@@ -253,7 +259,7 @@ export class SpaceshipOutfittingUI {
         this.componentList.appendChild(fuelTankSlot);
 
         const optionalH2 = document.createElement("h2");
-        optionalH2.innerText = i18n.t("spaceStation:optionalSlots");
+        optionalH2.innerText = this.t("spaceStation:optionalSlots");
         this.componentList.appendChild(optionalH2);
 
         for (const componentSlot of shipInternals.optionals) {
@@ -269,7 +275,8 @@ export class SpaceshipOutfittingUI {
     ): HTMLElement {
         const slotUI = document.createElement("button");
         const component = componentSlot.getComponent();
-        slotUI.textContent = component !== null ? getComponentTypeI18n(component.type) : i18n.t("components:emptySlot");
+        slotUI.textContent =
+            component !== null ? getComponentTypeI18n(component.type, this.t) : this.t("components:emptySlot");
         slotUI.classList.add("componentSlot");
         slotUI.addEventListener("click", () => {
             soundPlayer.playNow("click");

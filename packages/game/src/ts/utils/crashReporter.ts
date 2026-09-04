@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { alertModal } from "@/frontend/ui/dialogModal/alertModal";
 
@@ -58,6 +60,7 @@ type CrashSource =
 
 export class CrashReporter {
     private readonly consoleDumper: ConsoleDumper;
+    private readonly t: TFunction;
     private hasReportedCrash = false;
 
     private readonly handleError = (event: ErrorEvent): void => {
@@ -68,8 +71,9 @@ export class CrashReporter {
         void this.reportCrash({ type: "unhandledrejection", value: event }).catch(console.error);
     };
 
-    constructor(consoleDumper: ConsoleDumper) {
+    constructor(consoleDumper: ConsoleDumper, t: TFunction) {
         this.consoleDumper = consoleDumper;
+        this.t = t;
 
         window.addEventListener("error", this.handleError);
         window.addEventListener("unhandledrejection", this.handleUnhandledRejection);
@@ -139,6 +143,7 @@ export class CrashReporter {
         The crash log has been downloaded to your computer, please go to <a href="https://github.com/BarthPaleologue/CosmosJourneyer/issues">the issue tracker</a> and open a new bug issue with the crash log attached.
         If you don't have a GitHub account, you can send an email to barth.paleologue@cosmosjourneyer.com instead.`,
             new SoundPlayerMock(),
+            this.t,
         );
     }
 }

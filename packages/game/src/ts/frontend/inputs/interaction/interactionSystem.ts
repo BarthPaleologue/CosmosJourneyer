@@ -25,6 +25,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import Action from "@brianchirls/game-input/Action";
 import PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 import ReleaseInteraction from "@brianchirls/game-input/interactions/ReleaseInteraction";
+import type { TFunction } from "i18next";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
@@ -37,7 +38,7 @@ export type Interaction = {
 
 export interface Interactive {
     getPhysicsAggregate(): { body: PhysicsBody; shape: PhysicsShape };
-    getInteractions(): Array<Interaction>;
+    getInteractions(t: TFunction): Array<Interaction>;
 }
 
 export class InteractionSystem {
@@ -68,16 +69,19 @@ export class InteractionSystem {
     private isMakingChoiceFlag = false;
 
     private readonly cameraInteractionRanges: Map<Camera, number>;
+    private readonly t: TFunction;
 
     constructor(
         mask: number,
         scene: Scene,
         choiceHandler: (interactions: Array<Interaction>) => Promise<Interaction | null>,
+        t: TFunction,
     ) {
         this.scene = scene;
         this.physicsEngine = getPhysicsEngineV2(scene);
         this.mask = mask;
         this.choiceHandler = choiceHandler;
+        this.t = t;
 
         this.cameraInteractionRanges = new Map();
 
@@ -142,7 +146,7 @@ export class InteractionSystem {
         const { body, shape } = interactiveObject.getPhysicsAggregate();
         shape.filterMembershipMask |= this.mask;
 
-        this.interactions.set(body, () => interactiveObject.getInteractions());
+        this.interactions.set(body, () => interactiveObject.getInteractions(this.t));
 
         body.transformNode.onDisposeObservable.addOnce(() => {
             this.interactions.delete(body);

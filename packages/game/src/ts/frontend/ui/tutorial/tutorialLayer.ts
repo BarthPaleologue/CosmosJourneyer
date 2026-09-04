@@ -1,13 +1,12 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { IDisposable } from "@babylonjs/core/scene";
+import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { promptModalBoolean } from "@/frontend/ui/dialogModal";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
-
-import i18n from "@/i18n";
 
 import { TutorialControlsInputs } from "./tutorialLayerInputs";
 import type { Tutorial } from "./tutorials/tutorial";
@@ -35,8 +34,11 @@ export class TutorialLayer implements IDisposable {
 
     readonly onQuitTutorial: Observable<void> = new Observable();
 
-    constructor(soundPlayer: ISoundPlayer) {
+    private readonly t: TFunction;
+
+    constructor(soundPlayer: ISoundPlayer, t: TFunction) {
         this.soundPlayer = soundPlayer;
+        this.t = t;
 
         this.root = document.createElement("div");
         this.root.classList.add("tutorialLayer");
@@ -58,12 +60,12 @@ export class TutorialLayer implements IDisposable {
 
         this.prevButton = document.createElement("p");
         const prevButtonTextSpan = document.createElement("span");
-        prevButtonTextSpan.innerText = i18n.t("tutorials:common:previous");
+        prevButtonTextSpan.innerText = this.t("tutorials:common:previous");
         this.prevButton.appendChild(prevButtonTextSpan);
 
         this.nextButton = document.createElement("p");
         const nextButtonTextSpan = document.createElement("span");
-        nextButtonTextSpan.innerText = i18n.t("tutorials:common:next");
+        nextButtonTextSpan.innerText = this.t("tutorials:common:next");
         this.nextButton.appendChild(nextButtonTextSpan);
 
         void getGlobalKeyboardLayoutMap().then((keyboardLayoutMap) => {
@@ -109,7 +111,7 @@ export class TutorialLayer implements IDisposable {
         TutorialControlsInputs.map.nextPanel.on("complete", async () => {
             if (this.currentPanelIndex === this.tutorialPanelsHtml.length - 1) {
                 TutorialControlsInputs.setEnabled(false);
-                if (await promptModalBoolean(i18n.t("tutorials:common:quitConfirm"), this.soundPlayer)) {
+                if (await promptModalBoolean(this.t("tutorials:common:quitConfirm"), this.soundPlayer, this.t)) {
                     this.quitTutorial();
                     return;
                 }

@@ -20,6 +20,7 @@ import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { FlyByState } from "@/backend/missions/missionFlyByNodeSerialized";
 import type { MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyByNodeSerialized";
@@ -29,8 +30,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 
 import { parseDistance } from "@/utils/strings/parseToStrings";
-
-import i18n from "@/i18n";
 
 import { getGoToSystemInstructions } from "../../../common";
 import type { MissionContext } from "../../../missionContext";
@@ -130,7 +129,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
         const distanceLy = Vector3.Distance(
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
@@ -140,10 +139,10 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
-        return i18n.t("missions:sightseeing:describeFlyBy", {
-            objectType: getOrbitalObjectTypeToI18nString(objectModel),
+        return t("missions:sightseeing:describeFlyBy", {
+            objectType: getOrbitalObjectTypeToI18nString(objectModel, t),
             systemName: systemModel.name,
-            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy)) : i18n.t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
 
@@ -151,9 +150,10 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.isCompleted()) {
-            return i18n.t("missions:flyBy:missionCompleted");
+            return t("missions:flyBy:missionCompleted");
         }
 
         const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
@@ -168,13 +168,14 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
                     this.targetSystemCoordinates,
                     keyboardLayout,
                     universeBackend,
+                    t,
                 );
             case FlyByState.TOO_FAR_IN_SYSTEM:
-                return i18n.t("missions:common:getCloserToTarget", {
+                return t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name,
                 });
             case FlyByState.CLOSE_ENOUGH:
-                return i18n.t("missions:flyBy:missionCompleted");
+                return t("missions:flyBy:missionCompleted");
             default:
                 return assertUnreachable(this.state);
         }

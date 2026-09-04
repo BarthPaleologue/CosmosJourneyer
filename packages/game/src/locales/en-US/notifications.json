@@ -13,6 +13,7 @@
     "invalidSaveFileJson": "The save file is not a valid JSON. Please check your save file.",
     "failedToParseSaves": "Could not parse saves. Please check the console for more information.",
     "invalidStorageFormat": "Invalid storage format. Please check the console for more information.",
+    "saveNotFound": "The requested save could not be found.",
     "saveOk": "Saved to local storage successfully",
     "cantSaveTutorial": "Cannot save during a tutorial",
     "newDiscovery": "Discovered {{objectName}}. Data recorded.",

@@ -27,7 +27,6 @@ import { Settings } from "@/settings";
 import type { ISaveBackend } from "./saveBackend";
 import { safeParseSave } from "./saveFileData";
 import type { CmdrSaves, Save } from "./saveFileData";
-import { saveLoadingErrorToI18nString } from "./saveLoadingError";
 import type { SaveLoadingError } from "./saveLoadingError";
 
 /**
@@ -157,37 +156,34 @@ export class SaveBackendMultiFile implements ISaveBackend {
      * @param filePath - Path to the save file
      * @returns The loaded save or null if corrupted/missing
      */
-    private async loadSaveFile(filePath: string): Promise<Save | null> {
-        try {
-            const content = await this.fileSystem.readFile(filePath);
-            if (content === null) {
-                return null;
-            }
+    private async loadSaveFile(filePath: string): Promise<Result<Save, SaveLoadingError>> {
+        const content = await this.fileSystem.readFile(filePath);
+        if (content === null) {
+            return err({ type: "SAVE_NOT_FOUND" });
+        }
 
-            const saveJson = jsonSafeParse(content);
-            if (!saveJson) {
-                throw new Error("Invalid JSON");
-            }
-
-            const saveResult = safeParseSave(saveJson, this.universeBackend);
-            if (!saveResult.success) {
-                throw new Error(`Save validation failed: ${saveLoadingErrorToI18nString(saveResult.error)}`);
-            }
-
-            return saveResult.value;
-        } catch (error) {
-            // Quarantine corrupted save
-            const content = await this.fileSystem.readFile(filePath);
+        const saveJson = jsonSafeParse(content);
+        if (saveJson === null) {
             this.corruptedSaves.push({
                 filePath,
-                error,
-                rawContent: content ?? "",
+                error: "invalid json",
+                rawContent: content,
             });
-
-            console.error(`Corrupted save file: ${filePath}`, error);
             await this.quarantineCorruptedSave(filePath);
-            return null;
+            return err({ type: "INVALID_JSON" });
         }
+
+        const saveResult = safeParseSave(saveJson, this.universeBackend);
+        if (!saveResult.success) {
+            this.corruptedSaves.push({
+                filePath,
+                error: saveResult.error,
+                rawContent: content,
+            });
+            await this.quarantineCorruptedSave(filePath);
+        }
+
+        return saveResult;
     }
 
     /**
@@ -230,12 +226,12 @@ export class SaveBackendMultiFile implements ISaveBackend {
         const manualFiles = await this.fileSystem.listDirectory(manualDir);
         if (manualFiles !== null) {
             for (const fileName of manualFiles) {
-                const save = await this.loadSaveFile(`${manualDir}/${fileName}`);
-                if (save === null) {
+                const saveResult = await this.loadSaveFile(`${manualDir}/${fileName}`);
+                if (!saveResult.success) {
                     continue;
                 }
 
-                manualSaves.push(save);
+                manualSaves.push(saveResult.value);
             }
         }
 
@@ -244,12 +240,12 @@ export class SaveBackendMultiFile implements ISaveBackend {
         const autoFiles = await this.fileSystem.listDirectory(autoDir);
         if (autoFiles !== null) {
             for (const fileName of autoFiles) {
-                const save = await this.loadSaveFile(`${autoDir}/${fileName}`);
-                if (save === null) {
+                const saveResult = await this.loadSaveFile(`${autoDir}/${fileName}`);
+                if (!saveResult.success) {
                     continue;
                 }
 
-                autoSaves.push(save);
+                autoSaves.push(saveResult.value);
             }
         }
 
@@ -392,10 +388,12 @@ export class SaveBackendMultiFile implements ISaveBackend {
         const autoSaves: Array<{ uuid: string; timestamp: number }> = [];
 
         for (const fileName of autoFiles) {
-            const save = await this.loadSaveFile(`${autoDir}/${fileName}`);
-            if (save !== null) {
-                autoSaves.push({ uuid: save.uuid, timestamp: save.timestamp });
+            const saveResult = await this.loadSaveFile(`${autoDir}/${fileName}`);
+            if (!saveResult.success) {
+                continue;
             }
+            const save = saveResult.value;
+            autoSaves.push({ uuid: save.uuid, timestamp: save.timestamp });
         }
 
         // Sort by timestamp (newest first) and remove excess

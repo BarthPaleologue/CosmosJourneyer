@@ -1,5 +1,6 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { parseCommanderArchive } from "@/backend/save/commanderArchive";
 import type { ISaveBackend } from "@/backend/save/saveBackend";
@@ -16,8 +17,6 @@ import { alertModal, promptModalBoolean } from "@/frontend/ui/dialogModal";
 import { downloadBlob } from "@/utils/downloadBlob";
 import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { renderMarkdownInline } from "@/utils/markdown";
-
-import i18n from "@/i18n";
 
 import type { INotificationManager } from "./notificationManager";
 
@@ -40,11 +39,14 @@ export class SaveLoadingPanelContent {
     private readonly saveBackend: ISaveBackend;
     private readonly universeBackend: UniverseBackend;
 
+    private readonly t: TFunction;
+
     constructor(
         universeBackend: UniverseBackend,
         saveBackend: ISaveBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("saveLoadingPanelContent");
@@ -54,9 +56,11 @@ export class SaveLoadingPanelContent {
         this.saveBackend = saveBackend;
         this.universeBackend = universeBackend;
 
+        this.t = t;
+
         const migrationNotice = document.createElement("p");
         migrationNotice.classList.add("saveMigrationNotice");
-        migrationNotice.innerHTML = renderMarkdownInline(i18n.t("sidePanel:saveMigrationNotice"));
+        migrationNotice.innerHTML = renderMarkdownInline(this.t("sidePanel:saveMigrationNotice"));
         this.htmlRoot.appendChild(migrationNotice);
 
         const dropFileZone = document.createElement("div");
@@ -64,7 +68,7 @@ export class SaveLoadingPanelContent {
         this.htmlRoot.appendChild(dropFileZone);
 
         const dropFileText = document.createElement("p");
-        dropFileText.innerText = i18n.t("sidePanel:dropASaveFileHere");
+        dropFileText.innerText = this.t("sidePanel:dropASaveFileHere");
         dropFileZone.appendChild(dropFileText);
 
         dropFileZone.addEventListener("dragover", (event) => {
@@ -99,7 +103,7 @@ export class SaveLoadingPanelContent {
 
             const file = event.dataTransfer.files[0];
             if (file === undefined) {
-                await alertModal("No file dropped", this.soundPlayer);
+                await alertModal("No file dropped", this.soundPlayer, this.t);
                 return;
             }
 
@@ -114,7 +118,7 @@ export class SaveLoadingPanelContent {
             fileInput.onchange = async (): Promise<void> => {
                 const file = fileInput.files?.[0];
                 if (file === undefined) {
-                    await alertModal("No file selected", this.soundPlayer);
+                    await alertModal("No file selected", this.soundPlayer, this.t);
                     return;
                 }
 
@@ -188,7 +192,7 @@ export class SaveLoadingPanelContent {
             cmdrHeaderText.appendChild(cmdrName);
 
             const cmdrLastPlayed = document.createElement("p");
-            cmdrLastPlayed.innerText = i18n.t("sidePanel:lastPlayedOn", {
+            cmdrLastPlayed.innerText = this.t("sidePanel:lastPlayedOn", {
                 val: new Date(latestSave.timestamp),
                 formatParams: {
                     val: {
@@ -204,7 +208,7 @@ export class SaveLoadingPanelContent {
             cmdrHeaderText.appendChild(cmdrLastPlayed);
 
             const cmdrPlayTime = document.createElement("p");
-            cmdrPlayTime.innerText = i18n.t("sidePanel:journeyedFor", {
+            cmdrPlayTime.innerText = this.t("sidePanel:journeyedFor", {
                 nbHours: Math.ceil(latestSave.player.timePlayedSeconds / 60 / 60),
             });
             cmdrHeaderText.appendChild(cmdrPlayTime);
@@ -215,7 +219,7 @@ export class SaveLoadingPanelContent {
 
             const continueButton = document.createElement("button");
             continueButton.classList.add("icon", "large");
-            continueButton.title = i18n.t("sidePanel:continueCommander");
+            continueButton.title = this.t("sidePanel:continueCommander");
             continueButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 this.onLoadSaveObservable.notifyObservers(latestSave);
@@ -228,19 +232,19 @@ export class SaveLoadingPanelContent {
 
             const shareButton = document.createElement("button");
             shareButton.classList.add("icon", "large");
-            shareButton.title = i18n.t("sidePanel:shareCommander");
+            shareButton.title = this.t("sidePanel:shareCommander");
             shareButton.addEventListener("click", async () => {
                 this.soundPlayer.playNow("click");
                 const url = createUrlFromSave(latestSave);
                 if (url === null) {
-                    await alertModal("Could not create a URL from the save file.", this.soundPlayer);
+                    await alertModal("Could not create a URL from the save file.", this.soundPlayer, this.t);
                     return;
                 }
                 await navigator.clipboard.writeText(url.toString()).then(() => {
                     this.notificationManager.create(
                         "general",
                         "success",
-                        i18n.t("notifications:copiedToClipboard"),
+                        this.t("notifications:copiedToClipboard"),
                         5000,
                     );
                 });
@@ -253,7 +257,7 @@ export class SaveLoadingPanelContent {
 
             const downloadButton = document.createElement("button");
             downloadButton.classList.add("icon", "large");
-            downloadButton.title = i18n.t("sidePanel:downloadCommanderArchive");
+            downloadButton.title = this.t("sidePanel:downloadCommanderArchive");
             downloadButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 downloadCommanderArchive(cmdrUuid, latestSave.player.name, cmdrSaves);
@@ -283,14 +287,14 @@ export class SaveLoadingPanelContent {
 
             const expandButton = document.createElement("button");
             expandButton.classList.add("expandButton", "icon", "large");
-            expandButton.title = i18n.t("sidePanel:showCommanderSaves");
+            expandButton.title = this.t("sidePanel:showCommanderSaves");
             expandButton.appendChild(expandIcon);
             expandButton.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
                 savesList.classList.toggle("hidden");
                 expandButton.innerHTML = "";
                 const isHidden = savesList.classList.contains("hidden");
-                expandButton.title = i18n.t(isHidden ? "sidePanel:showCommanderSaves" : "sidePanel:hideCommanderSaves");
+                expandButton.title = this.t(isHidden ? "sidePanel:showCommanderSaves" : "sidePanel:hideCommanderSaves");
                 expandButton.appendChild(isHidden ? expandIcon : collapseIcon);
             });
             cmdrHeaderButtons.appendChild(expandButton);
@@ -321,18 +325,18 @@ export class SaveLoadingPanelContent {
                 : save.playerLocation;
         if (locationToUse === undefined) {
             console.warn("locationToUse is undefined");
-            saveLocation.innerText = i18n.t("sidePanel:locationNotFound");
+            saveLocation.innerText = this.t("sidePanel:locationNotFound");
             return saveDiv;
         }
         if (locationToUse.type === "inSpaceship") {
             console.warn("Spaceship inside a spaceship is not supported yet");
-            saveLocation.innerText = i18n.t("sidePanel:locationNotFound");
+            saveLocation.innerText = this.t("sidePanel:locationNotFound");
             return saveDiv;
         }
         const isLanded = locationToUse.type === "atStation";
         const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
-        saveLocation.innerText = i18n.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
-            location: nearestObject?.name ?? i18n.t("sidePanel:locationNotFound"),
+        saveLocation.innerText = this.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
+            location: nearestObject?.name ?? this.t("sidePanel:locationNotFound"),
             interpolation: {
                 escapeValue: false,
             },
@@ -379,11 +383,11 @@ export class SaveLoadingPanelContent {
             this.soundPlayer.playNow("click");
             const url = createUrlFromSave(save);
             if (url === null) {
-                await alertModal("Could not create a URL from the save file.", this.soundPlayer);
+                await alertModal("Could not create a URL from the save file.", this.soundPlayer, this.t);
                 return;
             }
             await navigator.clipboard.writeText(url.toString()).then(() => {
-                this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 5000);
+                this.notificationManager.create("general", "info", this.t("notifications:copiedToClipboard"), 5000);
             });
         });
         saveButtons.appendChild(shareButton);
@@ -412,7 +416,11 @@ export class SaveLoadingPanelContent {
         deleteButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
 
-            const shouldProceed = await promptModalBoolean(i18n.t("sidePanel:deleteSavePrompt"), this.soundPlayer);
+            const shouldProceed = await promptModalBoolean(
+                this.t("sidePanel:deleteSavePrompt"),
+                this.soundPlayer,
+                this.t,
+            );
             if (!shouldProceed) {
                 return;
             }
@@ -453,7 +461,7 @@ export class SaveLoadingPanelContent {
         const archiveResult = parseCommanderArchive(new Uint8Array(await file.arrayBuffer()), this.universeBackend);
         if (!archiveResult.success) {
             console.error("Could not import Commander archive:", archiveResult.error);
-            await alertModal(i18n.t("sidePanel:invalidCommanderArchive"), this.soundPlayer);
+            await alertModal(this.t("sidePanel:invalidCommanderArchive"), this.soundPlayer, this.t);
             return;
         }
 
@@ -473,7 +481,7 @@ export class SaveLoadingPanelContent {
                 [archiveResult.value.cmdrUuid]: savesToImport,
             });
             if (!success) {
-                await alertModal(i18n.t("sidePanel:commanderArchiveImportFailed"), this.soundPlayer);
+                await alertModal(this.t("sidePanel:commanderArchiveImportFailed"), this.soundPlayer, this.t);
                 return;
             }
         }
@@ -481,7 +489,7 @@ export class SaveLoadingPanelContent {
         this.notificationManager.create(
             "general",
             "success",
-            i18n.t("sidePanel:commanderArchiveImported", {
+            this.t("sidePanel:commanderArchiveImported", {
                 importedCount,
                 skippedCount: archiveSaveCount - importedCount,
             }),
@@ -494,7 +502,7 @@ export class SaveLoadingPanelContent {
         const saveFileDataResult = await parseSaveFile(file, universeBackend);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
-            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error), this.soundPlayer);
+            await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error, this.t), this.soundPlayer, this.t);
             return saveFileDataResult;
         }
 

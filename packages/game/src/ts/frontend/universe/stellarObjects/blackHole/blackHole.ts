@@ -22,6 +22,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { getSchwarzschildRadius, getShadowRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
@@ -70,8 +71,8 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
         return this.transform;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public getRadius(): number {

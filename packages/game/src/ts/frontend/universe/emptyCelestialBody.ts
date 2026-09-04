@@ -21,6 +21,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { CelestialBodyModel, OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 
@@ -67,8 +68,8 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
         return this.getRadius();
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     dispose(): void {

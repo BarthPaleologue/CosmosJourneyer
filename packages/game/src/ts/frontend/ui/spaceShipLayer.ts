@@ -18,6 +18,7 @@
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
+import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -54,9 +55,13 @@ export class SpaceShipLayer {
 
     private readonly currentMissionDisplay: CurrentMissionDisplay;
 
-    constructor(player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
+    private readonly t: TFunction;
+
+    constructor(player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer, t: TFunction) {
         this.root = document.createElement("div");
         this.root.id = "helmetOverlay";
+
+        this.t = t;
 
         this.throttleContainer = document.createElement("div");
         this.throttleContainer.id = "throttle";
@@ -97,7 +102,7 @@ export class SpaceShipLayer {
         fuelIcon.alt = "Fuel canister icon";
         this.fuelIndicator.appendChild(fuelIcon);
 
-        this.currentMissionDisplay = new CurrentMissionDisplay(player, universeBackend, soundPlayer);
+        this.currentMissionDisplay = new CurrentMissionDisplay(player, universeBackend, soundPlayer, this.t);
         this.root.appendChild(this.currentMissionDisplay.rootNode);
 
         this.cursor = document.createElement("div");
@@ -189,7 +194,7 @@ export class SpaceShipLayer {
         this.speedIndicator.textContent = parseSpeed(spaceship.getSpeed());
 
         const altitude = spaceship.getAltimeter().getAltitude();
-        this.altimeterIndicator.textContent = altitude !== null ? parseDistance(altitude) : "";
+        this.altimeterIndicator.textContent = altitude !== null ? parseDistance(altitude, this.t) : "";
 
         const fuelRemainingFraction = spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity();
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);

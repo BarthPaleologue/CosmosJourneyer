@@ -42,7 +42,7 @@ export async function createStarSystemViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    await initI18n();
+    const t = await initI18n();
 
     const universeBackend = new UniverseBackend(getAlphaTestisSystemModel());
 
@@ -80,6 +80,7 @@ export async function createStarSystemViewScene(
         notificationManager,
         assets,
         terrainSystem,
+        t,
         progressMonitor,
     );
 

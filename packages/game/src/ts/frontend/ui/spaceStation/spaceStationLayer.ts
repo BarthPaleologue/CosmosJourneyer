@@ -19,6 +19,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalFacilityModel, OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -27,7 +28,6 @@ import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Player } from "@/frontend/player/player";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 import type { INotificationManager } from "../notificationManager";
@@ -82,14 +82,19 @@ export class SpaceStationLayer {
 
     private readonly soundPlayer: ISoundPlayer;
 
+    private readonly t: TFunction;
+
     constructor(
         player: Player,
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.soundPlayer = soundPlayer;
+
+        this.t = t;
 
         player.onBalanceChangedObservable.add((balance) => {
             this.updatePlayerBalance(balance);
@@ -109,7 +114,7 @@ export class SpaceStationLayer {
 
         this.headerWelcome = document.createElement("p");
         this.headerWelcome.setAttribute("class", "welcomeTo");
-        this.headerWelcome.textContent = i18n.t("spaceStation:welcomeTo");
+        this.headerWelcome.textContent = this.t("spaceStation:welcomeTo");
         this.header.appendChild(this.headerWelcome);
 
         this.headerStationName = document.createElement("p");
@@ -132,9 +137,10 @@ export class SpaceStationLayer {
         this.editPlayerNameButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
             const newName = await promptModalString(
-                i18n.t("spaceStation:cmdrNameChangePrompt"),
+                this.t("spaceStation:cmdrNameChangePrompt"),
                 player.getName(),
                 this.soundPlayer,
+                this.t,
             );
             if (newName === null) {
                 return;
@@ -162,6 +168,7 @@ export class SpaceStationLayer {
             universeBackend,
             this.soundPlayer,
             notificationManager,
+            this.t,
         );
 
         this.actionsContainer = document.createElement("div");
@@ -178,11 +185,11 @@ export class SpaceStationLayer {
         this.missionsButton.appendChild(missionButtonIcon);
 
         const missionButtonTitle = document.createElement("h2");
-        missionButtonTitle.textContent = i18n.t("spaceStation:missions");
+        missionButtonTitle.textContent = this.t("spaceStation:missions");
         this.missionsButton.appendChild(missionButtonTitle);
 
         const missionButtonDescription = document.createElement("p");
-        missionButtonDescription.textContent = i18n.t("spaceStation:missionsDescription");
+        missionButtonDescription.textContent = this.t("spaceStation:missionsDescription");
         this.missionsButton.appendChild(missionButtonDescription);
 
         this.spaceshipHangarButton = document.createElement("div");
@@ -195,11 +202,11 @@ export class SpaceStationLayer {
         this.spaceshipHangarButton.appendChild(spaceshipButtonIcon);
 
         const spaceshipButtonTitle = document.createElement("h2");
-        spaceshipButtonTitle.textContent = i18n.t("spaceStation:shipHangar");
+        spaceshipButtonTitle.textContent = this.t("spaceStation:shipHangar");
         this.spaceshipHangarButton.appendChild(spaceshipButtonTitle);
 
         const spaceshipButtonDescription = document.createElement("p");
-        spaceshipButtonDescription.textContent = i18n.t("spaceStation:shipHangarDescription");
+        spaceshipButtonDescription.textContent = this.t("spaceStation:shipHangarDescription");
         this.spaceshipHangarButton.appendChild(spaceshipButtonDescription);
 
         this.explorationCenterButton = document.createElement("div");
@@ -212,11 +219,11 @@ export class SpaceStationLayer {
         this.explorationCenterButton.appendChild(explorationButtonIcon);
 
         const explorationButtonTitle = document.createElement("h2");
-        explorationButtonTitle.textContent = i18n.t("spaceStation:explorationCenter");
+        explorationButtonTitle.textContent = this.t("spaceStation:explorationCenter");
         this.explorationCenterButton.appendChild(explorationButtonTitle);
 
         const explorationButtonDescription = document.createElement("p");
-        explorationButtonDescription.textContent = i18n.t("spaceStation:explorationCenterDescription");
+        explorationButtonDescription.textContent = this.t("spaceStation:explorationCenterDescription");
         this.explorationCenterButton.appendChild(explorationButtonDescription);
 
         this.tradingButton = document.createElement("div");
@@ -229,11 +236,11 @@ export class SpaceStationLayer {
         this.tradingButton.appendChild(tradingButtonIcon);
 
         const tradingButtonTitle = document.createElement("h2");
-        tradingButtonTitle.textContent = i18n.t("spaceStation:market");
+        tradingButtonTitle.textContent = this.t("spaceStation:market");
         this.tradingButton.appendChild(tradingButtonTitle);
 
         const tradingButtonDescription = document.createElement("p");
-        tradingButtonDescription.textContent = i18n.t("spaceStation:marketDescription");
+        tradingButtonDescription.textContent = this.t("spaceStation:marketDescription");
         this.tradingButton.appendChild(tradingButtonDescription);
 
         this.infoButton = document.createElement("div");
@@ -246,11 +253,11 @@ export class SpaceStationLayer {
         this.infoButton.appendChild(infoButtonIcon);
 
         const infoButtonTitle = document.createElement("h2");
-        infoButtonTitle.textContent = i18n.t("spaceStation:stationInformation");
+        infoButtonTitle.textContent = this.t("spaceStation:stationInformation");
         this.infoButton.appendChild(infoButtonTitle);
 
         const infoButtonDescription = document.createElement("p");
-        infoButtonDescription.textContent = i18n.t("spaceStation:stationInformationDescription");
+        infoButtonDescription.textContent = this.t("spaceStation:stationInformationDescription");
         this.infoButton.appendChild(infoButtonDescription);
 
         const flexGrow = document.createElement("div");
@@ -267,11 +274,11 @@ export class SpaceStationLayer {
         this.takeOffButton.appendChild(takeOffButtonIcon);
 
         const takeOffButtonTitle = document.createElement("h2");
-        takeOffButtonTitle.textContent = i18n.t("spaceStation:takeOff");
+        takeOffButtonTitle.textContent = this.t("spaceStation:takeOff");
         this.takeOffButton.appendChild(takeOffButtonTitle);
 
         const takeOffButtonDescription = document.createElement("p");
-        takeOffButtonDescription.textContent = i18n.t("spaceStation:takeOffDescription");
+        takeOffButtonDescription.textContent = this.t("spaceStation:takeOffDescription");
         this.takeOffButton.appendChild(takeOffButtonDescription);
 
         this.missionsButton.addEventListener("click", async () => {
@@ -299,7 +306,7 @@ export class SpaceStationLayer {
             this.onTakeOffObservable.notifyObservers();
         });
 
-        this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer);
+        this.spaceshipDockPanel = new SpaceshipDockUI(player, soundPlayer, t);
     }
 
     private async setMainPanelState(
@@ -314,7 +321,7 @@ export class SpaceStationLayer {
         }
 
         if (this.currentStation === null) {
-            await alertModal("No current station", this.soundPlayer);
+            await alertModal("No current station", this.soundPlayer, this.t);
             return;
         }
 
@@ -327,7 +334,7 @@ export class SpaceStationLayer {
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
                 this.mainPanel.appendChild(
-                    generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer),
+                    generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer, this.t),
                 );
                 break;
             case "spaceship":

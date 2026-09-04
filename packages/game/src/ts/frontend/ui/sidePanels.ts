@@ -1,4 +1,5 @@
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import type { ISaveBackend } from "@/backend/save/saveBackend";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -35,32 +36,33 @@ export class SidePanels {
         soundPlayer: ISoundPlayer,
         musicConductor: MusicConductor,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.universeBackend = universeBackend;
         this.saveBackend = saveManager;
 
         // Create panel instances
-        this.loadSavePanel = new LoadSavePanel(universeBackend, saveManager, soundPlayer, notificationManager);
+        this.loadSavePanel = new LoadSavePanel(universeBackend, saveManager, soundPlayer, notificationManager, t);
         this.attachCloseButton(this.loadSavePanel.htmlRoot);
         document.body.appendChild(this.loadSavePanel.htmlRoot);
 
-        this.settingsPanel = new SettingsPanel(musicConductor);
+        this.settingsPanel = new SettingsPanel(musicConductor, t);
         this.attachCloseButton(this.settingsPanel.htmlRoot);
         document.body.appendChild(this.settingsPanel.htmlRoot);
 
-        this.tutorialsPanel = new TutorialsPanel();
+        this.tutorialsPanel = new TutorialsPanel(t);
         this.attachCloseButton(this.tutorialsPanel.htmlRoot);
         document.body.appendChild(this.tutorialsPanel.htmlRoot);
 
-        this.contributePanel = new ContributePanel();
+        this.contributePanel = new ContributePanel(t);
         this.attachCloseButton(this.contributePanel.htmlRoot);
         document.body.appendChild(this.contributePanel.htmlRoot);
 
-        this.creditsPanel = new CreditsPanel();
+        this.creditsPanel = new CreditsPanel(t);
         this.attachCloseButton(this.creditsPanel.htmlRoot);
         document.body.appendChild(this.creditsPanel.htmlRoot);
 
-        this.aboutPanel = new AboutPanel();
+        this.aboutPanel = new AboutPanel(t);
         this.attachCloseButton(this.aboutPanel.htmlRoot);
         document.body.appendChild(this.aboutPanel.htmlRoot);
     }

@@ -23,6 +23,7 @@ import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import type { Cullable } from "@/frontend/helpers/cullable";
@@ -161,8 +162,8 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
         return this.cloudsUniforms;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     /**

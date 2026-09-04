@@ -13,6 +13,7 @@
     "invalidSaveFileJson": "Le fichier de sauvegarde n'est pas un JSON valide. Veuillez vérifier votre fichier de sauvegarde.",
     "failedToParseSaves": "Echec de l'analyse des sauvegardes. Veuillez consulter la console pour plus d'informations.",
     "invalidStorageFormat": "Format de stockage invalide. Veuillez consulter la console pour plus d'informations.",
+    "saveNotFound": "La sauvegarde demandée est introuvable.",
     "saveOk": "Sauvegardé avec succès dans le stockage local.",
     "cantSaveTutorial": "Impossible de sauvegarder pendant un tutoriel.",
     "newDiscovery": "Découverte de {{objectName}}. Enregistrement des données effectuées.",

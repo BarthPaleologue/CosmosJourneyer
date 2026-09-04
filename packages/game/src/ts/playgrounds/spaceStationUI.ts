@@ -37,7 +37,7 @@ import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { initI18n } from "@/i18n";
 
-import { enablePhysics } from "./utils";
+import { addToWindow, enablePhysics } from "./utils";
 
 export async function createSpaceStationUIScene(
     engine: AbstractEngine,
@@ -48,7 +48,7 @@ export async function createSpaceStationUIScene(
 
     await enablePhysics(scene);
 
-    await initI18n();
+    const t = await initI18n();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 
@@ -77,7 +77,7 @@ export async function createSpaceStationUIScene(
     clusteredLightingSystem.registerRegion(spaceship);
     player.instancedSpaceships.push(spaceship);
 
-    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager);
+    const shipControls = new ShipControls(spaceship, scene, soundPlayer, tts, notificationManager, t);
 
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
@@ -93,6 +93,7 @@ export async function createSpaceStationUIScene(
         systemDatabase,
         soundPlayer,
         notificationManager,
+        t,
     );
 
     const stationModel = systemModel.orbitalFacilities[0];
@@ -108,7 +109,7 @@ export async function createSpaceStationUIScene(
         clusteredLightingSystem.update(camera);
     });
 
-    (window as Window & typeof globalThis & { player: Player }).player = player;
+    addToWindow("player", player);
 
     return scene;
 }

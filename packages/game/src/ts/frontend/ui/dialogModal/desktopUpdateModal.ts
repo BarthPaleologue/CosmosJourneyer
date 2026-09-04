@@ -1,8 +1,8 @@
+import type { TFunction } from "i18next";
+
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
 import type { DesktopUpdateState } from "@/utils/desktopUpdateApi";
-
-import i18n from "@/i18n";
 
 const changelogPlaceholder = "__COSMOS_CHANGELOG_LINK__";
 
@@ -26,11 +26,13 @@ export class DesktopUpdateModal {
     private readonly dialog: HTMLDialogElement;
     private readonly form: HTMLFormElement;
     private readonly soundPlayer: ISoundPlayer;
+    private readonly t: TFunction;
     private readonly onAction: (action: DesktopUpdateModalAction) => void;
     private busy = false;
 
-    public constructor(soundPlayer: ISoundPlayer, onAction: (action: DesktopUpdateModalAction) => void) {
+    public constructor(soundPlayer: ISoundPlayer, t: TFunction, onAction: (action: DesktopUpdateModalAction) => void) {
         this.soundPlayer = soundPlayer;
+        this.t = t;
         this.onAction = onAction;
         this.dialog = document.createElement("dialog");
         this.dialog.classList.add("desktopUpdateModal");
@@ -136,19 +138,19 @@ export class DesktopUpdateModal {
 
     private appendTitle(key: string, options?: Record<string, string | number>): void {
         const title = document.createElement("h2");
-        title.textContent = translate(key, options);
+        title.textContent = this.translate(key, options);
         this.form.appendChild(title);
     }
 
     private appendText(key: string): void {
         const text = document.createElement("p");
-        text.textContent = translate(key);
+        text.textContent = this.translate(key);
         this.form.appendChild(text);
     }
 
     private appendUpdateDescription(): void {
         const text = document.createElement("p");
-        const description = translate("desktopUpdate:updateDescription", {
+        const description = this.translate("desktopUpdate:updateDescription", {
             changelog: changelogPlaceholder,
         });
         const changelogIndex = description.indexOf(changelogPlaceholder);
@@ -162,7 +164,7 @@ export class DesktopUpdateModal {
 
         const changelogLink = document.createElement("a");
         changelogLink.href = "#";
-        changelogLink.textContent = translate("desktopUpdate:updateAvailableChangelogLink");
+        changelogLink.textContent = this.translate("desktopUpdate:updateAvailableChangelogLink");
         changelogLink.addEventListener("click", (event) => {
             event.preventDefault();
             this.soundPlayer.playNow("click");
@@ -194,7 +196,7 @@ export class DesktopUpdateModal {
         const percent = Math.max(0, Math.min(100, downloadPercent));
         progressBar.style.setProperty("--progress", `${percent}%`);
         progressBar.setAttribute("aria-valuenow", String(Math.round(percent)));
-        progressText.textContent = translate("desktopUpdate:downloadProgress", {
+        progressText.textContent = this.translate("desktopUpdate:downloadProgress", {
             percent: Math.round(percent),
         });
         return true;
@@ -205,10 +207,10 @@ export class DesktopUpdateModal {
         for (const { action, labelKey } of buttons) {
             const button = document.createElement("button");
             button.type = "button";
-            button.textContent = translate(labelKey);
+            button.textContent = this.translate(labelKey);
             button.disabled = this.busy;
             if (action === "backup") {
-                button.title = translate("desktopUpdate:backupExplanation");
+                button.title = this.translate("desktopUpdate:backupExplanation");
             }
             button.addEventListener("click", () => {
                 this.soundPlayer.playNow("click");
@@ -218,8 +220,7 @@ export class DesktopUpdateModal {
         }
         this.form.appendChild(menu);
     }
-}
-
-function translate(key: string, options?: Record<string, string | number>): string {
-    return options === undefined ? i18n.t(key) : i18n.t(key, options);
+    private translate(key: string, options?: Record<string, string | number>): string {
+        return options === undefined ? this.t(key) : this.t(key, options);
+    }
 }
