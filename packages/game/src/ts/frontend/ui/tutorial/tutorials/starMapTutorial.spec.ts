@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -24,10 +25,12 @@ import { Mission } from "@/frontend/missions/mission";
 
 import { StarMapTutorial } from "./starMapTutorial";
 
+const t = createInstance().getFixedT("en-US");
+
 describe("StarMapTutorial", () => {
     it("spawns near a space station", () => {
         const universeBackend = new UniverseBackend(getLoneStarSystem());
-        const tutorial = new StarMapTutorial();
+        const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);
@@ -62,7 +65,7 @@ describe("StarMapTutorial", () => {
 
     it("has correct mission objectives", () => {
         const universeBackend = new UniverseBackend(getLoneStarSystem());
-        const tutorial = new StarMapTutorial();
+        const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData(universeBackend);
         expect(saveDataResult.success).toBe(true);

@@ -26,12 +26,12 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
+import type { TFunction } from "i18next";
 
 import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
 import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
-import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
 export class LandingPad implements ILandingPad {
@@ -177,7 +177,7 @@ export class LandingPad implements ILandingPad {
         this.deck.dispose();
     }
 
-    getTypeName(): string {
-        return i18n.t("objectTypes:landingPad");
+    getTypeName(t: TFunction): string {
+        return t("objectTypes:landingPad");
     }
 }

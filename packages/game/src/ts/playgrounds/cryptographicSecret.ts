@@ -88,27 +88,31 @@ export async function createCryptographicSecretScene(
 
     const soundPlayerMock = new SoundPlayerMock();
 
-    await initI18n();
+    const t = await initI18n();
 
-    void promptModalString("Enter the decryption passphrase to reveal the secret function:", "", soundPlayerMock).then(
-        async (decryptionPassphrase) => {
-            if (decryptionPassphrase === null) {
-                await alertModal("Decryption cancelled.", soundPlayerMock);
-                return;
-            }
+    void promptModalString(
+        "Enter the decryption passphrase to reveal the secret function:",
+        "",
+        soundPlayerMock,
+        t,
+    ).then(async (decryptionPassphrase) => {
+        if (decryptionPassphrase === null) {
+            await alertModal("Decryption cancelled.", soundPlayerMock, t);
+            return;
+        }
 
-            const decryptedFunctionResult = await decryptFunction<() => void>(payload, decryptionPassphrase);
-            if (!decryptedFunctionResult.success) {
-                await alertModal(
-                    "Decryption Failed: The provided passphrase was incorrect, or an error occurred during decryption.",
-                    soundPlayerMock,
-                );
-                return;
-            }
+        const decryptedFunctionResult = await decryptFunction<() => void>(payload, decryptionPassphrase);
+        if (!decryptedFunctionResult.success) {
+            await alertModal(
+                "Decryption Failed: The provided passphrase was incorrect, or an error occurred during decryption.",
+                soundPlayerMock,
+                t,
+            );
+            return;
+        }
 
-            decryptedFunctionResult.value();
-        },
-    );
+        decryptedFunctionResult.value();
+    });
 
     return scene;
 }

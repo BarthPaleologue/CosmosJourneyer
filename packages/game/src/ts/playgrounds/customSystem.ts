@@ -46,7 +46,7 @@ export async function createCustomSystemScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    await initI18n();
+    const t = await initI18n();
 
     const urlParams = new URLSearchParams(window.location.search);
     const systemKey = urlParams.get("system");
@@ -98,6 +98,7 @@ export async function createCustomSystemScene(
         notificationManager,
         assets,
         terrainSystem,
+        t,
         progressMonitor,
     );
 

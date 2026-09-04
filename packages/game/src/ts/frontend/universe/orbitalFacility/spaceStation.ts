@@ -25,6 +25,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SpaceStationModel, StationSectionModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
@@ -134,8 +135,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         return this.boundingRadius;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {

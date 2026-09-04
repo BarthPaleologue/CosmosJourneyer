@@ -15,31 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { renderMarkdownInline } from "@/utils/markdown";
+import type { TFunction } from "i18next";
 
-import i18n from "@/i18n";
+import { renderMarkdownInline } from "@/utils/markdown";
 
 export class AboutPanel {
     readonly htmlRoot: HTMLElement;
 
-    constructor() {
-        this.htmlRoot = this.createPanelHTML();
+    constructor(t: TFunction) {
+        this.htmlRoot = this.createPanelHTML(t);
     }
 
-    private createPanelHTML(): HTMLElement {
+    private createPanelHTML(t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.className = "sidePanel";
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:about");
+        title.textContent = t("sidePanel:about");
         panel.appendChild(title);
 
         // About text
         const aboutText = document.createElement("p");
         aboutText.className = "aboutText";
         aboutText.style.whiteSpace = "pre-line"; // necessary to display \n in the text
-        aboutText.textContent = i18n.t("sidePanel:aboutText");
+        aboutText.textContent = t("sidePanel:aboutText");
         panel.appendChild(aboutText);
 
         // Signature
@@ -52,12 +52,12 @@ export class AboutPanel {
         const emailText = document.createElement("p");
         emailText.className = "aboutText";
         emailText.style.whiteSpace = "pre-line"; // necessary to display \n in the text
-        emailText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:emailContact"));
+        emailText.innerHTML = renderMarkdownInline(t("sidePanel:emailContact"));
         panel.appendChild(emailText);
 
         // Special thanks section
         const specialThanksHeader = document.createElement("h3");
-        specialThanksHeader.textContent = i18n.t("sidePanel:specialThanks");
+        specialThanksHeader.textContent = t("sidePanel:specialThanks");
         panel.appendChild(specialThanksHeader);
 
         const specialThanks = [

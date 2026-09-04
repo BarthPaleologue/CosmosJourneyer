@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { ISaveBackend } from "@/backend/save/saveBackend";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
 
 import type { INotificationManager } from "../notificationManager";
 import { SaveLoadingPanelContent } from "../saveLoadingPanelContent";
@@ -29,13 +29,23 @@ export class LoadSavePanel {
     readonly htmlRoot: HTMLElement;
     readonly content: SaveLoadingPanelContent;
 
+    private readonly t: TFunction;
+
     constructor(
         universeBackend: UniverseBackend,
         saveBackend: ISaveBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
-        this.content = new SaveLoadingPanelContent(universeBackend, saveBackend, soundPlayer, notificationManager);
+        this.t = t;
+        this.content = new SaveLoadingPanelContent(
+            universeBackend,
+            saveBackend,
+            soundPlayer,
+            notificationManager,
+            this.t,
+        );
         this.htmlRoot = this.createPanelHTML();
     }
 
@@ -45,7 +55,7 @@ export class LoadSavePanel {
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:loadSave");
+        title.textContent = this.t("sidePanel:loadSave");
         panel.appendChild(title);
 
         // Append the content

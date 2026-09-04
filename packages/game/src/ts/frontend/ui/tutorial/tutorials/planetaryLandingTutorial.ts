@@ -17,6 +17,7 @@
 
 import type { AxisComposite } from "@brianchirls/game-input/browser";
 import type { Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
@@ -30,8 +31,6 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { renderMarkdownBlock } from "@/utils/markdown";
 
-import i18n from "@/i18n";
-
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import type { Tutorial } from "./tutorial";
 
@@ -40,7 +39,7 @@ import gettingCloseToSurfaceImageSrc from "@assets/tutorials/planetaryLandingTut
 import landingImageSrc from "@assets/tutorials/planetaryLandingTutorial/landing.webp";
 import saveData from "@assets/tutorials/planetaryLandingTutorial/save.json";
 
-function getSpaceshipUpKeys(keyboardLayoutMap: Map<string, string> | null): string {
+function getSpaceshipUpKeys(keyboardLayoutMap: Map<string, string> | null, t: TFunction): string {
     const upDownBinding = SpaceShipControlsInputs.map.upDown.bindings[0];
     if (upDownBinding === undefined) {
         throw new Error("Spaceship up/down controls are missing");
@@ -49,41 +48,47 @@ function getSpaceshipUpKeys(keyboardLayoutMap: Map<string, string> | null): stri
     return axisCompositeToString(upDownBinding.control as AxisComposite, keyboardLayoutMap)
         .filter(([direction]) => direction === "positive")
         .map(([, key]) => key)
-        .join(` ${i18n.t("common:or")} `);
+        .join(` ${t("common:or")} `);
 }
 
 export class PlanetaryLandingTutorial implements Tutorial {
     readonly coverImageSrc: string = welcomeImageSrc;
+
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
+        this.t = t;
+    }
 
     getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, universeBackend);
     }
 
     getTitle(): string {
-        return i18n.t("tutorials:planetaryLanding:title");
+        return this.t("tutorials:planetaryLanding:title");
     }
     getDescription(): string {
-        return i18n.t("tutorials:planetaryLanding:description");
+        return this.t("tutorials:planetaryLanding:description");
     }
     async getContentPanelsHtml(): Promise<string[]> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
-        const spaceshipUpKeys = getSpaceshipUpKeys(keyboardLayoutMap);
+        const spaceshipUpKeys = getSpaceshipUpKeys(keyboardLayoutMap, this.t);
 
         const presentationPanelHtml = `
         <div class="tutorialContent">
             <img src="${welcomeImageSrc}" alt="Planetary landing welcome image">
-            <p>${i18n.t("tutorials:planetaryLanding:welcome")}</p>
+            <p>${this.t("tutorials:planetaryLanding:welcome")}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:navigationInfo", {
+                this.t("tutorials:common:navigationInfo", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                     previousKeys: pressInteractionToStrings(
                         TutorialControlsInputs.map.prevPanel,
                         keyboardLayoutMap,
-                    ).join(` ${i18n.t("common:or")} `),
+                    ).join(` ${this.t("common:or")} `),
                 }),
             )}
         </div>`;
@@ -92,30 +97,30 @@ export class PlanetaryLandingTutorial implements Tutorial {
         <div class="tutorialContent">
             <img src="${gettingCloseToSurfaceImageSrc}" alt="Getting close to the surface">
             
-            <p>${i18n.t("tutorials:planetaryLanding:gettingCloseToSurface")}</p>            
+            <p>${this.t("tutorials:planetaryLanding:gettingCloseToSurface")}</p>
         </div>`;
 
         const howToLandPanel = `
         <div class="tutorialContent">
             <img src="${landingImageSrc}" alt="Planetary landing">
             
-            <p>${i18n.t("tutorials:planetaryLanding:howToLand", {
+            <p>${this.t("tutorials:planetaryLanding:howToLand", {
                 keyLand: pressInteractionToStrings(SpaceShipControlsInputs.map.landing, keyboardLayoutMap).join(
-                    ` ${i18n.t("common:or")} `,
+                    ` ${this.t("common:or")} `,
                 ),
                 keyExit: pressInteractionToStrings(
                     StarSystemInputs.map.toggleSpaceShipCharacter,
                     keyboardLayoutMap,
-                ).join(` ${i18n.t("common:or")} `),
+                ).join(` ${this.t("common:or")} `),
             })}</p>
 
-            <p>${i18n.t("tutorials:planetaryLanding:howToLiftoff", { keyLiftoff: spaceshipUpKeys })}</p>
+            <p>${this.t("tutorials:planetaryLanding:howToLiftoff", { keyLiftoff: spaceshipUpKeys })}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:tutorialEnding", {
+                this.t("tutorials:common:tutorialEnding", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     keyQuit: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                 }),
             )}

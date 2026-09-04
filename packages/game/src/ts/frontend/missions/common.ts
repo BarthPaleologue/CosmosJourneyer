@@ -2,6 +2,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -11,8 +12,6 @@ import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 
 import { parseDistance } from "@/utils/strings/parseToStrings";
 
-import i18n from "@/i18n";
-
 import type { MissionContext } from "./missionContext";
 
 export function getGoToSystemInstructions(
@@ -20,12 +19,13 @@ export function getGoToSystemInstructions(
     targetSystemCoordinates: StarSystemCoordinates,
     keyboardLayout: Map<string, string>,
     universeBackend: UniverseBackend,
+    t: TFunction,
 ): string {
     const itinerary = missionContext.currentItinerary;
     if (itinerary === null) {
-        return i18n.t("missions:common:openStarMap", {
+        return t("missions:common:openStarMap", {
             starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(
-                ` ${i18n.t("common:or")} `,
+                ` ${t("common:or")} `,
             ),
         });
     }
@@ -40,16 +40,16 @@ export function getGoToSystemInstructions(
     );
 
     if (!isPlayerGoingToTargetSystem) {
-        return i18n.t("missions:common:openStarMap", {
+        return t("missions:common:openStarMap", {
             starMapKey: pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayout).join(
-                ` ${i18n.t("common:or")} `,
+                ` ${t("common:or")} `,
             ),
         });
     } else {
         const nextSystemCoordinates = itinerary[1];
         const nextSystemModel = universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
         if (nextSystemModel === null) {
-            return i18n.t("missions:common:corruptedItinerary");
+            return t("missions:common:corruptedItinerary");
         }
 
         const distanceToNextSystemLy = Vector3.Distance(
@@ -57,9 +57,9 @@ export function getGoToSystemInstructions(
             currentSystemPosition,
         );
 
-        return i18n.t("missions:common:travelToNextSystem", {
+        return t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.name,
-            distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy)),
+            distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy), t),
             nbJumps: itinerary.length - 1,
         });
     }

@@ -25,6 +25,8 @@ import { Inspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
+import { initI18n } from "@/i18n";
+
 import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 import { renderQrCodeOverlay } from "./playgrounds/utils";
@@ -37,7 +39,8 @@ document.body.appendChild(canvas);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const loadingScreen = new LoadingScreen(canvas);
+const t = await initI18n();
+const loadingScreen = new LoadingScreen(canvas, t);
 
 const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true });
 engine.useReverseDepthBuffer = true;

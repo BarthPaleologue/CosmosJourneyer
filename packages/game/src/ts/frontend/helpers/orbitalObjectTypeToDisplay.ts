@@ -19,10 +19,9 @@ import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
-import i18n from "@/i18n";
-
-export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>): string {
+export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>, t: TFunction): string {
     switch (model.type) {
         case "mandelbulb":
         case "juliaSet":
@@ -30,27 +29,27 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
         case "sierpinskiPyramid":
         case "mengerSponge":
         case "darkKnight":
-            return i18n.t("objectTypes:anomaly");
+            return t("objectTypes:anomaly");
         case "gasPlanet":
-            return i18n.t("objectTypes:gasPlanet");
+            return t("objectTypes:gasPlanet");
         case "telluricPlanet":
-            return i18n.t("objectTypes:telluricPlanet");
+            return t("objectTypes:telluricPlanet");
         case "telluricSatellite":
-            return i18n.t("objectTypes:telluricMoon");
+            return t("objectTypes:telluricMoon");
         case "spaceStation":
-            return i18n.t("objectTypes:spaceStation");
+            return t("objectTypes:spaceStation");
         case "spaceElevator":
-            return i18n.t("objectTypes:spaceElevator");
+            return t("objectTypes:spaceElevator");
         case "star":
-            return i18n.t("objectTypes:star", {
+            return t("objectTypes:star", {
                 stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature),
             });
         case "neutronStar":
-            return i18n.t("objectTypes:neutronStar");
+            return t("objectTypes:neutronStar");
         case "blackHole":
-            return i18n.t("objectTypes:blackHole");
+            return t("objectTypes:blackHole");
         case "custom":
-            return i18n.t("objectTypes:custom");
+            return t("objectTypes:custom");
         default:
             return assertUnreachable(model);
     }

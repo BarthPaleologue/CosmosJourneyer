@@ -56,7 +56,7 @@ export async function createInteractionDemo(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await initI18n();
+    const t = await initI18n();
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
@@ -106,18 +106,23 @@ export async function createInteractionDemo(
 
     const soundPlayer = new SoundPlayerMock();
 
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        scene.activeCamera?.detachControl();
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
-            useVirtualCursor: engine.isPointerLock,
-        });
-        scene.activeCamera?.attachControl(true);
-        return choice;
-    });
+            scene.activeCamera?.detachControl();
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer, {
+                useVirtualCursor: engine.isPointerLock,
+            });
+            scene.activeCamera?.attachControl(true);
+            return choice;
+        },
+        t,
+    );
     interactionSystem.enableForCamera(characterControls.firstPersonCamera, 5);
     interactionSystem.enableForCamera(characterControls.thirdPersonCamera, 10);
 

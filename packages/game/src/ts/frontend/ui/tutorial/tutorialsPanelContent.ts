@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-
-import i18n from "@/i18n";
+import type { TFunction } from "i18next";
 
 import { FlightTutorial } from "./tutorials/flightTutorial";
 import { FuelScoopTutorial } from "./tutorials/fuelScoopTutorial";
@@ -32,16 +31,16 @@ export class TutorialsPanelContent {
 
     private readonly availableTutorials: ReadonlyArray<Tutorial>;
 
-    constructor() {
+    constructor(t: TFunction) {
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("tutorialsMenuContainer");
 
         this.availableTutorials = [
-            new FlightTutorial(),
-            new StationLandingTutorial(),
-            new PlanetaryLandingTutorial(),
-            new StarMapTutorial(),
-            new FuelScoopTutorial(),
+            new FlightTutorial(t),
+            new StationLandingTutorial(t),
+            new PlanetaryLandingTutorial(t),
+            new StarMapTutorial(t),
+            new FuelScoopTutorial(t),
         ];
 
         this.availableTutorials.forEach((tutorial) => {
@@ -70,7 +69,7 @@ export class TutorialsPanelContent {
 
         const moreWillCome = document.createElement("p");
         moreWillCome.classList.add("moreWillCome");
-        moreWillCome.textContent = i18n.t("tutorials:common:moreWillComeSoon");
+        moreWillCome.textContent = t("tutorials:common:moreWillComeSoon");
         this.htmlRoot.appendChild(moreWillCome);
     }
 }

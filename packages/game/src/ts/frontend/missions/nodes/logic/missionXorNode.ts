@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { MissionXorNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -70,20 +71,21 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
         this.hasCompletedLock = this.children.filter((child) => child.isCompleted()).length === 1;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend)).join(" xor ");
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend, t)).join(" xor ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.hasCompletedLock) {
             return "Mission completed";
         }
         return this.children
-            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend))
+            .map((child) => child.describeNextTask(context, keyboardLayout, universeBackend, t))
             .join(" xor ");
     }
 

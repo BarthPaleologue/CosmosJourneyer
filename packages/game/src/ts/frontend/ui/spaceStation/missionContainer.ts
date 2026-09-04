@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -28,7 +30,13 @@ import { AcceptMissionButton } from "./acceptMissionButton";
 export class MissionContainer {
     readonly rootNode: HTMLElement;
 
-    constructor(mission: Mission, player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
+    constructor(
+        mission: Mission,
+        player: Player,
+        universeBackend: UniverseBackend,
+        soundPlayer: ISoundPlayer,
+        t: TFunction,
+    ) {
         this.rootNode = document.createElement("div");
         this.rootNode.className = "missionItem";
 
@@ -37,11 +45,11 @@ export class MissionContainer {
         this.rootNode.appendChild(descriptionContainer);
 
         const missionH4 = document.createElement("h4");
-        missionH4.innerText = mission.getTypeString();
+        missionH4.innerText = mission.getTypeString(t);
         descriptionContainer.appendChild(missionH4);
 
         const missionP = document.createElement("p");
-        missionP.innerText = mission.describe(universeBackend);
+        missionP.innerText = mission.describe(universeBackend, t);
         descriptionContainer.appendChild(missionP);
 
         const rewardP = document.createElement("p");
@@ -52,7 +60,7 @@ export class MissionContainer {
         buttonContainer.className = "missionButtonContainer";
         this.rootNode.appendChild(buttonContainer);
 
-        const acceptButton = new AcceptMissionButton(mission, player, soundPlayer);
+        const acceptButton = new AcceptMissionButton(mission, player, soundPlayer, t);
         buttonContainer.appendChild(acceptButton.rootNode);
     }
 }

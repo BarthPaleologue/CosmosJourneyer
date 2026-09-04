@@ -19,6 +19,7 @@ import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
+import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -43,6 +44,7 @@ export function generateMissionsDom(
     player: Player,
     universeBackend: UniverseBackend,
     soundPlayer: ISoundPlayer,
+    t: TFunction,
 ): HTMLDivElement {
     const starSystemModel = universeBackend.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
     if (starSystemModel === null) {
@@ -100,7 +102,7 @@ export function generateMissionsDom(
     htmlRoot.appendChild(missionList);
 
     sightSeeingMissions.forEach((mission) => {
-        const missionContainer = new MissionContainer(mission, player, universeBackend, soundPlayer);
+        const missionContainer = new MissionContainer(mission, player, universeBackend, soundPlayer, t);
         missionList.appendChild(missionContainer.rootNode);
     });
 
@@ -114,7 +116,7 @@ export function generateMissionsDom(
 
     contactStations.forEach(({ model: station, distance }) => {
         const stationP = document.createElement("p");
-        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(lightYearsToMeters(distance))})`;
+        stationP.innerText = `${station.name} in ${starSystem.name} (${parseDistance(lightYearsToMeters(distance), t)})`;
         htmlRoot.appendChild(stationP);
     });
 

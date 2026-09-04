@@ -1,9 +1,8 @@
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-
-import i18n from "@/i18n";
 
 import type { Player } from "../player/player";
 
@@ -13,13 +12,15 @@ export class StarMapBookmarkButton {
 
     private selectedSystemCoordinates: StarSystemCoordinates | null = null;
     private isSelectedSystemBookmarked = false;
+    private readonly t: TFunction;
 
-    constructor(player: Player, soundPlayer: ISoundPlayer) {
+    constructor(player: Player, soundPlayer: ISoundPlayer, t: TFunction) {
         this.rootNode = document.createElement("button");
         this.rootNode.classList.add("bookmarkButton");
-        this.rootNode.textContent = i18n.t("starMap:bookmark");
+        this.rootNode.textContent = t("starMap:bookmark");
 
         this.player = player;
+        this.t = t;
 
         this.rootNode.addEventListener("click", () => {
             if (this.selectedSystemCoordinates === null) {
@@ -32,13 +33,13 @@ export class StarMapBookmarkButton {
             if (!this.isSelectedSystemBookmarked) {
                 this.player.systemBookmarks.push(this.selectedSystemCoordinates);
                 this.rootNode.classList.add("bookmarked");
-                this.rootNode.textContent = i18n.t("starMap:bookmarked");
+                this.rootNode.textContent = this.t("starMap:bookmarked");
             } else {
                 this.player.systemBookmarks = this.player.systemBookmarks.filter(
                     (bookmark) => !starSystemCoordinatesEquals(bookmark, currentSystemSeed),
                 );
                 this.rootNode.classList.remove("bookmarked");
-                this.rootNode.textContent = i18n.t("starMap:bookmark");
+                this.rootNode.textContent = this.t("starMap:bookmark");
             }
 
             this.isSelectedSystemBookmarked = !this.isSelectedSystemBookmarked;
@@ -53,7 +54,7 @@ export class StarMapBookmarkButton {
             ) !== undefined;
         this.rootNode.classList.toggle("bookmarked", this.isSelectedSystemBookmarked);
         this.rootNode.textContent = this.isSelectedSystemBookmarked
-            ? i18n.t("starMap:bookmarked")
-            : i18n.t("starMap:bookmark");
+            ? this.t("starMap:bookmarked")
+            : this.t("starMap:bookmark");
     }
 }

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { MissionSequenceNodeSerialized } from "@/backend/missions/missionNodeSerialized";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -91,14 +92,15 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         this.activeChildIndex = index;
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
-        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend)).join(" then ");
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
+        return this.children.map((child) => child.describe(originSystemCoordinates, universeBackend, t)).join(" then ");
     }
 
     describeNextTask(
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.hasCompletedLock) {
             return "Mission completed";
@@ -107,7 +109,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         if (activeChild === undefined) {
             return "Mission error: activeChildIndex out of bounds";
         }
-        return activeChild.describeNextTask(context, keyboardLayout, universeBackend);
+        return activeChild.describeNextTask(context, keyboardLayout, universeBackend, t);
     }
 
     getTargetSystems(): StarSystemCoordinates[] {

@@ -24,6 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
+import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -41,8 +42,6 @@ import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/man
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
-
-import i18n from "@/i18n";
 
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic, slerpSmoothToRef } from "../helpers/animations/interpolations";
@@ -91,6 +90,7 @@ export class ShipControls implements Controls {
     private readonly tts: ITts;
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
+    private readonly t: TFunction;
 
     constructor(
         ship: Spaceship,
@@ -98,12 +98,14 @@ export class ShipControls implements Controls {
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.spaceship = ship;
 
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;
+        this.t = t;
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
@@ -480,7 +482,7 @@ export class ShipControls implements Controls {
 
         this.spaceship.onLowFuelWarning.add(() => {
             this.tts.enqueueSay("Charlotte", "low_fuel_warning");
-            this.notificationManager.create("spaceship", "warning", i18n.t("notifications:lowFuelWarning"), 5000);
+            this.notificationManager.create("spaceship", "warning", this.t("notifications:lowFuelWarning"), 5000);
         });
 
         this.spaceship.onLandingObservable.add(async () => {
@@ -495,27 +497,27 @@ export class ShipControls implements Controls {
                 this.notificationManager.create(
                     "spaceship",
                     "info",
-                    i18n.t("notifications:landingComplete", { bindingsString: bindingsString }),
+                    this.t("notifications:landingComplete", { bindingsString: bindingsString }),
                     5000,
                 );
             }
         });
 
         this.spaceship.onPlanetaryLandingEngaged.add(() => {
-            this.notificationManager.create("spaceship", "info", i18n.t("notifications:landingSequenceEngaged"), 5000);
+            this.notificationManager.create("spaceship", "info", this.t("notifications:landingSequenceEngaged"), 5000);
             this.tts.enqueueSay("Charlotte", "initiating_planetary_landing");
         });
 
         this.spaceship.onLandingCancelled.add(() => {
-            this.notificationManager.create("spaceship", "info", i18n.t("notifications:landingCancelled"), 5000);
+            this.notificationManager.create("spaceship", "info", this.t("notifications:landingCancelled"), 5000);
         });
 
         this.spaceship.onTakeOff.add(() => {
-            this.notificationManager.create("spaceship", "info", i18n.t("notifications:takeOffSuccess"), 2000);
+            this.notificationManager.create("spaceship", "info", this.t("notifications:takeOffSuccess"), 2000);
         });
 
         this.spaceship.onAutoPilotEngaged.add(() => {
-            this.notificationManager.create("spaceship", "info", i18n.t("notifications:autoPilotEngaged"), 10_000);
+            this.notificationManager.create("spaceship", "info", this.t("notifications:autoPilotEngaged"), 10_000);
         });
 
         this.spaceship.onWarpDriveDisabled.add((isEmergency) => {
@@ -544,6 +546,7 @@ export class ShipControls implements Controls {
         tts: ITts,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ): Promise<ShipControls> {
         return new ShipControls(
             await Spaceship.CreateDefault(scene, assets, soundPlayer, getPhysicsEngineV2(scene)),
@@ -551,6 +554,7 @@ export class ShipControls implements Controls {
             soundPlayer,
             tts,
             notificationManager,
+            t,
         );
     }
 

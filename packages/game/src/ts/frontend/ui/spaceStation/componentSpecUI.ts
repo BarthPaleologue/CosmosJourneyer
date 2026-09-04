@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/component";
 import type { SerializedComponent } from "@/backend/spaceship/serializedComponents/component";
@@ -31,7 +32,6 @@ import type { SerializedThrusters } from "@/backend/spaceship/serializedComponen
 import { getWarpDriveSpec } from "@/backend/spaceship/serializedComponents/warpDrive";
 import type { SerializedWarpDrive } from "@/backend/spaceship/serializedComponents/warpDrive";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 export class ComponentSpecUI {
@@ -39,9 +39,13 @@ export class ComponentSpecUI {
 
     private readonly placeHolderText: HTMLElement;
 
-    constructor(placeHolderText: string) {
+    private readonly t: TFunction;
+
+    constructor(placeHolderText: string, t: TFunction) {
         this.root = document.createElement("div");
         this.root.className = "componentSpec";
+
+        this.t = t;
 
         this.placeHolderText = document.createElement("p");
         this.placeHolderText.innerText = placeHolderText;
@@ -64,11 +68,11 @@ export class ComponentSpecUI {
 
         const componentName = document.createElement("h3");
         const qualityString = Settings.QUALITY_CHARS.at(serializedComponent.quality) ?? "[ERROR]";
-        componentName.textContent = `${getComponentTypeI18n(serializedComponent.type)} ${serializedComponent.size}${qualityString}`;
+        componentName.textContent = `${getComponentTypeI18n(serializedComponent.type, this.t)} ${serializedComponent.size}${qualityString}`;
         this.root.appendChild(componentName);
 
         const componentValue = document.createElement("p");
-        componentValue.innerText = `${i18n.t("spaceStation:value")}: ${getComponentValue(serializedComponent).toLocaleString()} ${Settings.CREDIT_SYMBOL}`;
+        componentValue.innerText = `${this.t("spaceStation:value")}: ${getComponentValue(serializedComponent).toLocaleString()} ${Settings.CREDIT_SYMBOL}`;
         this.root.appendChild(componentValue);
 
         switch (serializedComponent.type) {
@@ -97,7 +101,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const range = document.createElement("p");
-        range.innerText = `${i18n.t("spaceStation:range")}: ${i18n.t("units:shortLy", { value: spec.rangeLy.toLocaleString(undefined, { maximumSignificantDigits: 3 }) })}`;
+        range.innerText = `${this.t("spaceStation:range")}: ${this.t("units:shortLy", { value: spec.rangeLy.toLocaleString(undefined, { maximumSignificantDigits: 3 }) })}`;
         container.appendChild(range);
 
         return container;
@@ -108,7 +112,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const scoopRate = document.createElement("p");
-        scoopRate.innerText = `${i18n.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L/s`;
+        scoopRate.innerText = `${this.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L/s`;
         container.appendChild(scoopRate);
 
         return container;
@@ -119,7 +123,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const capacity = document.createElement("p");
-        capacity.innerText = `${i18n.t("spaceStation:capacity")}: ${spec.maxFuel.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L`;
+        capacity.innerText = `${this.t("spaceStation:capacity")}: ${spec.maxFuel.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L`;
         container.appendChild(capacity);
 
         return container;
@@ -130,7 +134,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const relativeRange = document.createElement("p");
-        relativeRange.innerText = `${i18n.t("spaceStation:relativeRange")}: ${spec.relativeRange.toLocaleString(undefined, { maximumSignificantDigits: 3 })}`;
+        relativeRange.innerText = `${this.t("spaceStation:relativeRange")}: ${spec.relativeRange.toLocaleString(undefined, { maximumSignificantDigits: 3 })}`;
         container.appendChild(relativeRange);
 
         return container;
@@ -141,7 +145,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const maxSpeed = document.createElement("p");
-        maxSpeed.innerText = `${i18n.t("spaceStation:maxSpeed")}: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
+        maxSpeed.innerText = `${this.t("spaceStation:maxSpeed")}: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
         container.appendChild(maxSpeed);
 
         return container;

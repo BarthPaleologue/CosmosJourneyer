@@ -21,12 +21,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
+import type { TFunction } from "i18next";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
 import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
-
-import i18n from "@/i18n";
 
 import type { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
@@ -148,7 +147,6 @@ export class SpaceElevatorClimber implements Targetable {
         this.boundingRadius = globalRadius + solarPanelWidth;
 
         this.targetInfo = {
-            name: i18n.t("objectTypes:spaceElevatorClimber"),
             type: ObjectTargetCursorType.FACILITY,
             minDistance: this.getBoundingRadius() * 7.0,
             maxDistance: this.getBoundingRadius() * 3000,
@@ -159,8 +157,8 @@ export class SpaceElevatorClimber implements Targetable {
         return this.boundingRadius;
     }
 
-    getTypeName(): string {
-        return i18n.t("objectTypes:spaceElevatorClimber");
+    getTypeName(t: TFunction): string {
+        return t("objectTypes:spaceElevatorClimber");
     }
 
     getTransform(): TransformNode {

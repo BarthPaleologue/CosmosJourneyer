@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import i18n from "@/i18n";
-
-export async function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer): Promise<boolean> {
+export async function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer, t: TFunction): Promise<boolean> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `
         <form method="dialog">
             <p>${prompt}</p>
             <menu>
-                <button value="cancel">${i18n.t("common:cancel")}</button>
-                <button value="ok">${i18n.t("common:confirm")}</button>
+                <button value="cancel">${t("common:cancel")}</button>
+                <button value="ok">${t("common:confirm")}</button>
             </menu>
         </form>
     `;

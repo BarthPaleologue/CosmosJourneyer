@@ -15,11 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import i18n from "@/i18n";
-
-export async function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlayer): Promise<{
+export async function connectEncyclopaediaGalacticaModal(
+    soundPlayer: ISoundPlayer,
+    t: TFunction,
+): Promise<{
     encyclopaediaUrlBase: string;
     accountId: string;
     password: string;
@@ -58,7 +61,7 @@ export async function connectEncyclopaediaGalacticaModal(soundPlayer: ISoundPlay
     const cancelButton = document.createElement("button");
     cancelButton.type = "reset";
     cancelButton.value = "cancel";
-    cancelButton.textContent = i18n.t("common:cancel");
+    cancelButton.textContent = t("common:cancel");
     menu.appendChild(cancelButton);
 
     const connectButton = document.createElement("button");

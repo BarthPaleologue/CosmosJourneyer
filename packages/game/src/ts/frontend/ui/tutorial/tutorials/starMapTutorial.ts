@@ -18,6 +18,7 @@
 import type AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type { Result } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
@@ -36,8 +37,6 @@ import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { escapeMarkdown, renderMarkdownBlock, renderMarkdownInline } from "@/utils/markdown";
 
-import i18n from "@/i18n";
-
 import { TutorialControlsInputs } from "../tutorialLayerInputs";
 import type { Tutorial } from "./tutorial";
 
@@ -52,16 +51,22 @@ import saveData from "@assets/tutorials/starMapTutorial/save.json";
 export class StarMapTutorial implements Tutorial {
     readonly coverImageSrc: string = coverImgSrc;
 
+    private readonly t: TFunction;
+
+    constructor(t: TFunction) {
+        this.t = t;
+    }
+
     getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
         return safeParseSave(saveData, universeBackend);
     }
 
     getTitle(): string {
-        return i18n.t("tutorials:starMap:title");
+        return this.t("tutorials:starMap:title");
     }
 
     getDescription(): string {
-        return i18n.t("tutorials:starMap:description");
+        return this.t("tutorials:starMap:description");
     }
 
     async getContentPanelsHtml(): Promise<string[]> {
@@ -69,32 +74,32 @@ export class StarMapTutorial implements Tutorial {
         const welcomePanelHtml = `
         <div class="tutorialContent">
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>${i18n.t("tutorials:starMap:welcome")}</p>
+            <p>${this.t("tutorials:starMap:welcome")}</p>
             
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:navigationInfo", {
+                this.t("tutorials:common:navigationInfo", {
                     // Interpolations are controlled display labels produced by the input binding API.
                     nextKeys: pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                        ` ${i18n.t("common:or")} `,
+                        ` ${this.t("common:or")} `,
                     ),
                     previousKeys: pressInteractionToStrings(
                         TutorialControlsInputs.map.prevPanel,
                         keyboardLayoutMap,
-                    ).join(` ${i18n.t("common:or")} `),
+                    ).join(` ${this.t("common:or")} `),
                 }),
             )}
         </div>`;
 
         const toggleStarMapKeys = pressInteractionToStrings(GeneralInputs.map.toggleStarMap, keyboardLayoutMap).join(
-            ` ${i18n.t("common:or")} `,
+            ` ${this.t("common:or")} `,
         );
 
         const howToOpenPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:open1")}</p>
-            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:open2", { keys: escapeMarkdown(toggleStarMapKeys) }))}</p>
+            <p>${this.t("tutorials:starMap:open1")}</p>
+            <p>${renderMarkdownInline(this.t("tutorials:starMap:open2", { keys: escapeMarkdown(toggleStarMapKeys) }))}</p>
             <img src="${openImgSrc}" alt="Star map opening" class="tutorialImage">
-            <p>${i18n.t("tutorials:starMap:open3")}</p>
+            <p>${this.t("tutorials:starMap:open3")}</p>
         </div>`;
 
         const horizontalKeys = dPadCompositeToString(
@@ -111,48 +116,48 @@ export class StarMapTutorial implements Tutorial {
 
         const howToUseStarMapPanelHtml = `
         <div class="tutorialContent">
-            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:controls1", { keys: escapeMarkdown(keys) }))}</p>
+            <p>${renderMarkdownInline(this.t("tutorials:starMap:controls1", { keys: escapeMarkdown(keys) }))}</p>
             <img src="${controlsImgSrc}" alt="Star map controls" class="tutorialImage">
-            <p>${i18n.t("tutorials:starMap:controls2")}</p>
+            <p>${this.t("tutorials:starMap:controls2")}</p>
         </div>`;
 
         const howToMissionsPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:missions1")}</p>
+            <p>${this.t("tutorials:starMap:missions1")}</p>
             <img src="${missionImgSrc}" alt="Star map missions" class="tutorialImage">
-            <p>${i18n.t("tutorials:starMap:missions2")}</p>
+            <p>${this.t("tutorials:starMap:missions2")}</p>
         </div>`;
 
         const howToInteractWithSystemPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:system1")}</p>
-            <p>${i18n.t("tutorials:starMap:system2")}</p>
+            <p>${this.t("tutorials:starMap:system1")}</p>
+            <p>${this.t("tutorials:starMap:system2")}</p>
             <img src="${plotItineraryImgSrc}" alt="Star map system interactions" class="tutorialImage">
-            <p>${i18n.t("tutorials:starMap:system3")}</p>
+            <p>${this.t("tutorials:starMap:system3")}</p>
         </div>`;
 
         const jumpKeys = pressInteractionToStrings(StarSystemInputs.map.jumpToSystem, keyboardLayoutMap).join(
-            ` ${i18n.t("common:or")} `,
+            ` ${this.t("common:or")} `,
         );
 
         const howToInterstellarTravelPanelHtml = `
         <div class="tutorialContent">
-            <p>${i18n.t("tutorials:starMap:travel1")}</p>
-            <p>${renderMarkdownInline(i18n.t("tutorials:starMap:travel2", { keys: escapeMarkdown(jumpKeys) }))}</p>
+            <p>${this.t("tutorials:starMap:travel1")}</p>
+            <p>${renderMarkdownInline(this.t("tutorials:starMap:travel2", { keys: escapeMarkdown(jumpKeys) }))}</p>
             <img src="${jumpImgSrc}" alt="Interstellar jump" class="tutorialImage">
-            <p>${i18n.t("tutorials:starMap:travel3")}</p>
+            <p>${this.t("tutorials:starMap:travel3")}</p>
         </div>`;
 
         const endPanelHtml = `
         <div class="tutorialContent">
             <img src="${coverImgSrc}" alt="Welcome to Cosmos Journeyer">
-            <p>${i18n.t("tutorials:starMap:congratulations")}</p>
+            <p>${this.t("tutorials:starMap:congratulations")}</p>
             ${renderMarkdownBlock(
-                i18n.t("tutorials:common:tutorialEnding", {
+                this.t("tutorials:common:tutorialEnding", {
                     // Key labels come from the controlled input binding display API; escape them before Markdown interpolation.
                     keyQuit: escapeMarkdown(
                         pressInteractionToStrings(TutorialControlsInputs.map.nextPanel, keyboardLayoutMap).join(
-                            ` ${i18n.t("common:or")} `,
+                            ` ${this.t("common:or")} `,
                         ),
                     ),
                 }),

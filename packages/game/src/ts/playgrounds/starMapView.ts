@@ -38,7 +38,7 @@ export async function createStarMapViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    await initI18n();
+    const t = await initI18n();
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
@@ -63,6 +63,7 @@ export async function createStarMapViewScene(
         universeBackend,
         soundPlayerMock,
         notificationManager,
+        t,
     );
     starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates, true);
 

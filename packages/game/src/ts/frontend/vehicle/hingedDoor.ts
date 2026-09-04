@@ -21,8 +21,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
-
-import i18n from "@/i18n";
+import type { TFunction } from "i18next";
 
 import type { Interaction } from "../inputs/interaction/interactionSystem";
 import type { Door, DoorState } from "./door";
@@ -74,12 +73,12 @@ export class HingedDoor implements Door {
         return this.doorAggregate;
     }
 
-    getInteractions(): Array<Interaction> {
+    getInteractions(t: TFunction): Array<Interaction> {
         switch (this.state) {
             case "opened":
                 return [
                     {
-                        label: i18n.t("interactions:close"),
+                        label: t("interactions:close"),
                         perform: async (): Promise<void> => {
                             this.close();
                             return Promise.resolve();
@@ -89,7 +88,7 @@ export class HingedDoor implements Door {
             case "closed":
                 return [
                     {
-                        label: i18n.t("interactions:open"),
+                        label: t("interactions:open"),
                         perform: async (): Promise<void> => {
                             this.open();
                             return Promise.resolve();

@@ -24,6 +24,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
@@ -119,8 +120,8 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
         return this.emissiveColor;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public updateMaterial(deltaTime: number): void {

@@ -60,7 +60,7 @@ export async function createRoverScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await initI18n();
+    const t = await initI18n();
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 
@@ -85,22 +85,27 @@ export async function createRoverScene(
     character.firstPersonCamera.minZ = 0.1;
 
     const soundPlayer = new SoundPlayer(sounds);
-    const interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-        if (interactions.length === 0) {
-            return null;
-        }
+    const interactionSystem = new InteractionSystem(
+        CollisionMask.INTERACTIVE,
+        scene,
+        async (interactions) => {
+            if (interactions.length === 0) {
+                return null;
+            }
 
-        const hasPointerLock = engine.isPointerLock;
-        if (hasPointerLock) {
-            document.exitPointerLock();
-        }
-        const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
-        if (hasPointerLock) {
-            await engine.getRenderingCanvas()?.requestPointerLock();
-        }
+            const hasPointerLock = engine.isPointerLock;
+            if (hasPointerLock) {
+                document.exitPointerLock();
+            }
+            const choice = await radialChoiceModal(interactions, (interaction) => interaction.label, soundPlayer);
+            if (hasPointerLock) {
+                await engine.getRenderingCanvas()?.requestPointerLock();
+            }
 
-        return choice;
-    });
+            return choice;
+        },
+        t,
+    );
     interactionSystem.enableForCamera(character.firstPersonCamera, 5);
     interactionSystem.enableForCamera(character.thirdPersonCamera, 10);
 

@@ -42,7 +42,7 @@ export async function createSaveLoadingPanelContentScene(
     const camera = new FreeCamera("camera", Vector3.Zero(), scene);
     camera.attachControl();
 
-    await initI18n();
+    const t = await initI18n();
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
@@ -55,7 +55,7 @@ export async function createSaveLoadingPanelContentScene(
         universeBackend,
     );
     if (!saveManager.success) {
-        await alertModal("Could not load saves", soundPlayer);
+        await alertModal("Could not load saves", soundPlayer, t);
         return scene;
     }
 
@@ -64,6 +64,7 @@ export async function createSaveLoadingPanelContentScene(
         saveManager.value,
         soundPlayer,
         notificationManager,
+        t,
     );
     saveLoadingPanelContent.htmlRoot.style.position = "absolute";
     document.body.appendChild(saveLoadingPanelContent.htmlRoot);

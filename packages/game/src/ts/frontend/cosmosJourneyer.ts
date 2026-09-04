@@ -34,6 +34,7 @@ import HavokPhysics from "@babylonjs/havok";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
@@ -75,7 +76,6 @@ import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
-import i18n, { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
@@ -151,6 +151,8 @@ export class CosmosJourneyer {
 
     private isAutoSaveEnabled = true;
 
+    private readonly t: TFunction;
+
     private constructor(
         player: Player,
         engine: AbstractEngine,
@@ -163,6 +165,7 @@ export class CosmosJourneyer {
         tts: Tts,
         notificationManager: INotificationManager,
         loadingProgressMonitor: ILoadingProgressMonitor,
+        t: TFunction,
     ) {
         this.engine = engine;
 
@@ -171,6 +174,8 @@ export class CosmosJourneyer {
         this.player = player;
 
         this.backend = backend;
+
+        this.t = t;
 
         this.player.discoveries.uploaded.forEach(async (discovery) => {
             await this.backend.encyclopaedia.contributeDiscoveryIfNew(discovery);
@@ -186,7 +191,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
 
             if (!this.player.tutorials.fuelScoopingCompleted) {
-                await this.tutorialLayer.setTutorial(new FuelScoopTutorial());
+                await this.tutorialLayer.setTutorial(new FuelScoopTutorial(this.t));
                 this.tutorialLayer.onQuitTutorial.addOnce(() => {
                     this.player.tutorials.fuelScoopingCompleted = true;
                 });
@@ -213,7 +218,7 @@ export class CosmosJourneyer {
         this.activeView = this.starSystemView;
         soundPlayer.setInstanceMask(AudioMasks.STAR_SYSTEM_VIEW);
 
-        this.tutorialLayer = new TutorialLayer(this.soundPlayer);
+        this.tutorialLayer = new TutorialLayer(this.soundPlayer, this.t);
         document.body.appendChild(this.tutorialLayer.root);
 
         this.sidePanels = new SidePanels(
@@ -222,6 +227,7 @@ export class CosmosJourneyer {
             this.soundPlayer,
             this.musicConductor,
             this.notificationManager,
+            this.t,
         );
         this.sidePanels.loadSavePanel.content.onLoadSaveObservable.add((saveData: DeepReadonly<Save>) => {
             engine.onEndFrameObservable.addOnce(async () => {
@@ -240,9 +246,10 @@ export class CosmosJourneyer {
             this.backend.save,
             this.backend.universe,
             this.soundPlayer,
+            this.t,
         );
         this.mainMenu.onStartObservable.add(async () => {
-            await this.tutorialLayer.setTutorial(new FlightTutorial());
+            await this.tutorialLayer.setTutorial(new FlightTutorial(this.t));
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.flightCompleted = true;
             });
@@ -271,8 +278,9 @@ export class CosmosJourneyer {
                 // if the main menu is not visible, then we are in game and we need to ask the player if they want to leave their game
                 await this.createAutoSave();
                 const shouldLoadTutorial = await promptModalBoolean(
-                    i18n.t("tutorials:common:loadTutorialWillLeaveGame"),
+                    this.t("tutorials:common:loadTutorialWillLeaveGame"),
                     this.soundPlayer,
+                    this.t,
                 );
                 if (!shouldLoadTutorial) {
                     return;
@@ -303,7 +311,7 @@ export class CosmosJourneyer {
                 return;
             }
 
-            await this.tutorialLayer.setTutorial(new StationLandingTutorial());
+            await this.tutorialLayer.setTutorial(new StationLandingTutorial(this.t));
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.stationLandingCompleted = true;
             });
@@ -323,13 +331,13 @@ export class CosmosJourneyer {
                 return;
             }
 
-            await this.tutorialLayer.setTutorial(new StarMapTutorial());
+            await this.tutorialLayer.setTutorial(new StarMapTutorial(this.t));
             this.tutorialLayer.onQuitTutorial.addOnce(() => {
                 this.player.tutorials.starMapCompleted = true;
             });
         });
 
-        this.pauseMenu = new PauseMenu(this.sidePanels, this.soundPlayer);
+        this.pauseMenu = new PauseMenu(this.sidePanels, this.soundPlayer, this.t);
         this.pauseMenu.onResume.add(async () => this.resume());
         this.pauseMenu.onScreenshot.add(async () => this.takeScreenshot());
         this.pauseMenu.onShare.add(() => {
@@ -338,21 +346,21 @@ export class CosmosJourneyer {
                 save.player.uuid = Settings.SHARED_POSITION_SAVE_UUID;
                 const url = createUrlFromSave(save);
                 if (url === null) {
-                    await alertModal("Could not create a shareable link.", this.soundPlayer);
+                    await alertModal("Could not create a shareable link.", this.soundPlayer, this.t);
                     return;
                 }
 
                 await navigator.clipboard.writeText(url.toString()).then(() => {
-                    this.notificationManager.create("general", "info", i18n.t("notifications:copiedToClipboard"), 2000);
+                    this.notificationManager.create("general", "info", this.t("notifications:copiedToClipboard"), 2000);
                 });
             });
         });
         this.pauseMenu.onSave.add(async () => {
             const saveSuccess = await this.createManualSave();
             if (saveSuccess) {
-                this.notificationManager.create("general", "success", i18n.t("notifications:saveOk"), 2000);
+                this.notificationManager.create("general", "success", this.t("notifications:saveOk"), 2000);
             } else {
-                this.notificationManager.create("general", "error", i18n.t("notifications:cantSaveTutorial"), 2000);
+                this.notificationManager.create("general", "error", this.t("notifications:cantSaveTutorial"), 2000);
             }
         });
 
@@ -418,18 +426,18 @@ export class CosmosJourneyer {
      * Creates the engine and the scenes and loads the assets async
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
-    public static async CreateAsync(): Promise<CosmosJourneyer> {
+    public static async CreateAsync(t: TFunction): Promise<CosmosJourneyer> {
         const canvas = document.createElement("canvas");
         document.body.prepend(canvas);
 
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const loadingScreen = new LoadingScreen(canvas);
+        const loadingScreen = new LoadingScreen(canvas, t);
 
         const backendResult = await CosmosJourneyerBackendLocal.New();
         if (!backendResult.success) {
-            await alertModal(backendResult.error.message, new SoundPlayerMock());
+            await alertModal(backendResult.error.message, new SoundPlayerMock(), t);
             throw backendResult.error;
         }
 
@@ -461,8 +469,6 @@ export class CosmosJourneyer {
         });
 
         const audioEngine = await CreateAudioEngineAsync();
-
-        await initI18n();
 
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
@@ -508,6 +514,7 @@ export class CosmosJourneyer {
             await alertModal(
                 `Failed to initialize the terrain engine: ${terrainSystemResult.error.message}`,
                 soundPlayer,
+                t,
             );
             throw terrainSystemResult.error;
         }
@@ -525,6 +532,7 @@ export class CosmosJourneyer {
             notificationManager,
             starSystemViewAssets.rendering,
             terrainSystemResult.value,
+            t,
             loadingProgressMonitor,
         );
 
@@ -536,6 +544,7 @@ export class CosmosJourneyer {
             backend.universe,
             soundPlayer,
             notificationManager,
+            t,
         );
 
         await starSystemView.resetPlayer(player);
@@ -543,7 +552,7 @@ export class CosmosJourneyer {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
 
         if (keyboardLayoutMap === null) {
-            await alertModal(i18n.t("notifications:unknownKeyboardLayout"), soundPlayer);
+            await alertModal(t("notifications:unknownKeyboardLayout"), soundPlayer, t);
         }
 
         return new CosmosJourneyer(
@@ -558,6 +567,7 @@ export class CosmosJourneyer {
             tts,
             notificationManager,
             loadingProgressMonitor,
+            t,
         );
     }
 
@@ -615,6 +625,7 @@ export class CosmosJourneyer {
             },
             this.notificationManager,
             this.soundPlayer,
+            this.t,
         );
         void controller.start();
         this.mainMenu.onVisibilityChanged.add(() => {
@@ -752,7 +763,7 @@ export class CosmosJourneyer {
             return;
         }
 
-        void this.tutorialLayer.setTutorial(new PlanetaryLandingTutorial());
+        void this.tutorialLayer.setTutorial(new PlanetaryLandingTutorial(this.t));
         this.tutorialLayer.onQuitTutorial.addOnce(() => {
             this.player.tutorials.planetaryLandingCompleted = true;
         });
@@ -804,7 +815,7 @@ export class CosmosJourneyer {
     public async takeScreenshot(): Promise<void> {
         const camera = this.activeView.getMainScene().activeCamera;
         if (camera === null) {
-            await alertModal("Cannot take screenshot: camera is null", this.soundPlayer);
+            await alertModal("Cannot take screenshot: camera is null", this.soundPlayer, this.t);
             return;
         }
 
@@ -987,9 +998,10 @@ export class CosmosJourneyer {
             this.player.uuid = crypto.randomUUID();
             this.player.setName(
                 (await promptModalString(
-                    i18n.t("spaceStation:cmdrNameChangePrompt"),
+                    this.t("spaceStation:cmdrNameChangePrompt"),
                     this.player.getName(),
                     this.soundPlayer,
+                    this.t,
                 )) ?? "Python",
             );
         }
@@ -1051,10 +1063,11 @@ export class CosmosJourneyer {
             if (!saveResult.success) {
                 console.error(saveResult.error);
                 await alertModal(
-                    i18n.t(
+                    this.t(
                         "The tutorial save has errors and could not be loaded! Check the console for more information.",
                     ),
                     this.soundPlayer,
+                    this.t,
                 );
                 return;
             }
@@ -1092,8 +1105,9 @@ export class CosmosJourneyer {
         }
 
         const shouldReturnToMainMenu = await promptModalBoolean(
-            i18n.t("tutorials:common:returnToMainMenuAfterTutorial"),
+            this.t("tutorials:common:returnToMainMenuAfterTutorial"),
             this.soundPlayer,
+            this.t,
         );
         if (!shouldReturnToMainMenu) {
             return;
@@ -1125,6 +1139,7 @@ export class CosmosJourneyer {
                 await alertModal(
                     "Player is in spaceship, but said spaceship does not exist. The loading procedure has been aborted.",
                     this.soundPlayer,
+                    this.t,
                 );
                 return;
             }
@@ -1133,6 +1148,7 @@ export class CosmosJourneyer {
                 await alertModal(
                     "Spaceship inside spaceships is not yet supported. The loading procedure has been aborted.",
                     this.soundPlayer,
+                    this.t,
                 );
                 return;
             }
@@ -1148,6 +1164,7 @@ export class CosmosJourneyer {
             await alertModal(
                 "Cannot load universe coordinates: system model not found. The loading procedure has been aborted.",
                 this.soundPlayer,
+                this.t,
             );
             return;
         }
@@ -1215,6 +1232,7 @@ export class CosmosJourneyer {
             await alertModal(
                 "The object you are trying to spawn near to could not be found. You will spawn around the first stellar object of the system instead.",
                 this.soundPlayer,
+                this.t,
             );
 
             return;
@@ -1273,6 +1291,7 @@ export class CosmosJourneyer {
             await alertModal(
                 "The space station you are trying to spawn at could not be found. You will spawn around the first stellar object of the system instead.",
                 this.soundPlayer,
+                this.t,
             );
 
             return;
@@ -1292,6 +1311,7 @@ export class CosmosJourneyer {
             await alertModal(
                 "There are no available pads at the space station you are trying to spawn at. You have been moved outside of the station instead.",
                 this.soundPlayer,
+                this.t,
             );
 
             return;

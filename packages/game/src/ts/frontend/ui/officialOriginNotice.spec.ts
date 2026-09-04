@@ -1,12 +1,18 @@
-import { describe, expect, it, vi } from "vitest";
+import { createInstance } from "i18next";
+import { describe, expect, it } from "vitest";
 
 import { createOfficialOriginNotice, isOfficialGameLocation } from "./officialOriginNotice";
 
-vi.mock("@/i18n", () => ({
-    default: {
-        t: (): string => "Play at [cosmosjourneyer.com](https://cosmosjourneyer.com).",
+const t = await createInstance().init({
+    lng: "en-US",
+    resources: {
+        "en-US": {
+            common: {
+                unofficialOriginNotice: "Play at [cosmosjourneyer.com](https://cosmosjourneyer.com).",
+            },
+        },
     },
-}));
+});
 
 describe("isOfficialGameLocation", () => {
     it.each([
@@ -23,7 +29,7 @@ describe("isOfficialGameLocation", () => {
     });
 
     it("renders the translated Markdown link safely", () => {
-        const notice = createOfficialOriginNotice({ protocol: "https:", hostname: "example.com" });
+        const notice = createOfficialOriginNotice(t, { protocol: "https:", hostname: "example.com" });
         const link = notice?.querySelector("a");
 
         expect(link?.href).toBe("https://cosmosjourneyer.com/");

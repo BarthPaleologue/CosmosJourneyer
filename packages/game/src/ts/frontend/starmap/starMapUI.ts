@@ -23,6 +23,7 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { factionToString } from "@cosmos-journeyer/universe-generation";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -31,8 +32,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
-
-import i18n from "@/i18n";
 
 import type { Player } from "../player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
@@ -81,23 +80,31 @@ export class StarMapUI {
     private readonly player: Player;
 
     private readonly universeBackend: UniverseBackend;
+    private readonly t: TFunction;
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
     private formatLyDistance(distanceInLy: number): string {
-        return distanceInLy.toLocaleString(i18n.resolvedLanguage, {
+        return distanceInLy.toLocaleString(undefined, {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
         });
     }
 
-    constructor(scene: Scene, player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer) {
+    constructor(
+        scene: Scene,
+        player: Player,
+        universeBackend: UniverseBackend,
+        soundPlayer: ISoundPlayer,
+        t: TFunction,
+    ) {
         this.scene = scene;
         this.scene.hoverCursor = "none";
 
         this.player = player;
 
         this.universeBackend = universeBackend;
+        this.t = t;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -172,7 +179,7 @@ export class StarMapUI {
         this.infoPanel.appendChild(hr2);
 
         const generalInfoTitle = document.createElement("h2");
-        generalInfoTitle.textContent = i18n.t("starMap:generalInfo");
+        generalInfoTitle.textContent = this.t("starMap:generalInfo");
         this.infoPanel.appendChild(generalInfoTitle);
 
         this.nbPlanets = document.createElement("p");
@@ -188,7 +195,7 @@ export class StarMapUI {
         this.infoPanel.appendChild(this.humanPresence);
 
         const humanPresenceTitle = document.createElement("h2");
-        humanPresenceTitle.textContent = i18n.t("starMap:humanPresence");
+        humanPresenceTitle.textContent = this.t("starMap:humanPresence");
         this.humanPresence.appendChild(humanPresenceTitle);
 
         this.nbSpaceStations = document.createElement("p");
@@ -225,10 +232,10 @@ export class StarMapUI {
 
         this.shortHandUIPlotItineraryButton = document.createElement("button");
         this.shortHandUIPlotItineraryButton.classList.add("plotItineraryButton");
-        this.shortHandUIPlotItineraryButton.textContent = i18n.t("starMap:plotItinerary");
+        this.shortHandUIPlotItineraryButton.textContent = this.t("starMap:plotItinerary");
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIPlotItineraryButton);
 
-        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player, soundPlayer);
+        this.shortHandUIBookmarkButton = new StarMapBookmarkButton(player, soundPlayer, t);
         this.shortHandUIButtonContainer.appendChild(this.shortHandUIBookmarkButton.rootNode);
 
         document.addEventListener("pointermove", (event) => {
@@ -380,7 +387,7 @@ export class StarMapUI {
             const currentPosition = wrapVector3(
                 this.universeBackend.getSystemGalacticPosition(currentSystemCoordinates),
             );
-            this.shortHandUIDistanceFromCurrent.textContent = `${i18n.t("starMap:distanceFromCurrent")}: ${i18n.t(
+            this.shortHandUIDistanceFromCurrent.textContent = `${this.t("starMap:distanceFromCurrent")}: ${this.t(
                 "units:shortLy",
                 {
                     value: this.formatLyDistance(Vector3.Distance(currentPosition, targetPosition)),
@@ -390,7 +397,7 @@ export class StarMapUI {
 
         const starModel = targetSystemModel.stellarObjects[0];
 
-        this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel);
+        this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel, this.t);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         const objectColor = getRgbFromTemperature(starModel.blackBodyTemperature);
@@ -404,31 +411,31 @@ export class StarMapUI {
         this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
             x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
 
-        this.nbPlanets.textContent = `${i18n.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
+        this.nbPlanets.textContent = `${this.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
 
-        this.distanceToSol.textContent = `${i18n.t("starMap:distanceToSol")}: ${i18n.t("units:shortLy", {
+        this.distanceToSol.textContent = `${this.t("starMap:distanceToSol")}: ${this.t("units:shortLy", {
             value: this.formatLyDistance(Vector3.Distance(targetPosition, Vector3.Zero())),
         })}`;
 
         if (this.universeBackend.isSystemInHumanBubble(targetSystemModel.coordinates)) {
             const spaceStations = targetSystemModel.orbitalFacilities;
 
-            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: ${spaceStations.length}`;
+            this.nbSpaceStations.textContent = `${this.t("starMap:spaceStations")}: ${spaceStations.length}`;
 
             const factionNames = spaceStations.map((station) => factionToString(station.faction));
             const uniqueFactions = Array.from(new Set(factionNames));
 
             if (uniqueFactions.length > 0) {
-                this.factions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
-                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+                this.factions.textContent = `${this.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
+                this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
             } else {
-                this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
-                this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+                this.factions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
+                this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
             }
         } else {
-            this.nbSpaceStations.textContent = `${i18n.t("starMap:spaceStations")}: 0`;
-            this.factions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
-            this.shortHandUIFactions.textContent = `${i18n.t("starMap:factions")}: ${i18n.t("starMap:none")}`;
+            this.nbSpaceStations.textContent = `${this.t("starMap:spaceStations")}: 0`;
+            this.factions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
+            this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
         }
     }
 

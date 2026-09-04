@@ -31,6 +31,7 @@ import { metersToLightYears } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
@@ -76,7 +77,6 @@ import type { View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
-import i18n from "@/i18n";
 import { CollisionMask, Settings } from "@/settings";
 
 import type { Controls } from "./controls";
@@ -239,6 +239,8 @@ export class StarSystemView implements View {
 
     private readonly clusteredLightingSystem: ClusteredLightingSystem;
 
+    private readonly t: TFunction;
+
     /**
      * Creates an empty star system view with a scene, a gui and a physics engine
      * To fill it with a star system, use `loadStarSystem` and then `initStarSystem`
@@ -267,13 +269,14 @@ export class StarSystemView implements View {
         notificationManager: INotificationManager,
         assets: RenderingAssets,
         terrainSystem: ITerrainSystem,
+        t: TFunction,
         progressMonitor: ILoadingProgressMonitor,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
         this.universeBackend = universeBackend;
 
-        this.spaceShipLayer = new SpaceShipLayer(this.player, this.universeBackend, soundPlayer);
+        this.spaceShipLayer = new SpaceShipLayer(this.player, this.universeBackend, soundPlayer, t);
         document.body.appendChild(this.spaceShipLayer.root);
 
         this.scene = scene;
@@ -290,27 +293,34 @@ export class StarSystemView implements View {
         this.terrainSystem = terrainSystem;
         this.progressMonitor = progressMonitor;
 
-        this.interactionSystem = new InteractionSystem(CollisionMask.INTERACTIVE, scene, async (interactions) => {
-            if (interactions.length === 0) {
-                return null;
-            }
+        this.t = t;
 
-            const hasPointerLock = engine.isPointerLock;
-            const activeCamera = scene.activeCamera;
-            if (hasPointerLock) {
-                activeCamera?.detachControl();
-            }
-            const choice = await radialChoiceModal(
-                interactions,
-                (interaction) => interaction.label,
-                soundPlayer,
-                hasPointerLock ? { useVirtualCursor: true } : undefined,
-            );
-            if (hasPointerLock) {
-                activeCamera?.attachControl(true);
-            }
-            return choice;
-        });
+        this.interactionSystem = new InteractionSystem(
+            CollisionMask.INTERACTIVE,
+            scene,
+            async (interactions) => {
+                if (interactions.length === 0) {
+                    return null;
+                }
+
+                const hasPointerLock = engine.isPointerLock;
+                const activeCamera = scene.activeCamera;
+                if (hasPointerLock) {
+                    activeCamera?.detachControl();
+                }
+                const choice = await radialChoiceModal(
+                    interactions,
+                    (interaction) => interaction.label,
+                    soundPlayer,
+                    hasPointerLock ? { useVirtualCursor: true } : undefined,
+                );
+                if (hasPointerLock) {
+                    activeCamera?.attachControl(true);
+                }
+                return choice;
+            },
+            this.t,
+        );
 
         this.interactionLayer = new InteractionLayer(this.interactionSystem, this.keyboardLayoutMap);
         document.body.appendChild(this.interactionLayer.root);
@@ -367,7 +377,7 @@ export class StarSystemView implements View {
 
             if (this.activeControls === shipControls) {
                 if (!spaceship.isLanded()) {
-                    this.notificationManager.create("spaceship", "error", i18n.t("notifications:mustBeLanded"), 3000);
+                    this.notificationManager.create("spaceship", "error", this.t("notifications:mustBeLanded"), 3000);
                     return;
                 }
 
@@ -407,7 +417,11 @@ export class StarSystemView implements View {
 
                 const roverResult = createWolfMk2(this.assets, this.scene, spawnPosition, spawnRotation);
                 if (!roverResult.success) {
-                    await alertModal(`Could not create Wolf Mk2 because ${roverResult.error}`, this.soundPlayer);
+                    await alertModal(
+                        `Could not create Wolf Mk2 because ${roverResult.error}`,
+                        this.soundPlayer,
+                        this.t,
+                    );
                     return;
                 }
 
@@ -422,7 +436,7 @@ export class StarSystemView implements View {
                     getPhysicsAggregate: () => rover.frame,
                     getInteractions: () => [
                         {
-                            label: i18n.t("interactions:drive", { vehicle: "Wolf Mk2" }),
+                            label: this.t("interactions:drive", { vehicle: "Wolf Mk2" }),
                             perform: async (): Promise<void> => {
                                 await this.switchToVehicleControls();
                             },
@@ -484,13 +498,14 @@ export class StarSystemView implements View {
             this.universeBackend,
             this.soundPlayer,
             this.notificationManager,
+            this.t,
         );
         this.spaceStationLayer.setVisibility(false);
         this.spaceStationLayer.onTakeOffObservable.add(() => {
             this.getSpaceshipControls().getSpaceship().takeOff();
         });
 
-        this.targetCursorLayer = new TargetCursorLayer();
+        this.targetCursorLayer = new TargetCursorLayer(t);
 
         window.StarSystemView = this;
     }
@@ -714,7 +729,7 @@ export class StarSystemView implements View {
             getInteractions: () => {
                 return [
                     {
-                        label: i18n.t("interactions:pilot"),
+                        label: this.t("interactions:pilot"),
                         perform: async (): Promise<void> => {
                             const shipControls = this.getSpaceshipControls();
                             const characterControls = this.getCharacterControls();
@@ -746,7 +761,7 @@ export class StarSystemView implements View {
                                 this.notificationManager.create(
                                     "spaceship",
                                     "info",
-                                    i18n.t("notifications:howToLiftOff", {
+                                    this.t("notifications:howToLiftOff", {
                                         bindingsString: axisCompositeToString(control, this.keyboardLayoutMap)[1]?.[1],
                                     }),
                                     5000,
@@ -765,6 +780,7 @@ export class StarSystemView implements View {
                 this.soundPlayer,
                 this.tts,
                 this.notificationManager,
+                this.t,
             );
             this.spaceshipControls.getCameras().forEach((camera) => (camera.maxZ = maxZ));
             this.clusteredLightingSystem.registerRegion(spaceship);
@@ -794,7 +810,7 @@ export class StarSystemView implements View {
                     Settings.CHARACTER_THIRD_PERSON_INTERACTION_RANGE,
                 );
             } else {
-                await alertModal(humanoidInstance.error, this.soundPlayer);
+                await alertModal(humanoidInstance.error, this.soundPlayer, this.t);
             }
         }
 
@@ -824,6 +840,7 @@ export class StarSystemView implements View {
             await alertModal(
                 "System model not found for coordinates generated by getNeighborStarSystemCoordinates",
                 this.soundPlayer,
+                this.t,
             );
             return;
         }
@@ -845,7 +862,7 @@ export class StarSystemView implements View {
         const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
 
         if (spaceship.getRemainingFuel() < fuelForJump) {
-            this.notificationManager.create("spaceship", "error", i18n.t("notifications:notEnoughFuel"), 5000);
+            this.notificationManager.create("spaceship", "error", this.t("notifications:notEnoughFuel"), 5000);
             this.jumpLock = false;
             return;
         }
@@ -1009,7 +1026,7 @@ export class StarSystemView implements View {
                 this.notificationManager.create(
                     "exploration",
                     "success",
-                    i18n.t("notifications:newDiscovery", {
+                    this.t("notifications:newDiscovery", {
                         objectName: nearestCelestialBody.model.name,
                     }),
                     15_000,

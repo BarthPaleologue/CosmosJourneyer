@@ -36,6 +36,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
+import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -49,6 +50,7 @@ export async function createStationLandingScene(
     });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
+    const t = await initI18n();
 
     await enablePhysics(scene);
 
@@ -57,7 +59,7 @@ export async function createStationLandingScene(
     const tts = new TtsMock();
     const soundPlayer = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();
-    const shipControls = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
+    const shipControls = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager, t);
 
     SpaceShipControlsInputs.setEnabled(true);
 

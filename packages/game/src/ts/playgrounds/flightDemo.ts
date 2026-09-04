@@ -31,6 +31,8 @@ import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 
+import { initI18n } from "@/i18n";
+
 import { enablePhysics, enableShadows } from "./utils";
 
 export async function createFlightDemoScene(
@@ -40,6 +42,7 @@ export async function createFlightDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "crosshair";
+    const t = await initI18n();
 
     await enablePhysics(scene);
 
@@ -49,7 +52,7 @@ export async function createFlightDemoScene(
     const tts = new TtsMock();
     const notificationManager = new NotificationManagerMock();
 
-    const ship = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager);
+    const ship = await ShipControls.CreateDefault(scene, assets, tts, soundPlayer, notificationManager, t);
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(ship.getSpaceship());
 

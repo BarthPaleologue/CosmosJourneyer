@@ -22,8 +22,7 @@ import {
     metersToLightSeconds,
     metersToLightYears,
 } from "@cosmos-journeyer/physics";
-
-import i18n from "@/i18n";
+import type { TFunction } from "i18next";
 
 export function parseSpeed(speed: number): string {
     if (speed < 1_000) {
@@ -41,35 +40,35 @@ export function parseSpeed(speed: number): string {
  * @param distance Distance in meters.
  * @returns A string representing the distance in a human-readable format.
  */
-export function parseDistance(distance: number): string {
+export function parseDistance(distance: number, t: TFunction): string {
     if (distance < 1_000) {
-        return i18n.t("units:shortM", { value: distance.toFixed(0) });
+        return t("units:shortM", { value: distance.toFixed(0) });
     } else if (distance < 1_000_000) {
-        return i18n.t("units:shortKm", { value: (distance / 1_000).toFixed(2) });
+        return t("units:shortKm", { value: (distance / 1_000).toFixed(2) });
     } else if (distance < 300_000_000) {
-        return i18n.t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
+        return t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
     } else if (distance < C * 120) {
-        return i18n.t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
+        return t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
     } else if (distance < lightYearsToMeters(0.1)) {
-        return i18n.t("units:shortLm", { value: metersToLightMinutes(distance).toFixed(2) });
+        return t("units:shortLm", { value: metersToLightMinutes(distance).toFixed(2) });
     } else {
-        return i18n.t("units:shortLy", {
+        return t("units:shortLy", {
             value: metersToLightYears(distance).toFixed(2),
         });
     }
 }
 
-export function parseSecondsRough(seconds: number): string {
+export function parseSecondsRough(seconds: number, t: TFunction): string {
     if (seconds < 60) {
-        return i18n.t("units:shortSeconds", { count: Number(seconds.toFixed(0)) });
+        return t("units:shortSeconds", { count: Number(seconds.toFixed(0)) });
     } else if (seconds < 60 * 60) {
-        return i18n.t("units:shortMinutes", { count: Number((seconds / 60).toFixed(0)) });
+        return t("units:shortMinutes", { count: Number((seconds / 60).toFixed(0)) });
     } else if (seconds < 60 * 60 * 24) {
-        return i18n.t("units:shortHours", { count: Number((seconds / 3600).toFixed(0)) });
+        return t("units:shortHours", { count: Number((seconds / 3600).toFixed(0)) });
     } else if (seconds < 60 * 60 * 24 * 365.25) {
-        return i18n.t("units:shortDays", { count: Number((seconds / (60 * 60 * 24)).toFixed(0)) });
+        return t("units:shortDays", { count: Number((seconds / (60 * 60 * 24)).toFixed(0)) });
     } else if (seconds < 60 * 60 * 24 * 365.25 * 10) {
-        return i18n.t("units:shortYears", {
+        return t("units:shortYears", {
             count: Number((seconds / (60 * 60 * 24 * 365.25)).toFixed(0)),
         });
     } else {
@@ -77,7 +76,7 @@ export function parseSecondsRough(seconds: number): string {
     }
 }
 
-export function parseSecondsPrecise(seconds: number): string {
+export function parseSecondsPrecise(seconds: number, t: TFunction): string {
     let secondsLeft = seconds;
     const nbYears = Math.floor(secondsLeft / (60 * 60 * 24 * 365.25));
     secondsLeft -= nbYears * 365.25 * 24 * 60 * 60;
@@ -91,19 +90,19 @@ export function parseSecondsPrecise(seconds: number): string {
 
     const result: string[] = [];
     if (nbYears > 0) {
-        result.push(i18n.t("units:years", { count: nbYears }));
+        result.push(t("units:years", { count: nbYears }));
     }
     if (nbDays > 0) {
-        result.push(i18n.t("units:days", { count: nbDays }));
+        result.push(t("units:days", { count: nbDays }));
     }
     if (nbHours > 0) {
-        result.push(i18n.t("units:hours", { count: nbHours }));
+        result.push(t("units:hours", { count: nbHours }));
     }
     if (nbMinutes > 0) {
-        result.push(i18n.t("units:minutes", { count: nbMinutes }));
+        result.push(t("units:minutes", { count: nbMinutes }));
     }
     if (nbSeconds > 0) {
-        result.push(i18n.t("units:seconds", { count: nbSeconds }));
+        result.push(t("units:seconds", { count: nbSeconds }));
     }
 
     return result.join(" ");

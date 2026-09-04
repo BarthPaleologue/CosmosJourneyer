@@ -19,6 +19,7 @@ import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
 
@@ -40,6 +41,7 @@ export class ObjectTargetCursor {
     readonly etaText: HTMLParagraphElement;
 
     readonly object: Targetable;
+    private readonly t: TFunction;
 
     private lastDistance = 0;
 
@@ -61,10 +63,12 @@ export class ObjectTargetCursor {
 
     private isOnScreen = false;
 
-    constructor(object: Targetable) {
+    constructor(object: Targetable, t: TFunction) {
+        this.t = t;
+        const name = object.targetInfo.name ?? object.getTypeName(t);
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
-        this.htmlRoot.dataset["name"] = object.targetInfo.name + " Target Cursor Root";
+        this.htmlRoot.dataset["name"] = name + " Target Cursor Root";
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
@@ -115,11 +119,11 @@ export class ObjectTargetCursor {
 
         this.nameText = document.createElement("p");
         this.nameText.classList.add("targetCursorName");
-        this.nameText.textContent = object.targetInfo.name;
+        this.nameText.textContent = name;
 
         this.typeText = document.createElement("p");
         this.typeText.classList.add("targetCursorType");
-        this.typeText.textContent = object.getTypeName();
+        this.typeText.textContent = object.getTypeName(t);
 
         this.distanceText = document.createElement("p");
         this.distanceText.classList.add("targetCursorDistance");
@@ -217,10 +221,10 @@ export class ObjectTargetCursor {
 
         const isTextVisible = this.isOnScreen && this.isInformationEnabled && this.alpha > 0;
         if (isTextVisible) {
-            this.distanceText.textContent = parseDistance(distance);
+            this.distanceText.textContent = parseDistance(distance, this.t);
 
             const nbSeconds = distance / speed;
-            this.etaText.textContent = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds) : "∞");
+            this.etaText.textContent = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds, this.t) : "∞");
         }
 
         this.lastDistance = distance;

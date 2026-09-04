@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 
 import type { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -25,7 +26,6 @@ import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Player } from "@/frontend/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 
-import i18n from "@/i18n";
 import { Settings } from "@/settings";
 
 import type { INotificationManager } from "../notificationManager";
@@ -57,15 +57,20 @@ export class ExplorationCenterPanel {
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
 
+    private readonly t: TFunction;
+
     constructor(
         encyclopaedia: EncyclopaediaGalacticaManager,
         player: Player,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
+
+        this.t = t;
 
         this.soundPlayer = soundPlayer;
         this.notificationManager = notificationManager;
@@ -74,7 +79,7 @@ export class ExplorationCenterPanel {
         this.htmlRoot.classList.add("flex-column", "discoveryPanel");
 
         const title = document.createElement("h2");
-        title.textContent = i18n.t("explorationCenter:explorationCenter");
+        title.textContent = this.t("explorationCenter:explorationCenter");
         this.htmlRoot.appendChild(title);
 
         const encyclopaediaContainer = document.createElement("div");
@@ -82,18 +87,18 @@ export class ExplorationCenterPanel {
         this.htmlRoot.appendChild(encyclopaediaContainer);
 
         const activeInstances = document.createElement("p");
-        activeInstances.textContent = i18n.t("explorationCenter:activeEncyclopaediaInstances", {
+        activeInstances.textContent = this.t("explorationCenter:activeEncyclopaediaInstances", {
             value: encyclopaedia.getBackendString(),
         });
         encyclopaediaContainer.appendChild(activeInstances);
 
         const addEncyclopaediaInstanceButton = document.createElement("button");
         addEncyclopaediaInstanceButton.classList.add("disabled");
-        addEncyclopaediaInstanceButton.textContent = i18n.t("explorationCenter:addNewInstance");
+        addEncyclopaediaInstanceButton.textContent = this.t("explorationCenter:addNewInstance");
         addEncyclopaediaInstanceButton.addEventListener("click", async () => {
             this.soundPlayer.playNow("click");
 
-            const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer);
+            const connectionInfo = await connectEncyclopaediaGalacticaModal(this.soundPlayer, this.t);
             if (connectionInfo === null) {
                 return;
             }
@@ -126,17 +131,17 @@ export class ExplorationCenterPanel {
         buttonHorizontalContainer.appendChild(this.sellAllButton);
 
         const optionLocal = document.createElement("option");
-        optionLocal.innerText = i18n.t("explorationCenter:filterLocal");
+        optionLocal.innerText = this.t("explorationCenter:filterLocal");
         optionLocal.value = ExplorationCenterFilter.LOCAL_ONLY;
         discoveryListSelect.appendChild(optionLocal);
 
         const optionUploaded = document.createElement("option");
-        optionUploaded.innerText = i18n.t("explorationCenter:filterUploaded");
+        optionUploaded.innerText = this.t("explorationCenter:filterUploaded");
         optionUploaded.value = ExplorationCenterFilter.UPLOADED_ONLY;
         discoveryListSelect.appendChild(optionUploaded);
 
         const optionAll = document.createElement("option");
-        optionAll.innerText = i18n.t("explorationCenter:filterAll");
+        optionAll.innerText = this.t("explorationCenter:filterAll");
         optionAll.value = ExplorationCenterFilter.ALL;
         discoveryListSelect.appendChild(optionAll);
 
@@ -173,6 +178,7 @@ export class ExplorationCenterPanel {
             universeBackend,
             this.soundPlayer,
             this.notificationManager,
+            this.t,
         );
         this.discoveryDetails.onSellDiscovery.add(async () => {
             await this.populate(universeBackend);
@@ -219,7 +225,7 @@ export class ExplorationCenterPanel {
             totalValue += result.value;
         }
         this.sellAllButton.toggleAttribute("disabled", totalValue === 0);
-        this.sellAllButton.innerText = i18n.t("common:sellAllFor", {
+        this.sellAllButton.innerText = this.t("common:sellAllFor", {
             price: `${totalValue.toLocaleString()}${Settings.CREDIT_SYMBOL}`,
         });
 
@@ -229,11 +235,11 @@ export class ExplorationCenterPanel {
             this.discoveryList.appendChild(container);
 
             const noDiscoveryTitle = document.createElement("h3");
-            noDiscoveryTitle.innerText = i18n.t("explorationCenter:noDiscoveryTitle");
+            noDiscoveryTitle.innerText = this.t("explorationCenter:noDiscoveryTitle");
             container.appendChild(noDiscoveryTitle);
 
             const noDiscoveryText = document.createElement("p");
-            noDiscoveryText.innerText = i18n.t("explorationCenter:noDiscoveryText");
+            noDiscoveryText.innerText = this.t("explorationCenter:noDiscoveryText");
             container.appendChild(noDiscoveryText);
 
             return;
@@ -241,7 +247,7 @@ export class ExplorationCenterPanel {
 
         const searchField = document.createElement("input");
         searchField.type = "search";
-        searchField.placeholder = i18n.t("explorationCenter:searchForADiscovery");
+        searchField.placeholder = this.t("explorationCenter:searchForADiscovery");
         searchField.addEventListener("keydown", (e) => {
             e.stopPropagation();
         });
@@ -271,7 +277,7 @@ export class ExplorationCenterPanel {
             this.discoveryList.appendChild(discoveryItem);
 
             const discoveryName = document.createElement("h3");
-            discoveryName.textContent = objectModel?.name ?? i18n.t("common:unknown");
+            discoveryName.textContent = objectModel?.name ?? this.t("common:unknown");
             discoveryItem.appendChild(discoveryName);
 
             const discoveryDate = document.createElement("p");

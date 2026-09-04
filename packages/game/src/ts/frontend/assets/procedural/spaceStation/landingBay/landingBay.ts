@@ -32,6 +32,7 @@ import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalFacilityModel, LandingBayModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -40,8 +41,6 @@ import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
 import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
-
-import i18n from "@/i18n";
 
 import { ProceduralSpotLightInstances } from "../../spotLight";
 import type { ProceduralSpotLightInstanceData } from "../../spotLight";
@@ -85,7 +84,6 @@ export class LandingBay {
         this.radius = 500;
         this.targetInfo = {
             type: ObjectTargetCursorType.LANDING_BAY,
-            name: this.getTypeName(),
             minDistance: LandingBay.TARGET_CURSOR_MIN_DISTANCE,
             maxDistance: LandingBay.TARGET_CURSOR_MAX_DISTANCE,
         };
@@ -358,8 +356,8 @@ export class LandingBay {
         return this.radius;
     }
 
-    getTypeName(): string {
-        return i18n.t("objectTypes:landingBay");
+    getTypeName(t: TFunction): string {
+        return t("objectTypes:landingBay");
     }
 
     dispose(): void {

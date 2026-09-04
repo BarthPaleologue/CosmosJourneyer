@@ -24,6 +24,7 @@ import {
     getObjectModelById,
 } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { AsteroidFieldMissionState } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import type { MissionAsteroidFieldNodeSerialized } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
@@ -33,8 +34,6 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { clamp } from "@/utils/math";
 import { parseDistance } from "@/utils/strings/parseToStrings";
-
-import i18n from "@/i18n";
 
 import { getGoToSystemInstructions } from "../../../common";
 import type { MissionContext } from "../../../missionContext";
@@ -150,7 +149,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         }
     }
 
-    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend): string {
+    describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
         const distanceLy = Vector3.Distance(
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
@@ -160,10 +159,10 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         if (objectModel === null || systemModel === null) {
             return "ERROR: objectModel or systemModel is null";
         }
-        return i18n.t("missions:sightseeing:describeAsteroidFieldTrek", {
+        return t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.name,
             systemName: systemModel.name,
-            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy)) : i18n.t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
 
@@ -171,9 +170,10 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         context: MissionContext,
         keyboardLayout: Map<string, string>,
         universeBackend: UniverseBackend,
+        t: TFunction,
     ): string {
         if (this.isCompleted()) {
-            return i18n.t("missions:asteroidField:missionCompleted");
+            return t("missions:asteroidField:missionCompleted");
         }
 
         const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
@@ -188,13 +188,14 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
                     this.targetSystemCoordinates,
                     keyboardLayout,
                     universeBackend,
+                    t,
                 );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
-                return i18n.t("missions:common:getCloserToTarget", {
+                return t("missions:common:getCloserToTarget", {
                     objectName: targetObject.name,
                 });
             case AsteroidFieldMissionState.CLOSE_ENOUGH:
-                return i18n.t("missions:asteroidField:missionCompleted");
+                return t("missions:asteroidField:missionCompleted");
             default:
                 return assertUnreachable(this.state);
         }

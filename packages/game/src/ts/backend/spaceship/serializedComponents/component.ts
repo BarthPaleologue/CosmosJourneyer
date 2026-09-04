@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 import { z } from "zod";
-
-import i18n from "@/i18n";
 
 import { SerializedDiscoveryScannerSchema } from "./discoveryScanner";
 import { SerializedFuelScoopSchema } from "./fuelScoop";
@@ -36,18 +35,18 @@ export const SerializedComponentSchema = z.discriminatedUnion("type", [
 
 export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;
 
-export function getComponentTypeI18n(type: SerializedComponent["type"]): string {
+export function getComponentTypeI18n(type: SerializedComponent["type"], t: TFunction): string {
     switch (type) {
         case "warpDrive":
-            return i18n.t("components:warpDrive");
+            return t("components:warpDrive");
         case "fuelScoop":
-            return i18n.t("components:fuelScoop");
+            return t("components:fuelScoop");
         case "fuelTank":
-            return i18n.t("components:fuelTank");
+            return t("components:fuelTank");
         case "discoveryScanner":
-            return i18n.t("components:discoveryScanner");
+            return t("components:discoveryScanner");
         case "thrusters":
-            return i18n.t("components:thrusters");
+            return t("components:thrusters");
         default:
             return assertUnreachable(type);
     }

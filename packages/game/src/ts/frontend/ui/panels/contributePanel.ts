@@ -15,60 +15,60 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { renderMarkdownInline } from "@/utils/markdown";
+import type { TFunction } from "i18next";
 
-import i18n from "@/i18n";
+import { renderMarkdownInline } from "@/utils/markdown";
 
 export class ContributePanel {
     readonly htmlRoot: HTMLElement;
 
-    constructor() {
-        this.htmlRoot = this.createPanelHTML();
+    constructor(t: TFunction) {
+        this.htmlRoot = this.createPanelHTML(t);
     }
 
-    private createPanelHTML(): HTMLElement {
+    private createPanelHTML(t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.className = "sidePanel";
 
         // Create title
         const title = document.createElement("h2");
-        title.textContent = i18n.t("sidePanel:contribute");
+        title.textContent = t("sidePanel:contribute");
         panel.appendChild(title);
 
         // Bug reports section
         const bugReportsHeader = document.createElement("h3");
-        bugReportsHeader.textContent = i18n.t("sidePanel:bugReports");
+        bugReportsHeader.textContent = t("sidePanel:bugReports");
         panel.appendChild(bugReportsHeader);
 
         const bugReportsText = document.createElement("p");
-        bugReportsText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:bugReportsText"));
+        bugReportsText.innerHTML = renderMarkdownInline(t("sidePanel:bugReportsText"));
         panel.appendChild(bugReportsText);
 
         // Translation section
         const translationHeader = document.createElement("h3");
-        translationHeader.textContent = i18n.t("sidePanel:translation");
+        translationHeader.textContent = t("sidePanel:translation");
         panel.appendChild(translationHeader);
 
         const translationText = document.createElement("p");
-        translationText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:translationText"));
+        translationText.innerHTML = renderMarkdownInline(t("sidePanel:translationText"));
         panel.appendChild(translationText);
 
         // Know how to code section
         const codeHeader = document.createElement("h3");
-        codeHeader.textContent = i18n.t("sidePanel:knowHowToCode");
+        codeHeader.textContent = t("sidePanel:knowHowToCode");
         panel.appendChild(codeHeader);
 
         const codeText = document.createElement("p");
-        codeText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:knowHowToCodeText"));
+        codeText.innerHTML = renderMarkdownInline(t("sidePanel:knowHowToCodeText"));
         panel.appendChild(codeText);
 
         // Support financially section
         const supportHeader = document.createElement("h3");
-        supportHeader.textContent = i18n.t("sidePanel:supportFinancially");
+        supportHeader.textContent = t("sidePanel:supportFinancially");
         panel.appendChild(supportHeader);
 
         const supportText = document.createElement("p");
-        supportText.innerHTML = renderMarkdownInline(i18n.t("sidePanel:supportFinanciallyText"));
+        supportText.innerHTML = renderMarkdownInline(t("sidePanel:supportFinanciallyText"));
         panel.appendChild(supportText);
 
         return panel;

@@ -32,6 +32,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalactica } from "@/backend/encyclopaedia/encyclopaediaGalactica";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
@@ -94,6 +95,7 @@ export class StarMapView implements View {
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
+    private readonly t: TFunction;
 
     private readonly starMap: StarMap;
     private readonly starMapNebulaFog: StarMapNebulaPostProcess;
@@ -106,6 +108,7 @@ export class StarMapView implements View {
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        t: TFunction,
     ) {
         this.scene = scene;
         this.scene.onDisposeObservable.addOnce(() => {
@@ -137,6 +140,7 @@ export class StarMapView implements View {
 
         this.soundPlayer = soundPlayer;
         this.notificationManager = notificationManager;
+        this.t = t;
 
         this.controls = new StarMapControls(this.scene);
         this.controls.getCameras().forEach((camera) => (camera.minZ = 0.01));
@@ -150,24 +154,24 @@ export class StarMapView implements View {
 
         this.stellarPathfinder = new StellarPathfinder(universeBackend);
 
-        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer);
+        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer, t);
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
             if (this.currentSystemCoordinates === null) {
-                await alertModal("current system seed is null!", this.soundPlayer);
+                await alertModal("current system seed is null!", this.soundPlayer, this.t);
                 return;
             }
             if (this.selectedSystemCoordinates === null) {
-                await alertModal("selected system seed is null!", this.soundPlayer);
+                await alertModal("selected system seed is null!", this.soundPlayer, this.t);
                 return;
             }
 
             const playerCurrentSpaceship = this.player.instancedSpaceships.at(0);
             if (playerCurrentSpaceship === undefined) {
-                await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer);
+                await alertModal("You do not own a spaceship! What have you done???", this.soundPlayer, this.t);
                 return;
             }
 
@@ -177,6 +181,7 @@ export class StarMapView implements View {
                 await alertModal(
                     "Your current spaceship has no warp drive! Install a warp drive to plot an itinerary.",
                     this.soundPlayer,
+                    this.t,
                 );
                 return;
             }
@@ -252,7 +257,7 @@ export class StarMapView implements View {
                     this.soundPlayer.playNow("itinerary_computed");
                     const path = this.stellarPathfinder.getPath();
                     if (!path.success) {
-                        await alertModal(path.error.message, this.soundPlayer);
+                        await alertModal(path.error.message, this.soundPlayer, this.t);
                         continue;
                     }
 

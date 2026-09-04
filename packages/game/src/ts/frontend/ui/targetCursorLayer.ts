@@ -18,6 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { IDisposable } from "@babylonjs/core/scene";
+import type { TFunction } from "i18next";
 
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Targetable } from "../universe/architecture/targetable";
@@ -35,8 +36,10 @@ export class TargetCursorLayer implements IDisposable {
     private readonly additionalPinnedTargets: Set<Targetable> = new Set();
 
     private closestToScreenCenterOrbitalObject: Targetable | null = null;
+    private readonly t: TFunction;
 
-    constructor() {
+    constructor(t: TFunction) {
+        this.t = t;
         this.layerRoot = document.createElement("div");
         this.layerRoot.classList.add("targetCursorLayer");
 
@@ -53,7 +56,7 @@ export class TargetCursorLayer implements IDisposable {
 
     public addObjects(objects: ReadonlyArray<Targetable>): void {
         for (const object of objects) {
-            const overlay = new ObjectTargetCursor(object);
+            const overlay = new ObjectTargetCursor(object, this.t);
             this.targetCursors.push(overlay);
             this.layerRoot.appendChild(overlay.htmlRoot);
         }

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import i18next, { init, t } from "i18next";
-import type { Resource, ResourceKey, ResourceLanguage } from "i18next";
+import { createInstance } from "i18next";
+import type { Resource, ResourceKey, ResourceLanguage, TFunction } from "i18next";
 import { z } from "zod";
 
 import { renderMarkdownInline } from "./utils/markdown";
@@ -72,12 +72,13 @@ function loadResources(): Resource {
     return resources;
 }
 
-export async function initI18n(): Promise<void> {
+export async function initI18n(): Promise<TFunction> {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);
     const language = urlParams.get("lang") ?? navigator.language;
 
-    await init({
+    const i18n = createInstance();
+    const t = await i18n.init({
         lng: language, // change this if you want to test a specific language
         debug: import.meta.env.DEV,
         fallbackLng: "en-US",
@@ -93,6 +94,6 @@ export async function initI18n(): Promise<void> {
 
         element.innerHTML = renderMarkdownInline(t(key));
     });
-}
 
-export default i18next;
+    return t;
+}

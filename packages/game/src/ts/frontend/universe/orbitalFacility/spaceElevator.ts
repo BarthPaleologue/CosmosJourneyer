@@ -26,6 +26,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { ElevatorSectionModel, SpaceElevatorModel } from "@cosmos-journeyer/universe-model";
+import type { TFunction } from "i18next";
 
 import { SpaceElevatorClimber } from "@/frontend/assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
@@ -180,8 +181,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         return this.boundingRadius;
     }
 
-    getTypeName(): string {
-        return getOrbitalObjectTypeToI18nString(this.model);
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {

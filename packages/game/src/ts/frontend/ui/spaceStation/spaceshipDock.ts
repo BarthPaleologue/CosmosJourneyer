@@ -15,10 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { TFunction } from "i18next";
+
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Player } from "@/frontend/player/player";
-
-import i18n from "@/i18n";
 
 import { SpaceshipOutfittingUI } from "./spaceshipOutfittingUI";
 
@@ -31,11 +31,15 @@ export class SpaceshipDockUI {
 
     private readonly spaceshipOutfittingUI: SpaceshipOutfittingUI;
 
-    constructor(player: Player, soundPlayer: ISoundPlayer) {
+    private readonly t: TFunction;
+
+    constructor(player: Player, soundPlayer: ISoundPlayer, t: TFunction) {
         this.root = document.createElement("div");
 
+        this.t = t;
+
         const spaceshipH2 = document.createElement("h2");
-        spaceshipH2.innerText = i18n.t("spaceStation:shipHangar");
+        spaceshipH2.innerText = t("spaceStation:shipHangar");
         this.root.appendChild(spaceshipH2);
 
         this.currentSpaceshipContainer = document.createElement("div");
@@ -43,13 +47,13 @@ export class SpaceshipDockUI {
         this.root.appendChild(this.currentSpaceshipContainer);
 
         const otherSpaceshipH2 = document.createElement("h2");
-        otherSpaceshipH2.innerText = i18n.t("spaceStation:otherSpaceships");
+        otherSpaceshipH2.innerText = t("spaceStation:otherSpaceships");
         this.root.appendChild(otherSpaceshipH2);
 
         this.otherSpaceshipContainer = document.createElement("div");
         this.root.appendChild(this.otherSpaceshipContainer);
 
-        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player, soundPlayer);
+        this.spaceshipOutfittingUI = new SpaceshipOutfittingUI(player, soundPlayer, this.t);
     }
 
     public generate(player: Player, soundPlayer: ISoundPlayer): void {
@@ -71,7 +75,7 @@ export class SpaceshipDockUI {
             fuelManagementContainer.appendChild(fuelText);
 
             const outfittingButton = document.createElement("button");
-            outfittingButton.innerText = i18n.t("spaceStation:outfitting");
+            outfittingButton.innerText = this.t("spaceStation:outfitting");
             fuelManagementContainer.appendChild(outfittingButton);
 
             outfittingButton.addEventListener("click", () => {
@@ -89,7 +93,7 @@ export class SpaceshipDockUI {
             });
 
             const refuelButton = document.createElement("button");
-            refuelButton.innerText = i18n.t("spaceStation:refuel");
+            refuelButton.innerText = this.t("spaceStation:refuel");
 
             refuelButton.addEventListener("click", () => {
                 soundPlayer.playNow("click");
@@ -101,14 +105,14 @@ export class SpaceshipDockUI {
             });
             fuelManagementContainer.appendChild(refuelButton);
         } else {
-            this.currentSpaceshipContainer.innerText = i18n.t("spaceStation:noSpaceship");
+            this.currentSpaceshipContainer.innerText = this.t("spaceStation:noSpaceship");
         }
 
         this.otherSpaceshipContainer.innerHTML = "";
 
         if (player.serializedSpaceships.length === 0) {
             const noSpaceshipP = document.createElement("p");
-            noSpaceshipP.innerText = i18n.t("spaceStation:noOtherSpaceship");
+            noSpaceshipP.innerText = this.t("spaceStation:noOtherSpaceship");
             this.otherSpaceshipContainer.appendChild(noSpaceshipP);
         }
 

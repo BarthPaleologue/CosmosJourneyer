@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { TFunction } from "i18next";
 import type { z } from "zod";
-
-import i18n from "@/i18n";
 
 export type SaveLoadingError =
     | {
@@ -36,16 +35,16 @@ export type SaveLoadingError =
           content: z.ZodError;
       };
 
-export function saveLoadingErrorToI18nString(error: SaveLoadingError): string {
+export function saveLoadingErrorToI18nString(error: SaveLoadingError, t: TFunction): string {
     switch (error.type) {
         case "INVALID_JSON":
-            return i18n.t("notifications:invalidSaveFileJson");
+            return t("notifications:invalidSaveFileJson");
         case "INVALID_SAVE":
-            return i18n.t("notifications:invalidSaveFile");
+            return t("notifications:invalidSaveFile");
         case "INVALID_STORAGE_FORMAT":
-            return i18n.t("notifications:invalidStorageFormat");
+            return t("notifications:invalidStorageFormat");
         case "SAVE_NOT_FOUND":
-            return i18n.t("notifications:saveNotFound");
+            return t("notifications:saveNotFound");
         default:
             return assertUnreachable(error);
     }
