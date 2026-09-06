@@ -18,8 +18,8 @@
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 export const maxShadowCastingSpheres = 8;
 

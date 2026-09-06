@@ -23,7 +23,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { EarthG } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
 

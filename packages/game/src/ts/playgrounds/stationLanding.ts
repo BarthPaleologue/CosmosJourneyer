@@ -31,10 +31,10 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
+import { SpaceStation } from "@/frontend/simulation/orbitalFacility/spaceStation";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

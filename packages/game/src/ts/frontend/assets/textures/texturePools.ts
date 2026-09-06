@@ -19,7 +19,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { CloudsLut } from "@/frontend/postProcesses/clouds/cloudsLut";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { StarMaterialLut } from "@/frontend/universe/stellarObjects/star/starMaterialLut";
+import { StarMaterialLut } from "@/frontend/simulation/stellarObjects/star/starMaterialLut";
 
 import { ItemPool } from "@/utils/itemPool";
 

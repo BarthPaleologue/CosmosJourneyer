@@ -24,8 +24,8 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
-import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import type { Transformable } from "../universe/architecture/transformable";
+import type { HasBoundingSphere } from "../simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "../simulation/architecture/transformable";
 import { CameraUniformNames, setCameraUniforms } from "./uniforms/cameraUniforms";
 import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUniforms";
 import { setSphereShadowCasterUniforms, SphereShadowCasterUniformNames } from "./uniforms/sphereShadowCasterUniforms";

@@ -30,8 +30,8 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
+import { AsteroidPatch } from "@/frontend/simulation/asteroidFields/asteroidPatch";
 
 import { enablePhysics } from "./utils";
 

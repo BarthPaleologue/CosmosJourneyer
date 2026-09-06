@@ -36,8 +36,8 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
+import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 

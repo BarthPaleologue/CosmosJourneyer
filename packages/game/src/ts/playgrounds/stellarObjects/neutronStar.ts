@@ -29,7 +29,7 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
+import { NeutronStar } from "@/frontend/simulation/stellarObjects/neutronStar/neutronStar";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

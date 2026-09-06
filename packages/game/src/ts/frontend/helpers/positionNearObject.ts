@@ -22,10 +22,10 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import type { Controls } from "@/frontend/controls";
 import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/helpers/transform";
-import type { CanHaveRings } from "@/frontend/universe/architecture/canHaveRings";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import type { StarSystemController } from "@/frontend/universe/starSystemController";
+import type { CanHaveRings } from "@/frontend/simulation/architecture/canHaveRings";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
+import type { StarSystemController } from "@/frontend/simulation/starSystemController";
 
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;

@@ -34,7 +34,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { EmptyCelestialBody } from "@/frontend/simulation/emptyCelestialBody";
 
 import { ItemPool } from "@/utils/itemPool";
 

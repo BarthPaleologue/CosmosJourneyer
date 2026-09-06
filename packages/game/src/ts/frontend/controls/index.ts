@@ -17,7 +17,7 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 export interface Controls extends Transformable {
     /**

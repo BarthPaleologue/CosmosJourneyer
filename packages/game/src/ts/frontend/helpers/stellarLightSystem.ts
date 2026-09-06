@@ -28,7 +28,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { AtmosphereUniforms } from "../postProcesses/atmosphere/atmosphereUniforms";
-import type { CelestialBody } from "../universe/architecture/orbitalObject";
+import type { CelestialBody } from "../simulation/architecture/orbitalObject";
 
 export class StellarLightSystem {
     private readonly stellarObjects: Array<{

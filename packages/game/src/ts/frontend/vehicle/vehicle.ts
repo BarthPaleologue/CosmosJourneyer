@@ -25,8 +25,8 @@ import type { TFunction } from "i18next";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
-import { ObjectTargetCursorType } from "../universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../simulation/architecture/targetable";
+import type { Targetable, TargetInfo } from "../simulation/architecture/targetable";
 import type { Door } from "./door";
 import type { Wheel } from "./wheel";
 

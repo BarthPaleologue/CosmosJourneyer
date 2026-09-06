@@ -33,17 +33,17 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
+import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
+import type { LightEmitter } from "../../../universe/architecture/lightEmitter";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
-import type { LightEmitter } from "../../architecture/lightEmitter";
 import { StarMaterial } from "./starMaterial";
 
 export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {

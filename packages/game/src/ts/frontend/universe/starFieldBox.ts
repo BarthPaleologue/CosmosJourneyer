@@ -26,7 +26,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { RenderingManager } from "@babylonjs/core/Rendering/renderingManager";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 export class StarFieldBox implements Transformable {
     readonly mesh: Mesh;

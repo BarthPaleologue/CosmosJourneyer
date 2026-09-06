@@ -27,7 +27,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

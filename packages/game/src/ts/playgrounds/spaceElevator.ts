@@ -30,9 +30,9 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
-import { SpaceElevator } from "@/frontend/universe/orbitalFacility/spaceElevator";
+import { CustomOrbitalObject } from "@/frontend/simulation/customOrbitalObject";
+import { KeplerianOrbitalSimulation } from "@/frontend/simulation/keplerianOrbitalSimulation";
+import { SpaceElevator } from "@/frontend/simulation/orbitalFacility/spaceElevator";
 
 import { Settings } from "@/settings";
 

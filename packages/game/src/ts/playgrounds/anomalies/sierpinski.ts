@@ -22,7 +22,7 @@ import { generateSierpinskiPyramidModel } from "@cosmos-journeyer/universe-gener
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
+import { EmptyCelestialBody } from "@/frontend/simulation/emptyCelestialBody";
 
 export async function createSierpinskiScene(
     engine: AbstractEngine,

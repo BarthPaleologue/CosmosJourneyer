@@ -27,8 +27,8 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
 import { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
+import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
 
 import { ItemPool } from "@/utils/itemPool";
 

@@ -17,8 +17,8 @@
 
 import type { Light } from "@babylonjs/core/Lights/light";
 
-import type { HasBoundingSphere } from "./hasBoundingSphere";
-import type { Transformable } from "./transformable";
+import type { HasBoundingSphere } from "../../simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "../../simulation/architecture/transformable";
 
 export interface ClusteredLightingRegion extends Transformable, HasBoundingSphere {
     getLights(): ReadonlyArray<Light>;

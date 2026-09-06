@@ -28,9 +28,9 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { ScatteringSystem } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TelluricPlanet } from "@/frontend/simulation/planets/telluricPlanet/telluricPlanet";
+import { ScatteringSystem } from "@/frontend/simulation/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

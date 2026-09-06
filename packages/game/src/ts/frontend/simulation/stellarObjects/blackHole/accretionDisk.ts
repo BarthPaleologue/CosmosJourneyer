@@ -19,7 +19,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import type { LightEmitter } from "../../architecture/lightEmitter";
+import type { LightEmitter } from "../../../universe/architecture/lightEmitter";
 
 export class AccretionDisk implements LightEmitter {
     private readonly emissiveColor: Color3;

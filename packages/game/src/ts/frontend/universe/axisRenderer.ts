@@ -19,8 +19,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import type { Mesh } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { HasBoundingSphere } from "./architecture/hasBoundingSphere";
-import type { Transformable } from "./architecture/transformable";
+import type { HasBoundingSphere } from "../simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "../simulation/architecture/transformable";
 import type { CreateLinesMeshFunction } from "./lineRendering";
 
 /**

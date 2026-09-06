@@ -30,7 +30,7 @@ import type { FusionSectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
+import type { StationSection } from "@/frontend/simulation/orbitalFacility/stationSection";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

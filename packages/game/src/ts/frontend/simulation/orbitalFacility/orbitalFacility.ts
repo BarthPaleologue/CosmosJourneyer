@@ -18,10 +18,10 @@
 import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
 
 import type { Cullable } from "@/frontend/helpers/cullable";
+import type { OrbitalObjectBase } from "@/frontend/simulation/architecture/orbitalObjectBase";
+import type { Targetable } from "@/frontend/simulation/architecture/targetable";
+import type { ManagesLandingPads } from "@/frontend/simulation/orbitalFacility/managesLandingPads";
 import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
-import type { OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
-import type { Targetable } from "@/frontend/universe/architecture/targetable";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 export interface OrbitalFacilityBase<T extends OrbitalObjectType>
     extends OrbitalObjectBase<T>, ManagesLandingPads, Cullable, Targetable, ClusteredLightingRegion {

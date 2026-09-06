@@ -38,9 +38,9 @@ import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import { LandingPadSize, LandingPadStatus } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { ProceduralSpotLightInstances } from "../../spotLight";
 import type { ProceduralSpotLightInstanceData } from "../../spotLight";

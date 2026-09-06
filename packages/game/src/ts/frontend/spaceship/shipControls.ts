@@ -34,10 +34,10 @@ import { createCameraShakeAnimation } from "@/frontend/helpers/animations/camera
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
+import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
+import type { ManagesLandingPads } from "@/frontend/simulation/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";

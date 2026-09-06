@@ -18,8 +18,8 @@
 import { TransformNode } from "@babylonjs/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 import { LandingPadManager, LandingPadSize } from "./landingPadManager";
 import type { ILandingPad, LandingRequest } from "./landingPadManager";

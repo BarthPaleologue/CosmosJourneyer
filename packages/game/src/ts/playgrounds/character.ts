@@ -37,7 +37,7 @@ import { CharacterInputs } from "@/frontend/controls/characterControls/character
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { setUpVector } from "@/frontend/helpers/transform";
-import { GravitySystem } from "@/frontend/universe/gravitySystem";
+import { GravitySystem } from "@/frontend/simulation/gravitySystem";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 

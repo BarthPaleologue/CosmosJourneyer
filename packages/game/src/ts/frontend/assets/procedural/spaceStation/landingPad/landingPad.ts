@@ -28,9 +28,9 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 import type { TFunction } from "i18next";
 
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
-import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import type { ILandingPad, LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { CollisionMask, Settings } from "@/settings";
 

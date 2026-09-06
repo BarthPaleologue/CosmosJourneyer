@@ -28,12 +28,13 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { SystemTarget } from "@/frontend/universe/systemTarget";
+import { SystemTarget } from "@/frontend/simulation/systemTarget";
 
 import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
+import { StarFieldBox } from "../universe/starFieldBox";
 import type {
     Anomaly,
     CelestialBody,
@@ -49,7 +50,6 @@ import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
 import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
-import { StarFieldBox } from "./starFieldBox";
 import type { StarSystemLoader } from "./starSystemLoader";
 
 /**

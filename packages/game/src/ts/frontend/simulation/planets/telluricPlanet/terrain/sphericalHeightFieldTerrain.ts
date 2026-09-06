@@ -24,7 +24,7 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
 import type { Cullable } from "@/frontend/helpers/cullable";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 import type { LodUpdateContext } from "./chunks/lodUpdateContext";
 import type { IScatteringSystem } from "./chunks/scatteringSystem";

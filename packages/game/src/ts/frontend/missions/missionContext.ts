@@ -21,7 +21,7 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { Itinerary } from "@/backend/player/serializedPlayer";
 
-import type { StarSystemController } from "@/frontend/universe/starSystemController";
+import type { StarSystemController } from "@/frontend/simulation/starSystemController";
 
 /**
  * Describes information used by mission nodes to update their state

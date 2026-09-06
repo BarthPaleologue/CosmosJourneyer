@@ -29,11 +29,11 @@ import type {
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
+import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
+import { TelluricPlanet } from "@/frontend/simulation/planets/telluricPlanet/telluricPlanet";
+import { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";
+import { NeutronStar } from "@/frontend/simulation/stellarObjects/neutronStar/neutronStar";
+import { Star } from "@/frontend/simulation/stellarObjects/star/star";
 
 import { wait } from "@/utils/wait";
 

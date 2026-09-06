@@ -26,10 +26,10 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { StarSystemController } from "@/frontend/simulation/starSystemController";
+import { StarSystemLoader } from "@/frontend/simulation/starSystemLoader";
 import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
-import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 
 import { initI18n } from "@/i18n";
 import { Settings } from "@/settings";

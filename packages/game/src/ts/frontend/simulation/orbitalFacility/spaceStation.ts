@@ -38,11 +38,11 @@ import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilit
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { Targetable, TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
+import { LandingPadManager } from "@/frontend/simulation/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import type { OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";

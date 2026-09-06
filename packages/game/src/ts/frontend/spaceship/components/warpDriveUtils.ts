@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { OrbitalObject } from "@/frontend/simulation/architecture/orbitalObject";
 
 import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
 

@@ -23,7 +23,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 
-import type { Transformable } from "../universe/architecture/transformable";
+import type { Transformable } from "../simulation/architecture/transformable";
 import { ThrusterExhaust } from "./thrusterExhaust";
 
 export class Thruster implements Transformable {

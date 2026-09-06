@@ -40,17 +40,17 @@ import { AudioMasks } from "@/frontend/audio/audioMasks";
 import type { ISoundInstance } from "@/frontend/audio/soundInstance";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { CelestialBody, OrbitalObject } from "@/frontend/simulation/architecture/orbitalObject";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
+import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
 
 import { SpaceDots } from "../assets/procedural/spaceDots";
-import { ObjectTargetCursorType } from "../universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../simulation/architecture/targetable";
+import type { Targetable, TargetInfo } from "../simulation/architecture/targetable";
 import { Altimeter } from "./altimeter";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import type { WarpInfluence } from "./components/warpInfluence";

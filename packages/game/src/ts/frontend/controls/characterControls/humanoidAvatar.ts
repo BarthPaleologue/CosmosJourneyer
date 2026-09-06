@@ -28,7 +28,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 import { moveTowards } from "@/utils/math";
 

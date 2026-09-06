@@ -34,8 +34,8 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 import { CollisionMask, Settings } from "@/settings";
 

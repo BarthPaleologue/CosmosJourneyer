@@ -7,8 +7,8 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { Targetable, TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 export class SystemTarget implements Targetable {
     readonly name: string;

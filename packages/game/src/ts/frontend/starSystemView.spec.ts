@@ -22,8 +22,8 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
+import { StarSystemController } from "@/frontend/simulation/starSystemController";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { StarSystemController } from "@/frontend/universe/starSystemController";
 
 import { StarSystemView } from "./starSystemView";
 

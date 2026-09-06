@@ -16,94 +16,83 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
-import type { DirectionalLight } from "@babylonjs/core/Lights/directionalLight";
-import type { Material } from "@babylonjs/core/Materials/material";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
+import type { NeutronStarModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
+import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
+import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
+import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
+import type { LightEmitter } from "../../../universe/architecture/lightEmitter";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
-import { GasPlanetProceduralMaterial } from "./gasPlanetProceduralMaterial";
-import { createGasPlanetTextureMaterial } from "./gasPlanetTextureMaterial";
+import { StarMaterial } from "../star/starMaterial";
 
-export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
-    readonly model: DeepReadonly<GasPlanetModel>;
+export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, LightEmitter {
+    readonly model: DeepReadonly<NeutronStarModel>;
 
-    readonly type = "gasPlanet";
+    readonly type = "neutronStar";
 
-    private readonly mesh: Mesh;
-    readonly material: GasPlanetProceduralMaterial | Material;
+    readonly mesh: Mesh;
 
-    readonly atmosphereUniforms: AtmosphereUniforms;
+    private readonly emissiveColor: Color3;
+
+    private readonly material: StarMaterial;
+
+    readonly volumetricLightUniforms = new VolumetricLightUniforms();
 
     readonly ringsUniforms: RingsUniforms | null;
+
     readonly asteroidField: AsteroidField | null;
 
     readonly targetInfo: TargetInfo;
 
     /**
-     * New Gas Planet
-     * @param model The model to create the planet from or a seed for the planet in [-1, 1]
+     * New Star
+     * @param model The seed of the star in [-1, 1]
      * @param scene
      */
-    constructor(
-        model: DeepReadonly<GasPlanetModel>,
-        textures: Textures,
-        ringsLutPool: ItemPool<RingsProceduralPatternLut>,
-        scene: Scene,
-    ) {
+    constructor(model: DeepReadonly<NeutronStarModel>, textures: Textures, scene: Scene) {
         this.model = model;
 
         this.mesh = MeshBuilder.CreateSphere(
             this.model.name,
             {
                 diameter: this.model.radius * 2,
-                segments: 64,
+                segments: 32,
             },
             scene,
         );
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
-        if (this.model.colorPalette.type === "procedural") {
-            this.material = new GasPlanetProceduralMaterial(
-                this.model.name,
-                this.model.seed,
-                this.model.colorPalette,
-                scene,
-            );
-        } else {
-            this.material = createGasPlanetTextureMaterial(
-                this.model.colorPalette.textureId,
-                textures.gasPlanet,
-                scene,
-            );
-        }
+        const starColor = getRgbFromTemperature(this.model.blackBodyTemperature);
+        this.emissiveColor = new Color3(starColor.r, starColor.g, starColor.b);
 
+        this.material = new StarMaterial(
+            this.model.seed,
+            this.model.blackBodyTemperature,
+            textures.pools.starMaterialLut,
+            scene,
+        );
         this.mesh.material = this.material;
-
-        const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / EarthRadius);
-        this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
 
         if (this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);
@@ -123,10 +112,20 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
-    updateMaterial(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
-        if (this.material instanceof GasPlanetProceduralMaterial) {
-            this.material.update(stellarObjects, deltaSeconds);
-        }
+    getTransform(): TransformNode {
+        return this.mesh;
+    }
+
+    getTypeName(t: TFunction): string {
+        return getOrbitalObjectTypeToI18nString(this.model, t);
+    }
+
+    public getEmissiveColor(): Color3 {
+        return this.emissiveColor;
+    }
+
+    public updateMaterial(deltaTime: number): void {
+        this.material.update(deltaTime);
     }
 
     public getRadius(): number {
@@ -134,15 +133,11 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
     }
 
     public getBoundingRadius(): number {
-        return this.model.radius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
+        return this.getRadius();
     }
 
     public computeCulling(camera: Camera): void {
-        this.mesh.setEnabled(isSizeOnScreenEnough(this, camera));
+        this.mesh.isVisible = isSizeOnScreenEnough(this, camera);
     }
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
@@ -150,9 +145,5 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         this.material.dispose();
         this.asteroidField?.dispose();
         this.ringsUniforms?.dispose(ringsLutPool);
-    }
-
-    getTransform(): TransformNode {
-        return this.mesh;
     }
 }

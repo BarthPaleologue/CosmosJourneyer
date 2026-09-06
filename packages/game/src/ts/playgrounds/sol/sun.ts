@@ -27,8 +27,8 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
+import { Star } from "@/frontend/simulation/stellarObjects/star/star";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { enablePhysics } from "../utils";
 

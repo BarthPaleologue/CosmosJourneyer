@@ -34,9 +34,9 @@ import { CloudsUniforms } from "@/frontend/postProcesses/clouds/cloudsUniforms";
 import { OceanUniforms } from "@/frontend/postProcesses/ocean/oceanUniforms";
 import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
-import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
+import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
+import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
 

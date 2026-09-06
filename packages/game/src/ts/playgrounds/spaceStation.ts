@@ -30,7 +30,7 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
+import { SpaceStation } from "@/frontend/simulation/orbitalFacility/spaceStation";
 
 import { Settings } from "@/settings";
 

@@ -31,9 +31,9 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { ScatteringSystemMock } from "@/frontend/universe/planets/telluricPlanet/terrain/chunks/scatteringSystem";
-import { SphericalHeightFieldTerrain } from "@/frontend/universe/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { ScatteringSystemMock } from "@/frontend/simulation/planets/telluricPlanet/terrain/chunks/scatteringSystem";
+import { SphericalHeightFieldTerrain } from "@/frontend/simulation/planets/telluricPlanet/terrain/sphericalHeightFieldTerrain";
+import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { Settings } from "@/settings";
 

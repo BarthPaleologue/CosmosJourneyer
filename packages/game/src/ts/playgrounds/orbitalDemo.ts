@@ -25,9 +25,9 @@ import { Scene } from "@babylonjs/core/scene";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
+import { CustomOrbitalObject } from "@/frontend/simulation/customOrbitalObject";
+import { KeplerianOrbitalSimulation } from "@/frontend/simulation/keplerianOrbitalSimulation";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
-import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
 import { CreateGreasedLineHelper } from "@/frontend/universe/lineRendering";
 import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 

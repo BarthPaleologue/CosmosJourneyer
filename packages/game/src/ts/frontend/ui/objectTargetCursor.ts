@@ -26,8 +26,8 @@ import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScre
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { ObjectTargetCursorType } from "../universe/architecture/targetable";
-import type { Targetable } from "../universe/architecture/targetable";
+import { ObjectTargetCursorType } from "../simulation/architecture/targetable";
+import type { Targetable } from "../simulation/architecture/targetable";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;

@@ -25,8 +25,8 @@ import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
+import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { AccretionDisk } from "./accretionDisk";

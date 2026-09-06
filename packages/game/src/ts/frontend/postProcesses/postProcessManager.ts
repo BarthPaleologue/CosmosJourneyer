@@ -41,15 +41,15 @@ import type {
     SierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-model";
 
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import type { GasPlanet } from "@/frontend/universe/planets/gasPlanet/gasPlanet";
-import type { TelluricPlanet } from "@/frontend/universe/planets/telluricPlanet/telluricPlanet";
-import type { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
-import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
-import type { Star } from "@/frontend/universe/stellarObjects/star/star";
+import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
+import type { CelestialBody } from "@/frontend/simulation/architecture/orbitalObject";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
+import type { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
+import type { TelluricPlanet } from "@/frontend/simulation/planets/telluricPlanet/telluricPlanet";
+import type { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@/frontend/simulation/stellarObjects/blackHole/blackHolePostProcess";
+import type { NeutronStar } from "@/frontend/simulation/stellarObjects/neutronStar/neutronStar";
+import type { Star } from "@/frontend/simulation/stellarObjects/star/star";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 

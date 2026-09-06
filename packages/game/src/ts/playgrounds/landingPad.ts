@@ -27,7 +27,7 @@ import { loadConcreteTextures } from "@/frontend/assets/textures/materials/concr
 import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareTextDecalTexture";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { enablePhysics } from "./utils";
 

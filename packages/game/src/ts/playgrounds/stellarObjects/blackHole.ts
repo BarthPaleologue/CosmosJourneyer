@@ -25,9 +25,9 @@ import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment"
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
+import { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";
+import { BlackHolePostProcess } from "@/frontend/simulation/stellarObjects/blackHole/blackHolePostProcess";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
-import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
-import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
 
 import { enablePointerLock } from "../utils";
 

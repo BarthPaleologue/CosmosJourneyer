@@ -24,7 +24,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 import { InstanceGlowMaterial } from "../materials/instanceGlow";
 

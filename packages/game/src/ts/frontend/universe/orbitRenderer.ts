@@ -22,7 +22,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 
 import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
-import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { OrbitalObject } from "@/frontend/simulation/architecture/orbitalObject";
 
 import type { CreateLinesMeshFunction } from "./lineRendering";
 

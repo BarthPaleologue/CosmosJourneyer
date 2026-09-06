@@ -34,7 +34,7 @@ import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import type { Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 import { Settings } from "@/settings";
 

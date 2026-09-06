@@ -24,8 +24,8 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { TFunction } from "i18next";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
+import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
+import type { Targetable, TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 import type { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";

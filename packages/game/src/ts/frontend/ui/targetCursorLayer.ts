@@ -20,10 +20,10 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { IDisposable } from "@babylonjs/core/scene";
 import type { TFunction } from "i18next";
 
-import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
-import type { Targetable } from "../universe/architecture/targetable";
-import type { Transformable } from "../universe/architecture/transformable";
-import type { TypedObject } from "../universe/architecture/typedObject";
+import type { HasBoundingSphere } from "../simulation/architecture/hasBoundingSphere";
+import type { Targetable } from "../simulation/architecture/targetable";
+import type { Transformable } from "../simulation/architecture/transformable";
+import type { TypedObject } from "../simulation/architecture/typedObject";
 import { ObjectTargetCursor } from "./objectTargetCursor";
 
 export class TargetCursorLayer implements IDisposable {
