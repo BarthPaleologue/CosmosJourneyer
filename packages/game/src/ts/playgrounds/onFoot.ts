@@ -30,15 +30,6 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
-import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
-import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";
-import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
-import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
-import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { TtsMock } from "@/frontend/audio/tts";
 import type { Controls } from "@/frontend/gameplay/controls";
 import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
@@ -52,9 +43,18 @@ import { VehicleInputs } from "@/frontend/gameplay/vehicle/vehicleControlsInputs
 import { createWolfMk2 } from "@/frontend/gameplay/vehicle/wolfMk2";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
-import { radialChoiceModal } from "@/frontend/ui/dialogModal/radialChoiceModal";
-import { InteractionLayer } from "@/frontend/ui/interactionLayer";
-import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { loadHumanoidPrefabs } from "@/frontend/presentation/assets/objects/humanoids";
+import { createButterfly } from "@/frontend/presentation/assets/procedural/butterfly/butterfly";
+import { ButterflyMaterial } from "@/frontend/presentation/assets/procedural/butterfly/butterflyMaterial";
+import { createGrassBlade } from "@/frontend/presentation/assets/procedural/grass/grassBlade";
+import { GrassMaterial } from "@/frontend/presentation/assets/procedural/grass/grassMaterial";
+import { loadRenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { TtsMock } from "@/frontend/presentation/audio/tts";
+import { radialChoiceModal } from "@/frontend/presentation/ui/dialogModal/radialChoiceModal";
+import { InteractionLayer } from "@/frontend/presentation/ui/interactionLayer";
+import { NotificationManagerMock } from "@/frontend/presentation/ui/notificationManager";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";

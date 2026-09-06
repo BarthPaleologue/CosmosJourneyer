@@ -27,8 +27,8 @@ import type {
     StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
 import { GasPlanet } from "@/frontend/simulation/planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "@/frontend/simulation/planets/telluricPlanet/telluricPlanet";
 import { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";

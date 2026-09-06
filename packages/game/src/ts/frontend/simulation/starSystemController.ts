@@ -25,16 +25,16 @@ import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@c
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
 import { SystemTarget } from "@/frontend/simulation/systemTarget";
 
 import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
-import { StarFieldBox } from "../universe/starFieldBox";
+import { StarFieldBox } from "../presentation/starFieldBox";
 import type {
     Anomaly,
     CelestialBody,

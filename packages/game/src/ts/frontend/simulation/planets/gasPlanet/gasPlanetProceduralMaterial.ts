@@ -26,7 +26,7 @@ import type { GasPlanetProceduralColorPalette } from "@cosmos-journeyer/universe
 import {
     setStellarObjectUniforms,
     StellarObjectUniformNames,
-} from "@/frontend/postProcesses/uniforms/stellarObjectUniforms";
+} from "@/frontend/presentation/postProcesses/uniforms/stellarObjectUniforms";
 
 import surfaceMaterialFragment from "@shaders/gasPlanetMaterial/fragment.glsl";
 import surfaceMaterialVertex from "@shaders/gasPlanetMaterial/vertex.glsl";

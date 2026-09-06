@@ -28,11 +28,11 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { createGrassBlade } from "@/frontend/assets/procedural/grass/grassBlade";
-import { GrassMaterial } from "@/frontend/assets/procedural/grass/grassMaterial";
-import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
 import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { createGrassBlade } from "@/frontend/presentation/assets/procedural/grass/grassBlade";
+import { GrassMaterial } from "@/frontend/presentation/assets/procedural/grass/grassMaterial";
+import { loadNoiseTextures } from "@/frontend/presentation/assets/textures/noises";
 
 import { createSky } from "./utils";
 

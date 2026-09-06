@@ -37,11 +37,6 @@ import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/ency
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { ITts } from "@/frontend/audio/tts";
 import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
 import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
 import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
@@ -58,7 +53,18 @@ import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighbor
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { getRotationQuaternion, lookAt, setRotationQuaternion, setUpVector } from "@/frontend/helpers/transform";
-import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { AudioMasks } from "@/frontend/presentation/audio/audioMasks";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
+import type { ITts } from "@/frontend/presentation/audio/tts";
+import { AxisRenderer } from "@/frontend/presentation/axisRenderer";
+import { OrbitRenderer } from "@/frontend/presentation/orbitRenderer";
+import { PostProcessManager } from "@/frontend/presentation/postProcesses/postProcessManager";
+import { alertModal, radialChoiceModal } from "@/frontend/presentation/ui/dialogModal";
+import { SpaceShipLayer } from "@/frontend/presentation/ui/spaceShipLayer";
+import { SpaceStationLayer } from "@/frontend/presentation/ui/spaceStation/spaceStationLayer";
+import { TargetCursorLayer } from "@/frontend/presentation/ui/targetCursorLayer";
 import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
 import type { Targetable } from "@/frontend/simulation/architecture/targetable";
 import type { ITerrainSystem } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystem";
@@ -67,12 +73,6 @@ import { StarSystemLoader } from "@/frontend/simulation/starSystemLoader";
 import { BlackHole } from "@/frontend/simulation/stellarObjects/blackHole/blackHole";
 import { NeutronStar } from "@/frontend/simulation/stellarObjects/neutronStar/neutronStar";
 import { SystemTarget } from "@/frontend/simulation/systemTarget";
-import { alertModal, radialChoiceModal } from "@/frontend/ui/dialogModal";
-import { SpaceShipLayer } from "@/frontend/ui/spaceShipLayer";
-import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
-import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
-import { AxisRenderer } from "@/frontend/universe/axisRenderer";
-import { OrbitRenderer } from "@/frontend/universe/orbitRenderer";
 import type { View } from "@/frontend/view";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -93,11 +93,11 @@ import { DepthRendererManager } from "./helpers/depthRendererManager";
 import { setCollisionsEnabled } from "./helpers/havok";
 import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
 import { getGuidanceMissionTargetables, getSystemTargetables } from "./helpers/targeting";
+import { CreateLinesHelper } from "./presentation/lineRendering";
+import { InteractionLayer } from "./presentation/ui/interactionLayer";
+import type { INotificationManager } from "./presentation/ui/notificationManager";
 import type { Transformable } from "./simulation/architecture/transformable";
 import type { TypedObject } from "./simulation/architecture/typedObject";
-import { InteractionLayer } from "./ui/interactionLayer";
-import type { INotificationManager } from "./ui/notificationManager";
-import { CreateLinesHelper } from "./universe/lineRendering";
 
 // register cosmos journeyer as part of window object
 declare global {

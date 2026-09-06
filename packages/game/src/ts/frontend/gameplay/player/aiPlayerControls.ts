@@ -19,10 +19,10 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { AiSpaceshipControls } from "@/frontend/gameplay/spaceship/aiSpaceshipControls";
 import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 

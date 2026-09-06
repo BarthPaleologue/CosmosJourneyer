@@ -26,11 +26,11 @@ import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 import earcut from "earcut";
 
-import type { RenderingAssets } from "../../assets/renderingAssets";
 import { bevelPolygon } from "../../helpers/bevel";
 import { createEdgeTubeFrame } from "../../helpers/meshFrame";
 import { createPanelsFromFrame } from "../../helpers/panelsFromFrame";
 import { sheerAlongY } from "../../helpers/sheer";
+import type { RenderingAssets } from "../../presentation/assets/renderingAssets";
 import { CanopyFrameMaterial } from "./canopyFrameMaterial";
 import type { Vehicle } from "./vehicle";
 import { VehicleBuilder } from "./vehicleBuilder";

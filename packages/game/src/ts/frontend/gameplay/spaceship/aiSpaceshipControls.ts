@@ -21,8 +21,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { Controls } from "@/frontend/gameplay/controls";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
 
 import type { Spaceship } from "./spaceship";
 

@@ -28,7 +28,7 @@ import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import type { Controls } from "..";
+import type { Controls } from "../";
 import { DefaultControlsInputs } from "./defaultControlsInputs";
 
 export class DefaultControls implements Controls {

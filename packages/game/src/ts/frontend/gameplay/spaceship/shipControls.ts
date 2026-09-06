@@ -26,14 +26,14 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
 import type { TFunction } from "i18next";
 
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { ITts } from "@/frontend/audio/tts";
 import type { Controls } from "@/frontend/gameplay/controls";
 import { StarSystemInputs } from "@/frontend/gameplay/inputs/starSystemInputs";
 import { createCameraShakeAnimation } from "@/frontend/helpers/animations/cameraShake";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
+import type { ITts } from "@/frontend/presentation/audio/tts";
 import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
 import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
@@ -45,7 +45,7 @@ import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { CustomAnimation } from "../../helpers/animations/customAnimation";
 import { easeInOutCubic, slerpSmoothToRef } from "../../helpers/animations/interpolations";
-import type { INotificationManager } from "../../ui/notificationManager";
+import type { INotificationManager } from "../../presentation/ui/notificationManager";
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";

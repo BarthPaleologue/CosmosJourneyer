@@ -19,10 +19,10 @@ import { FreeCamera, HemisphericLight, MeshBuilder, Scene, Vector3 } from "@baby
 import type { AbstractEngine } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { decryptFunction } from "@/frontend/helpers/cipher";
-import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { alertModal, promptModalString } from "@/frontend/presentation/ui/dialogModal";
 
 import { initI18n } from "@/i18n";
 

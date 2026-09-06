@@ -26,7 +26,7 @@ import type { DarkKnightModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import type { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
 
 import type { CelestialBodyBase } from "./architecture/celestialBody";
 import { ObjectTargetCursorType } from "./architecture/targetable";

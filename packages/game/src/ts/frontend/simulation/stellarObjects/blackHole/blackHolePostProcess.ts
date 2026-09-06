@@ -24,10 +24,13 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { Scene } from "@babylonjs/core/scene";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { CameraUniformNames, setCameraUniforms } from "@/frontend/postProcesses/uniforms/cameraUniforms";
-import { ObjectUniformNames, setObjectUniforms } from "@/frontend/postProcesses/uniforms/objectUniforms";
-import { SamplerUniformNames, setSamplerUniforms } from "@/frontend/postProcesses/uniforms/samplerUniforms";
-import type { UpdatablePostProcess } from "@/frontend/postProcesses/updatablePostProcess";
+import { CameraUniformNames, setCameraUniforms } from "@/frontend/presentation/postProcesses/uniforms/cameraUniforms";
+import { ObjectUniformNames, setObjectUniforms } from "@/frontend/presentation/postProcesses/uniforms/objectUniforms";
+import {
+    SamplerUniformNames,
+    setSamplerUniforms,
+} from "@/frontend/presentation/postProcesses/uniforms/samplerUniforms";
+import type { UpdatablePostProcess } from "@/frontend/presentation/postProcesses/updatablePostProcess";
 
 import { BlackHoleSamplerNames, BlackHoleUniformNames } from "./blackHoleUniforms";
 import type { BlackHoleUniforms } from "./blackHoleUniforms";

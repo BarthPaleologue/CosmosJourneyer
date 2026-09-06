@@ -19,8 +19,8 @@ import { Color4, FreeCamera, GlowLayer, Quaternion, TransformNode, Vector3 } fro
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { SpaceDots } from "@/frontend/assets/procedural/spaceDots";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { SpaceDots } from "@/frontend/presentation/assets/procedural/spaceDots";
 
 const DEFAULT_THROTTLE = 0.6;
 const DEFAULT_YAW = 0;

@@ -29,8 +29,8 @@ import {
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
 import { GravitySystem } from "@/frontend/simulation/gravitySystem";
 
 import { enablePhysics, enableShadows } from "./utils";

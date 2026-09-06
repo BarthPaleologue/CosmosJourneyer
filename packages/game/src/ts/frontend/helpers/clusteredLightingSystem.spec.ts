@@ -25,7 +25,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
+import type { ClusteredLightingRegion } from "@/frontend/presentation/clusteredLightingRegion";
 
 import { ClusteredLightingSystem } from "./clusteredLightingSystem";
 

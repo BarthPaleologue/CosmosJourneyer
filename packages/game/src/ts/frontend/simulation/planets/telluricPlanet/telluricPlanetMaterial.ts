@@ -56,7 +56,7 @@ import {
     vertexAttribute,
 } from "babylonjs-shading-language";
 
-import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
+import type { TerrainTextures } from "@/frontend/presentation/assets/textures/terrains";
 
 import { mixTriPlanarSamples, triangleWave3d, triPlanarMaterial } from "@/utils/bslExtensions";
 import type { TriPlanarMaterialSamples } from "@/utils/bslExtensions";

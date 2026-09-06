@@ -25,7 +25,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import type { RenderingAssets } from "../../assets/renderingAssets";
+import type { RenderingAssets } from "../../presentation/assets/renderingAssets";
 import type { Door } from "./door";
 import { filterVehicleShape } from "./filterVehicleShape";
 import { HingedDoor } from "./hingedDoor";

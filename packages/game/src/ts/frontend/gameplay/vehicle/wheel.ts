@@ -34,7 +34,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
-import { CreateTorusVertexData } from "../../assets/procedural/helpers/torusBuilder";
+import { CreateTorusVertexData } from "../../presentation/assets/procedural/helpers/torusBuilder";
 import { filterVehicleShape } from "./filterVehicleShape";
 
 const SteerableAxleAngleLimit = Math.PI / 3;

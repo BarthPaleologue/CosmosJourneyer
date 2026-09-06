@@ -6,7 +6,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
+import type { LandingPad } from "@/frontend/presentation/assets/procedural/spaceStation/landingPad/landingPad";
 
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 

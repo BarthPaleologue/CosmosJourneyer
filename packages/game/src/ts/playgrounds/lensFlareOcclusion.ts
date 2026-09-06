@@ -18,9 +18,9 @@
 import { Color3, FreeCamera, MeshBuilder, Scene, StandardMaterial, TransformNode, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { LensFlarePostProcess } from "@/frontend/presentation/postProcesses/lensFlarePostProcess";
 
 const SOURCE_POSITION = new Vector3(120, 0, 220);
 const OCCLUDER_POSITIONS = {

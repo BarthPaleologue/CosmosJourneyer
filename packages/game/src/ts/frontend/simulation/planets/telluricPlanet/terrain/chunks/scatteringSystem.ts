@@ -24,9 +24,9 @@ import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
-import type { Objects } from "@/frontend/assets/objects";
 import { createInstancePatch } from "@/frontend/helpers/instancing";
 import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
+import type { Objects } from "@/frontend/presentation/assets/objects";
 
 export type AssetType = "grass" | "rock" | "tree" | "butterfly";
 

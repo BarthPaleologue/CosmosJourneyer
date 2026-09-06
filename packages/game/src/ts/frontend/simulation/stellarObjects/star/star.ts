@@ -26,13 +26,13 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
-import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
+import type { Textures } from "@/frontend/presentation/assets/textures";
+import type { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
+import { VolumetricLightUniforms } from "@/frontend/presentation/postProcesses/volumetricLight/volumetricLightUniforms";
 import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
 import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
@@ -42,7 +42,7 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
-import type { LightEmitter } from "../../../universe/architecture/lightEmitter";
+import type { LightEmitter } from "../../../presentation/lightEmitter";
 import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { StarMaterial } from "./starMaterial";
 

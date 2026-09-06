@@ -19,9 +19,9 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { build_chunk_vertex_data, BuildData } from "terrain-generation";
 
-import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
 import { filterPoints, MaxScatterDensity } from "@/frontend/helpers/instancing";
 import type { ScatteringLayer } from "@/frontend/helpers/instancing";
+import { AvailableRockSizes } from "@/frontend/presentation/assets/objects/rockSizes";
 
 import { smoothstep } from "@/utils/math";
 

@@ -17,8 +17,8 @@
 
 import type { TFunction } from "i18next";
 
-import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { alertModal } from "@/frontend/ui/dialogModal/alertModal";
+import { SoundPlayerMock } from "@/frontend/presentation/audio/soundPlayer";
+import { alertModal } from "@/frontend/presentation/ui/dialogModal/alertModal";
 
 import packageJson from "../../../package.json";
 import type { ConsoleDumper, LogEntry } from "./consoleDumper";

@@ -28,13 +28,13 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
-import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
-import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
-import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { Textures } from "@/frontend/presentation/assets/textures";
+import { AtmosphereUniforms } from "@/frontend/presentation/postProcesses/atmosphere/atmosphereUniforms";
+import type { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
+import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
 import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
 import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";

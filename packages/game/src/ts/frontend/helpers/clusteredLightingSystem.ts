@@ -20,7 +20,7 @@ import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/cluste
 import type { Light } from "@babylonjs/core/Lights/light";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
+import type { ClusteredLightingRegion } from "@/frontend/presentation/clusteredLightingRegion";
 
 import { DefaultMinProjectedDiameter, getProjectedDiameter01 } from "./isObjectVisibleOnScreen";
 

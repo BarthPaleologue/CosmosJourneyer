@@ -34,21 +34,21 @@ import type { SerializedComponent } from "@/backend/spaceship/serializedComponen
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
 import type { SerializedSpaceship, ShipType } from "@/backend/spaceship/serializedSpaceship";
 
-import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import { AudioMasks } from "@/frontend/audio/audioMasks";
-import type { ISoundInstance } from "@/frontend/audio/soundInstance";
-import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { translate } from "@/frontend/helpers/transform";
+import { HyperSpaceTunnel } from "@/frontend/presentation/assets/procedural/hyperSpaceTunnel";
+import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
+import { AudioMasks } from "@/frontend/presentation/audio/audioMasks";
+import type { ISoundInstance } from "@/frontend/presentation/audio/soundInstance";
+import type { ISoundPlayer } from "@/frontend/presentation/audio/soundPlayer";
+import type { ClusteredLightingRegion } from "@/frontend/presentation/clusteredLightingRegion";
 import type { HasBoundingSphere } from "@/frontend/simulation/architecture/hasBoundingSphere";
 import type { CelestialBody, OrbitalObject } from "@/frontend/simulation/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 import type { ILandingPad } from "@/frontend/simulation/orbitalFacility/landingPadManager";
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
 
 import { CollisionMask } from "@/settings";
 
-import { SpaceDots } from "../../assets/procedural/spaceDots";
+import { SpaceDots } from "../../presentation/assets/procedural/spaceDots";
 import { ObjectTargetCursorType } from "../../simulation/architecture/targetable";
 import type { Targetable, TargetInfo } from "../../simulation/architecture/targetable";
 import { Altimeter } from "./altimeter";

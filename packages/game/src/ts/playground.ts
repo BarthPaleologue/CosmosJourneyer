@@ -27,7 +27,7 @@ import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
 import { initI18n } from "@/i18n";
 
-import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
+import { LoadingProgressMonitor } from "./frontend/presentation/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
 import { renderQrCodeOverlay } from "./playgrounds/utils";
 

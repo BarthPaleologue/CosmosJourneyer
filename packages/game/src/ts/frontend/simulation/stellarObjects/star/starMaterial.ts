@@ -19,7 +19,7 @@ import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 
-import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
+import { createEmptyTexture } from "@/frontend/presentation/assets/procedural/proceduralTexture";
 
 import type { RGBColor } from "@/utils/colors";
 import type { ItemPool } from "@/utils/itemPool";

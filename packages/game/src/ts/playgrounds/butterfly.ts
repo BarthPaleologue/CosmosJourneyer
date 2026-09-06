@@ -20,11 +20,11 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { seededSquirrelNoise } from "squirrel-noise";
 
-import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
-import { ButterflyMaterial } from "@/frontend/assets/procedural/butterfly/butterflyMaterial";
-import { loadParticleTextures } from "@/frontend/assets/textures/particles";
 import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helpers/instancing";
+import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
+import { createButterfly } from "@/frontend/presentation/assets/procedural/butterfly/butterfly";
+import { ButterflyMaterial } from "@/frontend/presentation/assets/procedural/butterfly/butterflyMaterial";
+import { loadParticleTextures } from "@/frontend/presentation/assets/textures/particles";
 
 import { createSky } from "./utils";
 

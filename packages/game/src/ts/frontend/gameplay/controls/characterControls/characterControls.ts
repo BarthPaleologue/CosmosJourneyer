@@ -30,7 +30,7 @@ import { lerpSmooth } from "@/utils/math";
 
 import { Settings } from "@/settings";
 
-import type { Controls } from "..";
+import type { Controls } from "../";
 import { CharacterInputs } from "./characterControlsInputs";
 import type { HumanoidAvatar } from "./humanoidAvatar";
 
