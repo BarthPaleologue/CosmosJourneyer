@@ -20,11 +20,11 @@ import type { TFunction } from "i18next";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Mission } from "@/frontend/gameplay/missions/mission";
+import type { MissionContext } from "@/frontend/gameplay/missions/missionContext";
+import type { Player } from "@/frontend/gameplay/player/player";
+import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-import type { Mission } from "@/frontend/missions/mission";
-import type { MissionContext } from "@/frontend/missions/missionContext";
-import type { Player } from "@/frontend/player/player";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

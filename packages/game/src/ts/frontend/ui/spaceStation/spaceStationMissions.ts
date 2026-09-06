@@ -24,9 +24,9 @@ import type { TFunction } from "i18next";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import { generateSightseeingMissions } from "@/frontend/gameplay/missions/generateSightSeeingMissions";
+import type { Player } from "@/frontend/gameplay/player/player";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
-import { generateSightseeingMissions } from "@/frontend/missions/generateSightSeeingMissions";
-import type { Player } from "@/frontend/player/player";
 
 import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { parseDistance } from "@/utils/strings/parseToStrings";

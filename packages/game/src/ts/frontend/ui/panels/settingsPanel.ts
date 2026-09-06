@@ -26,6 +26,7 @@ import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type Interaction from "@brianchirls/game-input/interactions/Interaction";
 import type { TFunction } from "i18next";
 
+import { InputMaps } from "@/frontend/gameplay/inputs/inputMaps";
 import {
     axisCompositeToString,
     buttonInputToString,
@@ -33,7 +34,6 @@ import {
     stickInputToString,
     vector2ToString,
 } from "@/frontend/helpers/inputControlsString";
-import { InputMaps } from "@/frontend/inputs/inputMaps";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

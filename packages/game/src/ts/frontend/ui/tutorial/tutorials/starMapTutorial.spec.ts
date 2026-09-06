@@ -21,7 +21,7 @@ import { describe, expect, it } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { Mission } from "@/frontend/missions/mission";
+import { Mission } from "@/frontend/gameplay/missions/mission";
 
 import { StarMapTutorial } from "./starMapTutorial";
 

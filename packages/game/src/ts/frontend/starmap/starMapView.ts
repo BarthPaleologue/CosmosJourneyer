@@ -40,9 +40,9 @@ import type { Itinerary } from "@/backend/player/serializedPlayer";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { Player } from "@/frontend/gameplay/player/player";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { lookAt } from "@/frontend/helpers/transform";
-import type { Player } from "@/frontend/player/player";
 import { StarMapNebulaPostProcess } from "@/frontend/postProcesses/starMapNebulaPostProcess";
 import { alertModal } from "@/frontend/ui/dialogModal";
 import type { View } from "@/frontend/view";

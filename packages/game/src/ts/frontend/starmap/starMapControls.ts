@@ -24,7 +24,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { Controls } from "@/frontend/controls";
+import type { Controls } from "@/frontend/gameplay/controls";
 
 import { lerpSmooth } from "@/utils/math";
 

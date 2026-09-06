@@ -23,7 +23,7 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { lookAt } from "@/frontend/helpers/transform";

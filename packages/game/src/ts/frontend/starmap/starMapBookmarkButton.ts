@@ -4,7 +4,7 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import type { Player } from "../player/player";
+import type { Player } from "../gameplay/player/player";
 
 export class StarMapBookmarkButton {
     readonly rootNode: HTMLElement;

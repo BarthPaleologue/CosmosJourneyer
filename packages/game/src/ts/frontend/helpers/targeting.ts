@@ -17,7 +17,7 @@
 
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 
-import type { Mission } from "../missions/mission";
+import type { Mission } from "../gameplay/missions/mission";
 import type { Targetable } from "../simulation/architecture/targetable";
 import type { StarSystemController } from "../simulation/starSystemController";
 

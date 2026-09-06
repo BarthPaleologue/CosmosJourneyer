@@ -34,17 +34,17 @@ import { loadSounds } from "@/frontend/assets/audio/sounds";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { Controls } from "@/frontend/controls";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import type { Controls } from "@/frontend/gameplay/controls";
+import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/gameplay/controls/characterControls/humanoidAvatar";
+import { InteractionSystem } from "@/frontend/gameplay/interactionSystem";
+import { VehicleControls } from "@/frontend/gameplay/vehicle/vehicleControls";
+import { VehicleInputs } from "@/frontend/gameplay/vehicle/vehicleControlsInputs";
+import { createWolfMk2 } from "@/frontend/gameplay/vehicle/wolfMk2";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { InteractionSystem } from "@/frontend/inputs/interaction/interactionSystem";
 import { radialChoiceModal } from "@/frontend/ui/dialogModal";
 import { InteractionLayer } from "@/frontend/ui/interactionLayer";
-import { VehicleControls } from "@/frontend/vehicle/vehicleControls";
-import { VehicleInputs } from "@/frontend/vehicle/vehicleControlsInputs";
-import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 

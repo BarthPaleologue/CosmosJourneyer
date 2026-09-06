@@ -26,10 +26,10 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/gameplay/player/player";
+import { ShipControls } from "@/frontend/gameplay/spaceship/shipControls";
+import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
-import { Player } from "@/frontend/player/player";
-import { ShipControls } from "@/frontend/spaceship/shipControls";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer";
 

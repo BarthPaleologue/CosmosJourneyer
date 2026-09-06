@@ -23,7 +23,7 @@ import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/ency
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { Player } from "@/frontend/player/player";
+import type { Player } from "@/frontend/gameplay/player/player";
 import { connectEncyclopaediaGalacticaModal } from "@/frontend/ui/dialogModal";
 
 import { Settings } from "@/settings";

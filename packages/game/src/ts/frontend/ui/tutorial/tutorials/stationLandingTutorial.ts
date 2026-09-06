@@ -23,8 +23,8 @@ import type { Save } from "@/backend/save/saveFileData";
 import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { TutorialControlsInputs } from "@/frontend/ui/tutorial/tutorialLayerInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";

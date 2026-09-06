@@ -26,8 +26,8 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { Player } from "@/frontend/gameplay/player/player";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { Player } from "@/frontend/player/player";
 import { TerrainSystemCpu } from "@/frontend/simulation/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";

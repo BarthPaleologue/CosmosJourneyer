@@ -27,7 +27,7 @@ import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
 import { SpaceStation } from "@/frontend/simulation/orbitalFacility/spaceStation";

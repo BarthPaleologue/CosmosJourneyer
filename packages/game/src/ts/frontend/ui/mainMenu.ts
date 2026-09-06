@@ -29,7 +29,7 @@ import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import type { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { TransformTranslationAnimation } from "@/frontend/helpers/animations/translation";
 import {
     positionNearObjectAsteroidField,

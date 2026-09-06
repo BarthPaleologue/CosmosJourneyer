@@ -33,11 +33,11 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
+import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
-import { Spaceship } from "@/frontend/spaceship/spaceship";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 

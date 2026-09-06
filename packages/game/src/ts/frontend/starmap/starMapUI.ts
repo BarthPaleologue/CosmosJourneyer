@@ -33,7 +33,7 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import type { Player } from "../player/player";
+import type { Player } from "../gameplay/player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { SystemIcons } from "./systemIcons";
 

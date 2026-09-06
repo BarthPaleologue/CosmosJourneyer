@@ -25,7 +25,7 @@ import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotL
 import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
 import { loadConcreteTextures } from "@/frontend/assets/textures/materials/concrete";
 import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareTextDecalTexture";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 

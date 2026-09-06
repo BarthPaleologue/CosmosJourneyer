@@ -26,7 +26,7 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
-import { Player } from "@/frontend/player/player";
+import { Player } from "@/frontend/gameplay/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 

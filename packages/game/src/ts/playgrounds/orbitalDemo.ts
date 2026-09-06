@@ -23,7 +23,7 @@ import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CustomOrbitalObject } from "@/frontend/simulation/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/simulation/keplerianOrbitalSimulation";

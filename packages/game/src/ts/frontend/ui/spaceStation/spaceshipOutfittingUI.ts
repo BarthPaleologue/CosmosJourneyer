@@ -21,10 +21,10 @@ import { getComponentTypeI18n } from "@/backend/spaceship/serializedComponents/c
 import { getComponentValue } from "@/backend/spaceship/serializedComponents/pricing";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { Player } from "@/frontend/player/player";
-import { deserializeComponent } from "@/frontend/spaceship/components/component";
-import type { ComponentSlot } from "@/frontend/spaceship/componentSlot";
-import type { SpaceshipInternals } from "@/frontend/spaceship/spaceshipInternals";
+import type { Player } from "@/frontend/gameplay/player/player";
+import { deserializeComponent } from "@/frontend/gameplay/spaceship/components/component";
+import type { ComponentSlot } from "@/frontend/gameplay/spaceship/componentSlot";
+import type { SpaceshipInternals } from "@/frontend/gameplay/spaceship/spaceshipInternals";
 
 import { Settings } from "@/settings";
 

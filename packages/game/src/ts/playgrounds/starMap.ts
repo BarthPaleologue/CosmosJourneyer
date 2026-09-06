@@ -23,7 +23,7 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 import { StarMap } from "@/frontend/starmap/starMap";
 
 export async function createStarMapScene(

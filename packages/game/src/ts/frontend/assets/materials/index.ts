@@ -22,7 +22,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
 
-import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
+import { TireMaterial } from "@/frontend/gameplay/vehicle/tireMaterial";
 
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";

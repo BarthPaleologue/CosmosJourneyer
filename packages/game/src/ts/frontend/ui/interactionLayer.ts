@@ -23,8 +23,8 @@ import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 
 import { Settings } from "@/settings";
 
+import type { InteractionSystem } from "../gameplay/interactionSystem";
 import { pressInteractionToStrings } from "../helpers/inputControlsString";
-import type { InteractionSystem } from "../inputs/interaction/interactionSystem";
 
 export class InteractionLayer {
     readonly root: HTMLDivElement;

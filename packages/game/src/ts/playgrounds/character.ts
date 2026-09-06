@@ -32,9 +32,9 @@ import { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
-import { CharacterControls } from "@/frontend/controls/characterControls/characterControls";
-import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
-import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
+import { CharacterControls } from "@/frontend/gameplay/controls/characterControls/characterControls";
+import { CharacterInputs } from "@/frontend/gameplay/controls/characterControls/characterControlsInputs";
+import { HumanoidAvatar } from "@/frontend/gameplay/controls/characterControls/humanoidAvatar";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { setUpVector } from "@/frontend/helpers/transform";
 import { GravitySystem } from "@/frontend/simulation/gravitySystem";

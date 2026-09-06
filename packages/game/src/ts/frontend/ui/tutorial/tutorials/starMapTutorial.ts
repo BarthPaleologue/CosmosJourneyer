@@ -25,13 +25,13 @@ import type { Save } from "@/backend/save/saveFileData";
 import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { GeneralInputs } from "@/frontend/gameplay/inputs/generalInputs";
+import { StarSystemInputs } from "@/frontend/gameplay/inputs/starSystemInputs";
 import {
     axisCompositeToString,
     dPadCompositeToString,
     pressInteractionToStrings,
 } from "@/frontend/helpers/inputControlsString";
-import { GeneralInputs } from "@/frontend/inputs/generalInputs";
-import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { StarMapInputs } from "@/frontend/starmap/starMapInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";

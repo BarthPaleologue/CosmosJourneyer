@@ -27,7 +27,7 @@ import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { Interaction, Interactive } from "@/frontend/inputs/interaction/interactionSystem";
+import type { Interaction, Interactive } from "@/frontend/gameplay/interactionSystem";
 import type { Transformable } from "@/frontend/simulation/architecture/transformable";
 
 export class Button implements Transformable, Interactive {

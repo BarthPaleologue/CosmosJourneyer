@@ -23,9 +23,9 @@ import type { TFunction } from "i18next";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { MissionContext } from "@/frontend/missions/missionContext";
-import type { Player } from "@/frontend/player/player";
-import type { Spaceship } from "@/frontend/spaceship/spaceship";
+import type { MissionContext } from "@/frontend/gameplay/missions/missionContext";
+import type { Player } from "@/frontend/gameplay/player/player";
+import type { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
 
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSpeed } from "@/utils/strings/parseToStrings";

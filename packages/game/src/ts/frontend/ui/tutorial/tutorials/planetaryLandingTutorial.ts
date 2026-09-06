@@ -24,9 +24,9 @@ import type { Save } from "@/backend/save/saveFileData";
 import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { StarSystemInputs } from "@/frontend/gameplay/inputs/starSystemInputs";
+import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import { axisCompositeToString, pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
-import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { renderMarkdownBlock } from "@/utils/markdown";

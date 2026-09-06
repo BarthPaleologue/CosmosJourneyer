@@ -20,8 +20,8 @@ import type { TFunction } from "i18next";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import type { Mission } from "@/frontend/missions/mission";
-import type { Player } from "@/frontend/player/player";
+import type { Mission } from "@/frontend/gameplay/missions/mission";
+import type { Player } from "@/frontend/gameplay/player/player";
 
 import { Settings } from "@/settings";
 

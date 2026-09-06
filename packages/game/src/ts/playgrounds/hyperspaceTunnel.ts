@@ -24,7 +24,7 @@ import { Scene } from "@babylonjs/core/scene";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
-import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
 
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,
