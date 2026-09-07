@@ -43,19 +43,11 @@ export type PadTarget = TargetBase & {
     readonly padIdentifier: string;
 };
 
-type AnomalyTarget = TargetBase & {
-    readonly type: typeof TargetType.ANOMALY;
-    readonly isDarkKnight: boolean;
-};
-
 type OtherTarget = TargetBase & {
     readonly type: Exclude<
         TargetType,
-        | typeof TargetType.STAR
-        | typeof TargetType.TELLURIC_SATELLITE
-        | typeof TargetType.LANDING_PAD
-        | typeof TargetType.ANOMALY
+        typeof TargetType.STAR | typeof TargetType.TELLURIC_SATELLITE | typeof TargetType.LANDING_PAD
     >;
 };
 
-export type Target = StarTarget | TelluricSatelliteTarget | PadTarget | AnomalyTarget | OtherTarget;
+export type Target = StarTarget | TelluricSatelliteTarget | PadTarget | OtherTarget;

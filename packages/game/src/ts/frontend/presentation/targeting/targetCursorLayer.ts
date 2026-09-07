@@ -17,160 +17,118 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { IDisposable } from "@babylonjs/core/scene";
+import type { Observer } from "@babylonjs/core/Misc/observable";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../gameplay/targeting/target";
-import type { Transformable } from "../../simulation/architecture/transformable";
+import { getSensorRange } from "../../gameplay/targeting/targetingSystem";
+import type { TargetingSystem } from "../../gameplay/targeting/targetingSystem";
 import { ObjectTargetCursor } from "./objectTargetCursor";
+import { getTargetCursorOpacity } from "./targetAppearance";
 
-export class TargetCursorLayer implements IDisposable {
-    private targetCursors: ObjectTargetCursor[] = [];
+export class TargetCursorLayer {
+    private hoveredTarget: Target | null = null;
+    private readonly targetCursors = new Map<Target, ObjectTargetCursor>();
+    private readonly root: HTMLDivElement;
 
-    private readonly layerRoot: HTMLDivElement;
-
-    private target: Target | null = null;
-
-    private readonly additionalPinnedTargets: Set<Target> = new Set();
-
-    private closestToScreenCenterOrbitalObject: Target | null = null;
+    private readonly targetingSystem: TargetingSystem;
     private readonly t: TFunction;
+    private readonly targetsAddedObserver: Observer<Iterable<Target>>;
+    private readonly targetsRemovedObserver: Observer<Iterable<Target>>;
 
-    constructor(t: TFunction) {
+    constructor(targetingSystem: TargetingSystem, t: TFunction) {
+        this.targetingSystem = targetingSystem;
         this.t = t;
-        this.layerRoot = document.createElement("div");
-        this.layerRoot.classList.add("targetCursorLayer");
-
-        document.body.appendChild(this.layerRoot);
+        this.root = document.createElement("div");
+        this.root.classList.add("targetCursorLayer");
+        document.body.appendChild(this.root);
+        this.targetsAddedObserver = targetingSystem.onTargetsAddedObservable.add((targets) => {
+            this.addTargets(targets);
+        });
+        this.targetsRemovedObserver = targetingSystem.onTargetsRemovedObservable.add((targets) => {
+            for (const target of targets) {
+                if (this.hoveredTarget === target) {
+                    this.hoveredTarget = null;
+                }
+                this.targetCursors.get(target)?.dispose();
+                this.targetCursors.delete(target);
+            }
+        });
+        this.addTargets(targetingSystem.getTargets());
     }
 
     public setEnabled(enabled: boolean): void {
-        this.layerRoot.style.display = enabled ? "block" : "none";
+        this.root.style.display = enabled ? "block" : "none";
+        if (!enabled) {
+            this.hoveredTarget = null;
+        }
     }
 
     public isEnabled(): boolean {
-        return this.layerRoot.style.display === "block";
+        return this.root.style.display === "block";
     }
 
-    public addObjects(objects: ReadonlyArray<Target>): void {
-        for (const object of objects) {
-            const overlay = new ObjectTargetCursor(object, this.t);
-            this.targetCursors.push(overlay);
-            this.layerRoot.appendChild(overlay.htmlRoot);
+    private addTargets(targets: Iterable<Target>): void {
+        for (const target of targets) {
+            const cursor = new ObjectTargetCursor(target, this.t);
+            this.targetCursors.set(target, cursor);
+            this.root.appendChild(cursor.htmlRoot);
         }
-    }
-
-    public removeObject(source: Transformable): void {
-        const object = this.targetCursors.find(
-            (cursor) => cursor.object.getTransform() === source.getTransform(),
-        )?.object;
-        if (object === undefined) {
-            return;
-        }
-        const targetCursor = this.targetCursors.find((cursor) => cursor.object === object);
-        if (targetCursor === undefined) {
-            return;
-        }
-
-        this.targetCursors = this.targetCursors.filter((cursor) => cursor.object !== object);
-        this.additionalPinnedTargets.delete(object);
-        targetCursor.dispose();
-
-        if (this.target === object) {
-            this.target = null;
-        }
-
-        if (this.closestToScreenCenterOrbitalObject === object) {
-            this.closestToScreenCenterOrbitalObject = null;
-        }
-    }
-
-    private computeClosestToScreenCenterOrbitalObject(): void {
-        let nearest = null;
-        let closestDistance = Number.POSITIVE_INFINITY;
-        this.targetCursors.forEach((overlay) => {
-            if (!overlay.isVisible()) {
-                return;
-            }
-
-            const screenCoordinates = overlay.screenCoordinates;
-            const distance = screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                nearest = overlay.object;
-            }
-        });
-
-        this.closestToScreenCenterOrbitalObject = nearest;
     }
 
     public getClosestToScreenCenterOrbitalObject(): Target | null {
-        return this.closestToScreenCenterOrbitalObject;
-    }
-
-    public reset(): void {
-        for (const targetCursor of this.targetCursors) {
-            targetCursor.dispose();
-        }
-        this.targetCursors = [];
-        this.setTarget(null);
-    }
-
-    public setTarget(source: Transformable | null, forcedValue?: boolean): void {
-        const object =
-            source === null
-                ? null
-                : (this.targetCursors.find((cursor) => cursor.object.getTransform() === source.getTransform())
-                      ?.object ?? null);
-        let shouldHide = this.target === object;
-        if (forcedValue !== undefined) {
-            shouldHide = !forcedValue;
-        }
-
-        if (shouldHide) {
-            this.target = null;
-            return;
-        }
-
-        this.target = object;
-    }
-
-    public getTarget(): Target | null {
-        return this.target;
-    }
-
-    public setAdditionalPinnedTargets(objects: ReadonlyArray<Target>): void {
-        this.additionalPinnedTargets.clear();
-        for (const object of objects) {
-            const canonical = this.targetCursors.find(
-                (cursor) => cursor.object.getTransform() === object.getTransform(),
-            )?.object;
-            if (canonical !== undefined) {
-                this.additionalPinnedTargets.add(canonical);
-            }
-        }
+        return this.hoveredTarget;
     }
 
     public update(camera: Camera): void {
         if (!this.isEnabled()) {
             return;
         }
-        for (const targetCursor of this.targetCursors) {
-            targetCursor.setPinned(this.additionalPinnedTargets.has(targetCursor.object));
-            targetCursor.update(camera);
+        camera.getViewMatrix();
+        camera.getProjectionMatrix();
+        const selected = this.targetingSystem.getTarget();
+        const forward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
+        let nearest: Target | null = null;
+        let closestDistance = Infinity;
+        for (const [target, cursor] of this.targetCursors) {
+            const isSelected = target === selected;
+            const sensorRange = this.targetingSystem.isKnown(target) || isSelected ? null : getSensorRange(target);
+            target.getTransform().computeWorldMatrix(true);
+            const offset = target.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
+            const opacity = this.targetingSystem.isAvailable(target)
+                ? getTargetCursorOpacity(
+                      target,
+                      offset.length(),
+                      sensorRange,
+                      isSelected,
+                      this.targetingSystem.hasKnownOverride(target),
+                  )
+                : 0;
+            cursor.update(camera, opacity);
             const distanceToCenterSquared =
-                (targetCursor.screenCoordinates.x - 0.5) ** 2 + (targetCursor.screenCoordinates.y - 0.5) ** 2;
-            const isHovered =
-                distanceToCenterSquared < 0.1 * 0.1 && targetCursor.object === this.closestToScreenCenterOrbitalObject;
-            const isTarget = targetCursor.object === this.target;
-            targetCursor.setTarget(isTarget);
-            targetCursor.setInformationEnabled(isTarget || isHovered);
+                (cursor.screenCoordinates.x - 0.5) ** 2 + (cursor.screenCoordinates.y - 0.5) ** 2;
+            const isHovered = distanceToCenterSquared < 0.1 * 0.1 && target === this.hoveredTarget;
+            cursor.setTarget(isSelected);
+            cursor.setInformationEnabled(isSelected || isHovered);
+            if (opacity > 0 && Vector3.Dot(offset, forward) > 0) {
+                const distance = cursor.screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    nearest = target;
+                }
+            }
         }
-        this.computeClosestToScreenCenterOrbitalObject();
+        this.hoveredTarget = nearest;
     }
 
     public dispose(): void {
-        this.reset();
+        this.setEnabled(false);
+        this.targetsAddedObserver.remove();
+        this.targetsRemovedObserver.remove();
+        for (const cursor of this.targetCursors.values()) {
+            cursor.dispose();
+        }
+        this.targetCursors.clear();
+        this.root.remove();
     }
 }

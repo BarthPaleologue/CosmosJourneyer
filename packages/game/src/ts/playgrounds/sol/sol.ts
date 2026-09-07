@@ -21,7 +21,8 @@ import type { AbstractEngine } from "@babylonjs/core";
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
 import { DefaultControls } from "@/frontend/gameplay/controls/defaultControls/defaultControls";
-import { getSystemTargets } from "@/frontend/gameplay/targeting/createTargets";
+import { createTargetContact, getSystemTargets } from "@/frontend/gameplay/targeting/createTargets";
+import { TargetingSystem } from "@/frontend/gameplay/targeting/targetingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import type { ILoadingProgressMonitor } from "@/frontend/presentation/assets/loadingProgressMonitor";
@@ -89,8 +90,9 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         [starSystemController.starFieldBox.mesh],
     );
 
-    const targetCursorLayer = new TargetCursorLayer(t);
-    targetCursorLayer.addObjects(getSystemTargets(starSystemController));
+    const targetingSystem = new TargetingSystem();
+    const targetCursorLayer = new TargetCursorLayer(targetingSystem, t);
+    targetingSystem.addContacts(getSystemTargets(starSystemController).map(createTargetContact));
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
@@ -100,6 +102,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         postProcessManager.update(deltaSeconds);
         starSystemController.update(deltaSeconds, terrainSystem);
         camera.getViewMatrix();
+        targetingSystem.update(camera.globalPosition);
         targetCursorLayer.update(camera);
     });
 

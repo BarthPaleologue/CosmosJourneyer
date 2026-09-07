@@ -19,6 +19,8 @@ import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
+import { smoothstep } from "@/utils/math";
+
 import { TargetType } from "../../gameplay/targeting/target";
 import type { Target } from "../../gameplay/targeting/target";
 
@@ -79,7 +81,7 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
         case TargetType.ANOMALY:
             return {
                 shape: "rounded",
-                minSize: target.isDarkKnight ? 2 : 5,
+                minSize: 5,
                 maxSize: 0,
             };
         case TargetType.SPACE_STATION:
@@ -147,37 +149,64 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
     }
 }
 
-export function getTargetCursorDistanceRange(target: Target): { readonly min: number; readonly max: number } {
+/** Presentation-only fades; sensor range is supplied by gameplay targeting. */
+export function getTargetCursorOpacity(
+    target: Target,
+    distance: number,
+    sensorRange: number | null,
+    isSelected: boolean,
+    hasKnownOverride: boolean,
+): number {
+    if (target.type === TargetType.STAR_SYSTEM && !isSelected) {
+        return 0;
+    }
+    const localOpacity =
+        target.type === TargetType.TELLURIC_SATELLITE && !isSelected && !hasKnownOverride
+            ? 1 - smoothstep(target.orbitSemiMajorAxis * 6.4, target.orbitSemiMajorAxis * 8, distance)
+            : 1;
+    const detectionOpacity =
+        sensorRange === null ? 1 : sensorRange > 0 ? 1 - smoothstep(sensorRange * 0.8, sensorRange, distance) : 0;
+    return getTargetProximityOpacity(target, distance) * detectionOpacity * localOpacity;
+}
+
+function getTargetProximityOpacity(target: Target, distance: number): number {
     const radius = target.getBoundingRadius();
+    let minDistance: number;
     switch (target.type) {
         case TargetType.CUSTOM:
-            return { min: 0, max: 0 };
+            minDistance = 0;
+            break;
         case TargetType.STAR_SYSTEM:
-            return { min: lightYearsToMeters(2), max: lightYearsToMeters(0.2) };
+            minDistance = lightYearsToMeters(2);
+            break;
         case TargetType.SPACESHIP:
-            return { min: radius * 15, max: 0 };
+            minDistance = radius * 15;
+            break;
         case TargetType.VEHICLE:
-            return { min: radius * 10, max: 0 };
-        case TargetType.SPACE_STATION:
-        case TargetType.SPACE_ELEVATOR:
-            return { min: radius * 6, max: 0 };
-        case TargetType.SPACE_ELEVATOR_CLIMBER:
-            return { min: radius * 7, max: radius * 3000 };
-        case TargetType.LANDING_BAY:
-            return { min: 8000, max: 30000 };
-        case TargetType.LANDING_PAD:
-            return { min: radius * 4, max: radius * 6 };
-        case TargetType.ANOMALY:
-            return target.isDarkKnight ? { min: radius * 5, max: radius * 100 } : { min: radius * 10, max: 0 };
-        case TargetType.TELLURIC_SATELLITE:
-            return { min: radius * 10, max: target.orbitSemiMajorAxis * 8 };
         case TargetType.STAR:
         case TargetType.NEUTRON_STAR:
         case TargetType.BLACK_HOLE:
         case TargetType.GAS_PLANET:
         case TargetType.TELLURIC_PLANET:
-            return { min: radius * 10, max: 0 };
+        case TargetType.TELLURIC_SATELLITE:
+        case TargetType.ANOMALY:
+            minDistance = radius * 10;
+            break;
+        case TargetType.SPACE_STATION:
+        case TargetType.SPACE_ELEVATOR:
+            minDistance = radius * 6;
+            break;
+        case TargetType.SPACE_ELEVATOR_CLIMBER:
+            minDistance = radius * 7;
+            break;
+        case TargetType.LANDING_BAY:
+            minDistance = 8000;
+            break;
+        case TargetType.LANDING_PAD:
+            minDistance = radius * 4;
+            break;
         default:
             return assertUnreachable(target);
     }
+    return minDistance > 0 ? smoothstep(minDistance * 0.5, minDistance, distance) : 1;
 }

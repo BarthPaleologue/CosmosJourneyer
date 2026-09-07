@@ -30,6 +30,33 @@ import type { Spaceship } from "../spaceship/spaceship";
 import type { Vehicle } from "../vehicle/vehicle";
 import { TargetType } from "./target";
 import type { PadTarget, Target } from "./target";
+import { TargetAcquisition } from "./targetContact";
+import type { TargetContact } from "./targetContact";
+
+/** Default acquisition for contacts registered by the player and star system. */
+export function createTargetContact(target: Target): TargetContact {
+    const acquisition = defaultAcquisition[target.type];
+    return { target, acquisition };
+}
+
+const defaultAcquisition = {
+    [TargetType.STAR_SYSTEM]: TargetAcquisition.KNOWN,
+    [TargetType.STAR]: TargetAcquisition.KNOWN,
+    [TargetType.NEUTRON_STAR]: TargetAcquisition.KNOWN,
+    [TargetType.BLACK_HOLE]: TargetAcquisition.KNOWN,
+    [TargetType.GAS_PLANET]: TargetAcquisition.KNOWN,
+    [TargetType.TELLURIC_PLANET]: TargetAcquisition.KNOWN,
+    [TargetType.TELLURIC_SATELLITE]: TargetAcquisition.KNOWN,
+    [TargetType.CUSTOM]: TargetAcquisition.KNOWN,
+    [TargetType.SPACE_STATION]: TargetAcquisition.KNOWN,
+    [TargetType.SPACE_ELEVATOR]: TargetAcquisition.KNOWN,
+    [TargetType.ANOMALY]: TargetAcquisition.SENSOR,
+    [TargetType.LANDING_PAD]: TargetAcquisition.SENSOR,
+    [TargetType.LANDING_BAY]: TargetAcquisition.SENSOR,
+    [TargetType.SPACE_ELEVATOR_CLIMBER]: TargetAcquisition.SENSOR,
+    [TargetType.SPACESHIP]: TargetAcquisition.KNOWN,
+    [TargetType.VEHICLE]: TargetAcquisition.KNOWN,
+} satisfies Record<TargetType, TargetAcquisition>;
 
 export function getSystemTargets(starSystem: StarSystemController): Array<Target> {
     const out: Array<Target> = [];
@@ -101,7 +128,6 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
 function createAnomalyTarget(anomaly: Anomaly): Target {
     return {
         type: TargetType.ANOMALY,
-        isDarkKnight: anomaly.type === "darkKnight",
         properName: anomaly.model.name,
         getTransform: () => anomaly.getTransform(),
         getBoundingRadius: () => anomaly.getBoundingRadius(),

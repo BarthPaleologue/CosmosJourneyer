@@ -20,18 +20,12 @@ import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TFunction } from "i18next";
 
+import type { Target } from "@/frontend/gameplay/targeting/target";
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
 
-import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import type { Target } from "../../gameplay/targeting/target";
-import {
-    getTargetCursorAppearance,
-    getTargetDisplayName,
-    getTargetTypeName,
-    getTargetCursorDistanceRange,
-} from "./targetAppearance";
+import { getTargetCursorAppearance, getTargetDisplayName, getTargetTypeName } from "./targetAppearance";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -49,19 +43,12 @@ export class ObjectTargetCursor {
 
     private lastDistance = 0;
 
-    readonly minDistance: number;
-    readonly maxDistance: number;
-
     readonly minSize: number;
     readonly maxSize: number;
-
-    private alpha = 1.0;
 
     readonly screenCoordinates: Vector3 = Vector3.Zero();
 
     private isTarget = false;
-
-    private isPinned = false;
 
     private isInformationEnabled = false;
 
@@ -113,9 +100,6 @@ export class ObjectTargetCursor {
         this.textBlock.appendChild(this.etaText);
 
         this.object = object;
-        const range = getTargetCursorDistanceRange(object);
-        this.minDistance = range.min;
-        this.maxDistance = range.max;
     }
 
     setTarget(isTarget: boolean): void {
@@ -123,15 +107,11 @@ export class ObjectTargetCursor {
         this.cursor.classList.toggle("target", isTarget);
     }
 
-    setPinned(isPinned: boolean): void {
-        this.isPinned = isPinned;
-    }
-
     setInformationEnabled(enabled: boolean): void {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera): void {
+    update(camera: Camera, opacity: number): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -140,7 +120,7 @@ export class ObjectTargetCursor {
 
         this.isOnScreen = Vector3.Dot(cameraToObject, cameraForward) > 0;
 
-        if (this.isOnScreen && this.alpha > 0) {
+        if (this.isOnScreen && opacity > 0) {
             Vector3.ProjectToRef(
                 this.object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
@@ -176,18 +156,10 @@ export class ObjectTargetCursor {
         }
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);
 
-        this.alpha = 1.0;
-        if (this.minDistance > 0) {
-            this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        }
-        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned) {
-            this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
-        }
+        this.cursor.style.opacity = `${Math.min(opacity, this.isTarget ? 1 : 0.5)}`;
+        this.textBlock.style.opacity = this.isInformationEnabled ? `${opacity}` : "0";
 
-        this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
-        this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
-
-        const isTextVisible = this.isOnScreen && this.isInformationEnabled && this.alpha > 0;
+        const isTextVisible = this.isOnScreen && this.isInformationEnabled && opacity > 0;
         if (isTextVisible) {
             this.distanceText.textContent = parseDistance(distance, this.t);
 
@@ -196,10 +168,6 @@ export class ObjectTargetCursor {
         }
 
         this.lastDistance = distance;
-    }
-
-    isVisible(): boolean {
-        return this.alpha > 0 && this.isOnScreen;
     }
 
     dispose(): void {

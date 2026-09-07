@@ -48,6 +48,7 @@ import { ShipControls } from "@/frontend/gameplay/spaceship/shipControls";
 import { Spaceship } from "@/frontend/gameplay/spaceship/spaceship";
 import { SpaceShipControlsInputs } from "@/frontend/gameplay/spaceship/spaceShipControlsInputs";
 import type { Target } from "@/frontend/gameplay/targeting/target";
+import { TargetingSystem } from "@/frontend/gameplay/targeting/targetingSystem";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
@@ -89,6 +90,7 @@ import {
     createSystemTarget,
     createVehicleTarget,
     getMissionKnownTargets,
+    createTargetContact,
     getSystemTargets,
 } from "./gameplay/targeting/createTargets";
 import { VehicleControls } from "./gameplay/vehicle/vehicleControls";
@@ -116,6 +118,8 @@ declare global {
  * While the player may travel to another star system, the star system view stays the same, only the star system controller changes.
  */
 export class StarSystemView implements View {
+    readonly targetingSystem = new TargetingSystem();
+
     /**
      * The HTML GUI used to display orbital objects cursors and information when targeted.
      */
@@ -361,8 +365,10 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.setTarget.on("complete", () => {
-            const closestObjectToCenter = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
-            this.setTarget(closestObjectToCenter);
+            const hoveredTarget = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
+            if (hoveredTarget !== null) {
+                this.setTarget(hoveredTarget);
+            }
         });
 
         StarSystemInputs.map.jumpToSystem.on("complete", () => {
@@ -432,7 +438,7 @@ export class StarSystemView implements View {
                 const rover = roverResult.value;
                 rover.brake();
                 this.vehicleControls.setVehicle(rover);
-                this.targetCursorLayer.addObjects([createVehicleTarget(rover)]);
+                this.targetingSystem.addContacts([createTargetContact(createVehicleTarget(rover))]);
 
                 this.starSystem?.stellarLightSystem.addShadowCasters(rover.allMeshes);
 
@@ -509,7 +515,7 @@ export class StarSystemView implements View {
             this.getSpaceshipControls().getSpaceship().takeOff();
         });
 
-        this.targetCursorLayer = new TargetCursorLayer(this.t);
+        this.targetCursorLayer = new TargetCursorLayer(this.targetingSystem, this.t);
 
         window.StarSystemView = this;
     }
@@ -532,7 +538,7 @@ export class StarSystemView implements View {
                 this.clusteredLightingSystem.unregisterRegion(facility);
             }
             this.starSystem.dispose();
-            this.targetCursorLayer.reset();
+            this.targetingSystem.reset();
             this.spaceStationLayer.reset();
         }
 
@@ -591,7 +597,7 @@ export class StarSystemView implements View {
             starSystem.addSystemTarget(neighbor.coordinates, this.universeBackend);
         }
 
-        this.initTargetCursorLayerFromSystem(this.targetCursorLayer, starSystem, spaceship);
+        this.initTargetingSystemFromSystem(this.targetingSystem, starSystem, spaceship);
 
         const orbitAxisRenderList = getOrbitAxisObjectList(starSystem);
 
@@ -677,16 +683,16 @@ export class StarSystemView implements View {
         this._isLoadingSystem = false;
     }
 
-    private initTargetCursorLayerFromSystem(
-        targetCursorLayer: TargetCursorLayer,
+    private initTargetingSystemFromSystem(
+        targetingSystem: TargetingSystem,
         starSystem: StarSystemController,
         spaceship: Spaceship,
     ): void {
         const targets: Array<Target> = [createSpaceshipTarget(spaceship)];
         targets.push(...getSystemTargets(starSystem));
 
-        targetCursorLayer.reset();
-        targetCursorLayer.addObjects(targets);
+        targetingSystem.reset();
+        targetingSystem.addContacts(targets.map(createTargetContact));
     }
 
     /**
@@ -726,7 +732,7 @@ export class StarSystemView implements View {
         this.player.serializedSpaceships.shift();
         this.player.instancedSpaceships.push(spaceship);
 
-        this.targetCursorLayer.addObjects([createSpaceshipTarget(spaceship)]);
+        this.targetingSystem.addContacts([createTargetContact(createSpaceshipTarget(spaceship))]);
 
         this.interactionSystem.register({
             getPhysicsAggregate: () => spaceship.aggregate,
@@ -749,10 +755,10 @@ export class StarSystemView implements View {
                             const vehicle = this.vehicleControls.getVehicle();
                             this.vehicleControls.setVehicle(null);
                             if (vehicle !== null) {
-                                if (this.targetCursorLayer.getTarget()?.getTransform() === vehicle.getTransform()) {
+                                if (this.targetingSystem.getTarget()?.getTransform() === vehicle.getTransform()) {
                                     this.spaceShipLayer.setTarget(null);
                                 }
-                                this.targetCursorLayer.removeObject(vehicle);
+                                this.targetingSystem.removeTarget(vehicle);
                                 vehicle.dispose();
                             }
 
@@ -822,7 +828,7 @@ export class StarSystemView implements View {
     }
 
     private getSelectedSystemTarget(): SystemTarget | null {
-        const target = this.targetCursorLayer.getTarget();
+        const target = this.targetingSystem.getTarget();
         if (target === null) {
             return null;
         }
@@ -1044,7 +1050,7 @@ export class StarSystemView implements View {
             }
         }
 
-        const target = this.targetCursorLayer.getTarget();
+        const target = this.targetingSystem.getTarget();
 
         const distanceLY =
             target !== null
@@ -1092,9 +1098,7 @@ export class StarSystemView implements View {
 
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
-        this.targetCursorLayer.setAdditionalPinnedTargets(
-            getMissionKnownTargets(this.player.currentMissions, starSystem),
-        );
+        this.targetingSystem.setKnownTargets(getMissionKnownTargets(this.player.currentMissions, starSystem));
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);
@@ -1106,14 +1110,17 @@ export class StarSystemView implements View {
             this.universeBackend,
         );
 
-        this.targetCursorLayer.update(activeControls.getActiveCamera());
+        const targetingCamera = activeControls.getActiveCamera();
+        targetingCamera.getViewMatrix();
+        this.targetingSystem.update(targetingCamera.globalPosition);
+        this.targetCursorLayer.update(targetingCamera);
         const targetLandingPad = spaceship.getTargetLandingPad();
         if (
             targetLandingPad !== null &&
             !spaceship.isLanded() &&
-            this.targetCursorLayer.getTarget()?.getTransform() !== targetLandingPad.getTransform()
+            this.targetingSystem.getTarget()?.getTransform() !== targetLandingPad.getTransform()
         ) {
-            this.targetCursorLayer.setTarget(targetLandingPad);
+            this.targetingSystem.setTarget(targetLandingPad);
         }
 
         if (spaceship.isLandedAtFacility() && this.isUiEnabled) {
@@ -1402,9 +1409,9 @@ export class StarSystemView implements View {
     }
 
     public setTarget(target: Target | Transformable | null): void {
-        if (target !== null && this.targetCursorLayer.getTarget()?.getTransform() === target.getTransform()) {
+        if (target !== null && this.targetingSystem.getTarget()?.getTransform() === target.getTransform()) {
             this.spaceShipLayer.setTarget(null);
-            this.targetCursorLayer.setTarget(null);
+            this.targetingSystem.setTarget(null);
             this.soundPlayer.playNow("target_unlock");
             return;
         }
@@ -1414,7 +1421,7 @@ export class StarSystemView implements View {
         }
 
         this.spaceShipLayer.setTarget(target.getTransform());
-        this.targetCursorLayer.setTarget(target);
+        this.targetingSystem.setTarget(target);
         this.soundPlayer.playNow("target_lock");
     }
 
@@ -1432,12 +1439,12 @@ export class StarSystemView implements View {
             const newTarget = this.getStarSystem().addSystemTarget(targetSeed, this.universeBackend);
             if (newTarget !== null) {
                 target = newTarget;
-                this.targetCursorLayer.addObjects([createSystemTarget(target)]);
+                this.targetingSystem.addContacts([createTargetContact(createSystemTarget(target))]);
             }
         }
 
         if (target !== undefined) {
-            this.targetCursorLayer.setTarget(target, true);
+            this.targetingSystem.setTarget(target, true);
             this.spaceShipLayer.setTarget(target.getTransform(), true);
         }
     }
