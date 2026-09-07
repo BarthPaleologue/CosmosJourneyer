@@ -156,7 +156,8 @@ export class ObjectTargetCursor {
         }
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);
 
-        this.cursor.style.opacity = `${Math.min(opacity, this.isTarget ? 1 : 0.5)}`;
+        const attentionOpacity = this.isTarget ? 1 : this.isInformationEnabled ? 0.65 : 0.3;
+        this.cursor.style.opacity = `${opacity * attentionOpacity}`;
         this.textBlock.style.opacity = this.isInformationEnabled ? `${opacity}` : "0";
 
         const isTextVisible = this.isOnScreen && this.isInformationEnabled && opacity > 0;

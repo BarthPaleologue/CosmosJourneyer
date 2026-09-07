@@ -16,14 +16,17 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Observer } from "@babylonjs/core/Misc/observable";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../gameplay/targeting/target";
 import { getSensorRange } from "../../gameplay/targeting/targetingSystem";
 import type { TargetingSystem } from "../../gameplay/targeting/targetingSystem";
+import { getCameraVerticalFov } from "../../helpers/getCameraVerticalFov";
+import type { Transformable } from "../../simulation/architecture/transformable";
 import { ObjectTargetCursor } from "./objectTargetCursor";
+import { resolveReticleTarget } from "./resolveReticleTarget";
 import { getTargetCursorOpacity } from "./targetAppearance";
 
 export class TargetCursorLayer {
@@ -76,49 +79,64 @@ export class TargetCursorLayer {
         }
     }
 
-    public getClosestToScreenCenterOrbitalObject(): Target | null {
+    /** Returns the same canonical contact whose hover indication was rendered, without resolving again. */
+    public getHoveredTarget(): Target | null {
         return this.hoveredTarget;
     }
 
-    public update(camera: Camera): void {
+    public update(camera: Camera, controlledObject: Transformable | null): void {
         if (!this.isEnabled()) {
             return;
         }
         camera.getViewMatrix();
         camera.getProjectionMatrix();
+        const transformation = camera.getTransformationMatrix();
         const selected = this.targetingSystem.getTarget();
         const forward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
-        let nearest: Target | null = null;
-        let closestDistance = Infinity;
-        for (const [target, cursor] of this.targetCursors) {
+        const projected = Vector3.Zero();
+        const frame = [...this.targetCursors].map(([target, cursor]) => {
             const isSelected = target === selected;
             const sensorRange = this.targetingSystem.isKnown(target) || isSelected ? null : getSensorRange(target);
             target.getTransform().computeWorldMatrix(true);
-            const offset = target.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
-            const opacity = this.targetingSystem.isAvailable(target)
-                ? getTargetCursorOpacity(
-                      target,
-                      offset.length(),
-                      sensorRange,
-                      isSelected,
-                      this.targetingSystem.hasKnownOverride(target),
-                  )
-                : 0;
+            const position = target.getTransform().getAbsolutePosition();
+            const offset = position.subtract(camera.globalPosition);
+            Vector3.ProjectToRef(position, Matrix.IdentityReadOnly, transformation, camera.viewport, projected);
+            const isOnScreen =
+                Vector3.Dot(offset, forward) > 0 &&
+                projected.x >= camera.viewport.x &&
+                projected.x <= camera.viewport.x + camera.viewport.width &&
+                projected.y >= camera.viewport.y &&
+                projected.y <= camera.viewport.y + camera.viewport.height;
+            const distance = offset.length();
+            const opacity =
+                isOnScreen && this.targetingSystem.isAvailable(target)
+                    ? getTargetCursorOpacity(
+                          target,
+                          distance,
+                          sensorRange,
+                          isSelected,
+                          this.targetingSystem.hasKnownOverride(target),
+                      )
+                    : 0;
+            return { target, cursor, opacity };
+        });
+        const controlledTransform = controlledObject?.getTransform();
+        const candidates = frame
+            .filter(({ target, opacity }) => opacity > 0 && target.getTransform() !== controlledTransform)
+            .map(({ target }) => target);
+        this.hoveredTarget = resolveReticleTarget(
+            candidates,
+            {
+                origin: camera.globalPosition,
+                direction: forward,
+            },
+            getCameraVerticalFov(camera),
+        );
+        for (const { target, cursor, opacity } of frame) {
+            cursor.setTarget(target === selected);
+            cursor.setInformationEnabled(target === selected || target === this.hoveredTarget);
             cursor.update(camera, opacity);
-            const distanceToCenterSquared =
-                (cursor.screenCoordinates.x - 0.5) ** 2 + (cursor.screenCoordinates.y - 0.5) ** 2;
-            const isHovered = distanceToCenterSquared < 0.1 * 0.1 && target === this.hoveredTarget;
-            cursor.setTarget(isSelected);
-            cursor.setInformationEnabled(isSelected || isHovered);
-            if (opacity > 0 && Vector3.Dot(offset, forward) > 0) {
-                const distance = cursor.screenCoordinates.subtract(new Vector3(0.5, 0.5, 0)).length();
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    nearest = target;
-                }
-            }
         }
-        this.hoveredTarget = nearest;
     }
 
     public dispose(): void {

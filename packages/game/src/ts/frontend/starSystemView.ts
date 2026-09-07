@@ -365,7 +365,7 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.setTarget.on("complete", () => {
-            const hoveredTarget = this.targetCursorLayer.getClosestToScreenCenterOrbitalObject();
+            const hoveredTarget = this.targetCursorLayer.getHoveredTarget();
             if (hoveredTarget !== null) {
                 this.setTarget(hoveredTarget);
             }
@@ -1111,9 +1111,15 @@ export class StarSystemView implements View {
         );
 
         const targetingCamera = activeControls.getActiveCamera();
+        const controlledObject =
+            activeControls === this.spaceshipControls
+                ? spaceship
+                : activeControls === this.vehicleControls
+                  ? this.vehicleControls.getVehicle()
+                  : null;
         targetingCamera.getViewMatrix();
         this.targetingSystem.update(targetingCamera.globalPosition);
-        this.targetCursorLayer.update(targetingCamera);
+        this.targetCursorLayer.update(targetingCamera, controlledObject);
         const targetLandingPad = spaceship.getTargetLandingPad();
         if (
             targetLandingPad !== null &&
