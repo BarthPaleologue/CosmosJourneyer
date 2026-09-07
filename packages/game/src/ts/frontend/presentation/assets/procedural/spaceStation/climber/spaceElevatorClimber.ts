@@ -21,25 +21,20 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
-import type { TFunction } from "i18next";
 
 import type { PBRTextures } from "@/frontend/presentation/assets/textures/materials";
-import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/simulation/architecture/targetable";
 
 import type { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { ClimberRingMaterial } from "./climberRingMaterial";
 
-export class SpaceElevatorClimber implements Targetable {
+export class SpaceElevatorClimber {
     private readonly transform: TransformNode;
 
     private readonly solarPanelMaterial: Material;
     private readonly metalSectionMaterial: Material;
 
     private readonly boundingRadius: number;
-
-    readonly targetInfo: TargetInfo;
 
     constructor(
         solarPanelMaterial: SolarPanelMaterial,
@@ -145,20 +140,10 @@ export class SpaceElevatorClimber implements Targetable {
         });
 
         this.boundingRadius = globalRadius + solarPanelWidth;
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.FACILITY,
-            minDistance: this.getBoundingRadius() * 7.0,
-            maxDistance: this.getBoundingRadius() * 3000,
-        };
     }
 
     getBoundingRadius(): number {
         return this.boundingRadius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return t("objectTypes:spaceElevatorClimber");
     }
 
     getTransform(): TransformNode {

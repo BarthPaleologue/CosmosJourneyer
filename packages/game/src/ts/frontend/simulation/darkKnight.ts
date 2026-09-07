@@ -23,14 +23,10 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { DarkKnightModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import type { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
 
 import type { CelestialBodyBase } from "./architecture/celestialBody";
-import { ObjectTargetCursorType } from "./architecture/targetable";
-import type { TargetInfo } from "./architecture/targetable";
 import type { AsteroidField } from "./asteroidFields/asteroidField";
 
 export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
@@ -46,7 +42,6 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
 
     readonly ringsUniforms: RingsUniforms | null = null;
     readonly asteroidField: AsteroidField | null = null;
-    readonly targetInfo: TargetInfo;
 
     constructor(model: DeepReadonly<DarkKnightModel>, scene: Scene) {
         this.type = model.type;
@@ -62,13 +57,6 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
         this.material.disableLighting = true;
 
         this.mesh.material = this.material;
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.ANOMALY,
-            name: this.model.name,
-            minDistance: this.radius * 5,
-            maxDistance: this.radius * 100,
-        };
     }
 
     getRadius(): number {
@@ -77,10 +65,6 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
 
     getBoundingRadius(): number {
         return this.radius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     getTransform(): TransformNode {

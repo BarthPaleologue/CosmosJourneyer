@@ -12,6 +12,7 @@
     "spaceElevatorClimber": "Space Elevator Climber",
     "anomaly": "Anomaly",
     "landingBay": "Landing Bay",
+    "landingPadName": "Pad {{padIdentifier}}",
     "landingPad": "Landing Pad",
     "spaceship": "Spaceship",
     "vehicle": "Vehicle"

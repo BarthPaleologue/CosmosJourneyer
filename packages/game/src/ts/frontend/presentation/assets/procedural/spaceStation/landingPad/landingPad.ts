@@ -26,15 +26,13 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import type { TFunction } from "i18next";
 
-import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import type { ILandingPad, LandingPadSize } from "@/frontend/simulation/orbitalFacility/landingPadManager";
 
 import { CollisionMask, Settings } from "@/settings";
 
 export class LandingPad implements ILandingPad {
+    private readonly identifier: string;
     private readonly deck: Mesh;
     private deckAggregate: PhysicsAggregate | null = null;
 
@@ -43,8 +41,6 @@ export class LandingPad implements ILandingPad {
     private readonly padSize: LandingPadSize;
 
     private readonly boundingRadius: number;
-
-    readonly targetInfo: TargetInfo;
 
     readonly padHeight = 0.5;
 
@@ -57,12 +53,14 @@ export class LandingPad implements ILandingPad {
     } | null;
 
     constructor(
-        name: string,
+        identifier: string,
         padSize: LandingPadSize,
         material: Material,
         scene: Scene,
         options?: Partial<{ centerDecalTexture: Texture }>,
     ) {
+        this.identifier = identifier;
+        const name = `Landing Pad ${identifier}`;
         this.padSize = padSize;
 
         this.width = 40 * padSize;
@@ -110,13 +108,6 @@ export class LandingPad implements ILandingPad {
         }
 
         this.enablePhysics(scene);
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.LANDING_PAD,
-            name,
-            minDistance: this.getBoundingRadius() * 4.0,
-            maxDistance: this.getBoundingRadius() * 6.0,
-        };
     }
 
     disablePhysics(): void {
@@ -137,6 +128,10 @@ export class LandingPad implements ILandingPad {
         this.deckAggregate.body.disablePreStep = false;
         this.deckAggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
         this.deckAggregate.shape.filterCollideMask = CollisionMask.DYNAMIC_OBJECTS;
+    }
+
+    getIdentifier(): string {
+        return this.identifier;
     }
 
     getPadSize(): LandingPadSize {
@@ -175,9 +170,5 @@ export class LandingPad implements ILandingPad {
         this.decal?.mesh.dispose();
         this.deckAggregate?.dispose();
         this.deck.dispose();
-    }
-
-    getTypeName(t: TFunction): string {
-        return t("objectTypes:landingPad");
     }
 }

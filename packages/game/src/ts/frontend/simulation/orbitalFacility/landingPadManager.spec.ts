@@ -18,9 +18,6 @@
 import { TransformNode } from "@babylonjs/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ObjectTargetCursorType } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
-
 import { LandingPadManager, LandingPadSize } from "./landingPadManager";
 import type { ILandingPad, LandingRequest } from "./landingPadManager";
 
@@ -28,17 +25,13 @@ vi.mock("@babylonjs/core");
 
 // Mock LandingPad implementation for testing
 class MockLandingPad implements ILandingPad {
+    getIdentifier(): string {
+        return "0";
+    }
     private readonly padSize: LandingPadSize;
     private readonly padNumber: number;
 
     private static PAD_NUMBER = 0;
-
-    readonly targetInfo: TargetInfo = {
-        type: ObjectTargetCursorType.LANDING_PAD,
-        name: "Mock Landing Pad",
-        minDistance: 0,
-        maxDistance: 0,
-    };
 
     private readonly transform = new TransformNode("mockLandingPadTransform");
 
@@ -49,10 +42,6 @@ class MockLandingPad implements ILandingPad {
 
     getPadNumber(): number {
         return this.padNumber;
-    }
-
-    getTypeName(): string {
-        return "MockLandingPad";
     }
 
     getPadSize(): LandingPadSize {

@@ -23,10 +23,8 @@ import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import type { Cullable } from "@/frontend/helpers/cullable";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import type { RenderingAssets } from "@/frontend/presentation/assets/renderingAssets";
 import { AtmosphereUniforms } from "@/frontend/presentation/postProcesses/atmosphere/atmosphereUniforms";
 import type { CloudsLut } from "@/frontend/presentation/postProcesses/clouds/cloudsLut";
@@ -34,8 +32,6 @@ import { CloudsUniforms } from "@/frontend/presentation/postProcesses/clouds/clo
 import { OceanUniforms } from "@/frontend/presentation/postProcesses/ocean/oceanUniforms";
 import type { RingsProceduralPatternLut } from "@/frontend/presentation/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/presentation/postProcesses/rings/ringsUniform";
-import { defaultTargetInfoCelestialBody } from "@/frontend/simulation/architecture/targetable";
-import type { TargetInfo } from "@/frontend/simulation/architecture/targetable";
 import { AsteroidField } from "@/frontend/simulation/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
@@ -67,8 +63,6 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
     readonly asteroidField: AsteroidField | null;
 
     readonly cloudsUniforms: CloudsUniforms | null;
-
-    readonly targetInfo: TargetInfo;
 
     /**
      * New Telluric Planet
@@ -148,10 +142,6 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
         } else {
             this.cloudsUniforms = null;
         }
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
-        this.targetInfo.maxDistance =
-            this.model.type === "telluricSatellite" ? this.model.orbit.semiMajorAxis * 8.0 : 0;
     }
 
     getTransform(): TransformNode {
@@ -160,10 +150,6 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
 
     getCloudsUniforms(): CloudsUniforms | null {
         return this.cloudsUniforms;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     /**
