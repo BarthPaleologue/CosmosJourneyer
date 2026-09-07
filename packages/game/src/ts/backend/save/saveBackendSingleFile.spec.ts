@@ -172,10 +172,8 @@ describe("SaveManager", () => {
 
         it("should assign unique timestamps when they are missing", async () => {
             const universeBackend = new UniverseBackend(getLoneStarSystem());
-            const { timestamp: firstTimestampValue, ...manualSaveWithoutTimestamp1 } = createTestSave(0);
-            void firstTimestampValue;
-            const { timestamp: secondTimestampValue, ...manualSaveWithoutTimestamp2 } = createTestSave(0);
-            void secondTimestampValue;
+            const manualSaveWithoutTimestamp1 = { ...createTestSave(0), timestamp: undefined };
+            const manualSaveWithoutTimestamp2 = { ...createTestSave(0), timestamp: undefined };
 
             const backend = new MockSaveBackend(
                 JSON.stringify({
