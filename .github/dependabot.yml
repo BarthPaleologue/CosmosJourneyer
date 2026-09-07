@@ -18,15 +18,6 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
-  - package-ecosystem: "uv"
-    directory: "/packages/gaia-explorer"
-    patterns:
-      - "*"
-    multi-ecosystem-group: "weekly-dependencies"
-    allow:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
-
   - package-ecosystem: "cargo"
     directory: "/packages/terrain-generation"
     patterns:
