@@ -85,6 +85,7 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vite-plugin-glsl": "^1.6.1",
+        "vite-slang": "0.6.0",
         "vitest": "catalog:"
     }
 }

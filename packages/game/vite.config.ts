@@ -6,6 +6,7 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig } from "vite";
 import type { PluginOption } from "vite";
 import glsl from "vite-plugin-glsl";
+import slang from "vite-slang";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +42,20 @@ const getLocalNetworkAddress = (): string | undefined => {
     }
 };
 
+const fixSlangWgslLoopsForBabylon = (): PluginOption => ({
+    name: "fix-slang-wgsl-loops-for-babylon",
+    enforce: "post",
+    transform: {
+        filter: { id: /\.slang$/ },
+        handler(code): { code: string; map: null } | undefined {
+            // Babylon's shader processor drops a semicolon from Slang's valid WGSL `for(;;)` loops.
+            // The equivalent `loop` syntax survives Babylon's preprocessing.
+            const fixedCode = code.replaceAll("for(;;)", "loop");
+            return fixedCode === code ? undefined : { code: fixedCode, map: null };
+        },
+    },
+});
+
 export default defineConfig(({ mode }) => {
     const isProduction = mode === "production";
     const localNetworkAddress = isProduction ? undefined : getLocalNetworkAddress();
@@ -64,6 +79,8 @@ export default defineConfig(({ mode }) => {
             basicSsl({
                 name: "cosmos-journeyer",
             }),
+            slang(),
+            fixSlangWgslLoopsForBabylon(),
             glsl(),
         ] as Array<PluginOption>,
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],
