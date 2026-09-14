@@ -8,9 +8,7 @@ export function err<T, E>(error: E): Result<T, E> {
     return { success: false, error };
 }
 
-export type DeepPartial<T> = {
-    [P in keyof T]?: DeepPartial<T[P]>;
-};
+export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 export type DeepReadonly<T> = {
     readonly [K in keyof T]: DeepReadonly<T[K]>;
