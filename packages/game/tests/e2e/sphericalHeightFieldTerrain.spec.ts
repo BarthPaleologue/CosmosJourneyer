@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { renderAndSnap } from "./utils/renderSnap";
 
@@ -16,8 +16,12 @@ test("The spherical height field terrain playground physics are correct", async 
         shotName: "physics-baseline",
         scene: "sphericalHeightFieldTerrain",
         flagToWait: "frozen",
-        urlParams: { seed: "261", freeze: 10, physicsViewer: "", startingDistance: 1136.5e3 },
+        urlParams: { seed: "261", freeze: 10, physicsViewer: "" },
     });
+
+    await expect
+        .poll(async () => page.evaluate(() => window.scene.meshes.some((mesh) => mesh.physicsBody !== null)))
+        .toBe(true);
 });
 
 test("The spherical height field terrain playground places cubes using sampled terrain heights", async ({ page }) => {

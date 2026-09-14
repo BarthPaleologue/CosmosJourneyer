@@ -16,12 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "@babylonjs/core/Engines/Extensions/";
+import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
+import glslangScriptUrl from "@babylonjs/core/assets/glslang/glslang.js?url";
+import glslangWasmUrl from "@babylonjs/core/assets/glslang/glslang.wasm?url";
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudioEngine";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Engine } from "@babylonjs/core/Engines/engine";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
+import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -97,6 +101,8 @@ import { StationLandingTutorial } from "./ui/tutorial/tutorials/stationLandingTu
 import type { Tutorial } from "./ui/tutorial/tutorials/tutorial";
 
 type EngineState = "uninitialized" | "running" | "paused";
+
+NodeMaterial.UseNativeShaderLanguageOfEngine = true;
 
 // register cosmos journeyer as part of window object
 declare global {
@@ -449,12 +455,18 @@ export class CosmosJourneyer {
 
         const backend = backendResult.value;
 
-        const engine = new Engine(canvas, true, {
-            // the preserveDrawingBuffer option is required for the screenshot feature to work
-            preserveDrawingBuffer: true,
+        const engine = new WebGPUEngine(canvas, {
+            antialias: true,
             useHighPrecisionMatrix: true,
             doNotHandleContextLost: true,
+            setMaximumLimits: true,
+            glslangOptions: { jsPath: glslangScriptUrl, wasmPath: glslangWasmUrl },
+            twgslOptions: {
+                wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
+                jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
+            },
         });
+        await engine.initAsync();
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = loadingScreen;

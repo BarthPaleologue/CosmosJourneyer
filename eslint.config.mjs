@@ -225,6 +225,7 @@ const pureLibraryRules = {
 
 export default defineConfig([
     globalIgnores([
+        "packages/game/src/ts/utils/TWGSL/**",
         "packages/game/rspack.config.js",
         "tsconfig.json",
         "packages/desktop-electron/dist",
