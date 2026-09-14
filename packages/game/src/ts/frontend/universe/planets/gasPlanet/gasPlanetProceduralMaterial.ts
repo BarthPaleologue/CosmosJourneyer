@@ -67,21 +67,9 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
 
         this.setFloat(GasPlanetMaterialUniformNames.SEED, seed);
 
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR1, [
-            colorPalette.color1.r,
-            colorPalette.color1.g,
-            colorPalette.color1.b,
-        ]);
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR2, [
-            colorPalette.color2.r,
-            colorPalette.color2.g,
-            colorPalette.color2.b,
-        ]);
-        this.setArray3(GasPlanetMaterialUniformNames.COLOR3, [
-            colorPalette.color3.r,
-            colorPalette.color3.g,
-            colorPalette.color3.b,
-        ]);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR1, colorPalette.color1);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR2, colorPalette.color2);
+        this.setColor3(GasPlanetMaterialUniformNames.COLOR3, colorPalette.color3);
 
         this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
 
