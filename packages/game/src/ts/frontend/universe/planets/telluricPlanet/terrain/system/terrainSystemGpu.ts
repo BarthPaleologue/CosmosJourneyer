@@ -10,6 +10,7 @@ import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 
 import { MaxScatterDensity } from "@/frontend/helpers/instancing";
+import { createComputeBindingMappingFromSlang } from "@/frontend/helpers/slangComputeBindings";
 
 import { Settings } from "@/settings";
 
@@ -27,8 +28,12 @@ import type {
 import type { BuildChunkInput, ComputeHeightsInput } from "./terrainTaskInputs";
 import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 
-import buildTerrainChunkSource from "@shaders/compute/terrain/buildTerrainChunk.wgsl";
-import computeTerrainHeightsSource from "@shaders/compute/terrain/computeTerrainHeights.wgsl";
+import buildTerrainChunkSource, {
+    reflection as buildTerrainChunkReflection,
+} from "@shaders/compute/terrain/buildTerrainChunk.slang";
+import computeTerrainHeightsSource, {
+    reflection as computeTerrainHeightsReflection,
+} from "@shaders/compute/terrain/computeTerrainHeights.slang";
 
 type QueuedTask =
     | { readonly type: "buildChunk"; readonly id: TaskId; readonly input: BuildChunkInput }
@@ -62,16 +67,20 @@ export class TerrainSystemGpu implements ITerrainSystem {
             if (!(engine instanceof WebGPUEngine)) {
                 return err(new Error("GPU terrain requires a WebGPUEngine"));
             }
+            const chunkBindings = createComputeBindingMappingFromSlang(buildTerrainChunkReflection);
+            if (!chunkBindings.success) {
+                return chunkBindings;
+            }
+            const heightsBindings = createComputeBindingMappingFromSlang(computeTerrainHeightsReflection);
+            if (!heightsBindings.success) {
+                return heightsBindings;
+            }
             const chunkShader = new ComputeShader(
                 "terrainChunkCompute",
                 engine,
                 { computeSource: buildTerrainChunkSource },
                 {
-                    bindingsMapping: {
-                        positions: { group: 0, binding: 0 },
-                        normals: { group: 0, binding: 1 },
-                        params: { group: 0, binding: 2 },
-                    },
+                    bindingsMapping: chunkBindings.value,
                 },
             );
             const heightsShader = new ComputeShader(
@@ -79,11 +88,7 @@ export class TerrainSystemGpu implements ITerrainSystem {
                 engine,
                 { computeSource: computeTerrainHeightsSource },
                 {
-                    bindingsMapping: {
-                        coordinates: { group: 0, binding: 0 },
-                        heights: { group: 0, binding: 1 },
-                        params: { group: 0, binding: 2 },
-                    },
+                    bindingsMapping: heightsBindings.value,
                 },
             );
             return ok(new TerrainSystemGpu(engine, rowVertexCount, chunkShader, heightsShader));

@@ -6,6 +6,7 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig } from "vite";
 import type { PluginOption } from "vite";
 import glsl from "vite-plugin-glsl";
+import slang from "vite-slang";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,7 @@ export default defineConfig(({ mode }) => {
             basicSsl({
                 name: "cosmos-journeyer",
             }),
+            slang(),
             glsl(),
         ] as Array<PluginOption>,
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],

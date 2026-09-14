@@ -323,6 +323,9 @@ importers:
       vite-plugin-glsl:
         specifier: 1.6.2
         version: 1.6.2(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1))
+      vite-slang:
+        specifier: 0.7.0
+        version: 0.7.0(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1))
       vitest:
         specifier: 'catalog:'
         version: 5.0.5(@types/node@26.6.5)(jsdom@30.1.3(@noble/hashes@2.4.0))(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1))
@@ -4429,6 +4432,10 @@ packages:
       esbuild:
         optional: true
 
+  vite-slang@0.7.0:
+    resolution: {integrity: sha512-hdUWtpEMEIhOwKxZr47XxJDBd44iA8klgA0iVaeAx5uV/r9e2CExIBJSQfFilE8DDBm0sb5D0C/SW3Ggk1FT8Q==}
+    peerDependencies:
+      vite: '*'
 
   vite@8.3.4:
     resolution: {integrity: sha512-IftLE8phJhdNRIGNEV4JCCvfNScoZQVfcXaN8TQropWGJtOHcu+iAB9pHcuGvmEb/kddw0LBe/jS8ztdC6xdiQ==}
@@ -9159,6 +9166,9 @@ snapshots:
     dependencies:
       vite: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1)
 
+  vite-slang@0.7.0(vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1)):
+    dependencies:
+      vite: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1)
 
   vite@8.3.4(@types/node@26.6.5)(jiti@2.7.0)(yaml@2.9.1):
     dependencies:
