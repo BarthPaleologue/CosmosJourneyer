@@ -34,6 +34,7 @@ import { createCustomSystemScene } from "./customSystem";
 import { createDarkKnightScene } from "./darkKnight";
 import { createDebugAssetsScene } from "./debugAssets";
 import { createDefaultScene } from "./default";
+import { createDiaryScene } from "./diary";
 import { createFlightDemoScene } from "./flightDemo";
 import { createForestScene } from "./forest";
 import { createGasPlanetScene } from "./gasPlanet";
@@ -45,6 +46,7 @@ import { createLandingPadScene } from "./landingPad";
 import { createLensFlareOcclusionScene } from "./lensFlareOcclusion";
 import { createOnFootScene } from "./onFoot";
 import { createOrbitalDemoScene } from "./orbitalDemo";
+import { createQrScanScene } from "./qrScan";
 import { createRingsScene } from "./rings";
 import { createRoverScene } from "./rover";
 import { createSaveLoadingPanelContentScene } from "./saveLoadingPanelContent";
@@ -69,6 +71,7 @@ import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createThrusterExhaustScene } from "./thrusterExhaust";
 import { createTriPlanarNormalScene } from "./triPlanarNormal";
 import { createTutorialScene } from "./tutorial";
+import { createUplinkScene } from "./uplink";
 import { createXrScene } from "./xr";
 
 export class PlaygroundRegistry {
@@ -126,6 +129,9 @@ export class PlaygroundRegistry {
         ["sphericalHeightFieldTerrain", createSphericalHeightFieldTerrainScene],
         ["cryptographicSecret", createCryptographicSecretScene],
         ["customSystem", createCustomSystemScene],
+        ["qrScan", createQrScanScene],
+        ["diary", createDiaryScene],
+        ["uplink", createUplinkScene],
     ]);
 
     register(

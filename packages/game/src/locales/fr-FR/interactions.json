@@ -2,5 +2,6 @@
     "pilot": "Piloter",
     "drive": "Conduire {{vehicle}}",
     "open": "Ouvrir",
-    "close": "Fermer"
+    "close": "Fermer",
+    "scan": "Scanner"
 }

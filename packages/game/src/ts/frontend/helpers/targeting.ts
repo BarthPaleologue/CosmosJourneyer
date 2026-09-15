@@ -25,6 +25,7 @@ export function getSystemTargetables(starSystem: StarSystemController): Array<Ta
     const out: Array<Targetable> = [];
 
     out.push(...starSystem.getCelestialBodies());
+    out.push(...starSystem.persistentEntitySystem.getTargets());
     out.push(...starSystem.getSystemTargets());
 
     for (const spaceStation of starSystem.getOrbitalFacilities()) {
