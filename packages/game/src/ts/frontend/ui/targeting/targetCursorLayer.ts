@@ -25,10 +25,11 @@ import { getSensorRange } from "../../targeting/targetingSystem";
 import type { TargetingSystem } from "../../targeting/targetingSystem";
 import type { Transformable } from "../../universe/architecture/transformable";
 import { ObjectTargetCursor } from "./objectTargetCursor";
+import { resolveReticleTarget } from "./resolveReticleTarget";
 import { getTargetCursorOpacity } from "./targetAppearance";
 
 export class TargetCursorLayer {
-    private closestToScreenCenterTarget: Target | null = null;
+    private hoveredTarget: Target | null = null;
     private readonly targetCursors = new Map<Target, ObjectTargetCursor>();
     private readonly root: HTMLDivElement;
 
@@ -48,8 +49,8 @@ export class TargetCursorLayer {
         });
         this.targetsRemovedObserver = targetingSystem.onTargetsRemovedObservable.add((targets) => {
             for (const target of targets) {
-                if (this.closestToScreenCenterTarget === target) {
-                    this.closestToScreenCenterTarget = null;
+                if (this.hoveredTarget === target) {
+                    this.hoveredTarget = null;
                 }
                 this.targetCursors.get(target)?.dispose();
                 this.targetCursors.delete(target);
@@ -61,7 +62,7 @@ export class TargetCursorLayer {
     public setEnabled(enabled: boolean): void {
         this.root.style.display = enabled ? "block" : "none";
         if (!enabled) {
-            this.closestToScreenCenterTarget = null;
+            this.hoveredTarget = null;
         }
     }
 
@@ -77,9 +78,9 @@ export class TargetCursorLayer {
         }
     }
 
-    /** Returns the visible target closest to the screen center, used for explicit selection. */
-    public getClosestToScreenCenterTarget(): Target | null {
-        return this.closestToScreenCenterTarget;
+    /** Returns the same canonical contact whose hover indication was rendered, without resolving again. */
+    public getHoveredTarget(): Target | null {
+        return this.hoveredTarget;
     }
 
     public update(camera: Camera, controlledObject: Transformable | null): void {
@@ -91,7 +92,6 @@ export class TargetCursorLayer {
         const transformation = camera.getTransformationMatrix();
         const selected = this.targetingSystem.getTarget();
         const forward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
-        const controlledTransform = controlledObject?.getTransform();
         const projected = Vector3.Zero();
         const frame = [...this.targetCursors].map(([target, cursor]) => {
             const isSelected = target === selected;
@@ -117,24 +117,20 @@ export class TargetCursorLayer {
                           this.targetingSystem.hasKnownOverride(target),
                       )
                     : 0;
-            return { target, cursor, opacity, projected: projected.clone(), isOnScreen };
+            return { target, cursor, opacity };
         });
-        let closest: Target | null = null;
-        let closestDistanceSquared = Number.POSITIVE_INFINITY;
-        for (const { target, opacity, projected: screenCoordinates, isOnScreen } of frame) {
-            if (opacity <= 0 || !isOnScreen || target.getTransform() === controlledTransform) {
-                continue;
-            }
-            const distanceSquared = (screenCoordinates.x - 0.5) ** 2 + (screenCoordinates.y - 0.5) ** 2;
-            if (distanceSquared < closestDistanceSquared) {
-                closestDistanceSquared = distanceSquared;
-                closest = target;
-            }
-        }
-        this.closestToScreenCenterTarget = closest;
+        const controlledTransform = controlledObject?.getTransform();
+        const candidates = frame
+            .filter(({ target, opacity }) => opacity > 0 && target.getTransform() !== controlledTransform)
+            .map(({ target }) => target);
+        const ray = {
+            origin: camera.globalPosition,
+            direction: forward,
+        };
+        this.hoveredTarget = resolveReticleTarget(candidates, ray, camera.fov);
         for (const { target, cursor, opacity } of frame) {
             cursor.setTarget(target === selected);
-            cursor.setInformationEnabled(target === selected || target === this.closestToScreenCenterTarget);
+            cursor.setInformationEnabled(target === selected || target === this.hoveredTarget);
             cursor.update(camera, opacity);
         }
     }

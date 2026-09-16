@@ -365,9 +365,9 @@ export class StarSystemView implements View {
         });
 
         StarSystemInputs.map.setTarget.on("complete", () => {
-            const closestTarget = this.targetCursorLayer.getClosestToScreenCenterTarget();
-            if (closestTarget !== null) {
-                this.setTarget(closestTarget);
+            const hoveredTarget = this.targetCursorLayer.getHoveredTarget();
+            if (hoveredTarget !== null) {
+                this.setTarget(hoveredTarget);
             }
         });
 
