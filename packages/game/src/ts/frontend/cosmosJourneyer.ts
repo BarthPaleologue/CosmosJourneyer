@@ -1260,7 +1260,7 @@ export class CosmosJourneyer {
         }
 
         // set the ui target to the nearest orbital object
-        this.starSystemView.targetCursorLayer.setTarget(nearestOrbitalObject);
+        this.starSystemView.targetingSystem.setTarget(nearestOrbitalObject);
         this.starSystemView.spaceShipLayer.setTarget(nearestOrbitalObject.getTransform());
     }
 
