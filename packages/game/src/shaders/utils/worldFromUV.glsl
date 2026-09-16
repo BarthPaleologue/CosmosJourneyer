@@ -20,15 +20,9 @@
 // https://forum.babylonjs.com/t/pixel-position-in-world-space-from-fragment-postprocess-shader-issue/30232
 // also see https://www.babylonjs-playground.com/#1PHYB0#318 for smaller scale testing
 // also see https://forum.babylonjs.com/t/clip-space-to-world-space-with-non-linear-reverse-depth-buffer-with-webgpu/48892/5
-// On WebGL, the depth renderer stores a linear view-space metric: depth 0 is the near plane and depth 1 is
-// the far plane, and the value is linear in the view-space z of the pixel. The world position is therefore
-// reconstructed as camera_position + ray * viewZ, where the ray is obtained by unprojecting the uv at the
-// near plane (which carries the 1/cos(theta) factor between the view-space z and the distance along the ray)
-// and viewZ = mix(camera_near, camera_far, depth).
+// This is a revised version that works with the reverse depth buffer
 vec3 worldFromUV(vec2 pos, float depth, mat4 inverseProjectionView) {
-    vec4 ndc = vec4(pos.xy * 2.0 - 1.0, 1.0, 1.0); // near plane (reverse depth buffer)
+    vec4 ndc = vec4(pos.xy * 2.0 - 1.0, depth, 1.0);
     vec4 positionWorldSpace = inverseProjectionView * ndc;
-    vec3 nearPlaneOffset = positionWorldSpace.xyz / positionWorldSpace.w - camera_position;
-    float viewZ = mix(camera_near, camera_far, depth);
-    return camera_position + nearPlaneOffset * (viewZ / camera_near);
+    return positionWorldSpace.xyz / positionWorldSpace.w;
 }

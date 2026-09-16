@@ -19,6 +19,7 @@ import "@babylonjs/core/Rendering/depthRendererSceneComponent";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { TextureSize } from "@babylonjs/core/Materials/Textures/textureCreationOptions";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 import type { DepthRenderer } from "@babylonjs/core/Rendering/depthRenderer";
 import type { Scene } from "@babylonjs/core/scene";
 
@@ -85,7 +86,8 @@ export class DepthRendererManager {
     getDepthRenderer(camera: Camera): DepthRenderer {
         let depthRenderer = this.cameraToDepthRenderer.get(camera);
         if (depthRenderer === undefined) {
-            depthRenderer = this.scene.enableDepthRenderer(camera, false, true);
+            depthRenderer = this.scene.enableDepthRenderer(camera, true, true);
+            depthRenderer.clearColor = new Color4(0, 0, 0, 1);
             this.cameraToDepthRenderer.set(camera, depthRenderer);
         }
 

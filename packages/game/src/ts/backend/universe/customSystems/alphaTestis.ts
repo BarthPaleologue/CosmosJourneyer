@@ -60,7 +60,7 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         ares.clouds.coverage = 1;
     }
     if (ares.atmosphere !== null) {
-        ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
+        ares.atmosphere.seaLevelPressure = EarthSeaLevelPressure * 0.5;
     }
 
     ares.orbit.semiMajorAxis = 25100 * hecate.radius;

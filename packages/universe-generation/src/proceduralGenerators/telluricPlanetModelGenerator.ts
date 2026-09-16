@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { CloudLayerHeight, ScaledEarthRadius } from "#/constants";
+import { CloudLayerHeight } from "#/constants";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
@@ -23,10 +23,12 @@ import {
     computeEffectiveTemperature,
     degreesToRadians,
     EarthMass,
+    EarthRadius,
     EarthSeaLevelPressure,
     getOceanDepth,
     hasLiquidWater,
 } from "@cosmos-journeyer/physics";
+import type { AerosolModel } from "@cosmos-journeyer/physics";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
@@ -39,7 +41,7 @@ import type {
     StellarObjectModel,
     TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
-import { normalRandom, uniformRandBool } from "extended-random";
+import { normalRandom, randRange, uniformRandBool } from "extended-random";
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
 import { generateSeededRingsModel } from "./ringsModelGenerator";
@@ -55,7 +57,7 @@ export function generateTelluricPlanetModel(
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * EarthRadius;
 
     const mass = EarthMass * (radius / 6_371e3) ** 3;
 
@@ -97,17 +99,9 @@ export function generateTelluricPlanetModel(
     };
 
     let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
-    if (radius <= 0.3 * ScaledEarthRadius) {
+    if (radius <= 0.3 * EarthRadius) {
         pressure = 0;
     }
-
-    const atmosphere: AtmosphereModel | null =
-        pressure > 0
-            ? {
-                  pressure,
-                  greenHouseEffectFactor: 0.5,
-              }
-            : null;
 
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
@@ -145,6 +139,27 @@ export function generateTelluricPlanetModel(
         oceanCoverage /= 1.3;
     }
 
+    const atmosphere: AtmosphereModel | null =
+        pressure > 0
+            ? {
+                  seaLevelPressure: pressure,
+                  greenHouseEffectFactor: 0.5,
+                  gasMix:
+                      ocean === null
+                          ? [
+                                ["CO2", 0.95],
+                                ["N2", 0.04],
+                                ["Ar", 0.01],
+                            ]
+                          : [
+                                ["N2", 0.78],
+                                ["O2", 0.21],
+                                ["Ar", 0.01],
+                            ],
+                  aerosols: generateAerosols(ocean, rng),
+              }
+            : null;
+
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =
         ocean !== null
@@ -152,16 +167,16 @@ export function generateTelluricPlanetModel(
             : null;
 
     const terrainSettings = {
-        continents_frequency: radius / ScaledEarthRadius,
+        continents_frequency: radius / EarthRadius,
         continents_fragmentation: oceanCoverage,
 
-        bumps_frequency: (30 * radius) / ScaledEarthRadius,
+        bumps_frequency: (30 * radius) / EarthRadius,
 
         max_bump_height: 1.5e3,
         max_mountain_height: 10e3,
         continent_base_height: ocean !== null ? ocean.depth : 0,
 
-        mountains_frequency: (60 * radius) / ScaledEarthRadius,
+        mountains_frequency: (60 * radius) / EarthRadius,
     };
 
     const rings: RingsModel | null = uniformRandBool(0.01, rng, GenerationSteps.RINGS)
@@ -187,5 +202,21 @@ export function generateTelluricPlanetModel(
         clouds,
         ocean,
         atmosphere,
+    };
+}
+
+function generateAerosols(
+    ocean: DeepReadonly<OceanModel> | null,
+    rng: ReturnType<typeof getRngFromSeed>,
+): AerosolModel {
+    if (ocean !== null) {
+        return { tau550: 0.05, settlingCoefficient: 0.15, particleRadius: 0.5e-6, angstromExponent: 0 };
+    }
+
+    return {
+        tau550: randRange(0.1, 2, rng, GenerationSteps.AEROSOL_TAU_550),
+        settlingCoefficient: randRange(0.15, 0.3, rng, GenerationSteps.AEROSOL_SETTLING_COEFFICIENT),
+        particleRadius: randRange(0.5e-6, 3e-6, rng, GenerationSteps.AEROSOL_PARTICLE_RADIUS),
+        angstromExponent: randRange(0, 1, rng, GenerationSteps.AEROSOL_ANGSTROM_EXPONENT),
     };
 }

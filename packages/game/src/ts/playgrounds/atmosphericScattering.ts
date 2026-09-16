@@ -18,6 +18,8 @@
 import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+import { EarthMass } from "@cosmos-journeyer/physics";
+import type { AtmosphereModel } from "@cosmos-journeyer/universe-model";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -54,7 +56,22 @@ export async function createAtmosphericScatteringScene(
 
     const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 2 * scalingFactor, segments: 64 }, scene);
 
-    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, 100e3);
+    const atmosphereModel: AtmosphereModel = {
+        seaLevelPressure: 101_325,
+        greenHouseEffectFactor: 0.5,
+        gasMix: [
+            ["N2", 0.78],
+            ["O2", 0.21],
+            ["Ar", 0.01],
+        ],
+        aerosols: {
+            tau550: 0.05,
+            settlingCoefficient: 0.15,
+            particleRadius: 0.5e-6,
+            angstromExponent: 0,
+        },
+    };
+    const atmosphereUniforms = new AtmosphereUniforms(scalingFactor, EarthMass, 298, atmosphereModel);
 
     const atmosphere = new CelestialBodyUberShaderPass(
         {

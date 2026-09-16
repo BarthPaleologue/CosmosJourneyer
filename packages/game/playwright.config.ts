@@ -3,16 +3,14 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
     testDir: "tests/e2e",
     timeout: 180_000,
+    workers: 1,
     use: {
         baseURL: "http://localhost:8080",
         browserName: "chromium",
+        channel: "chromium",
         headless: true,
         launchOptions: {
-            args: [
-                "--no-sandbox",
-                "--disable-dev-shm-usage",
-                "--use-gl=swiftshader", // software WebGL
-            ],
+            args: ["--no-sandbox", "--enable-unsafe-webgpu", "--use-webgpu-adapter=swiftshader", "--use-gpu-in-tests"],
         },
         viewport: { width: 1280, height: 720 },
     },
