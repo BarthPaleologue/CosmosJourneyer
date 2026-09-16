@@ -17,39 +17,45 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Observer } from "@babylonjs/core/Misc/observable";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../targeting/target";
-import { TargetAcquisition } from "../../targeting/targetContact";
-import type { TargetContact } from "../../targeting/targetContact";
+import { getSensorRange } from "../../targeting/targetingSystem";
+import type { TargetingSystem } from "../../targeting/targetingSystem";
 import type { Transformable } from "../../universe/architecture/transformable";
 import { ObjectTargetCursor } from "./objectTargetCursor";
 import { getTargetCursorOpacity } from "./targetAppearance";
-
-const sensorRangeFactor = 100;
-
-function getSensorRange(target: Target): number {
-    return target.getBoundingRadius() * sensorRangeFactor;
-}
 
 export class TargetCursorLayer {
     private closestToScreenCenterTarget: Target | null = null;
     private readonly targetCursors = new Map<Target, ObjectTargetCursor>();
     private readonly root: HTMLDivElement;
 
-    private readonly targets = new Map<TransformNode, TargetContact>();
-    private target: Target | null = null;
-    private readonly knownTargets = new Set<TransformNode>();
-    private readonly observerPosition = Vector3.Zero();
-
+    private readonly targetingSystem: TargetingSystem;
     private readonly t: TFunction;
+    private readonly targetsAddedObserver: Observer<Iterable<Target>>;
+    private readonly targetsRemovedObserver: Observer<Iterable<Target>>;
 
-    constructor(t: TFunction) {
+    constructor(targetingSystem: TargetingSystem, t: TFunction) {
+        this.targetingSystem = targetingSystem;
         this.t = t;
         this.root = document.createElement("div");
         this.root.classList.add("targetCursorLayer");
         document.body.appendChild(this.root);
+        this.targetsAddedObserver = targetingSystem.onTargetsAddedObservable.add((targets) => {
+            this.addTargets(targets);
+        });
+        this.targetsRemovedObserver = targetingSystem.onTargetsRemovedObservable.add((targets) => {
+            for (const target of targets) {
+                if (this.closestToScreenCenterTarget === target) {
+                    this.closestToScreenCenterTarget = null;
+                }
+                this.targetCursors.get(target)?.dispose();
+                this.targetCursors.delete(target);
+            }
+        });
+        this.addTargets(targetingSystem.getTargets());
     }
 
     public setEnabled(enabled: boolean): void {
@@ -63,105 +69,15 @@ export class TargetCursorLayer {
         return this.root.style.display === "block";
     }
 
-    public addContacts(contacts: Iterable<TargetContact>): void {
-        for (const contact of contacts) {
-            const target = contact.target;
-            const transform = target.getTransform();
-            if (this.targets.has(transform)) {
-                continue;
-            }
-            this.targets.set(transform, contact);
+    private addTargets(targets: Iterable<Target>): void {
+        for (const target of targets) {
             const cursor = new ObjectTargetCursor(target, this.t);
             this.targetCursors.set(target, cursor);
             this.root.appendChild(cursor.htmlRoot);
         }
     }
 
-    public removeTarget(object: Transformable): void {
-        const target = this.targets.get(object.getTransform())?.target;
-        if (target === undefined) {
-            return;
-        }
-        this.targets.delete(object.getTransform());
-        this.knownTargets.delete(object.getTransform());
-        if (this.target === target) {
-            this.target = null;
-        }
-        if (this.closestToScreenCenterTarget === target) {
-            this.closestToScreenCenterTarget = null;
-        }
-        this.targetCursors.get(target)?.dispose();
-        this.targetCursors.delete(target);
-    }
-
-    /** Updates the observer position used by sensor acquisition, independently of any cursor lifetime. */
-    public updateObserverPosition(observerPosition: Vector3): void {
-        this.observerPosition.copyFrom(observerPosition);
-    }
-
-    public reset(): void {
-        this.targets.clear();
-        this.target = null;
-        this.knownTargets.clear();
-        this.observerPosition.setAll(0);
-        this.closestToScreenCenterTarget = null;
-        for (const cursor of this.targetCursors.values()) {
-            cursor.dispose();
-        }
-        this.targetCursors.clear();
-    }
-
-    /** Explicit selection also supports assigned landing pads outside sensor range. */
-    public setTarget(object: Transformable | null, forcedValue?: boolean): void {
-        const target = object === null ? null : (this.getContact(object)?.target ?? null);
-        let shouldHide = this.target === target;
-        if (forcedValue !== undefined) {
-            shouldHide = !forcedValue;
-        }
-        this.target = shouldHide ? null : target;
-    }
-
-    public getTarget(): Target | null {
-        return this.target;
-    }
-
-    public getContact(object: Transformable): TargetContact | null {
-        return this.targets.get(object.getTransform()) ?? null;
-    }
-
-    public setKnownTargets(objects: Iterable<Target>): void {
-        this.knownTargets.clear();
-        for (const object of objects) {
-            if (this.targets.has(object.getTransform())) {
-                this.knownTargets.add(object.getTransform());
-            }
-        }
-    }
-
-    public hasKnownOverride(object: Target): boolean {
-        return this.knownTargets.has(object.getTransform());
-    }
-
-    public isKnown(object: Target): boolean {
-        const contact = this.getContact(object);
-        return contact !== null && (contact.acquisition === TargetAcquisition.KNOWN || this.hasKnownOverride(object));
-    }
-
-    /** Sensor detection uses the observer position from the latest update. */
-    public isAvailable(object: Target): boolean {
-        const contact = this.getContact(object);
-        if (contact === null) {
-            return false;
-        }
-        if (this.isKnown(object) || contact.target === this.target) {
-            return true;
-        }
-        const transform = contact.target.getTransform();
-        transform.computeWorldMatrix(true);
-        const range = getSensorRange(contact.target);
-        return Vector3.DistanceSquared(transform.getAbsolutePosition(), this.observerPosition) <= range * range;
-    }
-
+    /** Returns the visible target closest to the screen center, used for explicit selection. */
     public getClosestToScreenCenterTarget(): Target | null {
         return this.closestToScreenCenterTarget;
     }
@@ -173,13 +89,13 @@ export class TargetCursorLayer {
         camera.getViewMatrix();
         camera.getProjectionMatrix();
         const transformation = camera.getTransformationMatrix();
-        const selected = this.target;
+        const selected = this.targetingSystem.getTarget();
         const forward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
         const controlledTransform = controlledObject?.getTransform();
         const projected = Vector3.Zero();
         const frame = [...this.targetCursors].map(([target, cursor]) => {
             const isSelected = target === selected;
-            const sensorRange = this.isKnown(target) || isSelected ? null : getSensorRange(target);
+            const sensorRange = this.targetingSystem.isKnown(target) || isSelected ? null : getSensorRange(target);
             target.getTransform().computeWorldMatrix(true);
             const position = target.getTransform().getAbsolutePosition();
             const offset = position.subtract(camera.globalPosition);
@@ -192,8 +108,14 @@ export class TargetCursorLayer {
                 projected.y <= camera.viewport.y + camera.viewport.height;
             const distance = offset.length();
             const opacity =
-                isOnScreen && this.isAvailable(target)
-                    ? getTargetCursorOpacity(target, distance, sensorRange, isSelected, this.hasKnownOverride(target))
+                isOnScreen && this.targetingSystem.isAvailable(target)
+                    ? getTargetCursorOpacity(
+                          target,
+                          distance,
+                          sensorRange,
+                          isSelected,
+                          this.targetingSystem.hasKnownOverride(target),
+                      )
                     : 0;
             return { target, cursor, opacity, projected: projected.clone(), isOnScreen };
         });
@@ -219,6 +141,8 @@ export class TargetCursorLayer {
 
     public dispose(): void {
         this.setEnabled(false);
+        this.targetsAddedObserver.remove();
+        this.targetsRemovedObserver.remove();
         for (const cursor of this.targetCursors.values()) {
             cursor.dispose();
         }

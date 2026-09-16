@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix } from "@babylonjs/core/Maths/math";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
 import type { TFunction } from "i18next";
 
@@ -30,7 +28,9 @@ import type { Spaceship } from "@/frontend/spaceship/spaceship";
 import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSpeed } from "@/utils/strings/parseToStrings";
 
+import type { TargetingSystem } from "../targeting/targetingSystem";
 import { CurrentMissionDisplay } from "./currentMissionDisplay";
+import { TargetHelper } from "./targetHelper";
 
 import canisterIconPath from "@assets/icons/fuel_canister.webp";
 
@@ -47,9 +47,7 @@ export class SpaceShipLayer {
 
     private readonly cursor: HTMLElement;
 
-    private readonly targetHelper: HTMLElement;
-    private readonly targetDot: HTMLElement;
-    private currentTarget: TransformNode | null = null;
+    private readonly targetHelper: TargetHelper;
 
     private readonly fuelIndicator: HTMLElement;
 
@@ -57,11 +55,21 @@ export class SpaceShipLayer {
 
     private readonly t: TFunction;
 
-    constructor(player: Player, universeBackend: UniverseBackend, soundPlayer: ISoundPlayer, t: TFunction) {
+    private readonly targetingSystem: TargetingSystem;
+
+    constructor(
+        player: Player,
+        targetingSystem: TargetingSystem,
+        universeBackend: UniverseBackend,
+        soundPlayer: ISoundPlayer,
+        t: TFunction,
+    ) {
         this.root = document.createElement("div");
         this.root.id = "helmetOverlay";
 
         this.t = t;
+
+        this.targetingSystem = targetingSystem;
 
         this.throttleContainer = document.createElement("div");
         this.throttleContainer.id = "throttle";
@@ -85,13 +93,8 @@ export class SpaceShipLayer {
 
         this.root.appendChild(bottomHud);
 
-        this.targetHelper = document.createElement("div");
-        this.targetHelper.id = "targetHelper";
-        this.root.appendChild(this.targetHelper);
-
-        this.targetDot = document.createElement("div");
-        this.targetDot.id = "targetDot";
-        this.targetHelper.appendChild(this.targetDot);
+        this.targetHelper = new TargetHelper();
+        this.root.appendChild(this.targetHelper.root);
 
         this.fuelIndicator = document.createElement("div");
         this.fuelIndicator.id = "fuelIndicator";
@@ -133,21 +136,6 @@ export class SpaceShipLayer {
         return this.root.style.visibility === "visible";
     }
 
-    public setTarget(target: TransformNode | null, forcedValue?: boolean): void {
-        let shouldHide = target === null || this.currentTarget === target;
-        if (forcedValue !== undefined) {
-            shouldHide = !forcedValue;
-        }
-        if (shouldHide) {
-            this.targetHelper.style.display = "none";
-            this.currentTarget = null;
-            return;
-        }
-
-        this.targetHelper.style.display = "block";
-        this.currentTarget = target;
-    }
-
     public update(
         currentControls: TransformNode,
         missionContext: MissionContext,
@@ -158,22 +146,12 @@ export class SpaceShipLayer {
             return;
         }
 
-        if (this.currentTarget !== null) {
-            const directionWorld = this.currentTarget
-                .getAbsolutePosition()
-                .subtract(currentControls.getAbsolutePosition())
-                .normalize();
-            const directionLocal = Vector3.TransformNormal(
-                directionWorld,
-                Matrix.Invert(currentControls.getWorldMatrix()),
-            );
-
-            // set class of targetDot based on sign of directionLocal.z
-            this.targetDot.className = directionLocal.z < 0 ? "targetDot" : "targetDot behind";
-
-            // set top and left of targetDot based on direction2D (use %)
-            this.targetDot.style.top = `${50 - 50 * directionLocal.y}%`;
-            this.targetDot.style.left = `${50 + 50 * directionLocal.x}%`;
+        const currentTarget = this.targetingSystem.getTarget();
+        if (currentTarget !== null) {
+            this.targetHelper.setEnabled(true);
+            this.targetHelper.update(currentTarget.getTransform().getAbsolutePosition(), currentControls);
+        } else {
+            this.targetHelper.setEnabled(false);
         }
 
         this.currentMissionDisplay.update(missionContext, keyboardLayout, universeBackend);
