@@ -26,7 +26,8 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
-import { TargetCursorLayer } from "@/frontend/ui/targetCursorLayer";
+import { createTargetContact, getSystemTargets } from "@/frontend/targeting/createTargets";
+import { TargetCursorLayer } from "@/frontend/ui/targeting/targetCursorLayer";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
@@ -89,7 +90,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     );
 
     const targetCursorLayer = new TargetCursorLayer(t);
-    targetCursorLayer.addObjects(starSystemController.getCelestialBodies());
+    targetCursorLayer.addContacts(getSystemTargets(starSystemController).map(createTargetContact));
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
@@ -98,7 +99,9 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         terrainSystem.update();
         postProcessManager.update(deltaSeconds);
         starSystemController.update(deltaSeconds, terrainSystem);
-        targetCursorLayer.update(camera);
+        camera.getViewMatrix();
+        targetCursorLayer.updateObserverPosition(camera.globalPosition);
+        targetCursorLayer.update(camera, null);
     });
 
     scene.onBeforeCameraRenderObservable.add((cam) => {

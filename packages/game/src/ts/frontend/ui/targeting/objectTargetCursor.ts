@@ -18,16 +18,14 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
+import type { Target } from "@/frontend/targeting/target";
 
-import { smoothstep } from "@/utils/math";
 import { parseDistance, parseSecondsRough } from "@/utils/strings/parseToStrings";
 
-import { ObjectTargetCursorType } from "../universe/architecture/targetable";
-import type { Targetable } from "../universe/architecture/targetable";
+import { getTargetCursorAppearance, getTargetDisplayName, getTargetTypeName } from "./targetAppearance";
 
 export class ObjectTargetCursor {
     readonly htmlRoot: HTMLDivElement;
@@ -40,32 +38,26 @@ export class ObjectTargetCursor {
     readonly distanceText: HTMLParagraphElement;
     readonly etaText: HTMLParagraphElement;
 
-    readonly object: Targetable;
+    readonly object: Target;
     private readonly t: TFunction;
 
     private lastDistance = 0;
 
-    readonly minDistance: number;
-    readonly maxDistance: number;
-
     readonly minSize: number;
     readonly maxSize: number;
-
-    private alpha = 1.0;
 
     readonly screenCoordinates: Vector3 = Vector3.Zero();
 
     private isTarget = false;
 
-    private isPinned = false;
-
     private isInformationEnabled = false;
 
     private isOnScreen = false;
 
-    constructor(object: Targetable, t: TFunction) {
+    constructor(object: Target, t: TFunction) {
         this.t = t;
-        const name = object.targetInfo.name ?? object.getTypeName(t);
+        const name = getTargetDisplayName(object, t);
+        const appearance = getTargetCursorAppearance(object);
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("targetCursorRoot");
         this.htmlRoot.dataset["name"] = name + " Target Cursor Root";
@@ -73,46 +65,9 @@ export class ObjectTargetCursor {
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
 
-        switch (object.targetInfo.type) {
-            case ObjectTargetCursorType.CELESTIAL_BODY:
-                this.cursor.classList.add("rounded");
-                this.minSize = 5;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.FACILITY:
-                this.cursor.classList.add("rotated");
-                this.minSize = 3;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.ANOMALY:
-                this.cursor.classList.add("rounded");
-                this.minSize = 2;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.LANDING_BAY:
-                this.cursor.classList.add("rotated");
-                this.minSize = 2;
-                this.maxSize = 0;
-                break;
-            case ObjectTargetCursorType.LANDING_PAD:
-                this.cursor.classList.add("rotated");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            case ObjectTargetCursorType.STAR_SYSTEM:
-                this.cursor.classList.add("rounded");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            case ObjectTargetCursorType.SPACESHIP:
-            case ObjectTargetCursorType.VEHICLE:
-                this.cursor.classList.add("rotated");
-                this.minSize = 1.5;
-                this.maxSize = 1.5;
-                break;
-            default:
-                assertUnreachable(object.targetInfo.type);
-        }
+        this.cursor.classList.add(appearance.shape);
+        this.minSize = appearance.minSize;
+        this.maxSize = appearance.maxSize;
 
         this.textBlock = document.createElement("div");
         this.textBlock.classList.add("targetCursorText");
@@ -123,7 +78,7 @@ export class ObjectTargetCursor {
 
         this.typeText = document.createElement("p");
         this.typeText.classList.add("targetCursorType");
-        this.typeText.textContent = object.getTypeName(t);
+        this.typeText.textContent = getTargetTypeName(object, t);
 
         this.distanceText = document.createElement("p");
         this.distanceText.classList.add("targetCursorDistance");
@@ -145,9 +100,6 @@ export class ObjectTargetCursor {
         this.textBlock.appendChild(this.etaText);
 
         this.object = object;
-
-        this.minDistance = object.targetInfo.minDistance;
-        this.maxDistance = object.targetInfo.maxDistance;
     }
 
     setTarget(isTarget: boolean): void {
@@ -155,15 +107,11 @@ export class ObjectTargetCursor {
         this.cursor.classList.toggle("target", isTarget);
     }
 
-    setPinned(isPinned: boolean): void {
-        this.isPinned = isPinned;
-    }
-
     setInformationEnabled(enabled: boolean): void {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera): void {
+    update(camera: Camera, opacity: number): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = objectRay.length();
@@ -172,7 +120,7 @@ export class ObjectTargetCursor {
 
         this.isOnScreen = Vector3.Dot(cameraToObject, cameraForward) > 0;
 
-        if (this.isOnScreen && this.alpha > 0) {
+        if (this.isOnScreen && opacity > 0) {
             Vector3.ProjectToRef(
                 this.object.getTransform().getAbsolutePosition(),
                 Matrix.IdentityReadOnly,
@@ -208,18 +156,11 @@ export class ObjectTargetCursor {
         }
         this.htmlRoot.style.setProperty("--dim", `${size}vh`);
 
-        this.alpha = 1.0;
-        if (this.minDistance > 0) {
-            this.alpha *= smoothstep(this.minDistance * 0.5, this.minDistance, distance);
-        }
-        if (this.maxDistance > 0 && !this.isTarget && !this.isPinned) {
-            this.alpha *= smoothstep(this.maxDistance * 1.5, this.maxDistance, distance);
-        }
+        const attentionOpacity = this.isTarget ? 1 : this.isInformationEnabled ? 0.65 : 0.3;
+        this.cursor.style.opacity = `${opacity * attentionOpacity}`;
+        this.textBlock.style.opacity = this.isInformationEnabled ? `${opacity}` : "0";
 
-        this.cursor.style.opacity = `${Math.min(this.alpha, this.isTarget ? 1 : 0.5)}`;
-        this.textBlock.style.opacity = this.isInformationEnabled ? `${this.alpha}` : "0.0";
-
-        const isTextVisible = this.isOnScreen && this.isInformationEnabled && this.alpha > 0;
+        const isTextVisible = this.isOnScreen && this.isInformationEnabled && opacity > 0;
         if (isTextVisible) {
             this.distanceText.textContent = parseDistance(distance, this.t);
 
@@ -228,10 +169,6 @@ export class ObjectTargetCursor {
         }
 
         this.lastDistance = distance;
-    }
-
-    isVisible(): boolean {
-        return this.alpha > 0 && this.isOnScreen;
     }
 
     dispose(): void {
