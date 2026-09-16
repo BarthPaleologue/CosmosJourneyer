@@ -26,17 +26,13 @@ import type { Scene } from "@babylonjs/core/scene";
 import { EarthRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
 import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
@@ -59,8 +55,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
 
     readonly ringsUniforms: RingsUniforms | null;
     readonly asteroidField: AsteroidField | null;
-
-    readonly targetInfo: TargetInfo;
 
     /**
      * New Gas Planet
@@ -119,8 +113,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     updateMaterial(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
@@ -135,10 +127,6 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
 
     public getBoundingRadius(): number {
         return this.model.radius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {

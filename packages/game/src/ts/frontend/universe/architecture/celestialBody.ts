@@ -19,12 +19,11 @@ import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
 
 import type { CanHaveRings } from "./canHaveRings";
 import type { OrbitalObjectBase } from "./orbitalObjectBase";
-import type { Targetable } from "./targetable";
 
 /**
  * Describes all celestial bodies (a combination of OrbitalObject, CanHaveRings)
  */
-export interface CelestialBodyBase<T extends OrbitalObjectType> extends OrbitalObjectBase<T>, CanHaveRings, Targetable {
+export interface CelestialBodyBase<T extends OrbitalObjectType> extends OrbitalObjectBase<T>, CanHaveRings {
     /**
      * Returns the radius of the celestial body
      */

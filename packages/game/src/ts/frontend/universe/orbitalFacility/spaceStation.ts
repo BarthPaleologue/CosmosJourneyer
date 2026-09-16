@@ -25,7 +25,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SpaceStationModel, StationSectionModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
 import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
@@ -37,9 +36,6 @@ import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokama
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
-import { ObjectTargetCursorType } from "@/frontend/universe/architecture/targetable";
-import type { Targetable, TargetInfo } from "@/frontend/universe/architecture/targetable";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
@@ -62,8 +58,6 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     private readonly scene: Scene;
 
     private readonly boundingRadius: number;
-
-    readonly targetInfo: TargetInfo;
 
     private readonly landingPadManager: LandingPadManager;
 
@@ -110,13 +104,6 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
         this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.FACILITY,
-            name: this.name,
-            minDistance: this.getBoundingRadius() * 6.0,
-            maxDistance: 0.0,
-        };
     }
 
     getLights(): ReadonlyArray<Light> {
@@ -127,16 +114,12 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         return this.landingPadManager;
     }
 
-    getSubTargets(): ReadonlyArray<Targetable> {
-        return [...this.landingBays, ...this.getLandingPadManager().getLandingPads()];
+    getLandingBays(): Array<LandingBay> {
+        return this.landingBays;
     }
 
     public getBoundingRadius(): number {
         return this.boundingRadius;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public computeCulling(camera: Camera): void {
