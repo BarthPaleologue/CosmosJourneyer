@@ -36,8 +36,8 @@ const accelerateAction = new Action({
 const steerAction = new Action({
     bindings: [
         new AxisComposite({
-            positive: keyboard.getControl("KeyD"),
-            negative: keyboard.getControl("KeyA"),
+            positive: keyboard.getControl("KeyA"),
+            negative: keyboard.getControl("KeyD"),
         }),
     ],
 });
