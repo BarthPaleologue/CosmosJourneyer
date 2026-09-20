@@ -43,6 +43,14 @@ import { EmptyCelestialBody } from "./emptyCelestialBody";
 import { SpaceElevator } from "./orbitalFacility/spaceElevator";
 import { SpaceStation } from "./orbitalFacility/spaceStation";
 
+export type StarSystemLoaderOutput = {
+    stellarObjects: NonEmptyArray<StellarObject>;
+    planets: Array<Planet>;
+    satellites: Array<TelluricPlanet>;
+    anomalies: Array<Anomaly>;
+    orbitalFacilities: Array<OrbitalFacility>;
+};
+
 export class StarSystemLoader {
     private loadingIndex = 0;
 
@@ -58,13 +66,7 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<{
-        stellarObjects: readonly [StellarObject, ...StellarObject[]];
-        planets: readonly Planet[];
-        satellites: readonly TelluricPlanet[];
-        anomalies: readonly Anomaly[];
-        orbitalFacilities: readonly OrbitalFacility[];
-    }> {
+    ): Promise<StarSystemLoaderOutput> {
         const numberOfObjects =
             systemModel.stellarObjects.length +
             systemModel.planets.length +
@@ -107,7 +109,7 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<Readonly<NonEmptyArray<StellarObject>>> {
+    ): Promise<NonEmptyArray<StellarObject>> {
         const stellarObjects: StellarObject[] = [];
         for (const stellarObjectModel of stellarObjectModels) {
             console.log("Loading stellar object:", stellarObjectModel.name);
@@ -144,7 +146,7 @@ export class StarSystemLoader {
         anomalyModels: DeepReadonly<Array<AnomalyModel>>,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<ReadonlyArray<Anomaly>> {
+    ): Promise<Array<Anomaly>> {
         const anomalies: Anomaly[] = [];
         for (const anomalyModel of anomalyModels) {
             console.log("Loading Anomaly:", anomalyModel.name);
@@ -187,7 +189,7 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<ReadonlyArray<OrbitalFacility>> {
+    ): Promise<Array<OrbitalFacility>> {
         const orbitalFacilities: OrbitalFacility[] = [];
         for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
             let orbitalFacility: OrbitalFacility;
@@ -216,7 +218,7 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<ReadonlyArray<Planet>> {
+    ): Promise<Array<Planet>> {
         const planets: Planet[] = [];
         for (const planetModel of planetModels) {
             console.log("Loading planet", planetModel.name);
@@ -248,7 +250,7 @@ export class StarSystemLoader {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<ReadonlyArray<TelluricPlanet>> {
+    ): Promise<Array<TelluricPlanet>> {
         const satellites: TelluricPlanet[] = [];
         for (const satelliteModel of satelliteModels) {
             console.log("Loading satellite:", satelliteModel.name);

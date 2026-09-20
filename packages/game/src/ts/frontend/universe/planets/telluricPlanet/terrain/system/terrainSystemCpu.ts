@@ -179,8 +179,8 @@ export class TerrainSystemCpu implements ITerrainSystem {
     private serializeComputeHeightsInput(input: ComputeHeightsInput): ComputeHeightsWorkerPayload {
         const coordinates = new Float64Array(input.coordinates.length * 2);
         for (const [index, coordinate] of input.coordinates.entries()) {
-            coordinates[index * 2] = coordinate.latitudeRadians;
-            coordinates[index * 2 + 1] = coordinate.longitudeRadians;
+            coordinates[index * 2] = coordinate.latitude;
+            coordinates[index * 2 + 1] = coordinate.longitude;
         }
 
         return {
