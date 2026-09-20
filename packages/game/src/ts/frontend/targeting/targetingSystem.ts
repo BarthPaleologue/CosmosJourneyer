@@ -20,15 +20,10 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Observable } from "@babylonjs/core/Misc/observable";
 
 import type { Transformable } from "../universe/architecture/transformable";
+import type { Sensor } from "./sensors/sensor";
 import type { Target } from "./target";
 import { TargetAcquisition } from "./targetContact";
 import type { TargetContact } from "./targetContact";
-
-export const sensorRangeFactor = 100;
-
-export function getSensorRange(target: Target): number {
-    return target.getBoundingRadius() * sensorRangeFactor;
-}
 
 export class TargetingSystem {
     readonly onTargetsAddedObservable = new Observable<Iterable<Target>>();
@@ -38,6 +33,12 @@ export class TargetingSystem {
     private target: Target | null = null;
     private readonly knownTargets = new Set<TransformNode>();
     private readonly observerPosition = Vector3.Zero();
+
+    private activeSensors: Iterable<Sensor> = [];
+
+    public setActiveSensors(sensors: Iterable<Sensor>) {
+        this.activeSensors = sensors;
+    }
 
     public *getTargets(): Iterable<Target> {
         for (const contact of this.targets.values()) {
@@ -136,7 +137,14 @@ export class TargetingSystem {
         }
         const transform = contact.target.getTransform();
         transform.computeWorldMatrix(true);
-        const range = getSensorRange(contact.target);
-        return Vector3.DistanceSquared(transform.getAbsolutePosition(), this.observerPosition) <= range * range;
+
+        for (const sensor of this.activeSensors) {
+            const isDetected = sensor.detects(object);
+            if (isDetected) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
