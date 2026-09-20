@@ -12,6 +12,7 @@
     "spaceElevatorClimber": "Nacelle de l'Ascenseur Spatial",
     "anomaly": "Anomalie",
     "landingBay": "Baie d'Atterrissage",
+    "landingPadName": "Plateforme {{padIdentifier}}",
     "landingPad": "Plateforme d'Atterrissage",
     "spaceship": "Vaisseau Spatial",
     "vehicle": "Véhicule"

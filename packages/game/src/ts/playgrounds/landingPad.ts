@@ -55,7 +55,7 @@ export async function createLandingPadScene(
 
     const decalTexture = createSquareTextDecalTexture("LandingPadCenterDecal", "A1", scene);
 
-    const landingPad = new LandingPad("LandingPad", LandingPadSize.MEDIUM, landingPadMaterial, scene, {
+    const landingPad = new LandingPad("0", LandingPadSize.MEDIUM, landingPadMaterial, scene, {
         centerDecalTexture: decalTexture,
     });
 

@@ -21,13 +21,8 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { CelestialBodyModel, OrbitalObjectType } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
-
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 
 import type { CelestialBodyBase } from "./architecture/celestialBody";
-import { defaultTargetInfoCelestialBody } from "./architecture/targetable";
-import type { TargetInfo } from "./architecture/targetable";
 
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
     readonly model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>;
@@ -38,8 +33,6 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
 
     readonly asteroidField = null;
     readonly ringsUniforms = null;
-
-    readonly targetInfo: TargetInfo;
 
     /**
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
@@ -52,8 +45,6 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
 
         this.transform = new TransformNode(this.model.name, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {
@@ -66,10 +57,6 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
 
     getBoundingRadius(): number {
         return this.getRadius();
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     dispose(): void {

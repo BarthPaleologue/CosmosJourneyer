@@ -75,7 +75,7 @@ describe("StarSystemView", () => {
             setActiveControls: vi.fn(),
             soundPlayer: {},
             spaceshipControls,
-            targetCursorLayer: { addObjects: vi.fn() },
+            targetingSystem: { addContacts: vi.fn() },
             universeBackend,
             vehicleControls: { getCameras: () => [] },
         } as unknown as StarSystemView;
@@ -168,7 +168,7 @@ describe("StarSystemView", () => {
             spaceStationLayer: { reset: vi.fn() },
             spaceshipControls: null,
             starSystem: oldStarSystem,
-            targetCursorLayer: { reset: vi.fn() },
+            targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;
 

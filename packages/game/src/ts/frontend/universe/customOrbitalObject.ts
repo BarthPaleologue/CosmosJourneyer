@@ -21,15 +21,12 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModelBase } from "@cosmos-journeyer/universe-model";
 
 import type { OrbitalObjectBase } from "./architecture/orbitalObjectBase";
-import { ObjectTargetCursorType } from "./architecture/targetable";
-import type { Targetable, TargetInfo } from "./architecture/targetable";
 
-export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targetable {
+export class CustomOrbitalObject implements OrbitalObjectBase<"custom"> {
     private readonly _transform: TransformNode;
     readonly model: DeepReadonly<OrbitalObjectModelBase<"custom">>;
     readonly type: "custom";
     private readonly boundingRadius: number;
-    readonly targetInfo: TargetInfo;
 
     constructor(transform: TransformNode, model: DeepReadonly<OrbitalObjectModelBase<"custom">>) {
         this._transform = transform;
@@ -40,13 +37,6 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targeta
 
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
         this.boundingRadius = boundingVectors.max.subtract(boundingVectors.min).length() / 2;
-
-        this.targetInfo = {
-            type: ObjectTargetCursorType.CELESTIAL_BODY,
-            minDistance: 0,
-            maxDistance: 0,
-            name: transform.name,
-        };
     }
 
     getTransform(): TransformNode {
@@ -55,10 +45,6 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom">, Targeta
 
     getBoundingRadius(): number {
         return this.boundingRadius;
-    }
-
-    getTypeName(): string {
-        return "Wrapped Orbital Object";
     }
 
     dispose(): void {

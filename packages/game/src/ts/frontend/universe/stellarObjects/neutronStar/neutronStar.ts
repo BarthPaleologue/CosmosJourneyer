@@ -24,17 +24,13 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { NeutronStarModel } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
 
 import type { Textures } from "@/frontend/assets/textures";
 import type { Cullable } from "@/frontend/helpers/cullable";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
 import type { RingsProceduralPatternLut } from "@/frontend/postProcesses/rings/ringsProceduralLut";
 import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 import { VolumetricLightUniforms } from "@/frontend/postProcesses/volumetricLight/volumetricLightUniforms";
-import { defaultTargetInfoCelestialBody } from "@/frontend/universe/architecture/targetable";
-import type { TargetInfo } from "@/frontend/universe/architecture/targetable";
 import { AsteroidField } from "@/frontend/universe/asteroidFields/asteroidField";
 
 import type { ItemPool } from "@/utils/itemPool";
@@ -62,8 +58,6 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
     readonly ringsUniforms: RingsUniforms | null;
 
     readonly asteroidField: AsteroidField | null;
-
-    readonly targetInfo: TargetInfo;
 
     /**
      * New Star
@@ -108,16 +102,10 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
             this.ringsUniforms = null;
             this.asteroidField = null;
         }
-
-        this.targetInfo = defaultTargetInfoCelestialBody(model.name, this.getBoundingRadius());
     }
 
     getTransform(): TransformNode {
         return this.mesh;
-    }
-
-    getTypeName(t: TFunction): string {
-        return getOrbitalObjectTypeToI18nString(this.model, t);
     }
 
     public getEmissiveColor(): Color3 {
