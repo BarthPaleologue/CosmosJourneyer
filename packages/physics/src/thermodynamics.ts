@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StefanBoltzmannConstant } from "./constants/derived";
+import { sphereArea } from "./geometry";
 
 /**
  * Applies Stefan-Boltzmann law to calculate the radiative flux of a black body.
@@ -43,7 +44,7 @@ export function getRadiatedFlux(temperatureKelvin: number, emissivity: number): 
  * @returns The total radiated power in Watts.
  */
 export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number): number {
-    return getBlackBodyRadiatedFlux(temperatureKelvin) * 4 * Math.PI * radius ** 2;
+    return getBlackBodyRadiatedFlux(temperatureKelvin) * sphereArea(radius);
 }
 
 /**
@@ -56,7 +57,7 @@ export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number
  * @returns The irradiance in W/m² at the given distance.
  */
 export function getSphereIrradianceAtDistance(temperatureKelvin: number, radius: number, distance: number): number {
-    return getBlackBodyLuminosity(temperatureKelvin, radius) / (4 * Math.PI * distance ** 2);
+    return getBlackBodyLuminosity(temperatureKelvin, radius) / sphereArea(distance);
 }
 
 /**

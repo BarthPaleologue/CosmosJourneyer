@@ -4,9 +4,9 @@ import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphe
 import type { Transformable } from "../universe/architecture/transformable";
 
 export const TargetType = {
+    ANOMALY: "anomaly",
     BLACK_HOLE: "blackHole",
     CUSTOM: "custom",
-    ANOMALY: "anomaly",
     GAS_PLANET: "gasPlanet",
     LANDING_BAY: "landingBay",
     LANDING_PAD: "landingPad",
@@ -19,6 +19,7 @@ export const TargetType = {
     SPACESHIP: "spaceship",
     TELLURIC_PLANET: "telluricPlanet",
     TELLURIC_SATELLITE: "telluricSatellite",
+    UNKNOWN: "unknown",
     VEHICLE: "vehicle",
 } as const;
 
@@ -43,11 +44,19 @@ export type PadTarget = TargetBase & {
     readonly padIdentifier: string;
 };
 
+export type UnknownTarget = TargetBase & {
+    readonly type: typeof TargetType.UNKNOWN;
+    readonly radioEmissionStrength: number;
+};
+
 type OtherTarget = TargetBase & {
     readonly type: Exclude<
         TargetType,
-        typeof TargetType.STAR | typeof TargetType.TELLURIC_SATELLITE | typeof TargetType.LANDING_PAD
+        | typeof TargetType.STAR
+        | typeof TargetType.TELLURIC_SATELLITE
+        | typeof TargetType.LANDING_PAD
+        | typeof TargetType.UNKNOWN
     >;
 };
 
-export type Target = StarTarget | TelluricSatelliteTarget | PadTarget | OtherTarget;
+export type Target = StarTarget | TelluricSatelliteTarget | PadTarget | UnknownTarget | OtherTarget;

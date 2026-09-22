@@ -18,6 +18,8 @@
 import { ClusteredLightContainer, DirectionalLight, GlowLayer, Scene, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
+import type { UplinkModel } from "@/backend/persistentEntities/persistentEntityModel";
+
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { getBoundingRadius } from "@/frontend/helpers/boundingRadius";
@@ -39,7 +41,7 @@ export async function createUplinkScene(
 
     await initializeCsg2();
 
-    const model = { type: "uplink" } as const;
+    const model = { type: "uplink", name: "Uplink" } as const satisfies UplinkModel;
     const uplink = new Uplink(model, scene);
     uplink.setState(UplinkState.SCANNING);
     const boundingRadius = getBoundingRadius(uplink.getTransform());

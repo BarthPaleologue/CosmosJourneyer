@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { CreateSphere, HtmlTexture, MeshBuilder, PBRMetallicRoughnessMaterial } from "@babylonjs/core/pure";
+import { HtmlTexture, MeshBuilder, PBRMetallicRoughnessMaterial } from "@babylonjs/core/pure";
 import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -25,17 +25,21 @@ import type {
     DiaryDiscussionModel,
     PersistentEntityContentModel,
     SimpleAssetContentModel,
-    UplinkModel,
 } from "@/backend/persistentEntities/persistentEntityModel";
 
 import { renderMarkdownInline } from "@/utils/markdown";
 
 import type { ILoadingProgressMonitor } from "../assets/loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "../assets/objects/utils";
+import { getBoundingRadius } from "../helpers/boundingRadius";
+import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Transformable } from "../universe/architecture/transformable";
 import { Uplink } from "./uplink";
 
-export type PersistentEntityContent = Transformable;
+export interface PersistentEntityContent extends Transformable, HasBoundingSphere {
+    getName(): string;
+    getRadioEmissionStrength(): number;
+}
 
 export async function initContent(
     content: DeepReadonly<PersistentEntityContentModel>,
@@ -63,8 +67,13 @@ async function initSimpleAssetContent(
     const root = container.rootNodes[0] as TransformNode;
     container.addAllToScene();
 
+    const boundingRadius = getBoundingRadius(root);
+
     return {
+        getName: () => root.name,
         getTransform: () => root,
+        getBoundingRadius: () => boundingRadius,
+        getRadioEmissionStrength: () => 0,
     };
 }
 
@@ -115,21 +124,12 @@ export function initDiaryDiscussion(
 
     material.baseTexture = texture;
 
+    const boundingRadius = getBoundingRadius(root);
+
     return {
+        getName: () => content.entry.author,
         getTransform: () => root,
-    };
-}
-
-export function initUplink(content: UplinkModel, scene: Scene): PersistentEntityContent {
-    const bigAssMetalSphere = CreateSphere("uplink", { diameter: 2e3 }, scene);
-
-    const material = new PBRMetallicRoughnessMaterial("metalMaterial", scene);
-    material.roughness = 0.6;
-    material.metallic = 1;
-
-    bigAssMetalSphere.material = material;
-
-    return {
-        getTransform: () => bigAssMetalSphere,
+        getBoundingRadius: () => boundingRadius,
+        getRadioEmissionStrength: () => 0,
     };
 }

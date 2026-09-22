@@ -21,7 +21,6 @@ import type { Observer } from "@babylonjs/core/Misc/observable";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../targeting/target";
-import { getSensorRange } from "../../targeting/targetingSystem";
 import type { TargetingSystem } from "../../targeting/targetingSystem";
 import type { Transformable } from "../../universe/architecture/transformable";
 import { findBestTarget } from "./findBestTarget";
@@ -96,7 +95,6 @@ export class TargetCursorLayer {
         const projected = Vector3.Zero();
         const frame = [...this.targetCursors].map(([target, cursor]) => {
             const isSelected = target === selected;
-            const sensorRange = this.targetingSystem.isKnown(target) || isSelected ? null : getSensorRange(target);
             target.getTransform().computeWorldMatrix(true);
             const position = target.getTransform().getAbsolutePosition();
             const offset = position.subtract(camera.globalPosition);
@@ -113,7 +111,6 @@ export class TargetCursorLayer {
                     ? getTargetCursorOpacity(
                           target,
                           distance,
-                          sensorRange,
                           isSelected,
                           this.targetingSystem.hasKnownOverride(target),
                       )

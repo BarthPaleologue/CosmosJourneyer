@@ -108,6 +108,7 @@ export function getVestaAuthoredEntityModels() {
             type: "orbital",
             content: {
                 type: "uplink",
+                name: "Kagare uplink",
             },
             orbitalObject: {
                 type: "custom",

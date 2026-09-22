@@ -30,14 +30,17 @@ import {
     Vector3,
 } from "@babylonjs/core/pure";
 import type { Mesh, Scene } from "@babylonjs/core/pure";
-import { assertUnreachable, type DeepReadonly } from "@cosmos-journeyer/typescript";
+import { sphereArea } from "@cosmos-journeyer/physics";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { UplinkModel } from "@/backend/persistentEntities/persistentEntityModel";
 
 import { lerpSmooth } from "@/utils/math";
 
 import { createRing } from "../assets/procedural/helpers/ringBuilder";
-import type { Transformable } from "../universe/architecture/transformable";
+import { getBoundingRadius } from "../helpers/boundingRadius";
+import type { PersistentEntityContent } from "./contentLoader";
 
 export const UplinkState = {
     IDLE: "idle",
@@ -45,7 +48,7 @@ export const UplinkState = {
 } as const;
 export type UplinkState = (typeof UplinkState)[keyof typeof UplinkState];
 
-export class Uplink implements Transformable {
+export class Uplink implements PersistentEntityContent {
     readonly lights: Array<PointLight> = [];
 
     private readonly shell: Mesh;
@@ -58,7 +61,13 @@ export class Uplink implements Transformable {
 
     private ringRotationMask = 0;
 
+    private readonly model: DeepReadonly<UplinkModel>;
+
+    private readonly boundingRadius: number;
+
     constructor(model: DeepReadonly<UplinkModel>, scene: Scene) {
+        this.model = model;
+
         const outerRadius = 1e3;
         const shellThickness = 50;
         const entranceInnerRadius = 120;
@@ -184,6 +193,8 @@ export class Uplink implements Transformable {
         for (const csg of csgs) {
             csg.dispose();
         }
+
+        this.boundingRadius = getBoundingRadius(this.getTransform());
     }
 
     private initRings(scene: Scene) {
@@ -223,8 +234,22 @@ export class Uplink implements Transformable {
         }
     }
 
+    getName() {
+        return this.model.name;
+    }
+
     getTransform() {
         return this.shell;
+    }
+
+    getBoundingRadius() {
+        return this.boundingRadius;
+    }
+
+    getRadioEmissionStrength() {
+        const receivedEnergyDensity = 1e-17;
+        const receivedDistance = 1000e3;
+        return sphereArea(receivedDistance) * receivedEnergyDensity;
     }
 
     setState(state: UplinkState) {

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 
@@ -23,6 +24,9 @@ import type { Sensor } from "./sensor";
 
 export class PassiveRadioSensor implements Sensor {
     private readonly transform: TransformNode;
+
+    /** W/m² */
+    private readonly sensitivity = 1e-20;
 
     constructor(name: string, scene: Scene) {
         this.transform = new TransformNode(name, scene);
@@ -47,7 +51,21 @@ export class PassiveRadioSensor implements Sensor {
             case "telluricSatellite":
             case "vehicle":
                 return false;
+            case "unknown":
+                return this.detectsRadioSource(
+                    target.getTransform().getAbsolutePosition(),
+                    target.radioEmissionStrength,
+                );
         }
+    }
+
+    private detectsRadioSource(targetPosition: Vector3, radioEmissionStrength: number): boolean {
+        const sensorPosition = this.getTransform().getAbsolutePosition();
+        const distance2 = Vector3.DistanceSquared(sensorPosition, targetPosition);
+
+        const receivedPowerDensity = radioEmissionStrength / (4 * Math.PI * distance2);
+
+        return receivedPowerDensity > this.sensitivity;
     }
 
     getTransform() {

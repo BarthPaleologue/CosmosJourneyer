@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
@@ -71,6 +70,8 @@ export function getTargetTypeName(target: Target, t: TFunction): string {
             return t("objectTypes:spaceship");
         case TargetType.VEHICLE:
             return t("objectTypes:vehicle");
+        case TargetType.UNKNOWN:
+            return t("objectTypes:unknown");
         default:
             return assertUnreachable(target);
     }
@@ -133,6 +134,12 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
                 minSize: 5,
                 maxSize: 0,
             };
+        case TargetType.UNKNOWN:
+            return {
+                shape: "rounded",
+                minSize: 3,
+                maxSize: 0,
+            };
         case TargetType.BLACK_HOLE:
         case TargetType.CUSTOM:
         case TargetType.GAS_PLANET:
@@ -149,64 +156,21 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
     }
 }
 
-/** Presentation-only fades; sensor range is supplied by gameplay targeting. */
 export function getTargetCursorOpacity(
     target: Target,
     distance: number,
-    sensorRange: number | null,
     isSelected: boolean,
     hasKnownOverride: boolean,
 ): number {
-    if (target.type === TargetType.STAR_SYSTEM && !isSelected) {
-        return 0;
+    if (target.type === TargetType.STAR_SYSTEM) {
+        return isSelected ? 1 : 0;
     }
+
     const localOpacity =
         target.type === TargetType.TELLURIC_SATELLITE && !isSelected && !hasKnownOverride
             ? 1 - smoothstep(target.orbitSemiMajorAxis * 6.4, target.orbitSemiMajorAxis * 8, distance)
             : 1;
-    const detectionOpacity =
-        sensorRange === null ? 1 : sensorRange > 0 ? 1 - smoothstep(sensorRange * 0.8, sensorRange, distance) : 0;
-    return getTargetProximityOpacity(target, distance) * detectionOpacity * localOpacity;
-}
-
-function getTargetProximityOpacity(target: Target, distance: number): number {
-    const radius = target.getBoundingRadius();
-    let minDistance: number;
-    switch (target.type) {
-        case TargetType.CUSTOM:
-            minDistance = 0;
-            break;
-        case TargetType.STAR_SYSTEM:
-            minDistance = lightYearsToMeters(2);
-            break;
-        case TargetType.SPACESHIP:
-            minDistance = radius * 15;
-            break;
-        case TargetType.VEHICLE:
-        case TargetType.STAR:
-        case TargetType.NEUTRON_STAR:
-        case TargetType.BLACK_HOLE:
-        case TargetType.GAS_PLANET:
-        case TargetType.TELLURIC_PLANET:
-        case TargetType.TELLURIC_SATELLITE:
-        case TargetType.ANOMALY:
-            minDistance = radius * 10;
-            break;
-        case TargetType.SPACE_STATION:
-        case TargetType.SPACE_ELEVATOR:
-            minDistance = radius * 6;
-            break;
-        case TargetType.SPACE_ELEVATOR_CLIMBER:
-            minDistance = radius * 7;
-            break;
-        case TargetType.LANDING_BAY:
-            minDistance = 8000;
-            break;
-        case TargetType.LANDING_PAD:
-            minDistance = radius * 4;
-            break;
-        default:
-            return assertUnreachable(target);
-    }
-    return minDistance > 0 ? smoothstep(minDistance * 0.5, minDistance, distance) : 1;
+    const minDistance = target.getBoundingRadius() * 10;
+    const nearFadeOut = smoothstep(minDistance * 0.5, minDistance, distance);
+    return nearFadeOut * localOpacity;
 }

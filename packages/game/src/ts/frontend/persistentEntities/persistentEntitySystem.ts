@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { PersistentEntityContent } from "./contentLoader";
 import type { GroundedPersistentEntity, OrbitalPersistentEntity } from "./persistentEntity";
 import type { PersistentEntityLoaderOutput } from "./persistentEntityLoader";
 
@@ -27,7 +28,7 @@ export class PersistentEntitySystem {
         this.orbitalEntities = orbital;
     }
 
-    getEntities() {
+    getEntities(): Array<PersistentEntityContent> {
         return [
             ...this.groundedEntities.map((entity) => entity.content),
             ...this.orbitalEntities.map((entity) => entity.content),

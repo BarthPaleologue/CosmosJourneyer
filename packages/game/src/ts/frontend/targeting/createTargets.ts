@@ -22,6 +22,7 @@ import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { SpaceElevatorClimber } from "../assets/procedural/spaceStation/climber/spaceElevatorClimber";
 import type { LandingBay } from "../assets/procedural/spaceStation/landingBay/landingBay";
 import type { Mission } from "../missions/mission";
+import type { PersistentEntityContent } from "../persistentEntities/contentLoader";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { Anomaly, OrbitalFacility, OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { ILandingPad } from "../universe/orbitalFacility/landingPadManager";
@@ -29,7 +30,7 @@ import type { StarSystemController } from "../universe/starSystemController";
 import type { SystemTarget } from "../universe/systemTarget";
 import type { Vehicle } from "../vehicle/vehicle";
 import { TargetType } from "./target";
-import type { PadTarget, Target } from "./target";
+import type { PadTarget, Target, UnknownTarget } from "./target";
 
 export function getSystemTargets(starSystem: StarSystemController): Array<Target> {
     const out: Array<Target> = [];
@@ -43,6 +44,15 @@ export function getSystemTargets(starSystem: StarSystemController): Array<Target
     out.push(...persistentEntities.map(createPersistentContentTarget));
 
     return out;
+}
+
+function createPersistentContentTarget(content: PersistentEntityContent): UnknownTarget {
+    return {
+        type: "unknown",
+        getTransform: () => content.getTransform(),
+        getBoundingRadius: () => content.getBoundingRadius(),
+        radioEmissionStrength: content.getRadioEmissionStrength(),
+    };
 }
 
 function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target> {

@@ -35,6 +35,7 @@ export type DiaryDiscussionModel = {
 
 export type UplinkModel = {
     type: "uplink";
+    name: string;
 };
 
 export type PersistentEntityContentModel = SimpleAssetContentModel | DiaryDiscussionModel | UplinkModel;
