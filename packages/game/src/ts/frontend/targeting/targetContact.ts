@@ -42,5 +42,6 @@ const defaultAcquisition = {
     [TargetType.LANDING_BAY]: TargetAcquisition.SENSOR,
     [TargetType.SPACE_ELEVATOR_CLIMBER]: TargetAcquisition.SENSOR,
     [TargetType.SPACESHIP]: TargetAcquisition.SENSOR,
+    [TargetType.UNKNOWN]: TargetAcquisition.SENSOR,
     [TargetType.VEHICLE]: TargetAcquisition.SENSOR,
 } satisfies Record<TargetType, TargetAcquisition>;

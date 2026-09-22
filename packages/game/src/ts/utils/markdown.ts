@@ -4,7 +4,7 @@ const markdownRenderer = new MarkdownItRenderer({
     html: false,
     linkify: true,
     typographer: false,
-    breaks: false,
+    breaks: true,
 });
 
 markdownRenderer.linkify.set({

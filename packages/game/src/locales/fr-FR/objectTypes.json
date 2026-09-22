@@ -15,5 +15,6 @@
     "landingPadName": "Plateforme {{padIdentifier}}",
     "landingPad": "Plateforme d'Atterrissage",
     "spaceship": "Vaisseau Spatial",
+    "unknown": "Inconnu",
     "vehicle": "Véhicule"
 }

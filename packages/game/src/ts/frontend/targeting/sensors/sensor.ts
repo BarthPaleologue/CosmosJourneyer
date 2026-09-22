@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,13 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./blackHole";
-export * from "./constants";
-export * from "./orbit";
-export * from "./physics";
-export * from "./solarPanels";
-export * from "./stellarTypes";
-export * from "./thermodynamics";
-export * from "./unitConversions";
-export * from "./gasGiants";
-export * from "./geometry";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
+
+import type { Target } from "../target";
+
+export interface Sensor extends Transformable {
+    detects(target: Target): boolean;
+}

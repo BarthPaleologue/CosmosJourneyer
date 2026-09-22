@@ -15,5 +15,6 @@
     "landingPadName": "Pad {{padIdentifier}}",
     "landingPad": "Landing Pad",
     "spaceship": "Spaceship",
+    "unknown": "Unknown",
     "vehicle": "Vehicle"
 }

@@ -15,13 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export * from "./blackHole";
-export * from "./constants";
-export * from "./orbit";
-export * from "./physics";
-export * from "./solarPanels";
-export * from "./stellarTypes";
-export * from "./thermodynamics";
-export * from "./unitConversions";
-export * from "./gasGiants";
-export * from "./geometry";
+export function sphereArea(radius: number) {
+    return 4 * Math.PI * radius ** 2;
+}
