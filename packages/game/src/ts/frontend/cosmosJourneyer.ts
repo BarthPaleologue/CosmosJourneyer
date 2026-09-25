@@ -82,6 +82,9 @@ import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { AssetsExtensionPoints } from "./extensions/assetsExtensionPoints";
+import { initBuiltinExtensions, loadExtensions } from "./extensions/extensionLoader";
+import type { ExtensionPoints } from "./extensions/gameExtension";
 import { lookAt } from "./helpers/transform";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
@@ -510,12 +513,38 @@ export class CosmosJourneyer {
 
         const starSystemViewPhysicsEngine = getPhysicsEngineV2(starSystemViewScene);
 
-        const loadingProgressMonitor = new LoadingProgressMonitor();
-        loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
+        const progressMonitor = new LoadingProgressMonitor();
+        progressMonitor.addProgressCallback((startedCount, completedCount) => {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const assets = await loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
+        const extensionPoints: ExtensionPoints = {
+            assets: new AssetsExtensionPoints(),
+            systemContent: {
+                registerObjectFactory,
+                registerModelFactory,
+            },
+        };
+
+        const builtinExtensions = initBuiltinExtensions();
+
+        const extensionsResult = loadExtensions(builtinExtensions, extensionPoints);
+        if (!extensionsResult.success) {
+            return extensionsResult;
+        }
+
+        const builtinAssets = await loadAssets(starSystemViewScene, audioEngine, progressMonitor);
+
+        const extensionAssetsResult = await extensionPoints.assets.load({ audioEngine, progressMonitor });
+
+        if (!extensionAssetsResult.success) {
+            return extensionAssetsResult;
+        }
+
+        const assets = {
+            ...builtinAssets,
+            extensions: extensionAssetsResult.value,
+        };
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
@@ -539,7 +568,7 @@ export class CosmosJourneyer {
             assets.rendering,
             terrainSystemResult.value,
             t,
-            loadingProgressMonitor,
+            progressMonitor,
         );
 
         const starMapView = new StarMapView(
@@ -573,7 +602,7 @@ export class CosmosJourneyer {
                 soundPlayer,
                 tts,
                 notificationManager,
-                loadingProgressMonitor,
+                progressMonitor,
                 t,
             ),
         );

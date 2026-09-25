@@ -28,8 +28,6 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
         case "mandelbox":
         case "sierpinskiPyramid":
         case "mengerSponge":
-        case "darkKnight":
-            return t("objectTypes:anomaly");
         case "gasPlanet":
             return t("objectTypes:gasPlanet");
         case "telluricPlanet":
