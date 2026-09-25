@@ -31,7 +31,8 @@ import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
@@ -51,7 +52,7 @@ import { loadAssets } from "@/frontend/assets/assets";
 import type { Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicConductor } from "@/frontend/audio/musicConductor";
-import { SoundPlayer, SoundPlayerMock } from "@/frontend/audio/soundPlayer";
+import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { initializeCsg2 } from "@/frontend/helpers/csg2";
@@ -427,7 +428,7 @@ export class CosmosJourneyer {
      * Creates the engine and the scenes and loads the assets async
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
-    public static async CreateAsync(t: TFunction): Promise<CosmosJourneyer> {
+    public static async New(t: TFunction): Promise<Result<CosmosJourneyer, Error>> {
         const canvas = document.createElement("canvas");
         document.body.prepend(canvas);
 
@@ -438,8 +439,7 @@ export class CosmosJourneyer {
 
         const backendResult = await CosmosJourneyerBackendLocal.New();
         if (!backendResult.success) {
-            await alertModal(backendResult.error.message, new SoundPlayerMock(), t);
-            throw backendResult.error;
+            return backendResult;
         }
 
         const backend = backendResult.value;
@@ -512,12 +512,7 @@ export class CosmosJourneyer {
         const notificationManager = new NotificationManager(soundPlayer);
         const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
         if (!terrainSystemResult.success) {
-            await alertModal(
-                `Failed to initialize the terrain engine: ${terrainSystemResult.error.message}`,
-                soundPlayer,
-                t,
-            );
-            throw terrainSystemResult.error;
+            return terrainSystemResult;
         }
 
         // Init star system view
@@ -556,19 +551,21 @@ export class CosmosJourneyer {
             await alertModal(t("notifications:unknownKeyboardLayout"), soundPlayer, t);
         }
 
-        return new CosmosJourneyer(
-            player,
-            engine,
-            audioEngine,
-            starSystemViewAssets,
-            starSystemView,
-            starMapView,
-            backend,
-            soundPlayer,
-            tts,
-            notificationManager,
-            loadingProgressMonitor,
-            t,
+        return ok(
+            new CosmosJourneyer(
+                player,
+                engine,
+                audioEngine,
+                starSystemViewAssets,
+                starSystemView,
+                starMapView,
+                backend,
+                soundPlayer,
+                tts,
+                notificationManager,
+                loadingProgressMonitor,
+                t,
+            ),
         );
     }
 
