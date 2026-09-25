@@ -18,6 +18,7 @@
 import "@babylonjs/core/Helpers/sceneHelpers";
 import "@babylonjs/core/Materials/Textures/Loaders/envTextureLoader";
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
@@ -72,26 +73,31 @@ export type Textures = {
 
 /**
  * Loads all textures required by the game
- * @param scene - The scene to load textures into
+ * @param scene - The scene used to create scene-owned textures
+ * @param engine - The engine used to load regular textures
  * @param progressMonitor - The progress monitor to report loading progress
  * @returns A promise resolving to the Textures object
  */
-export async function loadTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<Textures> {
+export async function loadTextures(
+    scene: Scene,
+    engine: AbstractEngine,
+    progressMonitor: ILoadingProgressMonitor,
+): Promise<Textures> {
     // Water textures
-    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, scene, progressMonitor);
-    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, scene, progressMonitor);
+    const waterNormalMap1Promise = loadTextureAsync("WaterNormalMap1", waterNormal1, engine, progressMonitor);
+    const waterNormalMap2Promise = loadTextureAsync("WaterNormalMap2", waterNormal2, engine, progressMonitor);
 
-    const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, scene, progressMonitor);
+    const emptyTexturePromise = loadTextureAsync("EmptyTexture", empty, engine, progressMonitor);
 
     const environmentPromise = loadEnvironmentTextures(scene, progressMonitor);
 
-    const terrainTexturesPromise = loadTerrainTextures(scene, progressMonitor);
-    const particleTexturesPromise = loadParticleTextures(scene, progressMonitor);
-    const materialTexturesPromise = loadMaterialTextures(scene, progressMonitor);
-    const gasPlanetTexturesPromise = loadGasPlanetTextures(scene, progressMonitor);
-    const ringsTexturesPromise = loadRingsTextures(scene, progressMonitor);
+    const terrainTexturesPromise = loadTerrainTextures(engine, progressMonitor);
+    const particleTexturesPromise = loadParticleTextures(engine, progressMonitor);
+    const materialTexturesPromise = loadMaterialTextures(engine, progressMonitor);
+    const gasPlanetTexturesPromise = loadGasPlanetTextures(engine, progressMonitor);
+    const ringsTexturesPromise = loadRingsTextures(engine, progressMonitor);
 
-    const noiseTexturesPromise = loadNoiseTextures(scene, progressMonitor);
+    const noiseTexturesPromise = loadNoiseTextures(engine, progressMonitor);
 
     // Assemble and return the textures structure
     return {

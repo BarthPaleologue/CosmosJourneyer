@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
@@ -59,62 +59,62 @@ export type AllMaterialTextures = {
 };
 
 export async function loadMaterialTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<AllMaterialTextures> {
     // Space Station
     const spaceStationAlbedoPromise = loadTextureAsync(
         "SpaceStationAlbedo",
         spaceStationAlbedo,
-        scene,
+        engine,
         progressMonitor,
     );
     const spaceStationNormalPromise = loadTextureAsync(
         "SpaceStationNormal",
         spaceStationNormal,
-        scene,
+        engine,
         progressMonitor,
     );
     const spaceStationMetallicRoughnessPromise = loadTextureAsync(
         "SpaceStationMetallicRoughness",
         spaceStationMetallicRoughness,
-        scene,
+        engine,
         progressMonitor,
     );
     const spaceStationAmbientOcclusionPromise = loadTextureAsync(
         "SpaceStationAmbientOcclusion",
         spaceStationAmbientOcclusion,
-        scene,
+        engine,
         progressMonitor,
     );
 
     // Metal Panels
-    const metalPanelsAlbedoPromise = loadTextureAsync("MetalPanelsAlbedo", metalPanelsAlbedo, scene, progressMonitor);
-    const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal, scene, progressMonitor);
+    const metalPanelsAlbedoPromise = loadTextureAsync("MetalPanelsAlbedo", metalPanelsAlbedo, engine, progressMonitor);
+    const metalPanelsNormalPromise = loadTextureAsync("MetalPanelsNormal", metalPanelsNormal, engine, progressMonitor);
     const metalPanelsMetallicRoughnessPromise = loadTextureAsync(
         "MetalPanelsMetallicRoughness",
         metalPanelsMetallicRoughness,
-        scene,
+        engine,
         progressMonitor,
     );
     const metalPanelsAmbientOcclusionPromise = loadTextureAsync(
         "MetalPanelsAmbientOcclusion",
         metalPanelsAmbientOcclusion,
-        scene,
+        engine,
         progressMonitor,
     );
 
-    const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath, scene, progressMonitor);
+    const treeAlbedoPromise = loadTextureAsync("TreeAlbedo", treeTexturePath, engine, progressMonitor);
 
-    const concretePromise = loadConcreteTextures(scene, progressMonitor);
+    const concretePromise = loadConcreteTextures(engine, progressMonitor);
 
-    const cratePromise = loadCrateTextures(scene, progressMonitor);
+    const cratePromise = loadCrateTextures(engine, progressMonitor);
 
-    const tirePromise = loadTireTextures(scene, progressMonitor);
+    const tirePromise = loadTireTextures(engine, progressMonitor);
 
-    const styroFoamPromise = loadStyroFoamTextures(scene, progressMonitor);
+    const styroFoamPromise = loadStyroFoamTextures(engine, progressMonitor);
 
-    const solarPanelPromise = loadSolarPanelTextures(scene, progressMonitor);
+    const solarPanelPromise = loadSolarPanelTextures(engine, progressMonitor);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;

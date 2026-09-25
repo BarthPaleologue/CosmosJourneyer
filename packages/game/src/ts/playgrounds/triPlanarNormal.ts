@@ -63,7 +63,7 @@ export async function createTriPlanarNormalScene(
     camera.lowerRadiusLimit = 12;
     camera.attachControl();
 
-    const normalMap = await loadTextureAsync("NormalMap", normalMapPath, scene, progressMonitor);
+    const normalMap = await loadTextureAsync("NormalMap", normalMapPath, engine, progressMonitor);
 
     const sun = new DirectionalLight("sun", new Vector3(-1, -2, -1).normalize(), scene);
 

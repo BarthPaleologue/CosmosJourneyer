@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -34,13 +34,13 @@ export type GasPlanetTextures = {
 };
 
 export async function loadGasPlanetTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<GasPlanetTextures> {
-    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath, scene, progressMonitor);
-    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath, scene, progressMonitor);
-    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath, scene, progressMonitor);
-    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath, scene, progressMonitor);
+    const jupiterTexturePromise = loadTextureAsync("JupiterTexture", jupiterTexturePath, engine, progressMonitor);
+    const saturnTexturePromise = loadTextureAsync("SaturnTexture", saturnTexturePath, engine, progressMonitor);
+    const uranusTexturePromise = loadTextureAsync("UranusTexture", uranusTexturePath, engine, progressMonitor);
+    const neptuneTexturePromise = loadTextureAsync("NeptuneTexture", neptuneTexturePath, engine, progressMonitor);
 
     return {
         jupiter: await jupiterTexturePromise,

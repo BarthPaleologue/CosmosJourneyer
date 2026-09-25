@@ -36,7 +36,7 @@ export async function createStarMapScene(
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
-    const starMapTextures = await loadStarMapTextures(scene, progressMonitor);
+    const starMapTextures = await loadStarMapTextures(engine, progressMonitor);
 
     const starMap = new StarMap(universeBackend, starMapTextures, scene);
 

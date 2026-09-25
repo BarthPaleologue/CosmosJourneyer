@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Scene } from "@babylonjs/core/scene";
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 
 import type { PBRTextures } from ".";
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
@@ -27,21 +27,21 @@ import concreteMetallicRoughness from "@assets/degraded-concrete-ue/degraded-con
 import concreteNormal from "@assets/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
 
 export async function loadConcreteTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<PBRTextures> {
-    const albedo = loadTextureAsync("ConcreteAlbedo", concreteAlbedo, scene, progressMonitor);
-    const normal = loadTextureAsync("ConcreteNormal", concreteNormal, scene, progressMonitor);
+    const albedo = loadTextureAsync("ConcreteAlbedo", concreteAlbedo, engine, progressMonitor);
+    const normal = loadTextureAsync("ConcreteNormal", concreteNormal, engine, progressMonitor);
     const metallicRoughness = loadTextureAsync(
         "ConcreteMetallicRoughness",
         concreteMetallicRoughness,
-        scene,
+        engine,
         progressMonitor,
     );
     const ambientOcclusion = loadTextureAsync(
         "ConcreteAmbientOcclusion",
         concreteAmbientOcclusion,
-        scene,
+        engine,
         progressMonitor,
     );
 

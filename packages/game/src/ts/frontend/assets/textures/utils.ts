@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
@@ -24,12 +25,12 @@ import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 export async function loadTextureAsync(
     name: string,
     url: string,
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Texture> {
     progressMonitor.startTask();
     const texture = await new Promise<Texture>((resolve) => {
-        const createdTexture = new Texture(url, scene, false, false, undefined, () => {
+        const createdTexture = new Texture(url, engine, false, false, undefined, () => {
             resolve(createdTexture);
         });
         createdTexture.name = name;

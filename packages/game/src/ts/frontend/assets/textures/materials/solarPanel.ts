@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
@@ -36,17 +36,17 @@ export type SolarPanelTextures = {
 };
 
 export async function loadSolarPanelTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<SolarPanelTextures> {
-    const albedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedoPath, scene, progressMonitor);
-    const normalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormalPath, scene, progressMonitor);
-    const metallicPromise = loadTextureAsync("SolarPanelMetallic", solarPanelMetallicPath, scene, progressMonitor);
-    const roughnessPromise = loadTextureAsync("SolarPanelRoughness", solarPanelRoughnessPath, scene, progressMonitor);
+    const albedoPromise = loadTextureAsync("SolarPanelAlbedo", solarPanelAlbedoPath, engine, progressMonitor);
+    const normalPromise = loadTextureAsync("SolarPanelNormal", solarPanelNormalPath, engine, progressMonitor);
+    const metallicPromise = loadTextureAsync("SolarPanelMetallic", solarPanelMetallicPath, engine, progressMonitor);
+    const roughnessPromise = loadTextureAsync("SolarPanelRoughness", solarPanelRoughnessPath, engine, progressMonitor);
     const ambientOcclusionPromise = loadTextureAsync(
         "SolarPanelAmbientOcclusion",
         solarPanelAmbientOcclusionPath,
-        scene,
+        engine,
         progressMonitor,
     );
 

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -30,12 +30,12 @@ export type StarMapTextures = {
 };
 
 export async function loadStarMapTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<StarMapTextures> {
-    const starSprite = loadTextureAsync("StarSprite", starTexturePath, scene, progressMonitor);
+    const starSprite = loadTextureAsync("StarSprite", starTexturePath, engine, progressMonitor);
 
-    const blackHoleSprite = loadTextureAsync("BlackHoleSprite", blackHoleTexture, scene, progressMonitor);
+    const blackHoleSprite = loadTextureAsync("BlackHoleSprite", blackHoleTexture, engine, progressMonitor);
 
     return {
         starSprite: await starSprite,

@@ -44,7 +44,7 @@ export async function createNeutronStarScene(
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const defaultControls = new DefaultControls(scene);
     defaultControls.speed = 2e9;

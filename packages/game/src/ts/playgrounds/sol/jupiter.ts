@@ -41,7 +41,7 @@ export async function createJupiterScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     await enablePhysics(scene);
 

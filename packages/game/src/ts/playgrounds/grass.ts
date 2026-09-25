@@ -76,7 +76,7 @@ export async function createGrassScene(
     const grassBladeMesh = createGrassBlade(scene, 5);
     grassBladeMesh.isVisible = false;
 
-    const noiseTextures = await loadNoiseTextures(scene, progressMonitor);
+    const noiseTextures = await loadNoiseTextures(engine, progressMonitor);
     const grassMaterial = new GrassMaterial(noiseTextures.seamlessPerlin, scene);
     grassBladeMesh.material = grassMaterial.get();
 

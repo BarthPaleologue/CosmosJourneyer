@@ -53,7 +53,7 @@ export async function createStarMapViewScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const starMapViewAssets = await loadStarMapTextures(scene, progressMonitor);
+    const starMapViewAssets = await loadStarMapTextures(engine, progressMonitor);
 
     const starMap = new StarMapView(
         player,

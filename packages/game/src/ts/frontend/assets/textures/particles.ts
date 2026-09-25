@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -32,12 +32,12 @@ export type ParticleTextures = {
 };
 
 export async function loadParticleTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<{ plume: Texture; flare: Texture; butterfly: Texture }> {
-    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, scene, progressMonitor);
-    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, scene, progressMonitor);
-    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, scene, progressMonitor);
+    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, engine, progressMonitor);
+    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, engine, progressMonitor);
+    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, engine, progressMonitor);
 
     return {
         plume: await plumeParticlePromise,

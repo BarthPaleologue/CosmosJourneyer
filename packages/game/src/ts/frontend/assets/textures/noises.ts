@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -28,10 +28,10 @@ export type NoiseTextures = {
 };
 
 export async function loadNoiseTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<NoiseTextures> {
-    const seamlessPerlin = loadTextureAsync("SeamlessPerlinNoise", seamlessPerlinPath, scene, progressMonitor);
+    const seamlessPerlin = loadTextureAsync("SeamlessPerlinNoise", seamlessPerlinPath, engine, progressMonitor);
 
     return {
         seamlessPerlin: await seamlessPerlin,

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
@@ -34,13 +34,13 @@ export type StyroFoamTextures = {
 };
 
 export async function loadStyroFoamTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<StyroFoamTextures> {
-    const albedoPromise = loadTextureAsync("StyroFoamAlbedo", albedoPath, scene, progressMonitor);
-    const normalPromise = loadTextureAsync("StyroFoamNormal", normalPath, scene, progressMonitor);
-    const roughnessPromise = loadTextureAsync("StyroFoamRoughness", roughnessPath, scene, progressMonitor);
-    const ambientOcclusionPromise = loadTextureAsync("StyroFoamAmbientOcclusion", aoPath, scene, progressMonitor);
+    const albedoPromise = loadTextureAsync("StyroFoamAlbedo", albedoPath, engine, progressMonitor);
+    const normalPromise = loadTextureAsync("StyroFoamNormal", normalPath, engine, progressMonitor);
+    const roughnessPromise = loadTextureAsync("StyroFoamRoughness", roughnessPath, engine, progressMonitor);
+    const ambientOcclusionPromise = loadTextureAsync("StyroFoamAmbientOcclusion", aoPath, engine, progressMonitor);
 
     return {
         albedo: await albedoPromise,

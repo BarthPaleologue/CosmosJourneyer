@@ -35,7 +35,7 @@ export async function loadRenderingAssets(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<RenderingAssets> {
-    const texturesPromise = loadTextures(scene, progressMonitor);
+    const texturesPromise = loadTextures(scene, scene.getEngine(), progressMonitor);
 
     const textures = await texturesPromise;
 

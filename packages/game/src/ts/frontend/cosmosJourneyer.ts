@@ -518,7 +518,7 @@ export class CosmosJourneyer {
 
         const starSystemViewAssetsPromise = loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
 
-        const starMapViewAssetsPromise = loadStarMapTextures(starMapScene, loadingProgressMonitor);
+        const starMapViewAssetsPromise = loadStarMapTextures(engine, loadingProgressMonitor);
 
         const starSystemViewAssets = await starSystemViewAssetsPromise;
         const starMapViewAssets = await starMapViewAssetsPromise;
