@@ -23,25 +23,33 @@ import { loadTextureAsync } from "./utils";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import flareParticle from "@assets/flare.png";
+import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
 import plumeParticle from "@assets/textures/plume.png";
+import starTexturePath from "@assets/textures/starParticle.png";
 
 export type ParticleTextures = {
     plume: Texture;
     flare: Texture;
     butterfly: Texture;
+    starSprite: Texture;
+    blackHoleSprite: Texture;
 };
 
 export async function loadParticleTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
-): Promise<{ plume: Texture; flare: Texture; butterfly: Texture }> {
+): Promise<ParticleTextures> {
     const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, engine, progressMonitor);
     const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, engine, progressMonitor);
     const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, engine, progressMonitor);
+    const starSpritePromise = loadTextureAsync("StarSprite", starTexturePath, engine, progressMonitor);
+    const blackHoleSpritePromise = loadTextureAsync("BlackHoleSprite", blackHoleTexture, engine, progressMonitor);
 
     return {
         plume: await plumeParticlePromise,
         flare: await flareTexturePromise,
         butterfly: await butterflyPromise,
+        starSprite: await starSpritePromise,
+        blackHoleSprite: await blackHoleSpritePromise,
     };
 }

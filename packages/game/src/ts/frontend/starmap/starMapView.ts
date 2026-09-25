@@ -49,11 +49,11 @@ import type { View } from "@/frontend/view";
 
 import { lerp } from "@/utils/math";
 
-import type { StarMapTextures } from "../assets/textures/starMap";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutQuadratic } from "../helpers/animations/interpolations";
 import type { INotificationManager } from "../ui/notificationManager";
 import { StarMap } from "./starMap";
+import type { StarMapTextures } from "./starMap";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { getGreasedLinePathFromSystemSegments } from "./starMapPath";
@@ -103,7 +103,7 @@ export class StarMapView implements View {
     constructor(
         player: Player,
         scene: Scene,
-        assets: StarMapTextures,
+        textures: StarMapTextures,
         encyclopaedia: EncyclopaediaGalactica,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
@@ -116,7 +116,7 @@ export class StarMapView implements View {
             this.starMapNebulaFog.dispose();
         });
 
-        this.starMap = new StarMap(universeBackend, assets, this.scene);
+        this.starMap = new StarMap(universeBackend, textures, this.scene);
         this.starMap.onSystemHoverStart.add((starSystemCoordinates) => {
             this.starMapUI.setHoveredSystem(starSystemCoordinates);
             this.soundPlayer.playNow("hover");

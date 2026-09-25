@@ -37,9 +37,11 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
-import type { StarMapTextures } from "../assets/textures/starMap";
+import type { ParticleTextures } from "../assets/textures/particles";
 import { StarSectorView, vector3ToString } from "./starSectorView";
 import type { BuildData } from "./starSectorView";
+
+export type StarMapTextures = Pick<ParticleTextures, "starSprite" | "blackHoleSprite">;
 
 export class StarMap {
     private readonly scene: Scene;

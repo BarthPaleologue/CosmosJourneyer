@@ -24,7 +24,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
+import { loadParticleTextures } from "@/frontend/assets/textures/particles";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { Player } from "@/frontend/player/player";
 import { StarMapView } from "@/frontend/starmap/starMapView";
@@ -53,12 +53,12 @@ export async function createStarMapViewScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const starMapViewAssets = await loadStarMapTextures(engine, progressMonitor);
+    const particleTextures = await loadParticleTextures(engine, progressMonitor);
 
     const starMap = new StarMapView(
         player,
         scene,
-        starMapViewAssets,
+        particleTextures,
         encyclopaediaGalactica,
         universeBackend,
         soundPlayerMock,
