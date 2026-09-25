@@ -53,29 +53,6 @@ export class UniverseBackend {
     private readonly coordinatesToCustomSystems: Map<string, StarSystemModel> = new Map();
 
     /**
-     * Maps coordinates to plugins that modify the system at these coordinates.
-     */
-    private readonly coordinatesToSinglePlugins: Map<string, (systemModel: StarSystemModel) => StarSystemModel> =
-        new Map();
-
-    /**
-     * List plugins that can modify multiple systems at once
-     */
-    private readonly generalPlugins: {
-        /**
-         * @param systemModel The system model to test.
-         * @returns true if the plugin should apply to the given system, false otherwise.
-         */
-        predicate: (systemModel: StarSystemModel) => boolean;
-        /**
-         * The plugin to apply to the system.
-         * @param systemModel The system model to modify.
-         * @returns A pointer to the modified system model, or a new system model.
-         */
-        plugin: (systemModel: StarSystemModel) => StarSystemModel;
-    }[] = [];
-
-    /**
      * Function that returns the density of the universe in a given star sector.
      */
     private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
@@ -150,30 +127,6 @@ export class UniverseBackend {
     }
 
     /**
-     * Register a plugin that modifies a single system.
-     * @param coordinates The coordinates of the system to modify.
-     * @param plugin The plugin to apply to the system.
-     */
-    public registerSinglePlugin(
-        coordinates: StarSystemCoordinates,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ): void {
-        this.coordinatesToSinglePlugins.set(serializeStarSystemCoordinates(coordinates), plugin);
-    }
-
-    /**
-     * Register a plugin that modifies multiple systems.
-     * @param predicate The predicate used to match systems.
-     * @param plugin The plugin to apply to the matched systems.
-     */
-    public registerGeneralPlugin(
-        predicate: (systemModel: StarSystemModel) => boolean,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ): void {
-        this.generalPlugins.push({ predicate, plugin });
-    }
-
-    /**
      * Check if a system is in the human bubble.
      * @param systemCoordinates The coordinates of the system to check.
      * @returns true if the system is in the human bubble, false otherwise.
@@ -189,14 +142,14 @@ export class UniverseBackend {
      * @param coordinates The coordinates of the system you want the model of.
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | null {
         if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
-            return this.fallbackSystem;
+            return { ...this.fallbackSystem };
         }
 
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
-            return this.applyPlugins(customSystem);
+            return customSystem;
         }
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
@@ -218,9 +171,7 @@ export class UniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return this.applyPlugins(
-            generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates)),
-        );
+        return generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates));
     }
 
     private getGeneratedSystemCoordinatesInStarSector(
@@ -304,19 +255,21 @@ export class UniverseBackend {
             generatedModels.push(systemModel);
         }
 
-        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
-
-        const customSystemsAfterPlugins = customSystemModels.map((model) => this.applyPlugins(model));
+        const customSystemModels: Array<DeepReadonly<StarSystemModel>> = this.getCustomSystemsFromSector(
+            sectorX,
+            sectorY,
+            sectorZ,
+        );
 
         if (
             this.fallbackSystem.coordinates.starSectorX === sectorX &&
             this.fallbackSystem.coordinates.starSectorY === sectorY &&
             this.fallbackSystem.coordinates.starSectorZ === sectorZ
         ) {
-            customSystemsAfterPlugins.push(this.fallbackSystem);
+            customSystemModels.push(this.fallbackSystem);
         }
 
-        return generatedModels.concat(customSystemsAfterPlugins);
+        return generatedModels.concat(customSystemModels);
     }
 
     /**
@@ -362,7 +315,7 @@ export class UniverseBackend {
         starSectorY: number,
         starSectorZ: number,
         index: number,
-    ): DeepReadonly<StarSystemModel> | null {
+    ): StarSystemModel | null {
         const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
         return this.getSystemModelFromCoordinates(coordinates);
     }
@@ -480,25 +433,5 @@ export class UniverseBackend {
         }
 
         return getObjectModelById(universeObjectId.idInSystem, starSystemModel);
-    }
-
-    /**
-     * @param model The system model to apply the plugins to.
-     * @returns The modified system model, or a new system model.
-     */
-    private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
-        let newModel = model;
-        const singlePlugin = this.coordinatesToSinglePlugins.get(serializeStarSystemCoordinates(model.coordinates));
-        if (singlePlugin !== undefined) {
-            newModel = singlePlugin(model);
-        }
-
-        for (const generalPlugin of this.generalPlugins) {
-            if (generalPlugin.predicate(newModel)) {
-                newModel = generalPlugin.plugin(newModel);
-            }
-        }
-
-        return newModel;
     }
 }
