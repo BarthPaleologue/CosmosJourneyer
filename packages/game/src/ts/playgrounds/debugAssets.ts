@@ -15,8 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
-import type { BaseTexture } from "@babylonjs/core";
+import { BaseTexture, FreeCamera, MeshBuilder, PointLight, StandardMaterial } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -27,6 +26,20 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { enablePhysics } from "./utils";
 
+function* findTextures(value: unknown): Generator<BaseTexture> {
+    if (value instanceof BaseTexture) {
+        yield value;
+        return;
+    }
+    if (value === null || typeof value !== "object" || Object.getPrototypeOf(value) !== Object.prototype) {
+        return;
+    }
+    const children: ReadonlyArray<unknown> = Object.values(value);
+    for (const child of children) {
+        yield* findTextures(child);
+    }
+}
+
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
@@ -36,7 +49,7 @@ export async function createDebugAssetsScene(
 
     await enablePhysics(scene);
 
-    await loadRenderingAssets(scene, progressMonitor);
+    const { textures } = await loadRenderingAssets(scene, progressMonitor);
 
     const camera = new FreeCamera("camera", new Vector3(0, 1, -1).scale(15), scene);
     camera.setTarget(Vector3.Zero());
@@ -84,7 +97,9 @@ export async function createDebugAssetsScene(
         transform.instantiateHierarchy();
     }
 
-    for (const [i, texture] of scene.textures.entries()) {
+    const loadedTextures = [...new Set([...scene.textures, ...findTextures(textures)])];
+
+    for (const [i, texture] of loadedTextures.entries()) {
         showTexture(
             texture,
             new Vector3((i % sideLength) - sideLength / 2, 0, Math.floor(i / sideLength) - sideLength / 2),
