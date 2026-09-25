@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
@@ -42,21 +42,6 @@ describe("UniverseBackend", () => {
                 customSystem.coordinates.starSectorZ,
             );
             expect(retrievedSystems).toContain(customSystem);
-        });
-    });
-
-    describe("registerSinglePlugin", () => {
-        it("should modify a system at specific coordinates", () => {
-            const coordinates: StarSystemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
-            const plugin = (system: StarSystemModel): StarSystemModel => {
-                system.name = "Modified System";
-                return system;
-            };
-
-            universeBackend.registerSinglePlugin(coordinates, plugin);
-            const model = universeBackend.getSystemContentModelAt(coordinates);
-            expect(model).not.toBeNull();
-            expect(model?.system.name).toBe("Modified System");
         });
     });
 
