@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -43,58 +43,58 @@ export type AllTerrainTextures = {
 };
 
 export async function loadTerrainTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<AllTerrainTextures> {
     const rockNormalAmbientOcclusionPromise = loadTextureAsync(
         "RockNormalAmbientOcclusionMap",
         rockNormalAmbientOcclusionMap,
-        scene,
+        engine,
         progressMonitor,
     );
     const rockAlbedoRoughnessPromise = loadTextureAsync(
         "RockAlbedoRoughnessMap",
         rockAlbedoRoughnessMap,
-        scene,
+        engine,
         progressMonitor,
     );
 
     const grassNormalAmbientOcclusionPromise = loadTextureAsync(
         "GrassNormalAmbientOcclusionMap",
         grassNormalAmbientOcclusionMap,
-        scene,
+        engine,
         progressMonitor,
     );
     const grassAlbedoRoughnessPromise = loadTextureAsync(
         "GrassAlbedoRoughnessMap",
         grassAlbedoRoughnessMap,
-        scene,
+        engine,
         progressMonitor,
     );
 
     const snowNormalAmbientOcclusionPromise = loadTextureAsync(
         "SnowNormalAmbientOcclusionMap",
         snowNormalAmbientOcclusionMap,
-        scene,
+        engine,
         progressMonitor,
     );
     const snowAlbedoRoughnessPromise = loadTextureAsync(
         "SnowAlbedoRoughness",
         snowAlbedoRoughnessMap,
-        scene,
+        engine,
         progressMonitor,
     );
 
     const sandNormalAmbientOcclusionPromise = loadTextureAsync(
         "SandNormalAmbientOcclusionMap",
         sandNormalAmbientOcclusionMap,
-        scene,
+        engine,
         progressMonitor,
     );
     const sandAlbedoRoughnessPromise = loadTextureAsync(
         "SandAlbedoRoughnessMap",
         sandAlbedoRoughnessMap,
-        scene,
+        engine,
         progressMonitor,
     );
 

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
@@ -33,11 +33,14 @@ export type TireTextures = {
     ambientOcclusion: Texture;
 };
 
-export async function loadTireTextures(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<TireTextures> {
-    const albedoPromise = loadTextureAsync("TireAlbedo", tireAlbedoPath, scene, progressMonitor);
-    const normalHeightPromise = loadTextureAsync("TireNormalHeight", tireNormalHeightPath, scene, progressMonitor);
-    const roughnessPromise = loadTextureAsync("TireRoughness", tireRoughnessPath, scene, progressMonitor);
-    const ambientOcclusionPromise = loadTextureAsync("TireAmbientOcclusion", tireAOPath, scene, progressMonitor);
+export async function loadTireTextures(
+    engine: AbstractEngine,
+    progressMonitor: ILoadingProgressMonitor,
+): Promise<TireTextures> {
+    const albedoPromise = loadTextureAsync("TireAlbedo", tireAlbedoPath, engine, progressMonitor);
+    const normalHeightPromise = loadTextureAsync("TireNormalHeight", tireNormalHeightPath, engine, progressMonitor);
+    const roughnessPromise = loadTextureAsync("TireRoughness", tireRoughnessPath, engine, progressMonitor);
+    const ambientOcclusionPromise = loadTextureAsync("TireAmbientOcclusion", tireAOPath, engine, progressMonitor);
 
     return {
         albedo: await albedoPromise,

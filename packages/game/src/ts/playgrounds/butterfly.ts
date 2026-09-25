@@ -52,7 +52,7 @@ export async function createButterflyScene(
     const butterflyMesh = createButterfly(scene);
     butterflyMesh.isVisible = false;
 
-    const particleTextures = await loadParticleTextures(scene, progressMonitor);
+    const particleTextures = await loadParticleTextures(engine, progressMonitor);
     const butterflyMaterial = new ButterflyMaterial(particleTextures.butterfly, scene);
     butterflyMesh.material = butterflyMaterial.get();
 

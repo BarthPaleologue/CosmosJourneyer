@@ -39,7 +39,7 @@ export async function createSunScene(engine: AbstractEngine, progressMonitor: IL
 
     await enablePhysics(scene);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     const scalingFactor = 6_000e3 * 150;
 

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
@@ -30,11 +30,11 @@ export type RingsTextures = {
 };
 
 export async function loadRingsTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<RingsTextures> {
-    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, scene, progressMonitor);
-    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, scene, progressMonitor);
+    const saturnRingsTexturePromise = loadTextureAsync("SaturnRingsTexture", saturnRingsPath, engine, progressMonitor);
+    const uranusRingsTexturePromise = loadTextureAsync("UranusRingsTexture", uranusRingsPath, engine, progressMonitor);
 
     return {
         saturn: await saturnRingsTexturePromise,

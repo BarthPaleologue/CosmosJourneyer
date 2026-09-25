@@ -50,7 +50,7 @@ export async function createLandingPadScene(
     controls.getTransform().position.copyFromFloats(0, 30, -100);
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
-    const textures = await loadConcreteTextures(scene, progressMonitor);
+    const textures = await loadConcreteTextures(engine, progressMonitor);
     const landingPadMaterial = new LandingPadMaterial(textures, scene);
 
     const decalTexture = createSquareTextDecalTexture("LandingPadCenterDecal", "A1", scene);

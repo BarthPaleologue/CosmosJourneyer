@@ -82,7 +82,6 @@ import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "./assets/textures/starMap";
 import { lookAt } from "./helpers/transform";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
@@ -516,15 +515,10 @@ export class CosmosJourneyer {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const starSystemViewAssetsPromise = loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
+        const assets = await loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
 
-        const starMapViewAssetsPromise = loadStarMapTextures(starMapScene, loadingProgressMonitor);
-
-        const starSystemViewAssets = await starSystemViewAssetsPromise;
-        const starMapViewAssets = await starMapViewAssetsPromise;
-
-        const soundPlayer = new SoundPlayer(starSystemViewAssets.audio.sounds);
-        const tts = new Tts(starSystemViewAssets.audio.speakerVoiceLines);
+        const soundPlayer = new SoundPlayer(assets.audio.sounds);
+        const tts = new Tts(assets.audio.speakerVoiceLines);
         const notificationManager = new NotificationManager(soundPlayer);
         const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
         if (!terrainSystemResult.success) {
@@ -542,7 +536,7 @@ export class CosmosJourneyer {
             soundPlayer,
             tts,
             notificationManager,
-            starSystemViewAssets.rendering,
+            assets.rendering,
             terrainSystemResult.value,
             t,
             loadingProgressMonitor,
@@ -551,7 +545,7 @@ export class CosmosJourneyer {
         const starMapView = new StarMapView(
             player,
             starMapScene,
-            starMapViewAssets,
+            assets.rendering.textures.particles,
             backend.encyclopaedia,
             backend.universe,
             soundPlayer,
@@ -572,7 +566,7 @@ export class CosmosJourneyer {
                 player,
                 engine,
                 audioEngine,
-                starSystemViewAssets,
+                assets,
                 starSystemView,
                 starMapView,
                 backend,

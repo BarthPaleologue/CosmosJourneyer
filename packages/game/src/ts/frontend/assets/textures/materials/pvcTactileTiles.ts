@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../../loadingProgressMonitor";
 import { loadTextureAsync } from "../utils";
@@ -34,13 +34,18 @@ export type PvcTactileTilesTextures = {
 };
 
 export async function loadPvcTactileTilesTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<PvcTactileTilesTextures> {
-    const albedoPromise = loadTextureAsync("PvcTactileTilesAlbedo", albedoPath, scene, progressMonitor);
-    const normalPromise = loadTextureAsync("PvcTactileTilesNormal", normalPath, scene, progressMonitor);
-    const roughnessPromise = loadTextureAsync("PvcTactileTilesRoughness", roughnessPath, scene, progressMonitor);
-    const ambientOcclusionPromise = loadTextureAsync("PvcTactileTilesAmbientOcclusion", aoPath, scene, progressMonitor);
+    const albedoPromise = loadTextureAsync("PvcTactileTilesAlbedo", albedoPath, engine, progressMonitor);
+    const normalPromise = loadTextureAsync("PvcTactileTilesNormal", normalPath, engine, progressMonitor);
+    const roughnessPromise = loadTextureAsync("PvcTactileTilesRoughness", roughnessPath, engine, progressMonitor);
+    const ambientOcclusionPromise = loadTextureAsync(
+        "PvcTactileTilesAmbientOcclusion",
+        aoPath,
+        engine,
+        progressMonitor,
+    );
 
     return {
         albedo: await albedoPromise,

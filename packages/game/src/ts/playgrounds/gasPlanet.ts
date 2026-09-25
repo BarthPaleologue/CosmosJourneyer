@@ -42,7 +42,7 @@ export async function createGasPlanetScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.setAll(0);
 
-    const textures = await loadTextures(scene, progressMonitor);
+    const textures = await loadTextures(scene, engine, progressMonitor);
 
     await enablePhysics(scene);
 

@@ -22,7 +22,7 @@ import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { loadStarMapTextures } from "@/frontend/assets/textures/starMap";
+import { loadParticleTextures } from "@/frontend/assets/textures/particles";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { StarMap } from "@/frontend/starmap/starMap";
 
@@ -36,9 +36,9 @@ export async function createStarMapScene(
 
     const universeBackend = new UniverseBackend(getLoneStarSystem());
 
-    const starMapTextures = await loadStarMapTextures(scene, progressMonitor);
+    const particleTextures = await loadParticleTextures(engine, progressMonitor);
 
-    const starMap = new StarMap(universeBackend, starMapTextures, scene);
+    const starMap = new StarMap(universeBackend, particleTextures, scene);
 
     const defaultControls = new DefaultControls(scene);
 

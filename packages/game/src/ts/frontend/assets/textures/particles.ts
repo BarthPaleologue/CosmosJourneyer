@@ -15,33 +15,41 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
-import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadTextureAsync } from "./utils";
 
 import butterflyTexture from "@assets/butterfly.webp";
 import flareParticle from "@assets/flare.png";
+import blackHoleTexture from "@assets/textures/blackholeParticleSmall.png";
 import plumeParticle from "@assets/textures/plume.png";
+import starTexturePath from "@assets/textures/starParticle.png";
 
 export type ParticleTextures = {
     plume: Texture;
     flare: Texture;
     butterfly: Texture;
+    starSprite: Texture;
+    blackHoleSprite: Texture;
 };
 
 export async function loadParticleTextures(
-    scene: Scene,
+    engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
-): Promise<{ plume: Texture; flare: Texture; butterfly: Texture }> {
-    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, scene, progressMonitor);
-    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, scene, progressMonitor);
-    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, scene, progressMonitor);
+): Promise<ParticleTextures> {
+    const plumeParticlePromise = loadTextureAsync("PlumeParticle", plumeParticle, engine, progressMonitor);
+    const flareTexturePromise = loadTextureAsync("FlareTexture", flareParticle, engine, progressMonitor);
+    const butterflyPromise = loadTextureAsync("Butterfly", butterflyTexture, engine, progressMonitor);
+    const starSpritePromise = loadTextureAsync("StarSprite", starTexturePath, engine, progressMonitor);
+    const blackHoleSpritePromise = loadTextureAsync("BlackHoleSprite", blackHoleTexture, engine, progressMonitor);
 
     return {
         plume: await plumeParticlePromise,
         flare: await flareTexturePromise,
         butterfly: await butterflyPromise,
+        starSprite: await starSpritePromise,
+        blackHoleSprite: await blackHoleSpritePromise,
     };
 }
