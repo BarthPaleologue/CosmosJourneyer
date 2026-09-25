@@ -31,7 +31,7 @@ import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
-import { ok } from "@cosmos-journeyer/typescript";
+import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
@@ -469,15 +469,31 @@ export class CosmosJourneyer {
             engine.resize(true);
         });
 
-        const audioEngine = await CreateAudioEngineAsync();
+        const audioEngineResult = await promiseToResult(CreateAudioEngineAsync());
+        if (!audioEngineResult.success) {
+            return err(new Error("Failed to init audio engine", { cause: audioEngineResult.error }));
+        }
+
+        const audioEngine = audioEngineResult.value;
 
         // Log informations about the gpu and the api used
         console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init geometry and physics engines
-        const [havokInstance] = await Promise.all([HavokPhysics(), initializeCsg2()]);
-        console.log(`Havok and CSG2 initialized`);
+        const [havokResult, csgResult] = await Promise.all([
+            promiseToResult(HavokPhysics()),
+            promiseToResult(initializeCsg2()),
+        ]);
+
+        if (!havokResult.success) {
+            return err(new Error("Failed to init physics engine", { cause: havokResult.error }));
+        }
+        const havokInstance = havokResult.value;
+
+        if (!csgResult.success) {
+            return err(new Error("Failed to init geometry engine", { cause: csgResult.error }));
+        }
 
         const player = Player.Default(backend.universe);
 

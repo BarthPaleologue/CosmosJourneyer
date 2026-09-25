@@ -8,6 +8,14 @@ export function err<T, E>(error: E): Result<T, E> {
     return { success: false, error };
 }
 
+export async function promiseToResult<T>(promise: Readonly<Promise<T>>): Promise<Result<T, unknown>> {
+    try {
+        return ok(await promise);
+    } catch (cause) {
+        return err(cause);
+    }
+}
+
 export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 export type DeepReadonly<T> = {
