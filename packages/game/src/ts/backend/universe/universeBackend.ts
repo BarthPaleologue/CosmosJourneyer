@@ -53,29 +53,6 @@ export class UniverseBackend {
     private readonly coordinatesToCustomSystems: Map<string, StarSystemModel> = new Map();
 
     /**
-     * Maps coordinates to plugins that modify the system at these coordinates.
-     */
-    private readonly coordinatesToSinglePlugins: Map<string, (systemModel: StarSystemModel) => StarSystemModel> =
-        new Map();
-
-    /**
-     * List plugins that can modify multiple systems at once
-     */
-    private readonly generalPlugins: {
-        /**
-         * @param systemModel The system model to test.
-         * @returns true if the plugin should apply to the given system, false otherwise.
-         */
-        predicate: (systemModel: StarSystemModel) => boolean;
-        /**
-         * The plugin to apply to the system.
-         * @param systemModel The system model to modify.
-         * @returns A pointer to the modified system model, or a new system model.
-         */
-        plugin: (systemModel: StarSystemModel) => StarSystemModel;
-    }[] = [];
-
-    /**
      * Function that returns the density of the universe in a given star sector.
      */
     private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
@@ -136,7 +113,11 @@ export class UniverseBackend {
      * @param sectorZ
      * @returns The list of only the custom systems in the given sector.
      */
-    private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): StarSystemModel[] {
+    private getCustomSystemsFromSector(
+        sectorX: number,
+        sectorY: number,
+        sectorZ: number,
+    ): ReadonlyArray<StarSystemModel> {
         const sectorKey = this.starSectorToString(sectorX, sectorY, sectorZ);
         const systems = this.starSectorToCustomSystems.get(sectorKey);
         if (systems === undefined) {
@@ -147,30 +128,6 @@ export class UniverseBackend {
 
     private getCustomSystemFromCoordinates(coordinates: StarSystemCoordinates): StarSystemModel | undefined {
         return this.coordinatesToCustomSystems.get(serializeStarSystemCoordinates(coordinates));
-    }
-
-    /**
-     * Register a plugin that modifies a single system.
-     * @param coordinates The coordinates of the system to modify.
-     * @param plugin The plugin to apply to the system.
-     */
-    public registerSinglePlugin(
-        coordinates: StarSystemCoordinates,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ): void {
-        this.coordinatesToSinglePlugins.set(serializeStarSystemCoordinates(coordinates), plugin);
-    }
-
-    /**
-     * Register a plugin that modifies multiple systems.
-     * @param predicate The predicate used to match systems.
-     * @param plugin The plugin to apply to the matched systems.
-     */
-    public registerGeneralPlugin(
-        predicate: (systemModel: StarSystemModel) => boolean,
-        plugin: (systemModel: StarSystemModel) => StarSystemModel,
-    ): void {
-        this.generalPlugins.push({ predicate, plugin });
     }
 
     /**
@@ -196,7 +153,7 @@ export class UniverseBackend {
 
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
-            return this.applyPlugins(customSystem);
+            return customSystem;
         }
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
@@ -218,9 +175,7 @@ export class UniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return this.applyPlugins(
-            generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates)),
-        );
+        return generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates));
     }
 
     private getGeneratedSystemCoordinatesInStarSector(
@@ -304,19 +259,19 @@ export class UniverseBackend {
             generatedModels.push(systemModel);
         }
 
-        const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
-
-        const customSystemsAfterPlugins = customSystemModels.map((model) => this.applyPlugins(model));
+        const customSystemModels: Array<DeepReadonly<StarSystemModel>> = [
+            ...this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ),
+        ];
 
         if (
             this.fallbackSystem.coordinates.starSectorX === sectorX &&
             this.fallbackSystem.coordinates.starSectorY === sectorY &&
             this.fallbackSystem.coordinates.starSectorZ === sectorZ
         ) {
-            customSystemsAfterPlugins.push(this.fallbackSystem);
+            customSystemModels.push(this.fallbackSystem);
         }
 
-        return generatedModels.concat(customSystemsAfterPlugins);
+        return generatedModels.concat(customSystemModels);
     }
 
     /**
@@ -480,25 +435,5 @@ export class UniverseBackend {
         }
 
         return getObjectModelById(universeObjectId.idInSystem, starSystemModel);
-    }
-
-    /**
-     * @param model The system model to apply the plugins to.
-     * @returns The modified system model, or a new system model.
-     */
-    private applyPlugins(model: StarSystemModel): DeepReadonly<StarSystemModel> {
-        let newModel = model;
-        const singlePlugin = this.coordinatesToSinglePlugins.get(serializeStarSystemCoordinates(model.coordinates));
-        if (singlePlugin !== undefined) {
-            newModel = singlePlugin(model);
-        }
-
-        for (const generalPlugin of this.generalPlugins) {
-            if (generalPlugin.predicate(newModel)) {
-                newModel = generalPlugin.plugin(newModel);
-            }
-        }
-
-        return newModel;
     }
 }
