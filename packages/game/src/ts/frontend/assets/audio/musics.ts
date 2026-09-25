@@ -19,11 +19,10 @@ import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
 import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstractSound";
-import { CreateStreamingSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
-import type { IStreamingSoundOptions, StreamingSound } from "@babylonjs/core/AudioV2/abstractAudio/streamingSound";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadStreamingSoundAsync } from "./utils";
 
 import wanderingPath from "@assets/sound/music/455855__andrewkn__wandering.mp3";
 import atlanteanTwilightPath from "@assets/sound/music/Atlantean_Twilight.mp3";
@@ -59,31 +58,51 @@ export async function loadMusics(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Musics> {
-    const loadSoundAsync = async (
-        name: string,
-        url: string,
-        engine: AudioEngineV2,
-        options?: Partial<IStreamingSoundOptions>,
-    ): Promise<StreamingSound> => {
-        progressMonitor.startTask();
-        const sound = await CreateStreamingSoundAsync(name, url, options, engine);
-        progressMonitor.completeTask();
-        return sound;
-    };
-
-    const wanderingPromise = loadSoundAsync("Wandering", wanderingPath, audioEngine, { loop: true });
-    const straussBlueDanubePromise = loadSoundAsync("StraussBlueDanube", straussBlueDanubePath, audioEngine);
-    const deepRelaxationPromise = loadSoundAsync("DeepRelaxation", deepRelaxationPath, audioEngine);
-    const atlanteanTwilightPromise = loadSoundAsync("AtlanteanTwilight", atlanteanTwilightPath, audioEngine);
-    const infinitePerspectivePromise = loadSoundAsync("InfinitePerspective", infinitePerspectivePath, audioEngine);
-    const thatZenMomentPromise = loadSoundAsync("ThatZenMoment", thatZenMomentPath, audioEngine);
-    const echoesOfTimePromise = loadSoundAsync("EchoesOfTime", echoesOfTimePath, audioEngine);
-    const peaceOfMindPromise = loadSoundAsync("PeaceOfMind", peaceOfMindPath, audioEngine);
-    const spacialWindsPromise = loadSoundAsync("SpacialWinds", spacialWindsPath, audioEngine);
-    const mesmerizePromise = loadSoundAsync("Mesmerize", mesmerizePath, audioEngine);
-    const reawakeningPromise = loadSoundAsync("Reawakening", reawakeningPath, audioEngine);
-    const equatorialComplexPromise = loadSoundAsync("EquatorialComplex", equatorialComplexPath, audioEngine);
-    const soaringPromise = loadSoundAsync("Soaring", soaringPath, audioEngine);
+    const wanderingPromise = loadStreamingSoundAsync("Wandering", wanderingPath, audioEngine, progressMonitor, {
+        loop: true,
+    });
+    const straussBlueDanubePromise = loadStreamingSoundAsync(
+        "StraussBlueDanube",
+        straussBlueDanubePath,
+        audioEngine,
+        progressMonitor,
+    );
+    const deepRelaxationPromise = loadStreamingSoundAsync(
+        "DeepRelaxation",
+        deepRelaxationPath,
+        audioEngine,
+        progressMonitor,
+    );
+    const atlanteanTwilightPromise = loadStreamingSoundAsync(
+        "AtlanteanTwilight",
+        atlanteanTwilightPath,
+        audioEngine,
+        progressMonitor,
+    );
+    const infinitePerspectivePromise = loadStreamingSoundAsync(
+        "InfinitePerspective",
+        infinitePerspectivePath,
+        audioEngine,
+        progressMonitor,
+    );
+    const thatZenMomentPromise = loadStreamingSoundAsync(
+        "ThatZenMoment",
+        thatZenMomentPath,
+        audioEngine,
+        progressMonitor,
+    );
+    const echoesOfTimePromise = loadStreamingSoundAsync("EchoesOfTime", echoesOfTimePath, audioEngine, progressMonitor);
+    const peaceOfMindPromise = loadStreamingSoundAsync("PeaceOfMind", peaceOfMindPath, audioEngine, progressMonitor);
+    const spacialWindsPromise = loadStreamingSoundAsync("SpacialWinds", spacialWindsPath, audioEngine, progressMonitor);
+    const mesmerizePromise = loadStreamingSoundAsync("Mesmerize", mesmerizePath, audioEngine, progressMonitor);
+    const reawakeningPromise = loadStreamingSoundAsync("Reawakening", reawakeningPath, audioEngine, progressMonitor);
+    const equatorialComplexPromise = loadStreamingSoundAsync(
+        "EquatorialComplex",
+        equatorialComplexPath,
+        audioEngine,
+        progressMonitor,
+    );
+    const soaringPromise = loadStreamingSoundAsync("Soaring", soaringPath, audioEngine, progressMonitor);
 
     return {
         wandering: await wanderingPromise,

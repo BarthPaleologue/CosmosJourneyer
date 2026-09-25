@@ -18,11 +18,11 @@
 import "@babylonjs/core/Audio/audioEngine";
 import "@babylonjs/core/Audio/audioSceneComponent";
 
-import { CreateSoundAsync } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
-import type { IStaticSoundOptions, StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
+import type { StaticSound } from "@babylonjs/core/AudioV2/abstractAudio/staticSound";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
+import { loadStaticSoundAsync } from "./utils";
 
 import menuHoverSoundPath from "@assets/sound/166186__drminky__menu-screen-mouse-over.mp3";
 import disableWarpDriveSoundPath from "@assets/sound/204418__nhumphrey__large-engine.mp3";
@@ -59,82 +59,125 @@ export async function loadSounds(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Sounds> {
-    const loadSoundAsync = async (
-        name: string,
-        url: string,
-        engine: AudioEngineV2,
-        options?: Partial<IStaticSoundOptions>,
-    ): Promise<StaticSound> => {
-        progressMonitor.startTask();
-        const sound = await CreateSoundAsync(name, url, options, engine);
-        progressMonitor.completeTask();
-        return sound;
-    };
+    const ouchSoundPromise = loadStaticSoundAsync("OuchSound", ouchSoundPath, audioEngine, progressMonitor);
 
-    const ouchSoundPromise = loadSoundAsync("OuchSound", ouchSoundPath, audioEngine);
+    const engineRunningSoundPromise = loadStaticSoundAsync(
+        "EngineRunningSound",
+        engineRunningSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            loop: true,
+        },
+    );
 
-    const engineRunningSoundPromise = loadSoundAsync("EngineRunningSound", engineRunningSoundPath, audioEngine, {
-        loop: true,
-    });
+    const menuHoverSoundPromise = loadStaticSoundAsync(
+        "MenuHoverSound",
+        menuHoverSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 0.5,
+        },
+    );
 
-    const menuHoverSoundPromise = loadSoundAsync("MenuHoverSound", menuHoverSoundPath, audioEngine, {
-        playbackRate: 0.5,
-    });
+    const menuSelectSoundPromise = loadStaticSoundAsync(
+        "MenuSelectSound",
+        menuHoverSoundPath,
+        audioEngine,
+        progressMonitor,
+    );
 
-    const menuSelectSoundPromise = loadSoundAsync("MenuSelectSound", menuHoverSoundPath, audioEngine);
-
-    const openPauseMenuSoundPromise = loadSoundAsync("OpenPauseMenuSound", menuHoverSoundPath, audioEngine, {
-        playbackRate: 0.75,
-    });
+    const openPauseMenuSoundPromise = loadStaticSoundAsync(
+        "OpenPauseMenuSound",
+        menuHoverSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 0.75,
+        },
+    );
     // Target sounds
-    const targetLockSoundPromise = loadSoundAsync("TargetLockSound", targetSoundPath, audioEngine);
+    const targetLockSoundPromise = loadStaticSoundAsync(
+        "TargetLockSound",
+        targetSoundPath,
+        audioEngine,
+        progressMonitor,
+    );
 
-    const targetUnlockSoundPromise = loadSoundAsync("TargetUnlockSound", targetSoundPath, audioEngine, {
-        playbackRate: 0.5,
-    });
+    const targetUnlockSoundPromise = loadStaticSoundAsync(
+        "TargetUnlockSound",
+        targetSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 0.5,
+        },
+    );
     // Warp drive sounds
-    const enableWarpDriveSoundPromise = loadSoundAsync("EnableWarpDriveSound", enableWarpDriveSoundPath, audioEngine, {
-        playbackRate: 2,
-    });
+    const enableWarpDriveSoundPromise = loadStaticSoundAsync(
+        "EnableWarpDriveSound",
+        enableWarpDriveSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 2,
+        },
+    );
 
-    const disableWarpDriveSoundPromise = loadSoundAsync(
+    const disableWarpDriveSoundPromise = loadStaticSoundAsync(
         "DisableWarpDriveSound",
         disableWarpDriveSoundPath,
         audioEngine,
+        progressMonitor,
     );
-    const acceleratingWarpDriveSoundPromise = loadSoundAsync(
+    const acceleratingWarpDriveSoundPromise = loadStaticSoundAsync(
         "AcceleratingWarpDriveSound",
         acceleratingWarpDriveSoundPath,
         audioEngine,
+        progressMonitor,
         {
             playbackRate: 1.0,
             loop: true,
         },
     );
 
-    const deceleratingWarpDriveSoundPromise = loadSoundAsync(
+    const deceleratingWarpDriveSoundPromise = loadStaticSoundAsync(
         "DeceleratingWarpDriveSound",
         deceleratingWarpDriveSoundPath,
         audioEngine,
+        progressMonitor,
         {
             playbackRate: 1.0,
             loop: true,
         },
     );
 
-    const hyperSpaceSoundPromise = loadSoundAsync("HyperSpaceSound", hyperSpaceSoundPath, audioEngine, {
-        playbackRate: 1.5,
-        loop: true,
-    });
+    const hyperSpaceSoundPromise = loadStaticSoundAsync(
+        "HyperSpaceSound",
+        hyperSpaceSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 1.5,
+            loop: true,
+        },
+    );
 
-    const thrusterSoundPromise = loadSoundAsync("ThrusterSound", thrusterSoundPath, audioEngine, {
-        playbackRate: 1.0,
-        loop: true,
-    });
+    const thrusterSoundPromise = loadStaticSoundAsync(
+        "ThrusterSound",
+        thrusterSoundPath,
+        audioEngine,
+        progressMonitor,
+        {
+            playbackRate: 1.0,
+            loop: true,
+        },
+    );
 
     // UI sounds
-    const successSoundPromise = loadSoundAsync("Success", echoedBlipSoundPath, audioEngine);
-    const errorSoundPromise = loadSoundAsync("Error", errorBleepSoundPath, audioEngine);
+    const successSoundPromise = loadStaticSoundAsync("Success", echoedBlipSoundPath, audioEngine, progressMonitor);
+    const errorSoundPromise = loadStaticSoundAsync("Error", errorBleepSoundPath, audioEngine, progressMonitor);
 
     return {
         ouch: await ouchSoundPromise,
