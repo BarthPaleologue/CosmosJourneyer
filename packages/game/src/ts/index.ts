@@ -69,7 +69,13 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string): 
 }
 
 async function startCosmosJourneyer(): Promise<void> {
-    const engine = await CosmosJourneyer.CreateAsync(t);
+    const engineResult = await CosmosJourneyer.New(t);
+    if (!engineResult.success) {
+        await alertModal(engineResult.error.message, new SoundPlayerMock(), t);
+        return;
+    }
+
+    const engine = engineResult.value;
 
     const urlParams = new URLSearchParams(window.location.search);
 
