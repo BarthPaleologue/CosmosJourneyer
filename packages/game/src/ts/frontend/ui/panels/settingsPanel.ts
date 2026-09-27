@@ -37,16 +37,16 @@ import { InputMaps } from "@/frontend/inputs/inputMaps";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
-import type { MusicConductor } from "../../audio/musicConductor";
+import type { MusicSystem } from "../../audio/musicSystem";
 
 export class SettingsPanel {
     readonly htmlRoot: HTMLElement;
 
-    constructor(musicConductor: MusicConductor, t: TFunction) {
+    constructor(musicConductor: MusicSystem, t: TFunction) {
         this.htmlRoot = this.createPanelHTML(musicConductor, t);
     }
 
-    private createPanelHTML(musicConductor: MusicConductor, t: TFunction): HTMLElement {
+    private createPanelHTML(musicConductor: MusicSystem, t: TFunction): HTMLElement {
         const panel = document.createElement("div");
         panel.className = "sidePanel";
 

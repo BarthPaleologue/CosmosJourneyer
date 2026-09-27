@@ -51,7 +51,7 @@ import type {
 import { loadAssets } from "@/frontend/assets/assets";
 import type { Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
-import { MusicConductor } from "@/frontend/audio/musicConductor";
+import { MusicSystem } from "@/frontend/audio/musicSystem";
 import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
@@ -116,7 +116,7 @@ export class CosmosJourneyer {
     readonly starSystemView: StarSystemView;
     readonly starMap: StarMapView;
 
-    readonly musicConductor: MusicConductor;
+    readonly musicConductor: MusicSystem;
     readonly soundPlayer: ISoundPlayer;
     readonly tts: Tts;
     readonly notificationManager: INotificationManager;
@@ -202,7 +202,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.musicConductor = new MusicConductor(this.assets.audio.musics, audioEngine, this.starSystemView);
+        this.musicConductor = new MusicSystem(this.assets.audio.musics, audioEngine, this.starSystemView);
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;

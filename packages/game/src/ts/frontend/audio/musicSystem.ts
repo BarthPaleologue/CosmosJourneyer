@@ -24,7 +24,7 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { Musics } from "@/frontend/assets/audio/musics";
 import type { StarSystemView } from "@/frontend/starSystemView";
 
-export class MusicConductor {
+export class MusicSystem {
     private currentMusic: AbstractSound | null = null;
 
     /**
