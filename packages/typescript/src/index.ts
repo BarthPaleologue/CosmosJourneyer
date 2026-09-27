@@ -59,4 +59,4 @@ export type Assert<T extends true> = T;
 
 declare const brand: unique symbol;
 
-export type Brand<T, Name extends string> = T & { readonly [brand]: Name };
+export type Brand<T, B> = T & { readonly [brand]: B };
