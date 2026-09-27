@@ -6,7 +6,7 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import type { MusicConductor } from "../audio/musicConductor";
+import type { MusicSystem } from "../audio/musicSystem";
 import type { INotificationManager } from "./notificationManager";
 import { AboutPanel } from "./panels/aboutPanel";
 import { ContributePanel } from "./panels/contributePanel";
@@ -34,7 +34,7 @@ export class SidePanels {
         universeBackend: UniverseBackend,
         saveManager: ISaveBackend,
         soundPlayer: ISoundPlayer,
-        musicConductor: MusicConductor,
+        musicConductor: MusicSystem,
         notificationManager: INotificationManager,
         t: TFunction,
     ) {

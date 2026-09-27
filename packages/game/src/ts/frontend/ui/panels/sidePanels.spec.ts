@@ -3,7 +3,7 @@
 import type { TFunction } from "i18next";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
-import { MusicConductor } from "@/frontend/audio/musicConductor";
+import { MusicSystem } from "@/frontend/audio/musicSystem";
 
 import { initI18n } from "@/i18n";
 
@@ -21,10 +21,10 @@ describe("translated side panels", () => {
     });
 
     it("builds each panel with its translated title", () => {
-        vi.spyOn(MusicConductor.prototype, "getVolume").mockReturnValue(1);
+        vi.spyOn(MusicSystem.prototype, "getVolume").mockReturnValue(1);
 
         const panels = [
-            [new SettingsPanel(MusicConductor.prototype, t), "sidePanel:settings"],
+            [new SettingsPanel(MusicSystem.prototype, t), "sidePanel:settings"],
             [new TutorialsPanel(t), "sidePanel:tutorials"],
             [new ContributePanel(t), "sidePanel:contribute"],
             [new CreditsPanel(t), "sidePanel:credits"],
