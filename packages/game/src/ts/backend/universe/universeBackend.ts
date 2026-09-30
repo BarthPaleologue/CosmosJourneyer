@@ -21,6 +21,7 @@ import {
     starSystemCoordinatesEquals,
     getObjectModelById,
     serializeStarSystemCoordinates,
+    serializeStarSectorCoordinates,
 } from "@cosmos-journeyer/universe-model";
 import type {
     StarSystemCoordinates,
@@ -100,22 +101,11 @@ export class UniverseBackend {
     }
 
     /**
-     * Converts a star sector to a string. This is useful for using the star sector as a key in a map.
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns A string representation of the star sector.
-     */
-    private starSectorToString(sectorX: number, sectorY: number, sectorZ: number): string {
-        return `${sectorX}|${sectorY}|${sectorZ}`;
-    }
-
-    /**
      * Adds the given system to the database
      * @param system The system to register
      */
     public registerAuthoredSystem(system: StarSystemModel): void {
-        const sectorKey = this.starSectorToString(
+        const sectorKey = serializeStarSectorCoordinates(
             system.coordinates.starSectorX,
             system.coordinates.starSectorY,
             system.coordinates.starSectorZ,
@@ -137,7 +127,7 @@ export class UniverseBackend {
      * @returns The list of only the custom systems in the given sector.
      */
     private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): StarSystemModel[] {
-        const sectorKey = this.starSectorToString(sectorX, sectorY, sectorZ);
+        const sectorKey = serializeStarSectorCoordinates(sectorX, sectorY, sectorZ);
         const systems = this.starSectorToCustomSystems.get(sectorKey);
         if (systems === undefined) {
             return [];
