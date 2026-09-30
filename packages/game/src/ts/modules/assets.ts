@@ -15,21 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ICosmosJourneyerBackend } from "@/backend";
-
-import type { GameModuleApi } from "@/modules/gameModuleApi";
-import type { ModuleAssetRegistry } from "@/modules/moduleAssetRegistry";
-
-export function createGameModuleApi(
-    backend: ICosmosJourneyerBackend,
-    moduleAssetRegistry: ModuleAssetRegistry,
-): GameModuleApi {
-    return {
-        starSystems: {
-            registerAuthored: (model) => {
-                backend.universe.registerCustomSystem(model);
-            },
-        },
-        assets: moduleAssetRegistry,
-    };
+export interface AssetsExtensionPoint {
+    registerMusic(id: string, url: string): void;
+    registerSound(id: string, url: string): void;
 }

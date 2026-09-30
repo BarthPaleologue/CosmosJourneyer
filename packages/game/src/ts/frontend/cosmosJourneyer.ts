@@ -78,6 +78,7 @@ import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+import { ModuleAssetRegistry } from "@/modules/moduleAssetRegistry";
 import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
 import { Settings } from "@/settings";
 
@@ -512,19 +513,30 @@ export class CosmosJourneyer {
 
         const starSystemViewPhysicsEngine = getPhysicsEngineV2(starSystemViewScene);
 
-        const loadingProgressMonitor = new LoadingProgressMonitor();
-        loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
+        const progressMonitor = new LoadingProgressMonitor();
+        progressMonitor.addProgressCallback((startedCount, completedCount) => {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const gameModuleApi = createGameModuleApi(backend);
+        const moduleAssetRegistry = new ModuleAssetRegistry();
+
+        const gameModuleApi = createGameModuleApi(backend, moduleAssetRegistry);
+
         const builtinModules = getBuiltinModules();
+
         const modulesResult = setupModules(builtinModules, gameModuleApi);
         if (!modulesResult.success) {
             return modulesResult;
         }
 
-        const assets = await loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
+        const builtinAssets = await loadAssets(starSystemViewScene, audioEngine, progressMonitor);
+
+        const extensionAssets = await moduleAssetRegistry.load({ audioEngine, progressMonitor });
+
+        const assets = {
+            ...builtinAssets,
+            extensions: extensionAssets,
+        };
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
@@ -548,7 +560,7 @@ export class CosmosJourneyer {
             assets.rendering,
             terrainSystemResult.value,
             t,
-            loadingProgressMonitor,
+            progressMonitor,
         );
 
         const starMapView = new StarMapView(
@@ -582,7 +594,7 @@ export class CosmosJourneyer {
                 soundPlayer,
                 tts,
                 notificationManager,
-                loadingProgressMonitor,
+                progressMonitor,
                 t,
             ),
         );

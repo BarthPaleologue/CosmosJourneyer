@@ -17,8 +17,11 @@
 
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import type { AssetsExtensionPoint } from "./assets";
+
 export type GameModuleApi = Readonly<{
     starSystems: {
         registerAuthored(model: StarSystemModel): void;
     };
+    assets: AssetsExtensionPoint;
 }>;
