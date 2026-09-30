@@ -25,7 +25,6 @@ import type { TFunction } from "i18next";
 
 import type { ISaveBackend } from "@/backend/save/saveBackend";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
-import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -36,6 +35,8 @@ import {
     positionNearObjectWithStarVisible,
 } from "@/frontend/helpers/positionNearObject";
 import type { StarSystemView } from "@/frontend/starSystemView";
+
+import { getVestaSystemModel } from "@/modules/vesta/vesta";
 
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";

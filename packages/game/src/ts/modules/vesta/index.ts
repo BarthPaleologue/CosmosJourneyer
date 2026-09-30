@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,15 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
-import { getChronosSystemModel } from "./chronos";
+import type { GameModule } from "../gameModule";
 import { getVestaSystemModel } from "./vesta";
 
-// import { getSolSystemModel } from "./sol";
-
-export function registerCustomSystems(universeBackend: UniverseBackend): void {
-    universeBackend.registerCustomSystem(getVestaSystemModel());
-    universeBackend.registerCustomSystem(getChronosSystemModel());
-    // universeBackend.registerCustomSystem(getSolSystemModel());
-}
+export const VestaModule: GameModule = {
+    id: "vesta",
+    setup: ({ starSystems }) => {
+        starSystems.registerAuthored(getVestaSystemModel());
+    },
+};

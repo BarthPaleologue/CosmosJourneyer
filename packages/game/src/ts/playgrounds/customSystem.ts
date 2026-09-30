@@ -20,10 +20,8 @@ import { Scene } from "@babylonjs/core/scene";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
-import { getChronosSystemModel } from "@/backend/universe/customSystems/chronos";
 import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/eclipseTest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { getVestaSystemModel } from "@/backend/universe/customSystems/vesta";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -38,6 +36,8 @@ import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
+import { getChronosSystemModel } from "@/modules/chronos/chronos";
+import { getVestaSystemModel } from "@/modules/vesta/vesta";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
