@@ -15,66 +15,80 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { describe, expect, it } from "vitest";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { OrbitalObject } from "./architecture/orbitalObject";
+import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
 
-function createTestOrbitalObject({
-    id,
-    parentIds,
-    semiMajorAxis,
-    position = Vector3.Zero(),
-    siderealPeriod = 0,
-}: {
-    readonly id: string;
-    readonly parentIds: ReadonlyArray<string>;
-    readonly semiMajorAxis: number;
-    readonly position?: Vector3;
-    readonly siderealPeriod?: number;
-}): OrbitalObject {
+function createTestOrbitalObject(
+    scene: Scene,
+    {
+        id,
+        parentIds,
+        semiMajorAxis,
+        position = Vector3.Zero(),
+        siderealPeriod = 0,
+    }: {
+        readonly id: string;
+        readonly parentIds: ReadonlyArray<string>;
+        readonly semiMajorAxis: number;
+        readonly position?: Vector3;
+        readonly siderealPeriod?: number;
+    },
+): KeplerianObject {
+    const transform = new TransformNode(id, scene);
+    transform.position.copyFrom(position);
+
     return {
-        type: "custom",
-        model: {
-            type: "custom",
-            id,
-            name: id,
-            orbit: {
-                parentIds,
-                argumentOfPeriapsis: 0,
-                semiMajorAxis,
-                initialMeanAnomaly: 0,
-                longitudeOfAscendingNode: 0,
-                inclination: 0,
-                eccentricity: 0,
-                p: 2,
-            },
-            mass: 1,
-            rotation: {
-                axialTilt: 0,
-                spinAxisAzimuth: 0,
-                siderealPeriod,
-                initialRotationAngle: 0,
-            },
+        id,
+        mass: 1,
+        orbit: {
+            parentIds,
+            argumentOfPeriapsis: 0,
+            semiMajorAxis,
+            initialMeanAnomaly: 0,
+            longitudeOfAscendingNode: 0,
+            inclination: 0,
+            eccentricity: 0,
+            p: 2,
         },
-        getTransform: () => ({
-            position,
-            rotationQuaternion: Quaternion.Identity(),
-        }),
-    } as unknown as OrbitalObject;
+        rotation: {
+            axialTilt: 0,
+            spinAxisAzimuth: 0,
+            siderealPeriod,
+            initialRotationAngle: 0,
+        },
+        getTransform: () => transform,
+    };
 }
 
 describe("KeplerianOrbitalSimulation", () => {
+    let engine: NullEngine;
+    let scene: Scene;
+
+    beforeEach(() => {
+        engine = new NullEngine();
+        scene = new Scene(engine);
+    });
+
+    afterEach(() => {
+        scene.dispose();
+        engine.dispose();
+    });
+
     it("computes nested child positions from authoritative parent states", () => {
-        const star = createTestOrbitalObject({
+        const star = createTestOrbitalObject(scene, {
             id: "star",
             parentIds: [],
             semiMajorAxis: 0,
             position: new Vector3(100, 0, 0),
         });
-        const planet = createTestOrbitalObject({ id: "planet", parentIds: ["star"], semiMajorAxis: 10 });
-        const moon = createTestOrbitalObject({ id: "moon", parentIds: ["planet"], semiMajorAxis: 3 });
+        const planet = createTestOrbitalObject(scene, { id: "planet", parentIds: ["star"], semiMajorAxis: 10 });
+        const moon = createTestOrbitalObject(scene, { id: "moon", parentIds: ["planet"], semiMajorAxis: 3 });
 
         const simulation = new KeplerianOrbitalSimulation([star, planet, moon]);
         simulation.update(0);
@@ -93,7 +107,7 @@ describe("KeplerianOrbitalSimulation", () => {
     });
 
     it("returns a body-fixed relative state for the reference object", () => {
-        const reference = createTestOrbitalObject({
+        const reference = createTestOrbitalObject(scene, {
             id: "reference",
             parentIds: [],
             semiMajorAxis: 0,
@@ -118,13 +132,13 @@ describe("KeplerianOrbitalSimulation", () => {
     });
 
     it("can keep relative positions in the inertial frame when reference rotation is not compensated", () => {
-        const reference = createTestOrbitalObject({
+        const reference = createTestOrbitalObject(scene, {
             id: "reference",
             parentIds: [],
             semiMajorAxis: 0,
             siderealPeriod: 4,
         });
-        const target = createTestOrbitalObject({
+        const target = createTestOrbitalObject(scene, {
             id: "target",
             parentIds: [],
             semiMajorAxis: 0,

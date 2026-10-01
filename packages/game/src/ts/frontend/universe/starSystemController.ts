@@ -18,6 +18,7 @@
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
@@ -33,6 +34,7 @@ import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
+import { toKeplerian } from "../helpers/orbitalObject";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
 import type {
     Anomaly,
@@ -110,6 +112,7 @@ export class StarSystemController {
     private constructor(
         model: DeepReadonly<StarSystemModel>,
         orbitalObjects: Readonly<StarSystemLoaderOutput>,
+        orbitalSimulation: KeplerianOrbitalSimulation,
         assets: RenderingAssets,
         scene: Scene,
     ) {
@@ -138,7 +141,8 @@ export class StarSystemController {
                 ),
             );
         }
-        this.orbitalSimulation = new KeplerianOrbitalSimulation(this.getOrbitalObjects());
+
+        this.orbitalSimulation = orbitalSimulation;
 
         for (const stellarObject of this.stellarObjects) {
             let color: Color3 | null;
@@ -165,7 +169,18 @@ export class StarSystemController {
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<StarSystemController> {
         const result = await loader.load(model, assets, scene, progressMonitor);
-        return new StarSystemController(model, result, assets, scene);
+        const orbitalObjects = [
+            ...result.stellarObjects,
+            ...result.planets,
+            ...result.satellites,
+            ...result.anomalies,
+            ...result.orbitalFacilities,
+        ];
+
+        const orbitalSimulation = new KeplerianOrbitalSimulation([]);
+        orbitalSimulation.addObjects(orbitalObjects.map(toKeplerian));
+
+        return new StarSystemController(model, result, orbitalSimulation, assets, scene);
     }
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
@@ -283,12 +298,11 @@ export class StarSystemController {
     }
 
     private applyRelativeOrbitalTransform(
-        object: OrbitalObject,
+        transform: TransformNode,
         relativeTransform: OrbitalTransform,
         referenceAnchorPosition: Vector3,
         referenceAnchorOrientation: Quaternion,
     ): void {
-        const transform = object.getTransform();
         relativeTransform.position.applyRotationQuaternionToRef(referenceAnchorOrientation, transform.position);
         transform.position.addInPlace(referenceAnchorPosition);
 
@@ -344,19 +358,19 @@ export class StarSystemController {
 
         this.starFieldBox.setRotationMatrix(this.referencePlaneRotation.transpose());
 
-        for (const object of this.getOrbitalObjects()) {
+        for (const object of this.orbitalSimulation.getObjects()) {
             const relativeTransform = this.orbitalSimulation.getRelativeTransform(
-                object.model.id,
+                object.id,
                 referenceObject.model.id,
                 relativeTransformFrame,
             );
             if (relativeTransform === undefined) {
-                console.warn(`Could not compute orbital transform for ${object.model.name}`);
+                console.warn(`Could not compute orbital transform for ${object.id}`);
                 continue;
             }
 
             this.applyRelativeOrbitalTransform(
-                object,
+                object.getTransform(),
                 relativeTransform,
                 this.referenceAnchorPosition,
                 relativeTransformFrame === "reference" ? referenceAnchorOrientation : localFrameOrientation,
