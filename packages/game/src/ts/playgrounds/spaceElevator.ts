@@ -29,6 +29,7 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
+import { toKeplerian } from "@/frontend/helpers/orbitalObject";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
@@ -123,7 +124,7 @@ export async function createSpaceElevatorScene(
     new GlowLayer("glow", scene);
 
     let elapsedSeconds = 0;
-    const orbitalSimulation = new KeplerianOrbitalSimulation([planetImpostor, spaceElevator]);
+    const orbitalSimulation = new KeplerianOrbitalSimulation([planetImpostor, spaceElevator].map(toKeplerian));
 
     orbitalSimulation.update(elapsedSeconds);
     for (const object of [planetImpostor, spaceElevator]) {

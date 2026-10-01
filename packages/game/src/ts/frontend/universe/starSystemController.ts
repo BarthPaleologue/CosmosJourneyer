@@ -18,6 +18,7 @@
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
@@ -33,6 +34,7 @@ import { SystemTarget } from "@/frontend/universe/systemTarget";
 import { Settings } from "@/settings";
 
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
+import { toKeplerian } from "../helpers/orbitalObject";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
 import type {
     Anomaly,
@@ -44,7 +46,7 @@ import type {
 } from "./architecture/orbitalObject";
 import { GravitySystem } from "./gravitySystem";
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
-import type { OrbitalTransform } from "./keplerianOrbitalSimulation";
+import type { KeplerianObject, OrbitalTransform } from "./keplerianOrbitalSimulation";
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
@@ -83,6 +85,8 @@ export class StarSystemController {
     private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
+
+    private readonly keplerianObjects: ReadonlyArray<KeplerianObject>;
 
     /**
      * The list of all system targets in the system
@@ -138,7 +142,10 @@ export class StarSystemController {
                 ),
             );
         }
-        this.orbitalSimulation = new KeplerianOrbitalSimulation(this.getOrbitalObjects());
+
+        this.keplerianObjects = this.getKeplerianObjects();
+
+        this.orbitalSimulation = new KeplerianOrbitalSimulation(this.keplerianObjects);
 
         for (const stellarObject of this.stellarObjects) {
             let color: Color3 | null;
@@ -166,6 +173,10 @@ export class StarSystemController {
     ): Promise<StarSystemController> {
         const result = await loader.load(model, assets, scene, progressMonitor);
         return new StarSystemController(model, result, assets, scene);
+    }
+
+    private getKeplerianObjects(): Array<KeplerianObject> {
+        return this.getOrbitalObjects().map(toKeplerian);
     }
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
@@ -283,12 +294,11 @@ export class StarSystemController {
     }
 
     private applyRelativeOrbitalTransform(
-        object: OrbitalObject,
+        transform: TransformNode,
         relativeTransform: OrbitalTransform,
         referenceAnchorPosition: Vector3,
         referenceAnchorOrientation: Quaternion,
     ): void {
-        const transform = object.getTransform();
         relativeTransform.position.applyRotationQuaternionToRef(referenceAnchorOrientation, transform.position);
         transform.position.addInPlace(referenceAnchorPosition);
 
@@ -344,19 +354,19 @@ export class StarSystemController {
 
         this.starFieldBox.setRotationMatrix(this.referencePlaneRotation.transpose());
 
-        for (const object of this.getOrbitalObjects()) {
+        for (const object of this.keplerianObjects) {
             const relativeTransform = this.orbitalSimulation.getRelativeTransform(
-                object.model.id,
+                object.id,
                 referenceObject.model.id,
                 relativeTransformFrame,
             );
             if (relativeTransform === undefined) {
-                console.warn(`Could not compute orbital transform for ${object.model.name}`);
+                console.warn(`Could not compute orbital transform for ${object.id}`);
                 continue;
             }
 
             this.applyRelativeOrbitalTransform(
-                object,
+                object.getTransform(),
                 relativeTransform,
                 this.referenceAnchorPosition,
                 relativeTransformFrame === "reference" ? referenceAnchorOrientation : localFrameOrientation,

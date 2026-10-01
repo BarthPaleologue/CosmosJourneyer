@@ -17,11 +17,12 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import type { OrbitalObjectId } from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
 
 import { computeAbsoluteOrientation, getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
 
-import type { OrbitalObject } from "./architecture/orbitalObject";
+import type { Transformable } from "./architecture/transformable";
 
 export type OrbitalTransform = {
     readonly position: Vector3;
@@ -30,31 +31,40 @@ export type OrbitalTransform = {
 
 export type RelativeTransformFrame = "reference" | "inertial";
 
+export type KeplerianObject = Transformable &
+    Readonly<{
+        readonly id: string;
+        readonly mass: number;
+        readonly orbit: DeepReadonly<Orbit>;
+        readonly rotation: DeepReadonly<Rotation>;
+    }>;
+
 /**
  * Responsible for computing orbital positions and orientations of objects based on Kepler's laws of planetary motion.
  */
 export class KeplerianOrbitalSimulation {
-    private readonly objectsById = new Map<OrbitalObjectId, OrbitalObject>();
-    private readonly objectToParents = new Map<OrbitalObject, ReadonlyArray<OrbitalObject>>();
-    private readonly initialPositions = new Map<OrbitalObject, Vector3>();
-    private readonly transformCache = new Map<OrbitalObject, OrbitalTransform>();
+    private readonly objectsById = new Map<string, KeplerianObject>();
+    private readonly objectToParents = new Map<KeplerianObject, ReadonlyArray<KeplerianObject>>();
+    private readonly initialPositions = new Map<KeplerianObject, Vector3>();
+    private readonly transformCache = new Map<KeplerianObject, OrbitalTransform>();
 
     private elapsedSeconds = 0;
 
-    public constructor(orbitalObjects: ReadonlyArray<OrbitalObject>) {
+    public constructor(orbitalObjects: Iterable<KeplerianObject>) {
         for (const object of orbitalObjects) {
-            this.objectsById.set(object.model.id, object);
+            this.objectsById.set(object.id, object);
             this.initialPositions.set(object, object.getTransform().position.clone());
         }
 
         for (const object of orbitalObjects) {
+            const orbit = object.orbit;
             this.objectToParents.set(
                 object,
-                object.model.orbit.parentIds
+                orbit.parentIds
                     .map((parentId) => {
                         const parent = this.objectsById.get(parentId);
                         if (parent === undefined) {
-                            console.error(`Parent ${parentId} of ${object.model.name} is not defined`);
+                            console.error(`Parent ${parentId} of ${object.id} is not defined`);
                         }
                         return parent;
                     })
@@ -68,7 +78,7 @@ export class KeplerianOrbitalSimulation {
         this.transformCache.clear();
     }
 
-    public getTransform(objectId: OrbitalObjectId): OrbitalTransform | undefined {
+    public getTransform(objectId: string): OrbitalTransform | undefined {
         const object = this.objectsById.get(objectId);
         if (object === undefined) {
             return undefined;
@@ -84,8 +94,8 @@ export class KeplerianOrbitalSimulation {
      * @param frame "reference" expresses the result in the reference object's rotating frame; "inertial" only subtracts the reference position.
      */
     public getRelativeTransform(
-        objectId: OrbitalObjectId,
-        referenceObjectId: OrbitalObjectId,
+        objectId: string,
+        referenceObjectId: string,
         frame: RelativeTransformFrame,
     ): OrbitalTransform | undefined {
         const transform = this.getTransform(objectId);
@@ -114,7 +124,7 @@ export class KeplerianOrbitalSimulation {
         };
     }
 
-    private getTransformFromObject(object: OrbitalObject): OrbitalTransform {
+    private getTransformFromObject(object: KeplerianObject): OrbitalTransform {
         const cachedTransform = this.transformCache.get(object);
         if (cachedTransform !== undefined) {
             return cachedTransform;
@@ -129,13 +139,13 @@ export class KeplerianOrbitalSimulation {
         return transform;
     }
 
-    private computeAbsolutePosition(object: OrbitalObject): Vector3 {
+    private computeAbsolutePosition(object: KeplerianObject): Vector3 {
         const parents = this.objectToParents.get(object);
         if (parents === undefined) {
             return object.getTransform().position.clone();
         }
 
-        const orbit = object.model.orbit;
+        const orbit = object.orbit;
         if (orbit.semiMajorAxis === 0 || parents.length === 0) {
             const initialPosition = this.initialPositions.get(object);
             if (initialPosition === undefined) {
@@ -148,7 +158,7 @@ export class KeplerianOrbitalSimulation {
         let sumOfMasses = 0;
         for (const parent of parents) {
             const parentTransform = this.getTransformFromObject(parent);
-            const parentMass = parent.model.mass;
+            const parentMass = parent.mass;
             barycenter.addInPlace(parentTransform.position.scale(parentMass));
             sumOfMasses += parentMass;
         }
@@ -161,7 +171,7 @@ export class KeplerianOrbitalSimulation {
         return getPointOnOrbitLocal(orbit, sumOfMasses, this.elapsedSeconds).addInPlace(barycenter);
     }
 
-    private computeAbsoluteOrientation(object: OrbitalObject): Quaternion {
-        return computeAbsoluteOrientation(object.model.orbit.inclination, object.model.rotation, this.elapsedSeconds);
+    private computeAbsoluteOrientation(object: KeplerianObject): Quaternion {
+        return computeAbsoluteOrientation(object.orbit.inclination, object.rotation, this.elapsedSeconds);
     }
 }
