@@ -65,6 +65,16 @@ export type StrictEqual<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => 
 /** Turns "should be true" into a compilation error when it's not. */
 export type Assert<T extends true> = T;
 
-declare const brand: unique symbol;
+declare const tag: unique symbol;
 
-export type Brand<T, B> = T & { readonly [brand]: B };
+export type Tagged<T, TTag extends PropertyKey, TMetadata> = T & {
+    readonly [tag]: Readonly<{
+        Tag: TTag;
+        Metadata: TMetadata;
+    }>;
+};
+
+export type TagMetadataOf<T extends Tagged<unknown, PropertyKey, unknown>> =
+    T extends Tagged<unknown, PropertyKey, infer TMetadata> ? TMetadata : never;
+
+export type Brand<T, B extends PropertyKey> = Tagged<T, B, never>;
