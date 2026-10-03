@@ -537,9 +537,6 @@ export class PostProcessManager {
                 case "mengerSponge":
                     this.addRaymarchedBody(object, object.model, lightSources, object.ringsUniforms);
                     break;
-                case "darkKnight":
-                    // Intentionally left blank: No specific post-process required for DARK_KNIGHT.
-                    break;
                 default:
                     assertUnreachable(object);
             }

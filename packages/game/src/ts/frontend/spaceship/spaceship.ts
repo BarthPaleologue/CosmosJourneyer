@@ -564,7 +564,6 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
             case "mandelbox":
             case "sierpinskiPyramid":
             case "mengerSponge":
-            case "darkKnight":
                 fuelAvailability = 0;
                 break;
             default:

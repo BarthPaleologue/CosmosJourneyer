@@ -25,8 +25,6 @@ export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): 
     switch (body.type) {
         case "blackHole":
             return getSchwarzschildRadius(body.mass);
-        case "darkKnight":
-            return 100e3;
         case "star":
         case "neutronStar":
         case "telluricPlanet":

@@ -16,11 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { GameModule } from "../gameModule";
-import { getChronosSystemModel } from "./chronos";
+import { getChronosModel } from "./chronos";
 
 export const ChronosModule: GameModule = {
     id: "chronos",
-    setup: ({ starSystems }) => {
-        starSystems.registerAuthored(getChronosSystemModel());
+    setup: ({ starSystems, systemEntities }) => {
+        const { systemModel, systemEntityModels } = getChronosModel();
+        starSystems.registerAuthored(systemModel);
+        systemEntities.registerAuthored(systemModel.coordinates, systemEntityModels);
     },
 };

@@ -129,10 +129,6 @@ function generateAnomalyFlyByMissionsInSystem(
             continue;
         }
 
-        if (anomaly.type === "darkKnight") {
-            continue;
-        }
-
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
             {

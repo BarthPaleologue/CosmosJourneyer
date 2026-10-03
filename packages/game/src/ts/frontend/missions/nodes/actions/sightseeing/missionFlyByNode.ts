@@ -104,7 +104,6 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
             case "mandelbox":
             case "sierpinskiPyramid":
             case "mengerSponge":
-            case "darkKnight":
             case "spaceStation":
             case "spaceElevator":
             case "custom":

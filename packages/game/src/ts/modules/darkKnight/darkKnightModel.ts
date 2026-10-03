@@ -15,21 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, EarthMass } from "@cosmos-journeyer/physics";
-import type { DarkKnightModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
+import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
+import type { OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
-export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId>): DarkKnightModel {
+import type { InOrbitPlacementModel, SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
+
+export type DarkKnightModel = SystemContentModel<"darkKnight">;
+
+export function createDarkKnightOrbitalPlacementModel(parentIds: Iterable<OrbitalObjectId>): InOrbitPlacementModel {
     return {
-        type: "darkKnight",
-        id: "darkKnight",
-        name: "Dark Knight",
-        rotation: {
-            axialTilt: 0,
-            siderealPeriod: 0,
-            spinAxisAzimuth: 0,
-            initialRotationAngle: 0,
-        },
-        mass: EarthMass,
+        type: "inOrbit",
+        mass: 1e15,
         orbit: {
             parentIds: [...parentIds],
             argumentOfPeriapsis: 0,
@@ -39,6 +35,12 @@ export function generateDarkKnightModel(parentIds: ReadonlyArray<OrbitalObjectId
             longitudeOfAscendingNode: 0,
             semiMajorAxis: astronomicalUnitToMeters(100),
             initialMeanAnomaly: 0,
+        },
+        rotation: {
+            axialTilt: 0,
+            siderealPeriod: 0,
+            spinAxisAzimuth: 0,
+            initialRotationAngle: 0,
         },
     };
 }

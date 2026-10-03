@@ -38,7 +38,7 @@ import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
-import { getChronosSystemModel } from "@/modules/chronos/chronos";
+import { getChronosModel } from "@/modules/chronos/chronos";
 import { getVestaSystemModel } from "@/modules/vesta/vesta";
 import { Settings } from "@/settings";
 
@@ -58,7 +58,9 @@ export async function createCustomSystemScene(
 
     let systemModel: StarSystemModel;
     if (systemKey === "chronos") {
-        systemModel = getChronosSystemModel();
+        const chronos = getChronosModel();
+        systemModel = chronos.systemModel;
+        systemEntityBackend.registerAuthored(systemModel.coordinates, chronos.systemEntityModels);
     } else if (systemKey === "vesta") {
         systemModel = getVestaSystemModel();
     } else if (systemKey === "eclipseTest") {

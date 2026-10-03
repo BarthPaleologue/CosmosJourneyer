@@ -17,14 +17,14 @@
 
 import { Scene, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
-import { generateDarkKnightModel } from "@cosmos-journeyer/universe-generation";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
-import { DarkKnight } from "@/frontend/universe/darkKnight";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
+
+import { DarkKnight } from "@/modules/darkKnight/darkKnight";
 
 export async function createDarkKnightScene(
     engine: AbstractEngine,
@@ -45,9 +45,9 @@ export async function createDarkKnightScene(
     camera.attachControl();
 
     // Our built-in 'sphere' shape. Params: name, options, scene
-    const darkKnight = new DarkKnight(generateDarkKnightModel([]), scene);
+    const darkKnight = new DarkKnight(scene);
 
-    const scalingFactor = darkKnight.getBoundingRadius();
+    const scalingFactor = darkKnight.radius;
 
     controls.speed = scalingFactor;
     camera.maxZ *= scalingFactor;

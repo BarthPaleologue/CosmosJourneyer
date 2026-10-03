@@ -20,34 +20,18 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type { DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
-import type { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
 
-import type { CelestialBodyBase } from "./architecture/celestialBody";
-import type { AsteroidField } from "./asteroidFields/asteroidField";
-
-export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
-    readonly type: "darkKnight";
-
-    readonly model: DeepReadonly<DarkKnightModel>;
-
-    private readonly radius: number;
+export class DarkKnight implements SystemContent {
+    readonly radius: number;
 
     private readonly mesh: Mesh;
 
     private readonly material: PBRMetallicRoughnessMaterial;
 
-    readonly ringsUniforms: RingsUniforms | null = null;
-    readonly asteroidField: AsteroidField | null = null;
-
-    constructor(model: DeepReadonly<DarkKnightModel>, scene: Scene) {
-        this.type = model.type;
-        this.model = model;
-
-        this.radius = getCelestialBodyRadius(model);
+    constructor(scene: Scene) {
+        this.radius = 100e3;
 
         this.mesh = MeshBuilder.CreateSphere("DarkKnight", { diameter: this.radius * 2, segments: 256 }, scene);
 
@@ -57,14 +41,6 @@ export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
         this.material.disableLighting = true;
 
         this.mesh.material = this.material;
-    }
-
-    getRadius(): number {
-        return this.radius;
-    }
-
-    getBoundingRadius(): number {
-        return this.radius;
     }
 
     getTransform(): TransformNode {
