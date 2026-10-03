@@ -22,11 +22,18 @@ import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEn
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
 import type { AnySystemContentType, SystemContentFactoryOf } from "@/frontend/systemEntity/systemEntity";
+import type { SystemEntityProcessor } from "@/frontend/systemEntity/systemEntityProcessor";
+import type { SystemEntityUpdateContext } from "@/frontend/systemEntity/systemEntityProcessors";
 
 export interface SystemEntitiesExtensionPoint {
-    registerAuthored: (coordinates: StarSystemCoordinates, models: Iterable<DeepReadonly<SystemEntityModel>>) => void;
+    registerAuthored(coordinates: StarSystemCoordinates, models: Iterable<DeepReadonly<SystemEntityModel>>): void;
 
-    registerProcedural: (factory: SystemEntityModelGenerator) => void;
+    registerProcedural(factory: SystemEntityModelGenerator): void;
 
     registerContentFactory<T extends AnySystemContentType>(type: T, factory: SystemContentFactoryOf<T>): void;
+
+    registerUpdate<T extends AnySystemContentType>(
+        type: T,
+        update: SystemEntityProcessor<T, SystemEntityUpdateContext, void>,
+    ): void;
 }

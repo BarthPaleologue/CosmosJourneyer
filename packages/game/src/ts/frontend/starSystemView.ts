@@ -92,6 +92,7 @@ import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import type { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 import {
     createSpaceshipTarget,
     createSystemTarget,
@@ -199,6 +200,8 @@ export class StarSystemView implements View {
 
     private readonly systemEntityLoader: SystemEntityLoader;
 
+    private readonly systemEntityProcessors: SystemEntityProcessors;
+
     /** The system used to generate surface chunks for telluric planets. It is constant for the whole game. */
     private readonly terrainSystem: ITerrainSystem;
 
@@ -277,6 +280,7 @@ export class StarSystemView implements View {
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
         systemEntityLoader: SystemEntityLoader,
+        systemEntityProcessors: SystemEntityProcessors,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
@@ -289,6 +293,7 @@ export class StarSystemView implements View {
         this.encyclopaedia = encyclopaedia;
         this.universeBackend = universeBackend;
         this.systemEntityLoader = systemEntityLoader;
+        this.systemEntityProcessors = systemEntityProcessors;
 
         this.scene = scene;
         this.scene.skipPointerMovePicking = true;
@@ -1028,7 +1033,8 @@ export class StarSystemView implements View {
 
         activeControls.update(deltaSeconds);
 
-        starSystem.update(deltaSeconds, this.terrainSystem);
+        starSystem.update(deltaSeconds, this.terrainSystem, this.systemEntityProcessors);
+
         this.clusteredLightingSystem.update(activeControls.getActiveCamera());
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(

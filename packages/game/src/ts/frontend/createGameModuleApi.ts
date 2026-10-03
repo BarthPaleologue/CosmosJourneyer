@@ -20,10 +20,12 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 import type { GameModuleApi } from "@/modules/gameModuleApi";
 
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 
 export function createGameModuleApi(
     universeBackend: UniverseBackend,
     systemEntityLoader: SystemEntityLoader,
+    systemEntityProcessors: SystemEntityProcessors,
 ): GameModuleApi {
     return {
         starSystems: {
@@ -40,6 +42,9 @@ export function createGameModuleApi(
             },
             registerContentFactory: (type, factory) => {
                 systemEntityLoader.registerFactory(type, factory);
+            },
+            registerUpdate: (type, update) => {
+                systemEntityProcessors.registerUpdate(type, update);
             },
         },
     };

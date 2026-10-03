@@ -27,6 +27,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { getSystemTargets } from "@/frontend/targeting/createTargets";
 import { createDefaultTargetContact } from "@/frontend/targeting/targetContact";
 import { TargetingSystem } from "@/frontend/targeting/targetingSystem";
@@ -70,6 +71,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const starSystemLoader = new StarSystemLoader();
     const systemEntityLoader = new SystemEntityLoader();
+    const systemEntityProcessors = new SystemEntityProcessors();
     const starSystemControllerResult = await StarSystemController.CreateAsync(
         getSolSystemModel(),
         starSystemLoader,
@@ -109,7 +111,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
         terrainSystem.update();
         postProcessManager.update(deltaSeconds);
-        starSystemController.update(deltaSeconds, terrainSystem);
+        starSystemController.update(deltaSeconds, terrainSystem, systemEntityProcessors);
         camera.getViewMatrix();
         targetingSystem.update(camera.globalPosition);
         targetCursorLayer.update(camera, null);

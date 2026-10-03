@@ -85,6 +85,7 @@ import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { createGameModuleApi } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
 import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
@@ -519,7 +520,9 @@ export class CosmosJourneyer {
 
         const systemEntityLoader = new SystemEntityLoader();
 
-        const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader);
+        const systemEntityProcessors = new SystemEntityProcessors();
+
+        const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader, systemEntityProcessors);
 
         const builtinModules = getBuiltinModules();
         const modulesResult = setupModules(builtinModules, gameModuleApi);
@@ -546,6 +549,7 @@ export class CosmosJourneyer {
             backend.encyclopaedia,
             backend.universe,
             systemEntityLoader,
+            systemEntityProcessors,
             soundPlayer,
             tts,
             notificationManager,

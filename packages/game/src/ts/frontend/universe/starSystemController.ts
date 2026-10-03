@@ -40,6 +40,7 @@ import { toKeplerian } from "../helpers/orbitalObject";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
 import type { SystemEntity } from "../systemEntity/systemEntity";
 import type { SystemEntityLoadContext, SystemEntityLoader } from "../systemEntity/systemEntityLoader";
+import type { SystemEntityProcessors, SystemEntityUpdateContext } from "../systemEntity/systemEntityProcessors";
 import type {
     Anomaly,
     CelestialBody,
@@ -410,7 +411,11 @@ export class StarSystemController {
      * @param deltaSeconds The time elapsed since the last update
      * @param terrainSystem The system used to update the LOD of the telluric planets
      */
-    public update(deltaSeconds: number, terrainSystem: ITerrainSystem): void {
+    public update(
+        deltaSeconds: number,
+        terrainSystem: ITerrainSystem,
+        systemEntityProcessors: SystemEntityProcessors,
+    ): void {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             console.warn("No camera!");
@@ -435,6 +440,12 @@ export class StarSystemController {
             orbitalFacility.update(parents, cameraPosition, deltaSeconds);
             orbitalFacility.computeCulling(camera);
         }
+
+        const entityContext: SystemEntityUpdateContext = {
+            observerPosition: cameraPosition,
+            deltaSeconds,
+        };
+        systemEntityProcessors.updateEntities(this.getSystemEntities(), entityContext);
 
         // Update planet LOD and culling
         for (const object of this.getPlanetaryMassObjects()) {

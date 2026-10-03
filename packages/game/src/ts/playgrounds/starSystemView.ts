@@ -31,6 +31,7 @@ import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObj
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
@@ -50,6 +51,7 @@ export async function createStarSystemViewScene(
     const universeBackend = new UniverseBackend(systemEntityBackend, getAlphaTestisSystemModel());
 
     const systemEntityLoader = new SystemEntityLoader();
+    const systemEntityProcessors = new SystemEntityProcessors();
 
     const player = Player.Default(universeBackend);
 
@@ -81,6 +83,7 @@ export async function createStarSystemViewScene(
         encyclopaediaManager,
         universeBackend,
         systemEntityLoader,
+        systemEntityProcessors,
         soundPlayerMock,
         ttsMock,
         notificationManager,
