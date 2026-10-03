@@ -20,12 +20,17 @@ import type { ICosmosJourneyerBackend } from "@/backend";
 import type { GameModuleApi } from "@/modules/gameModuleApi";
 import type { ModuleAssetRegistry } from "@/modules/moduleAssetRegistry";
 
+import type { Musics } from "./assets/audio/musics";
+import type { SystemEntityMusicContext } from "./audio/musicSystem";
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import type { SystemEntityProcessorRegistry } from "./systemEntity/systemEntityProcessor";
+import type { Target } from "./targeting/target";
 
 export function createGameModuleApi(
     backend: ICosmosJourneyerBackend,
     moduleAssetRegistry: ModuleAssetRegistry,
     systemEntityLoader: SystemEntityLoader,
+    systemEntityProcessorRegistries: SystemEntityProcessorRegistries,
 ): GameModuleApi {
     return {
         starSystems: {
@@ -45,5 +50,24 @@ export function createGameModuleApi(
             },
         },
         assets: moduleAssetRegistry,
+        music: {
+            systemEntities: {
+                register: (type, getMusics) => {
+                    systemEntityProcessorRegistries.music.register(type, getMusics);
+                },
+            },
+        },
+        targeting: {
+            systemEntities: {
+                register: (type, factory) => {
+                    systemEntityProcessorRegistries.targeting.register(type, factory);
+                },
+            },
+        },
     };
 }
+
+export type SystemEntityProcessorRegistries = Readonly<{
+    targeting: SystemEntityProcessorRegistry<void, Array<Target>>;
+    music: SystemEntityProcessorRegistry<SystemEntityMusicContext, Array<keyof Musics>>;
+}>;

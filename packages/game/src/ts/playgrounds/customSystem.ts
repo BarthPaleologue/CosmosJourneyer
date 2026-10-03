@@ -100,6 +100,7 @@ export async function createCustomSystemScene(
         universeBackend,
         systemEntityBackend,
         systemEntityLoader,
+        () => [],
         soundPlayerMock,
         ttsMock,
         notificationManager,

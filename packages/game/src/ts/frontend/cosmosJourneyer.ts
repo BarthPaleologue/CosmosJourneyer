@@ -52,6 +52,7 @@ import { loadAssets } from "@/frontend/assets/assets";
 import type { Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicSystem } from "@/frontend/audio/musicSystem";
+import type { SystemEntityMusicContext, MusicLibrary } from "@/frontend/audio/musicSystem";
 import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
@@ -85,8 +86,11 @@ import { Settings } from "@/settings";
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { createGameModuleApi } from "./createGameModuleApi";
+import type { SystemEntityProcessorRegistries } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
+import type { SystemEntity } from "./systemEntity/systemEntity";
 import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import { SystemEntityProcessorRegistry } from "./systemEntity/systemEntityProcessor";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
@@ -166,6 +170,7 @@ export class CosmosJourneyer {
         starSystemView: StarSystemView,
         starMapView: StarMapView,
         backend: ICosmosJourneyerBackend,
+        musicSystem: MusicSystem,
         soundPlayer: ISoundPlayer,
         tts: Tts,
         notificationManager: INotificationManager,
@@ -206,7 +211,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.musicConductor = new MusicSystem(this.assets.audio.musics, audioEngine, this.starSystemView);
+        this.musicConductor = musicSystem;
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;
@@ -523,7 +528,17 @@ export class CosmosJourneyer {
 
         const systemEntityLoader = new SystemEntityLoader();
 
-        const gameModuleApi = createGameModuleApi(backend, moduleAssetRegistry, systemEntityLoader);
+        const systemEntityProcessorRegistries: SystemEntityProcessorRegistries = {
+            targeting: new SystemEntityProcessorRegistry(() => []),
+            music: new SystemEntityProcessorRegistry(() => []),
+        };
+
+        const gameModuleApi = createGameModuleApi(
+            backend,
+            moduleAssetRegistry,
+            systemEntityLoader,
+            systemEntityProcessorRegistries,
+        );
 
         const builtinModules = getBuiltinModules();
 
@@ -559,6 +574,7 @@ export class CosmosJourneyer {
             backend.universe,
             backend.systemEntity,
             systemEntityLoader,
+            (entity: SystemEntity) => systemEntityProcessorRegistries.targeting.dispatch(entity),
             soundPlayer,
             tts,
             notificationManager,
@@ -587,6 +603,19 @@ export class CosmosJourneyer {
             await alertModal(t("notifications:unknownKeyboardLayout"), soundPlayer, t);
         }
 
+        const musicLibrary: MusicLibrary = {
+            ...assets.audio.musics,
+            extensions: assets.extensions.musics,
+        };
+
+        const musicSystem = new MusicSystem(
+            musicLibrary,
+            audioEngine,
+            starSystemView,
+            (entity: SystemEntity, context: SystemEntityMusicContext) =>
+                systemEntityProcessorRegistries.music.dispatch(entity, context),
+        );
+
         return ok(
             new CosmosJourneyer(
                 player,
@@ -596,6 +625,7 @@ export class CosmosJourneyer {
                 starSystemView,
                 starMapView,
                 backend,
+                musicSystem,
                 soundPlayer,
                 tts,
                 notificationManager,

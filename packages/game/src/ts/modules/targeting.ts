@@ -15,19 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { AnySystemContentType, SystemEntity } from "@/frontend/systemEntity/systemEntity";
+import type { Target } from "@/frontend/targeting/target";
 
-import type { AssetsExtensionPoint } from "./assets";
-import type { MusicExtensionPoint } from "./music";
-import type { SystemEntitiesExtensionPoint } from "./systemEntities";
-import type { TargetingExtensionPoint } from "./targeting";
-
-export type GameModuleApi = Readonly<{
-    starSystems: {
-        registerAuthored(model: StarSystemModel): void;
+export type TargetingExtensionPoint = {
+    systemEntities: {
+        register<T extends AnySystemContentType>(
+            type: T,
+            createTargets: (entity: SystemEntity<T>) => Array<Target>,
+        ): void;
     };
-    systemEntities: SystemEntitiesExtensionPoint;
-    assets: AssetsExtensionPoint;
-    targeting: TargetingExtensionPoint;
-    music: MusicExtensionPoint;
-}>;
+};

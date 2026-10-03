@@ -82,6 +82,7 @@ export async function createStarSystemViewScene(
         universeBackend,
         systemEntityBackend,
         systemEntityLoader,
+        () => [],
         soundPlayerMock,
         ttsMock,
         notificationManager,
