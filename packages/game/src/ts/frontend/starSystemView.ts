@@ -574,6 +574,7 @@ export class StarSystemView implements View {
             this.loader,
             systemEntityModels,
             this.systemEntityLoader,
+            this.terrainSystem,
             this.assets,
             this.scene,
             this.progressMonitor,

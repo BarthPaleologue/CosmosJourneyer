@@ -178,12 +178,13 @@ export class StarSystemController {
         loader: StarSystemLoader,
         entityModels: Iterable<DeepReadonly<SystemEntityModel>>,
         entityLoader: SystemEntityLoader,
+        terrainSystem: ITerrainSystem,
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
-        const systemEntitiesResult = entityLoader.load(entityModels, scene);
+        const systemEntitiesResult = await entityLoader.load(entityModels, result, terrainSystem, scene);
         if (!systemEntitiesResult.success) {
             return systemEntitiesResult;
         }

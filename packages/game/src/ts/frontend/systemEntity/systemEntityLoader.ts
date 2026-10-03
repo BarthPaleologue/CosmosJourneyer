@@ -27,6 +27,8 @@ import type {
     SystemEntityModel,
 } from "@/backend/systemEntity/systemEntityModel";
 
+import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
+import type { StarSystemLoaderOutput } from "../universe/starSystemLoader";
 import type {
     AnySystemContentType,
     ContentModelOf,
@@ -51,7 +53,12 @@ export class SystemEntityLoader {
         this.registry.set(type, eraseFactory(type, factory));
     }
 
-    load(models: Iterable<DeepReadonly<SystemEntityModel>>, scene: Scene): Result<Array<SystemEntity>, Error> {
+    async load(
+        models: Iterable<DeepReadonly<SystemEntityModel>>,
+        orbitalObjects: Readonly<StarSystemLoaderOutput>,
+        terrainSystem: ITerrainSystem,
+        scene: Scene,
+    ): Promise<Result<Array<SystemEntity>, Error>> {
         const systemEntities: Array<SystemEntity> = [];
         const context: SystemContentFactoryContext = { scene };
         for (const model of models) {
@@ -60,8 +67,15 @@ export class SystemEntityLoader {
                 return entityResult;
             }
 
-            systemEntities.push(entityResult.value);
+            const entity = entityResult.value;
+            if (entity.placement.type === "onSurface") {
+                placeSurfaceEntity(entity.placement, orbitalObjects, terrainSystem);
+            }
+
+            systemEntities.push(entity);
         }
+
+        await flushSurfacePlacements();
 
         return ok(systemEntities);
     }
