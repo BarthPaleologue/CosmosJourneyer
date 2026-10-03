@@ -19,6 +19,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -29,6 +30,7 @@ import { TtsMock } from "@/frontend/audio/tts";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
@@ -45,6 +47,9 @@ export async function createStarSystemViewScene(
     const t = await initI18n();
 
     const universeBackend = new UniverseBackend(getAlphaTestisSystemModel());
+
+    const systemEntityBackend = new SystemEntityBackend();
+    const systemEntityLoader = new SystemEntityLoader();
 
     const player = Player.Default(universeBackend);
 
@@ -75,6 +80,8 @@ export async function createStarSystemViewScene(
         havokPlugin,
         encyclopaediaManager,
         universeBackend,
+        systemEntityBackend,
+        systemEntityLoader,
         soundPlayerMock,
         ttsMock,
         notificationManager,
@@ -88,7 +95,10 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    const loadResult = await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    if (!loadResult.success) {
+        throw loadResult.error;
+    }
 
     starSystemView.initStarSystem(0);
 

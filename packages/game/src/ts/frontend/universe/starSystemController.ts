@@ -21,9 +21,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
-import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, NonEmptyArray, Result } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -36,6 +38,8 @@ import { Settings } from "@/settings";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { toKeplerian } from "../helpers/orbitalObject";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
+import type { SystemEntity } from "../systemEntity/systemEntity";
+import type { SystemEntityLoader } from "../systemEntity/systemEntityLoader";
 import type {
     Anomaly,
     CelestialBody,
@@ -74,15 +78,17 @@ export class StarSystemController {
 
     private readonly stellarObjects: Readonly<NonEmptyArray<StellarObject>>;
 
-    private readonly planets: ReadonlyArray<Planet> = [];
+    private readonly planets: ReadonlyArray<Planet>;
 
-    private readonly satellites: ReadonlyArray<TelluricPlanet> = [];
+    private readonly satellites: ReadonlyArray<TelluricPlanet>;
 
-    private readonly anomalies: ReadonlyArray<Anomaly> = [];
+    private readonly anomalies: ReadonlyArray<Anomaly>;
 
-    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility> = [];
+    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility>;
 
     private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
+
+    private readonly systemEntities: ReadonlyArray<SystemEntity>;
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
 
@@ -114,6 +120,7 @@ export class StarSystemController {
     private constructor(
         model: DeepReadonly<StarSystemModel>,
         orbitalObjects: Readonly<StarSystemLoaderOutput>,
+        systemEntities: ReadonlyArray<SystemEntity>,
         assets: RenderingAssets,
         scene: Scene,
     ) {
@@ -128,6 +135,8 @@ export class StarSystemController {
         this.satellites = orbitalObjects.satellites;
         this.anomalies = orbitalObjects.anomalies;
         this.orbitalFacilities = orbitalObjects.orbitalFacilities;
+
+        this.systemEntities = systemEntities;
 
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
@@ -167,16 +176,34 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
+        entityModels: Iterable<DeepReadonly<SystemEntityModel>>,
+        entityLoader: SystemEntityLoader,
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<StarSystemController> {
+    ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
-        return new StarSystemController(model, result, assets, scene);
+        const systemEntitiesResult = entityLoader.load(entityModels, scene);
+        if (!systemEntitiesResult.success) {
+            return systemEntitiesResult;
+        }
+
+        return ok(new StarSystemController(model, result, systemEntitiesResult.value, assets, scene));
     }
 
     private getKeplerianObjects(): Array<KeplerianObject> {
-        return this.getOrbitalObjects().map(toKeplerian);
+        const keplerianObjects: Array<KeplerianObject> = this.getOrbitalObjects().map(toKeplerian);
+
+        for (const systemEntity of this.systemEntities) {
+            const entityLocation = systemEntity.placement;
+            if (entityLocation.type !== "inOrbit") {
+                continue;
+            }
+
+            keplerianObjects.push(entityLocation);
+        }
+
+        return keplerianObjects;
     }
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
@@ -273,6 +300,10 @@ export class StarSystemController {
      */
     public getAnomalies(): ReadonlyArray<Anomaly> {
         return this.anomalies;
+    }
+
+    public getSystemEntities(): ReadonlyArray<SystemEntity> {
+        return this.systemEntities;
     }
 
     /**
@@ -500,6 +531,11 @@ export class StarSystemController {
         this.stellarLightSystem.dispose();
 
         const pools = this.assets.textures.pools;
+
+        for (const systemEntity of this.systemEntities) {
+            systemEntity.content.dispose();
+            systemEntity.placement.getTransform().dispose();
+        }
 
         this.orbitalFacilities.forEach((facility) => {
             facility.dispose();

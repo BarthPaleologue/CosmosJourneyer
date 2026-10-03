@@ -28,13 +28,15 @@ import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
+import type { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -90,6 +92,7 @@ import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import type { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
+import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import {
     createSpaceshipTarget,
     createSystemTarget,
@@ -143,6 +146,8 @@ export class StarSystemView implements View {
 
     private readonly universeBackend: UniverseBackend;
 
+    private readonly systemEntityBackend: SystemEntityBackend;
+
     /**
      * The BabylonJS scene, upgraded with some helper methods and properties
      */
@@ -194,6 +199,8 @@ export class StarSystemView implements View {
      * The star system loader used to load the star system. It is constant for the whole game.
      */
     readonly loader: StarSystemLoader = new StarSystemLoader();
+
+    private readonly systemEntityLoader: SystemEntityLoader;
 
     /** The system used to generate surface chunks for telluric planets. It is constant for the whole game. */
     private readonly terrainSystem: ITerrainSystem;
@@ -272,6 +279,8 @@ export class StarSystemView implements View {
         physicsEngine: PhysicsEngineV2,
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
+        systemEntityBackend: SystemEntityBackend,
+        systemEntityLoader: SystemEntityLoader,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
@@ -283,6 +292,8 @@ export class StarSystemView implements View {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
         this.universeBackend = universeBackend;
+        this.systemEntityBackend = systemEntityBackend;
+        this.systemEntityLoader = systemEntityLoader;
 
         this.scene = scene;
         this.scene.skipPointerMovePicking = true;
@@ -531,9 +542,11 @@ export class StarSystemView implements View {
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
      * @param starSystemModel
      */
-    public async loadStarSystem(starSystemModel: DeepReadonly<StarSystemModel>): Promise<StarSystemController> {
+    public async loadStarSystem(
+        starSystemModel: DeepReadonly<StarSystemModel>,
+    ): Promise<Result<StarSystemController, Error>> {
         if (this._isLoadingSystem) {
-            throw new Error("Cannot load a new star system while the current one is loading");
+            return err(new Error("Cannot load a new star system while the current one is loading"));
         }
         this._isLoadingSystem = true;
 
@@ -549,13 +562,24 @@ export class StarSystemView implements View {
             this.spaceStationLayer.reset();
         }
 
-        this.starSystem = await StarSystemController.CreateAsync(
+        const systemEntityModels = this.systemEntityBackend.getModels(starSystemModel);
+
+        const starSystemResult = await StarSystemController.CreateAsync(
             starSystemModel,
             this.loader,
+            systemEntityModels,
+            this.systemEntityLoader,
             this.assets,
             this.scene,
             this.progressMonitor,
         );
+
+        if (!starSystemResult.success) {
+            this._isLoadingSystem = false;
+            return starSystemResult;
+        }
+
+        this.starSystem = starSystemResult.value;
 
         for (const facility of this.starSystem.getOrbitalFacilities()) {
             this.clusteredLightingSystem.registerRegion(facility);
@@ -571,7 +595,7 @@ export class StarSystemView implements View {
             this.starSystem.stellarLightSystem.addShadowCaster(characterRoot);
         }
 
-        return this.starSystem;
+        return ok(this.starSystem);
     }
 
     /**

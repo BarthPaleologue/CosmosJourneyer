@@ -20,6 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/eclipseTest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -31,6 +32,7 @@ import { TtsMock } from "@/frontend/audio/tts";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
@@ -50,6 +52,9 @@ export async function createCustomSystemScene(
 
     const urlParams = new URLSearchParams(window.location.search);
     const systemKey = urlParams.get("system");
+
+    const systemEntityBackend = new SystemEntityBackend();
+    const systemEntityLoader = new SystemEntityLoader();
 
     let systemModel: StarSystemModel;
     if (systemKey === "chronos") {
@@ -93,6 +98,8 @@ export async function createCustomSystemScene(
         havokPlugin,
         encyclopaediaManager,
         universeBackend,
+        systemEntityBackend,
+        systemEntityLoader,
         soundPlayerMock,
         ttsMock,
         notificationManager,
@@ -106,7 +113,10 @@ export async function createCustomSystemScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    const loadResult = await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    if (!loadResult.success) {
+        throw loadResult.error;
+    }
 
     starSystemView.initStarSystem(0);
 

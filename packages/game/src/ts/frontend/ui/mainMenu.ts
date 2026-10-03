@@ -18,7 +18,8 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
@@ -301,8 +302,12 @@ export class MainMenu {
         });
     }
 
-    async init(): Promise<void> {
-        await this.starSystemView.loadStarSystem(this.starSystemModel);
+    async init(): Promise<Result<void, Error>> {
+        const starSystemResult = await this.starSystemView.loadStarSystem(this.starSystemModel);
+        if (!starSystemResult.success) {
+            return starSystemResult;
+        }
+
         await this.syncContinueButton();
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
@@ -325,6 +330,8 @@ export class MainMenu {
         this.starSystemView.targetCursorLayer.setEnabled(false);
 
         this.show();
+
+        return ok(undefined);
     }
 
     private async syncContinueButton(): Promise<void> {

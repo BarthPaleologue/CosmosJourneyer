@@ -17,16 +17,20 @@
 
 import type { EncyclopaediaGalacticaManager } from "./encyclopaedia/encyclopaediaGalacticaManager";
 import type { ISaveBackend } from "./save/saveBackend";
+import type { SystemEntityBackend } from "./systemEntity/systemEntityBackend";
 import type { UniverseBackend } from "./universe/universeBackend";
 
 /** Exposes the backend services needed to operate Cosmos Journeyer. */
 export interface ICosmosJourneyerBackend {
-    /** The backend service responsible for save file management. */
+    /** Responsible for save file management. */
     readonly save: ISaveBackend;
 
-    /** The backend service responsible for exploration data. */
+    /** Responsible for exploration data. */
     readonly encyclopaedia: EncyclopaediaGalacticaManager;
 
-    /** The backend service responsible for universe data generation. */
+    /** Responsible for universe data generation. */
     readonly universe: UniverseBackend;
+
+    /** Responsible for system content data generation */
+    readonly systemEntity: SystemEntityBackend;
 }

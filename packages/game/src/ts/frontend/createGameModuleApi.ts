@@ -20,14 +20,28 @@ import type { ICosmosJourneyerBackend } from "@/backend";
 import type { GameModuleApi } from "@/modules/gameModuleApi";
 import type { ModuleAssetRegistry } from "@/modules/moduleAssetRegistry";
 
+import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+
 export function createGameModuleApi(
     backend: ICosmosJourneyerBackend,
     moduleAssetRegistry: ModuleAssetRegistry,
+    systemEntityLoader: SystemEntityLoader,
 ): GameModuleApi {
     return {
         starSystems: {
             registerAuthored: (model) => {
                 backend.universe.registerCustomSystem(model);
+            },
+        },
+        systemEntities: {
+            registerAuthored: (coordinates, models) => {
+                backend.systemEntity.registerAuthored(coordinates, models);
+            },
+            registerProcedural: (factory) => {
+                backend.systemEntity.registerProcedural(factory);
+            },
+            registerContentFactory: (type, factory) => {
+                systemEntityLoader.registerFactory(type, factory);
             },
         },
         assets: moduleAssetRegistry,

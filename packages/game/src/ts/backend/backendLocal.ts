@@ -26,6 +26,7 @@ import type { ISaveBackend } from "./save/saveBackend";
 import { SaveBackendMultiFile } from "./save/saveBackendMultiFile";
 import { SaveBackendSingleFile } from "./save/saveBackendSingleFile";
 import { SaveLocalStorage } from "./save/saveLocalStorage";
+import { SystemEntityBackend } from "./systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "./universe/customSystems/loneStar";
 import { UniverseBackend } from "./universe/universeBackend";
 
@@ -33,11 +34,18 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
     readonly save: ISaveBackend;
     readonly encyclopaedia: EncyclopaediaGalacticaManager;
     readonly universe: UniverseBackend;
+    readonly systemEntity: SystemEntityBackend;
 
-    constructor(save: ISaveBackend, encyclopaedia: EncyclopaediaGalacticaManager, universe: UniverseBackend) {
+    constructor(
+        save: ISaveBackend,
+        encyclopaedia: EncyclopaediaGalacticaManager,
+        universe: UniverseBackend,
+        systemEntity: SystemEntityBackend,
+    ) {
         this.save = save;
         this.encyclopaedia = encyclopaedia;
         this.universe = universe;
+        this.systemEntity = systemEntity;
     }
 
     static async New(): Promise<Result<CosmosJourneyerBackendLocal, Error>> {
@@ -76,6 +84,8 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
             );
         }
 
-        return ok(new CosmosJourneyerBackendLocal(saveBackend, encyclopaedia, universeBackend));
+        const systemEntity = new SystemEntityBackend();
+
+        return ok(new CosmosJourneyerBackendLocal(saveBackend, encyclopaedia, universeBackend, systemEntity));
     }
 }

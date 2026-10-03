@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { ok } from "@cosmos-journeyer/typescript";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -150,7 +151,7 @@ describe("StarSystemView", () => {
             getOrbitalFacilities: () => [newFacility],
             stellarLightSystem: { addShadowCaster: vi.fn() },
         } as unknown as StarSystemController;
-        vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(newStarSystem);
+        vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
 
         const clusteredLightingSystem = {
             registerRegion: vi.fn(),
@@ -168,6 +169,8 @@ describe("StarSystemView", () => {
             spaceStationLayer: { reset: vi.fn() },
             spaceshipControls: null,
             starSystem: oldStarSystem,
+            systemEntityBackend: { getModels: () => [] },
+            systemEntityLoader: {},
             targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;
