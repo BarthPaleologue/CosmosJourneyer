@@ -84,6 +84,7 @@ import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { createGameModuleApi } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
+import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
@@ -516,7 +517,10 @@ export class CosmosJourneyer {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const gameModuleApi = createGameModuleApi(backend);
+        const systemEntityLoader = new SystemEntityLoader();
+
+        const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader);
+
         const builtinModules = getBuiltinModules();
         const modulesResult = setupModules(builtinModules, gameModuleApi);
         if (!modulesResult.success) {
@@ -541,6 +545,7 @@ export class CosmosJourneyer {
             starSystemViewPhysicsEngine,
             backend.encyclopaedia,
             backend.universe,
+            systemEntityLoader,
             soundPlayer,
             tts,
             notificationManager,
@@ -716,7 +721,11 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) {
-            await this.mainMenu.init();
+            const initResult = await this.mainMenu.init();
+            if (!initResult.success) {
+                await alertModal("Could not init main menu", this.soundPlayer, this.t);
+                return;
+            }
         }
         this.starSystemView.initStarSystem(Date.now() / 1000);
 
@@ -1137,7 +1146,11 @@ export class CosmosJourneyer {
 
         await this.starSystemView.resetPlayer(Player.Default(this.backend.universe));
         this.starSystemView.setUIEnabled(false);
-        await this.mainMenu.init();
+        const mainMenuInitResult = await this.mainMenu.init();
+        if (!mainMenuInitResult.success) {
+            await alertModal("Could not init main menu.", this.soundPlayer, this.t);
+            return;
+        }
         this.starSystemView.initStarSystem(Date.now() / 1000);
     }
 
@@ -1175,16 +1188,12 @@ export class CosmosJourneyer {
             locationToUse = shipLocation;
         }
 
-        const systemModel = this.backend.universe.getSystemModelFromCoordinates(
+        const systemModel = this.backend.universe.getSystemContentModelAt(
             locationToUse.universeObjectId.systemCoordinates,
         );
 
         if (systemModel === null) {
-            await alertModal(
-                "Cannot load universe coordinates: system model not found. The loading procedure has been aborted.",
-                this.soundPlayer,
-                this.t,
-            );
+            await alertModal("Cannot load universe coordinates: system model not found.", this.soundPlayer, this.t);
             return;
         }
 
@@ -1197,7 +1206,11 @@ export class CosmosJourneyer {
         this.loadingProgressMonitor.reset();
         this.engine.loadingScreen.displayLoadingUI();
 
-        await this.starSystemView.loadStarSystem(systemModel);
+        const starSystemResult = await this.starSystemView.loadStarSystem(systemModel);
+        if (!starSystemResult.success) {
+            await alertModal("Cannot load universe coordinates: system loading failure.", this.soundPlayer, this.t);
+            return;
+        }
 
         if (this.state === "uninitialized") {
             await this.init(true);

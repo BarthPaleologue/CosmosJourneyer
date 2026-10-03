@@ -217,15 +217,15 @@ export class StarMap {
 
     private createInstance(data: BuildData): void {
         const starSystemCoordinates = data.coordinates;
-        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
-        if (starSystemModel === null) {
+        const systemContentModel = this.universeBackend.getSystemContentModelAt(starSystemCoordinates);
+        if (systemContentModel === null) {
             console.warn(`Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`);
             return;
         }
 
-        const stellarObjectModel = starSystemModel.stellarObjects[0];
+        const stellarObjectModel = systemContentModel.system.stellarObjects[0];
 
-        const instanceName = `${starSystemModel.name} Billboard instance`;
+        const instanceName = `${systemContentModel.system.name} Billboard instance`;
 
         let instance: InstancedMesh;
         if (stellarObjectModel.type !== "blackHole") {

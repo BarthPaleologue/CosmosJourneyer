@@ -1,6 +1,7 @@
 import type { DeepPartial } from "@cosmos-journeyer/typescript";
 import { expect, test } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -8,7 +9,7 @@ import { safeParseSave } from "./saveFileData";
 import type { Save } from "./saveFileData";
 
 test("Loading a correct save file", () => {
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
     if (fallbackStation === undefined) {
@@ -146,7 +147,7 @@ test("Loading a correct save file", () => {
 });
 
 test("Loading a minimal save file", () => {
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<Save> = {
         player: {
@@ -194,7 +195,7 @@ test("Loading a minimal save file", () => {
 });
 
 test("Loading a save file with legacy numeric mission node types", () => {
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
     const shipId = crypto.randomUUID();
     const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
     if (fallbackStation === undefined) {

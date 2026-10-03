@@ -18,6 +18,7 @@
 import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -27,7 +28,7 @@ const t = createInstance().getFixedT("en-US");
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
-        const universeBackend = new UniverseBackend(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
         const tutorial = new FuelScoopTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();
@@ -56,8 +57,12 @@ describe("FuelScoopTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const closestObjectModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const closestObjectModel = universeBackend.getObjectModel(shipLocation.universeObjectId);
 
-        expect(closestObjectModel?.type).toBe("star");
+        expect(closestObjectModel?.type).toBe("orbitalObject");
+        if (closestObjectModel?.type !== "orbitalObject") {
+            throw new Error("closestObjectModel is not an orbital object");
+        }
+        expect(closestObjectModel.object.type).toBe("star");
     });
 });

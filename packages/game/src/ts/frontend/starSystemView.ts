@@ -28,14 +28,15 @@ import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
-import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
+import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -90,6 +91,7 @@ import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import type { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
+import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import {
     createSpaceshipTarget,
     createSystemTarget,
@@ -195,6 +197,8 @@ export class StarSystemView implements View {
      */
     readonly loader: StarSystemLoader = new StarSystemLoader();
 
+    private readonly systemEntityLoader: SystemEntityLoader;
+
     /** The system used to generate surface chunks for telluric planets. It is constant for the whole game. */
     private readonly terrainSystem: ITerrainSystem;
 
@@ -272,6 +276,7 @@ export class StarSystemView implements View {
         physicsEngine: PhysicsEngineV2,
         encyclopaedia: EncyclopaediaGalacticaManager,
         universeBackend: UniverseBackend,
+        systemEntityLoader: SystemEntityLoader,
         soundPlayer: ISoundPlayer,
         tts: ITts,
         notificationManager: INotificationManager,
@@ -283,6 +288,7 @@ export class StarSystemView implements View {
         this.player = player;
         this.encyclopaedia = encyclopaedia;
         this.universeBackend = universeBackend;
+        this.systemEntityLoader = systemEntityLoader;
 
         this.scene = scene;
         this.scene.skipPointerMovePicking = true;
@@ -524,11 +530,13 @@ export class StarSystemView implements View {
 
     /**
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
-     * @param starSystemModel
+     * @param systemContentModel
      */
-    public async loadStarSystem(starSystemModel: DeepReadonly<StarSystemModel>): Promise<StarSystemController> {
+    public async loadStarSystem(
+        systemContentModel: DeepReadonly<StarSystemContentModel>,
+    ): Promise<Result<StarSystemController, Error>> {
         if (this._isLoadingSystem) {
-            throw new Error("Cannot load a new star system while the current one is loading");
+            return err(new Error("Cannot load a new star system while the current one is loading"));
         }
         this._isLoadingSystem = true;
 
@@ -544,13 +552,22 @@ export class StarSystemView implements View {
             this.spaceStationLayer.reset();
         }
 
-        this.starSystem = await StarSystemController.CreateAsync(
-            starSystemModel,
+        const starSystemResult = await StarSystemController.CreateAsync(
+            systemContentModel.system,
             this.loader,
+            systemContentModel.entities,
+            this.systemEntityLoader,
             this.assets,
             this.scene,
             this.progressMonitor,
         );
+
+        if (!starSystemResult.success) {
+            this._isLoadingSystem = false;
+            return starSystemResult;
+        }
+
+        this.starSystem = starSystemResult.value;
 
         for (const facility of this.starSystem.getOrbitalFacilities()) {
             this.clusteredLightingSystem.registerRegion(facility);
@@ -566,7 +583,7 @@ export class StarSystemView implements View {
             this.starSystem.stellarLightSystem.addShadowCaster(characterRoot);
         }
 
-        return this.starSystem;
+        return ok(this.starSystem);
     }
 
     /**
@@ -849,7 +866,7 @@ export class StarSystemView implements View {
         }
 
         const starSystemCoordinates = target.systemCoordinates;
-        const systemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+        const systemModel = this.universeBackend.getSystemContentModelAt(starSystemCoordinates);
         if (systemModel === null) {
             await alertModal(
                 "System model not found for coordinates generated by getNeighborStarSystemCoordinates",
@@ -935,7 +952,12 @@ export class StarSystemView implements View {
 
         spaceship.burnFuel(fuelForJump);
 
-        await this.loadStarSystem(systemModel);
+        const starSystemResult = await this.loadStarSystem(systemModel);
+        if (!starSystemResult.success) {
+            console.error("There was an error while loading the system", starSystemResult.error);
+            this.jumpLock = false;
+            return;
+        }
 
         this.scene.onBeforeRenderObservable.addOnce(() => {
             this.initStarSystem(Date.now() / 1000);
@@ -1038,6 +1060,7 @@ export class StarSystemView implements View {
                 systemCoordinates: starSystem.model.coordinates,
                 idInSystem: nearestCelestialBody.model.id,
             };
+
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
                 this.notificationManager.create(

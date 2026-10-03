@@ -18,6 +18,8 @@
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
+
 import { getLoneStarSystem } from "./customSystems/loneStar";
 import { getSolSystemModel } from "./customSystems/sol/sol";
 import { UniverseBackend } from "./universeBackend";
@@ -26,10 +28,10 @@ describe("UniverseBackend", () => {
     let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new UniverseBackend(getLoneStarSystem());
+        universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
     });
 
-    describe("registerAuthoredSystem", () => {
+    describe("registerCustomSystem", () => {
         it("should add a custom system that can be retrieved", () => {
             const customSystem = getSolSystemModel();
             universeBackend.registerAuthoredSystem(customSystem);
@@ -52,9 +54,9 @@ describe("UniverseBackend", () => {
             };
 
             universeBackend.registerSinglePlugin(coordinates, plugin);
-            const model = universeBackend.getSystemModelFromCoordinates(coordinates);
+            const model = universeBackend.getSystemContentModelAt(coordinates);
             expect(model).not.toBeNull();
-            expect(model?.name).toBe("Modified System");
+            expect(model?.system.name).toBe("Modified System");
         });
     });
 

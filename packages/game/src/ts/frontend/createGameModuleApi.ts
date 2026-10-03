@@ -15,14 +15,31 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { ICosmosJourneyerBackend } from "@/backend";
+import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { GameModuleApi } from "@/modules/gameModuleApi";
-export function createGameModuleApi(backend: ICosmosJourneyerBackend): GameModuleApi {
+
+import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+
+export function createGameModuleApi(
+    universeBackend: UniverseBackend,
+    systemEntityLoader: SystemEntityLoader,
+): GameModuleApi {
     return {
         starSystems: {
             registerAuthored: (model) => {
-                backend.universe.registerAuthoredSystem(model);
+                universeBackend.registerAuthoredSystem(model);
+            },
+        },
+        systemEntities: {
+            registerAuthored: (coordinates, models) => {
+                universeBackend.registerAuthoredEntities(coordinates, models);
+            },
+            registerProcedural: (factory) => {
+                universeBackend.registerProceduralEntities(factory);
+            },
+            registerContentFactory: (type, factory) => {
+                systemEntityLoader.registerFactory(type, factory);
             },
         },
     };

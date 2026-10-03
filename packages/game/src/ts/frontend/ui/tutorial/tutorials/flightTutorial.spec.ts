@@ -18,6 +18,7 @@
 import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -27,7 +28,7 @@ const t = createInstance().getFixedT("en-US");
 
 describe("flightTutorial", () => {
     it("spawns inside of the rings of the planet", () => {
-        const universeBackend = new UniverseBackend(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
         const tutorial = new FlightTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();
@@ -56,7 +57,9 @@ describe("flightTutorial", () => {
             throw new Error("shipLocation.location.type is not relative");
         }
 
-        const planetModel = universeBackend.getObjectModelByUniverseId(shipLocation.universeObjectId);
+        const targetModel = universeBackend.getObjectModel(shipLocation.universeObjectId);
+        expect(targetModel?.type).toBe("orbitalObject");
+        const planetModel = targetModel?.type === "orbitalObject" ? targetModel.object : null;
 
         expect(planetModel).not.toBe(null);
         if (planetModel === null) {

@@ -81,8 +81,8 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             return ok(this.redundantDataPrice);
         }
 
-        const model = this.universeBackend.getObjectModelByUniverseId(object);
-        if (model === null) {
+        const model = this.universeBackend.getObjectModel(object);
+        if (model === null || model.type === "systemEntity") {
             return err("Object model not found for object ID");
         }
         const systemGalacticPosition = this.universeBackend.getSystemGalacticPosition(object.systemCoordinates);
@@ -95,8 +95,10 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
 
         const valueFromDistance = distanceFromSolLy * 100;
 
+        const objectModel = model.object;
+
         let objectTypeMultiplier: number;
-        switch (model.type) {
+        switch (objectModel.type) {
             case "star":
                 objectTypeMultiplier = 1;
                 break;
@@ -107,13 +109,13 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 objectTypeMultiplier = 10;
                 break;
             case "telluricPlanet":
-                objectTypeMultiplier = this.evaluateTelluricPlanetMultiplier(model);
+                objectTypeMultiplier = this.evaluateTelluricPlanetMultiplier(objectModel);
                 break;
             case "telluricSatellite":
-                objectTypeMultiplier = this.evaluateTelluricSatelliteMultiplier(model);
+                objectTypeMultiplier = this.evaluateTelluricSatelliteMultiplier(objectModel);
                 break;
             case "gasPlanet":
-                objectTypeMultiplier = this.evaluateGasPlanetMultiplier(model);
+                objectTypeMultiplier = this.evaluateGasPlanetMultiplier(objectModel);
                 break;
             case "mandelbulb":
             case "juliaSet":
@@ -129,7 +131,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 objectTypeMultiplier = 0;
                 break;
             default:
-                return assertUnreachable(model);
+                return assertUnreachable(objectModel);
         }
 
         return ok(Math.ceil(valueFromDistance * objectTypeMultiplier));

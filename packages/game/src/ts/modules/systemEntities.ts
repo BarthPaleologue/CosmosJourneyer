@@ -15,13 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
-import type { SystemEntitiesExtensionPoint } from "./systemEntities";
+import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEntityBackend";
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
-export type GameModuleApi = Readonly<{
-    starSystems: {
-        registerAuthored(model: StarSystemModel): void;
-    };
-    systemEntities: SystemEntitiesExtensionPoint;
-}>;
+import type { AnySystemContentType, SystemContentFactoryOf } from "@/frontend/systemEntity/systemEntity";
+
+export interface SystemEntitiesExtensionPoint {
+    registerAuthored: (coordinates: StarSystemCoordinates, models: Iterable<DeepReadonly<SystemEntityModel>>) => void;
+
+    registerProcedural: (factory: SystemEntityModelGenerator) => void;
+
+    registerContentFactory<T extends AnySystemContentType>(type: T, factory: SystemContentFactoryOf<T>): void;
+}

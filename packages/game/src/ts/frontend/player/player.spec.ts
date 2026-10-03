@@ -25,6 +25,7 @@ import type { MissionSerialized } from "@/backend/missions/missionSerialized";
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
 import type { SerializedPlayer } from "@/backend/player/serializedPlayer";
 import { getDefaultSerializedSpaceship } from "@/backend/spaceship/serializedSpaceship";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -34,7 +35,7 @@ describe("Player", () => {
     let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new UniverseBackend(getLoneStarSystem());
+        universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
         vi.clearAllMocks();
     });
 

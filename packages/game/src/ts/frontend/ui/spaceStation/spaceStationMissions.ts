@@ -40,14 +40,14 @@ export function generateMissionsDom(
     soundPlayer: ISoundPlayer,
     t: TFunction,
 ): HTMLDivElement {
-    const starSystemModel = universeBackend.getSystemModelFromCoordinates(stationModel.starSystemCoordinates);
-    if (starSystemModel === null) {
+    const systemContentModel = universeBackend.getSystemContentModelAt(stationModel.starSystemCoordinates);
+    if (systemContentModel === null) {
         throw new Error("Cannot generate missions for a space station in an unknown star system");
     }
 
     const sightSeeingMissions = generateSightseeingMissions(
         stationModel,
-        starSystemModel,
+        systemContentModel,
         universeBackend,
         player,
         Date.now(),

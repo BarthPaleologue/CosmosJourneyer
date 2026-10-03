@@ -18,13 +18,14 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { ISaveBackend } from "@/backend/save/saveBackend";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
+import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -48,7 +49,7 @@ export class MainMenu {
     readonly controls: DefaultControls;
 
     readonly starSystemView: StarSystemView;
-    readonly starSystemModel: DeepReadonly<StarSystemModel>;
+    readonly systemContentModel: DeepReadonly<StarSystemContentModel>;
 
     readonly onStartObservable = new Observable<void>();
     readonly onContributeObservable = new Observable<void>();
@@ -187,22 +188,24 @@ export class MainMenu {
             planetId: "aphrodite",
         };
 
-        const system = universeBackend.getSystemModelFromCoordinates(mainMenuStartingPlanet.systemCoordinates);
-        if (system === null) {
+        const systemContent = universeBackend.getSystemContentModelAt(mainMenuStartingPlanet.systemCoordinates);
+        if (systemContent === null) {
             throw new Error(`Cannot find main menu system ${JSON.stringify(mainMenuStartingPlanet.systemCoordinates)}`);
         }
 
-        const object = system.planets.find((planet) => planet.id === mainMenuStartingPlanet.planetId);
+        const object = systemContent.system.planets.find((planet) => planet.id === mainMenuStartingPlanet.planetId);
         if (object === undefined) {
-            throw new Error(`Cannot find main menu planet ${mainMenuStartingPlanet.planetId} in ${system.name}`);
+            throw new Error(
+                `Cannot find main menu planet ${mainMenuStartingPlanet.planetId} in ${systemContent.system.name}`,
+            );
         }
 
         this.universeObjectId = {
-            systemCoordinates: system.coordinates,
+            systemCoordinates: systemContent.system.coordinates,
             idInSystem: object.id,
         };
 
-        this.starSystemModel = system;
+        this.systemContentModel = systemContent;
 
         // Create and append the main menu HTML structure
         const elements = this.createMainMenuHTML(t);
@@ -303,13 +306,17 @@ export class MainMenu {
         });
     }
 
-    async init(): Promise<void> {
-        await this.starSystemView.loadStarSystem(this.starSystemModel);
+    async init(): Promise<Result<void, Error>> {
+        const starSystemResult = await this.starSystemView.loadStarSystem(this.systemContentModel);
+        if (!starSystemResult.success) {
+            return starSystemResult;
+        }
+
         await this.syncContinueButton();
 
         this.starSystemView.onInitStarSystem.addOnce(async () => {
             await this.starSystemView.switchToDefaultControls(false);
-            const nbRadius = this.starSystemModel.stellarObjects[0].type === "blackHole" ? 8 : 2;
+            const nbRadius = this.systemContentModel.system.stellarObjects[0].type === "blackHole" ? 8 : 2;
             const targetObject = this.starSystemView
                 .getStarSystem()
                 .getOrbitalObjectById(this.universeObjectId.idInSystem);
@@ -327,6 +334,8 @@ export class MainMenu {
         this.starSystemView.targetCursorLayer.setEnabled(false);
 
         this.show();
+
+        return ok(undefined);
     }
 
     private async syncContinueButton(): Promise<void> {

@@ -38,6 +38,24 @@ import type { Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
+import type { SystemEntityBackend, SystemEntityModelGenerator } from "../systemEntity/systemEntityBackend";
+import type { SystemEntityModel } from "../systemEntity/systemEntityModel";
+
+export type StarSystemContentModel = {
+    system: StarSystemModel;
+    entities: Array<SystemEntityModel>;
+};
+
+export type UniverseObjectModel =
+    | {
+          type: "orbitalObject";
+          object: OrbitalObjectModel;
+      }
+    | {
+          type: "systemEntity";
+          object: SystemEntityModel;
+      };
+
 /**
  * The UniverseBackend defines the content of the universe.
  * It is responsible for generating star system models and system positions in the galaxy.
@@ -87,7 +105,11 @@ export class UniverseBackend {
      */
     readonly fallbackSystem: DeepReadonly<StarSystemModel>;
 
-    constructor(fallbackSystem: StarSystemModel) {
+    private readonly systemEntities: SystemEntityBackend;
+
+    constructor(systemEntityBackend: SystemEntityBackend, fallbackSystem: StarSystemModel) {
+        this.systemEntities = systemEntityBackend;
+
         const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
         let densitySampleStep = 0;
         const densityPerlin = makeNoise3D(() => {
@@ -118,6 +140,17 @@ export class UniverseBackend {
         }
 
         this.coordinatesToCustomSystems.set(serializeStarSystemCoordinates(system.coordinates), system);
+    }
+
+    public registerAuthoredEntities(
+        coordinates: StarSystemCoordinates,
+        entities: Iterable<DeepReadonly<SystemEntityModel>>,
+    ) {
+        this.systemEntities.registerAuthored(coordinates, entities);
+    }
+
+    public registerProceduralEntities(generator: SystemEntityModelGenerator) {
+        this.systemEntities.registerProcedural(generator);
     }
 
     /**
@@ -175,11 +208,21 @@ export class UniverseBackend {
         return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
     }
 
+    public getSystemContentModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemContentModel> | null {
+        const system = this.getSystemModelAt(coordinates);
+        if (system === null) {
+            return null;
+        }
+        const entities = this.systemEntities.getModels(system);
+
+        return { system, entities };
+    }
+
     /**
      * @param coordinates The coordinates of the system you want the model of.
      * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
      */
-    public getSystemModelFromCoordinates(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+    private getSystemModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
         if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
             return this.fallbackSystem;
         }
@@ -277,7 +320,7 @@ export class UniverseBackend {
      * @param sectorZ
      * @returns All system models (custom and generated) in the given star sector.
      */
-    public getSystemModelsInStarSector(
+    getSystemModelsInStarSector(
         sectorX: number,
         sectorY: number,
         sectorZ: number,
@@ -287,7 +330,7 @@ export class UniverseBackend {
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
         for (const systemCoordinates of generatedSystemCoordinates) {
-            const systemModel = this.getSystemModelFromCoordinates(systemCoordinates);
+            const systemModel = this.getSystemModelAt(systemCoordinates);
             if (systemModel === null) {
                 throw new Error("Generated system not found in the database!");
             }
@@ -445,14 +488,31 @@ export class UniverseBackend {
      * @param universeObjectId The id to look for
      * @returns The model if it exists, null otherwise
      */
-    public getObjectModelByUniverseId(universeObjectId: UniverseObjectId): DeepReadonly<OrbitalObjectModel> | null {
+    public getObjectModel(universeObjectId: UniverseObjectId): DeepReadonly<UniverseObjectModel> | null {
         const starSystemCoordinates = universeObjectId.systemCoordinates;
-        const starSystemModel = this.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = this.getSystemModelAt(starSystemCoordinates);
         if (starSystemModel === null) {
             return null;
         }
 
-        return getObjectModelById(universeObjectId.idInSystem, starSystemModel);
+        const objectModel = getObjectModelById(universeObjectId.idInSystem, starSystemModel);
+        if (objectModel !== null) {
+            return {
+                type: "orbitalObject",
+                object: objectModel,
+            };
+        }
+
+        const entities = this.systemEntities.getModels(starSystemModel);
+        const foundEntity = entities.find((entity) => entity.id === universeObjectId.idInSystem);
+        if (foundEntity !== undefined) {
+            return {
+                type: "systemEntity",
+                object: foundEntity,
+            };
+        }
+
+        return null;
     }
 
     /**

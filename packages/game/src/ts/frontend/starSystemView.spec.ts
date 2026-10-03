@@ -16,8 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { ok } from "@cosmos-journeyer/typescript";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -33,7 +35,7 @@ describe("StarSystemView", () => {
     });
 
     it("atomically replaces the player and spaceship controls after instantiation", async () => {
-        const universeBackend = new UniverseBackend(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
         const player = Player.Default(universeBackend);
         const nextPlayer = Player.Default(universeBackend);
         const currentPlayerUuid = player.uuid;
@@ -100,7 +102,7 @@ describe("StarSystemView", () => {
     });
 
     it("keeps the current player when the replacement spaceship cannot be instantiated", async () => {
-        const universeBackend = new UniverseBackend(getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
         const player = Player.Default(universeBackend);
         const nextPlayer = Player.Default(universeBackend);
         const currentSpaceshipSerialized = player.serializedSpaceships[0];
@@ -150,7 +152,7 @@ describe("StarSystemView", () => {
             getOrbitalFacilities: () => [newFacility],
             stellarLightSystem: { addShadowCaster: vi.fn() },
         } as unknown as StarSystemController;
-        vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(newStarSystem);
+        vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
 
         const clusteredLightingSystem = {
             registerRegion: vi.fn(),
@@ -168,11 +170,12 @@ describe("StarSystemView", () => {
             spaceStationLayer: { reset: vi.fn() },
             spaceshipControls: null,
             starSystem: oldStarSystem,
+            systemEntityLoader: {},
             targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;
 
-        await StarSystemView.prototype.loadStarSystem.call(context, {} as never);
+        await StarSystemView.prototype.loadStarSystem.call(context, { system: {}, entities: [] } as never);
 
         expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledWith(oldFacility);
         expect(oldStarSystem.dispose).toHaveBeenCalledOnce();
