@@ -62,7 +62,6 @@ function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target>
 
 export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target {
     switch (orbitalObject.type) {
-        case "darkKnight":
         case "juliaSet":
         case "mandelbox":
         case "mandelbulb":

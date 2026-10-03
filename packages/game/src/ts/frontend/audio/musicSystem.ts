@@ -202,7 +202,6 @@ export class MusicSystem {
             case "mandelbox":
             case "sierpinskiPyramid":
             case "mengerSponge":
-            case "darkKnight":
                 if (distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 100) {
                     this.setMusicFromSelection([this.musics.spacialWinds, this.musics.echoesOfTime]);
                     return;

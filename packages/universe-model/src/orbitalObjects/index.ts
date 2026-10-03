@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DarkKnightModel } from "./anomalies/darkKnightModel";
 import type { JuliaSetModel } from "./anomalies/juliaSetModel";
 import type { MandelboxModel } from "./anomalies/mandelboxModel";
 import type { MandelbulbModel } from "./anomalies/mandelbulbModel";
@@ -42,8 +41,7 @@ export type AnomalyModel =
     | JuliaSetModel
     | MandelboxModel
     | SierpinskiPyramidModel
-    | MengerSpongeModel
-    | DarkKnightModel;
+    | MengerSpongeModel;
 
 export type AnomalyType = AnomalyModel["type"];
 

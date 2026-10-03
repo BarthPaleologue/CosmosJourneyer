@@ -19,7 +19,6 @@ export type * from "./common";
 export * from "./starSystemCoordinates";
 export * from "./starSystemModel";
 export * from "./universeObjectId";
-export type * from "./orbitalObjects/anomalies/darkKnightModel";
 export type * from "./orbitalObjects/anomalies/juliaSetModel";
 export type * from "./orbitalObjects/anomalies/mandelboxModel";
 export type * from "./orbitalObjects/anomalies/mandelbulbModel";

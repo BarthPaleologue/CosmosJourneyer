@@ -38,7 +38,6 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 import { wait } from "@/utils/wait";
 
 import type { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
-import { DarkKnight } from "./darkKnight";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
 import { SpaceElevator } from "./orbitalFacility/spaceElevator";
 import { SpaceStation } from "./orbitalFacility/spaceStation";
@@ -166,9 +165,6 @@ export class StarSystemLoader {
                     break;
                 case "mengerSponge":
                     anomaly = new EmptyCelestialBody(anomalyModel, scene);
-                    break;
-                case "darkKnight":
-                    anomaly = new DarkKnight(anomalyModel, scene);
                     break;
                 default:
                     return assertUnreachable(anomalyModel);

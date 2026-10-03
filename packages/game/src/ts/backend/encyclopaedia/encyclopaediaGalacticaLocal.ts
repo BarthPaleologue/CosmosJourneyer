@@ -126,7 +126,6 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
                 break;
             case "spaceStation":
             case "spaceElevator":
-            case "darkKnight":
             case "custom":
                 objectTypeMultiplier = 0;
                 break;
