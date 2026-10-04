@@ -78,10 +78,12 @@ import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
 import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { createGameModuleApi } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
@@ -514,6 +516,13 @@ export class CosmosJourneyer {
         loadingProgressMonitor.addProgressCallback((startedCount, completedCount) => {
             loadingScreen.setProgress(startedCount, completedCount);
         });
+
+        const gameModuleApi = createGameModuleApi(backend);
+        const builtinModules = getBuiltinModules();
+        const modulesResult = setupModules(builtinModules, gameModuleApi);
+        if (!modulesResult.success) {
+            return modulesResult;
+        }
 
         const assets = await loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
 
