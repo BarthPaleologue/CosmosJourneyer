@@ -21,6 +21,9 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
+import type { OrbitalObject } from "../universe/architecture/orbitalObject";
+import type { KeplerianObject } from "../universe/keplerianOrbitalSimulation";
+
 export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>, t: TFunction): string {
     switch (model.type) {
         case "mandelbulb":
@@ -53,4 +56,14 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
         default:
             return assertUnreachable(model);
     }
+}
+
+export function toKeplerian(orbitalObject: OrbitalObject): KeplerianObject {
+    return {
+        id: orbitalObject.model.id,
+        mass: orbitalObject.model.mass,
+        orbit: orbitalObject.model.orbit,
+        rotation: orbitalObject.model.rotation,
+        getTransform: () => orbitalObject.getTransform(),
+    };
 }

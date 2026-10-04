@@ -24,7 +24,7 @@ import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "@/backend/encyc
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObject";
 import type { Player } from "@/frontend/player/player";
 import { alertModal } from "@/frontend/ui/dialogModal";
 

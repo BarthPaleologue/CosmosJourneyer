@@ -27,7 +27,7 @@ import type { MissionFlyByNodeSerialized } from "@/backend/missions/missionFlyBy
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObject";
 
 import { parseDistance } from "@/utils/strings/parseToStrings";
 

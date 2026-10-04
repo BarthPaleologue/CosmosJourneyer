@@ -24,6 +24,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { toKeplerian } from "@/frontend/helpers/orbitalObject";
 import { lookAt } from "@/frontend/helpers/transform";
 import { AxisRenderer } from "@/frontend/universe/axisRenderer";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
@@ -118,7 +119,7 @@ export async function createOrbitalDemoScene(
     });
 
     const bodies = [sun, earth, moon];
-    const orbitalSimulation = new KeplerianOrbitalSimulation(bodies);
+    const orbitalSimulation = new KeplerianOrbitalSimulation(bodies.map(toKeplerian));
 
     const orbitRenderer = new OrbitRenderer(CreateGreasedLineHelper);
     orbitRenderer.setOrbitalObjects(bodies, scene);

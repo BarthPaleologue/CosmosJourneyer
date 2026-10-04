@@ -29,7 +29,7 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
-import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObjectTypeToDisplay";
+import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObject";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
