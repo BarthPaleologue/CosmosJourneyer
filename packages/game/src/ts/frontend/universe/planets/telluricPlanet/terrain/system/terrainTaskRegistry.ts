@@ -36,6 +36,9 @@ export class TerrainTaskRegistry {
 
     private readonly completedHeightTasks: LRUMap<TaskId, Float32Array<ArrayBuffer>>;
 
+    private readonly failedHeightTasks: Set<TaskId> = new Set();
+    private readonly failedChunks: Set<ChunkId> = new Set();
+
     public constructor(maxCachedChunks: number) {
         this.completedChunks = new LRUMap(maxCachedChunks);
         this.completedHeightTasks = new LRUMap(maxCachedChunks);
@@ -46,6 +49,7 @@ export class TerrainTaskRegistry {
             return false;
         }
 
+        this.failedChunks.delete(chunkId);
         this.pendingTasks.set(taskId, { type: "buildChunk", chunkId });
         this.pendingChunkBuilds.set(chunkId, taskId);
         return true;
@@ -91,6 +95,10 @@ export class TerrainTaskRegistry {
         this.pendingTasks.delete(taskId);
         if (pendingTask.type === "buildChunk" && this.pendingChunkBuilds.get(pendingTask.chunkId) === taskId) {
             this.pendingChunkBuilds.delete(pendingTask.chunkId);
+            this.failedChunks.add(pendingTask.chunkId);
+        }
+        if (pendingTask.type === "computeHeights") {
+            this.failedHeightTasks.add(taskId);
         }
         return true;
     }
@@ -99,6 +107,10 @@ export class TerrainTaskRegistry {
         const buffers = this.completedChunks.get(chunkId);
         if (buffers !== undefined) {
             return { status: "chunkComputed", buffers };
+        }
+
+        if (this.failedChunks.has(chunkId)) {
+            return { status: "failed" };
         }
 
         return this.pendingChunkBuilds.has(chunkId) ? { status: "pending" } : undefined;
@@ -110,10 +122,16 @@ export class TerrainTaskRegistry {
             return { status: "heightComputed", heights };
         }
 
+        if (this.failedHeightTasks.has(taskId)) {
+            return { status: "failed" };
+        }
+
         return this.pendingTasks.get(taskId)?.type === "computeHeights" ? { status: "pending" } : undefined;
     }
 
     public reset(): void {
+        this.failedChunks.clear();
+        this.failedHeightTasks.clear();
         this.pendingTasks.clear();
         this.pendingChunkBuilds.clear();
         this.completedChunks.clear();

@@ -155,7 +155,7 @@ export class TerrainFaceQuadTree implements Cullable {
             }
 
             const chunkOutput = terrainSystem.getChunkOutput(chunk.id);
-            if (chunkOutput === undefined) {
+            if (chunkOutput === undefined || chunkOutput.status === "failed") {
                 this.requestChunkBuild(chunk, terrainSystem);
                 continue;
             } else if (chunkOutput.status !== "chunkComputed") {
