@@ -1,37 +1,38 @@
 version: 2
 
 multi-ecosystem-groups:
-  weekly-dependencies:
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "06:00"
-      timezone: "Europe/Paris"
+    weekly-dependencies:
+        schedule:
+            interval: "weekly"
+            day: "monday"
+            time: "06:00"
+            timezone: "Europe/Paris"
 
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    patterns:
-      - "*"
-    multi-ecosystem-group: "weekly-dependencies"
-    allow:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+    - package-ecosystem: "npm"
+      versioning-strategy: "increase"
+      directory: "/"
+      patterns:
+          - "*"
+      multi-ecosystem-group: "weekly-dependencies"
+      allow:
+          - dependency-name: "*"
+            update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
-  - package-ecosystem: "cargo"
-    directory: "/packages/terrain-generation"
-    patterns:
-      - "*"
-    multi-ecosystem-group: "weekly-dependencies"
-    allow:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+    - package-ecosystem: "cargo"
+      directory: "/packages/terrain-generation"
+      patterns:
+          - "*"
+      multi-ecosystem-group: "weekly-dependencies"
+      allow:
+          - dependency-name: "*"
+            update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    patterns:
-      - "*"
-    multi-ecosystem-group: "weekly-dependencies"
-    allow:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+    - package-ecosystem: "github-actions"
+      directory: "/"
+      patterns:
+          - "*"
+      multi-ecosystem-group: "weekly-dependencies"
+      allow:
+          - dependency-name: "*"
+            update-types: ["version-update:semver-minor", "version-update:semver-patch"]
