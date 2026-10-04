@@ -58,8 +58,8 @@
         "eslint": "catalog:",
         "eslint-import-resolver-typescript": "catalog:",
         "eslint-plugin-import-x": "catalog:",
-        "husky": "^9.1.7",
-        "lint-staged": "^17.5.1",
+        "husky": "9.1.7",
+        "lint-staged": "17.5.1",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
         "typescript-eslint": "catalog:"
