@@ -36,6 +36,10 @@ type TerrainSystemPendingOutput = {
     status: "pending";
 };
 
+type TerrainSystemFailedOutput = {
+    status: "failed";
+};
+
 export type TerrainBuffers = {
     positions: Float32Array<ArrayBuffer>;
     normals: Float32Array<ArrayBuffer>;
@@ -53,9 +57,15 @@ export type TerrainSystemHeightsComputedOutput = {
     heights: Float32Array<ArrayBuffer>;
 };
 
-export type TerrainSystemChunkOutput = TerrainSystemPendingOutput | TerrainSystemChunkComputedOutput;
+export type TerrainSystemChunkOutput =
+    | TerrainSystemPendingOutput
+    | TerrainSystemChunkComputedOutput
+    | TerrainSystemFailedOutput;
 
-export type TerrainSystemHeightsOutput = TerrainSystemPendingOutput | TerrainSystemHeightsComputedOutput;
+export type TerrainSystemHeightsOutput =
+    | TerrainSystemPendingOutput
+    | TerrainSystemHeightsComputedOutput
+    | TerrainSystemFailedOutput;
 
 export interface ITerrainSystem {
     requestChunk(chunkId: ChunkId, input: BuildChunkInput): void;

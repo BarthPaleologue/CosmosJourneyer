@@ -92,7 +92,7 @@ describe("TerrainTaskRegistry", () => {
         registry.registerChunkTask(chunkId, failedTaskId);
         expect(registry.failTask(failedTaskId)).toBe(true);
 
-        expect(registry.getChunkOutput(chunkId)).toBeUndefined();
+        expect(registry.getChunkOutput(chunkId)).toEqual({ status: "failed" });
         expect(registry.registerChunkTask(chunkId, makeTaskId("retry"))).toBe(true);
     });
 
