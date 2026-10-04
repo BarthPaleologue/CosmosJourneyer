@@ -18,11 +18,13 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 
+import { ChronosModule } from "./chronos";
 import type { GameModule } from "./gameModule";
 import type { GameModuleApi } from "./gameModuleApi";
+import { VestaModule } from "./vesta";
 
 export function getBuiltinModules(): Array<GameModule> {
-    return [];
+    return [VestaModule, ChronosModule];
 }
 
 /**
