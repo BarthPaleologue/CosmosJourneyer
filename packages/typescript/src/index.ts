@@ -20,7 +20,7 @@ export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T
 
 export type Primitive = string | number | boolean | bigint | symbol | undefined | null;
 
-type AnyFunction = (...args: never[]) => unknown;
+type AnyFunction = (...args: ReadonlyArray<never>) => unknown;
 
 export type DeepReadonly<T> = T extends Primitive | AnyFunction
     ? T
