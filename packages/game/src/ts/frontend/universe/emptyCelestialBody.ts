@@ -27,7 +27,7 @@ import type { CelestialBodyBase } from "./architecture/celestialBody";
 export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implements CelestialBodyBase<TObjectType> {
     readonly model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>;
 
-    readonly type: DeepReadonly<TObjectType>;
+    readonly type: TObjectType;
 
     private readonly transform: TransformNode;
 

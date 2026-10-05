@@ -21,6 +21,6 @@ import type { OrbitalObjectModel, OrbitalObjectType } from "@cosmos-journeyer/un
 import type { Transformable } from "./transformable";
 
 export interface OrbitalObjectBase<T extends OrbitalObjectType> extends Transformable {
-    type: DeepReadonly<T>;
+    type: T;
     model: Extract<DeepReadonly<OrbitalObjectModel>, { type: T }>;
 }
