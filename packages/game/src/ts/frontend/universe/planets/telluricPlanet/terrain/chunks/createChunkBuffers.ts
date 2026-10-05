@@ -17,7 +17,8 @@
 
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { build_chunk_vertex_data, BuildData } from "terrain-generation";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import { build_chunk_vertex_data, BuildData, Direction } from "terrain-generation";
 
 import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
 import { filterPoints, MaxScatterDensity } from "@/frontend/helpers/instancing";
@@ -31,9 +32,29 @@ import { createTerrainSettings } from "../createTerrainSettings";
 import type { TerrainBuffers } from "../system/terrainSystem";
 import { BeachElevationSpan } from "../terrainConstants";
 import type { BuildChunkWorkerPayload } from "../workers/terrainSystemWorkerProtocol";
+import type { FaceIndex } from "./faceIndex";
 import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 
 const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
+
+function faceIndexToDirection(faceIndex: FaceIndex): Direction {
+    switch (faceIndex) {
+        case 0:
+            return Direction.Up;
+        case 1:
+            return Direction.Down;
+        case 2:
+            return Direction.Left;
+        case 3:
+            return Direction.Right;
+        case 4:
+            return Direction.Forward;
+        case 5:
+            return Direction.Backward;
+        default:
+            return assertUnreachable(faceIndex);
+    }
+}
 
 export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffers {
     const nbVerticesPerSide = task.nbVerticesPerSide;
@@ -64,7 +85,7 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
 
     const buildData: BuildData = new BuildData(
         task.depth,
-        task.faceIndex,
+        faceIndexToDirection(task.faceIndex),
         task.position[0],
         task.position[1],
         task.position[2],
