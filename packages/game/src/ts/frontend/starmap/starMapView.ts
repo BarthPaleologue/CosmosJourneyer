@@ -20,6 +20,7 @@ import "@babylonjs/core/Culling/ray";
 
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import { ColorCurves } from "@babylonjs/core/Materials/colorCurves";
+import { GreasedLineMeshColorMode } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import { ImageProcessingConfiguration } from "@babylonjs/core/Materials/imageProcessingConfiguration";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -330,7 +331,7 @@ export class StarMapView implements View {
             {
                 color: Color3.FromHexString("#003f9f"),
                 width: 0.07,
-                colorMode: 0,
+                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
             },
             this.scene,
         );
@@ -358,7 +359,7 @@ export class StarMapView implements View {
                 dashRatio: 0.3,
                 color: Color3.FromHexString("#9a9a9a"),
                 width: 0.05,
-                colorMode: 0,
+                colorMode: GreasedLineMeshColorMode.COLOR_MODE_SET,
             },
             this.scene,
         );

@@ -18,13 +18,21 @@ export async function promiseToResult<T>(promise: Readonly<Promise<T>>): Promise
 
 export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
-export type DeepReadonly<T> = {
-    readonly [K in keyof T]: DeepReadonly<T[K]>;
-};
+export type Primitive = string | number | boolean | bigint | symbol | undefined | null;
 
-export type DeepMutable<T> = {
-    -readonly [K in keyof T]: DeepMutable<T[K]>;
-};
+type AnyFunction = (...args: ReadonlyArray<never>) => unknown;
+
+export type DeepReadonly<T> = T extends Primitive | AnyFunction
+    ? T
+    : T extends object
+      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+      : T;
+
+export type DeepMutable<T> = T extends Primitive | AnyFunction
+    ? T
+    : T extends object
+      ? { -readonly [K in keyof T]: DeepMutable<T[K]> }
+      : T;
 
 export type NonEmptyArray<T> = [T, ...T[]];
 
