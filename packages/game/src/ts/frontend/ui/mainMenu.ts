@@ -36,7 +36,7 @@ import {
 } from "@/frontend/helpers/positionNearObject";
 import type { StarSystemView } from "@/frontend/starSystemView";
 
-import { getVestaSystemModel } from "@/modules/vesta/vesta";
+import { getVestaModel } from "@/modules/vesta/vesta";
 
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
@@ -181,7 +181,7 @@ export class MainMenu {
 
         this.starSystemView.setUIEnabled(false);
 
-        const vestaModel = getVestaSystemModel();
+        const vestaModel = getVestaModel().starSystem;
 
         const mainMenuStartingPlanet = {
             systemCoordinates: vestaModel.coordinates,
