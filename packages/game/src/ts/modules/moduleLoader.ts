@@ -22,10 +22,11 @@ import { ChronosModule } from "./chronos";
 import { DarkKnightModule } from "./darkKnight";
 import type { GameModule } from "./gameModule";
 import type { GameModuleApi } from "./gameModuleApi";
+import { MonolithModule } from "./monolith";
 import { VestaModule } from "./vesta";
 
 export function getBuiltinModules(): Array<GameModule> {
-    return [DarkKnightModule, VestaModule, ChronosModule];
+    return [DarkKnightModule, MonolithModule, VestaModule, ChronosModule];
 }
 
 /**

@@ -16,11 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { GameModule } from "../gameModule";
-import { getVestaSystemModel } from "./vesta";
+import { getVestaModel } from "./vesta";
 
 export const VestaModule: GameModule = {
     id: "vesta",
-    setup: ({ starSystems }) => {
-        starSystems.registerAuthored(getVestaSystemModel());
+    setup: ({ starSystems, systemEntities }) => {
+        const vesta = getVestaModel();
+
+        starSystems.registerAuthored(vesta.starSystem);
+        systemEntities.registerAuthored(vesta.starSystem.coordinates, vesta.systemEntities);
     },
 };

@@ -34,18 +34,22 @@ import {
     SolarTemperature,
 } from "@cosmos-journeyer/physics";
 import type {
-    StarSystemModel,
     StarSystemCoordinates,
     StarModel,
     GasPlanetModel,
     TelluricPlanetModel,
     SpaceStationModel,
     TelluricSatelliteModel,
+    StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
+
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
 import { CropType } from "@/utils/agriculture";
 
-export function getVestaSystemModel(): StarSystemModel {
+import type { MonolithModel } from "../monolith/entity";
+
+export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
         starSectorX: -1,
         starSectorY: 2,
@@ -386,13 +390,38 @@ export function getVestaSystemModel(): StarSystemModel {
         rings: null,
     };
 
+    const monolith: SystemEntityModel<MonolithModel> = {
+        id: "monolith",
+        name: "Monolith",
+        content: {
+            type: "monolith",
+        },
+        placement: {
+            type: "onSurface",
+            parentId: phileas.id,
+            position: {
+                latitude: 0,
+                longitude: 0,
+                heightAboveGround: 0,
+            },
+            rotation: {
+                roll: 0,
+                pitch: 0,
+                heading: 0,
+            },
+        },
+    };
+
     return {
-        name: "Vesta",
-        coordinates,
-        stellarObjects: [vesta],
-        planets: [janus, aphrodite, melpomene],
-        satellites: [adonis, phileas],
-        anomalies: [],
-        orbitalFacilities: [newJulesVerne],
+        starSystem: {
+            name: "Vesta",
+            coordinates,
+            stellarObjects: [vesta],
+            planets: [janus, aphrodite, melpomene],
+            satellites: [adonis, phileas],
+            anomalies: [],
+            orbitalFacilities: [newJulesVerne],
+        },
+        systemEntities: [monolith],
     };
 }
