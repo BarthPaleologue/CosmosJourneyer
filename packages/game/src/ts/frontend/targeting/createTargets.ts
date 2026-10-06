@@ -23,6 +23,7 @@ import type { SpaceElevatorClimber } from "../assets/procedural/spaceStation/cli
 import type { LandingBay } from "../assets/procedural/spaceStation/landingBay/landingBay";
 import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
+import type { SystemEntity } from "../systemEntity/systemEntity";
 import type { Anomaly, OrbitalFacility, OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { ILandingPad } from "../universe/orbitalFacility/landingPadManager";
 import type { StarSystemController } from "../universe/starSystemController";
@@ -31,12 +32,21 @@ import type { Vehicle } from "../vehicle/vehicle";
 import { TargetType } from "./target";
 import type { PadTarget, Target } from "./target";
 
-export function getSystemTargets(starSystem: StarSystemController): Array<Target> {
+export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
+
+export function getSystemTargets(
+    starSystem: StarSystemController,
+    systemEntityTargetFactory: SystemEntityTargetFactory,
+): Array<Target> {
     const out: Array<Target> = [];
 
     const orbitalObjects = starSystem.getOrbitalObjects();
     const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTargets(object));
     out.push(...orbitalObjectTargets);
+
+    const systemEntities = starSystem.getSystemEntities();
+    const systemEntityTargets = systemEntities.flatMap((entity) => systemEntityTargetFactory(entity));
+    out.push(...systemEntityTargets);
 
     out.push(...starSystem.getSystemTargets().map(createSystemTarget));
 

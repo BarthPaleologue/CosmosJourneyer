@@ -103,7 +103,10 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const targetingSystem = new TargetingSystem();
     const targetCursorLayer = new TargetCursorLayer(targetingSystem, t);
-    targetingSystem.addContacts(getSystemTargets(starSystemController).map(createDefaultTargetContact));
+    const targets = getSystemTargets(starSystemController, (entity) =>
+        systemEntityProcessors.targeting.dispatch(entity),
+    );
+    targetingSystem.addContacts(targets.map(createDefaultTargetContact));
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

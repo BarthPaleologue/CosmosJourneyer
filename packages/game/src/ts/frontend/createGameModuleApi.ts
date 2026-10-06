@@ -47,5 +47,12 @@ export function createGameModuleApi(
                 systemEntityProcessors.registerUpdate(type, update);
             },
         },
+        targeting: {
+            systemEntities: {
+                register: (type, factory) => {
+                    systemEntityProcessors.targeting.register(type, factory);
+                },
+            },
+        },
     };
 }

@@ -100,6 +100,7 @@ import {
     getMissionKnownTargets,
     getSystemTargets,
 } from "./targeting/createTargets";
+import type { SystemEntityTargetFactory } from "./targeting/createTargets";
 import { createDefaultTargetContact, createTargetContact, TargetAcquisition } from "./targeting/targetContact";
 import { InteractionLayer } from "./ui/interactionLayer";
 import type { INotificationManager } from "./ui/notificationManager";
@@ -621,7 +622,12 @@ export class StarSystemView implements View {
             starSystem.addSystemTarget(neighbor.coordinates, this.universeBackend);
         }
 
-        this.initTargetingSystem(this.targetingSystem, starSystem, spaceship);
+        this.initTargetingSystem(
+            this.targetingSystem,
+            starSystem,
+            (entity) => this.systemEntityProcessors.targeting.dispatch(entity),
+            spaceship,
+        );
 
         const orbitAxisRenderList = getOrbitAxisObjectList(starSystem);
 
@@ -708,9 +714,10 @@ export class StarSystemView implements View {
     private initTargetingSystem(
         targetingSystem: TargetingSystem,
         starSystem: StarSystemController,
+        systemEntityTargetFactory: SystemEntityTargetFactory,
         spaceship: Spaceship,
     ): void {
-        const systemTargets = getSystemTargets(starSystem);
+        const systemTargets = getSystemTargets(starSystem, systemEntityTargetFactory);
         const shipTarget = createSpaceshipTarget(spaceship);
 
         targetingSystem.reset();
