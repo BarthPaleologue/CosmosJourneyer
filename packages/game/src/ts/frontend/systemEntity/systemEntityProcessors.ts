@@ -17,6 +17,8 @@
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
+import type { Musics } from "../assets/audio/musics";
+import type { SystemEntityMusicContext } from "../audio/musicSystem";
 import type { Target } from "../targeting/target";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
@@ -29,10 +31,12 @@ export type SystemEntityUpdateContext = {
 
 export class SystemEntityProcessors {
     readonly targeting: SystemEntityProcessorRegistry<void, Array<Target>>;
+    readonly music: SystemEntityProcessorRegistry<SystemEntityMusicContext, Array<keyof Musics>>;
     private readonly update: SystemEntityProcessorRegistry<SystemEntityUpdateContext, void>;
 
     constructor() {
         this.targeting = new SystemEntityProcessorRegistry(() => []);
+        this.music = new SystemEntityProcessorRegistry(() => []);
         this.update = new SystemEntityProcessorRegistry(() => {});
     }
 
@@ -51,6 +55,7 @@ export class SystemEntityProcessors {
 
     dispose() {
         this.targeting.dispose();
+        this.music.dispose();
         this.update.dispose();
     }
 }

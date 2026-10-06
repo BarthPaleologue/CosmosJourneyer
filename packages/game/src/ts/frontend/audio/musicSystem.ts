@@ -24,6 +24,14 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { Musics } from "@/frontend/assets/audio/musics";
 import type { StarSystemView } from "@/frontend/starSystemView";
 
+import type { ErasedSystemEntityProcessor } from "../systemEntity/systemEntityProcessor";
+
+export type SystemEntityMusicContext = {
+    distance: number;
+};
+
+export type SystemEntityMusicProcessor = ErasedSystemEntityProcessor<SystemEntityMusicContext, Array<keyof Musics>>;
+
 export class MusicSystem {
     private currentMusic: AbstractSound | null = null;
 
@@ -39,11 +47,19 @@ export class MusicSystem {
 
     private readonly starSystemView: StarSystemView;
 
+    private readonly systemEntityProcessor: SystemEntityMusicProcessor;
+
     private readonly musics: Musics;
 
-    constructor(musics: Musics, audioEngine: AudioEngineV2, starSystemView: StarSystemView) {
+    constructor(
+        musics: Musics,
+        audioEngine: AudioEngineV2,
+        starSystemView: StarSystemView,
+        systemEntityProcessor: SystemEntityMusicProcessor,
+    ) {
         this.musics = musics;
         this.starSystemView = starSystemView;
+        this.systemEntityProcessor = systemEntityProcessor;
 
         void audioEngine.unlockAsync().then(() => {
             if (this.currentMusic !== null) {
@@ -159,6 +175,19 @@ export class MusicSystem {
         if (!spaceship.isLanded() && spaceship.getTargetLandingPad() !== null) {
             this.setMusic(this.musics.straussBlueDanube);
             return;
+        }
+
+        for (const systemEntity of this.starSystemView.getStarSystem().getSystemEntities()) {
+            const distance = Vector3.Distance(
+                systemEntity.placement.getTransform().getAbsolutePosition(),
+                playerPosition,
+            );
+            const selection = this.systemEntityProcessor(systemEntity, { distance });
+            if (selection.length > 0) {
+                const musicSelection = selection.map((musicKey) => this.musics[musicKey]);
+                this.setMusicFromSelection(musicSelection);
+                return;
+            }
         }
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
