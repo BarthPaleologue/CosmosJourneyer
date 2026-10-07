@@ -21,6 +21,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
+    builtinAttribute,
     f,
     length,
     min,
@@ -45,7 +46,6 @@ import {
     uniformWorld,
     vec,
     vec2,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
@@ -59,9 +59,9 @@ export class LandingPadMaterial extends NodeMaterial {
 
         // Vertex Shader
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
         const uvSplit = splitVec(uv);
 
         const centeredUV = splitVec(sub(uv, f(0.5)));

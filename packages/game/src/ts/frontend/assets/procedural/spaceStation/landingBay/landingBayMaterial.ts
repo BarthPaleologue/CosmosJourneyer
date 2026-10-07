@@ -24,6 +24,7 @@ import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import {
     abs,
     atan2,
+    builtinAttribute,
     f,
     fract,
     length,
@@ -47,7 +48,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec2,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
@@ -99,9 +99,9 @@ export class LandingBayMaterial extends NodeMaterial {
             namePlateTexture.dispose();
         });
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
         const splitPosition = splitVec(position);
 

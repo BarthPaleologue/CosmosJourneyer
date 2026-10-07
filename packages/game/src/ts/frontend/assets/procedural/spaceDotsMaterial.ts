@@ -24,6 +24,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     add,
+    builtinAttribute,
     color,
     cross,
     f,
@@ -45,7 +46,6 @@ import {
     uniformFloat,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
     instanceIndex,
 } from "babylonjs-shading-language";
 
@@ -104,7 +104,7 @@ export class SpaceDotsMaterial {
         this.uBendYaw = uniformFloat("uBendYaw", { defaultValue: 0 });
         this.uBendPitch = uniformFloat("uBendPitch", { defaultValue: 0 });
 
-        const position = vertexAttribute("position");
+        const position = builtinAttribute("position");
         const dotIndex = instanceIndex();
         const globalWorld = uniformWorld();
 

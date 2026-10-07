@@ -19,6 +19,7 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
+    builtinAttribute,
     float,
     mul,
     outputFragColor,
@@ -34,7 +35,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { SolarPanelTextures } from "../../textures/materials/solarPanel";
@@ -44,8 +44,8 @@ export class SolarPanelMaterial extends NodeMaterial {
         super("SolarPanelNodeMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
 
         const positionXZ = swizzle(position, "xz");
         const uv = mul(positionXZ, float(0.1));

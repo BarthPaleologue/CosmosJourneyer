@@ -21,12 +21,12 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
+    builtinAttribute,
     cos,
     distance,
     f,
     getInstanceData,
     hash11,
-    instanceAttribute,
     mix,
     mul,
     outputFragColor,
@@ -52,7 +52,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec3,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 export class GrassMaterial {
@@ -62,13 +61,13 @@ export class GrassMaterial {
         this.material = new NodeMaterial("GrassMaterial", scene);
         this.material.backFaceCulling = false;
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
 
-        const world0 = instanceAttribute("world0");
-        const world1 = instanceAttribute("world1");
-        const world2 = instanceAttribute("world2");
-        const world3 = instanceAttribute("world3");
+        const world0 = builtinAttribute("world0");
+        const world1 = builtinAttribute("world1");
+        const world2 = builtinAttribute("world2");
+        const world3 = builtinAttribute("world3");
 
         const elapsedSeconds = uniformElapsedSeconds();
 

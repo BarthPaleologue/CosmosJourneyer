@@ -28,6 +28,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AdvancedDynamicTexture, Control, Rectangle, Slider, StackPanel, TextBlock } from "@babylonjs/gui";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 import {
+    builtinAttribute,
     f,
     normalize,
     outputFragColor,
@@ -41,7 +42,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -74,8 +74,8 @@ export async function createTriPlanarNormalScene(
 
     const material = new NodeMaterial("TriPlanarNormalMaterial", scene);
 
-    const position = vertexAttribute("position");
-    const normal = vertexAttribute("normal");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
 
     const world = uniformWorld();
     const positionW = transformPosition(world, position);

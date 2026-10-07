@@ -18,15 +18,14 @@
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
+    builtinAttribute,
     getInstanceData,
-    instanceAttribute,
     outputFragColor,
     outputVertexPosition,
     splitRgba,
     transformPosition,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 export class InstanceGlowMaterial {
@@ -35,17 +34,17 @@ export class InstanceGlowMaterial {
     constructor(scene: Scene) {
         this.material = new NodeMaterial("InstanceGlowMaterial", scene);
 
-        const position = vertexAttribute("position");
+        const position = builtinAttribute("position");
 
-        const world0 = instanceAttribute("world0");
-        const world1 = instanceAttribute("world1");
-        const world2 = instanceAttribute("world2");
-        const world3 = instanceAttribute("world3");
+        const world0 = builtinAttribute("world0");
+        const world1 = builtinAttribute("world1");
+        const world2 = builtinAttribute("world2");
+        const world3 = builtinAttribute("world3");
 
         const globalWorld = uniformWorld();
         const { output: instanceWorld } = getInstanceData(world0, world1, world2, world3, globalWorld);
 
-        const instanceColorRgba = instanceAttribute("instanceColor");
+        const instanceColorRgba = builtinAttribute("instanceColor");
 
         const instanceColorRgb = splitRgba(instanceColorRgba).rgbOut;
 

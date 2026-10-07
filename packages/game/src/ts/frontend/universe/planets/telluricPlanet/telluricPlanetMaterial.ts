@@ -27,10 +27,10 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 import {
     abs,
     add,
+    builtinAttribute,
     distance,
     dot,
     f,
-    instanceAttribute,
     length,
     mix,
     mul,
@@ -53,7 +53,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
@@ -88,11 +87,11 @@ export class TelluricPlanetMaterial {
     ) {
         this.material = new NodeMaterial("TelluricPlanetMaterial", scene);
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
 
         // Node material hack: we store the chunk position in the instance color attribute of the mesh
-        const chunkPosition = splitVec(instanceAttribute("instanceColor")).xyzOut;
+        const chunkPosition = splitVec(builtinAttribute("instanceColor")).xyzOut;
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
