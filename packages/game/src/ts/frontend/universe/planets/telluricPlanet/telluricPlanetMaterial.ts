@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -27,6 +28,7 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 import {
     abs,
     add,
+    attribute,
     builtinAttribute,
     distance,
     dot,
@@ -41,7 +43,6 @@ import {
     pbr,
     remap,
     smoothstep,
-    splitVec,
     sub,
     swizzle,
     textureTriPlanarSample,
@@ -90,8 +91,7 @@ export class TelluricPlanetMaterial {
         const position = builtinAttribute("position");
         const normal = builtinAttribute("normal");
 
-        // Node material hack: we store the chunk position in the instance color attribute of the mesh
-        const chunkPosition = splitVec(builtinAttribute("instanceColor")).xyzOut;
+        const chunkPosition = attribute("chunkPosition", NodeMaterialBlockConnectionPointTypes.Vector3);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
