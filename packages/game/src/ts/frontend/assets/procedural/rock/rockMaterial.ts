@@ -19,9 +19,9 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
+    builtinAttribute,
     f,
     getInstanceData,
-    instanceAttribute,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -32,7 +32,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import { triPlanarMaterial } from "@/utils/bslExtensions";
@@ -49,14 +48,14 @@ export class RockMaterial {
     ) {
         this.material = new NodeMaterial("RockMaterial", scene);
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
 
         const globalWorld = uniformWorld();
-        const world0 = instanceAttribute("world0");
-        const world1 = instanceAttribute("world1");
-        const world2 = instanceAttribute("world2");
-        const world3 = instanceAttribute("world3");
+        const world0 = builtinAttribute("world0");
+        const world1 = builtinAttribute("world1");
+        const world2 = builtinAttribute("world2");
+        const world3 = builtinAttribute("world3");
         const { output: instanceWorld } = getInstanceData(world0, world1, world2, world3, globalWorld);
 
         const positionW = transformPosition(instanceWorld, position);

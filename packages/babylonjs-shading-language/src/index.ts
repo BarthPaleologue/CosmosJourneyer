@@ -89,6 +89,8 @@ import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
+import { InstanceIndexBlock } from "./instanceIndexBlock";
+
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
     FRAG: NodeMaterialBlockTargets.Fragment,
@@ -159,7 +161,33 @@ export function uniformElapsedSeconds(): NodeMaterialConnectionPoint {
     return elapsedSecondsBlock.output;
 }
 
-export type VertexAttributeName =
+export type AttributeType =
+    | NodeMaterialBlockConnectionPointTypes.Float
+    | NodeMaterialBlockConnectionPointTypes.Vector2
+    | NodeMaterialBlockConnectionPointTypes.Vector3
+    | NodeMaterialBlockConnectionPointTypes.Vector4
+    | NodeMaterialBlockConnectionPointTypes.Color3
+    | NodeMaterialBlockConnectionPointTypes.Color4;
+
+/**
+ * Returns an attribute input block with an explicit type for any attribute name.
+ * The associated vertex buffer determines whether values are per vertex or per instance.
+ * @param name - The name of the attribute in the mesh's vertex buffers.
+ * @param type - The explicit scalar, vector, or color type of the attribute.
+ * @param options - Optional target options (vertex by default).
+ */
+export function attribute(
+    name: string,
+    type: AttributeType,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const inputBlock = new InputBlock(name, options?.target ?? NodeMaterialBlockTargets.Vertex, type);
+    inputBlock.setAsAttribute(name);
+
+    return inputBlock.output;
+}
+
+export type BuiltinAttributeName =
     | "position"
     | "normal"
     | "tangent"
@@ -168,40 +196,28 @@ export type VertexAttributeName =
     | "matricesIndices"
     | "matricesWeights"
     | "matricesIndicesExtra"
-    | "matricesWeightsExtra";
+    | "matricesWeightsExtra"
+    | "world0"
+    | "world1"
+    | "world2"
+    | "world3"
+    | "instanceColor";
 
 /**
- * Returns a vertex attribute input block for the given attribute name.
- * @param name - The name of the vertex attribute.
+ * Returns a built-in attribute input block whose type is inferred by Babylon.
+ * The associated vertex buffer determines whether values are per vertex or per instance.
+ * @param name - The name of the built-in attribute.
  * @param options - Optional target options.
  */
-export function vertexAttribute(
-    name: VertexAttributeName,
+export function builtinAttribute(
+    name: BuiltinAttributeName,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const attribute = new InputBlock(name);
-    attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
-    attribute.setAsAttribute(name);
+    const inputBlock = new InputBlock(name);
+    inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
+    inputBlock.setAsAttribute(name);
 
-    return attribute.output;
-}
-
-export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3" | "instanceColor";
-
-/**
- * Returns an instance attribute input block for the given name.
- * @param name - The instance attribute name.
- * @param options - Optional target options.
- */
-export function instanceAttribute(
-    name: InstanceAttributeName,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
-    const attribute = new InputBlock(name);
-    attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
-    attribute.setAsAttribute(name);
-
-    return attribute.output;
+    return inputBlock.output;
 }
 
 /**
@@ -390,6 +406,13 @@ export function triPlanarMapping(
     options?.sharpness?.connectTo(triPlanarBlock.sharpness);
 
     return triPlanarBlock;
+}
+
+/**
+ * @returns the instance index within the current draw as a float computed in the vertex shader.
+ */
+export function instanceIndex(): NodeMaterialConnectionPoint {
+    return new InstanceIndexBlock("InstanceIndex").output;
 }
 
 export type InstanceData = {

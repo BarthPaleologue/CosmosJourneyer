@@ -24,12 +24,11 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     add,
+    builtinAttribute,
     color,
     cross,
     f,
-    getInstanceData,
     hash11,
-    instanceAttribute,
     mod,
     mul,
     normalize,
@@ -47,7 +46,7 @@ import {
     uniformFloat,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
+    instanceIndex,
 } from "babylonjs-shading-language";
 
 import { addN, sampleDisk } from "@/utils/bslExtensions";
@@ -105,20 +104,16 @@ export class SpaceDotsMaterial {
         this.uBendYaw = uniformFloat("uBendYaw", { defaultValue: 0 });
         this.uBendPitch = uniformFloat("uBendPitch", { defaultValue: 0 });
 
-        const position = vertexAttribute("position");
-        const world0 = instanceAttribute("world0");
-        const world1 = instanceAttribute("world1");
-        const world2 = instanceAttribute("world2");
-        const world3 = instanceAttribute("world3");
+        const position = builtinAttribute("position");
+        const dotIndex = instanceIndex();
         const globalWorld = uniformWorld();
-        const { instanceID } = getInstanceData(world0, world1, world2, world3, globalWorld);
 
         const translationOffset = this.uTranslationOffset.output;
         const throttle = this.uThrottle.output;
         const minRadius = options?.minRadius ?? DEFAULT_MIN_RADIUS;
         const maxRadius = options?.maxRadius ?? DEFAULT_MAX_RADIUS;
 
-        const diskSample = sampleDisk(instanceID, { minRadius, maxRadius });
+        const diskSample = sampleDisk(dotIndex, { minRadius, maxRadius });
         const rollCompensationAngle = this.uRollCompensationAngle.output;
         const rotatedDiskSampleX = sub(
             mul(diskSample.x, cos(rollCompensationAngle)),
@@ -128,7 +123,7 @@ export class SpaceDotsMaterial {
             mul(diskSample.x, sin(rollCompensationAngle)),
             mul(diskSample.y, cos(rollCompensationAngle)),
         );
-        const phaseHash = hash11(add(instanceID, f(47)));
+        const phaseHash = hash11(add(dotIndex, f(47)));
         const tunnelLength = f(this.tunnelLength);
         const halfTunnelLength = f(this.tunnelLength / 2);
         const initialPhase = mul(phaseHash, tunnelLength);

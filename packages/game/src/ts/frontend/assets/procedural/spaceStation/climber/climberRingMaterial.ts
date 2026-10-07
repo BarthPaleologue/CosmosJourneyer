@@ -30,9 +30,9 @@ export class ClimberRingMaterial extends NodeMaterial {
 
         // Vertex
 
-        const position = BSL.vertexAttribute("position");
-        const normal = BSL.vertexAttribute("normal");
-        const uv = BSL.vertexAttribute("uv");
+        const position = BSL.builtinAttribute("position");
+        const normal = BSL.builtinAttribute("normal");
+        const uv = BSL.builtinAttribute("uv");
 
         const meshUVScaleFactor = BSL.vec(new Vector2(2, 10));
         const proceduralUV = BSL.mul(uv, meshUVScaleFactor);

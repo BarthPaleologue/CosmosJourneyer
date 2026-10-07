@@ -20,6 +20,7 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
+    builtinAttribute,
     f,
     getViewDirection,
     outputFragColor,
@@ -34,7 +35,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 export class CrateMaterial {
@@ -51,9 +51,9 @@ export class CrateMaterial {
     ) {
         this.material = new NodeMaterial("CrateMaterial", scene);
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);

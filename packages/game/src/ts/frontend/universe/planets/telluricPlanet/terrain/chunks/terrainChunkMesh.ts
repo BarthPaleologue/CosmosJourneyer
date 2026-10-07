@@ -19,7 +19,6 @@ import "@babylonjs/core/Engines/Extensions/engine.query";
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Material } from "@babylonjs/core/Materials/material";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { VertexData } from "@babylonjs/core/Meshes";
 import type { TransformNode } from "@babylonjs/core/Meshes";
@@ -111,14 +110,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         this.positionOnSphere = this.positionOnCube.normalizeToNew().scaleInPlace(planetModel.radius);
         this.getTransform().position = this.positionOnSphere;
 
-        // Node material hack: we store the planet-space position of the chunk in the instance color for easy access from Babylon NodeMaterial
-        this.mesh.registerInstancedBuffer("instanceColor", 4);
-        this.mesh.instancedBuffers["instanceColor"] = new Color4(
-            this.positionOnSphere.x,
-            this.positionOnSphere.y,
-            this.positionOnSphere.z,
-            1,
-        );
+        this.mesh.registerInstancedBuffer("chunkPosition", 3);
+        this.mesh.instancedBuffers["chunkPosition"] = this.positionOnSphere.clone();
 
         this.scatteringSystem = scatteringSystem;
     }

@@ -22,6 +22,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     add,
+    builtinAttribute,
     cos,
     discardTest,
     div,
@@ -30,7 +31,6 @@ import {
     getInstanceData,
     hash11,
     hslToRgb,
-    instanceAttribute,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -53,7 +53,6 @@ import {
     uniformWorld,
     vec,
     vec3,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 export class ButterflyMaterial {
@@ -63,14 +62,14 @@ export class ButterflyMaterial {
         this.material = new NodeMaterial("ButterflyMaterial", scene);
         this.material.backFaceCulling = false;
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
-        const world0 = instanceAttribute("world0");
-        const world1 = instanceAttribute("world1");
-        const world2 = instanceAttribute("world2");
-        const world3 = instanceAttribute("world3");
+        const world0 = builtinAttribute("world0");
+        const world1 = builtinAttribute("world1");
+        const world2 = builtinAttribute("world2");
+        const world3 = builtinAttribute("world3");
 
         const elapsedSeconds = uniformElapsedSeconds();
 

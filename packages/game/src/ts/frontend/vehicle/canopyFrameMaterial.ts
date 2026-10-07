@@ -19,6 +19,7 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
+    builtinAttribute,
     f,
     mul,
     outputFragColor,
@@ -33,7 +34,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 export class CanopyFrameMaterial {
@@ -50,9 +50,9 @@ export class CanopyFrameMaterial {
     ) {
         this.material = new NodeMaterial("canopyFrameMaterial", scene);
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);

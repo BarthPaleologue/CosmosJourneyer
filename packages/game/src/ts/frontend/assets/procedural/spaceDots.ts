@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
@@ -70,16 +69,6 @@ export class SpaceDots implements Transformable {
         vertexData.applyToMesh(this.mesh);
 
         const instanceCount = options?.instanceCount ?? DEFAULT_INSTANCE_COUNT;
-        const instanceBuffer = new VertexBuffer(
-            scene.getEngine(),
-            new Float32Array(instanceCount),
-            "instanceDummy",
-            false,
-            false,
-            1,
-            true,
-        );
-        this.mesh.setVerticesBuffer(instanceBuffer);
         this.mesh.forcedInstanceCount = instanceCount;
 
         this.material = new SpaceDotsMaterial(scene, options);

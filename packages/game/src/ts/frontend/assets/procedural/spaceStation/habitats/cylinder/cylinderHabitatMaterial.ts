@@ -21,6 +21,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     atan2,
+    builtinAttribute,
     f,
     length,
     mix,
@@ -43,7 +44,6 @@ import {
     uniformViewProjection,
     uniformWorld,
     vec2,
-    vertexAttribute,
 } from "babylonjs-shading-language";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
@@ -57,9 +57,9 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const nbSectors = tesselation;
         const sectorSize = circumference / nbSectors;
 
-        const position = vertexAttribute("position");
-        const normal = vertexAttribute("normal");
-        const uv = vertexAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
         const splitPosition = splitVec(position);
 
