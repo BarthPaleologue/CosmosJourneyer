@@ -159,6 +159,32 @@ export function uniformElapsedSeconds(): NodeMaterialConnectionPoint {
     return elapsedSecondsBlock.output;
 }
 
+export type AttributeType =
+    | NodeMaterialBlockConnectionPointTypes.Float
+    | NodeMaterialBlockConnectionPointTypes.Vector2
+    | NodeMaterialBlockConnectionPointTypes.Vector3
+    | NodeMaterialBlockConnectionPointTypes.Vector4
+    | NodeMaterialBlockConnectionPointTypes.Color3
+    | NodeMaterialBlockConnectionPointTypes.Color4;
+
+/**
+ * Returns an attribute input block with an explicit type for any attribute name.
+ * The associated vertex buffer determines whether values are per vertex or per instance.
+ * @param name - The name of the attribute in the mesh's vertex buffers.
+ * @param type - The explicit scalar, vector, or color type of the attribute.
+ * @param options - Optional target options (vertex by default).
+ */
+export function attribute(
+    name: string,
+    type: AttributeType,
+    options?: Partial<TargetOptions>,
+): NodeMaterialConnectionPoint {
+    const inputBlock = new InputBlock(name, options?.target ?? NodeMaterialBlockTargets.Vertex, type);
+    inputBlock.setAsAttribute(name);
+
+    return inputBlock.output;
+}
+
 export type VertexAttributeName =
     | "position"
     | "normal"
@@ -179,11 +205,11 @@ export function vertexAttribute(
     name: VertexAttributeName,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const attribute = new InputBlock(name);
-    attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
-    attribute.setAsAttribute(name);
+    const inputBlock = new InputBlock(name);
+    inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
+    inputBlock.setAsAttribute(name);
 
-    return attribute.output;
+    return inputBlock.output;
 }
 
 export type InstanceAttributeName = "world0" | "world1" | "world2" | "world3" | "instanceColor";
@@ -197,11 +223,11 @@ export function instanceAttribute(
     name: InstanceAttributeName,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const attribute = new InputBlock(name);
-    attribute.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
-    attribute.setAsAttribute(name);
+    const inputBlock = new InputBlock(name);
+    inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
+    inputBlock.setAsAttribute(name);
 
-    return attribute.output;
+    return inputBlock.output;
 }
 
 /**
