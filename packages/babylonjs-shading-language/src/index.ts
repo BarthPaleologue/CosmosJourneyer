@@ -89,6 +89,8 @@ import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
+import { InstanceIndexBlock } from "./instanceIndexBlock";
+
 export const Target = {
     VERT: NodeMaterialBlockTargets.Vertex,
     FRAG: NodeMaterialBlockTargets.Fragment,
@@ -416,6 +418,13 @@ export function triPlanarMapping(
     options?.sharpness?.connectTo(triPlanarBlock.sharpness);
 
     return triPlanarBlock;
+}
+
+/**
+ * @returns the instance index within the current draw as a float computed in the vertex shader.
+ */
+export function instanceIndex(): NodeMaterialConnectionPoint {
+    return new InstanceIndexBlock("InstanceIndex").output;
 }
 
 export type InstanceData = {
