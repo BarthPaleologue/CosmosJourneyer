@@ -1,17 +1,13 @@
 import { strFromU8, unzipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { UniverseBackend } from "@/backend/universe/universeBackend";
-
 import { createCommanderArchive, createCommanderArchiveFileName, parseCommanderArchive } from "./commanderArchive";
 import { safeParseSave } from "./saveFileData";
 
 import saveData from "@assets/tutorials/starMapTutorial/save.json";
 
 describe("Commander archives", () => {
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
-    const saveResult = safeParseSave(saveData, universeBackend);
+    const saveResult = safeParseSave(saveData);
     if (!saveResult.success) {
         throw new Error("Tutorial save fixture is invalid");
     }
@@ -45,7 +41,7 @@ describe("Commander archives", () => {
             auto: [],
         });
 
-        expect(parseCommanderArchive(archive, universeBackend)).toEqual({
+        expect(parseCommanderArchive(archive)).toEqual({
             success: true,
             value: {
                 cmdrUuid: save.player.uuid,
@@ -56,7 +52,7 @@ describe("Commander archives", () => {
     });
 
     it("rejects data that is not a ZIP archive", () => {
-        expect(parseCommanderArchive(new Uint8Array([1, 2, 3]), universeBackend)).toEqual({
+        expect(parseCommanderArchive(new Uint8Array([1, 2, 3]))).toEqual({
             success: false,
             error: "INVALID_ZIP",
         });

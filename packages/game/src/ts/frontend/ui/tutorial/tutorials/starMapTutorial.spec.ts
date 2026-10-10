@@ -32,7 +32,7 @@ describe("StarMapTutorial", () => {
         const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new StarMapTutorial(t);
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = tutorial.getSaveData();
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
@@ -67,7 +67,7 @@ describe("StarMapTutorial", () => {
         const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new StarMapTutorial(t);
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = tutorial.getSaveData();
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");

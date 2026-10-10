@@ -19,14 +19,13 @@ import type { Result } from "@cosmos-journeyer/typescript";
 
 import type { Save } from "@/backend/save/saveFileData";
 import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 export interface Tutorial {
     getTitle(): string;
     readonly coverImageSrc: string;
     getDescription(): string;
 
-    getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError>;
+    getSaveData(): Result<Save, SaveLoadingError>;
 
     getContentPanelsHtml(): Promise<string[]>;
 }

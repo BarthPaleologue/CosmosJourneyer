@@ -21,7 +21,6 @@ import type { TFunction } from "i18next";
 import { safeParseSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
 import type { SaveLoadingError } from "@/backend/save/saveLoadingError";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 
@@ -42,8 +41,8 @@ export class TemplateTutorial implements Tutorial {
         this.t = t;
     }
 
-    getSaveData(universeBackend: UniverseBackend): Result<Save, SaveLoadingError> {
-        return safeParseSave(saveData, universeBackend);
+    getSaveData(): Result<Save, SaveLoadingError> {
+        return safeParseSave(saveData);
     }
 
     getTitle(): string {

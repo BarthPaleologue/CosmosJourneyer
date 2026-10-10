@@ -15,30 +15,44 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Assert, DeepMutable, DeepReadonly, Result, StrictEqual } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
 import { encodeBase64 } from "@/utils/base64";
 
+import { SerializedPlayerSchema } from "../player/serializedPlayer";
 import type { SaveLoadingError } from "./saveLoadingError";
-import { safeParseSaveV2, SaveSchemaV2 } from "./v2/saveV2";
+import { UniverseCoordinatesSchema } from "./universeCoordinates";
 
-export const SaveSchema = SaveSchemaV2;
+export const SaveSchema = z.object({
+    uuid: z.string().default(() => crypto.randomUUID()),
 
-export type Save = z.infer<typeof SaveSchema>;
+    /** The timestamp when the save file was created. */
+    timestamp: z.number().default(() => Date.now()),
+
+    /** The player data. */
+    player: SerializedPlayerSchema,
+
+    playerLocation: UniverseCoordinatesSchema,
+
+    shipLocations: z.record(z.uuid(), UniverseCoordinatesSchema),
+
+    thumbnail: z.string().optional(),
+});
 
 /**
- * Parses a string into a SaveFileData object. Throws an error if the string is not a valid save file data.
- * @param json The string to parse.
- * @returns The parsed SaveFileData object. Returns null if the string is not valid.
+ * Data structure for the save file to allow restoring current star system and position.
  */
-export function safeParseSave(
-    json: Record<string, unknown>,
-    universeBackend: UniverseBackend,
-): Result<Save, SaveLoadingError> {
-    return safeParseSaveV2(json, universeBackend);
+export type Save = z.infer<typeof SaveSchema>;
+
+export function safeParseSave(json: Record<string, unknown>): Result<Save, SaveLoadingError> {
+    const result = SaveSchema.safeParse(json);
+    if (result.success) {
+        return ok(result.data);
+    }
+
+    return err({ type: "INVALID_SAVE", content: result.error });
 }
 
 export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
@@ -53,15 +67,15 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
-export function parseSaveArray(
-    rawSaves: Record<string, unknown>[],
-    universeBackend: UniverseBackend,
-): { validSaves: Save[]; invalidSaves: { save: unknown; error: SaveLoadingError }[] } {
+export function parseSaveArray(rawSaves: Record<string, unknown>[]): {
+    validSaves: Save[];
+    invalidSaves: { save: unknown; error: SaveLoadingError }[];
+} {
     const validSaves: Save[] = [];
     const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
 
     for (const save of rawSaves) {
-        const result = safeParseSave(save, universeBackend);
+        const result = safeParseSave(save);
         if (result.success) {
             validSaves.push(result.value);
         } else {

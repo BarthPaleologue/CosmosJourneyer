@@ -18,8 +18,6 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { SerializedPlayerSchema } from "@/backend/player/serializedPlayer";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { SaveBackendSingleFile } from "./saveBackendSingleFile";
 import type { IFile } from "./saveBackendSingleFile";
@@ -134,10 +132,9 @@ describe("SaveManager", () => {
 
     describe("Create", () => {
         it("should create a SaveManager with existing saves", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -147,10 +144,9 @@ describe("SaveManager", () => {
         });
 
         it("should create a SaveManager with empty saves", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend();
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -159,10 +155,9 @@ describe("SaveManager", () => {
         });
 
         it("should handle read errors", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend("invalid json data");
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(false);
             if (!result.success) {
@@ -171,7 +166,6 @@ describe("SaveManager", () => {
         });
 
         it("should assign unique timestamps when they are missing", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const manualSaveWithoutTimestamp1 = { ...createTestSave(0), timestamp: undefined };
             const manualSaveWithoutTimestamp2 = { ...createTestSave(0), timestamp: undefined };
 
@@ -194,7 +188,7 @@ describe("SaveManager", () => {
                 .mockImplementation(() => secondTimestamp + 1);
 
             try {
-                const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+                const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -215,10 +209,9 @@ describe("SaveManager", () => {
 
     describe("getSavesForCmdr", () => {
         it("should return saves for an existing cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -228,10 +221,9 @@ describe("SaveManager", () => {
         });
 
         it("should return undefined for a non-existent cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -243,10 +235,9 @@ describe("SaveManager", () => {
 
     describe("addManualSave", () => {
         it("should add a manual save to an existing cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -267,10 +258,9 @@ describe("SaveManager", () => {
         });
 
         it("should create new cmdr saves when adding manual save to non-existent cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend();
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -289,10 +279,9 @@ describe("SaveManager", () => {
 
     describe("addAutoSave", () => {
         it("should add an auto save to an existing cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend(JSON.stringify(testSaves));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -314,10 +303,9 @@ describe("SaveManager", () => {
         });
 
         it("should create new cmdr saves when adding auto save to non-existent cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend();
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -335,7 +323,6 @@ describe("SaveManager", () => {
         });
 
         it("should limit auto saves to MAX_AUTO_SAVES and remove oldest", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             // Create a cmdr with already 5 auto saves (at the limit)
             const cmdrUuid = "7471ef79-7a4a-4b82-9779-44bb43e9ad66";
             const initialData = {
@@ -352,7 +339,7 @@ describe("SaveManager", () => {
             };
             const backend = new MockSaveBackend(JSON.stringify(initialData));
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -372,10 +359,9 @@ describe("SaveManager", () => {
         });
 
         it("should handle adding multiple auto saves and maintain limit", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend();
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {
@@ -410,10 +396,9 @@ describe("SaveManager", () => {
 
     describe("importSaves", () => {
         it("should preserve all saves imported for a new cmdr", async () => {
-            const universeBackend = new UniverseBackend(getLoneStarSystem());
             const backend = new MockSaveBackend();
             const backupBackend = new MockSaveBackend();
-            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend, universeBackend);
+            const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
             expect(result.success).toBe(true);
             if (result.success) {

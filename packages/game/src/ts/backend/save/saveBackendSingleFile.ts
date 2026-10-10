@@ -18,8 +18,6 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
 import { jsonSafeParse } from "@/utils/json";
 
 import { Settings } from "@/settings";
@@ -84,7 +82,6 @@ export class SaveBackendSingleFile implements ISaveBackend {
     public static async CreateAsync(
         mainFile: IFile,
         backupFile: IFile,
-        universeBackend: UniverseBackend,
     ): Promise<Result<SaveBackendSingleFile, SaveLoadingError>> {
         const rawSaves = await mainFile.read();
         const rawBackupSaves = await backupFile.read();
@@ -124,8 +121,8 @@ export class SaveBackendSingleFile implements ISaveBackend {
 
         // filter saves
         for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
-            const parsedManualSaves = parseSaveArray(cmdrSaves.manual, universeBackend);
-            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto, universeBackend);
+            const parsedManualSaves = parseSaveArray(cmdrSaves.manual);
+            const parsedAutoSaves = parseSaveArray(cmdrSaves.auto);
 
             correctSaves[cmdrUuid] = {
                 manual: parsedManualSaves.validSaves,

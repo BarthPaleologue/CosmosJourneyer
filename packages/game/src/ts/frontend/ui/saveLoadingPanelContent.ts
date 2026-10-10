@@ -454,11 +454,11 @@ export class SaveLoadingPanelContent {
             return;
         }
 
-        await this.loadSaveFile(file, this.universeBackend);
+        await this.loadSaveFile(file);
     }
 
     private async importCommanderArchive(file: File): Promise<void> {
-        const archiveResult = parseCommanderArchive(new Uint8Array(await file.arrayBuffer()), this.universeBackend);
+        const archiveResult = parseCommanderArchive(new Uint8Array(await file.arrayBuffer()));
         if (!archiveResult.success) {
             console.error("Could not import Commander archive:", archiveResult.error);
             await alertModal(this.t("sidePanel:invalidCommanderArchive"), this.soundPlayer, this.t);
@@ -498,8 +498,8 @@ export class SaveLoadingPanelContent {
         await this.populateCmdrList(this.universeBackend, this.saveBackend);
     }
 
-    private async loadSaveFile(file: File, universeBackend: UniverseBackend): Promise<Result<Save, SaveLoadingError>> {
-        const saveFileDataResult = await parseSaveFile(file, universeBackend);
+    private async loadSaveFile(file: File): Promise<Result<Save, SaveLoadingError>> {
+        const saveFileDataResult = await parseSaveFile(file);
         if (!saveFileDataResult.success) {
             console.error(saveFileDataResult.error);
             await alertModal(saveLoadingErrorToI18nString(saveFileDataResult.error, this.t), this.soundPlayer, this.t);

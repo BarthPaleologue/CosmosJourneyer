@@ -30,7 +30,7 @@ describe("FuelScoopTutorial", () => {
         const universeBackend = new UniverseBackend(getLoneStarSystem());
         const tutorial = new FuelScoopTutorial(t);
 
-        const saveDataResult = tutorial.getSaveData(universeBackend);
+        const saveDataResult = tutorial.getSaveData();
         expect(saveDataResult.success).toBe(true);
         if (!saveDataResult.success) {
             throw new Error("saveData is not successful");
