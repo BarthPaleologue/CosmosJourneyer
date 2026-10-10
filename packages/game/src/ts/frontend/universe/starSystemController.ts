@@ -176,6 +176,7 @@ export class StarSystemController {
         loader: StarSystemLoader,
         entityModels: Iterable<DeepReadonly<SystemEntityModel>>,
         entityLoader: SystemEntityLoader,
+        terrainSystem: ITerrainSystem,
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
@@ -194,9 +195,11 @@ export class StarSystemController {
 
         const entityLoaderContext: SystemEntityLoadContext = {
             scene,
+            terrainSystem,
+            orbitalObjects,
             orbitalSimulation,
         };
-        const systemEntitiesResult = entityLoader.load(entityModels, entityLoaderContext);
+        const systemEntitiesResult = await entityLoader.load(entityModels, entityLoaderContext);
         if (!systemEntitiesResult.success) {
             return systemEntitiesResult;
         }

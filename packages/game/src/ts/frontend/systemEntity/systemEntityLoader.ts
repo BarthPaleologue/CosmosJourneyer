@@ -22,7 +22,11 @@ import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
+import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
+import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
+import { createOnSurfacePlacements } from "./createOnSurfacePlacements";
+import type { SurfacePlacementRequest } from "./createOnSurfacePlacements";
 import type {
     AnySystemContentType,
     ContentModelOf,
@@ -36,7 +40,9 @@ type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
 
 export type SystemEntityLoadContext = Readonly<{
     scene: Scene;
+    orbitalObjects: ReadonlyArray<OrbitalObject>;
     orbitalSimulation: KeplerianOrbitalSimulation;
+    terrainSystem: ITerrainSystem;
 }>;
 
 export class SystemEntityLoader {
@@ -50,12 +56,13 @@ export class SystemEntityLoader {
         this.registry.set(type, eraseFactory(type, factory));
     }
 
-    load(
+    async load(
         models: Iterable<DeepReadonly<SystemEntityModel>>,
         context: SystemEntityLoadContext,
-    ): Result<Array<SystemEntity>, Error> {
+    ): Promise<Result<Array<SystemEntity>, Error>> {
         const inOrbitPlacementModels: Array<{ entityId: string; placementModel: DeepReadonly<InOrbitPlacementModel> }> =
             [];
+        const onSurfacePlacementModels: Array<SurfacePlacementRequest> = [];
         const entityContents = new Map<string, { model: DeepReadonly<SystemEntityModel>; content: SystemContent }>();
         for (const model of models) {
             const contentResult = this.createContent(model, context.scene);
@@ -65,12 +72,32 @@ export class SystemEntityLoader {
 
             entityContents.set(model.id, { model, content: contentResult.value });
 
-            inOrbitPlacementModels.push({ entityId: model.id, placementModel: model.placement });
+            switch (model.placement.type) {
+                case "inOrbit":
+                    inOrbitPlacementModels.push({ entityId: model.id, placementModel: model.placement });
+                    break;
+                case "onSurface":
+                    onSurfacePlacementModels.push({ entityId: model.id, placementModel: model.placement });
+                    break;
+            }
         }
 
         const inOrbitPlacements = createInOrbitPlacements(inOrbitPlacementModels, context);
+        const onSurfacePlacementsResult = await createOnSurfacePlacements(
+            onSurfacePlacementModels,
+            context.orbitalObjects,
+            context.terrainSystem,
+            context.scene,
+        );
+        if (!onSurfacePlacementsResult.success) {
+            return onSurfacePlacementsResult;
+        }
+
+        const onSurfacePlacements = onSurfacePlacementsResult.value;
+
         const systemEntities: Array<SystemEntity> = [];
-        for (const [id, placement] of inOrbitPlacements) {
+        const entityPlacements = [...inOrbitPlacements.entries(), ...onSurfacePlacements.entries()];
+        for (const [id, placement] of entityPlacements) {
             const partial = entityContents.get(id);
             if (partial === undefined) {
                 return err(new Error(`Could not find content for entity ${id}`));

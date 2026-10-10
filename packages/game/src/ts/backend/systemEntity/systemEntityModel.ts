@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { Orbit, OrbitalObjectId, Rotation } from "@cosmos-journeyer/universe-model";
 
 export type SystemEntityModel<TContent extends SystemContentModel = SystemContentModel> = {
     id: string;
@@ -28,11 +28,31 @@ export type SystemContentModel<T extends string = string> = {
     type: T;
 };
 
-export type SystemEntityPlacementModel = InOrbitPlacementModel;
+export type SystemEntityPlacementModel = InOrbitPlacementModel | OnSurfacePlacementModel;
 
 export type InOrbitPlacementModel = {
     type: "inOrbit";
     mass: number;
     orbit: Orbit;
     rotation: Rotation;
+};
+
+export type OnSurfacePlacementModel = {
+    type: "onSurface";
+    parentId: OrbitalObjectId;
+    position: {
+        longitude: number;
+        latitude: number;
+        heightAboveGround: number;
+    };
+    rotation: OnSurfacePlacementRotation;
+};
+
+export type OnSurfacePlacementRotation = {
+    /** 0 = geographic north, +π/2 = east */
+    heading: number;
+    /** Positive = nose up */
+    pitch: number;
+    /** Rotation around the forward axis */
+    roll: number;
 };

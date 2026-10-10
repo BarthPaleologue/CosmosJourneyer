@@ -77,6 +77,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         starSystemLoader,
         [],
         systemEntityLoader,
+        terrainSystem,
         assets,
         scene,
         progressMonitor,
