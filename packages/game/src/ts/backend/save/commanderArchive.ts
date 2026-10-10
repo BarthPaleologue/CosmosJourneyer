@@ -20,8 +20,6 @@ import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { z } from "zod";
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
 import { jsonSafeParse } from "@/utils/json";
 
 import { safeParseSave } from "./saveFileData";
@@ -72,10 +70,7 @@ export function createCommanderArchiveFileName(cmdrUuid: string, cmdrName: strin
     return `CosmosJourneyer_${safeCmdrName || "Commander"}_${cmdrUuid}.zip`;
 }
 
-export function parseCommanderArchive(
-    archiveData: Uint8Array,
-    universeBackend: UniverseBackend,
-): Result<CommanderArchive, CommanderArchiveError> {
+export function parseCommanderArchive(archiveData: Uint8Array): Result<CommanderArchive, CommanderArchiveError> {
     let entries: Record<string, Uint8Array>;
     try {
         entries = unzipSync(archiveData);
@@ -113,7 +108,7 @@ export function parseCommanderArchive(
         if (saveJson === null) {
             return err("INVALID_SAVE");
         }
-        const saveResult = safeParseSave(saveJson, universeBackend);
+        const saveResult = safeParseSave(saveJson);
         if (
             !saveResult.success ||
             saveResult.value.player.uuid !== manifestResult.data.cmdrUuid ||

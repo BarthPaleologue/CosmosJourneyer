@@ -1076,7 +1076,7 @@ export class CosmosJourneyer {
     public loadTutorial(tutorial: Tutorial): void {
         this.engine.onEndFrameObservable.addOnce(async () => {
             this.mainMenu.hide();
-            const saveResult = tutorial.getSaveData(this.backend.universe);
+            const saveResult = tutorial.getSaveData();
             if (!saveResult.success) {
                 console.error(saveResult.error);
                 await alertModal(

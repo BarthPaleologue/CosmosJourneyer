@@ -4,8 +4,8 @@ import { expect, test } from "vitest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import { safeParseSave } from "../saveFileData";
-import type { SaveV2 } from "./saveV2";
+import { safeParseSave } from "./saveFileData";
+import type { Save } from "./saveFileData";
 
 test("Loading a correct save file", () => {
     const universeBackend = new UniverseBackend(getLoneStarSystem());
@@ -15,7 +15,7 @@ test("Loading a correct save file", () => {
         throw new Error("Fallback station is undefined!");
     }
 
-    const saveFileString: DeepPartial<SaveV2> = {
+    const saveFileString: DeepPartial<Save> = {
         player: {
             name: "Python",
             balance: 10000,
@@ -141,14 +141,14 @@ test("Loading a correct save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = safeParseSave(saveFileString);
     expect(parsedSaveFile.success).toBe(true);
 });
 
 test("Loading a minimal save file", () => {
     const universeBackend = new UniverseBackend(getLoneStarSystem());
     const shipId = crypto.randomUUID();
-    const saveFileString: DeepPartial<SaveV2> = {
+    const saveFileString: DeepPartial<Save> = {
         player: {
             name: "Python",
             balance: 10000,
@@ -185,7 +185,7 @@ test("Loading a minimal save file", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = safeParseSave(saveFileString);
     if (!parsedSaveFile.success) {
         console.log(parsedSaveFile.error);
     }
@@ -260,7 +260,7 @@ test("Loading a save file with legacy numeric mission node types", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFileString, universeBackend);
+    const parsedSaveFile = safeParseSave(saveFileString);
     expect(parsedSaveFile.success).toBe(true);
 });
 
@@ -340,7 +340,7 @@ test("Loading a save file with a corrupted itinerary", () => {
         },
     };
 
-    const parsedSaveFile = safeParseSave(saveFile, new UniverseBackend(getLoneStarSystem()));
+    const parsedSaveFile = safeParseSave(saveFile);
     if (!parsedSaveFile.success) {
         throw new Error(`Failed to parse save file: ${parsedSaveFile.error.type}`);
     }

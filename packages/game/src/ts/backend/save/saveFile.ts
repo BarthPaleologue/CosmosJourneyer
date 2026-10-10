@@ -18,18 +18,13 @@
 import { err } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
-
 import { jsonSafeParse } from "@/utils/json";
 
 import { safeParseSave } from "./saveFileData";
 import type { Save } from "./saveFileData";
 import type { SaveLoadingError } from "./saveLoadingError";
 
-export async function parseSaveFile(
-    rawSaveFile: File,
-    universeBackend: UniverseBackend,
-): Promise<Result<Save, SaveLoadingError>> {
+export async function parseSaveFile(rawSaveFile: File): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (event): void => {
@@ -50,7 +45,7 @@ export async function parseSaveFile(
                 return;
             }
 
-            resolve(safeParseSave(parsedData, universeBackend));
+            resolve(safeParseSave(parsedData));
         };
         reader.readAsText(rawSaveFile);
     });

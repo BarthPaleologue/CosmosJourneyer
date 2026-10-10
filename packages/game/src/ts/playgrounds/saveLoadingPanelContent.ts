@@ -52,7 +52,6 @@ export async function createSaveLoadingPanelContentScene(
     const saveManager = await SaveBackendSingleFile.CreateAsync(
         new SaveLocalStorage(SaveLocalStorage.SAVES_KEY),
         new SaveLocalStorage(SaveLocalStorage.BACKUP_SAVE_KEY),
-        universeBackend,
     );
     if (!saveManager.success) {
         await alertModal("Could not load saves", soundPlayer, t);
