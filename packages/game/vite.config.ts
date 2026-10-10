@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig } from "vite";
-import type { PluginOption } from "vite";
+import type { Plugin } from "vite";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
 
@@ -45,6 +45,7 @@ const getLocalNetworkAddress = (): string | undefined => {
 export default defineConfig(({ mode }) => {
     const isProduction = mode === "production";
     const localNetworkAddress = isProduction ? undefined : getLocalNetworkAddress();
+    const wasmPlugin = wasm() as Plugin;
 
     return {
         base: "./",
@@ -66,11 +67,11 @@ export default defineConfig(({ mode }) => {
                 name: "cosmos-journeyer",
             }),
             glsl(),
-            wasm(),
-        ] as Array<PluginOption>,
+            wasmPlugin,
+        ],
         worker: {
             format: "es",
-            plugins: (): Array<PluginOption> => [wasm()] as Array<PluginOption>,
+            plugins: () => [wasmPlugin],
         },
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],
         build: {
