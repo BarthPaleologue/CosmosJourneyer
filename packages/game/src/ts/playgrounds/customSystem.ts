@@ -19,24 +19,28 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/eclipseTest";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
-import { getChronosSystemModel } from "@/modules/chronos/chronos";
+import { getChronosModel } from "@/modules/chronos/chronos";
+import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
 import { getVestaSystemModel } from "@/modules/vesta/vesta";
 import { Settings } from "@/settings";
 
@@ -51,9 +55,26 @@ export async function createCustomSystemScene(
     const urlParams = new URLSearchParams(window.location.search);
     const systemKey = urlParams.get("system");
 
+    const backendResult = await CosmosJourneyerBackendLocal.New();
+    if (!backendResult.success) {
+        throw backendResult.error;
+    }
+
+    const backend = backendResult.value;
+
+    const systemEntityLoader = new SystemEntityLoader();
+    const systemEntityProcessors = new SystemEntityProcessors();
+
+    const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader, systemEntityProcessors);
+    const moduleSetupResult = setupModules(getBuiltinModules(), gameModuleApi);
+    if (!moduleSetupResult.success) {
+        throw moduleSetupResult.error;
+    }
+
     let systemModel: StarSystemModel;
     if (systemKey === "chronos") {
-        systemModel = getChronosSystemModel();
+        const chronos = getChronosModel();
+        systemModel = chronos.systemModel;
     } else if (systemKey === "vesta") {
         systemModel = getVestaSystemModel();
     } else if (systemKey === "eclipseTest") {
@@ -62,9 +83,14 @@ export async function createCustomSystemScene(
         systemModel = getLoneStarSystem();
     }
 
-    const universeBackend = new UniverseBackend(systemModel);
+    backend.universe.registerAuthoredSystem(systemModel);
+    const systemContentModel = backend.universe.getSystemContentModelAt(systemModel.coordinates);
+    if (systemContentModel === null) {
+        throw new Error("Cannot find the registered custom system");
+    }
+    const entityModels = systemContentModel.entities;
 
-    const player = Player.Default(universeBackend);
+    const player = Player.Default(backend.universe);
 
     const encyclopaediaManager = new EncyclopaediaGalacticaManager();
 
@@ -92,7 +118,9 @@ export async function createCustomSystemScene(
         engine,
         havokPlugin,
         encyclopaediaManager,
-        universeBackend,
+        backend.universe,
+        systemEntityLoader,
+        systemEntityProcessors,
         soundPlayerMock,
         ttsMock,
         notificationManager,
@@ -106,7 +134,10 @@ export async function createCustomSystemScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    const loadResult = await starSystemView.loadStarSystem({ system: systemModel, entities: entityModels });
+    if (!loadResult.success) {
+        throw loadResult.error;
+    }
 
     starSystemView.initStarSystem(0);
 

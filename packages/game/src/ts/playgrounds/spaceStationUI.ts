@@ -19,6 +19,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -56,7 +57,8 @@ export async function createSpaceStationUIScene(
     const tts = new TtsMock();
     const notificationManager = new NotificationManagerMock();
 
-    const systemDatabase = new UniverseBackend(getLoneStarSystem());
+    const systemEntityBackend = new SystemEntityBackend();
+    const systemDatabase = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
 
     const player = Player.Default(systemDatabase);
 

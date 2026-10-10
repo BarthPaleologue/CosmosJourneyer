@@ -26,6 +26,8 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { PostProcessManager } from "@/frontend/postProcesses/postProcessManager";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { getSystemTargets } from "@/frontend/targeting/createTargets";
 import { createDefaultTargetContact } from "@/frontend/targeting/targetContact";
 import { TargetingSystem } from "@/frontend/targeting/targetingSystem";
@@ -68,13 +70,21 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     const terrainSystem = terrainSystemResult.value;
 
     const starSystemLoader = new StarSystemLoader();
-    const starSystemController = await StarSystemController.CreateAsync(
+    const systemEntityLoader = new SystemEntityLoader();
+    const systemEntityProcessors = new SystemEntityProcessors();
+    const starSystemControllerResult = await StarSystemController.CreateAsync(
         getSolSystemModel(),
         starSystemLoader,
+        [],
+        systemEntityLoader,
         assets,
         scene,
         progressMonitor,
     );
+    if (!starSystemControllerResult.success) {
+        throw starSystemControllerResult.error;
+    }
+    const starSystemController = starSystemControllerResult.value;
     starSystemController.initPositions(2, Date.now() / 1000);
 
     const sun = starSystemController.getStellarObjects()[0];
@@ -93,7 +103,10 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const targetingSystem = new TargetingSystem();
     const targetCursorLayer = new TargetCursorLayer(targetingSystem, t);
-    targetingSystem.addContacts(getSystemTargets(starSystemController).map(createDefaultTargetContact));
+    const targets = getSystemTargets(starSystemController, (entity) =>
+        systemEntityProcessors.targeting.dispatch(entity),
+    );
+    targetingSystem.addContacts(targets.map(createDefaultTargetContact));
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
@@ -101,7 +114,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
         terrainSystem.update();
         postProcessManager.update(deltaSeconds);
-        starSystemController.update(deltaSeconds, terrainSystem);
+        starSystemController.update(deltaSeconds, terrainSystem, systemEntityProcessors);
         camera.getViewMatrix();
         targetingSystem.update(camera.globalPosition);
         targetCursorLayer.update(camera, null);

@@ -47,18 +47,18 @@ export function getGoToSystemInstructions(
         });
     } else {
         const nextSystemCoordinates = itinerary[1];
-        const nextSystemModel = universeBackend.getSystemModelFromCoordinates(nextSystemCoordinates);
+        const nextSystemModel = universeBackend.getSystemContentModelAt(nextSystemCoordinates);
         if (nextSystemModel === null) {
             return t("missions:common:corruptedItinerary");
         }
 
         const distanceToNextSystemLy = Vector3.Distance(
-            wrapVector3(universeBackend.getSystemGalacticPosition(nextSystemModel.coordinates)),
+            wrapVector3(universeBackend.getSystemGalacticPosition(nextSystemModel.system.coordinates)),
             currentSystemPosition,
         );
 
         return t("missions:common:travelToNextSystem", {
-            systemName: nextSystemModel.name,
+            systemName: nextSystemModel.system.name,
             distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy), t),
             nbJumps: itinerary.length - 1,
         });

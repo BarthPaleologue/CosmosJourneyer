@@ -21,6 +21,7 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { SaveBackendSingleFile } from "@/backend/save/saveBackendSingleFile";
 import { SaveLocalStorage } from "@/backend/save/saveLocalStorage";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -44,7 +45,8 @@ export async function createSaveLoadingPanelContentScene(
 
     const t = await initI18n();
 
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const systemEntityBackend = new SystemEntityBackend();
+    const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
 
     const soundPlayer = new SoundPlayerMock();
     const notificationManager = new NotificationManagerMock();

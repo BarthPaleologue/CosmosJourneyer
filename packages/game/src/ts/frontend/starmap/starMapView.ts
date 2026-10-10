@@ -126,7 +126,7 @@ export class StarMapView implements View {
             this.starMapUI.setHoveredSystem(null);
         });
         this.starMap.onSystemPicked.add((starSystemCoordinates) => {
-            const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+            const starSystemModel = this.universeBackend.getSystemContentModelAt(starSystemCoordinates);
             if (starSystemModel === null) {
                 throw new Error(
                     `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
@@ -134,7 +134,7 @@ export class StarMapView implements View {
             }
 
             this.soundPlayer.playNow("target_lock");
-            this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
+            this.starMapUI.setSelectedSystem(starSystemModel.system, this.currentSystemCoordinates);
             this.selectedSystemCoordinates = starSystemCoordinates;
             this.focusOnSystem(starSystemCoordinates);
         });
@@ -448,13 +448,13 @@ export class StarMapView implements View {
         }
 
         this.selectedSystemCoordinates = starSystemCoordinates;
-        const starSystemModel = this.universeBackend.getSystemModelFromCoordinates(starSystemCoordinates);
+        const starSystemModel = this.universeBackend.getSystemContentModelAt(starSystemCoordinates);
         if (starSystemModel === null) {
             throw new Error(
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         }
-        this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
+        this.starMapUI.setSelectedSystem(starSystemModel.system, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);
     }
 

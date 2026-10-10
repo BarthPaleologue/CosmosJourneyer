@@ -2,96 +2,67 @@
 
 If you are willing to contribute, this document will give you a good idea of where everything is and how it is organized.
 
-Most gameplay TypeScript modules live under `packages/game/src`. Shared pure physics utilities now live in the workspace package `packages/physics`, shared star-system data models live in `packages/universe-model`, and shared procedural universe model generators live in `packages/universe-generation` (see the root README for an overview).
+## General principles
 
-## General architecture
+Here are the principles the project upholds. From those principles, the architecture arises naturally.
 
-The following diagram is not an inheritance diagram, but a composition diagram. Each arrow represents an "is part of" relationship.
+### Separate data models from presentation
 
-For example, planets are part of the celestial bodies.
+It should be possible to describe the universe free from presentation concerns such as a game engine. This allows us to build multiple representations for the same data. For example a star can be represented as a 3d sphere when close-by, or as a sprite in the star-map. Both representations are built from the same data model.
 
-```mermaid
-graph TD
-    A[CosmosJourneyer<br><sub>Entry point</sub>] --> B[StarMap]
-    A --> C[Main & Pause Menus]
-    A --> EG[Encyclopaedia Galactica<br><sub>Manages player discoveries</sub>]
-    A --> SSDB[UniverseBackend<br><sub>Generates star system data on demand</sub>]
-    A --> D[StarSystemView]
+Data model production belongs to the `backend` part of the project: the part that doesn't know anything about the presentation.
 
-    B --> J[StarMapUI]
-    B --> K[StellarPathfinder]
+On the other hand, 3d objects and other presentations belong to the `frontend` part of the project. The frontend uses the backend to create the data models it needs to create a visual presentation.
 
-    subgraph StarSystemView
+All the frontend code lives inside the `game` package under the `frontend` source folder. The entrypoint for the backend lives inside the `backend` folder from the same package, but its dependencies live in the `universe-model` and `universe-generation` packages which provide the definitions and generators for the procedural universe.
 
-        D --> E[StarSystemController<br><sub>Everything owned by the current star system</sub>]
-        D --> F[PostProcessManager]
-        D --> G[Axis & Orbit Renderers]
-        D --> H[Terrain System<br><sub>Creates the surface of telluric planets</sub>]
+### Isolate systems
 
-        E --> I[StarSystemModel<br><sub>The blueprint used to instantiate<br>the current star system</sub>]
+Systems should be auditable in isolation for cognitive load and testability purposes. This means outlawing mutable global state and avoiding the use of concrete types in favor of narrow interfaces tailored for the system.
 
-    end
+For example `KeplerianOrbitalSimulation` only knows about a small orbital interface. That way you don't need to know anything about the rest of the code to improve the orbital simulation.
 
-    %% Styling for annotation text
-    classDef subtext font-size:10px, fill:#f9f, stroke-width:0px;
+## Wiring
 
-```
+The game's entry point is `CosmosJourneyer`. It owns the following:
 
-The entry point is `CosmosJourneyer`, which manages startup and the 3D context. It is also responsible for changing the view between the star system and the star map depending on the user's inputs. It is also responsible to control the pause and main menu.
+- An `ICosmosJourneyerBackend` responsible for producing data models.
+- The Babylon 3d engine instance, responsible for using the GPU.
+- The player's current state.
+- A `StarSystemView` responsible for gameplay and rendering inside a star system.
+- A `StarMapView` responsible for rendering the star map.
+- `GameModule` setup, responsible for adding new content.
+- Transitions between `StarMapView` and `StarSystemView`.
 
-The star map is responsible for displaying the position of the player in the galaxy and the nearby stars. It holds a UI that displays system data based on the star map selection. The star map can be used to plot itineraries accross the stars.
+The `StarMapView` owns:
 
-On the other hand, the star system view is responsible for displaying, loading and unloading star systems. The current star system is stored and managed inside the `StarSystemController` that is responsible from applying orbital mechanics.
+- A Babylon scene for its rendering.
+- A `StellarPathfinder` powered by the `UniverseBackend` responsible for finding the shortest path between 2 star systems.
+- A `StarMap`, responsible for the production of visual representations of nearby stars.
+- A `StarMapUI` responsible for displaying human-readable information about the star-map.
 
-The `StarSystemView` also holds the player's `ShipControls` that are used to control the spaceship.
+The `StarSystemView` owns:
 
-The `UniverseBackend` is responsible for serving `StarSystemModel` data on demand. The default game backend delegates procedural model creation to `packages/universe-generation`, but the backend boundary does not require procedural generation. These immutable data objects contain all the necessary information necessary to populate a `StarSystemController`.
+- A Babylon scene for its rendering.
+- A `StarSystemController` responsible for the current star system.
+- A `PostProcessManager` responsible for the rendering pipeline.
+- A `TerrainSystem` responsible for producing terrain vertex data.
+- An `Encyclopaedia Galactica` responsible for recording player discoveries
+- An `AxisRenderer` and `OrbitRenderer` for debug purposes.
+- The loading/unloading of star systems.
+- All player controls.
 
-The `StarSystemModel` contains collections of `OrbitalObjectModel` that are in turn used to generate actual `OrbitalObject`. This decoupling of information and concrete 3d object is important to work on data of objects not shown on the screen (like for generating missions).
+The `StarSystemController` owns:
 
-For each kind of `OrbitalObject` corresponds a kind of `OrbitalObjectModel`.
+- All current 3d objects with the same lifetime as the current system.
+- A `KeplerianOrbitalSimulation` responsible for providing orbital positions and orientations.
 
-The different kinds are explained in the next section.
+## Extensibility
 
-## Orbital Object's interfaces relations
+The game can be extended using modules loaded by `CosmosJourneyer` at startup.
 
-Cosmos Journeyer avoids class inheritance in favor of interface inheritance to compose behaviors and properties.
+`GameModule` instances receive a `GameModuleApi` during their setup. This API is their only way to interact with the game. It provides hooks/extension points onto which they can register new content and capabilities
 
-```mermaid
+Following the separation between data models and presentation, modules are expected to provide data models for the new content, and instructions on how to create presentations for these data models.
 
-classDiagram
-    OrbitalObject
-    TelluricPlanet <|-- Planet
-    GasPlanet <|-- Planet
-    Star <|-- StellarObject
-    BlackHole <|-- StellarObject
-    NeutronStar <|-- StellarObject
-    Anomaly <|-- CelestialBody
-    Planet <|-- CelestialBody
-    StellarObject <|-- CelestialBody
-    SpaceStation <|-- OrbitalFacility
-    SpaceElevator <|-- OrbitalFacility
-
-    CelestialBody <|-- OrbitalObject
-    OrbitalFacility <|-- OrbitalObject
-
-    OrbitalObject <|-- BoundingSphere
-    OrbitalObject <|-- Transformable
-
-```
-
-It all starts with simple `Transformable` and `BoundingSphere`:
-those are simple objects that possess a BaylonJS `TransformNode` for their position, rotation, scaling and a bounding volume to make simple calculations for distances.
-
-An `OrbitalObject` builds on top of this by adding the notion of orbit and mass to enable orbital mechanics. As OrbitalObject is a mere interface, their movement in space is not directly implemented. Instead, look for `OrbitalObjectUtils` which contains functions to move `OrbitalObject` through space.
-
-`CelestialBody` builds up on top of `OrbitalObject` by adding the notion of `radius`.
-
-`CelestialBody` are spherical orbital objects that encompasses both planets, stellar objects and the space anomalies
-
-`StellarObject` builds on top of `CelestialBody` by adding a light source and a temperature to control the color of the light source.
-
-`Planet` builds on top of `CelestialBody` by adding atmospheres.
-
-The other nodes are the concrete implementations of all these abstractions.
-They can be found in their respective folders under `packages/game/src/ts/frontend` (`planets` for `TelluricPlanet` and `GasPlanet`, `stellarObjects` for `Star`, `BlackHole` and `NeutronStar`, and `spaceStations` for `SpaceStation`).
+For example, a module may register a system entity model inside a star system. This means a module must register a factory to turn this data model into an object that can be placed inside the 3d scene.

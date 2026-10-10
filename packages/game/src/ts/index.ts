@@ -17,7 +17,6 @@
 
 import "@styles/index.css";
 
-import { safeParseSave } from "@/backend/save/saveFileData";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
@@ -29,6 +28,7 @@ import { jsonSafeParse } from "@/utils/json";
 
 import { initI18n } from "@/i18n";
 
+import { safeParseSave } from "./backend/save/saveFileData";
 import { ConsoleDumper } from "./utils/consoleDumper";
 import { CrashReporter } from "./utils/crashReporter";
 

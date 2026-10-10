@@ -20,7 +20,6 @@ import type { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/bla
 import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import type { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import type { DarkKnight } from "../darkKnight";
 import type { EmptyCelestialBody } from "../emptyCelestialBody";
 import type { SpaceElevator } from "../orbitalFacility/spaceElevator";
 import type { SpaceStation } from "../orbitalFacility/spaceStation";
@@ -36,8 +35,7 @@ export type Anomaly =
     | EmptyCelestialBody<"mandelbulb">
     | EmptyCelestialBody<"juliaSet">
     | EmptyCelestialBody<"sierpinskiPyramid">
-    | EmptyCelestialBody<"mandelbox">
-    | DarkKnight;
+    | EmptyCelestialBody<"mandelbox">;
 
 export type OrbitalFacility = SpaceStation | SpaceElevator;
 

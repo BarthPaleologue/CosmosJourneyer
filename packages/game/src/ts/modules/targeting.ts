@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { GameModule } from "../gameModule";
-import { getChronosModel } from "./chronos";
+import type { AnySystemContentType, SystemEntity } from "@/frontend/systemEntity/systemEntity";
+import type { Target } from "@/frontend/targeting/target";
 
-export const ChronosModule: GameModule = {
-    id: "chronos",
-    setup: ({ starSystems, systemEntities }) => {
-        const { systemModel, systemEntityModels } = getChronosModel();
-        starSystems.registerAuthored(systemModel);
-        systemEntities.registerAuthored(systemModel.coordinates, systemEntityModels);
-    },
+export type TargetingExtensionPoint = {
+    systemEntities: {
+        register<T extends AnySystemContentType>(
+            type: T,
+            createTargets: (entity: SystemEntity<T>) => Array<Target>,
+        ): void;
+    };
 };

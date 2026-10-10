@@ -334,9 +334,9 @@ export class SaveLoadingPanelContent {
             return saveDiv;
         }
         const isLanded = locationToUse.type === "atStation";
-        const nearestObject = universeBackend.getObjectModelByUniverseId(locationToUse.universeObjectId);
+        const nearestObject = universeBackend.getObjectModel(locationToUse.universeObjectId);
         saveLocation.innerText = this.t(isLanded ? "sidePanel:landedAt" : "sidePanel:near", {
-            location: nearestObject?.name ?? this.t("sidePanel:locationNotFound"),
+            location: nearestObject?.object.name ?? this.t("sidePanel:locationNotFound"),
             interpolation: {
                 escapeValue: false,
             },

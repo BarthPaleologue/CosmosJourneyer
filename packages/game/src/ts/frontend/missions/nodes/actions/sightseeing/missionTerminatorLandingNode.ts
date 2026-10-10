@@ -152,14 +152,14 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
-        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
-        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModel(this.objectId);
+        const systemModel = universeBackend.getSystemContentModelAt(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: object or system model is null";
         }
         return t("missions:sightseeing:describeTerminatorLanding", {
-            objectName: objectModel.name,
-            systemName: systemModel.name,
+            objectName: objectModel.object.name,
+            systemName: systemModel.system.name,
             distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
@@ -174,7 +174,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
             return t("missions:terminatorLanding:missionCompleted");
         }
 
-        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModel(this.objectId);
         if (targetObject === null) {
             return "ERROR: target object is null";
         }
@@ -190,7 +190,7 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
                 );
             case LandMissionState.TOO_FAR_IN_SYSTEM:
                 return t("missions:terminatorLanding:getCloserToTerminator", {
-                    objectName: targetObject.name,
+                    objectName: targetObject.object.name,
                 });
             case LandMissionState.LANDED:
                 return t("missions:terminatorLanding:missionCompleted");

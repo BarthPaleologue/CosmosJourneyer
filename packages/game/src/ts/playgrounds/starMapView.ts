@@ -20,6 +20,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { StarSystemCoordinatesSchema } from "@cosmos-journeyer/universe-model";
 
 import { EncyclopaediaGalacticaLocal } from "@/backend/encyclopaedia/encyclopaediaGalacticaLocal";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -40,7 +41,8 @@ export async function createStarMapViewScene(
 ): Promise<Scene> {
     const t = await initI18n();
 
-    const universeBackend = new UniverseBackend(getLoneStarSystem());
+    const systemEntityBackend = new SystemEntityBackend();
+    const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
 
     const player = Player.Default(universeBackend);
 

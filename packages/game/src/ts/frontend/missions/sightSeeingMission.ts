@@ -84,11 +84,15 @@ export function newSightSeeingMission(
     const targetGalacticCoordinates = wrapVector3(universeBackend.getSystemGalacticPosition(targetSystemCoordinates));
     const distanceLY = Vector3.Distance(missionGiverGalacticCoordinates, targetGalacticCoordinates);
 
-    const targetModel = universeBackend.getObjectModelByUniverseId(target.objectId);
+    const targetModel = universeBackend.getObjectModel(target.objectId);
 
     // reward far away targets more
     let reward = Math.max(5_000, 1000 * Math.ceil(distanceLY));
-    if (targetModel?.type === "neutronStar" || targetModel?.type === "blackHole") {
+    if (
+        targetModel !== null &&
+        targetModel.type === "orbitalObject" &&
+        (targetModel.object.type === "neutronStar" || targetModel.object.type === "blackHole")
+    ) {
         // reward for stellar objects is higher to nudge the player towards them
         reward *= 1.5;
     }

@@ -90,6 +90,7 @@ export default defineConfig(({ mode }) => {
         },
         test: {
             environment: "jsdom",
+            typecheck: { enabled: true },
             include: ["**/*.{test,spec}.ts"],
             exclude: ["node_modules", "dist", ".git", "tests/e2e/**"],
         },

@@ -19,6 +19,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alphaTestis";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -29,6 +30,8 @@ import { TtsMock } from "@/frontend/audio/tts";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
 import { StarSystemView } from "@/frontend/starSystemView";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
@@ -44,7 +47,11 @@ export async function createStarSystemViewScene(
 ): Promise<Scene> {
     const t = await initI18n();
 
-    const universeBackend = new UniverseBackend(getAlphaTestisSystemModel());
+    const systemEntityBackend = new SystemEntityBackend();
+    const universeBackend = new UniverseBackend(systemEntityBackend, getAlphaTestisSystemModel());
+
+    const systemEntityLoader = new SystemEntityLoader();
+    const systemEntityProcessors = new SystemEntityProcessors();
 
     const player = Player.Default(universeBackend);
 
@@ -75,6 +82,8 @@ export async function createStarSystemViewScene(
         havokPlugin,
         encyclopaediaManager,
         universeBackend,
+        systemEntityLoader,
+        systemEntityProcessors,
         soundPlayerMock,
         ttsMock,
         notificationManager,
@@ -88,7 +97,10 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    await starSystemView.loadStarSystem(universeBackend.fallbackSystem);
+    const loadResult = await starSystemView.loadStarSystem({ system: universeBackend.fallbackSystem, entities: [] });
+    if (!loadResult.success) {
+        throw loadResult.error;
+    }
 
     starSystemView.initStarSystem(0);
 

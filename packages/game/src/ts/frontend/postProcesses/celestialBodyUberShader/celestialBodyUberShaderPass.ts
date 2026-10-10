@@ -26,7 +26,7 @@ import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { AnomalyModel, DarkKnightModel } from "@cosmos-journeyer/universe-model";
+import type { AnomalyModel } from "@cosmos-journeyer/universe-model";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import type { AtmosphereUniforms } from "@/frontend/postProcesses/atmosphere/atmosphereUniforms";
@@ -71,7 +71,7 @@ const MatterJetsUniformNames = {
     DIPOLE_TILT: "dipole_tilt",
 } as const;
 
-type RaymarchedBodyModel = Exclude<AnomalyModel, DarkKnightModel>;
+type RaymarchedBodyModel = AnomalyModel;
 
 export type CelestialBodyUberShaderFeatures = {
     readonly raymarchedBody: DeepReadonly<RaymarchedBodyModel> | null;

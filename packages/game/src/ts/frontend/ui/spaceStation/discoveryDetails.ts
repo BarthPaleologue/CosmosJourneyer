@@ -131,9 +131,7 @@ export class DiscoveryDetails {
             return;
         }
 
-        const systemModel = universeBackend.getSystemModelFromCoordinates(
-            this.currentDiscovery.objectId.systemCoordinates,
-        );
+        const systemModel = universeBackend.getSystemContentModelAt(this.currentDiscovery.objectId.systemCoordinates);
 
         if (systemModel === null) {
             console.error(discovery);
@@ -145,12 +143,12 @@ export class DiscoveryDetails {
             return;
         }
 
-        const objectModel = getObjectModelById(this.currentDiscovery.objectId.idInSystem, systemModel);
+        const objectModel = universeBackend.getObjectModel(this.currentDiscovery.objectId);
 
-        this.objectName.innerText = objectModel?.name ?? this.t("common:unknown");
+        this.objectName.innerText = objectModel?.object.name ?? this.t("common:unknown");
         this.htmlRoot.appendChild(this.objectName);
 
-        if (objectModel === null) {
+        if (objectModel === null || objectModel.type === "systemEntity") {
             console.error(discovery);
             await alertModal(
                 "Object could not be found for the discovery. More information in the console.",
@@ -161,27 +159,27 @@ export class DiscoveryDetails {
         }
 
         this.objectType.innerText = this.t("orbitalObject:type", {
-            value: getOrbitalObjectTypeToI18nString(objectModel, this.t),
+            value: getOrbitalObjectTypeToI18nString(objectModel.object, this.t),
         });
         this.htmlRoot.appendChild(this.objectType);
 
         this.siderealDayDuration.innerText = this.t("orbitalObject:siderealDayDuration", {
-            value: parseSecondsPrecise(objectModel.rotation.siderealPeriod, this.t),
+            value: parseSecondsPrecise(objectModel.object.rotation.siderealPeriod, this.t),
         });
         this.htmlRoot.appendChild(this.siderealDayDuration);
 
-        const parentIds = objectModel.orbit.parentIds;
-        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel));
+        const parentIds = objectModel.object.orbit.parentIds;
+        const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel.system));
         const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
 
-        const orbitalPeriod = getOrbitalPeriod(objectModel.orbit.semiMajorAxis, parentMass);
+        const orbitalPeriod = getOrbitalPeriod(objectModel.object.orbit.semiMajorAxis, parentMass);
         this.orbitDuration.innerText = this.t("orbit:period", {
             value: parseSecondsPrecise(orbitalPeriod, this.t),
         });
         this.htmlRoot.appendChild(this.orbitDuration);
 
         this.orbitRadius.innerText = this.t("orbit:radius", {
-            value: parseDistance(objectModel.orbit.semiMajorAxis, this.t),
+            value: parseDistance(objectModel.object.orbit.semiMajorAxis, this.t),
         });
         this.htmlRoot.appendChild(this.orbitRadius);
 

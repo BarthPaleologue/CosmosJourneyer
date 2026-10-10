@@ -17,11 +17,11 @@
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { OrbitalFacilityModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
+import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import type { Player } from "@/frontend/player/player";
@@ -34,13 +34,13 @@ import { newSightSeeingMission } from "./sightSeeingMission";
 /**
  * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
  * @param spaceStationModel The space station model where the missions are generated
- * @param starSystemModel
+ * @param systemContentModel
  * @param player The player for which the missions are generated
  * @param timestampMillis The current timestamp in milliseconds
  */
 export function generateSightseeingMissions(
     spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
-    starSystemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     universeBackend: UniverseBackend,
     player: Player,
     timestampMillis: number,
@@ -52,13 +52,17 @@ export function generateSightseeingMissions(
     const rng = getRngFromSeed(spaceStationModel.seed + currentHour);
 
     const spaceStationUniverseId: UniverseObjectId = {
-        systemCoordinates: starSystemModel.coordinates,
+        systemCoordinates: systemContentModel.system.coordinates,
         idInSystem: spaceStationModel.id,
     };
 
-    const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, universeBackend);
+    const neighborSystems = getNeighborStarSystemCoordinates(
+        systemContentModel.system.coordinates,
+        75,
+        universeBackend,
+    );
     neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {
-        const neighborSystemModel = universeBackend.getSystemModelFromCoordinates(systemCoordinates);
+        const neighborSystemModel = universeBackend.getSystemContentModelAt(systemCoordinates);
         if (neighborSystemModel === null) {
             return;
         }
@@ -75,10 +79,12 @@ export function generateSightseeingMissions(
         );
     });
 
-    missions.push(...generateAsteroidFieldMissionsInSystem(starSystemModel, spaceStationUniverseId, universeBackend));
+    missions.push(
+        ...generateAsteroidFieldMissionsInSystem(systemContentModel, spaceStationUniverseId, universeBackend),
+    );
 
     missions.push(
-        ...generateTerminatorLandingMissionsInSystem(starSystemModel, spaceStationUniverseId, universeBackend),
+        ...generateTerminatorLandingMissionsInSystem(systemContentModel, spaceStationUniverseId, universeBackend),
     );
 
     // filter missions to avoid duplicates with already accepted missions of the player
@@ -90,7 +96,7 @@ export function generateSightseeingMissions(
 }
 
 function generateSightseeingMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
@@ -118,7 +124,7 @@ function generateSightseeingMissionsInSystem(
 }
 
 function generateAnomalyFlyByMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
     spaceStationUniverseId: UniverseObjectId,
     distance: number,
@@ -126,12 +132,8 @@ function generateAnomalyFlyByMissionsInSystem(
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
-    for (const [anomalyIndex, anomaly] of systemModel.anomalies.entries()) {
+    for (const [anomalyIndex, anomaly] of systemContentModel.system.anomalies.entries()) {
         if (!uniformRandBool(1.0 / (1.0 + 1.5 * distance), rng, 38 + anomalyIndex + systemPosition.length())) {
-            continue;
-        }
-
-        if (anomaly.type === "darkKnight") {
             continue;
         }
 
@@ -140,7 +142,7 @@ function generateAnomalyFlyByMissionsInSystem(
             {
                 type: MissionType.SIGHT_SEEING_FLY_BY,
                 objectId: {
-                    systemCoordinates: systemModel.coordinates,
+                    systemCoordinates: systemContentModel.system.coordinates,
                     idInSystem: anomaly.id,
                 },
             },
@@ -158,20 +160,20 @@ function generateAnomalyFlyByMissionsInSystem(
 }
 
 function generateNeutronStarFlyByMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    const neutronStars = systemModel.stellarObjects.filter((model) => model.type === "neutronStar");
+    const neutronStars = systemContentModel.system.stellarObjects.filter((model) => model.type === "neutronStar");
     for (const neutronStar of neutronStars) {
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
             {
                 type: MissionType.SIGHT_SEEING_FLY_BY,
                 objectId: {
-                    systemCoordinates: systemModel.coordinates,
+                    systemCoordinates: systemContentModel.system.coordinates,
                     idInSystem: neutronStar.id,
                 },
             },
@@ -188,20 +190,20 @@ function generateNeutronStarFlyByMissionsInSystem(
 }
 
 function generateBlackHoleFlyByMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    const blackHoles = systemModel.stellarObjects.filter((model) => model.type === "blackHole");
+    const blackHoles = systemContentModel.system.stellarObjects.filter((model) => model.type === "blackHole");
     for (const blackHole of blackHoles) {
         const mission = newSightSeeingMission(
             spaceStationUniverseId,
             {
                 type: MissionType.SIGHT_SEEING_FLY_BY,
                 objectId: {
-                    systemCoordinates: systemModel.coordinates,
+                    systemCoordinates: systemContentModel.system.coordinates,
                     idInSystem: blackHole.id,
                 },
             },
@@ -218,13 +220,13 @@ function generateBlackHoleFlyByMissionsInSystem(
 }
 
 function generateAsteroidFieldMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    for (const planet of systemModel.planets) {
+    for (const planet of systemContentModel.system.planets) {
         if (planet.rings === null) {
             continue;
         }
@@ -234,7 +236,7 @@ function generateAsteroidFieldMissionsInSystem(
             {
                 type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
                 objectId: {
-                    systemCoordinates: systemModel.coordinates,
+                    systemCoordinates: systemContentModel.system.coordinates,
                     idInSystem: planet.id,
                 },
             },
@@ -251,13 +253,13 @@ function generateAsteroidFieldMissionsInSystem(
 }
 
 function generateTerminatorLandingMissionsInSystem(
-    systemModel: DeepReadonly<StarSystemModel>,
+    systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
     const missions: Array<Mission> = [];
 
-    for (const planet of systemModel.planets) {
+    for (const planet of systemContentModel.system.planets) {
         if (planet.type !== "telluricPlanet") {
             continue;
         }
@@ -271,7 +273,7 @@ function generateTerminatorLandingMissionsInSystem(
             {
                 type: MissionType.SIGHT_SEEING_TERMINATOR_LANDING,
                 objectId: {
-                    systemCoordinates: systemModel.coordinates,
+                    systemCoordinates: systemContentModel.system.coordinates,
                     idInSystem: planet.id,
                 },
             },

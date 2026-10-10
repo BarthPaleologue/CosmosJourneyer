@@ -15,8 +15,10 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it } from "vitest";
+
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 
 import { getLoneStarSystem } from "./customSystems/loneStar";
 import { getSolSystemModel } from "./customSystems/sol/sol";
@@ -26,10 +28,10 @@ describe("UniverseBackend", () => {
     let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new UniverseBackend(getLoneStarSystem());
+        universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
     });
 
-    describe("registerAuthoredSystem", () => {
+    describe("registerCustomSystem", () => {
         it("should add a custom system that can be retrieved", () => {
             const customSystem = getSolSystemModel();
             universeBackend.registerAuthoredSystem(customSystem);
@@ -40,21 +42,6 @@ describe("UniverseBackend", () => {
                 customSystem.coordinates.starSectorZ,
             );
             expect(retrievedSystems).toContain(customSystem);
-        });
-    });
-
-    describe("registerSinglePlugin", () => {
-        it("should modify a system at specific coordinates", () => {
-            const coordinates: StarSystemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
-            const plugin = (system: StarSystemModel): StarSystemModel => {
-                system.name = "Modified System";
-                return system;
-            };
-
-            universeBackend.registerSinglePlugin(coordinates, plugin);
-            const model = universeBackend.getSystemModelFromCoordinates(coordinates);
-            expect(model).not.toBeNull();
-            expect(model?.name).toBe("Modified System");
         });
     });
 

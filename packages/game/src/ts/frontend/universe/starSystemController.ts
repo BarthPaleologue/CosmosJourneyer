@@ -21,9 +21,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
-import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, NonEmptyArray, Result } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -36,6 +38,9 @@ import { Settings } from "@/settings";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { toKeplerian } from "../helpers/orbitalObject";
 import { StellarLightSystem } from "../helpers/stellarLightSystem";
+import type { SystemEntity } from "../systemEntity/systemEntity";
+import type { SystemEntityLoadContext, SystemEntityLoader } from "../systemEntity/systemEntityLoader";
+import type { SystemEntityProcessors, SystemEntityUpdateContext } from "../systemEntity/systemEntityProcessors";
 import type {
     Anomaly,
     CelestialBody,
@@ -74,15 +79,17 @@ export class StarSystemController {
 
     private readonly stellarObjects: Readonly<NonEmptyArray<StellarObject>>;
 
-    private readonly planets: ReadonlyArray<Planet> = [];
+    private readonly planets: ReadonlyArray<Planet>;
 
-    private readonly satellites: ReadonlyArray<TelluricPlanet> = [];
+    private readonly satellites: ReadonlyArray<TelluricPlanet>;
 
-    private readonly anomalies: ReadonlyArray<Anomaly> = [];
+    private readonly anomalies: ReadonlyArray<Anomaly>;
 
-    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility> = [];
+    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility>;
 
     private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
+
+    private readonly systemEntities: ReadonlyArray<SystemEntity>;
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
 
@@ -112,6 +119,7 @@ export class StarSystemController {
     private constructor(
         model: DeepReadonly<StarSystemModel>,
         orbitalObjects: Readonly<StarSystemLoaderOutput>,
+        systemEntities: ReadonlyArray<SystemEntity>,
         orbitalSimulation: KeplerianOrbitalSimulation,
         assets: RenderingAssets,
         scene: Scene,
@@ -127,6 +135,8 @@ export class StarSystemController {
         this.satellites = orbitalObjects.satellites;
         this.anomalies = orbitalObjects.anomalies;
         this.orbitalFacilities = orbitalObjects.orbitalFacilities;
+
+        this.systemEntities = systemEntities;
 
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
@@ -164,10 +174,12 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
+        entityModels: Iterable<DeepReadonly<SystemEntityModel>>,
+        entityLoader: SystemEntityLoader,
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
-    ): Promise<StarSystemController> {
+    ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
         const orbitalObjects = [
             ...result.stellarObjects,
@@ -180,7 +192,18 @@ export class StarSystemController {
         const orbitalSimulation = new KeplerianOrbitalSimulation([]);
         orbitalSimulation.addObjects(orbitalObjects.map(toKeplerian));
 
-        return new StarSystemController(model, result, orbitalSimulation, assets, scene);
+        const entityLoaderContext: SystemEntityLoadContext = {
+            scene,
+            orbitalSimulation,
+        };
+        const systemEntitiesResult = entityLoader.load(entityModels, entityLoaderContext);
+        if (!systemEntitiesResult.success) {
+            return systemEntitiesResult;
+        }
+
+        return ok(
+            new StarSystemController(model, result, systemEntitiesResult.value, orbitalSimulation, assets, scene),
+        );
     }
 
     public getMostInfluentialObject(position: Vector3): OrbitalObject {
@@ -277,6 +300,10 @@ export class StarSystemController {
      */
     public getAnomalies(): ReadonlyArray<Anomaly> {
         return this.anomalies;
+    }
+
+    public getSystemEntities(): ReadonlyArray<SystemEntity> {
+        return this.systemEntities;
     }
 
     /**
@@ -384,7 +411,11 @@ export class StarSystemController {
      * @param deltaSeconds The time elapsed since the last update
      * @param terrainSystem The system used to update the LOD of the telluric planets
      */
-    public update(deltaSeconds: number, terrainSystem: ITerrainSystem): void {
+    public update(
+        deltaSeconds: number,
+        terrainSystem: ITerrainSystem,
+        systemEntityProcessors: SystemEntityProcessors,
+    ): void {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             console.warn("No camera!");
@@ -409,6 +440,12 @@ export class StarSystemController {
             orbitalFacility.update(parents, cameraPosition, deltaSeconds);
             orbitalFacility.computeCulling(camera);
         }
+
+        const entityContext: SystemEntityUpdateContext = {
+            observerPosition: cameraPosition,
+            deltaSeconds,
+        };
+        systemEntityProcessors.updateEntities(this.getSystemEntities(), entityContext);
 
         // Update planet LOD and culling
         for (const object of this.getPlanetaryMassObjects()) {
@@ -470,11 +507,11 @@ export class StarSystemController {
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
 
-        const systemModel = universeBackend.getSystemModelFromCoordinates(targetCoordinates);
-        if (systemModel === null) {
+        const systemContentModel = universeBackend.getSystemContentModelAt(targetCoordinates);
+        if (systemContentModel === null) {
             return null;
         }
-        const placeholderTransform = new SystemTarget(systemModel, direction.scale(distance), this.scene);
+        const placeholderTransform = new SystemTarget(systemContentModel.system, direction.scale(distance), this.scene);
         placeholderTransform.updatePosition(this.referencePlaneRotation, this.referenceAnchorPosition);
 
         this.systemTargets.push(placeholderTransform);
@@ -504,6 +541,11 @@ export class StarSystemController {
         this.stellarLightSystem.dispose();
 
         const pools = this.assets.textures.pools;
+
+        for (const systemEntity of this.systemEntities) {
+            systemEntity.content.dispose();
+            systemEntity.placement.getTransform().dispose();
+        }
 
         this.orbitalFacilities.forEach((facility) => {
             facility.dispose();

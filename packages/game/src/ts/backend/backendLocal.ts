@@ -17,9 +17,6 @@
 
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
-import { generateDarkKnightModel } from "@cosmos-journeyer/universe-generation";
-
-import { hashArray } from "@/utils/hash";
 
 import type { ICosmosJourneyerBackend } from ".";
 import { EncyclopaediaGalacticaLocal } from "./encyclopaedia/encyclopaediaGalacticaLocal";
@@ -29,6 +26,7 @@ import type { ISaveBackend } from "./save/saveBackend";
 import { SaveBackendMultiFile } from "./save/saveBackendMultiFile";
 import { SaveBackendSingleFile } from "./save/saveBackendSingleFile";
 import { SaveLocalStorage } from "./save/saveLocalStorage";
+import { SystemEntityBackend } from "./systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "./universe/customSystems/loneStar";
 import { UniverseBackend } from "./universe/universeBackend";
 
@@ -44,33 +42,8 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
     }
 
     static async New(): Promise<Result<CosmosJourneyerBackendLocal, Error>> {
-        const universeBackend = new UniverseBackend(getLoneStarSystem());
-
-        universeBackend.registerGeneralPlugin(
-            (system) => {
-                if (system.anomalies.some((anomaly) => anomaly.type === "darkKnight")) {
-                    return false;
-                }
-
-                return (
-                    hashArray([
-                        system.coordinates.starSectorX,
-                        system.coordinates.starSectorY,
-                        system.coordinates.starSectorZ,
-                        system.coordinates.localX,
-                        system.coordinates.localY,
-                        system.coordinates.localZ,
-                    ]) > 0.05
-                );
-            },
-            (system) => {
-                const stellarIds = system.stellarObjects.map((stellarObject) => stellarObject.id);
-                return {
-                    ...system,
-                    anomalies: [...system.anomalies, generateDarkKnightModel(stellarIds)],
-                };
-            },
-        );
+        const systemEntityBackend = new SystemEntityBackend();
+        const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
 
         const encyclopaedia = new EncyclopaediaGalacticaManager();
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(universeBackend));

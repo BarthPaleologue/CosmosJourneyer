@@ -16,18 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { degreesToRadians, getShadowRadius, solarMassToKg } from "@cosmos-journeyer/physics";
-import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
     StarSystemModel,
     BlackHoleModel,
-    DarkKnightModel,
     SpaceStationModel,
     StarSystemCoordinates,
 } from "@cosmos-journeyer/universe-model";
 
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+
 import { CropType } from "@/utils/agriculture";
 
-export function getChronosSystemModel(): StarSystemModel {
+import type { DarkKnightModel } from "../darkKnight/darkKnightModel";
+
+export function getChronosModel(): { systemModel: StarSystemModel; systemEntityModels: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
         starSectorX: 0,
         starSectorY: 2,
@@ -59,29 +61,6 @@ export function getChronosSystemModel(): StarSystemModel {
         accretionDiskRadius: chronosShadowRadius * 4,
         rotation: {
             siderealPeriod: 1e-3,
-            axialTilt: 0,
-            spinAxisAzimuth: 0,
-            initialRotationAngle: 0,
-        },
-    };
-
-    const ananke: DarkKnightModel = {
-        type: "darkKnight",
-        id: "ananke",
-        name: "Ananke",
-        orbit: {
-            parentIds: ["chronos"],
-            semiMajorAxis: chronos.accretionDiskRadius * 2,
-            eccentricity: 0,
-            inclination: degreesToRadians(70),
-            longitudeOfAscendingNode: 0,
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: 0,
-            p: 2,
-        },
-        mass: 1000e3,
-        rotation: {
-            siderealPeriod: 0,
             axialTilt: 0,
             spinAxisAzimuth: 0,
             initialRotationAngle: 0,
@@ -129,13 +108,41 @@ export function getChronosSystemModel(): StarSystemModel {
         starSystemCoordinates: coordinates,
     };
 
+    const ananke: SystemEntityModel<DarkKnightModel> = {
+        id: "ananke",
+        name: "Ananke",
+        content: {
+            type: "darkKnight",
+        },
+        placement: {
+            type: "inOrbit",
+            mass: 1000e3,
+            orbit: {
+                parentIds: ["chronos"],
+                semiMajorAxis: chronos.accretionDiskRadius * 2,
+                eccentricity: 0,
+                inclination: degreesToRadians(70),
+                longitudeOfAscendingNode: 0,
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: 0,
+                p: 2,
+            },
+            rotation: {
+                siderealPeriod: 0,
+                axialTilt: 0,
+                spinAxisAzimuth: 0,
+                initialRotationAngle: 0,
+            },
+        },
+    };
+
     const anankeOutpost: SpaceStationModel = {
         type: "spaceStation",
         id: "anankeOutpost",
         name: "Ananke Outpost",
         orbit: {
             parentIds: ["ananke"],
-            semiMajorAxis: getCelestialBodyRadius(ananke) * 1.5,
+            semiMajorAxis: 150e3,
             eccentricity: 0,
             inclination: 0,
             longitudeOfAscendingNode: 0,
@@ -245,12 +252,15 @@ export function getChronosSystemModel(): StarSystemModel {
     };
 
     return {
-        name: "Chronos",
-        coordinates,
-        stellarObjects: [chronos],
-        planets: [],
-        satellites: [],
-        anomalies: [ananke],
-        orbitalFacilities: [chronosResearchLab, anankeOutpost, bigDream, zurvanInstance],
+        systemModel: {
+            name: "Chronos",
+            coordinates,
+            stellarObjects: [chronos],
+            planets: [],
+            satellites: [],
+            anomalies: [],
+            orbitalFacilities: [chronosResearchLab, anankeOutpost, bigDream, zurvanInstance],
+        },
+        systemEntityModels: [ananke],
     };
 }

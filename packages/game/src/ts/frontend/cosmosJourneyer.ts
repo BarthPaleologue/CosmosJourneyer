@@ -51,6 +51,7 @@ import { loadAssets } from "@/frontend/assets/assets";
 import type { Assets } from "@/frontend/assets/assets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import { MusicSystem } from "@/frontend/audio/musicSystem";
+import type { SystemEntityMusicContext } from "@/frontend/audio/musicSystem";
 import { SoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
@@ -84,6 +85,9 @@ import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import { createGameModuleApi } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
+import type { SystemEntity } from "./systemEntity/systemEntity";
+import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 import { NotificationManager } from "./ui/notificationManager";
 import type { INotificationManager } from "./ui/notificationManager";
 import { FlightTutorial } from "./ui/tutorial/tutorials/flightTutorial";
@@ -163,6 +167,7 @@ export class CosmosJourneyer {
         starSystemView: StarSystemView,
         starMapView: StarMapView,
         backend: ICosmosJourneyerBackend,
+        musicSystem: MusicSystem,
         soundPlayer: ISoundPlayer,
         tts: Tts,
         notificationManager: INotificationManager,
@@ -203,7 +208,7 @@ export class CosmosJourneyer {
             await this.createAutoSave();
         });
 
-        this.musicConductor = new MusicSystem(this.assets.audio.musics, audioEngine, this.starSystemView);
+        this.musicConductor = musicSystem;
         this.soundPlayer = soundPlayer;
         this.tts = tts;
         this.notificationManager = notificationManager;
@@ -516,7 +521,12 @@ export class CosmosJourneyer {
             loadingScreen.setProgress(startedCount, completedCount);
         });
 
-        const gameModuleApi = createGameModuleApi(backend);
+        const systemEntityLoader = new SystemEntityLoader();
+
+        const systemEntityProcessors = new SystemEntityProcessors();
+
+        const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader, systemEntityProcessors);
+
         const builtinModules = getBuiltinModules();
         const modulesResult = setupModules(builtinModules, gameModuleApi);
         if (!modulesResult.success) {
@@ -541,6 +551,8 @@ export class CosmosJourneyer {
             starSystemViewPhysicsEngine,
             backend.encyclopaedia,
             backend.universe,
+            systemEntityLoader,
+            systemEntityProcessors,
             soundPlayer,
             tts,
             notificationManager,
@@ -569,6 +581,14 @@ export class CosmosJourneyer {
             await alertModal(t("notifications:unknownKeyboardLayout"), soundPlayer, t);
         }
 
+        const musicSystem = new MusicSystem(
+            assets.audio.musics,
+            audioEngine,
+            starSystemView,
+            (entity: SystemEntity, context: SystemEntityMusicContext) =>
+                systemEntityProcessors.music.dispatch(entity, context),
+        );
+
         return ok(
             new CosmosJourneyer(
                 player,
@@ -578,6 +598,7 @@ export class CosmosJourneyer {
                 starSystemView,
                 starMapView,
                 backend,
+                musicSystem,
                 soundPlayer,
                 tts,
                 notificationManager,
@@ -716,7 +737,11 @@ export class CosmosJourneyer {
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) {
-            await this.mainMenu.init();
+            const initResult = await this.mainMenu.init();
+            if (!initResult.success) {
+                await alertModal("Could not init main menu", this.soundPlayer, this.t);
+                return;
+            }
         }
         this.starSystemView.initStarSystem(Date.now() / 1000);
 
@@ -1137,7 +1162,11 @@ export class CosmosJourneyer {
 
         await this.starSystemView.resetPlayer(Player.Default(this.backend.universe));
         this.starSystemView.setUIEnabled(false);
-        await this.mainMenu.init();
+        const mainMenuInitResult = await this.mainMenu.init();
+        if (!mainMenuInitResult.success) {
+            await alertModal("Could not init main menu.", this.soundPlayer, this.t);
+            return;
+        }
         this.starSystemView.initStarSystem(Date.now() / 1000);
     }
 
@@ -1175,16 +1204,12 @@ export class CosmosJourneyer {
             locationToUse = shipLocation;
         }
 
-        const systemModel = this.backend.universe.getSystemModelFromCoordinates(
+        const systemModel = this.backend.universe.getSystemContentModelAt(
             locationToUse.universeObjectId.systemCoordinates,
         );
 
         if (systemModel === null) {
-            await alertModal(
-                "Cannot load universe coordinates: system model not found. The loading procedure has been aborted.",
-                this.soundPlayer,
-                this.t,
-            );
+            await alertModal("Cannot load universe coordinates: system model not found.", this.soundPlayer, this.t);
             return;
         }
 
@@ -1197,7 +1222,11 @@ export class CosmosJourneyer {
         this.loadingProgressMonitor.reset();
         this.engine.loadingScreen.displayLoadingUI();
 
-        await this.starSystemView.loadStarSystem(systemModel);
+        const starSystemResult = await this.starSystemView.loadStarSystem(systemModel);
+        if (!starSystemResult.success) {
+            await alertModal("Cannot load universe coordinates: system loading failure.", this.soundPlayer, this.t);
+            return;
+        }
 
         if (this.state === "uninitialized") {
             await this.init(true);

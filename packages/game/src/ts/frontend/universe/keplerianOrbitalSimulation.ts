@@ -50,6 +50,8 @@ export class KeplerianOrbitalSimulation {
 
     private readonly orbitalObjects: Array<KeplerianObject> = [];
 
+    private readonly objectsAwaitingParents: Set<KeplerianObject> = new Set();
+
     private elapsedSeconds = 0;
 
     public constructor(orbitalObjects: ReadonlyArray<KeplerianObject>) {
@@ -64,23 +66,35 @@ export class KeplerianOrbitalSimulation {
         for (const object of orbitalObjects) {
             this.addObject(object);
         }
+
+        if (this.objectsAwaitingParents.size > 0) {
+            const objectsAwaitingParents = [...this.objectsAwaitingParents];
+            this.objectsAwaitingParents.clear();
+
+            for (const object of objectsAwaitingParents) {
+                this.addObject(object);
+            }
+        }
     }
 
-    public addObject(object: KeplerianObject) {
-        this.objectsById.set(object.id, object);
-        this.initialPositions.set(object, object.getTransform().position.clone());
-
+    private addObject(object: KeplerianObject) {
         const orbit = object.orbit;
         const parents = orbit.parentIds
             .map((parentId) => {
                 const parent = this.objectsById.get(parentId);
                 if (parent === undefined) {
-                    console.error(`Parent ${parentId} of ${object.id} is not defined`);
+                    this.objectsAwaitingParents.add(object);
                 }
                 return parent;
             })
             .filter((parent) => parent !== undefined);
 
+        if (this.objectsAwaitingParents.has(object)) {
+            return;
+        }
+
+        this.objectsById.set(object.id, object);
+        this.initialPositions.set(object, object.getTransform().position.clone());
         this.objectToParents.set(object, parents);
         this.orbitalObjects.push(object);
     }

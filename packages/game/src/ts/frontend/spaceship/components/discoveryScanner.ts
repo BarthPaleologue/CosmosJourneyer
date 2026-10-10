@@ -65,7 +65,6 @@ export function isScannerInRange(
         case "mandelbox":
         case "sierpinskiPyramid":
         case "mengerSponge":
-        case "darkKnight":
         case "star":
             baseDistanceMultiplier = 1;
             break;

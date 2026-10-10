@@ -257,7 +257,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.appendChild(searchField);
 
         discoveries.forEach((discovery) => {
-            const objectModel = universeBackend.getObjectModelByUniverseId(discovery.objectId);
+            const objectModel = universeBackend.getObjectModel(discovery.objectId);
 
             const discoveryItem = document.createElement("div");
             discoveryItem.classList.add("listItemContainer", "flex-column");
@@ -277,7 +277,7 @@ export class ExplorationCenterPanel {
             this.discoveryList.appendChild(discoveryItem);
 
             const discoveryName = document.createElement("h3");
-            discoveryName.textContent = objectModel?.name ?? this.t("common:unknown");
+            discoveryName.textContent = objectModel?.object.name ?? this.t("common:unknown");
             discoveryItem.appendChild(discoveryName);
 
             const discoveryDate = document.createElement("p");

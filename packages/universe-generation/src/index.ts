@@ -1,4 +1,3 @@
-export * from "./proceduralGenerators/anomalies/darkKnightModelGenerator";
 export * from "./proceduralGenerators/anomalies/juliaSetModelGenerator";
 export * from "./proceduralGenerators/anomalies/mandelboxModelGenerator";
 export * from "./proceduralGenerators/anomalies/mandelbulbModelGenerator";

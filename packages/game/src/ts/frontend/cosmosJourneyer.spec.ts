@@ -17,6 +17,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
@@ -38,7 +39,7 @@ describe("CosmosJourneyer", () => {
 
     it("snapshots the player before awaiting thumbnail creation", async () => {
         const systemModel = getLoneStarSystem();
-        const universeBackend = new UniverseBackend(systemModel);
+        const universeBackend = new UniverseBackend(new SystemEntityBackend(), systemModel);
         const player = Player.Default(universeBackend);
         const serializedSpaceship = player.serializedSpaceships[0];
         const stellarObject = systemModel.stellarObjects[0];

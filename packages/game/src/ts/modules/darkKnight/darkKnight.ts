@@ -16,62 +16,69 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PBRMetallicRoughnessMaterial } from "@babylonjs/core/Materials/PBR/pbrMetallicRoughnessMaterial";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type { DarkKnightModel } from "@cosmos-journeyer/universe-model";
 
-import type { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
+import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
 
-import type { CelestialBodyBase } from "./architecture/celestialBody";
-import type { AsteroidField } from "./asteroidFields/asteroidField";
+import { CollisionMask } from "@/settings";
 
-export class DarkKnight implements CelestialBodyBase<"darkKnight"> {
-    readonly type: "darkKnight";
-
-    readonly model: DeepReadonly<DarkKnightModel>;
-
-    private readonly radius: number;
+export class DarkKnight implements SystemContent {
+    readonly radius: number;
 
     private readonly mesh: Mesh;
 
     private readonly material: PBRMetallicRoughnessMaterial;
 
-    readonly ringsUniforms: RingsUniforms | null = null;
-    readonly asteroidField: AsteroidField | null = null;
+    private aggregate: PhysicsAggregate | null = null;
 
-    constructor(model: DeepReadonly<DarkKnightModel>, scene: Scene) {
-        this.type = model.type;
-        this.model = model;
+    private readonly scene: Scene;
 
-        this.radius = getCelestialBodyRadius(model);
+    constructor(scene: Scene) {
+        this.radius = 100e3;
 
         this.mesh = MeshBuilder.CreateSphere("DarkKnight", { diameter: this.radius * 2, segments: 256 }, scene);
+        this.mesh.receiveShadows = true;
 
         this.material = new PBRMetallicRoughnessMaterial("DarkKnightMaterial", scene);
         this.material.metallic = 1;
         this.material.roughness = 0.0;
-        this.material.disableLighting = true;
 
         this.mesh.material = this.material;
-    }
 
-    getRadius(): number {
-        return this.radius;
-    }
-
-    getBoundingRadius(): number {
-        return this.radius;
+        this.scene = scene;
     }
 
     getTransform(): TransformNode {
         return this.mesh;
     }
 
+    update(observerPosition: Vector3) {
+        const position = this.getTransform().getAbsolutePosition();
+        const distance2 = Vector3.DistanceSquared(observerPosition, position);
+
+        const activationThreshold = this.radius * 5;
+        const deactivationThreshold = this.radius * 6;
+
+        if (distance2 < activationThreshold ** 2 && this.aggregate === null) {
+            this.aggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE, { mass: 0 }, this.scene);
+            this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+            this.aggregate.body.disablePreStep = false;
+        } else if (distance2 > deactivationThreshold ** 2 && this.aggregate !== null) {
+            this.aggregate.dispose();
+            this.aggregate = null;
+        }
+    }
+
     dispose(): void {
+        this.aggregate?.dispose();
         this.mesh.dispose();
+        this.material.dispose();
     }
 }

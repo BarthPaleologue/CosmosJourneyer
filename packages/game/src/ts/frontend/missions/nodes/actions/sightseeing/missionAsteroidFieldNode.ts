@@ -52,10 +52,11 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
     }
 
     public static New(objectId: UniverseObjectId, universeBackend: UniverseBackend): MissionAsteroidFieldNode | null {
-        const objectModel = universeBackend.getObjectModelByUniverseId(objectId);
-        if (objectModel === null) {
+        const model = universeBackend.getObjectModel(objectId);
+        if (model === null || model.type !== "orbitalObject") {
             return null;
         }
+        const objectModel = model.object;
 
         if (objectModel.type !== "telluricPlanet" && objectModel.type !== "gasPlanet") {
             return null;
@@ -145,14 +146,14 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
-        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
-        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
+        const objectModel = universeBackend.getObjectModel(this.objectId);
+        const systemModel = universeBackend.getSystemContentModelAt(this.targetSystemCoordinates);
         if (objectModel === null || systemModel === null) {
             return "ERROR: objectModel or systemModel is null";
         }
         return t("missions:sightseeing:describeAsteroidFieldTrek", {
-            objectName: objectModel.name,
-            systemName: systemModel.name,
+            objectName: objectModel.object.name,
+            systemName: systemModel.system.name,
             distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
@@ -167,7 +168,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
             return t("missions:asteroidField:missionCompleted");
         }
 
-        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModel(this.objectId);
         if (targetObject === null) {
             return "ERROR: targetObject is null";
         }
@@ -183,7 +184,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
                 );
             case AsteroidFieldMissionState.TOO_FAR_IN_SYSTEM:
                 return t("missions:common:getCloserToTarget", {
-                    objectName: targetObject.name,
+                    objectName: targetObject.object.name,
                 });
             case AsteroidFieldMissionState.CLOSE_ENOUGH:
                 return t("missions:asteroidField:missionCompleted");

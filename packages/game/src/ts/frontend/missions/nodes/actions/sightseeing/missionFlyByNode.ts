@@ -104,7 +104,6 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
             case "mandelbox":
             case "sierpinskiPyramid":
             case "mengerSponge":
-            case "darkKnight":
             case "spaceStation":
             case "spaceElevator":
             case "custom":
@@ -134,14 +133,14 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
             wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
             wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
         );
-        const objectModel = universeBackend.getObjectModelByUniverseId(this.objectId);
-        const systemModel = universeBackend.getSystemModelFromCoordinates(this.targetSystemCoordinates);
-        if (objectModel === null || systemModel === null) {
+        const objectModel = universeBackend.getObjectModel(this.objectId);
+        const systemModel = universeBackend.getSystemContentModelAt(this.targetSystemCoordinates);
+        if (objectModel === null || systemModel === null || objectModel.type === "systemEntity") {
             return "ERROR: object or system model is null";
         }
         return t("missions:sightseeing:describeFlyBy", {
-            objectType: getOrbitalObjectTypeToI18nString(objectModel, t),
-            systemName: systemModel.name,
+            objectType: getOrbitalObjectTypeToI18nString(objectModel.object, t),
+            systemName: systemModel.system.name,
             distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
@@ -156,7 +155,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
             return t("missions:flyBy:missionCompleted");
         }
 
-        const targetObject = universeBackend.getObjectModelByUniverseId(this.objectId);
+        const targetObject = universeBackend.getObjectModel(this.objectId);
         if (targetObject === null) {
             return "ERROR: target object is null";
         }
@@ -172,7 +171,7 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
                 );
             case FlyByState.TOO_FAR_IN_SYSTEM:
                 return t("missions:common:getCloserToTarget", {
-                    objectName: targetObject.name,
+                    objectName: targetObject.object.name,
                 });
             case FlyByState.CLOSE_ENOUGH:
                 return t("missions:flyBy:missionCompleted");
