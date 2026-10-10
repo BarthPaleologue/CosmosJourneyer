@@ -18,11 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import {
-    starSystemCoordinatesEquals,
-    universeObjectIdEquals,
-    getObjectModelById,
-} from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
@@ -56,12 +52,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
     }
 
     public static New(objectId: UniverseObjectId, universeBackend: UniverseBackend): MissionAsteroidFieldNode | null {
-        const systemModel = universeBackend.getSystemModelFromCoordinates(objectId.systemCoordinates);
-        if (systemModel === null) {
-            return null;
-        }
-
-        const objectModel = getObjectModelById(objectId.idInSystem, systemModel);
+        const objectModel = universeBackend.getObjectModelByUniverseId(objectId);
         if (objectModel === null) {
             return null;
         }

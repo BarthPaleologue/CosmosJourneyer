@@ -22,7 +22,7 @@ export function createGameModuleApi(backend: ICosmosJourneyerBackend): GameModul
     return {
         starSystems: {
             registerAuthored: (model) => {
-                backend.universe.registerCustomSystem(model);
+                backend.universe.registerAuthoredSystem(model);
             },
         },
     };

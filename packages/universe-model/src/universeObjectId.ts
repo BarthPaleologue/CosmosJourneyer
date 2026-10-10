@@ -18,14 +18,12 @@
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
-import type { OrbitalObjectModel } from "./orbitalObjects/index";
 import { orbitalObjectIdEquals, OrbitalObjectIdSchema } from "./orbitalObjects/orbitalObjectId";
 import {
     serializeStarSystemCoordinates,
     starSystemCoordinatesEquals,
     StarSystemCoordinatesSchema,
 } from "./starSystemCoordinates";
-import type { StarSystemModel } from "./starSystemModel";
 
 export const UniverseObjectIdSchema = z.object({
     idInSystem: OrbitalObjectIdSchema,
@@ -44,21 +42,6 @@ export function universeObjectIdEquals(a: DeepReadonly<UniverseObjectId>, b: Dee
         orbitalObjectIdEquals(a.idInSystem, b.idInSystem) &&
         starSystemCoordinatesEquals(a.systemCoordinates, b.systemCoordinates)
     );
-}
-
-/**
- * Get the universe object ID of the given orbital object within the star system.
- * @param orbitalObject An orbital object within the star system.
- * @param starSystem The star system controller.
- */
-export function getUniverseObjectId(
-    orbitalObject: DeepReadonly<OrbitalObjectModel>,
-    starSystem: DeepReadonly<StarSystemModel>,
-): UniverseObjectId {
-    return {
-        systemCoordinates: starSystem.coordinates,
-        idInSystem: orbitalObject.id,
-    };
 }
 
 export function serializeUniverseObjectId(id: DeepReadonly<UniverseObjectId>): string {

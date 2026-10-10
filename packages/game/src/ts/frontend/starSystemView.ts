@@ -29,7 +29,7 @@ import { AxisComposite } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { starSystemCoordinatesEquals, getUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
@@ -480,11 +480,6 @@ export class StarSystemView implements View {
 
                 await this.setActiveControls(characterControls);
             }
-        });
-
-        StarSystemInputs.map.printDebugInfo.on("complete", () => {
-            const object = this.getStarSystem().getNearestOrbitalObject(Vector3.Zero());
-            console.log(getUniverseObjectId(object.model, this.getStarSystem().model));
         });
 
         this.depthRendererManager = new DepthRendererManager(this.scene);
@@ -1039,7 +1034,10 @@ export class StarSystemView implements View {
             shipDiscoveryScanner !== null &&
             isScannerInRange(shipDiscoveryScanner, spaceship.getTransform().getAbsolutePosition(), nearestCelestialBody)
         ) {
-            const universeId = getUniverseObjectId(nearestCelestialBody.model, starSystem.model);
+            const universeId: UniverseObjectId = {
+                systemCoordinates: starSystem.model.coordinates,
+                idInSystem: nearestCelestialBody.model.id,
+            };
             const isNewDiscovery = this.player.addVisitedObjectIfNew(universeId);
             if (isNewDiscovery) {
                 this.notificationManager.create(

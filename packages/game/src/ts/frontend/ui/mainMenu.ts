@@ -19,7 +19,6 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
@@ -198,7 +197,10 @@ export class MainMenu {
             throw new Error(`Cannot find main menu planet ${mainMenuStartingPlanet.planetId} in ${system.name}`);
         }
 
-        this.universeObjectId = getUniverseObjectId(object, system);
+        this.universeObjectId = {
+            systemCoordinates: system.coordinates,
+            idInSystem: object.id,
+        };
 
         this.starSystemModel = system;
 

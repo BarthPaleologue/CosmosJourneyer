@@ -33,8 +33,7 @@ import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
 import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
-import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
-import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
@@ -895,7 +894,10 @@ export class CosmosJourneyer {
         // Finding the index of the nearest orbital object
         const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
 
-        const universeObjectId = getUniverseObjectId(nearestOrbitalObject.model, currentStarSystem.model);
+        const universeObjectId: UniverseObjectId = {
+            systemCoordinates: currentStarSystem.model.coordinates,
+            idInSystem: nearestOrbitalObject.model.id,
+        };
 
         // Finding the position of the player in the nearest orbital object's frame of reference
         const nearestOrbitalObjectInverseWorld = nearestOrbitalObject
