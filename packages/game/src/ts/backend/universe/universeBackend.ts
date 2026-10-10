@@ -114,7 +114,7 @@ export class UniverseBackend {
      * Adds the given system to the database
      * @param system The system to register
      */
-    public registerCustomSystem(system: StarSystemModel): void {
+    public registerAuthoredSystem(system: StarSystemModel): void {
         const sectorKey = this.starSectorToString(
             system.coordinates.starSectorX,
             system.coordinates.starSectorY,

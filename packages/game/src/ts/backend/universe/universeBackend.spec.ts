@@ -29,10 +29,10 @@ describe("UniverseBackend", () => {
         universeBackend = new UniverseBackend(getLoneStarSystem());
     });
 
-    describe("registerCustomSystem", () => {
+    describe("registerAuthoredSystem", () => {
         it("should add a custom system that can be retrieved", () => {
             const customSystem = getSolSystemModel();
-            universeBackend.registerCustomSystem(customSystem);
+            universeBackend.registerAuthoredSystem(customSystem);
 
             const retrievedSystems = universeBackend.getSystemModelsInStarSector(
                 customSystem.coordinates.starSectorX,
