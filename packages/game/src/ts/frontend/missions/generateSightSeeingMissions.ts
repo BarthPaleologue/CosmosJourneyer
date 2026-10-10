@@ -17,7 +17,6 @@
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getUniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { OrbitalFacilityModel, StarSystemModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { uniformRandBool } from "extended-random";
 
@@ -52,7 +51,10 @@ export function generateSightseeingMissions(
 
     const rng = getRngFromSeed(spaceStationModel.seed + currentHour);
 
-    const spaceStationUniverseId = getUniverseObjectId(spaceStationModel, starSystemModel);
+    const spaceStationUniverseId: UniverseObjectId = {
+        systemCoordinates: starSystemModel.coordinates,
+        idInSystem: spaceStationModel.id,
+    };
 
     const neighborSystems = getNeighborStarSystemCoordinates(starSystemModel.coordinates, 75, universeBackend);
     neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {

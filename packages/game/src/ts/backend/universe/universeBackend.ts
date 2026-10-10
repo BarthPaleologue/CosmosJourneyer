@@ -351,23 +351,6 @@ export class UniverseBackend {
     }
 
     /**
-     * @param starSectorX
-     * @param starSectorY
-     * @param starSectorZ
-     * @param index The index of the generated system in the star sector.
-     * @returns The system model of the system generated given the seed, or null if the system is not found.
-     */
-    public getSystemModelFromSeed(
-        starSectorX: number,
-        starSectorY: number,
-        starSectorZ: number,
-        index: number,
-    ): DeepReadonly<StarSystemModel> | null {
-        const coordinates = this.getSystemCoordinatesFromSeed(starSectorX, starSectorY, starSectorZ, index);
-        return this.getSystemModelFromCoordinates(coordinates);
-    }
-
-    /**
      * @param coordinates The coordinates of the system you want the position of.
      * @returns The position of the given system in the galaxy.
      */
