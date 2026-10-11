@@ -269,6 +269,11 @@ export class StarSystemController {
         return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
     }
 
+    /** @returns The objects registered in the orbital simulation. */
+    public getKeplerianObjects(): Iterable<KeplerianObject> {
+        return this.orbitalSimulation.getObjects();
+    }
+
     /**
      * Returns the planets in the system, excluding their satellites.
      * @returns The planets in the current system.

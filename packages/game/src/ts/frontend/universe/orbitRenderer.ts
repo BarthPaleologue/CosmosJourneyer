@@ -22,14 +22,14 @@ import type { Scene } from "@babylonjs/core/scene";
 import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
 
 import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
-import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 
+import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import type { CreateLinesMeshFunction } from "./lineRendering";
 
 export class OrbitRenderer {
-    private readonly orbitMeshes: Map<OrbitalObject, Mesh> = new Map();
+    private readonly orbitMeshes: Map<KeplerianObject, Mesh> = new Map();
 
-    private readonly orbitalObjectToParents: Map<OrbitalObject, ReadonlyArray<OrbitalObject>> = new Map();
+    private readonly orbitalObjectToParents: Map<KeplerianObject, ReadonlyArray<KeplerianObject>> = new Map();
 
     private _isVisible = false;
 
@@ -39,13 +39,11 @@ export class OrbitRenderer {
         this.createOrbitMeshFromPoints = createOrbitMeshFromPoints;
     }
 
-    setOrbitalObjects(orbitalObjects: ReadonlyArray<OrbitalObject>, scene: Scene): void {
+    setOrbitalObjects(orbitalObjects: ReadonlyArray<KeplerianObject>, scene: Scene): void {
         this.reset();
 
         for (const orbitalObject of orbitalObjects) {
-            const parents = orbitalObjects.filter((parent) =>
-                orbitalObject.model.orbit.parentIds.includes(parent.model.id),
-            );
+            const parents = orbitalObjects.filter((parent) => orbitalObject.orbit.parentIds.includes(parent.id));
 
             this.createOrbitMesh(orbitalObject, parents, scene);
 
@@ -55,10 +53,14 @@ export class OrbitRenderer {
         this.setVisibility(this.isVisible());
     }
 
-    private createOrbitMesh(orbitalObject: OrbitalObject, parents: ReadonlyArray<OrbitalObject>, scene: Scene): void {
-        const parentMassSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0);
+    private createOrbitMesh(
+        orbitalObject: KeplerianObject,
+        parents: ReadonlyArray<KeplerianObject>,
+        scene: Scene,
+    ): void {
+        const parentMassSum = parents.reduce((sum, parent) => sum + parent.mass, 0);
 
-        const orbit = orbitalObject.model.orbit;
+        const orbit = orbitalObject.orbit;
         const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.semiMajorAxis / 200e3)));
         const timestep = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum) / nbSteps;
         const points: Vector3[] = [];
@@ -74,7 +76,7 @@ export class OrbitRenderer {
         }
 
         const orbitMesh = this.createOrbitMeshFromPoints(
-            `${orbitalObject.model.name}OrbitHelper`,
+            `${orbitalObject.id}OrbitHelper`,
             points,
             { r: 0.4, g: 0.4, b: 0.4 },
             scene,
@@ -84,7 +86,7 @@ export class OrbitRenderer {
         this.orbitMeshes.set(orbitalObject, orbitMesh);
     }
 
-    getOrbitMesh(orbitalObject: OrbitalObject): Mesh | undefined {
+    getOrbitMesh(orbitalObject: KeplerianObject): Mesh | undefined {
         return this.orbitMeshes.get(orbitalObject);
     }
 
@@ -110,9 +112,9 @@ export class OrbitRenderer {
             }
 
             const parentBarycenter = Vector3.Zero();
-            const massSum = parents.reduce((sum, parent) => sum + parent.model.mass, 0.001);
+            const massSum = parents.reduce((sum, parent) => sum + parent.mass, 0.001);
             for (const parent of parents) {
-                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.model.mass));
+                parentBarycenter.addInPlace(parent.getTransform().position.scale(parent.mass));
             }
             parentBarycenter.scaleInPlace(1 / massSum);
 
