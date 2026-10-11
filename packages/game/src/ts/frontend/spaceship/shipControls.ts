@@ -142,11 +142,11 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            const nearestOrbitalObject = spaceship.getNearestOrbitalObject();
+            const nearestObject = spaceship.getNearestObject();
             if (
                 warpDrive.isDisabled() &&
-                nearestOrbitalObject !== null &&
-                !canEngageWarpDrive(spaceship.getTransform(), spaceship.getAltimeter(), 0, nearestOrbitalObject)
+                nearestObject !== null &&
+                !canEngageWarpDrive(spaceship.getTransform(), spaceship.getAltimeter(), 0, nearestObject)
             ) {
                 tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;
