@@ -120,7 +120,7 @@ export async function createStarSystemViewScene(
             const landingPad = starSystemView
                 .getStarSystem()
                 .getOrbitalFacilities()[0]
-                ?.getLandingPadManager()
+                ?.getLandingPadProvider()
                 .getLandingPads()[0];
             if (landingPad !== undefined) {
                 shipControls.getSpaceship().spawnOnPad(landingPad);

@@ -31,8 +31,8 @@ import { MetalSectionMaterial } from "@/frontend/assets/procedural/spaceStation/
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { clamp, remap, triangleWave } from "@/utils/math";
 
@@ -64,7 +64,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
     private elapsedSeconds = 0;
 
-    private readonly landingPadManager: LandingPadManager;
+    private readonly landingPadProvider: LandingPadProvider;
 
     constructor(model: DeepReadonly<SpaceElevatorModel>, assets: RenderingAssets, scene: Scene) {
         this.model = model;
@@ -120,8 +120,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
                 landingPadToLandingBay.set(landingPad, { bay, index: landingPadIndex });
             }
         }
-        this.landingPadManager = new LandingPadManager(allLandingPads);
-        this.landingPadManager.onStatusChanged.add(({ pad, status }) => {
+        this.landingPadProvider = new LandingPadProvider(allLandingPads);
+        this.landingPadProvider.onStatusChanged.add(({ pad, status }) => {
             const padInfo = landingPadToLandingBay.get(pad);
             if (padInfo === undefined) {
                 console.warn("Landing pad not found in landing bay map");
@@ -150,8 +150,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         return this.sections.flatMap((section) => section.getLights());
     }
 
-    getLandingPadManager(): LandingPadManager {
-        return this.landingPadManager;
+    getLandingPadProvider(): LandingPadProvider {
+        return this.landingPadProvider;
     }
 
     getClimber(): SpaceElevatorClimber {

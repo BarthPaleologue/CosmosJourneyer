@@ -43,7 +43,7 @@ import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/c
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { CollisionMask } from "@/settings";
 

@@ -28,8 +28,8 @@ import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { createFacilitySections } from "./createFacilitySections";
 import type { OrbitalFacilityBase } from "./orbitalFacility";
@@ -49,7 +49,7 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     private readonly boundingRadius: number;
 
-    private readonly landingPadManager: LandingPadManager;
+    private readonly landingPadProvider: LandingPadProvider;
 
     constructor(model: DeepReadonly<SpaceStationModel>, assets: RenderingAssets, scene: Scene) {
         this.model = model;
@@ -71,8 +71,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
                 landingPadToLandingBay.set(landingPad, { bay, index: landingPadIndex });
             }
         }
-        this.landingPadManager = new LandingPadManager(allLandingPads);
-        this.landingPadManager.onStatusChanged.add(({ pad, status }) => {
+        this.landingPadProvider = new LandingPadProvider(allLandingPads);
+        this.landingPadProvider.onStatusChanged.add(({ pad, status }) => {
             const padInfo = landingPadToLandingBay.get(pad);
             if (padInfo === undefined) {
                 console.warn("Landing pad not found in landing bay map");
@@ -99,8 +99,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         return this.sections.flatMap((section) => section.getLights());
     }
 
-    getLandingPadManager(): LandingPadManager {
-        return this.landingPadManager;
+    getLandingPadProvider(): LandingPadProvider {
+        return this.landingPadProvider;
     }
 
     getLandingBays(): Array<LandingBay> {

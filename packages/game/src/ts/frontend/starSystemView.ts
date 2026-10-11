@@ -902,7 +902,7 @@ export class StarSystemView implements View {
             return;
         }
 
-        const landingPad = station.getLandingPadManager().getAvailableLandingPads().at(0);
+        const landingPad = station.getLandingPadProvider().getAvailableLandingPads().at(0);
         if (landingPad === undefined) {
             const fallbackObject = station;
 
