@@ -17,8 +17,6 @@
 
 import { z } from "zod";
 
-import type { OrbitalObjectType } from "./index";
-
 export const OrbitalObjectIdSchema = z.string();
 
 /**
@@ -35,7 +33,7 @@ export type OrbitalObjectId = z.infer<typeof OrbitalObjectIdSchema>;
  */
 export function createOrbitalObjectId(
     parentIds: ReadonlyArray<OrbitalObjectId>,
-    type: OrbitalObjectType,
+    type: string,
     index: number,
 ): OrbitalObjectId {
     return `[${parentIds.join("|")}]->${type}${index}`;

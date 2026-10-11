@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,12 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { HasSeed } from "../hasSeed";
-import type { OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
-import type { ElevatorSectionModel } from "./sections";
+import type { AnySystemContentType, SystemEntity } from "@/frontend/systemEntity/systemEntity";
+import type { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
-export type SpaceElevatorModel = OrbitalFacilityModelBase<"spaceElevator"> &
-    HasSeed & {
-        tetherLength: number;
-        sections: Array<ElevatorSectionModel>;
+export type LandingPadExtensionPoint = {
+    systemEntities: {
+        register<T extends AnySystemContentType>(
+            type: T,
+            getLandingPadManager: (entity: SystemEntity<T>) => LandingPadProvider | null,
+        ): void;
     };
+};

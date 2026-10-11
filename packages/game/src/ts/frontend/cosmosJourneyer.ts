@@ -305,7 +305,7 @@ export class CosmosJourneyer {
             }
 
             const shipControls = this.starSystemView.getSpaceshipControls();
-            const closestLandableFacility = shipControls.getClosestLandableFacility();
+            const closestLandableFacility = shipControls.getLandingPadProvider();
             if (closestLandableFacility === null) {
                 return;
             }

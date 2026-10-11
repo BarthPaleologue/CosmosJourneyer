@@ -20,7 +20,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
-import { generateSpaceElevatorModel, generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
+import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
@@ -33,8 +33,9 @@ import { toKeplerian } from "@/frontend/helpers/orbitalObject";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
-import { SpaceElevator } from "@/frontend/universe/orbitalFacility/spaceElevator";
 
+import { generateSpaceElevatorModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceElevatorModelGenerator";
+import { SpaceElevator } from "@/modules/orbitalFacilities/spaceElevator";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -86,7 +87,6 @@ export async function createSpaceElevatorScene(
         planets: [planet],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -99,7 +99,7 @@ export async function createSpaceElevatorScene(
         systemModel,
     );
 
-    const spaceElevator = new SpaceElevator(spaceElevatorModel, assets, scene);
+    const spaceElevator = new SpaceElevator(spaceElevatorModel, { assets, scene });
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(spaceElevator);
 
@@ -129,7 +129,7 @@ export async function createSpaceElevatorScene(
     new GlowLayer("glow", scene);
 
     let elapsedSeconds = 0;
-    const orbitalSimulation = new KeplerianOrbitalSimulation([planetImpostor, spaceElevator].map(toKeplerian));
+    const orbitalSimulation = new KeplerianOrbitalSimulation([toKeplerian(planetImpostor), spaceElevator.placement]);
 
     orbitalSimulation.update(elapsedSeconds);
     for (const object of [planetImpostor, spaceElevator]) {

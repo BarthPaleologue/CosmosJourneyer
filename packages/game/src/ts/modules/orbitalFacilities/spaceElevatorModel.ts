@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,17 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OrbitalObjectType } from "..";
-import type { CropType, Faction } from "../../common";
-import type { StarSystemCoordinates } from "../../starSystemCoordinates";
-import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
+import type { SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
 
-/** Provisional mass in kg for kilometer-scale stations, pending structural mass estimates. */
-export const DefaultOrbitalFacilityMass = 1e12;
+import type { CropType } from "@/utils/agriculture";
 
-export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
-    starSystemCoordinates: StarSystemCoordinates;
+import type { ElevatorSectionModel } from "./sections";
+import type { Faction } from "./society/factions";
 
+export type SpaceElevatorModel = SystemContentModel<"spaceElevator"> & {
     population: number;
 
     /**
@@ -45,4 +42,8 @@ export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjec
     faction: Faction;
 
     solarPanelEfficiency: number;
+
+    sections: Array<ElevatorSectionModel>;
+
+    tetherLength: number;
 };

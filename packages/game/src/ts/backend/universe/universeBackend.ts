@@ -204,7 +204,7 @@ export class UniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates));
+        return generateStarSystemModel(systemRng, coordinates);
     }
 
     private getGeneratedSystemCoordinatesInStarSector(

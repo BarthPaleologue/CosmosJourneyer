@@ -16,19 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { degreesToRadians, getShadowRadius, solarMassToKg } from "@cosmos-journeyer/physics";
-import { DefaultOrbitalFacilityMass } from "@cosmos-journeyer/universe-model";
-import type {
-    StarSystemModel,
-    BlackHoleModel,
-    SpaceStationModel,
-    StarSystemCoordinates,
-} from "@cosmos-journeyer/universe-model";
+import type { StarSystemModel, BlackHoleModel, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
 import { CropType } from "@/utils/agriculture";
 
 import type { DarkKnightModel } from "../darkKnight/darkKnightModel";
+import { DefaultOrbitalFacilityMass } from "../orbitalFacilities/constants";
+import type { SpaceStationModel } from "../orbitalFacilities/spaceStationModel";
 
 /** @returns The authored Chronos system. */
 export function getChronosModel(): { systemModel: StarSystemModel; systemEntityModels: Array<SystemEntityModel> } {
@@ -69,45 +65,51 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
     };
 
-    const chronosResearchLab: SpaceStationModel = {
-        type: "spaceStation",
+    const chronosResearchLab: SystemEntityModel<SpaceStationModel> = {
         id: "chronosResearchLab",
         name: "Chronos Research Lab",
-        orbit: {
-            parentIds: ["chronos"],
-            semiMajorAxis: chronos.accretionDiskRadius * 4,
-            eccentricity: 0,
-            inclination: degreesToRadians(40),
-            longitudeOfAscendingNode: degreesToRadians(120),
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: Math.PI,
-            p: 2,
+        content: {
+            type: "spaceStation",
+            solarPanelEfficiency: 0.5,
+            agricultureMix: [[1, CropType.CASSAVA]],
+            nbHydroponicLayers: 4,
+            annualEnergyPerCapitaKWh: 2000,
+            population: 500_000,
+            populationDensity: 1,
+            faction: "human_commonwealth",
+            sections: [
+                { type: "engineBay" },
+                { type: "utility", hasTanks: true },
+                { type: "cylinderHabitat", radius: 10e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                { type: "utility", hasTanks: true },
+                { type: "fusion", netPowerOutput: 500_000 * 2000 * 10 },
+                { type: "utility", hasTanks: true },
+                { type: "landingBay", heightFactor: 2 },
+            ],
         },
-        mass: DefaultOrbitalFacilityMass,
-        spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+        placement: {
+            type: "inOrbit",
+            orbit: {
+                parentIds: ["chronos"],
+                semiMajorAxis: chronos.accretionDiskRadius * 4,
+                eccentricity: 0,
+                inclination: degreesToRadians(40),
+                longitudeOfAscendingNode: degreesToRadians(120),
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: Math.PI,
+                p: 2,
+            },
+            mass: DefaultOrbitalFacilityMass,
+            attitude: {
+                spin: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+            },
         },
-        solarPanelEfficiency: 0.5,
-        agricultureMix: [[1, CropType.CASSAVA]],
-        nbHydroponicLayers: 4,
-        annualEnergyPerCapitaKWh: 2000,
-        population: 500_000,
-        populationDensity: 1,
-        faction: "human_commonwealth",
-        seed: 0,
-        sections: [
-            { type: "engineBay" },
-            { type: "utility", hasTanks: true },
-            { type: "cylinderHabitat", radius: 10e3, surface: { housing: 0.5, agriculture: 0.5 } },
-            { type: "utility", hasTanks: true },
-            { type: "fusion", netPowerOutput: 500_000 * 2000 * 10 },
-            { type: "utility", hasTanks: true },
-            { type: "landingBay", heightFactor: 2 },
-        ],
-        starSystemCoordinates: coordinates,
     };
 
     const ananke: SystemEntityModel<DarkKnightModel> = {
@@ -141,119 +143,137 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
     };
 
-    const anankeOutpost: SpaceStationModel = {
-        type: "spaceStation",
+    const anankeOutpost: SystemEntityModel<SpaceStationModel> = {
         id: "anankeOutpost",
         name: "Ananke Outpost",
-        orbit: {
-            parentIds: ["ananke"],
-            semiMajorAxis: 150e3,
-            eccentricity: 0,
-            inclination: 0,
-            longitudeOfAscendingNode: 0,
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: 0,
-            p: 2,
+        content: {
+            type: "spaceStation",
+            solarPanelEfficiency: 0.5,
+            agricultureMix: [[1, CropType.CASSAVA]],
+            nbHydroponicLayers: 4,
+            annualEnergyPerCapitaKWh: 2000,
+            population: 200,
+            populationDensity: 1,
+            faction: "human_commonwealth",
+            sections: [
+                { type: "cylinderHabitat", radius: 5e3, surface: { housing: 0.5, agriculture: 0.1 } },
+                { type: "utility", hasTanks: true },
+                { type: "fusion", netPowerOutput: 2000 * 200 },
+                { type: "utility", hasTanks: true },
+                { type: "landingBay", heightFactor: 2 },
+            ],
         },
-        mass: DefaultOrbitalFacilityMass,
-        spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+        placement: {
+            type: "inOrbit",
+            orbit: {
+                parentIds: ["ananke"],
+                semiMajorAxis: 150e3,
+                eccentricity: 0,
+                inclination: 0,
+                longitudeOfAscendingNode: 0,
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: 0,
+                p: 2,
+            },
+            mass: DefaultOrbitalFacilityMass,
+            attitude: {
+                spin: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+            },
         },
-        solarPanelEfficiency: 0.5,
-        agricultureMix: [[1, CropType.CASSAVA]],
-        nbHydroponicLayers: 4,
-        annualEnergyPerCapitaKWh: 2000,
-        population: 200,
-        populationDensity: 1,
-        faction: "human_commonwealth",
-        seed: 0,
-        sections: [
-            { type: "cylinderHabitat", radius: 5e3, surface: { housing: 0.5, agriculture: 0.1 } },
-            { type: "utility", hasTanks: true },
-            { type: "fusion", netPowerOutput: 2000 * 200 },
-            { type: "utility", hasTanks: true },
-            { type: "landingBay", heightFactor: 2 },
-        ],
-        starSystemCoordinates: coordinates,
     };
 
-    const bigDream: SpaceStationModel = {
-        type: "spaceStation",
+    const bigDream: SystemEntityModel<SpaceStationModel> = {
         id: "bigDream",
         name: "Big Dream",
-        orbit: {
-            parentIds: ["chronos"],
-            semiMajorAxis: chronos.accretionDiskRadius * 6,
-            eccentricity: 0,
-            inclination: degreesToRadians(20),
-            longitudeOfAscendingNode: degreesToRadians(240),
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: Math.PI / 2,
-            p: 2,
+        content: {
+            type: "spaceStation",
+            solarPanelEfficiency: 0.5,
+            agricultureMix: [[1, CropType.CASSAVA]],
+            nbHydroponicLayers: 4,
+            annualEnergyPerCapitaKWh: 1000,
+            population: 5_000_000,
+            populationDensity: 1,
+            faction: "dreamers_connection",
+            sections: [
+                { type: "cylinderHabitat", radius: 8e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                { type: "utility", hasTanks: true },
+                { type: "fusion", netPowerOutput: 5_000_000 * 1000 },
+                { type: "utility", hasTanks: true },
+                { type: "landingBay", heightFactor: 2 },
+            ],
         },
-        mass: DefaultOrbitalFacilityMass,
-        spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+        placement: {
+            type: "inOrbit",
+            orbit: {
+                parentIds: ["chronos"],
+                semiMajorAxis: chronos.accretionDiskRadius * 6,
+                eccentricity: 0,
+                inclination: degreesToRadians(20),
+                longitudeOfAscendingNode: degreesToRadians(240),
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: Math.PI / 2,
+                p: 2,
+            },
+            mass: DefaultOrbitalFacilityMass,
+            attitude: {
+                spin: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+            },
         },
-        solarPanelEfficiency: 0.5,
-        agricultureMix: [[1, CropType.CASSAVA]],
-        nbHydroponicLayers: 4,
-        annualEnergyPerCapitaKWh: 1000,
-        population: 5_000_000,
-        populationDensity: 1,
-        faction: "dreamers_connection",
-        seed: 0,
-        sections: [
-            { type: "cylinderHabitat", radius: 8e3, surface: { housing: 0.5, agriculture: 0.5 } },
-            { type: "utility", hasTanks: true },
-            { type: "fusion", netPowerOutput: 5_000_000 * 1000 },
-            { type: "utility", hasTanks: true },
-            { type: "landingBay", heightFactor: 2 },
-        ],
-        starSystemCoordinates: coordinates,
     };
 
-    const zurvanInstance: SpaceStationModel = {
-        type: "spaceStation",
+    const zurvanInstance: SystemEntityModel<SpaceStationModel> = {
         id: "zurvanInstance",
         name: "Zurvan Instance",
-        orbit: {
-            parentIds: ["chronos"],
-            semiMajorAxis: chronos.accretionDiskRadius * 4,
-            eccentricity: 0,
-            inclination: degreesToRadians(40),
-            longitudeOfAscendingNode: degreesToRadians(120),
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: 0,
-            p: 2,
+        content: {
+            type: "spaceStation",
+            solarPanelEfficiency: 0.5,
+            agricultureMix: [],
+            nbHydroponicLayers: 4,
+            annualEnergyPerCapitaKWh: 10_000,
+            population: 50_000,
+            populationDensity: 1,
+            faction: "satori_concord",
+            sections: [
+                { type: "fusion", netPowerOutput: 50_000 * 10_000 },
+                { type: "utility", hasTanks: true },
+                { type: "landingBay", heightFactor: 2 },
+            ],
         },
-        mass: DefaultOrbitalFacilityMass,
-        spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+        placement: {
+            type: "inOrbit",
+            orbit: {
+                parentIds: ["chronos"],
+                semiMajorAxis: chronos.accretionDiskRadius * 4,
+                eccentricity: 0,
+                inclination: degreesToRadians(40),
+                longitudeOfAscendingNode: degreesToRadians(120),
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: 0,
+                p: 2,
+            },
+            mass: DefaultOrbitalFacilityMass,
+            attitude: {
+                spin: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+            },
         },
-        solarPanelEfficiency: 0.5,
-        agricultureMix: [],
-        nbHydroponicLayers: 4,
-        annualEnergyPerCapitaKWh: 10_000,
-        population: 50_000,
-        populationDensity: 1,
-        faction: "satori_concord",
-        seed: 0,
-        sections: [
-            { type: "fusion", netPowerOutput: 50_000 * 10_000 },
-            { type: "utility", hasTanks: true },
-            { type: "landingBay", heightFactor: 2 },
-        ],
-        starSystemCoordinates: coordinates,
     };
 
     return {
@@ -264,8 +284,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             planets: [],
             satellites: [],
             anomalies: [],
-            orbitalFacilities: [chronosResearchLab, anankeOutpost, bigDream, zurvanInstance],
         },
-        systemEntityModels: [ananke],
+        systemEntityModels: [ananke, chronosResearchLab, anankeOutpost, bigDream, zurvanInstance],
     };
 }

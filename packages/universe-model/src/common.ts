@@ -15,11 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type Faction =
-    | "feynman_interstellar"
-    | "church_of_awakening"
-    | "human_commonwealth"
-    | "satori_concord"
-    | "dreamers_connection";
-
-export type CropType = "potato" | "yam" | "sweet_potato" | "rice" | "peanut" | "wheat" | "lentil" | "cassava";
+export type RGBColor = {
+    r: number;
+    g: number;
+    b: number;
+};

@@ -31,7 +31,8 @@ import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSec
 import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
 import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
+
+import type { StationSection } from "./stationSection";
 
 /**
  * Instantiates the ordered station sections and attaches each one to the facility hierarchy.

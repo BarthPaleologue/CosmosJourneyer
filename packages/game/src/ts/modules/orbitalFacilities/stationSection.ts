@@ -16,10 +16,14 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Light } from "@babylonjs/core/Lights/light";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import type { HasBoundingSphere } from "./hasBoundingSphere";
-import type { Transformable } from "./transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
-export interface ClusteredLightingRegion extends Transformable, HasBoundingSphere {
-    getLights(): ReadonlyArray<Light>;
+export interface StationSection extends Transformable {
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void;
+
+    getLights(): Array<Light>;
+
+    dispose(): void;
 }
