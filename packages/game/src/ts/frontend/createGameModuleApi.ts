@@ -50,6 +50,9 @@ export function createGameModuleApi(
             registerContentFactory: (type, factory) => {
                 systemEntityLoader.registerFactory(type, factory);
             },
+            registerSpatialGeometry: (type, getGeometry) => {
+                systemEntityProcessors.spatialGeometry.register(type, getGeometry);
+            },
             registerUpdate: (type, update) => {
                 systemEntityProcessors.registerUpdate(type, update);
             },

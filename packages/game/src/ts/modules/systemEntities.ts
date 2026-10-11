@@ -24,6 +24,7 @@ import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel
 import type { AnySystemContentType, SystemContentFactoryOf } from "@/frontend/systemEntity/systemEntity";
 import type { SystemEntityProcessor } from "@/frontend/systemEntity/systemEntityProcessor";
 import type { SystemEntityUpdateContext } from "@/frontend/systemEntity/systemEntityProcessors";
+import type { SpatialGeometry } from "@/frontend/universe/systemObject";
 
 export interface SystemEntitiesExtensionPoint {
     registerAuthored(coordinates: StarSystemCoordinates, models: Iterable<DeepReadonly<SystemEntityModel>>): void;
@@ -31,6 +32,11 @@ export interface SystemEntitiesExtensionPoint {
     registerProcedural(factory: SystemEntityModelGenerator): void;
 
     registerContentFactory<T extends AnySystemContentType>(type: T, factory: SystemContentFactoryOf<T>): void;
+
+    registerSpatialGeometry<T extends AnySystemContentType>(
+        type: T,
+        getGeometry: SystemEntityProcessor<T, void, SpatialGeometry>,
+    ): void;
 
     registerUpdate<T extends AnySystemContentType>(
         type: T,

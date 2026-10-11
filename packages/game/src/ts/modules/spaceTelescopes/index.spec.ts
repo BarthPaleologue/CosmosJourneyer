@@ -88,6 +88,9 @@ describe("space telescope module in Vesta", () => {
                 registerAuthored: vi.fn(),
                 registerProcedural,
                 registerUpdate,
+                registerSpatialGeometry: (type, getGeometry) => {
+                    processors.spatialGeometry.register(type, getGeometry);
+                },
                 registerContentFactory: (type, factory) => {
                     loader.registerFactory(type, factory);
                 },

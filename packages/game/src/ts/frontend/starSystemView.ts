@@ -570,6 +570,7 @@ export class StarSystemView implements View {
             this.assets,
             this.scene,
             this.progressMonitor,
+            this.systemEntityProcessors.spatialGeometry,
         );
 
         if (!starSystemResult.success) {
@@ -741,11 +742,11 @@ export class StarSystemView implements View {
         let isTooCloseToNearestObject = false;
 
         // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
+        const nearestOrbitalObject = currentStarSystem.getNearestSystemObject(currentWorldPosition);
 
         const universeObjectId: UniverseObjectId = {
             systemCoordinates: currentStarSystem.model.coordinates,
-            idInSystem: nearestOrbitalObject.model.id,
+            idInSystem: nearestOrbitalObject.id,
         };
 
         // Finding the position of the player in the nearest orbital object's frame of reference
@@ -825,7 +826,7 @@ export class StarSystemView implements View {
 
         const playerTransform = controls.getTransform();
         const starSystem = this.getStarSystem();
-        const nearestOrbitalObject = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+        const nearestOrbitalObject = starSystem.getSystemObjectById(location.universeObjectId.idInSystem);
 
         if (nearestOrbitalObject === undefined) {
             const fallbackObject = starSystem.getStellarObjects()[0];
@@ -860,9 +861,22 @@ export class StarSystemView implements View {
 
         if (distanceToObject < objectRadius * 1.1) {
             if (distanceToObject < 0.1) {
-                playerTransform.position.addInPlace(new Vector3(0, 0, objectRadius * 5.0));
+                playerTransform.setAbsolutePosition(
+                    nearestOrbitalObject
+                        .getTransform()
+                        .getAbsolutePosition()
+                        .add(new Vector3(0, 0, objectRadius * 5.0)),
+                );
             } else {
-                playerTransform.position.scaleInPlace((objectRadius * 1.1) / distanceToObject);
+                const offset = playerTransform
+                    .getAbsolutePosition()
+                    .subtract(nearestOrbitalObject.getTransform().getAbsolutePosition());
+                playerTransform.setAbsolutePosition(
+                    nearestOrbitalObject
+                        .getTransform()
+                        .getAbsolutePosition()
+                        .add(offset.scale((objectRadius * 1.1) / distanceToObject)),
+                );
             }
         }
 
@@ -1279,9 +1293,13 @@ export class StarSystemView implements View {
         this.postProcessManager.update(deltaSeconds);
 
         const spaceship = this.spaceshipControls.getSpaceship();
-        spaceship.setNearestOrbitalObject(nearestOrbitalObject);
         spaceship.setNearestCelestialBody(nearestCelestialBody);
         spaceship.setClosestWalkableObject(nearestCelestialBody);
+
+        const nearestObject = starSystem.getNearestSystemObject(spaceship.getTransform().getAbsolutePosition());
+        spaceship.setNearestObject(
+            nearestObject.id === nearestOrbitalObject.model.id ? nearestOrbitalObject : nearestObject,
+        );
 
         if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
             this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);

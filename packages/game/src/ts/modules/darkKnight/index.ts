@@ -60,6 +60,10 @@ export const DarkKnightModule: GameModule = {
             ];
         });
 
+        systemEntities.registerSpatialGeometry(type, (entity) => ({
+            getTransform: () => entity.content.getTransform(),
+            getBoundingRadius: () => entity.content.radius,
+        }));
         systemEntities.registerContentFactory(type, (model, context) => ok(new DarkKnight(context.scene)));
 
         systemEntities.registerUpdate(type, (darkKnight, context) => {

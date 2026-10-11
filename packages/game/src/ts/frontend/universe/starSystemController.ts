@@ -59,6 +59,7 @@ import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatte
 import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
 import type { StarSystemLoader, StarSystemLoaderOutput } from "./starSystemLoader";
+import type { SystemObject } from "./systemObject";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.
@@ -90,6 +91,8 @@ export class StarSystemController {
 
     private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
 
+    private readonly spatialGeometry: SystemEntityProcessors["spatialGeometry"];
+
     private readonly systemEntities: ReadonlyArray<SystemEntity>;
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
@@ -120,6 +123,7 @@ export class StarSystemController {
      * @param orbitalSimulation - The simulation that supplies current orbital transforms.
      * @param assets - The loaded assets used to create the star system’s visual objects.
      * @param scene The scene in which the star system will be rendered
+     * @param spatialGeometry Entity geometry registered by modules.
      */
     private constructor(
         model: DeepReadonly<StarSystemModel>,
@@ -128,7 +132,9 @@ export class StarSystemController {
         orbitalSimulation: KeplerianOrbitalSimulation,
         assets: RenderingAssets,
         scene: Scene,
+        spatialGeometry: SystemEntityProcessors["spatialGeometry"],
     ) {
+        this.spatialGeometry = spatialGeometry;
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, 1000e3, scene);
         this.model = model;
@@ -185,6 +191,7 @@ export class StarSystemController {
         assets: RenderingAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
+        spatialGeometry: SystemEntityProcessors["spatialGeometry"],
     ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
         const orbitalObjects = [
@@ -211,7 +218,15 @@ export class StarSystemController {
         }
 
         return ok(
-            new StarSystemController(model, result, systemEntitiesResult.value, orbitalSimulation, assets, scene),
+            new StarSystemController(
+                model,
+                result,
+                systemEntitiesResult.value,
+                orbitalSimulation,
+                assets,
+                scene,
+                spatialGeometry,
+            ),
         );
     }
 
@@ -304,6 +319,52 @@ export class StarSystemController {
      */
     public getAnomalies(): ReadonlyArray<Anomaly> {
         return this.anomalies;
+    }
+
+    /** @returns Celestial bodies and entity geometry that can anchor saved coordinates. */
+    public getSystemObjects(): Array<SystemObject> {
+        const objects: Array<SystemObject> = this.getOrbitalObjects().map((object) => ({
+            id: object.model.id,
+            name: object.model.name,
+            getTransform: () => object.getTransform(),
+            getBoundingRadius: () => object.getBoundingRadius(),
+        }));
+        for (const entity of this.systemEntities) {
+            const geometry = this.spatialGeometry.dispatch(entity);
+            if (geometry === null) {
+                continue;
+            }
+            objects.push({
+                id: entity.model.id,
+                name: entity.model.name,
+                getTransform: () => geometry.getTransform(),
+                getBoundingRadius: () => geometry.getBoundingRadius(),
+            });
+        }
+        return objects;
+    }
+
+    /**
+     * @param id Identifier within this system.
+     * @returns The spatial object, when its module provides geometry.
+     */
+    public getSystemObjectById(id: string): SystemObject | undefined {
+        return this.getSystemObjects().find((object) => object.id === id);
+    }
+
+    /**
+     * @param position World position of the observer.
+     * @returns The object with the nearest bounding surface.
+     */
+    public getNearestSystemObject(position: Vector3): SystemObject {
+        const objects = this.getSystemObjects();
+        return objects.reduce((nearest, object) => {
+            const distance =
+                Vector3.Distance(position, object.getTransform().getAbsolutePosition()) - object.getBoundingRadius();
+            const nearestDistance =
+                Vector3.Distance(position, nearest.getTransform().getAbsolutePosition()) - nearest.getBoundingRadius();
+            return distance < nearestDistance ? object : nearest;
+        });
     }
 
     public getSystemEntities(): ReadonlyArray<SystemEntity> {
