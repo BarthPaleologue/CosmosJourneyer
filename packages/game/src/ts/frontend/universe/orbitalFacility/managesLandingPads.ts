@@ -15,11 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { LandingPadManager } from "./landingPadManager";
+import type { LandingPadProvider } from "./landingPadProvider";
 
 export interface ManagesLandingPads {
     /**
      * Returns the landing pad manager responsible for handling landing operations
      */
-    getLandingPadManager(): LandingPadManager;
+    getLandingPadProvider(): LandingPadProvider;
 }

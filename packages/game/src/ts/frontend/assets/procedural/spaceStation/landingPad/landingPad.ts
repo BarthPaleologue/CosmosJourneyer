@@ -27,7 +27,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { CollisionMask, Settings } from "@/settings";
 

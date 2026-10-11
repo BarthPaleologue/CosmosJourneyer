@@ -24,7 +24,7 @@ import { EarthG } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { alignRotationToRef } from "@/frontend/helpers/rotation";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { CollisionMask } from "@/settings";
 

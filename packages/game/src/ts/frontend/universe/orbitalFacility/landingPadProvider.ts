@@ -48,7 +48,7 @@ export type StatusChangedHandler = (status: LandingPadStatus) => void;
 /**
  * Manages landing pads for orbital facilities such as space stations and space elevators
  */
-export class LandingPadManager {
+export class LandingPadProvider {
     private readonly landingPads: ReadonlyArray<ILandingPad>;
     private readonly landingPadStatus: Map<ILandingPad, LandingPadStatus> = new Map();
     readonly onStatusChanged: Observable<{ pad: ILandingPad; status: LandingPadStatus }> = new Observable();
