@@ -19,7 +19,6 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -42,7 +41,6 @@ export async function createStarMapScene(
 
     const systemEntityBackend = new SystemEntityBackend();
     const universeBackend = new UniverseBackend(systemEntityBackend);
-    universeBackend.registerAuthoredSystem(getLoneStarSystem());
 
     const particleTextures = await loadParticleTextures(engine, progressMonitor);
 

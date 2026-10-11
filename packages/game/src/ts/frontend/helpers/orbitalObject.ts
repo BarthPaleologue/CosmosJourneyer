@@ -44,10 +44,6 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
             return t("objectTypes:telluricPlanet");
         case "telluricSatellite":
             return t("objectTypes:telluricMoon");
-        case "spaceStation":
-            return t("objectTypes:spaceStation");
-        case "spaceElevator":
-            return t("objectTypes:spaceElevator");
         case "star":
             return t("objectTypes:star", {
                 stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature),

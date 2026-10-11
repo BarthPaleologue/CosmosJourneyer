@@ -220,16 +220,6 @@ export class MusicSystem {
             case "gasPlanet":
             case "custom":
                 break;
-            case "spaceStation":
-            case "spaceElevator":
-                if (
-                    (warpDrive === null || warpDrive.isDisabled()) &&
-                    distanceToClosestObject < closestOrbitalObject.getBoundingRadius() * 10
-                ) {
-                    this.setMusic(this.musics.equatorialComplex);
-                    return;
-                }
-                break;
             default:
                 assertUnreachable(closestOrbitalObject.model);
         }

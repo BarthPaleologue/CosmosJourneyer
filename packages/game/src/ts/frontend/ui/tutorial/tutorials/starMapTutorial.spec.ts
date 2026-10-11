@@ -16,20 +16,31 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createInstance } from "i18next";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { Mission } from "@/frontend/missions/mission";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
+
+import { OrbitalFacilitiesModule } from "@/modules/orbitalFacilities";
 
 import { StarMapTutorial } from "./starMapTutorial";
 
 const t = createInstance().getFixedT("en-US");
 
 describe("StarMapTutorial", () => {
+    let universeBackend: UniverseBackend;
+    beforeEach(() => {
+        universeBackend = new UniverseBackend(new SystemEntityBackend());
+        OrbitalFacilitiesModule.setup(
+            createGameModuleApi(universeBackend, new SystemEntityLoader(), new SystemEntityProcessors()),
+        );
+    });
     it("spawns near a space station", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();
@@ -59,14 +70,13 @@ describe("StarMapTutorial", () => {
         }
 
         const targetModel = universeBackend.getObjectModel(shipLocation.universeObjectId);
-        expect(targetModel?.type).toBe("orbitalObject");
-        const stationModel = targetModel?.type === "orbitalObject" ? targetModel.object : null;
+        expect(targetModel?.type).toBe("systemEntity");
+        const stationModel = targetModel?.type === "systemEntity" ? targetModel.object.content : null;
 
         expect(stationModel?.type).toBe("spaceStation");
     });
 
     it("has correct mission objectives", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();

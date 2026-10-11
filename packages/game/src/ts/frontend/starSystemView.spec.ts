@@ -29,6 +29,7 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
+import type { LandingFacility } from "@/frontend/systemEntity/landingFacility";
 import { LandingPadProvider, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
@@ -152,11 +153,9 @@ describe("StarSystemView", () => {
         const newFacility = {};
         const oldStarSystem = {
             dispose: vi.fn(),
-            getOrbitalFacilities: () => [],
             getSystemEntities: () => [oldFacility],
         };
         const newStarSystem = {
-            getOrbitalFacilities: () => [],
             getSystemEntities: () => [newFacility],
             stellarLightSystem: { addShadowCaster: vi.fn(), addShadowCasters: vi.fn() },
         } as unknown as StarSystemController;
@@ -340,29 +339,28 @@ describe("station save loading", () => {
             getPadHeight: () => 1,
         };
         const provider = new LandingPadProvider([pad]);
-        const station = {
-            type: "spaceStation" as const,
-            model: { id: "station", name: "Station" },
-            getTransform: () => transform,
-            getBoundingRadius: () => 100,
-            getLandingPadProvider: () => provider,
-        };
-        const setClosestLandableFacility = vi.fn();
+        const object = { id: "station", name: "Station", getTransform: () => transform, getBoundingRadius: () => 100 };
+        const entity = { model: { id: "station", name: "Station" } };
+        const setLandingFacility = vi.fn<(facility: LandingFacility | null) => void>();
         const spawnOnPad = vi.fn(() => {
             expect(provider.getAvailableLandingPads()).toHaveLength(0);
-            expect(setClosestLandableFacility).toHaveBeenCalledExactlyOnceWith(station);
+            const facility = setLandingFacility.mock.calls[0]?.[0];
+            expect(facility?.object.id).toBe("station");
+            expect(facility?.pads).toBe(provider);
         });
         const controls = {
             getSpaceship: () => ({ spawnOnPad }),
-            setClosestLandableFacility,
+            setLandingFacility,
             syncCameraTransform: vi.fn(),
         };
         const context = {
             getActiveControls: () => ({ getTransform: () => transform }),
             getSpaceshipControls: () => controls,
-            getStarSystem: () => ({
-                getOrbitalObjectById: (id: string) => (id === station.model.id ? station : undefined),
-            }),
+            getStarSystem: () => ({ getSystemEntities: () => [entity], getSystemObjectById: () => object }),
+            systemEntityProcessors: {
+                landingPadProviders: { dispatch: () => provider },
+                spatialGeometry: { dispatch: () => object },
+            },
         } as unknown as StarSystemView;
         const prototype = StarSystemView.prototype as unknown as {
             loadAtStationLocation(this: StarSystemView, location: AtStationCoordinates): Promise<void>;

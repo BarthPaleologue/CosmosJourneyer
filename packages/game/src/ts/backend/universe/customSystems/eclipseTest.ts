@@ -53,6 +53,5 @@ export function getEclipseTestSystemModel(): StarSystemModel {
         planets: [planet],
         satellites: [moon],
         anomalies: [],
-        orbitalFacilities: [],
     };
 }

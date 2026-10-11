@@ -53,9 +53,7 @@ export async function createStarSystemViewScene(
     const t = await initI18n();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const authoredSystem = getAlphaTestisSystemModel();
     const universeBackend = new UniverseBackend(systemEntityBackend);
-    universeBackend.registerAuthoredSystem(authoredSystem);
 
     const systemEntityLoader = new SystemEntityLoader();
     const systemEntityProcessors = new SystemEntityProcessors();
@@ -104,12 +102,14 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    const loadResult = await starSystemView.loadStarSystem({ system: authoredSystem, entities: [] });
+    const loadResult = await starSystemView.loadStarSystem(getAlphaTestisSystemModel());
     if (!loadResult.success) {
         throw loadResult.error;
     }
 
     starSystemView.initStarSystem(0);
+
+    const starSystem = starSystemView.getStarSystem();
 
     const shipControls = starSystemView.getSpaceshipControls();
 
@@ -117,11 +117,10 @@ export async function createStarSystemViewScene(
     const spawnLocationParam = urlParams.get("spawnLocation");
     switch (spawnLocationParam) {
         case "atStation": {
-            const landingPad = starSystemView
-                .getStarSystem()
-                .getOrbitalFacilities()[0]
-                ?.getLandingPadProvider()
-                .getLandingPads()[0];
+            const landingPadProviders = starSystem
+                .getSystemEntities()
+                .map((entity) => systemEntityProcessors.landingPadProviders.dispatch(entity));
+            const landingPad = landingPadProviders[0]?.getLandingPads()[0];
             if (landingPad !== undefined) {
                 shipControls.getSpaceship().spawnOnPad(landingPad);
                 shipControls.syncCameraTransform();

@@ -16,13 +16,16 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
-import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
+
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
+
+import type { StarSystemContentModel } from "../universeBackend";
 
 /**
  * @returns Lone Star system model at its fixed coordinates.
  */
-export function getLoneStarSystem(): StarSystemModel {
+export function getLoneStarSystem(): StarSystemContentModel {
     const systemModel: StarSystemModel = {
         name: "Lone Star",
         coordinates: {
@@ -64,14 +67,10 @@ export function getLoneStarSystem(): StarSystemModel {
         planets: [],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
-    const stationModel = generateSpaceStationModel("loneStarStation", 0, systemModel.stellarObjects[0], systemModel, {
-        name: "Lone Star Outpost",
-    });
+    const stationModel = generateSpaceStationModel("loneStarStation", 0, systemModel.stellarObjects[0], systemModel);
+    stationModel.name = "Lone Star Outpost";
 
-    systemModel.orbitalFacilities.push(stationModel);
-
-    return systemModel;
+    return { system: systemModel, entities: [stationModel] };
 }

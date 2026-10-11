@@ -37,6 +37,7 @@ import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer"
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { initI18n } from "@/i18n";
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
 
 import { addToWindow, enablePhysics } from "./utils";
 
@@ -63,9 +64,7 @@ export async function createSpaceStationUIScene(
     const notificationManager = new NotificationManagerMock();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const systemModel = getLoneStarSystem();
     const systemDatabase = new UniverseBackend(systemEntityBackend);
-    systemDatabase.registerAuthoredSystem(systemModel);
 
     const player = Player.Default(systemDatabase);
 
@@ -103,13 +102,17 @@ export async function createSpaceStationUIScene(
         t,
     );
 
-    const stationModel = systemModel.orbitalFacilities[0];
-    if (stationModel === undefined) {
-        throw new Error("No station found in system model");
-    }
+    const systemContent = getLoneStarSystem();
+
+    const stationModel = generateSpaceStationModel(
+        "station",
+        42,
+        systemContent.system.stellarObjects[0],
+        systemContent.system,
+    );
 
     spaceStationUI.setStation(
-        { idInSystem: stationModel.id, systemCoordinates: systemModel.coordinates },
+        { idInSystem: stationModel.id, systemCoordinates: systemContent.system.coordinates },
         stationModel.name,
         player,
     );
