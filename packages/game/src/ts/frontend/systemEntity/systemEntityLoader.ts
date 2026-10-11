@@ -23,7 +23,6 @@ import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
-import type { RenderingAssets } from "../assets/renderingAssets";
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
 import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
@@ -36,17 +35,18 @@ import type {
     SystemEntity,
     SystemContent,
     InOrbitPlacement,
+    SystemContentFactoryContext,
 } from "./systemEntity";
 
 type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
 
-export type SystemEntityLoadContext = Readonly<{
-    scene: Scene;
-    assets: RenderingAssets;
-    orbitalObjects: ReadonlyArray<OrbitalObject>;
-    orbitalSimulation: KeplerianOrbitalSimulation;
-    terrainSystem: ITerrainSystem;
-}>;
+export type SystemEntityLoadContext = Readonly<
+    SystemContentFactoryContext & {
+        orbitalObjects: ReadonlyArray<OrbitalObject>;
+        orbitalSimulation: KeplerianOrbitalSimulation;
+        terrainSystem: ITerrainSystem;
+    }
+>;
 
 export class SystemEntityLoader {
     private readonly registry: Map<string, ErasedSystemContentFactory> = new Map();
@@ -68,7 +68,7 @@ export class SystemEntityLoader {
         const onSurfacePlacementModels: Array<SurfacePlacementRequest> = [];
         const entityContents = new Map<string, { model: DeepReadonly<SystemEntityModel>; content: SystemContent }>();
         for (const model of models) {
-            const contentResult = this.createContent(model, context.scene, context.assets);
+            const contentResult = this.createContent(model, context);
             if (!contentResult.success) {
                 return contentResult;
             }
@@ -122,16 +122,14 @@ export class SystemEntityLoader {
 
     private createContent(
         model: DeepReadonly<SystemEntityModel>,
-        scene: Scene,
-        assets: RenderingAssets,
+        context: SystemContentFactoryContext,
     ): Result<SystemContent, Error> {
-        const context = { scene, assets };
         const factory = this.registry.get(model.content.type);
         if (factory === undefined) {
             return err(new Error(`No SystemContent factory registered for "${model.content.type}"`));
         }
 
-        return factory(model.content, context);
+        return factory(model, context);
     }
 }
 
@@ -147,20 +145,34 @@ export function createInOrbitPlacements(
 ): Map<string, InOrbitPlacement> {
     const placements = new Map<string, InOrbitPlacement>();
     for (const { entityId, placementModel } of models) {
-        const transform = new TransformNode(`${entityId}_in_orbit_placement`, context.scene);
-        const placement = {
-            type: "inOrbit",
-            id: entityId,
-            mass: placementModel.mass,
-            orbit: placementModel.orbit,
-            spin: placementModel.attitude.spin,
-            getTransform: () => transform,
-        } as const;
+        const placement = createInOrbitPlacement(entityId, placementModel, context.scene);
         placements.set(entityId, placement);
         context.orbitalSimulation.addObjects([placement]);
     }
 
     return placements;
+}
+
+/**
+ * @param id Entity identifier used by the orbital simulation.
+ * @param placementModel Orbital and attitude data.
+ * @param scene Scene owning the placement transform.
+ * @returns The simulation object for an orbital entity.
+ */
+export function createInOrbitPlacement(
+    id: string,
+    placementModel: DeepReadonly<InOrbitPlacementModel>,
+    scene: Scene,
+): InOrbitPlacement {
+    const transform = new TransformNode(`${id}_in_orbit_placement`, scene);
+    return {
+        type: "inOrbit",
+        id,
+        mass: placementModel.mass,
+        orbit: placementModel.orbit,
+        spin: placementModel.attitude.spin,
+        getTransform: () => transform,
+    } as const;
 }
 
 /**
@@ -174,10 +186,10 @@ function eraseFactory<T extends AnySystemContentType>(
     factory: SystemContentFactoryOf<T>,
 ): ErasedSystemContentFactory {
     return (model, context) => {
-        if (model.type !== type) {
-            return err(new Error(`Expected model type "${type}", got "${model.type}"`));
+        if (model.content.type !== type) {
+            return err(new Error(`Expected model type "${type}", got "${model.content.type}"`));
         }
 
-        return factory(model as DeepReadonly<ContentModelOf<T>>, context);
+        return factory(model as DeepReadonly<SystemEntityModel<ContentModelOf<T>>>, context);
     };
 }

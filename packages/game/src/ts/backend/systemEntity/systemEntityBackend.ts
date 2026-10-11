@@ -19,12 +19,16 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { serializeStarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import type { Vector3Like } from "@/utils/types";
+
 import type { SystemEntityModel } from "./systemEntityModel";
 
 export type SystemEntityModelGenerator = (context: SystemEntityModelContext) => Array<SystemEntityModel>;
 
 export type SystemEntityModelContext = DeepReadonly<{
     system: StarSystemModel;
+    /** Galactic position resolved by the universe backend, in light-years. */
+    galacticPosition: Vector3Like;
 }>;
 
 export class SystemEntityBackend {
@@ -43,15 +47,13 @@ export class SystemEntityBackend {
         this.proceduralEntityGenerators.push(generator);
     }
 
-    getModels(starSystem: DeepReadonly<StarSystemModel>): DeepReadonly<Array<SystemEntityModel>> {
+    getModels(context: SystemEntityModelContext): DeepReadonly<Array<SystemEntityModel>> {
         const results: Array<DeepReadonly<SystemEntityModel>> = [];
-        const systemKey = serializeStarSystemCoordinates(starSystem.coordinates);
+        const systemKey = serializeStarSystemCoordinates(context.system.coordinates);
         const authoredModels = this.systemToEntities.get(systemKey);
         if (authoredModels !== undefined) {
             results.push(...authoredModels);
         }
-
-        const context: SystemEntityModelContext = { system: starSystem };
 
         for (const generator of this.proceduralEntityGenerators) {
             results.push(...generator(context));

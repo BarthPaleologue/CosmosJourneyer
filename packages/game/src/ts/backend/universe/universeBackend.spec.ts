@@ -16,8 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEntityBackend";
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 
 import { getSolSystemModel } from "./customSystems/sol/sol";
@@ -71,5 +72,18 @@ describe("UniverseBackend", () => {
             };
             expect(universeBackend.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });
+    });
+
+    it("passes the backend-resolved position to procedural generators", () => {
+        const system = getSolSystemModel();
+        universeBackend.registerAuthoredSystem(system);
+        const galacticPosition = { x: 17, y: -23, z: 41 };
+        vi.spyOn(universeBackend, "getSystemGalacticPosition").mockReturnValue(galacticPosition);
+        const generator = vi.fn<SystemEntityModelGenerator>(() => []);
+        universeBackend.registerProceduralEntities(generator);
+
+        universeBackend.getSystemContentModelAt(system.coordinates);
+
+        expect(generator).toHaveBeenCalledExactlyOnceWith({ system, galacticPosition });
     });
 });

@@ -157,7 +157,10 @@ export class UniverseBackend {
         if (system === null) {
             return null;
         }
-        const entities = this.systemEntities.getModels(system);
+        const entities = this.systemEntities.getModels({
+            system,
+            galacticPosition: this.getSystemGalacticPosition(system.coordinates),
+        });
 
         return { system, entities };
     }
@@ -408,12 +411,12 @@ export class UniverseBackend {
      */
     public getObjectModel(universeObjectId: UniverseObjectId): DeepReadonly<UniverseObjectModel> | null {
         const starSystemCoordinates = universeObjectId.systemCoordinates;
-        const starSystemModel = this.getSystemModelAt(starSystemCoordinates);
-        if (starSystemModel === null) {
+        const systemContentModel = this.getSystemContentModelAt(starSystemCoordinates);
+        if (systemContentModel === null) {
             return null;
         }
 
-        const objectModel = getObjectModelById(universeObjectId.idInSystem, starSystemModel);
+        const objectModel = getObjectModelById(universeObjectId.idInSystem, systemContentModel.system);
         if (objectModel !== null) {
             return {
                 type: "orbitalObject",
@@ -421,7 +424,7 @@ export class UniverseBackend {
             };
         }
 
-        const entities = this.systemEntities.getModels(starSystemModel);
+        const entities = systemContentModel.entities;
         const foundEntity = entities.find((entity) => entity.id === universeObjectId.idInSystem);
         if (foundEntity !== undefined) {
             return {
