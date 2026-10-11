@@ -23,11 +23,14 @@ import { Scene } from "@babylonjs/core/scene";
 import { ok } from "@cosmos-journeyer/typescript";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { AtStationCoordinates } from "@/backend/save/universeCoordinates";
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
+import { LandingPadProvider, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 
 import { StarSystemView } from "./starSystemView";
@@ -254,6 +257,70 @@ describe("StarSystemView", () => {
             expect(starSystem.update.mock.invocationCallOrder[0]).toBeLessThan(
                 clusteredLightingSystem.update.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
             );
+        } finally {
+            scene.dispose();
+            engine.dispose();
+        }
+    });
+});
+
+describe("station save loading", () => {
+    it("reserves the spawned pad and establishes its installation before spawning", async () => {
+        const engine = new NullEngine();
+        const scene = new Scene(engine);
+        const transform = new TransformNode("station", scene);
+        const pad: ILandingPad = {
+            getTransform: () => transform,
+            getBoundingRadius: () => 10,
+            getIdentifier: () => "A",
+            getPadSize: () => LandingPadSize.SMALL,
+            getPadHeight: () => 1,
+        };
+        const provider = new LandingPadProvider([pad]);
+        const station = {
+            type: "spaceStation" as const,
+            model: { id: "station", name: "Station" },
+            getTransform: () => transform,
+            getBoundingRadius: () => 100,
+            getLandingPadProvider: () => provider,
+        };
+        const setClosestLandableFacility = vi.fn();
+        const spawnOnPad = vi.fn(() => {
+            expect(provider.getAvailableLandingPads()).toHaveLength(0);
+            expect(setClosestLandableFacility).toHaveBeenCalledExactlyOnceWith(station);
+        });
+        const controls = {
+            getSpaceship: () => ({ spawnOnPad }),
+            setClosestLandableFacility,
+            syncCameraTransform: vi.fn(),
+        };
+        const context = {
+            getActiveControls: () => ({ getTransform: () => transform }),
+            getSpaceshipControls: () => controls,
+            getStarSystem: () => ({
+                getOrbitalObjectById: (id: string) => (id === station.model.id ? station : undefined),
+            }),
+        } as unknown as StarSystemView;
+        const prototype = StarSystemView.prototype as unknown as {
+            loadAtStationLocation(this: StarSystemView, location: AtStationCoordinates): Promise<void>;
+        };
+        try {
+            await prototype.loadAtStationLocation.call(context, {
+                type: "atStation",
+                universeObjectId: {
+                    idInSystem: "station",
+                    systemCoordinates: {
+                        starSectorX: 0,
+                        starSectorY: 0,
+                        starSectorZ: 0,
+                        localX: 0,
+                        localY: 0,
+                        localZ: 0,
+                    },
+                },
+            });
+            expect(spawnOnPad).toHaveBeenCalledWith(pad);
+            expect(controls.syncCameraTransform).toHaveBeenCalledOnce();
         } finally {
             scene.dispose();
             engine.dispose();
