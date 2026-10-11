@@ -25,6 +25,7 @@ import type { ClusteredLightingRegion } from "../helpers/clusteredLightingSystem
 import type { Target } from "../targeting/target";
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Transformable } from "../universe/architecture/transformable";
+import type { LandingPadProvider } from "../universe/orbitalFacility/landingPadProvider";
 import type { SpatialGeometry } from "../universe/systemObject";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
@@ -43,6 +44,7 @@ export class SystemEntityProcessors {
     private readonly update: SystemEntityProcessorRegistry<SystemEntityUpdateContext, void>;
     readonly shadowCasters: SystemEntityProcessorRegistry<void, Array<TransformNode>>;
     readonly sphereOccluders: SystemEntityProcessorRegistry<void, Array<Transformable & HasBoundingSphere>>;
+    readonly landingPadProviders: SystemEntityProcessorRegistry<void, LandingPadProvider | null>;
     readonly lightingRegions: SystemEntityProcessorRegistry<void, ClusteredLightingRegion | null>;
 
     constructor() {
@@ -52,6 +54,7 @@ export class SystemEntityProcessors {
         this.update = new SystemEntityProcessorRegistry(() => {});
         this.shadowCasters = new SystemEntityProcessorRegistry(() => []);
         this.sphereOccluders = new SystemEntityProcessorRegistry(() => []);
+        this.landingPadProviders = new SystemEntityProcessorRegistry(() => null);
         this.lightingRegions = new SystemEntityProcessorRegistry(() => null);
     }
 
@@ -75,6 +78,7 @@ export class SystemEntityProcessors {
         this.update.dispose();
         this.shadowCasters.dispose();
         this.sphereOccluders.dispose();
+        this.landingPadProviders.dispose();
         this.lightingRegions.dispose();
     }
 }
