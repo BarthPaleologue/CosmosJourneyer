@@ -82,6 +82,13 @@ export function createGameModuleApi(
                     },
                 },
             },
+            lighting: {
+                systemEntities: {
+                    registerRegion: (type, getRegion) => {
+                        systemEntityProcessors.lightingRegions.register(type, getRegion);
+                    },
+                },
+            },
         },
     };
 }

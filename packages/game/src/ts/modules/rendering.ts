@@ -17,6 +17,7 @@
 
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
+import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import type { AnySystemContentType, SystemEntity } from "@/frontend/systemEntity/systemEntity";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -32,6 +33,14 @@ export type RenderingExtensionPoint = {
             registerSphereOccluders<T extends AnySystemContentType>(
                 type: T,
                 getSphereOccluders: (entity: SystemEntity<T>) => Array<Transformable & HasBoundingSphere>,
+            ): void;
+        };
+    };
+    lighting: {
+        systemEntities: {
+            registerRegion<T extends AnySystemContentType>(
+                type: T,
+                getRegion: (entity: SystemEntity<T>) => ClusteredLightingRegion,
             ): void;
         };
     };

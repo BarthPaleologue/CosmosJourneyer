@@ -550,6 +550,16 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
+            const systemEntities = this.starSystem.getSystemEntities();
+            for (const entity of systemEntities) {
+                const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+                if (region === null) {
+                    continue;
+                }
+
+                this.clusteredLightingSystem.unregisterRegion(region);
+            }
+
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.terrainSystem.reset();
             this.postProcessManager.reset();
@@ -599,6 +609,15 @@ export class StarSystemView implements View {
             this.systemEntityProcessors.shadowCasters.dispatch(entity),
         );
         this.starSystem.stellarLightSystem.addShadowCasters(systemEntityShadowCasters);
+
+        for (const entity of systemEntities) {
+            const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+            if (region === null) {
+                continue;
+            }
+
+            this.clusteredLightingSystem.registerRegion(region);
+        }
 
         return ok(this.starSystem);
     }
