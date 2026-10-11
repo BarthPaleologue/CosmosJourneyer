@@ -17,8 +17,10 @@
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { uniformRandBool, getRngFromSeed } from "@cosmos-journeyer/random";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import { err, ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
+import { serializeUniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
 import { MissionType } from "@/backend/missions/missionSerialized";
 import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
@@ -26,35 +28,41 @@ import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import type { Player } from "@/frontend/player/player";
 
+import { hashString } from "@/utils/hash";
+
 import type { Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**
  * Generates station missions deterministically for the current hour.
- * @param spaceStationModel - Station offering the missions.
- * @param systemContentModel - System content and orbital-object data.
+ * @param stationId - Station offering the missions.
  * @param universeBackend - Universe lookup for target objects.
  * @param player - Player whose accepted and completed missions are excluded.
  * @param timestampMillis - Timestamp in milliseconds used to select the hourly set.
  * @returns Available station and nearby-system missions not already accepted or completed.
  */
 export function generateSightseeingMissions(
-    spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
-    systemContentModel: DeepReadonly<StarSystemContentModel>,
+    stationId: DeepReadonly<UniverseObjectId>,
     universeBackend: UniverseBackend,
     player: Player,
     timestampMillis: number,
-): ReadonlyArray<Mission> {
+): Result<ReadonlyArray<Mission>, Error> {
+    const systemContentModel = universeBackend.getSystemContentModelAt(stationId.systemCoordinates);
+    if (systemContentModel === null) {
+        return err(
+            new Error(
+                `Could not find the system associated to station with id: ${serializeUniverseObjectId(stationId)}`,
+            ),
+        );
+    }
+
+    const missionSeed = hashString(serializeUniverseObjectId(stationId));
+
     const currentHour = Math.floor(timestampMillis / 1000 / 60 / 60) % (24 * 30);
 
     const missions: Array<Mission> = [];
 
-    const rng = getRngFromSeed(spaceStationModel.seed + currentHour);
-
-    const spaceStationUniverseId: UniverseObjectId = {
-        systemCoordinates: systemContentModel.system.coordinates,
-        idInSystem: spaceStationModel.id,
-    };
+    const rng = getRngFromSeed(missionSeed + currentHour);
 
     const neighborSystems = getNeighborStarSystemCoordinates(
         systemContentModel.system.coordinates,
@@ -71,7 +79,7 @@ export function generateSightseeingMissions(
             ...generateSightseeingMissionsInSystem(
                 neighborSystemModel,
                 systemPosition,
-                spaceStationUniverseId,
+                stationId,
                 distance,
                 rng,
                 universeBackend,
@@ -79,19 +87,17 @@ export function generateSightseeingMissions(
         );
     });
 
-    missions.push(
-        ...generateAsteroidFieldMissionsInSystem(systemContentModel, spaceStationUniverseId, universeBackend),
-    );
+    missions.push(...generateAsteroidFieldMissionsInSystem(systemContentModel, stationId, universeBackend));
 
-    missions.push(
-        ...generateTerminatorLandingMissionsInSystem(systemContentModel, spaceStationUniverseId, universeBackend),
-    );
+    missions.push(...generateTerminatorLandingMissionsInSystem(systemContentModel, stationId, universeBackend));
 
     // filter missions to avoid duplicates with already accepted missions of the player
-    return missions.filter((mission) =>
-        player.currentMissions
-            .concat(player.completedMissions)
-            .every((currentMission) => !mission.equals(currentMission)),
+    return ok(
+        missions.filter((mission) =>
+            player.currentMissions
+                .concat(player.completedMissions)
+                .every((currentMission) => !mission.equals(currentMission)),
+        ),
     );
 }
 
@@ -135,7 +141,7 @@ function generateSightseeingMissionsInSystem(
 
 /**
  * Samples anomaly fly-by missions with a probability that decreases with system distance.
- * @param systemContentModel - System content and orbital-object data.
+ * @param systemContentModel System content and orbital-object data.
  * @param systemPosition - Galactic position used in deterministic anomaly sampling.
  * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
  * @param distance - Distance from the mission giver in light-years.
@@ -180,7 +186,7 @@ function generateAnomalyFlyByMissionsInSystem(
 }
 
 /**
- * @param systemContentModel - System content and orbital-object data.
+ * @param systemContentModel System content and orbital-object data.
  * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
  * @param universeBackend - Universe lookup for target objects.
  * @returns Fly-by missions for neutron-star targets.
@@ -216,7 +222,7 @@ function generateNeutronStarFlyByMissionsInSystem(
 }
 
 /**
- * @param systemContentModel - System content and orbital-object data.
+ * @param systemContentModel System content and orbital-object data.
  * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
  * @param universeBackend - Universe lookup for target objects.
  * @returns Fly-by missions for black-hole targets.
@@ -253,7 +259,7 @@ function generateBlackHoleFlyByMissionsInSystem(
 
 /**
  * Creates asteroid-field missions for planets with rings.
- * @param systemContentModel - System content and orbital-object data.
+ * @param systemContentModel System content and orbital-object data.
  * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
  * @param universeBackend - Universe lookup for target objects.
  * @returns Missions for valid asteroid-field targets.
@@ -293,7 +299,7 @@ function generateAsteroidFieldMissionsInSystem(
 
 /**
  * Creates terminator-landing missions for telluric planets without oceans.
- * @param systemContentModel - System content and orbital-object data.
+ * @param systemContentModel System content and orbital-object data.
  * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
  * @param universeBackend - Universe lookup for target objects.
  * @returns Missions for eligible landing targets.
