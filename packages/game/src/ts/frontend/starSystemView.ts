@@ -1156,7 +1156,11 @@ export class StarSystemView implements View {
 
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
-        this.targetingSystem.setKnownTargets(getMissionKnownTargets(this.player.currentMissions, starSystem));
+        this.targetingSystem.setKnownTargets(
+            getMissionKnownTargets(this.player.currentMissions, starSystem, (entity) =>
+                this.systemEntityProcessors.targeting.dispatch(entity),
+            ),
+        );
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);
