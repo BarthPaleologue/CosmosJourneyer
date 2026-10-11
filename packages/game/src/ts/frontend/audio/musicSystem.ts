@@ -43,8 +43,6 @@ export class MusicSystem {
     private volume = 1;
     private readonly fadeSeconds = 3;
 
-    private readonly pauseMusicWhenPaused = false;
-
     private readonly starSystemView: StarSystemView;
 
     private readonly systemEntityProcessor: SystemEntityMusicProcessor;
@@ -121,10 +119,7 @@ export class MusicSystem {
 
     public update(isPaused: boolean, isInStarSystemView: boolean, isInMainMenu: boolean, deltaSeconds: number): void {
         if (this.currentMusic !== null) {
-            if (isPaused && this.pauseMusicWhenPaused && this.currentMusic.state === SoundState.Started) {
-                this.currentMusic.pause();
-                return;
-            } else if (!isPaused && this.currentMusic.state === SoundState.Paused) {
+            if (!isPaused && this.currentMusic.state === SoundState.Paused) {
                 this.currentMusic.play();
                 return;
             }
@@ -177,6 +172,18 @@ export class MusicSystem {
             return;
         }
 
+        const warpDrive = spaceship.getInternals().getWarpDrive();
+        if (warpDrive !== null && warpDrive.isEnabled()) {
+            const suitableMusics = [
+                this.musics.atlanteanTwilight,
+                this.musics.infinitePerspective,
+                this.musics.mesmerize,
+            ];
+
+            this.setMusicFromSelection(suitableMusics);
+            return;
+        }
+
         for (const systemEntity of this.starSystemView.getStarSystem().getSystemEntities()) {
             const distance = Vector3.Distance(
                 systemEntity.placement.getTransform().getAbsolutePosition(),
@@ -189,8 +196,6 @@ export class MusicSystem {
                 return;
             }
         }
-
-        const warpDrive = spaceship.getInternals().getWarpDrive();
 
         switch (closestOrbitalObject.model.type) {
             case "blackHole":
@@ -229,23 +234,6 @@ export class MusicSystem {
                 assertUnreachable(closestOrbitalObject.model);
         }
 
-        if (warpDrive !== null && warpDrive.isEnabled()) {
-            const suitableMusics = [
-                this.musics.atlanteanTwilight,
-                this.musics.infinitePerspective,
-                this.musics.mesmerize,
-            ];
-
-            this.setMusicFromSelection(suitableMusics);
-            return;
-        }
-
-        if (!spaceship.isLanded() && (warpDrive === null || warpDrive.isDisabled())) {
-            const suitableMusics = [this.musics.thatZenMoment, this.musics.deepRelaxation, this.musics.peaceOfMind];
-            this.setMusicFromSelection(suitableMusics);
-            return;
-        }
-
         if (isOnFoot || spaceship.isLanded()) {
             const suitableMusics = [
                 this.musics.thatZenMoment,
@@ -255,6 +243,12 @@ export class MusicSystem {
                 this.musics.reawakening,
             ];
 
+            this.setMusicFromSelection(suitableMusics);
+            return;
+        }
+
+        if (!spaceship.isLanded() && (warpDrive === null || warpDrive.isDisabled())) {
+            const suitableMusics = [this.musics.thatZenMoment, this.musics.deepRelaxation, this.musics.peaceOfMind];
             this.setMusicFromSelection(suitableMusics);
             return;
         }
