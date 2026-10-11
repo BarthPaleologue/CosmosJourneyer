@@ -41,14 +41,7 @@ import { StellarLightSystem } from "../helpers/stellarLightSystem";
 import type { SystemEntity } from "../systemEntity/systemEntity";
 import type { SystemEntityLoadContext, SystemEntityLoader } from "../systemEntity/systemEntityLoader";
 import type { SystemEntityProcessors, SystemEntityUpdateContext } from "../systemEntity/systemEntityProcessors";
-import type {
-    Anomaly,
-    CelestialBody,
-    OrbitalFacility,
-    OrbitalObject,
-    Planet,
-    StellarObject,
-} from "./architecture/orbitalObject";
+import type { Anomaly, CelestialBody, OrbitalObject, Planet, StellarObject } from "./architecture/orbitalObject";
 import { GravitySystem } from "./gravitySystem";
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
 import type { OrbitalTransform } from "./keplerianOrbitalSimulation";
@@ -84,10 +77,6 @@ export class StarSystemController {
     private readonly satellites: ReadonlyArray<TelluricPlanet>;
 
     private readonly anomalies: ReadonlyArray<Anomaly>;
-
-    private readonly orbitalFacilities: ReadonlyArray<OrbitalFacility>;
-
-    private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
 
     private readonly systemEntities: ReadonlyArray<SystemEntity>;
 
@@ -134,7 +123,6 @@ export class StarSystemController {
         this.planets = orbitalObjects.planets;
         this.satellites = orbitalObjects.satellites;
         this.anomalies = orbitalObjects.anomalies;
-        this.orbitalFacilities = orbitalObjects.orbitalFacilities;
 
         this.systemEntities = systemEntities;
 
@@ -142,15 +130,6 @@ export class StarSystemController {
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
         this.stellarLightSystem = new StellarLightSystem(this.scene);
         this.scatteringSystem = new ScatteringSystem(this.assets.objects, this.stellarLightSystem, this.scene);
-
-        for (const orbitalFacility of this.orbitalFacilities) {
-            this.orbitalFacilityToParents.set(
-                orbitalFacility,
-                this.getOrbitalObjects().filter((otherObject) =>
-                    orbitalFacility.model.orbit.parentIds.includes(otherObject.model.id),
-                ),
-            );
-        }
 
         this.orbitalSimulation = orbitalSimulation;
 
@@ -182,19 +161,14 @@ export class StarSystemController {
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
-        const orbitalObjects = [
-            ...result.stellarObjects,
-            ...result.planets,
-            ...result.satellites,
-            ...result.anomalies,
-            ...result.orbitalFacilities,
-        ];
+        const orbitalObjects = [...result.stellarObjects, ...result.planets, ...result.satellites, ...result.anomalies];
 
         const orbitalSimulation = new KeplerianOrbitalSimulation([]);
         orbitalSimulation.addObjects(orbitalObjects.map(toKeplerian));
 
         const entityLoaderContext: SystemEntityLoadContext = {
             scene,
+            assets,
             terrainSystem,
             orbitalObjects,
             orbitalSimulation,
@@ -249,13 +223,6 @@ export class StarSystemController {
     }
 
     /**
-     * Returns all the space stations in the star system
-     */
-    public getOrbitalFacilities(): ReadonlyArray<OrbitalFacility> {
-        return this.orbitalFacilities;
-    }
-
-    /**
      * Returns all the celestial bodies in the star system
      */
     public getCelestialBodies(): ReadonlyArray<CelestialBody> {
@@ -273,7 +240,7 @@ export class StarSystemController {
      * Returns all the orbital objects in the star system
      */
     public getOrbitalObjects(): ReadonlyArray<OrbitalObject> {
-        return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
+        return [...this.getCelestialBodies()];
     }
 
     /**
@@ -438,12 +405,6 @@ export class StarSystemController {
             object.asteroidField?.update(cameraPosition, this.assets.objects.asteroids, deltaSeconds);
         }
 
-        for (const orbitalFacility of this.getOrbitalFacilities()) {
-            const parents = this.orbitalFacilityToParents.get(orbitalFacility) ?? [];
-            orbitalFacility.update(parents, cameraPosition, deltaSeconds);
-            orbitalFacility.computeCulling(camera);
-        }
-
         const entityContext: SystemEntityUpdateContext = {
             observerPosition: cameraPosition,
             deltaSeconds,
@@ -539,7 +500,6 @@ export class StarSystemController {
      */
     public dispose(): void {
         this.scatteringSystem.dispose();
-        this.orbitalFacilityToParents.clear();
 
         this.stellarLightSystem.dispose();
 
@@ -550,9 +510,6 @@ export class StarSystemController {
             systemEntity.placement.getTransform().dispose();
         }
 
-        this.orbitalFacilities.forEach((facility) => {
-            facility.dispose();
-        });
         this.anomalies.forEach((anomaly) => {
             anomaly.dispose();
         });

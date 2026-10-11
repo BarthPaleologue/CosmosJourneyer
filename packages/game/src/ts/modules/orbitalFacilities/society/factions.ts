@@ -1,9 +1,16 @@
 import { uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { Faction, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import { getPowerPlayData } from "./powerplay";
+
+export type Faction =
+    | "feynman_interstellar"
+    | "church_of_awakening"
+    | "human_commonwealth"
+    | "satori_concord"
+    | "dreamers_connection";
 
 export function factionToString(faction: Faction): string {
     switch (faction) {

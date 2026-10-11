@@ -20,7 +20,6 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
-import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
@@ -30,8 +29,9 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { lookAt } from "@/frontend/helpers/transform";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
+import { SpaceStation } from "@/modules/orbitalFacilities/spaceStation";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -75,7 +75,6 @@ export async function createSpaceStationScene(
         planets: [],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
     const sunModel = systemModel.stellarObjects[0];
@@ -91,7 +90,7 @@ export async function createSpaceStationScene(
         { orbit: { semiMajorAxis: distanceToStar } },
     );
 
-    const spaceStation = new SpaceStation(spaceStationModel, assets, scene);
+    const spaceStation = new SpaceStation(spaceStationModel, { assets, scene });
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(spaceStation);
 
@@ -116,7 +115,7 @@ export async function createSpaceStationScene(
 
         const cameraWorldPosition = camera.globalPosition;
 
-        spaceStation.update([], cameraWorldPosition, deltaSeconds);
+        spaceStation.update(cameraWorldPosition, deltaSeconds);
         clusteredLightingSystem.update(camera);
     });
 

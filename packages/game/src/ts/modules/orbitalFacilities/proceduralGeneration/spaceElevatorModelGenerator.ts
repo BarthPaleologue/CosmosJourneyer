@@ -15,12 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HydroponicToConventionalRatio, IndividualAverageDailyIntake, SeedHalfRange } from "#/constants";
-import { getFactionFromCoordinates } from "#/society/factions";
-import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
-import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
-import { generateSpaceElevatorName } from "#/utils/strings/spaceStationNameGenerator";
 import {
     getOrbitRadiusFromPeriod,
     getSolarPanelSurfaceFromEnergyRequirement,
@@ -32,15 +27,21 @@ import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeye
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type {
-    PlanetModel,
-    Orbit,
-    SpaceElevatorModel,
-    ElevatorSectionModel,
-    StarSystemModel,
-    Rotation,
-} from "@cosmos-journeyer/universe-model";
+import type { PlanetModel, Orbit, StarSystemModel, Rotation } from "@cosmos-journeyer/universe-model";
 
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+
+import {
+    CropTypes,
+    getEdibleEnergyPerAreaPerDay,
+    HydroponicToConventionalRatio,
+    IndividualAverageDailyIntake,
+} from "@/utils/agriculture";
+import type { CropType } from "@/utils/agriculture";
+
+import type { ElevatorSectionModel } from "../sections";
+import { getFactionFromCoordinates } from "../society/factions";
+import type { SpaceElevatorModel } from "../spaceElevatorModel";
 import { generateFusionSectionModel } from "./sections/fusion";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
@@ -48,13 +49,14 @@ import { generateRingHabitatModel } from "./sections/habitats/ring";
 import { generateLandingBayModel } from "./sections/landingBay";
 import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
+import { generateSpaceElevatorName } from "./spaceStationNameGenerator";
 
 export function generateSpaceElevatorModel(
     id: string,
     seed: number,
     parentBody: DeepReadonly<PlanetModel>,
     systemModel: DeepReadonly<StarSystemModel>,
-): SpaceElevatorModel {
+): SystemEntityModel<SpaceElevatorModel> {
     const rng = getRngFromSeed(seed);
 
     const name = generateSpaceElevatorName(rng, 2756);
@@ -202,22 +204,27 @@ export function generateSpaceElevatorModel(
     sections.push(generateLandingBayModel(SeedHalfRange * rng(37)));
 
     return {
-        type: "spaceElevator",
-        seed,
-        starSystemCoordinates: systemModel.coordinates,
-        id: id,
+        id,
         name,
-        orbit,
-        mass,
-        rotation,
-        tetherLength,
-        population,
-        annualEnergyPerCapitaKWh,
-        populationDensity: targetPopulationDensity,
-        agricultureMix,
-        nbHydroponicLayers,
-        faction,
-        solarPanelEfficiency,
-        sections,
+        content: {
+            type: "spaceElevator",
+            seed,
+            starSystemCoordinates: systemModel.coordinates,
+            tetherLength,
+            population,
+            annualEnergyPerCapitaKWh,
+            populationDensity: targetPopulationDensity,
+            agricultureMix,
+            nbHydroponicLayers,
+            faction,
+            solarPanelEfficiency,
+            sections,
+        },
+        placement: {
+            type: "inOrbit",
+            orbit,
+            mass,
+            rotation,
+        },
     };
 }

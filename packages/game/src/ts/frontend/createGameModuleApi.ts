@@ -72,6 +72,20 @@ export function createGameModuleApi(
                     },
                 },
             },
+            lighting: {
+                systemEntities: {
+                    registerRegion: (type, getRegion) => {
+                        systemEntityProcessors.lightingRegions.register(type, getRegion);
+                    },
+                },
+            },
+        },
+        landingPad: {
+            systemEntities: {
+                register: (type, getLandingPadManager) => {
+                    systemEntityProcessors.landingPadManagers.register(type, getLandingPadManager);
+                },
+            },
         },
     };
 }

@@ -38,7 +38,6 @@ import type {
     StarModel,
     GasPlanetModel,
     TelluricPlanetModel,
-    SpaceStationModel,
     TelluricSatelliteModel,
     StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
@@ -48,6 +47,7 @@ import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel
 import { CropType } from "@/utils/agriculture";
 
 import type { MonolithModel } from "../monolith/entity";
+import type { SpaceStationModel } from "../orbitalFacilities/spaceStationModel";
 
 export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
@@ -297,58 +297,61 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     } satisfies TelluricSatelliteModel;
 
-    const newJulesVerne: SpaceStationModel = {
-        type: "spaceStation",
+    const newJulesVerne: SystemEntityModel<SpaceStationModel> = {
         name: "New Jules Verne",
         id: "newJulesVerne",
-        mass: 10,
-        orbit: {
-            parentIds: ["aphrodite"],
-            semiMajorAxis: aphrodite.rings.outerRadius * 1.5,
-            inclination: degreesToRadians(30),
-            initialMeanAnomaly: degreesToRadians(254),
-            longitudeOfAscendingNode: degreesToRadians(23),
-            argumentOfPeriapsis: degreesToRadians(6),
-            eccentricity: 0.5,
-            p: 2,
+        content: {
+            type: "spaceStation",
+            agricultureMix: [[1, CropType.LENTIL]],
+            nbHydroponicLayers: 2,
+            annualEnergyPerCapitaKWh: 200_000,
+            solarPanelEfficiency: 0.4,
+            population: 300_000,
+            populationDensity: 4_000,
+            faction: "human_commonwealth",
+            sections: [
+                { type: "engineBay" },
+                { type: "utility", hasTanks: true },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: true },
+                { type: "solar", surface: 10_000e3, axisCount: 3, secondaryArmCount: 2 },
+                { type: "utility", hasTanks: true },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: true },
+                {
+                    type: "cylinderHabitat",
+                    radius: 3e3,
+                    surface: { housing: km2ToM2(300_000 / 4_000), agriculture: km2ToM2(300_000 / 4_000) * 0.3 },
+                },
+                { type: "utility", hasTanks: true },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: false },
+                { type: "utility", hasTanks: true },
+                { type: "landingBay", heightFactor: 2 },
+            ],
         },
-        rotation: {
-            siderealPeriod: 0,
-            spinAxisAzimuth: 0,
-            axialTilt: 0,
-            initialRotationAngle: 0,
-        },
-        seed: 47,
-        starSystemCoordinates: coordinates,
-        agricultureMix: [[1, CropType.LENTIL]],
-        nbHydroponicLayers: 2,
-        annualEnergyPerCapitaKWh: 200_000,
-        solarPanelEfficiency: 0.4,
-        population: 300_000,
-        populationDensity: 4_000,
-        faction: "human_commonwealth",
-        sections: [
-            { type: "engineBay" },
-            { type: "utility", hasTanks: true },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: true },
-            { type: "solar", surface: 10_000e3, axisCount: 3, secondaryArmCount: 2 },
-            { type: "utility", hasTanks: true },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: true },
-            {
-                type: "cylinderHabitat",
-                radius: 3e3,
-                surface: { housing: km2ToM2(300_000 / 4_000), agriculture: km2ToM2(300_000 / 4_000) * 0.3 },
+        placement: {
+            type: "inOrbit",
+            mass: 10,
+            orbit: {
+                parentIds: ["aphrodite"],
+                semiMajorAxis: aphrodite.rings.outerRadius * 1.5,
+                inclination: degreesToRadians(30),
+                initialMeanAnomaly: degreesToRadians(254),
+                longitudeOfAscendingNode: degreesToRadians(23),
+                argumentOfPeriapsis: degreesToRadians(6),
+                eccentricity: 0.5,
+                p: 2,
             },
-            { type: "utility", hasTanks: true },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: false },
-            { type: "utility", hasTanks: true },
-            { type: "landingBay", heightFactor: 2 },
-        ],
+            rotation: {
+                siderealPeriod: 0,
+                spinAxisAzimuth: 0,
+                axialTilt: 0,
+                initialRotationAngle: 0,
+            },
+        },
     };
 
     const snowLine = getWaterIceFrostLine(vesta.blackBodyTemperature, vesta.radius);
@@ -420,8 +423,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             planets: [janus, aphrodite, melpomene],
             satellites: [adonis, phileas],
             anomalies: [],
-            orbitalFacilities: [newJulesVerne],
         },
-        systemEntities: [monolith],
+        systemEntities: [monolith, newJulesVerne],
     };
 }

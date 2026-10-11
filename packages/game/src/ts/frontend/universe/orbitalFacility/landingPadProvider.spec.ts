@@ -18,8 +18,8 @@
 import { TransformNode } from "@babylonjs/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { LandingPadManager, LandingPadSize } from "./landingPadManager";
-import type { ILandingPad, LandingRequest } from "./landingPadManager";
+import { LandingPadProvider, LandingPadSize } from "./landingPadProvider";
+import type { ILandingPad, LandingRequest } from "./landingPadProvider";
 
 vi.mock("@babylonjs/core");
 
@@ -69,7 +69,7 @@ describe("LandingPadManager", () => {
     let mediumPad: ILandingPad;
     let largePad: ILandingPad;
     let allPads: ILandingPad[];
-    let landingPadManager: LandingPadManager;
+    let landingPadManager: LandingPadProvider;
 
     beforeEach(() => {
         // Create fresh instances for each test
@@ -79,7 +79,7 @@ describe("LandingPadManager", () => {
         allPads = [smallPad, mediumPad, largePad];
 
         // Pass the array directly instead of a lambda
-        landingPadManager = new LandingPadManager(allPads);
+        landingPadManager = new LandingPadProvider(allPads);
     });
 
     it("should return all landing pads", () => {

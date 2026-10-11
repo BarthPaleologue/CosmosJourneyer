@@ -16,13 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HydroponicToConventionalRatio, IndividualAverageDailyIntake, SeedHalfRange } from "#/constants";
-import { getFactionFromCoordinates } from "#/society/factions";
 import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
 import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
-import { generateSpaceStationName } from "#/utils/strings/spaceStationNameGenerator";
 import {
     degreesToRadians,
     getSolarPanelSurfaceFromEnergyRequirement,
@@ -34,15 +32,13 @@ import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@c
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type {
-    CelestialBodyModel,
-    Orbit,
-    SpaceStationModel,
-    StationSectionModel,
-    StarSystemModel,
-    Rotation,
-} from "@cosmos-journeyer/universe-model";
+import type { CelestialBodyModel, Orbit, StarSystemModel, Rotation } from "@cosmos-journeyer/universe-model";
 
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+
+import type { StationSectionModel } from "../sections";
+import { getFactionFromCoordinates } from "../society/factions";
+import type { SpaceStationModel } from "../spaceStationModel";
 import { generateEngineBayModel } from "./sections/engineBay";
 import { generateFusionSectionModel } from "./sections/fusion";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
@@ -51,14 +47,15 @@ import { generateRingHabitatModel } from "./sections/habitats/ring";
 import { generateLandingBayModel } from "./sections/landingBay";
 import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
+import { generateSpaceStationName } from "./spaceStationNameGenerator";
 
 export function generateSpaceStationModel(
     id: string,
     seed: number,
     parentBody: DeepReadonly<CelestialBodyModel>,
     systemModel: DeepReadonly<StarSystemModel>,
-    overrides?: DeepReadonly<DeepPartial<SpaceStationModel>>,
-): SpaceStationModel {
+    overrides?: DeepReadonly<SystemEntityModel<DeepPartial<SpaceStationModel>>>,
+): SystemEntityModel<SpaceStationModel> {
     const rng = getRngFromSeed(seed);
 
     const name = overrides?.name ?? generateSpaceStationName(rng, 2756);
@@ -225,21 +222,25 @@ export function generateSpaceStationModel(
     sections.push(generateLandingBayModel(SeedHalfRange * rng(37)));
 
     return {
-        type: "spaceStation",
-        seed,
-        starSystemCoordinates: systemModel.coordinates,
-        id: id,
+        id,
         name,
-        orbit,
-        mass,
-        rotation,
-        population,
-        annualEnergyPerCapitaKWh,
-        populationDensity: targetPopulationDensity,
-        agricultureMix,
-        nbHydroponicLayers,
-        faction,
-        solarPanelEfficiency,
-        sections,
+        content: {
+            seed,
+            starSystemCoordinates: systemModel.coordinates,
+            population,
+            annualEnergyPerCapitaKWh,
+            populationDensity: targetPopulationDensity,
+            agricultureMix,
+            nbHydroponicLayers,
+            faction,
+            solarPanelEfficiency,
+            sections,
+        },
+        placement: {
+            type: "inOrbit",
+            orbit,
+            mass,
+            rotation,
+        },
     };
 }

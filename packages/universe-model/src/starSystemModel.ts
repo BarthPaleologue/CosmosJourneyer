@@ -17,13 +17,7 @@
 
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 
-import type {
-    AnomalyModel,
-    OrbitalFacilityModel,
-    OrbitalObjectModel,
-    PlanetModel,
-    StellarObjectModel,
-} from "./orbitalObjects/index";
+import type { AnomalyModel, OrbitalObjectModel, PlanetModel, StellarObjectModel } from "./orbitalObjects/index";
 import type { OrbitalObjectId } from "./orbitalObjects/orbitalObjectId";
 import type { TelluricSatelliteModel } from "./orbitalObjects/telluricSatelliteModel";
 import type { StarSystemCoordinates } from "./starSystemCoordinates";
@@ -62,11 +56,6 @@ export type StarSystemModel = {
      * The orbital anomalies in the star system.
      */
     anomalies: Array<AnomalyModel>;
-
-    /**
-     * The orbital facilities in the star system (space station, space elevators, etc.)
-     */
-    orbitalFacilities: Array<OrbitalFacilityModel>;
 };
 
 /**
@@ -97,11 +86,6 @@ export function getObjectModelById(
     const anomaly = starSystem.anomalies.find((object) => object.id === id);
     if (anomaly !== undefined) {
         return anomaly;
-    }
-
-    const orbitalFacility = starSystem.orbitalFacilities.find((object) => object.id === id);
-    if (orbitalFacility !== undefined) {
-        return orbitalFacility;
     }
 
     return null;

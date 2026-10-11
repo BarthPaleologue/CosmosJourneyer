@@ -147,18 +147,6 @@ export class UniverseBackend {
         return this.coordinatesToCustomSystems.get(serializeStarSystemCoordinates(coordinates));
     }
 
-    /**
-     * Check if a system is in the human bubble.
-     * @param systemCoordinates The coordinates of the system to check.
-     * @returns true if the system is in the human bubble, false otherwise.
-     */
-    public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
-        const systemPosition = this.getSystemGalacticPosition(systemCoordinates);
-        const distanceToSolLy = Math.hypot(systemPosition.x, systemPosition.y, systemPosition.z);
-
-        return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
-    }
-
     public getSystemContentModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemContentModel> | null {
         const system = this.getSystemModelAt(coordinates);
         if (system === null) {
@@ -202,7 +190,7 @@ export class UniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates));
+        return generateStarSystemModel(systemRng, coordinates);
     }
 
     private getGeneratedSystemCoordinatesInStarSector(

@@ -27,7 +27,6 @@ import type {
     StarSystemCoordinates,
     AnomalyModel,
     AnomalyType,
-    OrbitalFacilityModel,
     PlanetModel,
     StellarObjectModel,
     TelluricSatelliteModel,
@@ -40,8 +39,6 @@ import { generateMandelbulbModel } from "./anomalies/mandelbulbModelGenerator";
 import { generateMengerSpongeModel } from "./anomalies/mengerSpongeModelGenerator";
 import { generateSierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModelGenerator";
 import { generateGasPlanetModel } from "./gasPlanet/gasPlanetModelGenerator";
-import { generateSpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModelGenerator";
-import { generateSpaceStationModel } from "./orbitalFacilities/spaceStationModelGenerator";
 import { generateBlackHoleModel } from "./stellarObjects/blackHoleModelGenerator";
 import { generateNeutronStarModel } from "./stellarObjects/neutronStarModelGenerator";
 import { generateStarModel } from "./stellarObjects/starModelGenerator";
@@ -59,7 +56,6 @@ const GenerationSteps = {
     NB_MOONS: 10,
     MOONS: 11,
     ANOMALIES: 666,
-    SPACE_STATIONS: 2000,
 } as const satisfies Record<string, number>;
 
 /**
@@ -72,7 +68,6 @@ const GenerationSteps = {
 export function generateStarSystemModel(
     systemRng: (step: number) => number,
     coordinates: DeepReadonly<StarSystemCoordinates>,
-    isCivilized: boolean,
 ): StarSystemModel {
     const systemName = generateStarName(systemRng, GenerationSteps.NAME);
 
@@ -243,8 +238,6 @@ export function generateStarSystemModel(
         }
     }
 
-    const orbitalFacilities: Array<OrbitalFacilityModel> = [];
-
     if (!isNonEmptyArray(stellarObjects)) {
         throw new Error("No stellar objects were generated for the star system");
     }
@@ -256,60 +249,7 @@ export function generateStarSystemModel(
         planets: planets,
         satellites: satellites,
         anomalies: anomalies,
-        orbitalFacilities: orbitalFacilities,
     };
-
-    if (isCivilized) {
-        // finally, space station are placed
-        const planetToScore = new Map<PlanetModel, number>();
-
-        planets.forEach((planet) => {
-            let score = 0;
-            const nbMoons = satellites.filter((satellite) => satellite.orbit.parentIds.includes(planet.id)).length;
-            score += nbMoons;
-            score += planet.rings !== null ? 2 : 0;
-
-            planetToScore.set(planet, score);
-        });
-
-        // sort planets by potential score
-        const sortedPlanets = planets.toSorted((planetA, planetB) => {
-            const scoreA = planetToScore.get(planetA) ?? 0;
-            const scoreB = planetToScore.get(planetB) ?? 0;
-            return scoreB - scoreA;
-        });
-
-        const nbStations = Math.min(planets.length, Math.max(1, systemRng(77) * Math.floor(planets.length / 2)));
-
-        const planetsWithStations = sortedPlanets.slice(0, nbStations);
-
-        planetsWithStations.forEach((planet) => {
-            const spaceStationSeed =
-                centeredRand(systemRng, GenerationSteps.SPACE_STATIONS + orbitalFacilities.length) * SeedHalfRange;
-
-            if (
-                uniformRandBool(0.5, systemRng, 657) && // 50% chance of having a space elevator
-                planet.type === "telluricPlanet" && // space elevators can't be built on gas giants yet
-                planet.rings === null // can't have rings because the tether would be at risk
-            ) {
-                const spaceElevatorModel = generateSpaceElevatorModel(
-                    createOrbitalObjectId([planet.id], "spaceElevator", 0),
-                    spaceStationSeed,
-                    planet,
-                    systemModel,
-                );
-                orbitalFacilities.push(spaceElevatorModel);
-            } else {
-                const spaceStationModel = generateSpaceStationModel(
-                    createOrbitalObjectId([planet.id], "spaceStation", 0),
-                    spaceStationSeed,
-                    planet,
-                    systemModel,
-                );
-                orbitalFacilities.push(spaceStationModel);
-            }
-        });
-    }
 
     return systemModel;
 }

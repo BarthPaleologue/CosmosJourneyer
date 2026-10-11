@@ -20,6 +20,7 @@ import type { DeepReadonly, TagMetadataOf, Result, Tagged } from "@cosmos-journe
 
 import type { SystemContentModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
+import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Transformable } from "../universe/architecture/transformable";
 import type { KeplerianObject } from "../universe/keplerianOrbitalSimulation";
 
@@ -60,10 +61,11 @@ export type ContentOf<T extends AnySystemContentType> =
     TagMetadataOf<T> extends { Content: infer TContent extends SystemContent } ? TContent : never;
 
 export type SystemContentFactoryOf<T extends AnySystemContentType> = (
-    model: DeepReadonly<ContentModelOf<T>>,
+    model: DeepReadonly<SystemEntityModel<ContentModelOf<T>>>,
     context: SystemContentFactoryContext,
 ) => Result<ContentOf<T>, Error>;
 
 export type SystemContentFactoryContext = {
     scene: Scene;
+    assets: RenderingAssets;
 };

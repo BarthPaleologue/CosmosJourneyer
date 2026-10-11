@@ -37,17 +37,14 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { wait } from "@/utils/wait";
 
-import type { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
+import type { Anomaly, Planet, StellarObject } from "./architecture/orbitalObject";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
-import { SpaceElevator } from "./orbitalFacility/spaceElevator";
-import { SpaceStation } from "./orbitalFacility/spaceStation";
 
 export type StarSystemLoaderOutput = {
     stellarObjects: NonEmptyArray<StellarObject>;
     planets: Array<Planet>;
     satellites: Array<TelluricPlanet>;
     anomalies: Array<Anomaly>;
-    orbitalFacilities: Array<OrbitalFacility>;
 };
 
 export class StarSystemLoader {
@@ -70,8 +67,7 @@ export class StarSystemLoader {
             systemModel.stellarObjects.length +
             systemModel.planets.length +
             systemModel.satellites.length +
-            systemModel.anomalies.length +
-            systemModel.orbitalFacilities.length;
+            systemModel.anomalies.length;
 
         this.loadingIndex = 0;
 
@@ -90,7 +86,6 @@ export class StarSystemLoader {
         const planets = await this.loadPlanets(systemModel.planets, assets, scene, progressMonitor);
         const satellites = await this.loadSatellites(systemModel.satellites, assets, scene, progressMonitor);
         const anomalies = await this.loadAnomalies(systemModel.anomalies, scene, progressMonitor);
-        const orbitalFacilities = await this.loadOrbitalFacilities(systemModel, assets, scene, progressMonitor);
 
         await wait(1000);
 
@@ -99,7 +94,6 @@ export class StarSystemLoader {
             planets,
             satellites,
             anomalies,
-            orbitalFacilities,
         };
     }
 
@@ -178,35 +172,6 @@ export class StarSystemLoader {
         }
 
         return anomalies;
-    }
-
-    private async loadOrbitalFacilities(
-        systemModel: DeepReadonly<StarSystemModel>,
-        assets: RenderingAssets,
-        scene: Scene,
-        progressMonitor: ILoadingProgressMonitor,
-    ): Promise<Array<OrbitalFacility>> {
-        const orbitalFacilities: OrbitalFacility[] = [];
-        for (const orbitalFacilityModel of systemModel.orbitalFacilities) {
-            let orbitalFacility: OrbitalFacility;
-            switch (orbitalFacilityModel.type) {
-                case "spaceStation":
-                    orbitalFacility = new SpaceStation(orbitalFacilityModel, assets, scene);
-                    break;
-                case "spaceElevator":
-                    orbitalFacility = new SpaceElevator(orbitalFacilityModel, assets, scene);
-                    break;
-                default:
-                    return assertUnreachable(orbitalFacilityModel);
-            }
-            orbitalFacilities.push(orbitalFacility);
-            orbitalFacility.getTransform().setAbsolutePosition(new Vector3(this.offset * ++this.loadingIndex, 0, 0));
-            progressMonitor.completeTask();
-
-            await wait(this.timeOut);
-        }
-
-        return orbitalFacilities;
     }
 
     private async loadPlanets(

@@ -19,18 +19,15 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 
-import type { SpaceElevatorClimber } from "../assets/procedural/spaceStation/climber/spaceElevatorClimber";
-import type { LandingBay } from "../assets/procedural/spaceStation/landingBay/landingBay";
 import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { SystemEntity } from "../systemEntity/systemEntity";
-import type { Anomaly, OrbitalFacility, OrbitalObject } from "../universe/architecture/orbitalObject";
-import type { ILandingPad } from "../universe/orbitalFacility/landingPadManager";
+import type { Anomaly, OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { StarSystemController } from "../universe/starSystemController";
 import type { SystemTarget } from "../universe/systemTarget";
 import type { Vehicle } from "../vehicle/vehicle";
 import { TargetType } from "./target";
-import type { PadTarget, Target } from "./target";
+import type { Target } from "./target";
 
 export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
 
@@ -41,7 +38,7 @@ export function getSystemTargets(
     const out: Array<Target> = [];
 
     const orbitalObjects = starSystem.getOrbitalObjects();
-    const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTargets(object));
+    const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTarget(object));
     out.push(...orbitalObjectTargets);
 
     const systemEntities = starSystem.getSystemEntities();
@@ -51,13 +48,6 @@ export function getSystemTargets(
     out.push(...starSystem.getSystemTargets().map(createSystemTarget));
 
     return out;
-}
-
-function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target> {
-    if (orbitalObject.type === "spaceElevator" || orbitalObject.type === "spaceStation") {
-        return createOrbitalFacilityTargets(orbitalObject);
-    }
-    return [createOrbitalObjectTarget(orbitalObject)];
 }
 
 export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target {
@@ -74,8 +64,6 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
         case "telluricPlanet":
         case "gasPlanet":
         case "telluricSatellite":
-        case "spaceStation":
-        case "spaceElevator":
         case "custom":
             break;
     }
@@ -141,56 +129,6 @@ export function createVehicleTarget(vehicle: Vehicle): Target {
         getTransform: () => vehicle.getTransform(),
         getBoundingRadius: () => vehicle.getBoundingRadius(),
     };
-}
-
-function createOrbitalFacilityTargets(orbitalFacility: OrbitalFacility): Array<Target> {
-    const out: Array<Target> = [createOrbitalObjectTarget(orbitalFacility)];
-
-    const landingPads = orbitalFacility.getLandingPadManager().getLandingPads();
-    const landingPadTargets = landingPads.flatMap((pad) => createLandingPadTargets(pad));
-    out.push(...landingPadTargets);
-
-    const landingBays = orbitalFacility.getLandingBays();
-    const landingBayTargets = landingBays.flatMap((bay) => createLandingBayTargets(bay));
-    out.push(...landingBayTargets);
-
-    if (orbitalFacility.type === "spaceElevator") {
-        const climberTargets = createClimberTargets(orbitalFacility.getClimber());
-        out.push(...climberTargets);
-    }
-
-    return out;
-}
-
-export function createLandingPadTargets(landingPad: ILandingPad): Array<PadTarget> {
-    return [
-        {
-            getTransform: () => landingPad.getTransform(),
-            getBoundingRadius: () => landingPad.getBoundingRadius(),
-            type: TargetType.LANDING_PAD,
-            padIdentifier: landingPad.getIdentifier(),
-        },
-    ];
-}
-
-function createLandingBayTargets(landingBay: LandingBay): Array<Target> {
-    return [
-        {
-            getTransform: () => landingBay.getTransform(),
-            getBoundingRadius: () => landingBay.getBoundingRadius(),
-            type: TargetType.LANDING_BAY,
-        },
-    ];
-}
-
-function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
-    return [
-        {
-            getTransform: () => climber.getTransform(),
-            getBoundingRadius: () => climber.getBoundingRadius(),
-            type: TargetType.SPACE_ELEVATOR_CLIMBER,
-        },
-    ];
 }
 
 export function getMissionKnownTargets(
