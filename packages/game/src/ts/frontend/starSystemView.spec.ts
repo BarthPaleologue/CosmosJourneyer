@@ -152,11 +152,12 @@ describe("StarSystemView", () => {
         const newFacility = {};
         const oldStarSystem = {
             dispose: vi.fn(),
-            getOrbitalFacilities: (): ReadonlyArray<object> => [oldFacility],
+            getOrbitalFacilities: () => [],
+            getSystemEntities: () => [oldFacility],
         };
         const newStarSystem = {
-            getOrbitalFacilities: () => [newFacility],
-            getSystemEntities: () => [],
+            getOrbitalFacilities: () => [],
+            getSystemEntities: () => [newFacility],
             stellarLightSystem: { addShadowCaster: vi.fn(), addShadowCasters: vi.fn() },
         } as unknown as StarSystemController;
         vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
@@ -178,7 +179,10 @@ describe("StarSystemView", () => {
             spaceshipControls: null,
             starSystem: oldStarSystem,
             systemEntityLoader: {},
-            systemEntityProcessors: {},
+            systemEntityProcessors: {
+                lightingRegions: { dispatch: (entity: object) => entity },
+                shadowCasters: { dispatch: () => [] },
+            },
             targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;

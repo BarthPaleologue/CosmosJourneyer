@@ -20,9 +20,13 @@ import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/cluste
 import type { Light } from "@babylonjs/core/Lights/light";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
-
+import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import type { Transformable } from "../universe/architecture/transformable";
 import { DefaultMinProjectedDiameter, getProjectedDiameter01 } from "./isObjectVisibleOnScreen";
+
+export interface ClusteredLightingRegion extends Transformable, HasBoundingSphere {
+    getLights(): ReadonlyArray<Light>;
+}
 
 type ClusteredLightingRegionState = {
     isActive: boolean;

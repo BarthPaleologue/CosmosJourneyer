@@ -104,6 +104,7 @@ describe("space telescope module in Vesta", () => {
             },
             music: { systemEntities: { register: vi.fn() } },
             rendering: {
+                lighting: { systemEntities: { registerRegion: vi.fn() } },
                 shadows: {
                     systemEntities: {
                         registerShadowCasters: (type, processor) => {
