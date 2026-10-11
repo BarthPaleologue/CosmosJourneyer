@@ -19,7 +19,6 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { factionToString } from "@cosmos-journeyer/universe-generation";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
@@ -50,7 +49,6 @@ export class StarMapUI {
     readonly shortHandUITitle: HTMLHeadingElement;
     readonly shortHandUISystemType: HTMLParagraphElement;
     readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
-    readonly shortHandUIFactions: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
     readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
     readonly shortHandUIBookmarkButton: StarMapBookmarkButton;
@@ -157,9 +155,6 @@ export class StarMapUI {
 
         this.shortHandUIDistanceFromCurrent = document.createElement("p");
         this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
-
-        this.shortHandUIFactions = document.createElement("p");
-        this.shortHandUI.appendChild(this.shortHandUIFactions);
 
         this.shortHandUIButtonContainer = document.createElement("div");
         this.shortHandUIButtonContainer.classList.add("buttonContainer");
@@ -336,21 +331,6 @@ export class StarMapUI {
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
         this.shortHandUITitle.textContent = targetSystemModel.name;
-
-        if (this.universeBackend.isSystemInHumanBubble(targetSystemModel.coordinates)) {
-            const spaceStations = targetSystemModel.orbitalFacilities;
-
-            const factionNames = spaceStations.map((station) => factionToString(station.faction));
-            const uniqueFactions = Array.from(new Set(factionNames));
-
-            if (uniqueFactions.length > 0) {
-                this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
-            } else {
-                this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
-            }
-        } else {
-            this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
-        }
     }
 
     rebuildSystemIcons(): void {

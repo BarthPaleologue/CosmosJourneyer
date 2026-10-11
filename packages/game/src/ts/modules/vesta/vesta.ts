@@ -330,7 +330,6 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         solarPanelEfficiency: 0.4,
         population: 300_000,
         populationDensity: 4_000,
-        faction: "human_commonwealth",
         sections: [
             { type: "engineBay" },
             { type: "utility", hasTanks: true },

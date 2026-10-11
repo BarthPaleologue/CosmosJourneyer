@@ -96,7 +96,6 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         annualEnergyPerCapitaKWh: 2000,
         population: 500_000,
         populationDensity: 1,
-        faction: "human_commonwealth",
         seed: 0,
         sections: [
             { type: "engineBay" },
@@ -168,7 +167,6 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         annualEnergyPerCapitaKWh: 2000,
         population: 200,
         populationDensity: 1,
-        faction: "human_commonwealth",
         seed: 0,
         sections: [
             { type: "cylinderHabitat", radius: 5e3, surface: { housing: 0.5, agriculture: 0.1 } },
@@ -207,7 +205,6 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         annualEnergyPerCapitaKWh: 1000,
         population: 5_000_000,
         populationDensity: 1,
-        faction: "dreamers_connection",
         seed: 0,
         sections: [
             { type: "cylinderHabitat", radius: 8e3, surface: { housing: 0.5, agriculture: 0.5 } },
@@ -246,7 +243,6 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         annualEnergyPerCapitaKWh: 10_000,
         population: 50_000,
         populationDensity: 1,
-        faction: "satori_concord",
         seed: 0,
         sections: [
             { type: "fusion", netPowerOutput: 50_000 * 10_000 },

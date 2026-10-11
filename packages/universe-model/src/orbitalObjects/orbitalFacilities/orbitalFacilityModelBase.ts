@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { OrbitalObjectType } from "..";
-import type { CropType, Faction } from "../../common";
+import type { CropType } from "../../common";
 import type { StarSystemCoordinates } from "../../starSystemCoordinates";
 import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
@@ -41,8 +41,6 @@ export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjec
     agricultureMix: [number, CropType][];
 
     nbHydroponicLayers: number;
-
-    faction: Faction;
 
     solarPanelEfficiency: number;
 };
