@@ -402,7 +402,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             position: {
                 latitude: 0.02151829597894311,
                 longitude: 2.426090777615558,
-                heightAboveGround: 0,
+                heightAboveGround: -0.3,
             },
             rotation: {
                 roll: 0,

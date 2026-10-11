@@ -42,8 +42,10 @@ export class Monolith implements SystemContent {
     private readonly scene: Scene;
 
     constructor(scene: Scene) {
-        const height = 6;
-        this.mesh = CreateBox("Monolith", { width: 2, height, depth: 0.5 }, scene);
+        const height = 3.35;
+        const depth = height / 3 ** 2;
+        const width = depth * 2 ** 2;
+        this.mesh = CreateBox("Monolith", { width, height, depth }, scene);
         this.mesh.position.y = height / 2;
         this.mesh.bakeCurrentTransformIntoVertices();
 
