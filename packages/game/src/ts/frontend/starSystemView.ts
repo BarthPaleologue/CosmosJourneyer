@@ -543,12 +543,19 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.spaceshipControls?.setClosestLandableFacility(null);
+            const systemEntities = this.starSystem.getSystemEntities();
+            for (const entity of systemEntities) {
+                const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+                if (region === null) {
+                    continue;
+                }
+
+                this.clusteredLightingSystem.unregisterRegion(region);
+            }
+
+            this.spaceshipControls?.setLandingPadProvider(null);
             this.terrainSystem.reset();
             this.postProcessManager.reset();
-            for (const facility of this.starSystem.getOrbitalFacilities()) {
-                this.clusteredLightingSystem.unregisterRegion(facility);
-            }
             this.starSystem.dispose();
             this.targetingSystem.reset();
             this.spaceStationLayer.reset();
@@ -572,10 +579,6 @@ export class StarSystemView implements View {
 
         this.starSystem = starSystemResult.value;
 
-        for (const facility of this.starSystem.getOrbitalFacilities()) {
-            this.clusteredLightingSystem.registerRegion(facility);
-        }
-
         const shipMesh = this.spaceshipControls?.getSpaceship();
         if (shipMesh !== undefined) {
             this.starSystem.stellarLightSystem.addShadowCaster(shipMesh.getTransform());
@@ -591,6 +594,15 @@ export class StarSystemView implements View {
             this.systemEntityProcessors.shadowCasters.dispatch(entity),
         );
         this.starSystem.stellarLightSystem.addShadowCasters(systemEntityShadowCasters);
+
+        for (const entity of systemEntities) {
+            const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+            if (region === null) {
+                continue;
+            }
+
+            this.clusteredLightingSystem.registerRegion(region);
+        }
 
         return ok(this.starSystem);
     }
@@ -1071,11 +1083,8 @@ export class StarSystemView implements View {
         spaceship.setNearestCelestialBody(nearestCelestialBody);
         spaceship.setClosestWalkableObject(nearestCelestialBody);
 
-        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
-        } else {
-            this.spaceshipControls.setClosestLandableFacility(null);
-        }
+        const landingPadManager = this.systemEntityProcessors.landingPadManagers.dispatch(nearestEntity);
+        this.spaceshipControls.setLandingPadProvider(landingPadManager);
 
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (
@@ -1181,28 +1190,8 @@ export class StarSystemView implements View {
             this.targetingSystem.setTarget(targetLandingPad);
         }
 
-        if (spaceship.isLandedAtFacility() && this.isUiEnabled) {
-            this.spaceStationLayer.setVisibility(true);
-            const facility = this.spaceshipControls.getClosestLandableFacility();
-            this.getStarSystem()
-                .getOrbitalFacilities()
-                .find((spaceStation) => {
-                    if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(
-                            spaceStation.model,
-                            starSystem
-                                .getOrbitalObjects()
-                                .map((object) => object.model)
-                                .filter((object) => spaceStation.model.orbit.parentIds.includes(object.id)),
-                            this.player,
-                        );
-                        return true;
-                    }
-                    return false;
-                });
-        } else {
-            this.spaceStationLayer.setVisibility(false);
-        }
+        const shouldDisplayStationLayer = spaceship.isLandedAtFacility() && this.isUiEnabled;
+        this.spaceStationLayer.setVisibility(shouldDisplayStationLayer);
 
         this.targetCursorLayer.setEnabled(this.isUiEnabled && !spaceship.isLandedAtFacility());
         this.spaceShipLayer.setVisibility(

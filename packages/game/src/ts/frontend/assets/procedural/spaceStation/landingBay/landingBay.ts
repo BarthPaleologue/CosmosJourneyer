@@ -36,7 +36,7 @@ import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
-import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { ProceduralSpotLightInstances } from "../../spotLight";
 import type { ProceduralSpotLightInstanceData } from "../../spotLight";

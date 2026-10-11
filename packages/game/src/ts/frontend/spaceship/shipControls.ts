@@ -34,10 +34,8 @@ import { createCameraShakeAnimation } from "@/frontend/helpers/animations/camera
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
@@ -67,7 +65,7 @@ export class ShipControls implements Controls {
 
     private cameraShakeAnimation: CustomAnimation<Vector2> | null = null;
 
-    private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
+    private landingPadProvider: LandingPadProvider | null = null;
 
     private targetFov = Tools.ToRadians(60);
 
@@ -163,23 +161,17 @@ export class ShipControls implements Controls {
                 tts.sayNow("Charlotte", "warp_drive_disengaged");
                 this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 0.5);
 
-                if (this.closestLandableFacility !== null) {
-                    const distanceToLandingFacility = Vector3.Distance(
-                        this.getTransform().getAbsolutePosition(),
-                        this.closestLandableFacility.getTransform().getAbsolutePosition(),
+                if (this.landingPadProvider !== null) {
+                    const bindingsString = pressInteractionToStrings(
+                        SpaceShipControlsInputs.map.emitLandingRequest,
+                        keyboardLayoutMap,
+                    ).join(", ");
+                    this.notificationManager.create(
+                        "space-station",
+                        "info",
+                        `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
+                        5000,
                     );
-                    if (distanceToLandingFacility < 500e3) {
-                        const bindingsString = pressInteractionToStrings(
-                            SpaceShipControlsInputs.map.emitLandingRequest,
-                            keyboardLayoutMap,
-                        ).join(", ");
-                        this.notificationManager.create(
-                            "space-station",
-                            "info",
-                            `Don't forget to send a landing request with ${bindingsString} before approaching the facility`,
-                            5000,
-                        );
-                    }
                 }
             }
         };
@@ -230,10 +222,10 @@ export class ShipControls implements Controls {
             if (spaceship.isLanded() || spaceship.isLanding()) {
                 return;
             }
-            if (this.closestLandableFacility === null) {
+            if (this.landingPadProvider === null) {
                 return;
             }
-            const landingPad = this.closestLandableFacility.getLandingPadManager().handleLandingRequest({
+            const landingPad = this.landingPadProvider.handleLandingRequest({
                 minimumPadSize: LandingPadSize.SMALL,
             });
             if (landingPad === null) {
@@ -327,7 +319,7 @@ export class ShipControls implements Controls {
     private cancelLandingRequest(spaceship: Spaceship): void {
         const currentLandingPad = spaceship.getTargetLandingPad();
         if (currentLandingPad !== null) {
-            this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
+            this.landingPadProvider?.cancelLandingRequest(currentLandingPad);
         }
     }
 
@@ -347,12 +339,12 @@ export class ShipControls implements Controls {
         return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 
-    public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null): void {
-        this.closestLandableFacility = facility;
+    public setLandingPadProvider(facility: LandingPadProvider | null): void {
+        this.landingPadProvider = facility;
     }
 
-    public getClosestLandableFacility(): (Transformable & HasBoundingSphere & ManagesLandingPads) | null {
-        return this.closestLandableFacility;
+    public getLandingPadProvider(): LandingPadProvider | null {
+        return this.landingPadProvider;
     }
 
     public update(deltaSeconds: number): void {
@@ -465,7 +457,7 @@ export class ShipControls implements Controls {
 
     reset(): void {
         this.resetCameraHandler("behindCentered");
-        this.closestLandableFacility = null;
+        this.landingPadProvider = null;
     }
 
     setSpaceship(ship: Spaceship): void {

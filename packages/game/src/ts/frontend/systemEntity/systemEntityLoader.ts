@@ -17,13 +17,11 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import type { Scene } from "@babylonjs/core/scene";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
-import type { RenderingAssets } from "../assets/renderingAssets";
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
 import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
@@ -31,22 +29,22 @@ import { createOnSurfacePlacements } from "./createOnSurfacePlacements";
 import type { SurfacePlacementRequest } from "./createOnSurfacePlacements";
 import type {
     AnySystemContentType,
-    ContentModelOf,
     SystemContentFactoryOf,
     SystemEntity,
     SystemContent,
     InOrbitPlacement,
+    SystemContentFactoryContext,
 } from "./systemEntity";
 
 type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
 
-export type SystemEntityLoadContext = Readonly<{
-    scene: Scene;
-    assets: RenderingAssets;
-    orbitalObjects: ReadonlyArray<OrbitalObject>;
-    orbitalSimulation: KeplerianOrbitalSimulation;
-    terrainSystem: ITerrainSystem;
-}>;
+export type SystemEntityLoadContext = Readonly<
+    SystemContentFactoryContext & {
+        orbitalObjects: ReadonlyArray<OrbitalObject>;
+        orbitalSimulation: KeplerianOrbitalSimulation;
+        terrainSystem: ITerrainSystem;
+    }
+>;
 
 export class SystemEntityLoader {
     private readonly registry: Map<string, ErasedSystemContentFactory> = new Map();
@@ -68,7 +66,7 @@ export class SystemEntityLoader {
         const onSurfacePlacementModels: Array<SurfacePlacementRequest> = [];
         const entityContents = new Map<string, { model: DeepReadonly<SystemEntityModel>; content: SystemContent }>();
         for (const model of models) {
-            const contentResult = this.createContent(model, context.scene, context.assets);
+            const contentResult = this.createContent(model, context);
             if (!contentResult.success) {
                 return contentResult;
             }
@@ -122,16 +120,14 @@ export class SystemEntityLoader {
 
     private createContent(
         model: DeepReadonly<SystemEntityModel>,
-        scene: Scene,
-        assets: RenderingAssets,
+        context: SystemContentFactoryContext,
     ): Result<SystemContent, Error> {
-        const context = { scene, assets };
         const factory = this.registry.get(model.content.type);
         if (factory === undefined) {
             return err(new Error(`No SystemContent factory registered for "${model.content.type}"`));
         }
 
-        return factory(model.content, context);
+        return factory(model, context);
     }
 }
 
@@ -174,10 +170,10 @@ function eraseFactory<T extends AnySystemContentType>(
     factory: SystemContentFactoryOf<T>,
 ): ErasedSystemContentFactory {
     return (model, context) => {
-        if (model.type !== type) {
-            return err(new Error(`Expected model type "${type}", got "${model.type}"`));
+        if (model.content.type !== type) {
+            return err(new Error(`Expected model type "${type}", got "${model.content.type}"`));
         }
 
-        return factory(model as DeepReadonly<ContentModelOf<T>>, context);
+        return factory(model as DeepReadonly<SystemEntityModel<T>>, context);
     };
 }

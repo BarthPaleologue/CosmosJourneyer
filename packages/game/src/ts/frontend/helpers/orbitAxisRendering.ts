@@ -15,19 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OrbitalObject } from "../universe/architecture/orbitalObject";
+import type { KeplerianObject } from "../universe/keplerianOrbitalSimulation";
 import type { StarSystemController } from "../universe/starSystemController";
 
 /**
  * @param starSystem - Current rendered star system.
  * @returns Rendered objects eligible for orbit-axis visualization.
  */
-export function getOrbitAxisObjectList(starSystem: StarSystemController): Array<OrbitalObject> {
-    const out: Array<OrbitalObject> = [];
+export function getOrbitAxisObjectList(starSystem: StarSystemController): Array<KeplerianObject> {
+    const out: Array<KeplerianObject> = [];
 
     out.push(...starSystem.getStellarObjects());
     out.push(...starSystem.getPlanetaryMassObjects());
-    out.push(...starSystem.getOrbitalFacilities());
+    out.push(
+        ...starSystem
+            .getSystemEntities()
+            .map((entity) => entity.placement)
+            .filter((placement) => placement.type === "inOrbit"),
+    );
 
     return out;
 }

@@ -21,8 +21,6 @@ import type { MandelbulbModel } from "./anomalies/mandelbulbModel";
 import type { MengerSpongeModel } from "./anomalies/mengerSpongeModel";
 import type { SierpinskiPyramidModel } from "./anomalies/sierpinskiPyramidModel";
 import type { GasPlanetModel } from "./gasPlanetModel";
-import type { SpaceElevatorModel } from "./orbitalFacilities/spaceElevatorModel";
-import type { SpaceStationModel } from "./orbitalFacilities/spacestationModel";
 import type { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import type { BlackHoleModel } from "./stellarObjects/blackHoleModel";
 import type { NeutronStarModel } from "./stellarObjects/neutronStarModel";
@@ -47,10 +45,8 @@ export type AnomalyType = AnomalyModel["type"];
 
 export type CelestialBodyModel = StellarObjectModel | PlanetaryMassObjectModel | AnomalyModel;
 
-export type OrbitalFacilityModel = SpaceStationModel | SpaceElevatorModel;
-
 export type CustomObjectModel = OrbitalObjectModelBase<"custom">;
 
-export type OrbitalObjectModel = CelestialBodyModel | OrbitalFacilityModel | CustomObjectModel;
+export type OrbitalObjectModel = CelestialBodyModel | CustomObjectModel;
 
 export type OrbitalObjectType = OrbitalObjectModel["type"];
