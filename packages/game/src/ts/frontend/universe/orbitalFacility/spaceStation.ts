@@ -17,29 +17,21 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Light } from "@babylonjs/core/Lights/light";
-import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
-import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { SpaceStationModel, StationSectionModel } from "@cosmos-journeyer/universe-model";
+import type { SpaceStationModel } from "@cosmos-journeyer/universe-model";
 
-import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
-import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
-import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
-import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
 import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
-import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
-import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
-import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadManager } from "@/frontend/universe/orbitalFacility/landingPadManager";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { createFacilitySections } from "./createFacilitySections";
 import type { OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";
 
@@ -50,12 +42,10 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     readonly type = "spaceStation";
 
-    readonly sections: Array<StationSection> = [];
-    readonly landingBays: Array<LandingBay> = [];
+    readonly sections: Array<StationSection>;
+    readonly landingBays: Array<LandingBay>;
 
     private readonly root: TransformNode;
-
-    private readonly scene: Scene;
 
     private readonly boundingRadius: number;
 
@@ -69,9 +59,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.root = new TransformNode(this.name, scene);
         this.root.rotationQuaternion = Quaternion.Identity();
 
-        this.scene = scene;
-
-        this.generate(assets);
+        this.sections = createFacilitySections(this.root, model.sections, model.name, assets, scene);
+        this.landingBays = this.sections.filter((section): section is LandingBay => section instanceof LandingBay);
 
         // Now that landing bays are generated, create the landing pad manager with all pads
         const allLandingPads: Array<ILandingPad> = [];
@@ -124,58 +113,6 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     public computeCulling(camera: Camera): void {
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
-    }
-
-    private getSectionFromModel(model: StationSectionModel, assets: RenderingAssets): StationSection {
-        switch (model.type) {
-            case "engineBay":
-                return new EngineBay(assets, this.scene);
-            case "utility":
-                return new UtilitySection(model, assets, this.scene);
-            case "solar":
-                return new SolarSection(model, assets, this.scene);
-            case "fusion":
-                return new TokamakSection(model, assets, this.scene);
-            case "cylinderHabitat":
-                return new CylinderHabitat(model, assets.textures, this.scene);
-            case "ringHabitat":
-                return new RingHabitat(model, assets.textures, this.scene);
-            case "helixHabitat":
-                return new HelixHabitat(model, assets.textures, this.scene);
-            case "landingBay": {
-                const landingBay = new LandingBay(model, this.model, assets, this.scene);
-                this.landingBays.push(landingBay);
-                return landingBay;
-            }
-            default:
-                return assertUnreachable(model);
-        }
-    }
-
-    private generate(assets: RenderingAssets): void {
-        for (const section of this.model.sections) {
-            const newSection = this.getSectionFromModel(section, assets);
-            const lastNode = this.sections.at(-1);
-            if (lastNode !== undefined) {
-                this.placeNode(newSection.getTransform(), lastNode.getTransform());
-            }
-
-            this.sections.push(newSection);
-            newSection.getTransform().parent = this.root;
-        }
-    }
-
-    private placeNode(node: TransformNode, parent: TransformNode): void {
-        // Make sure bounds are current
-        parent.computeWorldMatrix(true);
-        node.computeWorldMatrix(true);
-
-        const parentBV = parent.getHierarchyBoundingVectors();
-        const nodeBV = node.getHierarchyBoundingVectors();
-
-        const deltaY = parentBV.max.y - nodeBV.min.y; // bring node bottom to parent top
-
-        node.translate(Axis.Y, deltaY, Space.WORLD);
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {

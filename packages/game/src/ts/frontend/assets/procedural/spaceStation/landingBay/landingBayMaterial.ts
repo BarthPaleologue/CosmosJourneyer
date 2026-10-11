@@ -19,8 +19,6 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import type { Scene } from "@babylonjs/core/scene";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import {
     abs,
     atan2,
@@ -56,7 +54,7 @@ import { Settings } from "@/settings";
 
 export class LandingBayMaterial extends NodeMaterial {
     constructor(
-        stationModel: DeepReadonly<OrbitalFacilityModel>,
+        displayName: string,
         meanRadius: number,
         deltaRadius: number,
         height: number,
@@ -85,7 +83,7 @@ export class LandingBayMaterial extends NodeMaterial {
 
         //Add text to dynamic texture
         namePlateTexture.drawText(
-            stationModel.name.toUpperCase(),
+            displayName.toUpperCase(),
             null,
             null,
             `${font_size}px ${Settings.MAIN_FONT}`,

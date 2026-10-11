@@ -30,8 +30,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import type { Scene } from "@babylonjs/core/scene";
 import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel, LandingBayModel } from "@cosmos-journeyer/universe-model";
+import type { LandingBayModel } from "@cosmos-journeyer/universe-model";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -65,12 +64,7 @@ export class LandingBay {
 
     private readonly lights: Array<Light> = [];
 
-    constructor(
-        model: LandingBayModel,
-        stationModel: DeepReadonly<OrbitalFacilityModel>,
-        assets: RenderingAssets,
-        scene: Scene,
-    ) {
+    constructor(model: LandingBayModel, displayName: string, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
         this.radius = 500;
@@ -153,7 +147,7 @@ export class LandingBay {
         }
 
         this.landingBayMaterial = new LandingBayMaterial(
-            stationModel,
+            displayName,
             this.radius,
             deltaRadius,
             heightFactor,
