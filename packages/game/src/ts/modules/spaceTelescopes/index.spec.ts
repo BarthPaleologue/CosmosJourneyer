@@ -102,6 +102,7 @@ describe("space telescope module in Vesta", () => {
                     },
                 },
             },
+            landingPad: { systemEntities: { register: vi.fn() } },
             music: { systemEntities: { register: vi.fn() } },
             rendering: {
                 lighting: { systemEntities: { registerRegion: vi.fn() } },
