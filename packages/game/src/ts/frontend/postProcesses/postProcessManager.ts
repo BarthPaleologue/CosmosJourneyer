@@ -149,7 +149,7 @@ export class PostProcessManager {
 
     private readonly lensFlareRenderEffect: PostProcessRenderEffect;
 
-    private readonly sphereShadows: SphereShadowsPostProcess;
+    readonly sphereShadows: SphereShadowsPostProcess;
 
     private readonly sphereShadowsRenderEffect: PostProcessRenderEffect;
 

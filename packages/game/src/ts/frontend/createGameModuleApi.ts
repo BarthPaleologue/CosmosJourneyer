@@ -61,5 +61,17 @@ export function createGameModuleApi(
                 },
             },
         },
+        rendering: {
+            shadows: {
+                systemEntities: {
+                    registerShadowCasters: (type, getShadowCasters) => {
+                        systemEntityProcessors.shadowCasters.register(type, getShadowCasters);
+                    },
+                    registerSphereOccluders: (type, getSphereOccluders) => {
+                        systemEntityProcessors.sphereOccluders.register(type, getSphereOccluders);
+                    },
+                },
+            },
+        },
     };
 }

@@ -41,7 +41,7 @@ import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/ter
 import { initI18n } from "@/i18n";
 import { getChronosModel } from "@/modules/chronos/chronos";
 import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
-import { getVestaSystemModel } from "@/modules/vesta/vesta";
+import { getVestaModel } from "@/modules/vesta/vesta";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -76,7 +76,8 @@ export async function createCustomSystemScene(
         const chronos = getChronosModel();
         systemModel = chronos.systemModel;
     } else if (systemKey === "vesta") {
-        systemModel = getVestaSystemModel();
+        const vesta = getVestaModel();
+        systemModel = vesta.starSystem;
     } else if (systemKey === "eclipseTest") {
         systemModel = getEclipseTestSystemModel();
     } else {

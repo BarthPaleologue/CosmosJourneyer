@@ -43,9 +43,11 @@ export type SystemEntity<T extends AnySystemContentType = AnySystemContentType> 
     placement: SystemEntityPlacement;
 }>;
 
-export type SystemEntityPlacement = InOrbitPlacement;
+export type SystemEntityPlacement = InOrbitPlacement | OnSurfacePlacement;
 
 export type InOrbitPlacement = { type: "inOrbit" } & KeplerianObject;
+
+export type OnSurfacePlacement = { type: "onSurface" } & Transformable;
 
 export interface SystemContent extends Transformable {
     dispose(): void;

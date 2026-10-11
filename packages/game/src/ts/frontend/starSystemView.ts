@@ -563,6 +563,7 @@ export class StarSystemView implements View {
             this.loader,
             systemContentModel.entities,
             this.systemEntityLoader,
+            this.terrainSystem,
             this.assets,
             this.scene,
             this.progressMonitor,
@@ -589,6 +590,12 @@ export class StarSystemView implements View {
             this.starSystem.stellarLightSystem.addShadowCaster(characterRoot);
         }
 
+        const systemEntities = this.starSystem.getSystemEntities();
+        const systemEntityShadowCasters = systemEntities.flatMap((entity) =>
+            this.systemEntityProcessors.shadowCasters.dispatch(entity),
+        );
+        this.starSystem.stellarLightSystem.addShadowCasters(systemEntityShadowCasters);
+
         return ok(this.starSystem);
     }
 
@@ -612,6 +619,14 @@ export class StarSystemView implements View {
                 ...spaceship.getMainThrusters().map((thruster) => thruster.exhaust.getProxyMesh()),
             ],
         );
+
+        const systemEntities = starSystem.getSystemEntities();
+        const sphereOccluders = systemEntities.flatMap((entity) =>
+            this.systemEntityProcessors.sphereOccluders.dispatch(entity),
+        );
+        for (const sphereOccluder of sphereOccluders) {
+            this.postProcessManager.sphereShadows.addShadowCaster(sphereOccluder);
+        }
 
         const currentJumpRange = spaceship.getInternals().getWarpDrive()?.rangeLY ?? 0;
         for (const neighbor of getNeighborStarSystemCoordinates(

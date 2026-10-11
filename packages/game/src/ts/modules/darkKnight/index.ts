@@ -29,7 +29,7 @@ import type { DarkKnightModel } from "./darkKnightModel";
 
 export const DarkKnightModule: GameModule = {
     id: "dark-knight",
-    setup: ({ systemEntities, targeting, music }): void => {
+    setup: ({ systemEntities, targeting, music, rendering }): void => {
         const type = makeSystemContentType<DarkKnightModel, DarkKnight>("darkKnight");
 
         systemEntities.registerProcedural(({ system }) => {
@@ -84,5 +84,12 @@ export const DarkKnightModule: GameModule = {
 
             return [];
         });
+
+        rendering.shadows.systemEntities.registerSphereOccluders(type, (darkKnight) => [
+            {
+                getTransform: () => darkKnight.content.getTransform(),
+                getBoundingRadius: () => darkKnight.content.radius,
+            },
+        ]);
     },
 };
