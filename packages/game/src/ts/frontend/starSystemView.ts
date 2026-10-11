@@ -111,6 +111,7 @@ import { createDefaultTargetContact, createTargetContact, TargetAcquisition } fr
 import { InteractionLayer } from "./ui/interactionLayer";
 import type { INotificationManager } from "./ui/notificationManager";
 import { CreateLinesHelper } from "./universe/lineRendering";
+import { LandingPadSize } from "./universe/orbitalFacility/landingPadProvider";
 import { VehicleControls } from "./vehicle/vehicleControls";
 import { VehicleInputs } from "./vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "./vehicle/wolfMk2";
@@ -902,8 +903,9 @@ export class StarSystemView implements View {
             return;
         }
 
-        const landingPad = station.getLandingPadProvider().getAvailableLandingPads().at(0);
-        if (landingPad === undefined) {
+        const landingPadProvider = station.getLandingPadProvider();
+        const landingPad = landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        if (landingPad === null) {
             const fallbackObject = station;
 
             positionNearObject(
@@ -923,6 +925,7 @@ export class StarSystemView implements View {
         }
 
         const shipControls = this.getSpaceshipControls();
+        shipControls.setClosestLandableFacility(station);
         shipControls.getSpaceship().spawnOnPad(landingPad);
         shipControls.syncCameraTransform();
     }
