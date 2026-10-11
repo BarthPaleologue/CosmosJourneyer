@@ -18,6 +18,7 @@
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import type { MusicExtensionPoint } from "./music";
+import type { RenderingExtensionPoint } from "./rendering";
 import type { SystemEntitiesExtensionPoint } from "./systemEntities";
 import type { TargetingExtensionPoint } from "./targeting";
 
@@ -28,4 +29,5 @@ export type GameModuleApi = Readonly<{
     systemEntities: SystemEntitiesExtensionPoint;
     targeting: TargetingExtensionPoint;
     music: MusicExtensionPoint;
+    rendering: RenderingExtensionPoint;
 }>;

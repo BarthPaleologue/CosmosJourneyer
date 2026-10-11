@@ -150,7 +150,8 @@ describe("StarSystemView", () => {
         };
         const newStarSystem = {
             getOrbitalFacilities: () => [newFacility],
-            stellarLightSystem: { addShadowCaster: vi.fn() },
+            getSystemEntities: () => [],
+            stellarLightSystem: { addShadowCaster: vi.fn(), addShadowCasters: vi.fn() },
         } as unknown as StarSystemController;
         vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
 

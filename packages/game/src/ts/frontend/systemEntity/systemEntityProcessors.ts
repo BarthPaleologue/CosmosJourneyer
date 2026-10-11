@@ -16,10 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import type { Musics } from "../assets/audio/musics";
 import type { SystemEntityMusicContext } from "../audio/musicSystem";
 import type { Target } from "../targeting/target";
+import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
+import type { Transformable } from "../universe/architecture/transformable";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
 import type { SystemEntityProcessor } from "./systemEntityProcessor";
@@ -33,11 +36,15 @@ export class SystemEntityProcessors {
     readonly targeting: SystemEntityProcessorRegistry<void, Array<Target>>;
     readonly music: SystemEntityProcessorRegistry<SystemEntityMusicContext, Array<keyof Musics>>;
     private readonly update: SystemEntityProcessorRegistry<SystemEntityUpdateContext, void>;
+    readonly shadowCasters: SystemEntityProcessorRegistry<void, Array<TransformNode>>;
+    readonly sphereOccluders: SystemEntityProcessorRegistry<void, Array<Transformable & HasBoundingSphere>>;
 
     constructor() {
         this.targeting = new SystemEntityProcessorRegistry(() => []);
         this.music = new SystemEntityProcessorRegistry(() => []);
         this.update = new SystemEntityProcessorRegistry(() => {});
+        this.shadowCasters = new SystemEntityProcessorRegistry(() => []);
+        this.sphereOccluders = new SystemEntityProcessorRegistry(() => []);
     }
 
     registerUpdate<T extends AnySystemContentType>(
@@ -57,5 +64,7 @@ export class SystemEntityProcessors {
         this.targeting.dispose();
         this.music.dispose();
         this.update.dispose();
+        this.shadowCasters.dispose();
+        this.sphereOccluders.dispose();
     }
 }

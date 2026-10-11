@@ -26,7 +26,7 @@ import type { MonolithModel } from "./entity";
 
 export const MonolithModule: GameModule = {
     id: "monolith",
-    setup: ({ systemEntities, targeting }): void => {
+    setup: ({ systemEntities, targeting, rendering }): void => {
         const type = makeSystemContentType<MonolithModel, Monolith>("monolith");
 
         systemEntities.registerContentFactory(type, (model, context) => ok(new Monolith(context.scene)));
@@ -45,5 +45,7 @@ export const MonolithModule: GameModule = {
                 },
             ];
         });
+
+        rendering.shadows.systemEntities.registerShadowCasters(type, (monolith) => [monolith.content.getTransform()]);
     },
 };

@@ -80,7 +80,7 @@ export class StellarLightSystem {
         }
     }
 
-    public addShadowCasters(meshes: ReadonlyArray<TransformNode | AbstractMesh>): void {
+    public addShadowCasters(meshes: Iterable<TransformNode | AbstractMesh>): void {
         for (const mesh of meshes) {
             this.addShadowCaster(mesh);
         }
