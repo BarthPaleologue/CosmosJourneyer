@@ -18,7 +18,8 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
+import { serializeUniverseObjectId, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -64,7 +65,7 @@ export class SpaceStationLayer {
     private readonly explorationCenterButton: HTMLElement;
     private readonly takeOffButton: HTMLElement;
 
-    private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
+    private currentStationId: DeepReadonly<UniverseObjectId> | null = null;
 
     private mainPanelState: MainPanelState = "none";
 
@@ -275,18 +276,14 @@ export class SpaceStationLayer {
             this.mainPanelState = state;
         }
 
-        if (this.currentStation === null) {
+        if (this.currentStationId === null) {
             await alertModal("No current station", this.soundPlayer, this.t);
             return;
         }
 
         switch (this.mainPanelState) {
             case "missions":
-                this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = "";
-                this.mainPanel.appendChild(
-                    generateMissionsDom(this.currentStation, player, universeBackend, this.soundPlayer, this.t),
-                );
+                this.setMissionsPanel(this.currentStationId, player, universeBackend);
                 break;
             case "spaceship":
                 this.mainPanel.classList.remove("hidden");
@@ -309,6 +306,23 @@ export class SpaceStationLayer {
         }
     }
 
+    private setMissionsPanel(stationId: DeepReadonly<UniverseObjectId>, player: Player, universe: UniverseBackend) {
+        this.mainPanel.classList.remove("hidden");
+        this.mainPanel.innerHTML = "";
+
+        const domResult = generateMissionsDom(stationId, player, universe, this.soundPlayer, this.t);
+        if (!domResult.success) {
+            void alertModal(
+                `Could not generate missions for station: ${serializeUniverseObjectId(stationId)}`,
+                this.soundPlayer,
+                this.t,
+            );
+            return;
+        }
+
+        this.mainPanel.appendChild(domResult.value);
+    }
+
     public setVisibility(visible: boolean): void {
         if (this.rootHtml.style.visibility !== "" && this.isVisible() === visible) {
             return;
@@ -320,12 +334,12 @@ export class SpaceStationLayer {
         return this.rootHtml.style.visibility !== "hidden";
     }
 
-    public setStation(station: DeepReadonly<OrbitalFacilityModel>, player: Player): void {
-        if (this.currentStation === station) {
-            return;
+    public setStation(stationId: DeepReadonly<UniverseObjectId>, stationName: string, player: Player): void {
+        if (this.currentStationId !== null && !universeObjectIdEquals(this.currentStationId, stationId)) {
+            this.reset();
         }
-        this.currentStation = station;
-        this.headerStationName.textContent = station.name;
+        this.currentStationId = stationId;
+        this.headerStationName.textContent = stationName;
 
         this.updatePlayerName(player.getName());
         this.updatePlayerBalance(player.getBalance());
@@ -340,7 +354,8 @@ export class SpaceStationLayer {
     }
 
     public reset(): void {
-        this.currentStation = null;
+        this.currentStationId = null;
+        this.mainPanelState = "none";
         this.headerStationName.textContent = "";
         this.playerName.textContent = "";
         this.playerBalance.textContent = "";
