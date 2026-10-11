@@ -66,7 +66,7 @@ export type ContentOf<T extends AnySystemContentType> =
     TagMetadataOf<T> extends { Content: infer TContent extends SystemContent } ? TContent : never;
 
 export type SystemContentFactoryOf<T extends AnySystemContentType> = (
-    model: DeepReadonly<ContentModelOf<T>>,
+    model: DeepReadonly<SystemEntityModel<ContentModelOf<T>>>,
     context: SystemContentFactoryContext,
 ) => Result<ContentOf<T>, Error>;
 

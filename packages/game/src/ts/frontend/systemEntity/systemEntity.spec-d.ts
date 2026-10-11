@@ -32,7 +32,10 @@ test("entities retain their content type and readonly model", () => {
 
 test("factories accept the associated readonly model and return the associated content", () => {
     expectTypeOf<SystemContentFactoryOf<TestDarkKnightType>>().toEqualTypeOf<
-        (model: DeepReadonly<DarkKnightModel>, context: SystemContentFactoryContext) => Result<DarkKnight, Error>
+        (
+            model: DeepReadonly<SystemEntityModel<DarkKnightModel>>,
+            context: SystemContentFactoryContext,
+        ) => Result<DarkKnight, Error>
     >();
 });
 
