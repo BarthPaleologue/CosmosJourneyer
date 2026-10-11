@@ -138,7 +138,6 @@ export class StarMapUI {
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
-
         this.cursor = document.createElement("div");
         this.cursor.classList.add("virtualCursor");
         this.htmlRoot.appendChild(this.cursor);
@@ -329,7 +328,6 @@ export class StarMapUI {
 
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel, this.t);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
-
         this.shortHandUITitle.textContent = targetSystemModel.name;
     }
 

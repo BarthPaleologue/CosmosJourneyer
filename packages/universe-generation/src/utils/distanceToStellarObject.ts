@@ -26,7 +26,7 @@ import type { OrbitalObjectModel, StellarObjectModel, StarSystemModel } from "@c
  * @returns Distances keyed by the stellar objects that parent the orbital object.
  */
 export function getDistancesToStellarObjects(
-    object: DeepReadonly<OrbitalObjectModel>,
+    object: DeepReadonly<Pick<OrbitalObjectModel, "orbit">>,
     systemModel: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<Map<StellarObjectModel, number>> {
     const distances: Map<DeepReadonly<StellarObjectModel>, number> = new Map();

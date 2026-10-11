@@ -253,21 +253,33 @@ export class CosmosJourneyer {
             });
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
-            const closestSpaceStation = this.starSystemView
-                .getStarSystem()
-                .getOrbitalFacilities()
-                .reduce((closest, current) => {
-                    const currentDistance = Vector3.DistanceSquared(
-                        spaceshipPosition,
-                        current.getTransform().getAbsolutePosition(),
-                    );
-                    const closestDistance = Vector3.DistanceSquared(
-                        spaceshipPosition,
-                        closest.getTransform().getAbsolutePosition(),
-                    );
-                    return currentDistance < closestDistance ? current : closest;
-                });
-            this.starSystemView.setTarget(closestSpaceStation);
+
+            const starSystem = this.starSystemView.getStarSystem();
+            const systemEntities = starSystem.getSystemEntities();
+            const sortedEntities = systemEntities.toSorted((a, b) => {
+                const distanceA2 = Vector3.DistanceSquared(
+                    a.placement.getTransform().getAbsolutePosition(),
+                    spaceshipPosition,
+                );
+                const distanceB2 = Vector3.DistanceSquared(
+                    b.placement.getTransform().getAbsolutePosition(),
+                    spaceshipPosition,
+                );
+
+                return distanceA2 - distanceB2;
+            });
+
+            const closestStation = sortedEntities.find((entity) => {
+                const landingPadProvider =
+                    this.starSystemView.systemEntityProcessors.landingPadProviders.dispatch(entity);
+                return landingPadProvider !== null;
+            });
+
+            if (closestStation === undefined) {
+                return;
+            }
+
+            this.starSystemView.setTarget(closestStation.content);
             await this.createAutoSave();
         });
 
@@ -297,14 +309,14 @@ export class CosmosJourneyer {
             }
 
             const shipControls = this.starSystemView.getSpaceshipControls();
-            const closestLandableFacility = shipControls.getClosestLandableFacility();
-            if (closestLandableFacility === null) {
+            const landingFacility = shipControls.getLandingFacility();
+            if (landingFacility === null) {
                 return;
             }
 
             const shipPosition = shipControls.getTransform().getAbsolutePosition();
-            const facilityPosition = closestLandableFacility.getTransform().position;
-            const limitDistance = 10 * closestLandableFacility.getBoundingRadius();
+            const facilityPosition = landingFacility.object.getTransform().getAbsolutePosition();
+            const limitDistance = 10 * landingFacility.object.getBoundingRadius();
             if (Vector3.DistanceSquared(shipPosition, facilityPosition) > limitDistance ** 2) {
                 return;
             }
@@ -902,12 +914,17 @@ export class CosmosJourneyer {
             spaceShipControls.getTransform(),
         );
 
-        const shipLocation: UniverseCoordinates = spaceship.isLandedAtFacility()
-            ? {
-                  type: "atStation",
-                  universeObjectId: shipUniverseCoordinates.universeObjectId,
-              }
-            : shipUniverseCoordinates;
+        const landingFacility = spaceShipControls.getLandingFacility();
+        const shipLocation: UniverseCoordinates =
+            spaceship.isLandedAtFacility() && landingFacility !== null
+                ? {
+                      type: "atStation",
+                      universeObjectId: {
+                          systemCoordinates: shipUniverseCoordinates.universeObjectId.systemCoordinates,
+                          idInSystem: landingFacility.object.id,
+                      },
+                  }
+                : shipUniverseCoordinates;
 
         const saveData: Save = {
             uuid: crypto.randomUUID(),

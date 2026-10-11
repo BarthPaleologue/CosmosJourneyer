@@ -18,6 +18,17 @@
 import { perHaToPerM2 } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
+/**
+ * The average daily intake for a human being in kcal/day.
+ * It is 2500 for males and 2000 for females, hence 2250.
+ */
+export const IndividualAverageDailyIntake = 2250;
+
+/**
+ * Hydroponic agriculture can be 250% more productive than conventional agriculture.
+ */
+export const HydroponicToConventionalRatio = 3.5;
+
 export const CropType = {
     POTATO: "potato",
     YAM: "yam",

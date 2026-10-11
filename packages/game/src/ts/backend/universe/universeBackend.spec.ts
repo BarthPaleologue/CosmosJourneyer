@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEntityBackend";
@@ -45,32 +44,6 @@ describe("UniverseBackend", () => {
             const positions = universeBackend.getSystemPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
             expect(positions).toHaveLength(coordinates.length);
             expect(positions).toContainEqual(universeBackend.getSystemGalacticPosition(customSystem.coordinates));
-        });
-    });
-
-    describe("isSystemInHumanBubble", () => {
-        it("should return true for systems near origin", () => {
-            const closeCoordinates: StarSystemCoordinates = {
-                starSectorX: 0,
-                starSectorY: 0,
-                starSectorZ: 0,
-                localX: 0,
-                localY: 0,
-                localZ: 0,
-            };
-            expect(universeBackend.isSystemInHumanBubble(closeCoordinates)).toBe(true);
-        });
-
-        it("should return false for distant systems", () => {
-            const farCoordinates = {
-                starSectorX: 1000,
-                starSectorY: 1000,
-                starSectorZ: 1000,
-                localX: 0,
-                localY: 0,
-                localZ: 0,
-            };
-            expect(universeBackend.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });
     });
 

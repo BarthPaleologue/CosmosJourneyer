@@ -19,8 +19,6 @@ import { ClusteredLightContainer, Color3, GlowLayer, HemisphericLight, Scene, Ve
 import type { AbstractEngine } from "@babylonjs/core";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
-import { LandingPadMaterial } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPadMaterial";
 import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
 import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
 import { loadConcreteTextures } from "@/frontend/assets/textures/materials/concrete";
@@ -28,6 +26,9 @@ import { createSquareTextDecalTexture } from "@/frontend/assets/textures/squareT
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+
+import { LandingPad } from "@/modules/orbitalFacilities/assets/landingPad/landingPad";
+import { LandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
 
 import { enablePhysics } from "./utils";
 

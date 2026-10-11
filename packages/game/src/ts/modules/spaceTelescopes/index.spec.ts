@@ -156,14 +156,15 @@ describe("space telescope module in Vesta", () => {
             },
         });
         expect(systemEntities.some((entity) => entity.id === "monolith")).toBe(true);
-        expect(starSystem.orbitalFacilities.map((facility) => facility.id)).toEqual(["newJulesVerne"]);
+        expect(
+            systemEntities.filter((entity) => entity.content.type === "spaceStation").map((entity) => entity.id),
+        ).toEqual(["newJulesVerne"]);
         const ids = [
             ...systemEntities,
             ...starSystem.stellarObjects,
             ...starSystem.planets,
             ...starSystem.satellites,
             ...starSystem.anomalies,
-            ...starSystem.orbitalFacilities,
         ].map((entity) => entity.id);
         expect(new Set(ids).size).toBe(ids.length);
         expect(registerProcedural).not.toHaveBeenCalled();

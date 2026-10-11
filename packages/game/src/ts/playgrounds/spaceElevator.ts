@@ -17,10 +17,10 @@
 
 import { CreateSphere, DirectionalLight, GlowLayer, PBRMaterial } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
-import { generateSpaceElevatorModel, generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
+import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
@@ -31,10 +31,12 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { toKeplerian } from "@/frontend/helpers/orbitalObject";
 import { lookAt } from "@/frontend/helpers/transform";
+import { createInOrbitPlacement } from "@/frontend/systemEntity/systemEntityLoader";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
-import { SpaceElevator } from "@/frontend/universe/orbitalFacility/spaceElevator";
 
+import { generateSpaceElevatorModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceElevatorModelGenerator";
+import { SpaceElevator } from "@/modules/orbitalFacilities/spaceElevator";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -86,7 +88,6 @@ export async function createSpaceElevatorScene(
         planets: [planet],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -99,7 +100,13 @@ export async function createSpaceElevatorScene(
         systemModel,
     );
 
-    const spaceElevator = new SpaceElevator(spaceElevatorModel, assets, scene);
+    const spaceElevator = new SpaceElevator(spaceElevatorModel.name, spaceElevatorModel.content, { assets, scene });
+    const spaceElevatorPlacement = createInOrbitPlacement(spaceElevatorModel.id, spaceElevatorModel.placement, scene);
+
+    spaceElevator.getTransform().parent = spaceElevatorPlacement.getTransform();
+    const { yaw, pitch, roll } = spaceElevatorModel.placement.attitude.localFrameOrientation;
+    spaceElevator.getTransform().rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, pitch, roll);
+
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(spaceElevator);
 
@@ -129,11 +136,12 @@ export async function createSpaceElevatorScene(
     new GlowLayer("glow", scene);
 
     let elapsedSeconds = 0;
-    const orbitalSimulation = new KeplerianOrbitalSimulation([planetImpostor, spaceElevator].map(toKeplerian));
+    const keplerianObjects = [toKeplerian(planetImpostor), spaceElevatorPlacement];
+    const orbitalSimulation = new KeplerianOrbitalSimulation(keplerianObjects);
 
     orbitalSimulation.update(elapsedSeconds);
-    for (const object of [planetImpostor, spaceElevator]) {
-        const orbitalTransform = orbitalSimulation.getTransform(object.model.id);
+    for (const object of keplerianObjects) {
+        const orbitalTransform = orbitalSimulation.getTransform(object.id);
         if (orbitalTransform === undefined) {
             continue;
         }
@@ -142,7 +150,7 @@ export async function createSpaceElevatorScene(
         transform.rotationQuaternion = orbitalTransform.orientation.clone();
         transform.computeWorldMatrix(true);
     }
-    spaceElevator.update([planetImpostor], Vector3.Zero(), elapsedSeconds);
+    spaceElevator.update(Vector3.Zero(), elapsedSeconds);
 
     landingBay.getTransform().computeWorldMatrix(true);
     defaultControls.getTransform().position = landingBay
@@ -163,8 +171,8 @@ export async function createSpaceElevatorScene(
         const cameraWorldPosition = camera.globalPosition;
 
         orbitalSimulation.update(elapsedSeconds);
-        for (const object of [planetImpostor, spaceElevator]) {
-            const orbitalTransform = orbitalSimulation.getTransform(object.model.id);
+        for (const object of keplerianObjects) {
+            const orbitalTransform = orbitalSimulation.getTransform(object.id);
             if (orbitalTransform === undefined) {
                 continue;
             }
@@ -173,7 +181,7 @@ export async function createSpaceElevatorScene(
             transform.rotationQuaternion = orbitalTransform.orientation.clone();
             transform.computeWorldMatrix(true);
         }
-        spaceElevator.update([planetImpostor], cameraWorldPosition, deltaSeconds);
+        spaceElevator.update(cameraWorldPosition, deltaSeconds);
         clusteredLightingSystem.update(camera);
     });
 

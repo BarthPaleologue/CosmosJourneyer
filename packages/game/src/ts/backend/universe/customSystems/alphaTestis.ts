@@ -23,17 +23,20 @@ import {
 } from "@cosmos-journeyer/physics";
 import {
     generateGasPlanetModel,
-    generateSpaceStationModel,
     generateStarModel,
     generateTelluricPlanetModel,
     generateTelluricSatelliteModel,
 } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
+
+import type { StarSystemContentModel } from "../universeBackend";
+
 /**
  * @returns Alpha Testis system definition with its fixed coordinates and orbital objects.
  */
-export function getAlphaTestisSystemModel(): StarSystemModel {
+export function getAlphaTestisSystemModel(): StarSystemContentModel {
     const systemName = "Alpha Testis";
     const systemCoordinates: StarSystemCoordinates = {
         starSectorX: 0,
@@ -79,13 +82,12 @@ export function getAlphaTestisSystemModel(): StarSystemModel {
         planets: [hecate, ares, andromaque],
         satellites: [manaleth],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
     const spaceStation = generateSpaceStationModel("hecate->station", 0, hecate, model);
-    spaceStation.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
+    if (spaceStation.placement.type === "inOrbit") {
+        spaceStation.placement.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
+    }
 
-    model.orbitalFacilities.push(spaceStation);
-
-    return model;
+    return { system: model, entities: [spaceStation] };
 }

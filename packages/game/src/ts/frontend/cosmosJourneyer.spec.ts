@@ -38,7 +38,7 @@ describe("CosmosJourneyer", () => {
     });
 
     it("snapshots the player before awaiting thumbnail creation", async () => {
-        const systemModel = getLoneStarSystem();
+        const { system: systemModel } = getLoneStarSystem();
         const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const player = Player.Default(universeBackend);
         const serializedSpaceship = player.serializedSpaceships[0];
@@ -76,6 +76,7 @@ describe("CosmosJourneyer", () => {
                 getSpaceshipControls: () => ({
                     getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
                     getTransform: (): object => ({}),
+                    getLandingFacility: () => null,
                 }),
             },
         } as unknown as CosmosJourneyer;

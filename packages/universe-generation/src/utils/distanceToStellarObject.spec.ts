@@ -18,7 +18,6 @@
 import { ScaledEarthRadius } from "#/constants";
 import { astronomicalUnitToMeters, EarthMass, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
 
@@ -100,61 +99,16 @@ describe("distanceToStellarObject", () => {
         ],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [
-            {
-                type: "spaceStation",
-                id: "station",
-                name: "Station",
-                orbit: {
-                    p: 2,
-                    semiMajorAxis: ScaledEarthRadius * 30,
-                    parentIds: ["planet"],
-                    argumentOfPeriapsis: 0,
-                    inclination: 0,
-                    initialMeanAnomaly: 0,
-                    longitudeOfAscendingNode: 0,
-                    eccentricity: 0,
-                },
-                population: 1e6,
-                populationDensity: 1e3,
-                solarPanelEfficiency: 0.4,
-                agricultureMix: [],
-                seed: 0,
-                spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
-                },
-                starSystemCoordinates: {
-                    starSectorX: 0,
-                    starSectorY: 0,
-                    starSectorZ: 0,
-                    localX: 0,
-                    localY: 0,
-                    localZ: 0,
-                },
-                nbHydroponicLayers: 15,
-                annualEnergyPerCapitaKWh: 4000,
-                mass: 1e6,
-                sections: [],
-            },
-        ],
     };
 
-    it("should be true", () => {
-        const station = systemModel.orbitalFacilities[0];
-        if (station === undefined) {
-            throw new Error("Station is undefined");
+    it("uses the stellar ancestor distance for an object orbiting a planet", () => {
+        const planet = systemModel.planets[0];
+        if (planet === undefined) {
+            throw new Error("Planet is undefined");
         }
-        const parentId = station.orbit.parentIds[0];
-        if (parentId === undefined) {
-            throw new Error("Parent ID is undefined");
-        }
-        const parent = getObjectModelById(parentId, systemModel);
-        expect(parent).not.toBeNull();
-        const distances = getDistancesToStellarObjects(station, systemModel);
+        const object = { orbit: { ...planet.orbit, parentIds: [planet.id], semiMajorAxis: ScaledEarthRadius * 30 } };
+        const distances = getDistancesToStellarObjects(object, systemModel);
         expect(distances.size).toBe(1);
-        expect(distances.get(systemModel.stellarObjects[0])).toBe(parent?.orbit.semiMajorAxis);
+        expect(distances.get(systemModel.stellarObjects[0])).toBe(planet.orbit.semiMajorAxis);
     });
 });

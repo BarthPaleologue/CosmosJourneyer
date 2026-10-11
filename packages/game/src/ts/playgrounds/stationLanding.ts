@@ -19,8 +19,6 @@ import { DirectionalLight, GlowLayer } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
-import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
@@ -34,9 +32,10 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
 import { initI18n } from "@/i18n";
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
+import { SpaceStation } from "@/modules/orbitalFacilities/spaceStation";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -73,8 +72,6 @@ export async function createStationLandingScene(
     scene.activeCamera = camera;
     camera.attachControl();
 
-    const distanceToStar = astronomicalUnitToMeters(1);
-
     const coordinates = {
         starSectorX: 0,
         starSectorY: 0,
@@ -91,7 +88,6 @@ export async function createStationLandingScene(
         planets: [],
         satellites: [],
         anomalies: [],
-        orbitalFacilities: [],
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -102,10 +98,9 @@ export async function createStationLandingScene(
         seedParam !== null ? Number(seedParam) : Math.random() * Settings.SEED_HALF_RANGE,
         systemModel.stellarObjects[0],
         systemModel,
-        { orbit: { semiMajorAxis: distanceToStar } },
     );
 
-    const spaceStation = new SpaceStation(spaceStationModel, assets, scene);
+    const spaceStation = new SpaceStation(spaceStationModel, { assets, scene });
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(spaceStation);
     clusteredLightingSystem.registerRegion(shipControls.getSpaceship());
@@ -129,7 +124,15 @@ export async function createStationLandingScene(
 
     shipControls.getTransform().computeWorldMatrix(true);
     shipControls.syncCameraTransform();
-    shipControls.setClosestLandableFacility(spaceStation);
+    shipControls.setLandingFacility({
+        object: {
+            id: spaceStationModel.id,
+            name: spaceStationModel.name,
+            getTransform: () => spaceStation.getTransform(),
+            getBoundingRadius: () => spaceStation.getBoundingRadius(),
+        },
+        pads: spaceStation.getLandingPadProvider(),
+    });
 
     new DirectionalLight("sun", new Vector3(-1, -1, 1).normalize(), scene);
     new GlowLayer("glow", scene);
@@ -138,7 +141,7 @@ export async function createStationLandingScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         shipControls.update(deltaSeconds);
-        spaceStation.update([], camera.globalPosition, deltaSeconds);
+        spaceStation.update(camera.globalPosition, deltaSeconds);
         clusteredLightingSystem.update(camera);
     });
 
