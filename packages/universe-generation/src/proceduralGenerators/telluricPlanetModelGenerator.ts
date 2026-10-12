@@ -17,7 +17,6 @@
 
 import { CloudLayerHeight, ScaledEarthRadius } from "#/constants";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import {
     computeEffectiveTemperature,
@@ -27,6 +26,7 @@ import {
     getOceanDepth,
     hasLiquidWater,
 } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, normalRandom, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
@@ -39,7 +39,6 @@ import type {
     StellarObjectModel,
     TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
-import { normalRandom, uniformRandBool } from "extended-random";
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
 import { generateSeededRingsModel } from "./ringsModelGenerator";

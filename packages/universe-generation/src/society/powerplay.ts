@@ -16,9 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PowerPlaySeed } from "#/constants";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import type { Vector3Like } from "#/utils/types";
-import { makeNoise3D } from "fast-simplex-noise";
+import { getRngFromSeed, makeNoise3D } from "@cosmos-journeyer/random";
 
 const materialistSpiritualistRng = getRngFromSeed(PowerPlaySeed);
 let materialistSpiritualistSampleStep = 0;

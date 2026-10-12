@@ -16,12 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { CelestialBodyModel, Orbit, BlackHoleModel, Rotation } from "@cosmos-journeyer/universe-model";
-import { normalRandom } from "extended-random";
 
 export function generateBlackHoleModel(
     id: string,

@@ -17,12 +17,11 @@
 
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SierpinskiPyramidModel, OrbitalObjectModel, Orbit, Rotation } from "@cosmos-journeyer/universe-model";
-import { normalRandom, randRange } from "extended-random";
 
 export function generateSierpinskiPyramidModel(
     id: string,

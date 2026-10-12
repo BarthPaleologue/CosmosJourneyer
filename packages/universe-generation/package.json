@@ -26,11 +26,9 @@
     },
     "dependencies": {
         "@cosmos-journeyer/physics": "workspace:^",
+        "@cosmos-journeyer/random": "workspace:^",
         "@cosmos-journeyer/typescript": "workspace:^",
-        "@cosmos-journeyer/universe-model": "workspace:^",
-        "extended-random": "1.2.2",
-        "fast-simplex-noise": "4.0.0",
-        "squirrel-noise": "1.0.0"
+        "@cosmos-journeyer/universe-model": "workspace:^"
     },
     "devDependencies": {
         "eslint": "catalog:",

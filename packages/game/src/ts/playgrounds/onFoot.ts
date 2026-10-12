@@ -28,7 +28,7 @@ import {
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { seededSquirrelNoise } from "squirrel-noise";
+import { seededLegacySquirrelNoise } from "@cosmos-journeyer/random";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
@@ -107,7 +107,7 @@ export async function createOnFootScene(
     const grassMaterial = new GrassMaterial(assets.textures.noises.seamlessPerlin, scene);
     grassBladeMesh.material = grassMaterial.get();
 
-    const rng = seededSquirrelNoise(0);
+    const rng = seededLegacySquirrelNoise(0);
     let rngState = 0;
     const wrappedRng = (): number => {
         return rng(rngState++);

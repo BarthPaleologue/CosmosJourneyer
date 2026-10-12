@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
 import type { RingHabitatModel } from "@cosmos-journeyer/universe-model";
 
 export function generateRingHabitatModel(

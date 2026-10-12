@@ -20,6 +20,7 @@ import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { randRange } from "@cosmos-journeyer/random";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -71,7 +72,6 @@ export async function createFlightDemoScene(
 
     const box = MeshBuilder.CreateBox("box", { size: 50 }, scene);
 
-    const randRange = (min: number, max: number): number => Math.random() * (max - min) + min;
     const range = 5e3;
     const instanceCount = 10_000;
     const matrixBuffer = new Float32Array(instanceCount * 16);

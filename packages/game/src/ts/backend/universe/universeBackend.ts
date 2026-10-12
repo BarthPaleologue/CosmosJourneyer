@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { centeredRand, makeNoise3D, getRngFromSeed } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { generateStarSystemModel } from "@cosmos-journeyer/universe-generation";
 import {
@@ -29,10 +30,7 @@ import type {
     OrbitalObjectModel,
     StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
-import { centeredRand } from "extended-random";
-import { makeNoise3D } from "fast-simplex-noise/lib/3d";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import { hashVec3 } from "@/utils/hash";
 import type { Vector3Like } from "@/utils/types";
 

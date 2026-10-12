@@ -11,6 +11,7 @@ const projectConfigs = [
     "./packages/game/tsconfig.json",
     "./packages/gaia-explorer/tsconfig.json",
     "./packages/physics/tsconfig.json",
+    "./packages/random/tsconfig.json",
     "./packages/typescript/tsconfig.json",
     "./packages/universe-generation/tsconfig.json",
     "./packages/universe-model/tsconfig.json",
@@ -90,6 +91,7 @@ const typeScriptWorkspaceRules = {
                         target: [
                             "packages/babylonjs-shading-language/src",
                             "packages/physics/src",
+                            "packages/random/src",
                             "packages/typescript/src",
                             "packages/universe-generation/src",
                             "packages/universe-model/src",
@@ -207,13 +209,9 @@ const typeScriptWorkspaceRules = {
     },
 };
 
-const readonlyParameterTypesConfig = {
-    files: [
-        "packages/physics/**/*.{ts,tsx}",
-        "packages/typescript/**/*.{ts,tsx}",
-        "packages/universe-generation/**/*.{ts,tsx}",
-        "packages/universe-model/**/*.{ts,tsx}",
-    ],
+// Require readonly parameters in pure TypeScript libraries.
+const pureLibraryRules = {
+    files: ["packages/{physics,random,typescript,universe-generation,universe-model}/**/*.{ts,tsx}"],
     rules: {
         "@typescript-eslint/prefer-readonly-parameter-types": [
             "error",
@@ -255,5 +253,5 @@ export default defineConfig([
     importX.flatConfigs.typescript,
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
-    readonlyParameterTypesConfig,
+    pureLibraryRules,
 ]);

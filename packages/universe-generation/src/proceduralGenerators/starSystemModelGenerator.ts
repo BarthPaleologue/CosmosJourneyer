@@ -16,11 +16,10 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { SeedHalfRange } from "#/constants";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
-import { wheelOfFortune } from "#/utils/random";
 import { Alphabet, ReversedGreekAlphabet } from "#/utils/strings/alphabets";
 import { romanNumeral } from "#/utils/strings/romanNumerals";
 import { generateStarName } from "#/utils/strings/starNameGenerator";
+import { getRngFromSeed, wheelOfFortune, centeredRand, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { createOrbitalObjectId } from "@cosmos-journeyer/universe-model";
@@ -34,7 +33,6 @@ import type {
     TelluricSatelliteModel,
     StarSystemModel,
 } from "@cosmos-journeyer/universe-model";
-import { centeredRand, randRangeInt, uniformRandBool } from "extended-random";
 
 import { generateJuliaSetModel } from "./anomalies/juliaSetModelGenerator";
 import { generateMandelboxModel } from "./anomalies/mandelboxModelGenerator";

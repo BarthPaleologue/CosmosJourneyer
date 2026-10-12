@@ -17,11 +17,10 @@
 
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
+import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel, Orbit, NeutronStarModel, Rotation } from "@cosmos-journeyer/universe-model";
-import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 /**
  * Creates a new pseudo-random neutron star model

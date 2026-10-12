@@ -18,12 +18,11 @@
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { GasPlanetModel, Orbit, Rotation, StellarObjectModel } from "@cosmos-journeyer/universe-model";
-import { normalRandom, randRange, randRangeInt, uniformRandBool } from "extended-random";
 
 import { getGasPlanetOrbitRadius, sampleGasPlanetMass } from "./gasPlanetModelHelpers";
 

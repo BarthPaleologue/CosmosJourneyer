@@ -179,6 +179,7 @@ This project uses a pnpm workspace. Packages live under `packages/` and share to
 - `packages/game`: main Babylon.js game sources, assets, build config, and tests
 - `packages/desktop-electron`: Electron desktop shell that packages the game for desktop distribution
 - `packages/physics`: physics formulas, constants, and unit conversions
+- `packages/random`: shared indexed random generation, distributions, sampling, and simplex noise
 - `packages/universe-model`: star system and orbital object data models
 - `packages/universe-generation`: procedural generators for universe model data
 - `packages/babylonjs-shader-language`: wrapper for BabylonJS Node Materials
