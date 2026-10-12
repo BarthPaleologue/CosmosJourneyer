@@ -113,7 +113,7 @@ export class Vehicle {
             position: wheel.frameLocalPosition,
             steerable: wheel.steering !== null,
         }));
-        this.steeringGeometry = deriveSteeringGeometry(wheelGeometry, {
+        this.steeringGeometry = deriveSteeringGeometry(wheelGeometry, this.mechanicalSteeringAngleLimit, {
             steeringReferenceZOverride: options?.steeringReferenceZ,
         });
         if (
@@ -155,6 +155,11 @@ export class Vehicle {
                 this.maxLateralAcceleration,
                 this.mechanicalSteeringAngleLimit,
             );
+            curvature = clamp(
+                curvature,
+                geometry.mechanicalCurvatureLimits.minCurvature,
+                geometry.mechanicalCurvatureLimits.maxCurvature,
+            );
             // Store the applied virtual angle so keyboard integration cannot wind up.
             this.steeringCommandAngle = Math.atan(curvature * geometry.referenceLeverArm);
         } else {
@@ -177,6 +182,7 @@ export class Vehicle {
                           curvature,
                           wheel.frameLocalPosition.z - geometry.steeringReferenceZ,
                           this.mechanicalSteeringAngleLimit,
+                          wheel.frameLocalPosition.x,
                       )
                     : this.steeringCommandAngle *
                       (this.steeringMode === "counterPhase" && steering.position === "rear" ? -1 : 1);

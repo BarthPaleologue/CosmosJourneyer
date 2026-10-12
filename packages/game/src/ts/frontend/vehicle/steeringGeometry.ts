@@ -17,7 +17,7 @@
 
 import { clamp } from "@/utils/math";
 
-/** Frame-local wheel geometry; left/right Ackermann differences and tire slip are ignored. */
+/** Frame-local wheel geometry; tire slip is ignored. */
 type SteeringWheelGeometry = {
     readonly position: { readonly x: number; readonly z: number };
     readonly steerable: boolean;
@@ -26,6 +26,7 @@ type SteeringWheelGeometry = {
 export type SteeringGeometry = {
     readonly steeringReferenceZ: number;
     readonly referenceLeverArm: number;
+    readonly mechanicalCurvatureLimits: { readonly minCurvature: number; readonly maxCurvature: number };
 };
 
 type SteeringGeometryOptions = {
@@ -43,6 +44,7 @@ const AxleTolerance = 0.001;
  */
 export function deriveSteeringGeometry(
     wheels: ReadonlyArray<SteeringWheelGeometry>,
+    mechanicalAngleLimit: number,
     options?: Partial<SteeringGeometryOptions>,
 ): SteeringGeometry | undefined {
     const steeringReferenceZOverride = options?.steeringReferenceZOverride;
@@ -78,7 +80,11 @@ export function deriveSteeringGeometry(
     if (referenceLeverArm <= AxleTolerance) {
         return undefined;
     }
-    return { steeringReferenceZ, referenceLeverArm };
+    return {
+        steeringReferenceZ,
+        referenceLeverArm,
+        mechanicalCurvatureLimits: getMechanicalCurvatureLimits(wheels, steeringReferenceZ, mechanicalAngleLimit),
+    };
 }
 
 /** The requested angle is virtual: it acts at the largest steering lever arm. */
@@ -98,6 +104,46 @@ export function computeSpeedLimitedCurvature(
     return clamp(requestedCurvature, -maxCurvature, maxCurvature);
 }
 
-export function getWheelSteeringAngle(curvature: number, leverArm: number, mechanicalAngleLimit: number): number {
-    return clamp(Math.atan(curvature * leverArm), -mechanicalAngleLimit, mechanicalAngleLimit);
+/**
+ * Bound curvature before computing Ackermann angles so no individual wheel hits
+ * its stop early and breaks the common turning center. Positive motor angles
+ * steer front wheels toward +X with the existing axle/frame constraints.
+ */
+export function getMechanicalCurvatureLimits(
+    wheels: ReadonlyArray<SteeringWheelGeometry>,
+    steeringReferenceZ: number,
+    mechanicalAngleLimit: number,
+): { readonly minCurvature: number; readonly maxCurvature: number } {
+    const tangentLimit = Math.tan(mechanicalAngleLimit);
+    let positiveDenominator = 0;
+    let negativeDenominator = 0;
+    for (const wheel of wheels) {
+        if (!wheel.steerable) {
+            continue;
+        }
+        const longitudinalLeverArm = Math.abs(wheel.position.z - steeringReferenceZ);
+        positiveDenominator = Math.max(positiveDenominator, longitudinalLeverArm + wheel.position.x * tangentLimit);
+        negativeDenominator = Math.max(negativeDenominator, longitudinalLeverArm - wheel.position.x * tangentLimit);
+    }
+    return {
+        maxCurvature: positiveDenominator > AxleTolerance ? tangentLimit / positiveDenominator : Infinity,
+        minCurvature: negativeDenominator > AxleTolerance ? -tangentLimit / negativeDenominator : -Infinity,
+    };
+}
+
+/** Ackermann about (1 / curvature, steeringReferenceZ); in-phase steering bypasses this model. */
+export function getWheelSteeringAngle(
+    curvature: number,
+    leverArm: number,
+    mechanicalAngleLimit: number,
+    lateralPosition: number,
+): number {
+    if (leverArm === 0 || curvature === 0) {
+        return 0;
+    }
+    return clamp(
+        Math.atan2(curvature * leverArm, 1 - curvature * lateralPosition),
+        -mechanicalAngleLimit,
+        mechanicalAngleLimit,
+    );
 }

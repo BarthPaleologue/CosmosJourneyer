@@ -238,7 +238,16 @@ describe("vehicle steering", () => {
     });
 });
 
-describe("vehicle steering inputs", () => {
+const wolfLayout: ReadonlyArray<TestWheelLayout> = [
+    { x: 2.2, z: 2.6, steerable: true },
+    { x: -2.2, z: 2.6, steerable: true },
+    { x: 2.2, z: 0, steerable: false },
+    { x: -2.2, z: 0, steerable: false },
+    { x: 2.2, z: -2.6, steerable: true },
+    { x: -2.2, z: -2.6, steerable: true },
+];
+
+describe("vehicle steering inputs and Ackermann", () => {
     it("reaches full lock under held input instead of fighting return-to-center", () => {
         fixture = createVehicle();
         for (let i = 0; i < 120; i++) {
@@ -259,7 +268,44 @@ describe("vehicle steering inputs", () => {
             expect(lastAngles()[0]).toBeCloseTo(0.3);
         }
     });
+
+    it("limits the Wolf's inside wheels to 45 degrees while sharing one turning center", () => {
+        fixture = createVehicle(wolfLayout);
+        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: 0 });
+        const angles = lastAngles();
+        expect(angles[0]).toBeCloseTo(degreesToRadians(45));
+        expect(angles[1]).toBeCloseTo(Math.atan(2.6 / 7));
+        expect(angles[2]).toBeCloseTo(-(angles[0] ?? 0));
+        expect(angles[3]).toBeCloseTo(-(angles[1] ?? 0));
+        const commandedAngles = fixture.wheels.filter((wheel) => wheel.steering !== null);
+        commandedAngles.forEach((wheel, i) => {
+            expect(wheel.frameLocalPosition.x + wheel.frameLocalPosition.z / Math.tan(angles[i] ?? 0)).toBeCloseTo(4.8);
+        });
+        // The stored command also respects the Ackermann mechanical limit.
+        fixture.vehicle.turn(0, 0.225, { horizontalSpeed: 0 });
+        const centerAngle = Math.atan(2.6 / 4.8) / 2;
+        expect(lastAngles()[0]).toBeCloseTo(Math.atan2(Math.tan(centerAngle), 1 - (Math.tan(centerAngle) * 2.2) / 2.6));
+    });
+
+    it("preserves the lateral acceleration budget, reverse signs and in-phase behavior", () => {
+        fixture = createVehicle(wolfLayout);
+        const speed = kmhToMetersPerSecond(40);
+        const curvature = EarthG / speed ** 2;
+        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: speed });
+        const angles = lastAngles();
+        expect(angles[0]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 - curvature * 2.2));
+        expect(angles[1]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 + curvature * 2.2));
+        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: -speed });
+        expect(lastAngles()).toEqual(angles);
+        fixture.vehicle.setTargetSteeringAngle(-1, { horizontalSpeed: speed });
+        expect(lastAngles()[0]).toBeCloseTo(-(angles[1] ?? 0));
+        expect(lastAngles()[1]).toBeCloseTo(-(angles[0] ?? 0));
+        fixture.vehicle.setSteeringMode("inPhase");
+        fixture.vehicle.setTargetSteeringAngle(0.2, { horizontalSpeed: 0 });
+        expect(lastAngles().every((angle) => angle === 0.2)).toBe(true);
+    });
 });
+
 const driveLayout: ReadonlyArray<TestWheelLayout> = [
     { z: 2, steerable: true, powered: true, radius: 0.5 },
     { z: -2, steerable: false, powered: true, radius: 1 },
