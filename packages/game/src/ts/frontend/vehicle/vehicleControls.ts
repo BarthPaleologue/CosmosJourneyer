@@ -34,7 +34,7 @@ import type { ThirdPersonCameraPreset, ThirdPersonCameraPresetNames } from "./th
 import type { Vehicle } from "./vehicle";
 import { VehicleInputs } from "./vehicleControlsInputs";
 
-type CameraPresetInput = (typeof VehicleInputs.map)["resetCamera"];
+type VehicleButtonInput = (typeof VehicleInputs.map)["resetCamera"];
 
 export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
@@ -69,15 +69,16 @@ export class VehicleControls implements Controls {
 
         this.activeCamera = this.thirdPersonCamera;
 
-        VehicleInputs.map.toggleCamera.on("complete", () => {
+        const toggleCameraHandler = (): void => {
             if (this.activeCamera === this.firstPersonCamera) {
                 this.switchToThirdPersonCamera();
             } else {
                 this.switchToFirstPersonCamera();
             }
-        });
+        };
+        this.bindInput(VehicleInputs.map.toggleCamera, toggleCameraHandler, scene);
 
-        VehicleInputs.map.toggleDoors.on("complete", () => {
+        const toggleDoorsHandler = (): void => {
             if (this.vehicle === null) {
                 return;
             }
@@ -85,21 +86,33 @@ export class VehicleControls implements Controls {
             for (const door of this.vehicle.doors) {
                 toggleDoor(door);
             }
-        });
+        };
+        this.bindInput(VehicleInputs.map.toggleDoors, toggleDoorsHandler, scene);
 
-        this.bindCameraPresetInput(VehicleInputs.map.resetCamera, "behindCentered");
-        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset1, "behindLeft");
-        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset2, "behindRight");
-        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset3, "frontLookingLeft");
-        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset4, "frontLookingRight");
+        this.bindCameraPresetInput(VehicleInputs.map.resetCamera, "behindCentered", scene);
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset1, "behindLeft", scene);
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset2, "behindRight", scene);
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset3, "frontLookingLeft", scene);
+        this.bindCameraPresetInput(VehicleInputs.map.switchToCameraPreset4, "frontLookingRight", scene);
     }
 
-    private bindCameraPresetInput(input: CameraPresetInput, presetName: ThirdPersonCameraPresetNames): void {
+    private bindCameraPresetInput(
+        input: VehicleButtonInput,
+        presetName: ThirdPersonCameraPresetNames,
+        scene: Scene,
+    ): void {
         const handler = (): void => {
             this.resetCamera(presetName);
         };
 
+        this.bindInput(input, handler, scene);
+    }
+
+    private bindInput(input: VehicleButtonInput, handler: () => void, scene: Scene): void {
         input.on("complete", handler);
+        scene.onDisposeObservable.addOnce(() => {
+            input.off("complete", handler);
+        });
     }
 
     private resetCamera(presetName: ThirdPersonCameraPresetNames): void {
@@ -245,15 +258,16 @@ export class VehicleControls implements Controls {
 
         this.getActiveCamera().getViewMatrix(true);
 
-        const steeringSpeed = VehicleInputs.map.steer.value * 1.8;
-        vehicle.turn(steeringSpeed, deltaSeconds);
+        const steeringRate = VehicleInputs.map.steer.value * 1.8;
+        vehicle.turn(steeringRate, deltaSeconds, { horizontalSpeed });
         vehicle.setBoostEnabled(VehicleInputs.map.boost.value > 0);
 
+        const throttle = VehicleInputs.map.accelerate.value;
         if (VehicleInputs.map.brake.value > 0) {
             vehicle.brake();
         } else {
             const vehicleMaxAcceleration = 0.7 * EarthG;
-            const vehicleAcceleration = VehicleInputs.map.accelerate.value * vehicleMaxAcceleration;
+            const vehicleAcceleration = throttle * vehicleMaxAcceleration;
             vehicle.accelerate(vehicleAcceleration, deltaSeconds);
         }
 

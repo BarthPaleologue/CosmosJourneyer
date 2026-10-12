@@ -30,7 +30,7 @@ import type { Door } from "./door";
 import { filterVehicleShape } from "./filterVehicleShape";
 import { HingedDoor } from "./hingedDoor";
 import { Vehicle } from "./vehicle";
-import type { FixedVehiclePart } from "./vehicle";
+import type { FixedVehiclePart, VehicleOptions } from "./vehicle";
 import { CreateAxle, CreateWheel, Wheel } from "./wheel";
 import type { WheelModel } from "./wheel";
 
@@ -166,7 +166,7 @@ export class VehicleBuilder {
         return [this.frame];
     }
 
-    build(name: string): Vehicle {
+    build(name: string, options?: Partial<VehicleOptions>): Vehicle {
         const allMeshes = this.frame.getChildMeshes();
         allMeshes.push(this.frame);
 
@@ -174,7 +174,10 @@ export class VehicleBuilder {
             mass: 2000,
             restitution: 0,
             friction: 1,
-            center: new Vector3(0, -2.5, 0),
+        });
+        frameAggregate.body.setMassProperties({
+            ...frameAggregate.body.getMassProperties(),
+            centerOfMass: new Vector3(0, -0.4, 0),
         });
         filterVehicleShape(frameAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
@@ -274,6 +277,6 @@ export class VehicleBuilder {
             physicWheels.push(physicWheel);
         }
 
-        return new Vehicle(name, frameAggregate, doors, physicWheels, fixedVehicleParts, allMeshes);
+        return new Vehicle(name, frameAggregate, doors, physicWheels, fixedVehicleParts, allMeshes, options);
     }
 }

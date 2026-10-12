@@ -62,6 +62,9 @@ type WheelDraft = {
 export class Wheel {
     readonly radius: number;
 
+    /** Immutable geometry relative to the chassis, independent of its world pose. */
+    readonly frameLocalPosition: Readonly<Pick<Vector3, "x" | "y" | "z">>;
+
     readonly wheelAxleConstraint: Physics6DoFConstraint;
     readonly steering: {
         position: "rear" | "front";
@@ -95,6 +98,7 @@ export class Wheel {
         };
 
         this.radius = radius;
+        this.frameLocalPosition = Object.freeze(model.position.clone());
 
         const { physicsBody: wheelBody, physicsShape: wheelShape } = AddWheelPhysics(
             wheelMesh,
@@ -125,14 +129,9 @@ export class Wheel {
         }
 
         const frameAxleConstraint = AttachAxleToFrame(this.axle.body, frameBody, scene, steerable);
-        const frameInverseWorldMatrix = frameBody.transformNode.getWorldMatrix().clone().invert();
-        const wheelPositionInFrameSpace = Vector3.TransformCoordinates(
-            this.wheel.mesh.position,
-            frameInverseWorldMatrix,
-        );
         this.steering = steerable
             ? {
-                  position: wheelPositionInFrameSpace.z > 0 ? "front" : "rear",
+                  position: this.frameLocalPosition.z > 0 ? "front" : "rear",
                   constraint: frameAxleConstraint,
               }
             : null;
@@ -270,10 +269,11 @@ function AttachAxleToFrame(
                 maxLimit: 0,
             },
             {
-                // Angular leeway X
+                // Lock support pitch so suspension cannot swing fore/aft.
+                // Wheel spin remains free in the wheel/axle joint.
                 axis: PhysicsConstraintAxis.ANGULAR_X,
-                minLimit: -0.25,
-                maxLimit: 0.25,
+                minLimit: 0,
+                maxLimit: 0,
             },
             {
                 // Steering

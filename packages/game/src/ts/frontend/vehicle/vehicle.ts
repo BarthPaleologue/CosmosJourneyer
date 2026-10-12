@@ -15,22 +15,39 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { degreesToRadians, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
+import { degreesToRadians, EarthG, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
 import { getBoundingRadius } from "../helpers/boundingRadius";
 import type { Door } from "./door";
+import { deriveSteeringGeometry, getWheelSteeringAngle, computeSpeedLimitedCurvature } from "./steeringGeometry";
+import type { SteeringGeometry } from "./steeringGeometry";
 import type { Wheel } from "./wheel";
 
 const SteeringMotorMaxForce = 10_000;
 
 export type SteeringMode = "counterPhase" | "inPhase";
+
+export type VehicleOptions = {
+    /** Initial tuning budget in m/s², independent of the local gravity system. */
+    readonly maxLateralAcceleration: number;
+    /** Explicit turning reference for layouts with incompatible fixed axles. */
+    readonly steeringReferenceZ: number;
+    /** Torque in N·m on powered wheels when throttle is released; zero means freewheel. */
+    readonly engineBrakeTorque: number;
+};
+
+export type VehicleSteeringOptions = {
+    /** Ground-plane speed in m/s; omit to use the magnitude of the 3D velocity. */
+    readonly horizontalSpeed: number;
+};
 
 export type FixedVehiclePart = {
     readonly aggregate: PhysicsAggregate;
@@ -51,8 +68,13 @@ export class Vehicle {
 
     private steeringMode: SteeringMode = "counterPhase";
 
-    private targetSpeed = 0;
-    private targetSteeringAngle = 0;
+    readonly steeringGeometry: SteeringGeometry | undefined;
+    readonly maxLateralAcceleration: number;
+
+    readonly engineBrakeTorque: number;
+
+    private targetLongitudinalSpeed: number | undefined;
+    private steeringCommandAngle = 0;
 
     readonly maxSpeed = {
         forward: kmhToMetersPerSecond(40),
@@ -60,10 +82,8 @@ export class Vehicle {
         reverse: kmhToMetersPerSecond(20),
     } as const;
 
-    readonly maxSteeringAngle = {
-        lowSpeed: degreesToRadians(45),
-        highSpeed: degreesToRadians(7),
-    } as const;
+    readonly mechanicalSteeringAngleLimit = degreesToRadians(45);
+    readonly legacyHighSpeedSteeringAngleLimit = degreesToRadians(7);
 
     private boostEnabled = false;
 
@@ -78,6 +98,7 @@ export class Vehicle {
         wheels: ReadonlyArray<Wheel>,
         fixedParts: ReadonlyArray<FixedVehiclePart>,
         allMeshes: ReadonlyArray<AbstractMesh>,
+        options?: Partial<VehicleOptions>,
     ) {
         this.name = name;
         this.frame = frame;
@@ -85,6 +106,25 @@ export class Vehicle {
         this.wheels = [...wheels];
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
+
+        this.engineBrakeTorque = options?.engineBrakeTorque ?? 0;
+        this.maxLateralAcceleration = options?.maxLateralAcceleration ?? EarthG;
+        const wheelGeometry = this.wheels.map((wheel) => ({
+            position: wheel.frameLocalPosition,
+            steerable: wheel.steering !== null,
+        }));
+        this.steeringGeometry = deriveSteeringGeometry(wheelGeometry, this.mechanicalSteeringAngleLimit, {
+            steeringReferenceZOverride: options?.steeringReferenceZ,
+        });
+        if (
+            import.meta.env.DEV &&
+            this.steeringGeometry === undefined &&
+            this.wheels.some((wheel) => wheel.steering !== null)
+        ) {
+            console.warn(
+                `Vehicle "${name}" has no usable steering reference; using legacy steering. Multiple fixed axles require an explicit steeringReferenceZ approximation.`,
+            );
+        }
 
         this.boundingRadius = getBoundingRadius(this.getTransform());
     }
@@ -94,72 +134,108 @@ export class Vehicle {
     }
 
     setSteeringMode(mode: SteeringMode): void {
+        if (mode === this.steeringMode) {
+            return;
+        }
         this.steeringMode = mode;
+        // A command in one mode cannot be carried into a different wheel motion.
+        this.setTargetSteeringAngle(0);
     }
 
-    setTargetSteeringAngle(angle: number): void {
-        const linearVelocity = this.frame.body.getLinearVelocity().length();
-        const maxSteeringAngle = lerp(
-            this.maxSteeringAngle.highSpeed,
-            this.maxSteeringAngle.lowSpeed,
-            2 ** (-linearVelocity / kmhToMetersPerSecond(10)),
-        );
-        this.targetSteeringAngle = clamp(angle, -maxSteeringAngle, maxSteeringAngle);
+    /** Pass ground-plane speed when available; other callers retain the 3D speed fallback. */
+    setTargetSteeringAngle(requestedSteeringAngle: number, options?: Partial<VehicleSteeringOptions>): void {
+        const speed = Math.abs(options?.horizontalSpeed ?? this.frame.body.getLinearVelocity().length());
+        const geometry = this.steeringMode === "counterPhase" ? this.steeringGeometry : undefined;
+        let curvature = 0;
+        if (geometry !== undefined) {
+            curvature = computeSpeedLimitedCurvature(
+                requestedSteeringAngle,
+                geometry.referenceLeverArm,
+                speed,
+                this.maxLateralAcceleration,
+                this.mechanicalSteeringAngleLimit,
+            );
+            curvature = clamp(
+                curvature,
+                geometry.mechanicalCurvatureLimits.minCurvature,
+                geometry.mechanicalCurvatureLimits.maxCurvature,
+            );
+            // Store the applied virtual angle so keyboard integration cannot wind up.
+            this.steeringCommandAngle = Math.atan(curvature * geometry.referenceLeverArm);
+        } else {
+            const maxSteeringAngle = lerp(
+                this.legacyHighSpeedSteeringAngleLimit,
+                this.mechanicalSteeringAngleLimit,
+                2 ** (-speed / kmhToMetersPerSecond(10)),
+            );
+            this.steeringCommandAngle = clamp(requestedSteeringAngle, -maxSteeringAngle, maxSteeringAngle);
+        }
         for (const wheel of this.wheels) {
             const steering = wheel.steering;
             if (steering === null) {
                 continue;
             }
 
-            const wheelAngle =
-                steering.position === "front"
-                    ? this.targetSteeringAngle
-                    : this.getSteeringMode() === "counterPhase"
-                      ? -this.targetSteeringAngle
-                      : this.targetSteeringAngle;
+            const wheelSteeringAngle =
+                geometry !== undefined
+                    ? getWheelSteeringAngle(
+                          curvature,
+                          wheel.frameLocalPosition.z - geometry.steeringReferenceZ,
+                          this.mechanicalSteeringAngleLimit,
+                          wheel.frameLocalPosition.x,
+                      )
+                    : this.steeringCommandAngle *
+                      (this.steeringMode === "counterPhase" && steering.position === "rear" ? -1 : 1);
             steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, SteeringMotorMaxForce);
-            steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelAngle);
+            steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelSteeringAngle);
         }
     }
 
     setTargetSpeed(speed: number): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
-        this.targetSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
-        const motorTorque = this.boostEnabled ? 15_000 : 5_000;
+        this.targetLongitudinalSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
+        this.setDriveMotorTargets(this.targetLongitudinalSpeed, this.boostEnabled ? 15_000 : 5_000);
+    }
+
+    private setDriveMotorTargets(speed: number, torque: number): void {
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
             }
-
-            const targetAngularVelocity = this.targetSpeed / wheel.radius;
-
-            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
-            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, targetAngularVelocity);
+            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, torque);
+            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, speed / wheel.radius);
         }
     }
 
     accelerate(acceleration: number, deltaSeconds: number): void {
-        this.setTargetSpeed(this.targetSpeed + acceleration * deltaSeconds);
-        this.targetSpeed = lerpSmooth(this.targetSpeed, 0, 2.5, deltaSeconds);
+        if (acceleration === 0) {
+            this.releaseThrottle();
+            return;
+        }
+        if (this.targetLongitudinalSpeed === undefined) {
+            // Resume from actual longitudinal motion rather than a stale command or zero.
+            const forward = this.getTransform().getDirection(Vector3.Forward());
+            this.targetLongitudinalSpeed = Vector3.Dot(this.frame.body.getLinearVelocity(), forward);
+        }
+        this.setTargetSpeed(this.targetLongitudinalSpeed + acceleration * deltaSeconds);
+    }
+
+    releaseThrottle(): void {
+        this.targetLongitudinalSpeed = undefined;
+        this.setDriveMotorTargets(0, this.engineBrakeTorque);
     }
 
     brake(): void {
-        const brakeTorque = 20_000;
-        for (const wheel of this.wheels) {
-            if (wheel.motor === null) {
-                continue;
-            }
-
-            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, brakeTorque);
-            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 0);
-        }
-
-        this.targetSpeed = 0;
+        this.targetLongitudinalSpeed = undefined;
+        this.setDriveMotorTargets(0, 20_000);
     }
 
-    turn(steeringSpeed: number, deltaSeconds: number): void {
-        this.setTargetSteeringAngle(this.targetSteeringAngle + steeringSpeed * deltaSeconds);
-        this.targetSteeringAngle = lerpSmooth(this.targetSteeringAngle, 0, 0.225, deltaSeconds);
+    turn(steeringRate: number, deltaSeconds: number, options?: Partial<VehicleSteeringOptions>): void {
+        const angle =
+            steeringRate === 0
+                ? lerpSmooth(this.steeringCommandAngle, 0, 0.225, deltaSeconds)
+                : this.steeringCommandAngle + steeringRate * deltaSeconds;
+        this.setTargetSteeringAngle(angle, options);
     }
 
     setBoostEnabled(enabled: boolean): void {

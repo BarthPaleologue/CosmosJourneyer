@@ -18,10 +18,11 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
 import type { Vehicle } from "./vehicle";
 import { VehicleControls } from "./vehicleControls";
+import { VehicleInputs } from "./vehicleControlsInputs";
 
 describe("VehicleControls", () => {
     const engine = new NullEngine();
@@ -30,6 +31,28 @@ describe("VehicleControls", () => {
     afterAll(() => {
         scene.dispose();
         engine.dispose();
+    });
+
+    it("releases input subscriptions with the scene while preserving live controls", () => {
+        const disposedScene = new Scene(engine);
+        const disposedControls = new VehicleControls(disposedScene);
+        const disposedSwitch = vi.spyOn(disposedControls, "switchToFirstPersonCamera");
+        disposedScene.dispose();
+
+        const liveScene = new Scene(engine);
+        const liveControls = new VehicleControls(liveScene);
+        const liveSwitch = vi.spyOn(liveControls, "switchToFirstPersonCamera");
+        VehicleInputs.setEnabled(true);
+        try {
+            window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyB" }));
+            window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyB" }));
+            expect(disposedSwitch).not.toHaveBeenCalled();
+            expect(liveSwitch).toHaveBeenCalledOnce();
+        } finally {
+            VehicleInputs.setEnabled(false);
+            liveScene.dispose();
+            vi.restoreAllMocks();
+        }
     });
 
     it("detaches the first person camera before releasing the vehicle", () => {
