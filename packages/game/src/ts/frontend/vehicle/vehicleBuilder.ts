@@ -174,7 +174,10 @@ export class VehicleBuilder {
             mass: 2000,
             restitution: 0,
             friction: 1,
-            center: new Vector3(0, -2.5, 0),
+        });
+        frameAggregate.body.setMassProperties({
+            ...frameAggregate.body.getMassProperties(),
+            centerOfMass: new Vector3(0, -0.4, 0),
         });
         filterVehicleShape(frameAggregate.shape, CollisionMask.VEHICLE_PARTS);
 
