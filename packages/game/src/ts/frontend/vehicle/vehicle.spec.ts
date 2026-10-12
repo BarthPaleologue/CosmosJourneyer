@@ -28,6 +28,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Vehicle } from "./vehicle";
 import type { VehicleOptions } from "./vehicle";
 import { VehicleControls } from "./vehicleControls";
+import { VehicleInputs } from "./vehicleControlsInputs";
 import { Wheel } from "./wheel";
 
 // Keep real meshes/transforms and the production steering controller; mock only physics motors.
@@ -100,13 +101,27 @@ function createVehicle(
             }
             return vi.spyOn(wheel.steering.constraint, "setAxisMotorTarget");
         });
-    return { vehicle, frame, models, wheels, targets, scene, engine };
+    const driveMotors = wheels
+        .filter((wheel) => wheel.motor !== null)
+        .map((wheel) => {
+            if (wheel.motor === null) {
+                throw new Error("Expected a drive motor");
+            }
+            return {
+                target: vi.spyOn(wheel.motor, "setAxisMotorTarget"),
+                torque: vi.spyOn(wheel.motor, "setAxisMotorMaxForce"),
+            };
+        });
+    return { vehicle, frame, models, wheels, targets, driveMotors, scene, engine };
 }
 
 let fixture: ReturnType<typeof createVehicle>;
 afterEach(() => {
     fixture.scene.dispose();
     fixture.engine.dispose();
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+    VehicleInputs.setEnabled(false);
     vi.restoreAllMocks();
 });
 const lastAngles = () => fixture.targets.map((target) => target.mock.lastCall?.[1]);
@@ -243,5 +258,118 @@ describe("vehicle steering inputs", () => {
             }
             expect(lastAngles()[0]).toBeCloseTo(0.3);
         }
+    });
+});
+const driveLayout: ReadonlyArray<TestWheelLayout> = [
+    { z: 2, steerable: true, powered: true, radius: 0.5 },
+    { z: -2, steerable: false, powered: true, radius: 1 },
+    { z: -2, steerable: false },
+];
+const driveTargets = () => fixture.driveMotors.map((motor) => motor.target.mock.lastCall?.[1]);
+const driveTorques = () => fixture.driveMotors.map((motor) => motor.torque.mock.lastCall?.[1]);
+function setLongitudinalVelocity(speed: number) {
+    const forward = fixture.vehicle.getTransform().getDirection(Vector3.Forward());
+    vi.spyOn(fixture.frame.body, "getLinearVelocity").mockReturnValue(forward.scale(speed));
+}
+
+describe("vehicle throttle and braking", () => {
+    it("integrates acceleration without decaying a held throttle command", () => {
+        fixture = createVehicle(driveLayout);
+        setLongitudinalVelocity(8);
+        for (const fps of [30, 60, 120]) {
+            fixture.vehicle.setTargetSpeed(0);
+            for (let i = 0; i < fps; i++) {
+                fixture.vehicle.accelerate(5, 1 / fps);
+            }
+            expect(driveTargets()[0]).toBeCloseTo(10);
+            expect(driveTargets()[1]).toBeCloseTo(5);
+        }
+        expect(driveTorques()).toEqual([5000, 5000]);
+    });
+
+    it("releases all drive torque at zero throttle and leaves unpowered wheels alone", () => {
+        fixture = createVehicle(driveLayout);
+        const freeWheel = fixture.wheels[2];
+        if (freeWheel === undefined) {
+            throw new Error("Expected a free wheel");
+        }
+        const freeTarget = vi.spyOn(freeWheel.wheelAxleConstraint, "setAxisMotorTarget");
+        fixture.vehicle.setTargetSpeed(10);
+        fixture.vehicle.accelerate(0, 0.016);
+        expect(driveTorques()).toEqual([0, 0]);
+        expect(driveTargets()).toEqual([0, 0]);
+        expect(freeTarget).not.toHaveBeenCalled();
+    });
+
+    it("makes engine braking configurable independently of service braking and boost", () => {
+        fixture = createVehicle(driveLayout, { engineBrakeTorque: 500 });
+        fixture.vehicle.setBoostEnabled(true);
+        fixture.vehicle.setTargetSpeed(5);
+        expect(driveTorques()).toEqual([15000, 15000]);
+        fixture.vehicle.releaseThrottle();
+        expect(driveTorques()).toEqual([500, 500]);
+        expect(driveTargets()).toEqual([0, 0]);
+        fixture.vehicle.brake();
+        expect(driveTorques()).toEqual([20000, 20000]);
+        fixture.vehicle.releaseThrottle();
+        expect(driveTorques()).toEqual([500, 500]);
+    });
+
+    it("resumes from actual signed motion after coasting or braking without restoring stale commands", () => {
+        fixture = createVehicle(driveLayout);
+        fixture.vehicle.setTargetSpeed(20);
+        fixture.vehicle.releaseThrottle();
+        setLongitudinalVelocity(8);
+        fixture.vehicle.accelerate(2, 0.1);
+        expect(driveTargets()[1]).toBeCloseTo(8.2);
+        fixture.vehicle.brake();
+        setLongitudinalVelocity(4);
+        fixture.vehicle.accelerate(2, 0.1);
+        expect(driveTargets()[1]).toBeCloseTo(4.2);
+        fixture.vehicle.releaseThrottle();
+        setLongitudinalVelocity(-3);
+        fixture.vehicle.accelerate(-2, 0.1);
+        expect(driveTargets()[1]).toBeCloseTo(-3.2);
+        expect(driveTorques()).toEqual([5000, 5000]);
+    });
+
+    it("retains forward, reverse and boost limits", () => {
+        fixture = createVehicle(driveLayout);
+        fixture.vehicle.accelerate(100, 1);
+        expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(40));
+        fixture.vehicle.setBoostEnabled(true);
+        fixture.vehicle.accelerate(100, 1);
+        expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(80));
+        fixture.vehicle.setBoostEnabled(false);
+        fixture.vehicle.accelerate(100, 1);
+        expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(40));
+        fixture.vehicle.accelerate(-100, 1);
+        expect(driveTargets()[1]).toBeCloseTo(-kmhToMetersPerSecond(20));
+    });
+});
+
+describe("vehicle throttle input routing", () => {
+    it("prioritizes braking, releases throttle to freewheel and restores drive torque", () => {
+        fixture = createVehicle(driveLayout);
+        const controls = new VehicleControls(fixture.scene);
+        controls.setVehicle(fixture.vehicle);
+        VehicleInputs.setEnabled(true);
+        window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
+        controls.update(0.1);
+        expect(driveTorques()).toEqual([5000, 5000]);
+        window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
+        controls.update(0.1);
+        expect(driveTorques()).toEqual([0, 0]);
+        expect(driveTargets()).toEqual([0, 0]);
+        window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
+        window.dispatchEvent(new KeyboardEvent("keydown", { code: "Space" }));
+        controls.update(0.1);
+        expect(driveTorques()).toEqual([20000, 20000]);
+        expect(driveTargets()).toEqual([0, 0]);
+        window.dispatchEvent(new KeyboardEvent("keyup", { code: "Space" }));
+        setLongitudinalVelocity(3);
+        controls.update(0.1);
+        expect(driveTorques()).toEqual([5000, 5000]);
+        expect(driveTargets()[1]).toBeCloseTo(3 + 0.7 * EarthG * 0.1);
     });
 });

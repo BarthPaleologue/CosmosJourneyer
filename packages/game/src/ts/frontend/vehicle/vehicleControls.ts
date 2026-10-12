@@ -262,11 +262,12 @@ export class VehicleControls implements Controls {
         vehicle.turn(steeringRate, deltaSeconds, { horizontalSpeed });
         vehicle.setBoostEnabled(VehicleInputs.map.boost.value > 0);
 
+        const throttle = VehicleInputs.map.accelerate.value;
         if (VehicleInputs.map.brake.value > 0) {
             vehicle.brake();
         } else {
             const vehicleMaxAcceleration = 0.7 * EarthG;
-            const vehicleAcceleration = VehicleInputs.map.accelerate.value * vehicleMaxAcceleration;
+            const vehicleAcceleration = throttle * vehicleMaxAcceleration;
             vehicle.accelerate(vehicleAcceleration, deltaSeconds);
         }
 

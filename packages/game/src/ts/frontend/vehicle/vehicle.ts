@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
@@ -39,6 +40,8 @@ export type VehicleOptions = {
     readonly maxLateralAcceleration: number;
     /** Explicit turning reference for layouts with incompatible fixed axles. */
     readonly steeringReferenceZ: number;
+    /** Torque in N·m on powered wheels when throttle is released; zero means freewheel. */
+    readonly engineBrakeTorque: number;
 };
 
 export type VehicleSteeringOptions = {
@@ -68,7 +71,9 @@ export class Vehicle {
     readonly steeringGeometry: SteeringGeometry | undefined;
     readonly maxLateralAcceleration: number;
 
-    private targetLongitudinalSpeed = 0;
+    readonly engineBrakeTorque: number;
+
+    private targetLongitudinalSpeed: number | undefined;
     private steeringCommandAngle = 0;
 
     readonly maxSpeed = {
@@ -102,6 +107,7 @@ export class Vehicle {
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
 
+        this.engineBrakeTorque = options?.engineBrakeTorque ?? 0;
         this.maxLateralAcceleration = options?.maxLateralAcceleration ?? EarthG;
         const wheelGeometry = this.wheels.map((wheel) => ({
             position: wheel.frameLocalPosition,
@@ -182,36 +188,40 @@ export class Vehicle {
     setTargetSpeed(speed: number): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
         this.targetLongitudinalSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
-        const motorTorque = this.boostEnabled ? 15_000 : 5_000;
+        this.setDriveMotorTargets(this.targetLongitudinalSpeed, this.boostEnabled ? 15_000 : 5_000);
+    }
+
+    private setDriveMotorTargets(speed: number, torque: number): void {
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
             }
-
-            const targetAngularVelocity = this.targetLongitudinalSpeed / wheel.radius;
-
-            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, motorTorque);
-            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, targetAngularVelocity);
+            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, torque);
+            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, speed / wheel.radius);
         }
     }
 
     accelerate(acceleration: number, deltaSeconds: number): void {
+        if (acceleration === 0) {
+            this.releaseThrottle();
+            return;
+        }
+        if (this.targetLongitudinalSpeed === undefined) {
+            // Resume from actual longitudinal motion rather than a stale command or zero.
+            const forward = this.getTransform().getDirection(Vector3.Forward());
+            this.targetLongitudinalSpeed = Vector3.Dot(this.frame.body.getLinearVelocity(), forward);
+        }
         this.setTargetSpeed(this.targetLongitudinalSpeed + acceleration * deltaSeconds);
-        this.targetLongitudinalSpeed = lerpSmooth(this.targetLongitudinalSpeed, 0, 2.5, deltaSeconds);
+    }
+
+    releaseThrottle(): void {
+        this.targetLongitudinalSpeed = undefined;
+        this.setDriveMotorTargets(0, this.engineBrakeTorque);
     }
 
     brake(): void {
-        const brakeTorque = 20_000;
-        for (const wheel of this.wheels) {
-            if (wheel.motor === null) {
-                continue;
-            }
-
-            wheel.motor.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_X, brakeTorque);
-            wheel.motor.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_X, 0);
-        }
-
-        this.targetLongitudinalSpeed = 0;
+        this.targetLongitudinalSpeed = undefined;
+        this.setDriveMotorTargets(0, 20_000);
     }
 
     turn(steeringRate: number, deltaSeconds: number, options?: Partial<VehicleSteeringOptions>): void {
