@@ -102,7 +102,7 @@ export class Vehicle {
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
 
-        this.maxLateralAcceleration = options?.maxLateralAcceleration ?? 0.5 * EarthG;
+        this.maxLateralAcceleration = options?.maxLateralAcceleration ?? EarthG;
         const wheelGeometry = this.wheels.map((wheel) => ({
             position: wheel.frameLocalPosition,
             steerable: wheel.steering !== null,

@@ -124,7 +124,7 @@ describe("vehicle steering", () => {
     it("sends equal opposite targets through the original position motors", () => {
         fixture = createVehicle();
         fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: kmhToMetersPerSecond(40) });
-        const expected = Math.atan((0.5 * EarthG * 2.6) / kmhToMetersPerSecond(40) ** 2);
+        const expected = Math.atan((EarthG * 2.6) / kmhToMetersPerSecond(40) ** 2);
         expect(lastAngles()[0]).toBeCloseTo(expected);
         expect(lastAngles()[1]).toBeCloseTo(-expected);
         expect(fixture.targets[0]?.mock.lastCall?.[0]).toBe(PhysicsConstraintAxis.ANGULAR_Y);
@@ -176,7 +176,7 @@ describe("vehicle steering", () => {
         fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: 0 });
         expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(45));
         fixture.vehicle.setTargetSteeringAngle(1);
-        expect(lastAngles()[0]).toBeCloseTo(Math.atan((0.5 * EarthG * 2.6) / 50 ** 2));
+        expect(lastAngles()[0]).toBeCloseTo(Math.atan((EarthG * 2.6) / 50 ** 2));
     });
 
     it("controls pass speed projected along the supplied local up direction", () => {
