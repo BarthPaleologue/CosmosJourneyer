@@ -222,3 +222,26 @@ describe("vehicle steering", () => {
         expect(lastAngles()).toEqual([]);
     });
 });
+
+describe("vehicle steering inputs", () => {
+    it("reaches full lock under held input instead of fighting return-to-center", () => {
+        fixture = createVehicle();
+        for (let i = 0; i < 120; i++) {
+            fixture.vehicle.turn(1.8, 1 / 60, { horizontalSpeed: 0 });
+        }
+        expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(45));
+        fixture.vehicle.turn(0, 0.225, { horizontalSpeed: 0 });
+        expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(22.5));
+    });
+
+    it("integrates held input consistently at different frame rates", () => {
+        fixture = createVehicle();
+        for (const fps of [30, 60, 120]) {
+            fixture.vehicle.setTargetSteeringAngle(0, { horizontalSpeed: 0 });
+            for (let i = 0; i < fps; i++) {
+                fixture.vehicle.turn(0.3, 1 / fps, { horizontalSpeed: 0 });
+            }
+            expect(lastAngles()[0]).toBeCloseTo(0.3);
+        }
+    });
+});

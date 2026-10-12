@@ -215,8 +215,11 @@ export class Vehicle {
     }
 
     turn(steeringRate: number, deltaSeconds: number, options?: Partial<VehicleSteeringOptions>): void {
-        this.setTargetSteeringAngle(this.steeringCommandAngle + steeringRate * deltaSeconds, options);
-        this.steeringCommandAngle = lerpSmooth(this.steeringCommandAngle, 0, 0.225, deltaSeconds);
+        const angle =
+            steeringRate === 0
+                ? lerpSmooth(this.steeringCommandAngle, 0, 0.225, deltaSeconds)
+                : this.steeringCommandAngle + steeringRate * deltaSeconds;
+        this.setTargetSteeringAngle(angle, options);
     }
 
     setBoostEnabled(enabled: boolean): void {
