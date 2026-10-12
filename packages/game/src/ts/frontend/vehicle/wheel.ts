@@ -269,10 +269,11 @@ function AttachAxleToFrame(
                 maxLimit: 0,
             },
             {
-                // Angular leeway X
+                // Lock support pitch so suspension cannot swing fore/aft.
+                // Wheel spin remains free in the wheel/axle joint.
                 axis: PhysicsConstraintAxis.ANGULAR_X,
-                minLimit: -0.25,
-                maxLimit: 0.25,
+                minLimit: 0,
+                maxLimit: 0,
             },
             {
                 // Steering

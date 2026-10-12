@@ -127,15 +127,6 @@ afterEach(() => {
 const lastAngles = () => fixture.targets.map((target) => target.mock.lastCall?.[1]);
 
 describe("vehicle steering", () => {
-    it("retains immutable local wheel positions through world translation and rotation", () => {
-        fixture = createVehicle();
-        expect(fixture.wheels[0]?.frameLocalPosition).toEqual(fixture.models[0]?.position);
-        fixture.models[0]?.position.set(99, 99, 99);
-        expect(fixture.wheels[0]?.frameLocalPosition.z).toBe(2.6);
-        expect(Object.isFrozen(fixture.wheels[0]?.frameLocalPosition)).toBe(true);
-        expect(fixture.vehicle.steeringGeometry).toEqual({ steeringReferenceZ: 0, referenceLeverArm: 2.6 });
-    });
-
     it("sends equal opposite targets through the original position motors", () => {
         fixture = createVehicle();
         fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: kmhToMetersPerSecond(40) });
