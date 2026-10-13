@@ -25,7 +25,7 @@ export type OutputPayload = DeepReadonly<{
         temperature_min_K?: number;
         row_limit?: number;
     };
-    cubes: Readonly<Record<CubeId, SpatialCube>>;
+    cubes: Record<CubeId, SpatialCube>;
 }>;
 export function buildOutput(
     cubes: DeepReadonly<Map<CubeId, SpatialCube>>,

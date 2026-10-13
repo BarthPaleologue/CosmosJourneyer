@@ -56,7 +56,7 @@ export class TerrainFaceQuadTree implements Cullable {
 
     private readonly scene: Scene;
 
-    readonly planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    readonly planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
 
     readonly planetName: string;
     readonly planetSeed: number;
@@ -78,7 +78,7 @@ export class TerrainFaceQuadTree implements Cullable {
      */
     constructor(
         faceIndex: FaceIndex,
-        planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
         parentTransform: TransformNode,
         material: Material,
         scene: Scene,

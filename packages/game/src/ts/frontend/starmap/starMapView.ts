@@ -337,7 +337,7 @@ export class StarMapView implements View {
         );
     }
 
-    private drawVisitedSystems(path: DeepReadonly<StarSystemCoordinates>[]): void {
+    private drawVisitedSystems(path: DeepReadonly<Array<StarSystemCoordinates>>): void {
         if (this.visitedSystemsLines !== null) {
             this.visitedSystemsLines.dispose(undefined, true);
             this.visitedSystemsLines = null;

@@ -274,7 +274,7 @@ export class UniverseBackend {
         sectorY: number,
         sectorZ: number,
     ): DeepReadonly<Array<StarSystemModel>> {
-        const generatedModels: DeepReadonly<StarSystemModel>[] = [];
+        const generatedModels: Array<DeepReadonly<StarSystemModel>> = [];
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 

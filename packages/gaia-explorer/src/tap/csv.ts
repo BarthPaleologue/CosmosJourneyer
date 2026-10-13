@@ -1,10 +1,12 @@
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+
 function assertClosed(quoted: boolean): void {
     if (quoted) {
         throw new Error("Invalid CSV: unterminated quoted field");
     }
 }
 /** Parse RFC 4180-style CSV without converting textual values. */
-export function parseCsv(text: string): ReadonlyArray<Readonly<Record<string, string>>> {
+export function parseCsv(text: string): DeepReadonly<Array<Record<string, string>>> {
     const rows: string[][] = [];
     let row: string[] = [];
     let field = "";

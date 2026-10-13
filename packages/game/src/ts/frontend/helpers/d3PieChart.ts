@@ -20,7 +20,7 @@ import { arc, interpolateViridis, pie, scaleSequential } from "d3";
 import type { PieArcDatum } from "d3";
 
 export function makeD3PieChart<T>(
-    data: DeepReadonly<T[]>,
+    data: DeepReadonly<Array<T>>,
     extractProportion: (d: DeepReadonly<T>) => number,
     extractLegend: (d: DeepReadonly<T>) => string,
 ): string {

@@ -27,7 +27,7 @@ export function generateJuliaSetModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 

@@ -27,7 +27,7 @@ export function generateMandelboxModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): MandelboxModel {
     const rng = getRngFromSeed(seed);
 

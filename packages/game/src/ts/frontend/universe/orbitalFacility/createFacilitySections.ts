@@ -35,7 +35,7 @@ import type { StationSection } from "@/frontend/universe/orbitalFacility/station
 
 export function createFacilitySections(
     root: TransformNode,
-    models: DeepReadonly<ReadonlyArray<StationSectionModel>>,
+    models: DeepReadonly<Array<StationSectionModel>>,
     displayName: string,
     assets: RenderingAssets,
     scene: Scene,

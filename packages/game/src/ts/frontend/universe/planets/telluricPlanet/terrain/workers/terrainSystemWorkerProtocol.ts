@@ -24,7 +24,7 @@ import type { TaskId } from "../system/terrainSystem";
 
 export type BuildChunkWorkerPayload = {
     type: "buildChunk";
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
     position: [number, number, number];
     nbVerticesPerSide: number;
     depth: number;
@@ -33,7 +33,7 @@ export type BuildChunkWorkerPayload = {
 
 export type ComputeHeightsWorkerPayload = {
     type: "computeHeights";
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
     coordinates: Float64Array;
 };
 

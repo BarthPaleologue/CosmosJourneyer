@@ -27,7 +27,7 @@ export function generateSierpinskiPyramidModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): SierpinskiPyramidModel {
     const rng = getRngFromSeed(seed);
 

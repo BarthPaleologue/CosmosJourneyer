@@ -76,7 +76,7 @@ export class TelluricPlanetMaterial {
     private readonly material: NodeMaterial;
 
     constructor(
-        planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
         textures: {
             grass: TerrainTextures;
             sand: TerrainTextures;
