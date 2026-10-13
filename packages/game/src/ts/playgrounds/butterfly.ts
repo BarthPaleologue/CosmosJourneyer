@@ -18,7 +18,7 @@
 import { ArcRotateCamera, DirectionalLight, HemisphericLight, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { seededSquirrelNoise } from "squirrel-noise";
+import { seededLegacySquirrelNoise } from "@cosmos-journeyer/random";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { createButterfly } from "@/frontend/assets/procedural/butterfly/butterfly";
@@ -56,7 +56,7 @@ export async function createButterflyScene(
     const butterflyMaterial = new ButterflyMaterial(particleTextures.butterfly, scene);
     butterflyMesh.material = butterflyMaterial.get();
 
-    const rng = seededSquirrelNoise(0);
+    const rng = seededLegacySquirrelNoise(0);
     let rngState = 0;
     const wrappedRng = (): number => {
         return rng(rngState++);

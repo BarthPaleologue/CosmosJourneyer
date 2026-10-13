@@ -20,8 +20,6 @@ import { getFactionFromCoordinates } from "#/society/factions";
 import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
 import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
-import { randomPieChart, wheelOfFortune } from "#/utils/random";
 import { generateSpaceElevatorName } from "#/utils/strings/spaceStationNameGenerator";
 import {
     getOrbitRadiusFromPeriod,
@@ -30,6 +28,7 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";

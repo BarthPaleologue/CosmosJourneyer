@@ -18,10 +18,10 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { IDisposable, Scene } from "@babylonjs/core/scene";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
 
 import type { Asteroid } from "@/frontend/assets/objects/asteroids";
 
-import { getRngFromSeed } from "@/utils/getRngFromSeed";
 import type { RingVolume } from "@/utils/ringVolume";
 
 import { AsteroidPatch } from "./asteroidPatch";

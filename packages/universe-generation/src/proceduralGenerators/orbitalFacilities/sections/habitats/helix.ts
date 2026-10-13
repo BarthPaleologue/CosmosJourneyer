@@ -15,9 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
+import { getRngFromSeed, randRangeInt } from "@cosmos-journeyer/random";
 import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
-import { randRangeInt } from "extended-random";
 
 export function generateHelixHabitatModel(
     seed: number,

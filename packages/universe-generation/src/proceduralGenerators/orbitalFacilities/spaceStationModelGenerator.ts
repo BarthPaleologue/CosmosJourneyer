@@ -21,9 +21,7 @@ import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
 import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
 import { clamp } from "#/utils/math";
-import { randomPieChart, wheelOfFortune } from "#/utils/random";
 import { generateSpaceStationName } from "#/utils/strings/spaceStationNameGenerator";
 import {
     degreesToRadians,
@@ -32,6 +30,7 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
+import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -43,7 +42,6 @@ import type {
     StarSystemModel,
     Rotation,
 } from "@cosmos-journeyer/universe-model";
-import { normalRandom } from "extended-random";
 
 import { generateEngineBayModel } from "./sections/engineBay";
 import { generateFusionSectionModel } from "./sections/fusion";

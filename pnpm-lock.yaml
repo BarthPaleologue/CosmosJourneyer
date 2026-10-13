@@ -229,6 +229,9 @@ importers:
       '@cosmos-journeyer/physics':
         specifier: workspace:^
         version: link:../physics
+      '@cosmos-journeyer/random':
+        specifier: workspace:^
+        version: link:../random
       '@cosmos-journeyer/typescript':
         specifier: workspace:^
         version: link:../typescript
@@ -247,12 +250,6 @@ importers:
       earcut:
         specifier: 3.2.4
         version: 3.2.4
-      extended-random:
-        specifier: 1.2.2
-        version: 1.2.2
-      fast-simplex-noise:
-        specifier: 4.0.0
-        version: 4.0.0
       fflate:
         specifier: 0.8.3
         version: 0.8.3
@@ -271,9 +268,6 @@ importers:
       qrcode:
         specifier: 1.5.4
         version: 1.5.4
-      squirrel-noise:
-        specifier: 1.0.0
-        version: 1.0.0
       terrain-generation:
         specifier: workspace:^
         version: link:../terrain-generation
@@ -348,6 +342,25 @@ importers:
         specifier: 'catalog:'
         version: 5.0.3(@types/node@26.6.3)(jsdom@30.1.1(@noble/hashes@2.4.0))(vite@8.3.2(@types/node@26.6.3)(jiti@2.7.0)(yaml@2.9.1))
 
+  packages/random:
+    dependencies:
+      fast-simplex-noise:
+        specifier: 4.0.0
+        version: 4.0.0
+    devDependencies:
+      eslint:
+        specifier: 'catalog:'
+        version: 10.11.0(jiti@2.7.0)
+      oxfmt:
+        specifier: 'catalog:'
+        version: 0.71.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.3(@types/node@26.6.3)(jsdom@30.1.1(@noble/hashes@2.4.0))(vite@8.3.2(@types/node@26.6.3)(jiti@2.7.0)(yaml@2.9.1))
+
   packages/terrain-generation: {}
 
   packages/typescript:
@@ -367,21 +380,15 @@ importers:
       '@cosmos-journeyer/physics':
         specifier: workspace:^
         version: link:../physics
+      '@cosmos-journeyer/random':
+        specifier: workspace:^
+        version: link:../random
       '@cosmos-journeyer/typescript':
         specifier: workspace:^
         version: link:../typescript
       '@cosmos-journeyer/universe-model':
         specifier: workspace:^
         version: link:../universe-model
-      extended-random:
-        specifier: 1.2.2
-        version: 1.2.2
-      fast-simplex-noise:
-        specifier: 4.0.0
-        version: 4.0.0
-      squirrel-noise:
-        specifier: 1.0.0
-        version: 1.0.0
     devDependencies:
       eslint:
         specifier: 'catalog:'
@@ -3005,9 +3012,6 @@ packages:
   exponential-backoff@3.1.3:
     resolution: {integrity: sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==}
 
-  extended-random@1.2.2:
-    resolution: {integrity: sha512-q4sK87LS059ui6VDQUIgXEqARKWcRZxH9wzw+BTDoi+Nk0VX9iVoIkm6VEF0365aNeaVJiZ3huoLAAHVU7nm9Q==}
-
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -4092,9 +4096,6 @@ packages:
 
   sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
-
-  squirrel-noise@1.0.0:
-    resolution: {integrity: sha512-/nXWlW2nymr447PW4ZVHo84NgR9dLKZUoNwz4c17sn+aWhw+e3Jcr/kFIpQ8lT1dQ5c4XSdrDq2aPzIAgmAnHg==}
 
   stable-hash-x@0.2.0:
     resolution: {integrity: sha512-o3yWv49B/o4QZk5ZcsALc6t0+eCelPc44zZsLtCQnZPDwFpDYSWcDnrv2TtMmMbQ7uKo3J0HTURCqckw23czNQ==}
@@ -7639,8 +7640,6 @@ snapshots:
 
   exponential-backoff@3.1.3: {}
 
-  extended-random@1.2.2: {}
-
   fast-deep-equal@3.1.3: {}
 
   fast-glob@3.3.1:
@@ -8767,8 +8766,6 @@ snapshots:
 
   sprintf-js@1.1.3:
     optional: true
-
-  squirrel-noise@1.0.0: {}
 
   stable-hash-x@0.2.0: {}
 

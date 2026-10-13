@@ -15,10 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "#/utils/getRngFromSeed";
-import { wheelOfFortune } from "#/utils/random";
+import { getRngFromSeed, wheelOfFortune, randRangeInt } from "@cosmos-journeyer/random";
 import type { SolarSectionModel } from "@cosmos-journeyer/universe-model";
-import { randRangeInt } from "extended-random";
 
 export function generateSolarSectionModel(seed: number, surface: number): SolarSectionModel {
     const rng = getRngFromSeed(seed);
