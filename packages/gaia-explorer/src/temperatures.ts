@@ -1,3 +1,5 @@
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+
 import type { GaiaRow } from "./gaia/schemas";
 import type { GaiaSourceId, SimbadMetadata } from "./metadata";
 const BASE = { O: 30000, B: 20000, A: 8500, F: 6500, G: 5600, K: 4400, M: 3300, L: 2100, T: 1300, Y: 600 } as const;
@@ -58,8 +60,8 @@ function objectFallback(type: string | null): number | undefined {
     return undefined;
 }
 export function resolveTemperatureOverrides(
-    rows: ReadonlyArray<GaiaRow>,
-    metadata: ReadonlyMap<GaiaSourceId, SimbadMetadata>,
+    rows: DeepReadonly<Array<GaiaRow>>,
+    metadata: DeepReadonly<Map<GaiaSourceId, SimbadMetadata>>,
 ): ReadonlyMap<GaiaSourceId, number> {
     const result = new Map<GaiaSourceId, number>();
     for (const row of rows) {
