@@ -1,5 +1,5 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
-import type { Result } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import { parseCsv } from "./csv";
 
@@ -11,7 +11,7 @@ export type TapError = Readonly<{
 export interface TapClient {
     query(
         adql: string,
-        signal?: AbortSignal,
+        signal?: DeepReadonly<AbortSignal>,
     ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>>;
 }
 export type Fetch = typeof fetch;
@@ -29,17 +29,21 @@ const defaultLogger = (message: string): void => {
 };
 const requestBody = (adql: string): URLSearchParams =>
     new URLSearchParams({ REQUEST: "doQuery", LANG: "ADQL", FORMAT: "csv", QUERY: adql });
-const errorFromException = (error: unknown, timeout: AbortSignal, signal?: AbortSignal): TapError => ({
+const errorFromException = (
+    error: unknown,
+    timeout: DeepReadonly<AbortSignal>,
+    signal?: DeepReadonly<AbortSignal>,
+): TapError => ({
     kind: timeout.aborted && signal?.aborted !== true ? "timeout" : signal?.aborted === true ? "aborted" : "network",
     message: error instanceof Error ? error.message : "TAP request failed",
 });
-const httpError = (response: Response): TapError => ({
+const httpError = (response: DeepReadonly<Response>): TapError => ({
     kind: "http",
     message: `TAP request failed: ${response.status} ${response.statusText}`,
     status: response.status,
 });
 const parseResponse = async (
-    response: Response,
+    response: DeepReadonly<Response>,
 ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> => {
     if (!response.ok) {
         return err(httpError(response));
@@ -54,7 +58,7 @@ const parseResponse = async (
     }
 };
 const logRowCount = (
-    result: Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>,
+    result: DeepReadonly<Result<Array<Record<string, string>>, TapError>>,
     logger: (message: string) => void,
     prefix: string,
 ): void => {
@@ -67,7 +71,7 @@ export function createSyncTapClient(endpoint: string, options: TapClientOptions 
     return {
         async query(
             adql: string,
-            signal?: AbortSignal,
+            signal?: DeepReadonly<AbortSignal>,
         ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
             const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
@@ -89,7 +93,7 @@ export function createSyncTapClient(endpoint: string, options: TapClientOptions 
 }
 
 const terminalPhases = new Set(["ABORTED", "COMPLETED", "ERROR"]);
-const wait = async (milliseconds: number, signal: AbortSignal): Promise<void> => {
+const wait = async (milliseconds: number, signal: DeepReadonly<AbortSignal>): Promise<void> => {
     await new Promise<void>((resolve, reject) => {
         const onAbort = (): void => {
             clearTimeout(timeout);
@@ -123,7 +127,7 @@ export function createAsyncTapClient(endpoint: string, options: AsyncTapClientOp
     return {
         async query(
             adql: string,
-            signal?: AbortSignal,
+            signal?: DeepReadonly<AbortSignal>,
         ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
             const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);

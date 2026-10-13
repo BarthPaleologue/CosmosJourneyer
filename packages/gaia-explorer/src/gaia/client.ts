@@ -1,5 +1,5 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
-import type { Result } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { QueryConfig } from "../config";
 import { createAsyncTapClient } from "../tap/client";
@@ -10,7 +10,7 @@ import type { GaiaRow } from "./schemas";
 export const GaiaTapAsyncEndpoint = "https://gea.esac.esa.int/tap-server/tap/async";
 export type GaiaClientOptions = AsyncTapClientOptions & Readonly<{ endpoint?: string }>;
 const numeric = (value: string): number | null => (value.trim() === "" ? null : Number(value));
-function parseGaiaRows(rows: ReadonlyArray<Readonly<Record<string, string>>>): Result<ReadonlyArray<GaiaRow>, string> {
+function parseGaiaRows(rows: DeepReadonly<Array<Record<string, string>>>): Result<ReadonlyArray<GaiaRow>, string> {
     const parsedRows: GaiaRow[] = [];
     for (const raw of rows) {
         const designation = raw["designation"]?.trim();
@@ -33,11 +33,14 @@ function parseGaiaRows(rows: ReadonlyArray<Readonly<Record<string, string>>>): R
     return ok(parsedRows);
 }
 export class GaiaClient {
-    private readonly tap: TapClient;
-    public constructor(tap: TapClient) {
+    private readonly tap: Readonly<TapClient>;
+    public constructor(tap: Readonly<TapClient>) {
         this.tap = tap;
     }
-    async query(config: QueryConfig, signal?: AbortSignal): Promise<Result<ReadonlyArray<GaiaRow>, TapError>> {
+    async query(
+        config: QueryConfig,
+        signal?: DeepReadonly<AbortSignal>,
+    ): Promise<Result<ReadonlyArray<GaiaRow>, TapError>> {
         const result = await this.tap.query(buildGaiaAdql(config), signal);
         if (!result.success) {
             return result;

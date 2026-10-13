@@ -24,9 +24,11 @@ type AnyFunction = (...args: ReadonlyArray<never>) => unknown;
 
 export type DeepReadonly<T> = T extends Primitive | AnyFunction
     ? T
-    : T extends object
-      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-      : T;
+    : T extends ReadonlyMap<infer K, infer V>
+      ? Readonly<ReadonlyMap<DeepReadonly<K>, DeepReadonly<V>>>
+      : T extends object
+        ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+        : T;
 
 export type DeepMutable<T> = T extends Primitive | AnyFunction
     ? T

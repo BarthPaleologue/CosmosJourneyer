@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { z } from "zod";
 
 export const TemperatureMin = 800;
@@ -31,7 +32,7 @@ export type ValidationResult = Readonly<{
     issues: ReadonlyArray<string>;
 }>;
 type ValidatedStar = z.infer<typeof StarSchema>;
-function validateStar(star: ValidatedStar, cubeId: string): ReadonlyArray<string> {
+function validateStar(star: DeepReadonly<ValidatedStar>, cubeId: string): ReadonlyArray<string> {
     const issues: string[] = [];
     if (star.nature === null) {
         issues.push(`Missing nature for ${star.name} in cube ${cubeId}`);

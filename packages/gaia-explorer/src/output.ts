@@ -28,7 +28,7 @@ export type OutputPayload = DeepReadonly<{
     cubes: Readonly<Record<CubeId, SpatialCube>>;
 }>;
 export function buildOutput(
-    cubes: ReadonlyMap<CubeId, SpatialCube>,
+    cubes: DeepReadonly<Map<CubeId, SpatialCube>>,
     grid: GridConfig,
     query: QueryConfig,
     retrieved: number,

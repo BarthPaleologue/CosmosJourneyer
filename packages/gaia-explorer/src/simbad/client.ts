@@ -1,5 +1,5 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
-import type { Result } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { GaiaRow } from "../gaia/schemas";
 import type { GaiaSourceId, SimbadMetadata } from "../metadata";
@@ -21,7 +21,7 @@ const nullableNumber = (value: string | undefined): number | null => {
 };
 function parseMetadata(
     raw: Readonly<Record<string, string>>,
-    batch: ReadonlyArray<GaiaRow>,
+    batch: DeepReadonly<Array<GaiaRow>>,
 ): Result<readonly [GaiaSourceId, SimbadMetadata] | undefined, string> {
     const parsed = SimbadRowSchema.safeParse({
         input_id: raw["input_id"],
@@ -48,32 +48,16 @@ function parseMetadata(
         },
     ]);
 }
-function addBatchMetadata(
-    metadata: Map<GaiaSourceId, SimbadMetadata>,
-    raws: ReadonlyArray<Readonly<Record<string, string>>>,
-    batch: ReadonlyArray<GaiaRow>,
-): Result<undefined, string> {
-    for (const raw of raws) {
-        const parsed = parseMetadata(raw, batch);
-        if (!parsed.success) {
-            return parsed;
-        }
-        if (parsed.value !== undefined) {
-            metadata.set(...parsed.value);
-        }
-    }
-    return ok(undefined);
-}
 export class SimbadClient {
-    private readonly tap: TapClient;
+    private readonly tap: Readonly<TapClient>;
     private readonly batchSize: number;
-    public constructor(tap: TapClient, batchSize = 400) {
+    public constructor(tap: Readonly<TapClient>, batchSize = 400) {
         this.tap = tap;
         this.batchSize = batchSize;
     }
     async query(
-        rows: ReadonlyArray<GaiaRow>,
-        signal?: AbortSignal,
+        rows: DeepReadonly<Array<GaiaRow>>,
+        signal?: DeepReadonly<AbortSignal>,
     ): Promise<Result<ReadonlyMap<GaiaSourceId, SimbadMetadata>, TapError>> {
         const metadata = new Map<GaiaSourceId, SimbadMetadata>();
         for (let start = 0; start < rows.length; start += this.batchSize) {
@@ -84,12 +68,17 @@ export class SimbadClient {
             if (!response.success) {
                 return response;
             }
-            const parsed = addBatchMetadata(metadata, response.value, batch);
-            if (!parsed.success) {
-                return err({
-                    kind: "protocol",
-                    message: `Invalid SIMBAD payload: ${parsed.error}`,
-                });
+            for (const raw of response.value) {
+                const parsed = parseMetadata(raw, batch);
+                if (!parsed.success) {
+                    return err({
+                        kind: "protocol",
+                        message: `Invalid SIMBAD payload: ${parsed.error}`,
+                    });
+                }
+                if (parsed.value !== undefined) {
+                    metadata.set(...parsed.value);
+                }
             }
         }
         return ok(metadata);

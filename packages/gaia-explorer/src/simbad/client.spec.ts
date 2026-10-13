@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { GaiaRow } from "../gaia/schemas";
 import type { TapClient } from "../tap/client";
@@ -17,6 +17,29 @@ const gaiaRow: GaiaRow = {
 };
 
 describe("SimbadClient", () => {
+    it("returns a protocol error instead of partial metadata when a later batch is invalid", async () => {
+        const query = vi
+            .fn<TapClient["query"]>()
+            .mockResolvedValueOnce({
+                success: true,
+                value: [{ input_id: gaiaRow.designation ?? "", main_id: "GJ 699" }],
+            })
+            .mockResolvedValueOnce({
+                success: true,
+                value: [{ input_id: "Gaia DR3 2", main_id: "" }],
+            });
+
+        const result = await new SimbadClient({ query }, 1).query([
+            gaiaRow,
+            { ...gaiaRow, source_id: "2", designation: "Gaia DR3 2" },
+        ]);
+
+        expect(result.success).toBe(false);
+        expect(!result.success && result.error.kind).toBe("protocol");
+        expect(!result.success && result.error.message).toContain("Invalid SIMBAD payload:");
+        expect(query).toHaveBeenCalledTimes(2);
+    });
+
     it("returns invalid external rows as protocol errors", async () => {
         const tap: TapClient = {
             query: async () =>

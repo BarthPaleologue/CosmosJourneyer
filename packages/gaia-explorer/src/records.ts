@@ -1,3 +1,5 @@
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+
 import type { StarNature } from "./classification";
 import { LightYearPerParsec } from "./config";
 import type { GaiaRow } from "./gaia/schemas";
@@ -22,10 +24,10 @@ export function toCartesian(
     return [distanceLy * cosDec * Math.cos(ra), distanceLy * cosDec * Math.sin(ra), distanceLy * Math.sin(dec)];
 }
 export function rowToStar(
-    row: GaiaRow,
-    names: ReadonlyMap<GaiaSourceId, string> = new Map(),
-    temperatures: ReadonlyMap<GaiaSourceId, number> = new Map(),
-    natures: ReadonlyMap<GaiaSourceId, StarNature> = new Map(),
+    row: DeepReadonly<GaiaRow>,
+    names: DeepReadonly<Map<GaiaSourceId, string>> = new Map(),
+    temperatures: DeepReadonly<Map<GaiaSourceId, number>> = new Map(),
+    natures: DeepReadonly<Map<GaiaSourceId, StarNature>> = new Map(),
 ): StarRecord | undefined {
     if (row.parallax === null || row.parallax <= 0) {
         return undefined;
@@ -43,10 +45,10 @@ export function rowToStar(
     };
 }
 export function rowsToStars(
-    rows: ReadonlyArray<GaiaRow>,
-    names?: ReadonlyMap<GaiaSourceId, string>,
-    temperatures?: ReadonlyMap<GaiaSourceId, number>,
-    natures?: ReadonlyMap<GaiaSourceId, StarNature>,
+    rows: DeepReadonly<Array<GaiaRow>>,
+    names?: DeepReadonly<Map<GaiaSourceId, string>>,
+    temperatures?: DeepReadonly<Map<GaiaSourceId, number>>,
+    natures?: DeepReadonly<Map<GaiaSourceId, StarNature>>,
 ): ReadonlyArray<StarRecord> {
     return rows
         .map((row) => rowToStar(row, names, temperatures, natures))

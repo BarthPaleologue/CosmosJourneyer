@@ -211,7 +211,7 @@ const typeScriptWorkspaceRules = {
 
 // Require readonly parameters in pure TypeScript libraries.
 const pureLibraryRules = {
-    files: ["packages/{physics,random,typescript,universe-generation,universe-model}/**/*.{ts,tsx}"],
+    files: ["packages/{gaia-explorer,physics,random,typescript,universe-generation,universe-model}/**/*.{ts,tsx}"],
     rules: {
         "@typescript-eslint/prefer-readonly-parameter-types": [
             "error",
