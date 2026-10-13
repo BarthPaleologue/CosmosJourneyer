@@ -25,9 +25,9 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import type { Vector3Like } from "@/utils/types";
 
-export type StarSystemSegment = Readonly<{
-    from: DeepReadonly<StarSystemCoordinates>;
-    to: DeepReadonly<StarSystemCoordinates>;
+export type StarSystemSegment = DeepReadonly<{
+    from: StarSystemCoordinates;
+    to: StarSystemCoordinates;
 }>;
 
 export type GreasedLinePath = Readonly<{
@@ -82,7 +82,7 @@ export function getGreasedLinePathFromSystemSegments(
     const points: Vector3[] = [];
     const widths: number[] = [];
     let lastDrawnSystem: DeepReadonly<StarSystemCoordinates> | null = null;
-    let currentRun: DeepReadonly<StarSystemCoordinates>[] = [];
+    let currentRun: Array<DeepReadonly<StarSystemCoordinates>> = [];
 
     const pushPoint = (system: DeepReadonly<StarSystemCoordinates>, width: number): void => {
         points.push(wrapVector3(getSystemGalacticPosition(system)));

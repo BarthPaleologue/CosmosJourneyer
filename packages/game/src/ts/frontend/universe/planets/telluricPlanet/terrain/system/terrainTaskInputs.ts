@@ -22,7 +22,7 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 import type { FaceIndex } from "../chunks/faceIndex";
 
 export type BuildChunkInput = {
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
     depth: number;
     faceIndex: FaceIndex;
     position: Vector3;
@@ -34,6 +34,6 @@ export type GeographicCoordinates = {
 };
 
 export type ComputeHeightsInput = {
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
     coordinates: ReadonlyArray<GeographicCoordinates>;
 };

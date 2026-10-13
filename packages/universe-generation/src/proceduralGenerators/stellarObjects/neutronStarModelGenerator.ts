@@ -34,7 +34,7 @@ export function generateNeutronStarModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 

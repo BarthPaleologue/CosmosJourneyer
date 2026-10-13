@@ -42,11 +42,7 @@ export class SphericalHeightFieldTerrain implements Transformable, Cullable {
         TerrainFaceQuadTree,
     ];
 
-    constructor(
-        model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
-        material: Material,
-        scene: Scene,
-    ) {
+    constructor(model: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>, material: Material, scene: Scene) {
         this.transform = new TransformNode(`${model.name}SphericalHeightFieldTerrain`, scene);
         this.transform.rotationQuaternion = Quaternion.Identity();
         this.faces = [

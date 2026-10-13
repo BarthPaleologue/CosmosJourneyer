@@ -12,7 +12,7 @@ export interface TapClient {
     query(
         adql: string,
         signal?: DeepReadonly<AbortSignal>,
-    ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>>;
+    ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>>;
 }
 export type Fetch = typeof fetch;
 export type TapClientOptions = Readonly<{
@@ -44,7 +44,7 @@ const httpError = (response: DeepReadonly<Response>): TapError => ({
 });
 const parseResponse = async (
     response: DeepReadonly<Response>,
-): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> => {
+): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>> => {
     if (!response.ok) {
         return err(httpError(response));
     }
@@ -72,7 +72,7 @@ export function createSyncTapClient(endpoint: string, options: TapClientOptions 
         async query(
             adql: string,
             signal?: DeepReadonly<AbortSignal>,
-        ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> {
+        ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
             const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
             try {
@@ -128,7 +128,7 @@ export function createAsyncTapClient(endpoint: string, options: AsyncTapClientOp
         async query(
             adql: string,
             signal?: DeepReadonly<AbortSignal>,
-        ): Promise<Result<ReadonlyArray<Readonly<Record<string, string>>>, TapError>> {
+        ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
             const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
             let jobUrl: string | undefined;

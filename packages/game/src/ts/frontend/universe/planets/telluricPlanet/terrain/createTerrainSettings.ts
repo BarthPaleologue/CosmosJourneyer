@@ -20,7 +20,7 @@ import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journe
 import { TerrainSettings } from "terrain-generation";
 
 export function createTerrainSettings(
-    planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+    planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
 ): TerrainSettings {
     const terrainSettings = new TerrainSettings();
     terrainSettings.planet_diameter = planetModel.radius * 2;

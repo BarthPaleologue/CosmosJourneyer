@@ -27,7 +27,7 @@ export function generateMengerSpongeModel(
     id: string,
     seed: number,
     name: string,
-    parentBodies: ReadonlyArray<DeepReadonly<OrbitalObjectModel>>,
+    parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): MengerSpongeModel {
     const rng = getRngFromSeed(seed);
 

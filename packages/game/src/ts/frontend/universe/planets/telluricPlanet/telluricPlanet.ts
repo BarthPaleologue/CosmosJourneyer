@@ -45,7 +45,7 @@ import { SphericalHeightFieldTerrain } from "./terrain/sphericalHeightFieldTerra
 import type { ITerrainSystem } from "./terrain/system/terrainSystem";
 
 export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "telluricSatellite">, Cullable {
-    readonly model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>;
+    readonly model: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>;
 
     readonly type: "telluricPlanet" | "telluricSatellite";
 
@@ -70,7 +70,7 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
      * @param scene
      */
     constructor(
-        model: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        model: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
         assets: RenderingAssets,
         scene: Scene,
     ) {

@@ -83,7 +83,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         faceIndex: FaceIndex,
         parentTransform: TransformNode,
         material: Material,
-        planetModel: DeepReadonly<TelluricPlanetModel> | DeepReadonly<TelluricSatelliteModel>,
+        planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
         scatteringSystem: IScatteringSystem,
         scene: Scene,
     ) {
