@@ -20,3 +20,4 @@ packages/game/src/asset/others_0013_2k_4LqXNJ/** filter=lfs diff=lfs merge=lfs -
 packages/game/src/asset/tiles_0011_2k_CN4UaB/** filter=lfs diff=lfs merge=lfs -text
 packages/game/src/asset/**/*_normal_ambient_occlusion.webp filter=lfs diff=lfs merge=lfs -text
 packages/game/src/asset/testNormal.webp filter=lfs diff=lfs merge=lfs -text
+packages/game/src/asset/materials/foil/*.jpg filter=lfs diff=lfs merge=lfs -text
