@@ -31,6 +31,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     smoothstep,
     splitVec,
     step,
@@ -144,6 +145,7 @@ export class LandingPadMaterial extends NodeMaterial {
         const cameraPosition = uniformCameraPosition();
 
         const pbrLighting = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: finalAlbedo,
             ambientOcclusion: finalAmbientOcclusion,
             perturbedNormal: perturbedNormal.output,

@@ -30,6 +30,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     remap,
     splitVec,
     step,
@@ -105,6 +106,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const cameraPosition = uniformCameraPosition();
 
         const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             ambientOcclusion: occlusion.r,
             perturbedNormal: perturbedNormal.output,

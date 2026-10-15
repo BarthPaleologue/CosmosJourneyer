@@ -34,6 +34,7 @@ import {
     outputFragColor,
     outputVertexPosition,
     pbr,
+    reflection,
     textureSample,
     transformDirection,
     transformPosition,
@@ -113,6 +114,7 @@ export async function createTriPlanarNormalScene(
     const cameraPosition = uniformCameraPosition();
     const view = uniformView();
     const pbrShading = pbr(f(0.0), f(0.4), normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
         perturbedNormal: perturbedNormalW,
     });
 

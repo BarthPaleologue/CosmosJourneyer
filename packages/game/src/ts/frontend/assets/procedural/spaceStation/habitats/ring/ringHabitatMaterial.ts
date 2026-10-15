@@ -28,6 +28,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     splitVec,
     step,
     sub,
@@ -90,6 +91,7 @@ export class RingHabitatMaterial extends NodeMaterial {
         const cameraPosition = uniformCameraPosition();
 
         const pbrLighting = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             ambientOcclusion: occlusion.r,
             perturbedNormal: perturbedNormal.output,

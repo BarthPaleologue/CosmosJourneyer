@@ -28,6 +28,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     splitVec,
     textureSample,
     transformDirection,
@@ -106,6 +107,7 @@ export class TireMaterial {
         const view = uniformView();
 
         const pbrShading = pbr(f(0.0), roughness.r, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             perturbedNormal,
             ambientOcclusion: ambientOcclusion.r,

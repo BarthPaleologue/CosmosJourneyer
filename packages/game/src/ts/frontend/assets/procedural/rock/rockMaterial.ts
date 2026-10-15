@@ -26,6 +26,7 @@ import {
     outputFragColor,
     outputVertexPosition,
     pbr,
+    reflection,
     transformDirection,
     transformPosition,
     uniformCameraPosition,
@@ -76,6 +77,7 @@ export class RockMaterial {
 
         const view = uniformView();
         const pbrShading = pbr(f(0), rockSamples.roughness, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, instanceWorld),
             albedoRgb: rockSamples.albedo,
             perturbedNormal: finalNormalW,
             ambientOcclusion: rockSamples.ambientOcclusion,

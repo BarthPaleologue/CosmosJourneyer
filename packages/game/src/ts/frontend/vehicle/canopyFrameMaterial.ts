@@ -26,6 +26,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     textureTriPlanarSample,
     transformDirection,
     transformPosition,
@@ -85,6 +86,7 @@ export class CanopyFrameMaterial {
         const perturbedNormal = perturbNormal(uv, positionW, normalW, normalMapValue.rgb, f(1));
 
         const pbrShading = pbr(f(0.0), roughness.r, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             perturbedNormal: perturbedNormal.output,
             ambientOcclusion: ambientOcclusion.r,

@@ -19,7 +19,25 @@ import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMate
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
-import * as BSL from "babylonjs-shading-language";
+import {
+    builtinAttribute,
+    float,
+    mul,
+    outputFragColor,
+    outputVertexPosition,
+    pbr,
+    perturbNormal,
+    reflection,
+    textureSample,
+    transformDirection,
+    transformPosition,
+    uniformCameraPosition,
+    uniformTexture2d,
+    uniformView,
+    uniformViewProjection,
+    uniformWorld,
+    vec,
+} from "babylonjs-shading-language";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
@@ -30,46 +48,40 @@ export class ClimberRingMaterial extends NodeMaterial {
 
         // Vertex
 
-        const position = BSL.builtinAttribute("position");
-        const normal = BSL.builtinAttribute("normal");
-        const uv = BSL.builtinAttribute("uv");
+        const position = builtinAttribute("position");
+        const normal = builtinAttribute("normal");
+        const uv = builtinAttribute("uv");
 
-        const meshUVScaleFactor = BSL.vec(new Vector2(2, 10));
-        const proceduralUV = BSL.mul(uv, meshUVScaleFactor);
+        const meshUVScaleFactor = vec(new Vector2(2, 10));
+        const proceduralUV = mul(uv, meshUVScaleFactor);
 
-        const world = BSL.uniformWorld();
-        const positionW = BSL.transformPosition(world, position);
-        const normalW = BSL.transformDirection(world, normal);
+        const world = uniformWorld();
+        const positionW = transformPosition(world, position);
+        const normalW = transformDirection(world, normal);
 
-        const viewProjection = BSL.uniformViewProjection();
-        const positionClipSpace = BSL.transformPosition(viewProjection, positionW);
+        const viewProjection = uniformViewProjection();
+        const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = BSL.outputVertexPosition(positionClipSpace);
+        const vertexOutput = outputVertexPosition(positionClipSpace);
 
         // Fragment
 
-        const albedoTexture = BSL.uniformTexture2d(textures.albedo).source;
-        const metallicRoughnessTexture = BSL.uniformTexture2d(textures.metallicRoughness).source;
-        const aoTexture = BSL.uniformTexture2d(textures.ambientOcclusion).source;
-        const normalTexture = BSL.uniformTexture2d(textures.normal).source;
+        const albedoTexture = uniformTexture2d(textures.albedo).source;
+        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+        const aoTexture = uniformTexture2d(textures.ambientOcclusion).source;
+        const normalTexture = uniformTexture2d(textures.normal).source;
 
-        const albedo = BSL.textureSample(albedoTexture, proceduralUV, { convertToLinearSpace: true });
-        const metallicRoughnesstexture = BSL.textureSample(metallicRoughnessTexture, proceduralUV);
-        const aoTextureValue = BSL.textureSample(aoTexture, proceduralUV);
-        const normalTextureValue = BSL.textureSample(normalTexture, proceduralUV);
+        const albedo = textureSample(albedoTexture, proceduralUV, { convertToLinearSpace: true });
+        const metallicRoughnesstexture = textureSample(metallicRoughnessTexture, proceduralUV);
+        const aoTextureValue = textureSample(aoTexture, proceduralUV);
+        const normalTextureValue = textureSample(normalTexture, proceduralUV);
 
-        const perturbedNormal = BSL.perturbNormal(
-            proceduralUV,
-            positionW,
-            normalW,
-            normalTextureValue.rgb,
-            BSL.float(1),
-        );
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, float(1));
 
-        const view = BSL.uniformView();
-        const cameraPosition = BSL.uniformCameraPosition();
+        const view = uniformView();
+        const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = BSL.pbr(
+        const pbrColor = pbr(
             metallicRoughnesstexture.r,
             metallicRoughnesstexture.g,
             normalW,
@@ -77,13 +89,14 @@ export class ClimberRingMaterial extends NodeMaterial {
             cameraPosition,
             positionW,
             {
+                reflection: reflection(position, world),
                 albedoRgb: albedo.rgb,
                 ambientOcclusion: aoTextureValue.r,
                 perturbedNormal: perturbedNormal.output,
             },
         );
 
-        const fragmentOutput = BSL.outputFragColor(pbrColor.lighting);
+        const fragmentOutput = outputFragColor(pbrColor.lighting);
 
         this.addOutputNode(vertexOutput);
         this.addOutputNode(fragmentOutput);

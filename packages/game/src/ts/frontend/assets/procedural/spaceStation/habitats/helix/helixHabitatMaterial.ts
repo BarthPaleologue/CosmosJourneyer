@@ -27,6 +27,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     splitVec,
     step,
     sub,
@@ -94,6 +95,7 @@ export class HelixHabitatMaterial extends NodeMaterial {
         const cameraPosition = uniformCameraPosition();
 
         const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             ambientOcclusion: occlusion.r,
             perturbedNormal: perturbedNormal.output,

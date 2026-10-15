@@ -41,6 +41,7 @@ import {
     outputFragColor,
     outputVertexPosition,
     pbr,
+    reflection,
     remap,
     smoothstep,
     sub,
@@ -186,6 +187,7 @@ export class TelluricPlanetMaterial {
 
         const view = uniformView();
         const pbrShading = pbr(f(0), finalSamples.roughness, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: finalSamples.albedo,
             perturbedNormal: finalNormalW,
             ambientOcclusion: finalSamples.ambientOcclusion,
