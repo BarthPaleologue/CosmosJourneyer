@@ -142,11 +142,22 @@ export async function createCustomSystemScene(
 
     starSystemView.initStarSystem(0);
 
+    const spawnEntityId = urlParams.get("spawnAtEntity");
+    const spawnEntity = starSystemView
+        .getStarSystem()
+        .getSystemEntities()
+        .find((entity) => entity.model.id === spawnEntityId);
+    const entityTarget =
+        spawnEntity === undefined ? undefined : systemEntityProcessors.targeting.dispatch(spawnEntity)[0];
     positionNearObjectBrightSide(
         starSystemView.getSpaceshipControls(),
-        starSystemView.getStarSystem().getStellarObjects()[0],
+        entityTarget ?? starSystemView.getStarSystem().getStellarObjects()[0],
         starSystemView.getStarSystem(),
     );
+    if (entityTarget !== undefined) {
+        starSystemView.setTarget(entityTarget);
+    }
+    starSystemView.getSpaceshipControls().syncCameraTransform();
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;
