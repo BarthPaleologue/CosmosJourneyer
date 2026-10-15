@@ -23,10 +23,11 @@ import { DarkKnightModule } from "./darkKnight";
 import type { GameModule } from "./gameModule";
 import type { GameModuleApi } from "./gameModuleApi";
 import { MonolithModule } from "./monolith";
+import { SpaceTelescopesModule } from "./spaceTelescopes";
 import { VestaModule } from "./vesta";
 
 export function getBuiltinModules(): Array<GameModule> {
-    return [DarkKnightModule, MonolithModule, VestaModule, ChronosModule];
+    return [DarkKnightModule, MonolithModule, SpaceTelescopesModule, VestaModule, ChronosModule];
 }
 
 /**
