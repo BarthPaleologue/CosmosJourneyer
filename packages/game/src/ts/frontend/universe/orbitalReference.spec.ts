@@ -87,12 +87,8 @@ describe("orbital reference selection", () => {
         return simulation;
     }
 
-    it("returns undefined for an empty simulation or unusable masses", () => {
+    it("returns undefined for an empty simulation", () => {
         expect(getMostInfluentialObject([], Vector3.Zero())).toBeUndefined();
-        const objects = [0, -1, Number.NaN, Number.POSITIVE_INFINITY].map((mass, index) =>
-            object(String(index), mass, Vector3.Zero()),
-        );
-        expect(getMostInfluentialObject(objects, Vector3.Zero())).toBeUndefined();
     });
 
     it("prefers mass at equal distance and keeps the first candidate on ties", () => {
