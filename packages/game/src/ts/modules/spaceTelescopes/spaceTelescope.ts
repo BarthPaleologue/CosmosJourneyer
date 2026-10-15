@@ -159,6 +159,8 @@ export class SpaceTelescope implements SystemContent {
         }
         const hierarchyBounds = this.transform.getHierarchyBoundingVectors();
         this.radius = Math.max(hierarchyBounds.min.length(), hierarchyBounds.max.length());
+        // Put the optical axis on +X and the shields on -X, perpendicular to the placement's +Y spin axis.
+        this.transform.rotation.z = -Math.PI / 2;
     }
 
     getTransform(): TransformNode {

@@ -43,6 +43,8 @@ export async function createSpaceTelescopeScene(
     scene.createDefaultSkybox(textures.milkyWay, true, 10_000, 0);
     const model = createSpaceTelescopeModel();
     const telescope = new SpaceTelescope(model, scene);
+    // Present the native Y-up geometry with the prototype's camera framing.
+    telescope.getTransform().rotation.z = 0;
     const light = new DirectionalLight("telescopeLight", new Vector3(-1, -2, 1).normalize(), scene);
     light.position.set(200, 400, -200);
     const view = new URLSearchParams(window.location.search).get("view");

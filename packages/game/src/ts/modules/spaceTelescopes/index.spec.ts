@@ -15,12 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { NullEngine, NullEngineOptions } from "@babylonjs/core/Engines/nullEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters, getOrbitalPeriod } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { SystemEntity } from "@/frontend/systemEntity/systemEntity";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { TargetType } from "@/frontend/targeting/target";
@@ -31,6 +33,38 @@ import { SpaceTelescopesModule } from ".";
 import type { GameModuleApi } from "../gameModuleApi";
 import { getVestaModel } from "../vesta/vesta";
 
+function expectSunFacingHeatShields(
+    entity: SystemEntity,
+    simulation: KeplerianOrbitalSimulation,
+    period: number,
+): void {
+    const content = entity.content.getTransform();
+    const placement = entity.placement.getTransform();
+    const shield = content.getScene().getTransformNodeByName("insulationRig");
+    expect(shield).not.toBeNull();
+    if (shield === null) {
+        return;
+    }
+    for (const phase of [0, 0.125, 0.25, 0.5, 0.75, 1]) {
+        simulation.update(period * phase);
+        const state = simulation.getTransform(entity.model.id);
+        expect(state).toBeDefined();
+        if (state === undefined) {
+            continue;
+        }
+        placement.position.copyFrom(state.position);
+        placement.rotationQuaternion = state.orientation.clone();
+        placement.computeWorldMatrix(true);
+        const contentWorld = content.computeWorldMatrix(true);
+        shield.computeWorldMatrix(true);
+        const towardStar = state.position.negate().normalize();
+        const towardShield = shield.getAbsolutePosition().subtract(placement.getAbsolutePosition()).normalize();
+        expect(Vector3.Dot(towardShield, towardStar)).toBeCloseTo(1, 6);
+        const opticalAxis = Vector3.TransformNormal(Vector3.Up(), contentWorld).normalize();
+        expect(Vector3.Dot(opticalAxis, towardStar)).toBeCloseTo(-1, 6);
+    }
+}
+
 describe("space telescope module in Vesta", () => {
     let engine: NullEngine;
     let scene: Scene;
@@ -40,7 +74,9 @@ describe("space telescope module in Vesta", () => {
     const registerUpdate = vi.fn();
     const registerAuthoredSystem = vi.fn();
     beforeEach(() => {
-        engine = new NullEngine();
+        const engineOptions = new NullEngineOptions();
+        engineOptions.useHighPrecisionMatrix = true;
+        engine = new NullEngine(engineOptions);
         scene = new Scene(engine);
         loader = new SystemEntityLoader();
         processors = new SystemEntityProcessors();
@@ -93,7 +129,7 @@ describe("space telescope module in Vesta", () => {
                 mass: 100_000,
                 orbit: {
                     parentIds: ["vesta"],
-                    semiMajorAxis: astronomicalUnitToMeters(30),
+                    semiMajorAxis: astronomicalUnitToMeters(3),
                     eccentricity: 0,
                     inclination: 0,
                     longitudeOfAscendingNode: 0,
@@ -101,7 +137,9 @@ describe("space telescope module in Vesta", () => {
                     initialMeanAnomaly: 0,
                     p: 2,
                 },
-                rotation: { siderealPeriod: 0 },
+                rotation: {
+                    siderealPeriod: getOrbitalPeriod(astronomicalUnitToMeters(3), starSystem.stellarObjects[0].mass),
+                },
             },
         });
         expect(systemEntities.some((entity) => entity.id === "monolith")).toBe(true);
@@ -122,10 +160,10 @@ describe("space telescope module in Vesta", () => {
 
     it("loads the registered factory, attaches content to its orbital placement and exposes targeting and shadows", async () => {
         const { starSystem, systemEntities } = getVestaModel();
-        const stellarObjects = starSystem.stellarObjects.map((star) => ({
-            ...star,
-            getTransform: () => new TransformNode(star.id, scene),
-        }));
+        const stellarObjects = starSystem.stellarObjects.map((star) => {
+            const transform = new TransformNode(star.id, scene);
+            return { ...star, getTransform: () => transform };
+        });
         const orbitalSimulation = new KeplerianOrbitalSimulation(stellarObjects);
         const telescopeModels = systemEntities.filter((entity) => entity.content.type === "spaceTelescope");
         const context = {
@@ -161,15 +199,20 @@ describe("space telescope module in Vesta", () => {
         expect(targets[0]?.getBoundingRadius()).toBeLessThan(150);
         expect(processors.shadowCasters.dispatch(entity, undefined)).toEqual([entity.content.getTransform()]);
         const initial = orbitalSimulation.getTransform(entity.model.id);
-        expect(initial?.position.length()).toBeCloseTo(astronomicalUnitToMeters(30), 0);
+        expect(initial?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         const parent = starSystem.stellarObjects[0];
-        orbitalSimulation.update(getOrbitalPeriod(astronomicalUnitToMeters(30), parent.mass) / 4);
+        orbitalSimulation.update(getOrbitalPeriod(astronomicalUnitToMeters(3), parent.mass) / 4);
         const advanced = orbitalSimulation.getTransform(entity.model.id);
-        expect(advanced?.position.length()).toBeCloseTo(astronomicalUnitToMeters(30), 0);
+        expect(advanced?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         expect(advanced?.position.equalsWithEpsilon(initial?.position ?? entity.content.getTransform().position)).toBe(
             false,
         );
-        expect(advanced?.orientation.asArray()).toEqual(initial?.orientation.asArray());
+        expect(advanced?.orientation.asArray()).not.toEqual(initial?.orientation.asArray());
+        expectSunFacingHeatShields(
+            entity,
+            orbitalSimulation,
+            getOrbitalPeriod(astronomicalUnitToMeters(3), parent.mass),
+        );
         entity.content.dispose();
         entity.placement.getTransform().dispose();
     });

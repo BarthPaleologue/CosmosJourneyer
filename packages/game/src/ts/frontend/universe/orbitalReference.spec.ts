@@ -120,7 +120,7 @@ describe("orbital reference selection", () => {
 
     it("selects the telescope at a million km where a sixth-power score still selects the star", () => {
         const star = object("star", SolarMass, Vector3.Zero());
-        const telescope = object("telescope", 100_000, new Vector3(astronomicalUnitToMeters(30), 0, 0));
+        const telescope = object("telescope", 100_000, new Vector3(astronomicalUnitToMeters(3), 0, 0));
         const observer = telescope.getTransform().position.add(new Vector3(0, 1e9, 0));
         const sixthPower = (entry: KeplerianObject) =>
             entry.mass / Vector3.DistanceSquared(entry.getTransform().getAbsolutePosition(), observer) ** 3;

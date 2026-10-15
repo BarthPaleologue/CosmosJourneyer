@@ -108,17 +108,24 @@ test("Vesta's telescope stays fixed near the ship while orbital time advances", 
         const scene = window.scene;
         const telescope = scene.getTransformNodeByName("spaceTelescope");
         const camera = scene.activeCamera;
-        if (telescope === null || camera === null) {
+        const star = scene.getMeshByName("Vesta");
+        const shield = scene.getTransformNodeByName("insulationRig");
+        if (telescope === null || camera === null || star === null || shield === null) {
             return undefined;
         }
         const initial = telescope.getAbsolutePosition().clone();
         const initialOrientation = telescope.absoluteRotationQuaternion.clone();
+        const initialStarOrientation = star.absoluteRotationQuaternion.clone();
         scene.getEngine().getDeltaTime = () => 1000 / 60;
         for (let i = 0; i < 30; i++) {
             scene.render();
         }
         const final = telescope.getAbsolutePosition();
+        const towardStar = star.getAbsolutePosition().subtract(final).normalize();
+        const towardShield = shield.getAbsolutePosition().subtract(final).normalize();
         return {
+            sunAlignment: towardStar.dot(towardShield),
+            timeAdvanced: !star.absoluteRotationQuaternion.equalsWithEpsilon(initialStarOrientation, 1e-9),
             distance: final.subtract(camera.globalPosition).length(),
             drift: final.subtract(initial).length(),
             sameOrientation: telescope.absoluteRotationQuaternion.equalsWithEpsilon(initialOrientation, 1e-6),
@@ -127,5 +134,7 @@ test("Vesta's telescope stays fixed near the ship while orbital time advances", 
     expect(motion?.distance).toBeLessThan(1000);
     expect(motion?.drift).toBeLessThan(0.01);
     expect(motion?.sameOrientation).toBe(true);
+    expect(motion?.sunAlignment).toBeCloseTo(1, 6);
+    expect(motion?.timeAdvanced).toBe(true);
     expect(errors).toEqual([]);
 });

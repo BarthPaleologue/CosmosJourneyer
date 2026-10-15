@@ -415,6 +415,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
+    const spaceTelescopeOrbitRadius = astronomicalUnitToMeters(3);
     const spaceTelescope: SystemEntityModel<SpaceTelescopeModel> = {
         id: "vestaSpaceTelescope",
         name: "Vesta Deep Space Telescope",
@@ -424,7 +425,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             mass: 100_000,
             orbit: {
                 parentIds: [vesta.id],
-                semiMajorAxis: astronomicalUnitToMeters(30),
+                semiMajorAxis: spaceTelescopeOrbitRadius,
                 eccentricity: 0,
                 inclination: 0,
                 longitudeOfAscendingNode: 0,
@@ -436,7 +437,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 axialTilt: 0,
                 spinAxisAzimuth: 0,
                 initialRotationAngle: 0,
-                siderealPeriod: 0,
+                siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, vesta.mass),
             },
         },
     };
