@@ -32,7 +32,7 @@ export type * from "./orbitalObjects/hasSeed";
 export type * from "./orbitalObjects/index";
 export type * from "./orbitalObjects/oceanModel";
 export * from "./orbitalObjects/orbit";
-export type * from "./orbitalObjects/orbitalFacilities/orbitalFacilityModelBase";
+export * from "./orbitalObjects/orbitalFacilities/orbitalFacilityModelBase";
 export * from "./orbitalObjects/orbitalFacilities/sections/engineBay";
 export * from "./orbitalObjects/orbitalFacilities/sections/fusion";
 export * from "./orbitalObjects/orbitalFacilities/sections/habitats/cylinder";

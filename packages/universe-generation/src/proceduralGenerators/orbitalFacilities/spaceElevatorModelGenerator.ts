@@ -31,7 +31,7 @@ import {
 import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import { DefaultOrbitalFacilityMass, getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
     PlanetModel,
     Orbit,
@@ -76,7 +76,7 @@ export function generateSpaceElevatorModel(
 
     const tetherLength = orbitRadius - parentBody.radius;
 
-    const mass = 1;
+    const mass = DefaultOrbitalFacilityMass;
 
     const rotation: Rotation = {
         siderealPeriod: parentSiderealDayDuration,
