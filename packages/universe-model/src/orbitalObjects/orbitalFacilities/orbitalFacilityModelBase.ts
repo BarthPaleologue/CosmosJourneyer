@@ -20,6 +20,9 @@ import type { CropType, Faction } from "../../common";
 import type { StarSystemCoordinates } from "../../starSystemCoordinates";
 import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
+/** Provisional mass in kg for kilometer-scale stations, pending structural mass estimates. */
+export const DefaultOrbitalFacilityMass = 1e12;
+
 export type OrbitalFacilityModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
     starSystemCoordinates: StarSystemCoordinates;
 

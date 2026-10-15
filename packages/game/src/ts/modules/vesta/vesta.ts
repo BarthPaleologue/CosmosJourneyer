@@ -33,6 +33,7 @@ import {
     SolarRadius,
     SolarTemperature,
 } from "@cosmos-journeyer/physics";
+import { DefaultOrbitalFacilityMass } from "@cosmos-journeyer/universe-model";
 import type {
     StarSystemCoordinates,
     StarModel,
@@ -301,7 +302,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         type: "spaceStation",
         name: "New Jules Verne",
         id: "newJulesVerne",
-        mass: 10,
+        mass: DefaultOrbitalFacilityMass,
         orbit: {
             parentIds: ["aphrodite"],
             semiMajorAxis: aphrodite.rings.outerRadius * 1.5,

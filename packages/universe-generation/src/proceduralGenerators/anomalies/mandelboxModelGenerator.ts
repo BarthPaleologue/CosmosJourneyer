@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { DefaultAnomalyMass } from "#/constants";
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
@@ -58,7 +59,7 @@ export function generateMandelboxModel(
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };
 
-    const mass = 10;
+    const mass = DefaultAnomalyMass;
 
     const rotation: Rotation = {
         siderealPeriod: 0,

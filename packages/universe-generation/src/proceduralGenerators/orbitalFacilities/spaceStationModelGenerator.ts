@@ -33,7 +33,7 @@ import {
 import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
-import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import { DefaultOrbitalFacilityMass, getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
     CelestialBodyModel,
     Orbit,
@@ -90,7 +90,7 @@ export function generateSpaceStationModel(
         initialMeanAnomaly: 0,
     };
 
-    const mass = 1;
+    const mass = DefaultOrbitalFacilityMass;
 
     const rotation: Rotation = {
         siderealPeriod: 0,

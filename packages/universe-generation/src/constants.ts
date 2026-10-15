@@ -16,3 +16,6 @@ export const IndividualAverageDailyIntake = 2250;
  * Hydroponic agriculture can be 250% more productive than conventional agriculture.
  */
 export const HydroponicToConventionalRatio = 3.5;
+
+/** Provisional mass in kg for the 200–1000 km orbital anomalies. */
+export const DefaultAnomalyMass = 1e20;

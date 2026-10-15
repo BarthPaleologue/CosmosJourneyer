@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { degreesToRadians, getShadowRadius, solarMassToKg } from "@cosmos-journeyer/physics";
+import { DefaultOrbitalFacilityMass } from "@cosmos-journeyer/universe-model";
 import type {
     StarSystemModel,
     BlackHoleModel,
@@ -81,7 +82,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             initialMeanAnomaly: Math.PI,
             p: 2,
         },
-        mass: 1,
+        mass: DefaultOrbitalFacilityMass,
         rotation: {
             siderealPeriod: 0,
             axialTilt: 0,
@@ -116,7 +117,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
         placement: {
             type: "inOrbit",
-            mass: 1000e3,
+            mass: 1e15,
             orbit: {
                 parentIds: ["chronos"],
                 semiMajorAxis: chronos.accretionDiskRadius * 2,
@@ -150,7 +151,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             initialMeanAnomaly: 0,
             p: 2,
         },
-        mass: 1000e3,
+        mass: DefaultOrbitalFacilityMass,
         rotation: {
             siderealPeriod: 0,
             axialTilt: 0,
@@ -189,7 +190,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             initialMeanAnomaly: Math.PI / 2,
             p: 2,
         },
-        mass: 1,
+        mass: DefaultOrbitalFacilityMass,
         rotation: {
             siderealPeriod: 0,
             axialTilt: 0,
@@ -228,7 +229,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             initialMeanAnomaly: 0,
             p: 2,
         },
-        mass: 1,
+        mass: DefaultOrbitalFacilityMass,
         rotation: {
             siderealPeriod: 0,
             axialTilt: 0,

@@ -51,7 +51,8 @@ import type {
 } from "./architecture/orbitalObject";
 import { GravitySystem } from "./gravitySystem";
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
-import type { OrbitalTransform } from "./keplerianOrbitalSimulation";
+import type { KeplerianObject, OrbitalTransform } from "./keplerianOrbitalSimulation";
+import { getMostInfluentialObject, getNavigationReferenceFrame } from "./orbitalReference";
 import type { GasPlanet } from "./planets/gasPlanet/gasPlanet";
 import { TelluricPlanet } from "./planets/telluricPlanet/telluricPlanet";
 import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatteringSystem";
@@ -209,24 +210,6 @@ export class StarSystemController {
         );
     }
 
-    public getMostInfluentialObject(position: Vector3): OrbitalObject {
-        const orbitalObjects = this.getOrbitalObjects();
-
-        let greatestInfluence = Number.NEGATIVE_INFINITY;
-        let bestObject: OrbitalObject = this.stellarObjects[0];
-        for (const object of orbitalObjects) {
-            const distanceSquared = Vector3.DistanceSquared(object.getTransform().position, position);
-            const influence = object.getBoundingRadius() / distanceSquared ** 2;
-
-            if (influence > greatestInfluence) {
-                greatestInfluence = influence;
-                bestObject = object;
-            }
-        }
-
-        return bestObject;
-    }
-
     /**
      * Returns the nearest orbital object to the given position
      * @param position The position from which we want to find the nearest orbital object
@@ -348,11 +331,12 @@ export class StarSystemController {
      * @param timestampSeconds The timestamp to which we want to advance the simulation (in seconds)
      */
     public initPositions(nbWarmUpUpdates: number, timestampSeconds: number): void {
-        this.updateOrbitalSimulation(this.stellarObjects[0], timestampSeconds);
+        const referenceObject = toKeplerian(this.stellarObjects[0]);
+        this.updateOrbitalSimulation(referenceObject, timestampSeconds);
 
         // Perform warm-up updates with small time steps
         for (let i = 0; i < nbWarmUpUpdates; i++) {
-            this.updateOrbitalSimulation(this.stellarObjects[0], 1);
+            this.updateOrbitalSimulation(referenceObject, 1);
         }
     }
 
@@ -362,7 +346,7 @@ export class StarSystemController {
      * @param referenceObject The object that will be kept in place while the others are moved around it
      * @param deltaSeconds The time elapsed since the last update
      */
-    private updateOrbitalSimulation(referenceObject: OrbitalObject, deltaSeconds: number): void {
+    private updateOrbitalSimulation(referenceObject: KeplerianObject, deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         this.referenceAnchorPosition.copyFrom(referenceObject.getTransform().position);
@@ -372,14 +356,13 @@ export class StarSystemController {
 
         this.orbitalSimulation.update(this.elapsedSeconds);
 
-        const referenceTransform = this.orbitalSimulation.getTransform(referenceObject.model.id);
+        const referenceTransform = this.orbitalSimulation.getTransform(referenceObject.id);
         if (referenceTransform === undefined) {
-            console.warn(`Could not compute orbital transform for ${referenceObject.model.name}`);
+            console.warn(`Could not compute orbital transform for ${referenceObject.id}`);
             return;
         }
 
-        const relativeTransformFrame =
-            referenceObject.type === "blackHole" || referenceObject.type === "neutronStar" ? "inertial" : "reference";
+        const relativeTransformFrame = getNavigationReferenceFrame(referenceObject.rotation.siderealPeriod);
         const localFrameOrientation =
             relativeTransformFrame === "reference"
                 ? referenceAnchorOrientation.multiply(referenceTransform.orientation.conjugate())
@@ -391,7 +374,7 @@ export class StarSystemController {
         for (const object of this.orbitalSimulation.getObjects()) {
             const relativeTransform = this.orbitalSimulation.getRelativeTransform(
                 object.id,
-                referenceObject.model.id,
+                referenceObject.id,
                 relativeTransformFrame,
             );
             if (relativeTransform === undefined) {
@@ -427,7 +410,10 @@ export class StarSystemController {
 
         const cameraPosition = camera.globalPosition;
 
-        const referenceObject = this.getMostInfluentialObject(cameraPosition);
+        const referenceObject = getMostInfluentialObject(this.orbitalSimulation.getObjects(), cameraPosition);
+        if (referenceObject === undefined) {
+            return;
+        }
         this.updateOrbitalSimulation(referenceObject, deltaSeconds * this.orbitalSimulationTimeMultiplier);
 
         for (const systemTarget of this.systemTargets) {
