@@ -32,7 +32,7 @@ for (const view of ["overview", "mirror", "shields"]) {
             };
         });
         await page.screenshot({ path: testInfo.outputPath(`${view}.png`) });
-        expect(rendering.meshCount).toBe(34); // Telescope and environment skybox.
+        expect(rendering.meshCount).toBe(35); // Telescope, collision mesh and environment skybox.
         expect(rendering.segments).toBe(720);
         expect(rendering.mirrorCastsShadows).toBe(true);
         expect(rendering.materialsReady).toBe(true);
@@ -116,6 +116,7 @@ test("Vesta's telescope stays fixed near the ship while orbital time advances", 
         const initial = telescope.getAbsolutePosition().clone();
         const initialOrientation = telescope.absoluteRotationQuaternion.clone();
         const initialStarOrientation = star.absoluteRotationQuaternion.clone();
+        const collider = scene.getMeshByName("spaceTelescopeCollider");
         scene.getEngine().getDeltaTime = () => 1000 / 60;
         for (let i = 0; i < 30; i++) {
             scene.render();
@@ -124,6 +125,7 @@ test("Vesta's telescope stays fixed near the ship while orbital time advances", 
         const towardStar = star.getAbsolutePosition().subtract(final).normalize();
         const towardShield = shield.getAbsolutePosition().subtract(final).normalize();
         return {
+            collisionBodyActive: Boolean(collider?.physicsBody?.shape),
             sunAlignment: towardStar.dot(towardShield),
             timeAdvanced: !star.absoluteRotationQuaternion.equalsWithEpsilon(initialStarOrientation, 1e-9),
             distance: final.subtract(camera.globalPosition).length(),
@@ -136,5 +138,6 @@ test("Vesta's telescope stays fixed near the ship while orbital time advances", 
     expect(motion?.sameOrientation).toBe(true);
     expect(motion?.sunAlignment).toBeCloseTo(1, 6);
     expect(motion?.timeAdvanced).toBe(true);
+    expect(motion?.collisionBodyActive).toBe(true);
     expect(errors).toEqual([]);
 });

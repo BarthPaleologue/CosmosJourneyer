@@ -36,6 +36,9 @@ export const SpaceTelescopesModule: GameModule = {
             }
             return ok(new SpaceTelescope(parsed.data, scene));
         });
+        systemEntities.registerUpdate(type, (entity, context) => {
+            entity.content.update(context.observerPosition);
+        });
         targeting.systemEntities.register(type, (entity) => [
             {
                 type: TargetType.CUSTOM,

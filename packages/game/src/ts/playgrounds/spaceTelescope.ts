@@ -30,7 +30,7 @@ import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { SpaceTelescope } from "@/modules/spaceTelescopes/spaceTelescope";
 import { createSpaceTelescopeModel } from "@/modules/spaceTelescopes/spaceTelescopeModel";
 
-import { enableShadows } from "./utils";
+import { enablePhysics, enableShadows } from "./utils";
 
 export async function createSpaceTelescopeScene(
     engine: AbstractEngine,
@@ -38,6 +38,7 @@ export async function createSpaceTelescopeScene(
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
+    await enablePhysics(scene);
     const textures = await loadEnvironmentTextures(scene, progressMonitor);
     scene.environmentTexture = textures.milkyWay;
     scene.createDefaultSkybox(textures.milkyWay, true, 10_000, 0);
@@ -60,6 +61,9 @@ export async function createSpaceTelescopeScene(
     camera.upperRadiusLimit = 50_000;
     camera.wheelDeltaPercentage = 0.01;
     camera.attachControl();
+    scene.onBeforeRenderObservable.add(() => {
+        telescope.update(camera.globalPosition);
+    });
     const depthRenderers = new DepthRendererManager(scene);
     enableShadows(light, depthRenderers, {
         maxZ: telescope.radius * 4,

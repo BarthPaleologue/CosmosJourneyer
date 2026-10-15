@@ -154,7 +154,7 @@ describe("space telescope module in Vesta", () => {
         ].map((entity) => entity.id);
         expect(new Set(ids).size).toBe(ids.length);
         expect(registerProcedural).not.toHaveBeenCalled();
-        expect(registerUpdate).not.toHaveBeenCalled();
+        expect(registerUpdate).toHaveBeenCalledWith("spaceTelescope", expect.any(Function));
         expect(registerAuthoredSystem).not.toHaveBeenCalled();
     });
 

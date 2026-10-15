@@ -15,16 +15,23 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
 import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
 import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
+
+import { CollisionMask } from "@/settings";
 
 import { createInsulationSheetMaterial } from "./insulationSheet";
 import { createPrimaryMirror } from "./primaryMirror";
@@ -33,6 +40,7 @@ import type { SpaceTelescopeModel } from "./spaceTelescopeModel";
 export class SpaceTelescope implements SystemContent {
     private readonly transform: TransformNode;
     private readonly materials: ReadonlyArray<PBRMaterial>;
+    private aggregate: PhysicsAggregate | null = null;
     readonly radius: number;
 
     /** Models are validated by the content factory before allocating Babylon resources. */
@@ -167,7 +175,60 @@ export class SpaceTelescope implements SystemContent {
         return this.transform;
     }
 
+    update(observerPosition: Vector3): void {
+        const distanceSquared = Vector3.DistanceSquared(observerPosition, this.transform.getAbsolutePosition());
+        if (distanceSquared < 10e3 ** 2 && this.aggregate === null) {
+            const collider = this.createCollider();
+            this.aggregate = new PhysicsAggregate(collider, PhysicsShapeType.MESH, { mass: 0 }, collider.getScene());
+            this.aggregate.shape.filterMembershipMask = CollisionMask.ENVIRONMENT;
+            this.aggregate.shape.filterCollideMask = CollisionMask.EVERYTHING & ~CollisionMask.ENVIRONMENT;
+            this.aggregate.body.disablePreStep = false;
+        } else if (distanceSquared > 12e3 ** 2) {
+            this.disposePhysics();
+        }
+    }
+
+    private createCollider(): Mesh {
+        const inverseRoot = this.transform.computeWorldMatrix(true).clone().invert();
+        const parts: VertexData[] = [];
+        for (const mesh of this.transform.getChildMeshes()) {
+            if (!(mesh instanceof Mesh)) {
+                continue;
+            }
+            const local = mesh.computeWorldMatrix(true).multiply(inverseRoot);
+            const instances = mesh.hasThinInstances ? mesh.thinInstanceGetWorldMatrices() : [Matrix.Identity()];
+            for (const instance of instances) {
+                const part = new VertexData();
+                part.positions = mesh.getVerticesData(VertexBuffer.PositionKind, false, true);
+                part.indices = mesh.getIndices();
+                part.transform(instance.multiply(local));
+                parts.push(part);
+            }
+        }
+        // Bake the static segments into one collision mesh; rendering keeps its shared thin instances.
+        const data = new VertexData();
+        data.positions = [];
+        data.indices = [];
+        data.merge(parts, true);
+        const collider = new Mesh("spaceTelescopeCollider", this.transform.getScene());
+        data.applyToMesh(collider);
+        collider.isVisible = false;
+        collider.isPickable = false;
+        collider.parent = this.transform;
+        return collider;
+    }
+
+    private disposePhysics(): void {
+        if (this.aggregate !== null) {
+            const collider = this.aggregate.transformNode;
+            this.aggregate.dispose();
+            this.aggregate = null;
+            collider.dispose();
+        }
+    }
+
     dispose(): void {
+        this.disposePhysics();
         this.transform.dispose();
         for (const material of this.materials) {
             material.dispose(false, true);
