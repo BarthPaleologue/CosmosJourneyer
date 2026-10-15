@@ -63,6 +63,7 @@ import { NegateBlock } from "@babylonjs/core/Materials/Node/Blocks/negateBlock";
 import { NormalizeBlock } from "@babylonjs/core/Materials/Node/Blocks/normalizeBlock";
 import { OneMinusBlock } from "@babylonjs/core/Materials/Node/Blocks/oneMinusBlock";
 import { PBRMetallicRoughnessBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/pbrMetallicRoughnessBlock";
+import { ReflectionBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/reflectionBlock";
 import { SubSurfaceBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/subSurfaceBlock";
 import { PowBlock } from "@babylonjs/core/Materials/Node/Blocks/powBlock";
 import { RemapBlock } from "@babylonjs/core/Materials/Node/Blocks/remapBlock";
@@ -1409,6 +1410,22 @@ export function subSurfaceScatter(
     return sssBlock.subsurface;
 }
 
+/**
+ * Creates PBR reflections from the scene's environment texture.
+ * @param positionVec3 - The mesh-local position.
+ * @param worldMat4 - The world matrix.
+ * @returns The reflection connection for the pbr helper.
+ */
+export function reflection(
+    positionVec3: NodeMaterialConnectionPoint,
+    worldMat4: NodeMaterialConnectionPoint,
+): NodeMaterialConnectionPoint {
+    const reflectionBlock = new ReflectionBlock("Reflection");
+    positionVec3.connectTo(reflectionBlock.position);
+    worldMat4.connectTo(reflectionBlock.world);
+    return reflectionBlock.reflection;
+}
+
 export type PBROptions = {
     useEnergyConservation: boolean;
     useRadianceOcclusion: boolean;
@@ -1418,6 +1435,7 @@ export type PBROptions = {
     opacity: PBRMetallicRoughnessBlock["opacity"];
     perturbedNormal: PBRMetallicRoughnessBlock["perturbedNormal"];
     subSurfaceScattering: PBRMetallicRoughnessBlock["subsurface"];
+    reflection: PBRMetallicRoughnessBlock["reflection"];
     lightFalloff: typeof Light.FALLOFF_PHYSICAL | typeof Light.FALLOFF_GLTF | typeof Light.FALLOFF_STANDARD;
 };
 
@@ -1465,6 +1483,7 @@ export function pbr(
     options?.opacity?.connectTo(PBRMetallicRoughness.opacity);
     options?.perturbedNormal?.connectTo(PBRMetallicRoughness.perturbedNormal);
     options?.subSurfaceScattering?.connectTo(PBRMetallicRoughness.subsurface);
+    options?.reflection?.connectTo(PBRMetallicRoughness.reflection);
 
     return PBRMetallicRoughness;
 }
