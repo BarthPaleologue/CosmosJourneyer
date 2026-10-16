@@ -27,6 +27,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     textureSample,
     transformDirection,
     transformPosition,
@@ -98,6 +99,7 @@ export class CrateMaterial {
         const view = uniformView();
 
         const pbrShading = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             perturbedNormal,
             ambientOcclusion: ambientOcclusion.r,

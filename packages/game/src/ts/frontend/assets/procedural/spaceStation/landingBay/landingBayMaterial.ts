@@ -32,6 +32,7 @@ import {
     outputVertexPosition,
     pbr,
     perturbNormal,
+    reflection,
     remap,
     splitVec,
     step,
@@ -174,6 +175,7 @@ export class LandingBayMaterial extends NodeMaterial {
         const cameraPosition = uniformCameraPosition();
 
         const pbrColor = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+            reflection: reflection(position, world),
             albedoRgb: finalAlbedo,
             ambientOcclusion: finalAo,
             perturbedNormal: perturbedNormal.output,

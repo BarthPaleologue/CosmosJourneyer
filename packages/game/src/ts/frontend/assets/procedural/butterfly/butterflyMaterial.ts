@@ -35,6 +35,7 @@ import {
     outputFragColor,
     outputVertexPosition,
     pbr,
+    reflection,
     remap,
     rgbToHsl,
     rotateAround,
@@ -137,7 +138,10 @@ export class ButterflyMaterial {
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
-        const shading = pbr(f(0), f(1), normalW, view, cameraPosition, positionW, { albedoRgb: shiftedAlbedo });
+        const shading = pbr(f(0), f(1), normalW, view, cameraPosition, positionW, {
+            albedoRgb: shiftedAlbedo,
+            reflection: reflection(position3, instanceWorld),
+        });
 
         const ambient = mul(f(0.8), shiftedAlbedo);
 
