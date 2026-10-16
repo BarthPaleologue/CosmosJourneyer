@@ -32,8 +32,10 @@ import { LandingPadMaterial } from "../procedural/spaceStation/landingPad/landin
 import { MetalSectionMaterial } from "../procedural/spaceStation/metalSectionMaterial";
 import type { Textures } from "../textures";
 import { CrateMaterial } from "./crate";
+import { FoilMaterial } from "./foil";
 
 export type Materials = {
+    readonly foil: FoilMaterial;
     readonly butterfly: Material;
     readonly grass: Material;
     readonly rock: Material;
@@ -80,6 +82,7 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     glass.backFaceCulling = false;
 
     return {
+        foil: new FoilMaterial(textures.materials.foil, scene),
         butterfly: new ButterflyMaterial(textures.particles.butterfly, scene).get(),
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
         rock: new RockMaterial(textures.terrains.rock, scene).get(),

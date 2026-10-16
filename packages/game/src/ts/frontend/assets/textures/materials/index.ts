@@ -23,6 +23,8 @@ import { loadTextureAsync } from "../utils";
 import { loadConcreteTextures } from "./concrete";
 import { loadCrateTextures } from "./crate";
 import type { CrateTextures } from "./crate";
+import { loadFoilTextures } from "./foil";
+import type { FoilTextures } from "./foil";
 import { loadSolarPanelTextures } from "./solarPanel";
 import type { SolarPanelTextures } from "./solarPanel";
 import { loadStyroFoamTextures } from "./styrofoam";
@@ -48,6 +50,7 @@ export type PBRTextures = {
 };
 
 export type AllMaterialTextures = {
+    foil: FoilTextures;
     solarPanel: SolarPanelTextures;
     spaceStation: PBRTextures;
     metalPanels: PBRTextures;
@@ -114,12 +117,15 @@ export async function loadMaterialTextures(
 
     const styroFoamPromise = loadStyroFoamTextures(engine, progressMonitor);
 
+    const foilPromise = loadFoilTextures(engine, progressMonitor);
+
     const solarPanelPromise = loadSolarPanelTextures(engine, progressMonitor);
 
     const treeAlbedo = await treeAlbedoPromise;
     treeAlbedo.hasAlpha = true;
 
     return {
+        foil: await foilPromise,
         solarPanel: await solarPanelPromise,
         spaceStation: {
             albedo: await spaceStationAlbedoPromise,
