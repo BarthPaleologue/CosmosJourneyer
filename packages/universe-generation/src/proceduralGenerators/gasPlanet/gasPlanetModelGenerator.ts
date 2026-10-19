@@ -22,7 +22,7 @@ import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass 
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type { GasPlanetModel, Orbit, Rotation, StellarObjectModel } from "@cosmos-journeyer/universe-model";
+import type { GasPlanetModel, Orbit, SpinModel, StellarObjectModel } from "@cosmos-journeyer/universe-model";
 
 import { getGasPlanetOrbitRadius, sampleGasPlanetMass } from "./gasPlanetModelHelpers";
 
@@ -55,7 +55,7 @@ export function generateGasPlanetModel(
     if (parentBodies.length > 0) {
         for (const parent of parentBodies) {
             parentAverageInclination += parent.orbit.inclination;
-            parentAverageAxialTilt += parent.rotation.axialTilt;
+            parentAverageAxialTilt += parent.spin.axialTilt;
         }
         parentAverageInclination /= parentBodies.length;
         parentAverageAxialTilt /= parentBodies.length;
@@ -77,10 +77,10 @@ export function generateGasPlanetModel(
         initialMeanAnomaly: 0,
     };
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: (24 * 60 * 60) / 10,
         axialTilt: normalRandom(0, degreesToRadians(25), rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -109,7 +109,7 @@ export function generateGasPlanetModel(
         seed,
         radius,
         orbit,
-        rotation,
+        spin,
         mass,
         atmosphere: {
             pressure: EarthSeaLevelPressure,

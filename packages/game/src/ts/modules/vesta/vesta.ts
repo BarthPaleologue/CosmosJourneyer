@@ -68,9 +68,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         radius: SolarRadius,
         mass: SolarMass,
         seed: 42,
-        rotation: {
+        spin: {
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
             siderealPeriod: durationToSeconds({ days: 20, hours: 2, minutes: 5 }),
         },
@@ -96,9 +96,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         radius: EarthRadius * 0.1,
         mass: EarthMass * 0.1 ** 3,
         seed: 44,
-        rotation: {
+        spin: {
             axialTilt: degreesToRadians(5),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
             siderealPeriod: janusOrbitalPeriod,
         },
@@ -143,9 +143,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         radius: aphroditeRadius,
         mass: EarthMass * 0.2 ** 3,
         seed: 45,
-        rotation: {
+        spin: {
             axialTilt: degreesToRadians(10),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
             siderealPeriod: durationToSeconds({ hours: 26, minutes: 21, seconds: 48 }),
         },
@@ -224,9 +224,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             p: 2,
             longitudeOfAscendingNode: degreesToRadians(175),
         },
-        rotation: {
+        spin: {
             axialTilt: degreesToRadians(0.2),
-            spinAxisAzimuth: degreesToRadians(22),
+            axisAzimuth: degreesToRadians(22),
             siderealPeriod: getOrbitalPeriod(adonisOrbitRadius, aphrodite.mass),
             initialRotationAngle: degreesToRadians(18),
         },
@@ -270,9 +270,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             p: 2,
             longitudeOfAscendingNode: degreesToRadians(15),
         },
-        rotation: {
+        spin: {
             axialTilt: degreesToRadians(5),
-            spinAxisAzimuth: degreesToRadians(246),
+            axisAzimuth: degreesToRadians(246),
             siderealPeriod: getOrbitalPeriod(phileasOrbitRadius, aphrodite.mass),
             initialRotationAngle: degreesToRadians(354),
         },
@@ -313,9 +313,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             eccentricity: 0.5,
             p: 2,
         },
-        rotation: {
+        spin: {
             siderealPeriod: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             axialTilt: 0,
             initialRotationAngle: 0,
         },
@@ -361,9 +361,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         radius: JupiterRadius * 0.7,
         mass: JupiterMass * 0.7 ** 3,
         seed: 43,
-        rotation: {
+        spin: {
             axialTilt: degreesToRadians(30),
-            spinAxisAzimuth: degreesToRadians(75),
+            axisAzimuth: degreesToRadians(75),
             initialRotationAngle: degreesToRadians(156),
             siderealPeriod: durationToSeconds({ hours: 16, minutes: 48, seconds: 9 }),
         },

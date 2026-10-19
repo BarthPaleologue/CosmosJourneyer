@@ -63,10 +63,10 @@ export async function createOrbitalDemoScene(
             p: 2,
         },
         type: "custom",
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         mass: 1e12,
@@ -86,10 +86,10 @@ export async function createOrbitalDemoScene(
             p: 2,
         },
         type: "custom",
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: Tools.ToRadians(23.5),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         mass: 1e11,
@@ -104,16 +104,16 @@ export async function createOrbitalDemoScene(
             semiMajorAxis: 3,
             initialMeanAnomaly: 0,
             longitudeOfAscendingNode: 0,
-            inclination: earth.model.orbit.inclination + earth.model.rotation.axialTilt,
+            inclination: earth.model.orbit.inclination + earth.model.spin.axialTilt,
             eccentricity: 0.7,
             p: 2,
         },
         type: "custom",
         mass: 1e10,
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
     });

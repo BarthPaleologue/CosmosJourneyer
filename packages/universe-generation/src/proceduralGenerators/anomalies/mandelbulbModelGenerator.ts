@@ -22,7 +22,7 @@ import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { MandelbulbModel, OrbitalObjectModel, Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { MandelbulbModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export function generateMandelbulbModel(
     id: string,
@@ -60,10 +60,10 @@ export function generateMandelbulbModel(
 
     const mass = DefaultAnomalyMass;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -73,7 +73,7 @@ export function generateMandelbulbModel(
         name,
         radius,
         mass,
-        rotation,
+        spin,
         accentColor,
         power,
         orbit,

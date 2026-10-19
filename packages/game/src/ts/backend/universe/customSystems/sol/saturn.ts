@@ -25,10 +25,10 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         type: "gasPlanet",
         radius: 58_232e3,
         mass: 5.683e26,
-        rotation: {
+        spin: {
             siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
             axialTilt: degreesToRadians(26.73),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         orbit: {

@@ -22,7 +22,7 @@ import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { MandelboxModel, OrbitalObjectModel, Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { MandelboxModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export function generateMandelboxModel(
     id: string,
@@ -61,10 +61,10 @@ export function generateMandelboxModel(
 
     const mass = DefaultAnomalyMass;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -74,7 +74,7 @@ export function generateMandelboxModel(
         name,
         radius,
         mass,
-        rotation,
+        spin,
         mr2,
         spread,
         color: accentColor,

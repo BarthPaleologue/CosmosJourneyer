@@ -36,11 +36,14 @@ export function createDarkKnightOrbitalPlacementModel(parentIds: Iterable<Orbita
             semiMajorAxis: astronomicalUnitToMeters(100),
             initialMeanAnomaly: 0,
         },
-        rotation: {
-            axialTilt: 0,
-            siderealPeriod: 0,
-            spinAxisAzimuth: 0,
-            initialRotationAngle: 0,
+        attitude: {
+            spin: {
+                axialTilt: 0,
+                siderealPeriod: 0,
+                axisAzimuth: 0,
+                initialRotationAngle: 0,
+            },
+            localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
         },
     };
 }

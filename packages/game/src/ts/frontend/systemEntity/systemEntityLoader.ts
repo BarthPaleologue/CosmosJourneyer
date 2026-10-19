@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { err, ok } from "@cosmos-journeyer/typescript";
@@ -105,7 +106,12 @@ export class SystemEntityLoader {
 
             const { model, content } = partial;
 
-            content.getTransform().parent = placement.getTransform();
+            const contentTransform = content.getTransform();
+            contentTransform.parent = placement.getTransform();
+            if (model.placement.type === "inOrbit") {
+                const { yaw, pitch, roll } = model.placement.attitude.localFrameOrientation;
+                contentTransform.rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, pitch, roll);
+            }
             systemEntities.push({ model, content, placement });
         }
 
@@ -135,7 +141,7 @@ export function createInOrbitPlacements(
             id: entityId,
             mass: placementModel.mass,
             orbit: placementModel.orbit,
-            rotation: placementModel.rotation,
+            spin: placementModel.attitude.spin,
             getTransform: () => transform,
         } as const;
         placements.set(entityId, placement);

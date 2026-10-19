@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Orbit, OrbitalObjectId, Rotation } from "@cosmos-journeyer/universe-model";
+import type { Orbit, OrbitalObjectId, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export type SystemEntityModel<TContent extends SystemContentModel = SystemContentModel> = {
     id: string;
@@ -34,7 +34,17 @@ export type InOrbitPlacementModel = {
     type: "inOrbit";
     mass: number;
     orbit: Orbit;
-    rotation: Rotation;
+    attitude: AttitudeModel;
+};
+
+export type AttitudeModel = {
+    spin: SpinModel;
+    /** Model orientation relative to the spinning frame, in radians. */
+    localFrameOrientation: {
+        yaw: number;
+        pitch: number;
+        roll: number;
+    };
 };
 
 export type OnSurfacePlacementModel = {

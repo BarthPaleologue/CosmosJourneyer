@@ -20,7 +20,7 @@ import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalObjectModel, Orbit, NeutronStarModel, Rotation } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectModel, Orbit, NeutronStarModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
 /**
  * Creates a new pseudo-random neutron star model
@@ -40,9 +40,9 @@ export function generateNeutronStarModel(
 
     const mass = 1.9885e30;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         axialTilt: 0,
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
         // https://arxiv.org/pdf/2402.14030 and https://en.wikipedia.org/wiki/Neutron_star#:~:text=Because%20it%20has%20only%20a,1.4%20ms%20to%2030%20s.
         siderealPeriod: clamp(normalRandom(0.5e-2, 5e-3, rng, GenerationSteps.SIDEREAL_DAY_SECONDS), 1.4e-3, 30),
@@ -83,7 +83,7 @@ export function generateNeutronStarModel(
         blackBodyTemperature,
         dipoleTilt,
         mass,
-        rotation,
+        spin,
         radius,
         orbit,
         rings,

@@ -25,10 +25,10 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         type: "gasPlanet",
         radius: 69_911e3,
         mass: 1.898e27,
-        rotation: {
+        spin: {
             siderealPeriod: durationToSeconds({ hours: 9, minutes: 55, seconds: 30 }),
             axialTilt: degreesToRadians(3.13),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         orbit: {

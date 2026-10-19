@@ -60,10 +60,10 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         mass: chronosMass,
         blackBodyTemperature: 6000,
         accretionDiskRadius: chronosShadowRadius * 4,
-        rotation: {
+        spin: {
             siderealPeriod: 1e-3,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
     };
@@ -83,10 +83,10 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             p: 2,
         },
         mass: DefaultOrbitalFacilityMass,
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         solarPanelEfficiency: 0.5,
@@ -128,11 +128,14 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                 initialMeanAnomaly: 0,
                 p: 2,
             },
-            rotation: {
-                siderealPeriod: 0,
-                axialTilt: 0,
-                spinAxisAzimuth: 0,
-                initialRotationAngle: 0,
+            attitude: {
+                spin: {
+                    siderealPeriod: 0,
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
             },
         },
     };
@@ -152,10 +155,10 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             p: 2,
         },
         mass: DefaultOrbitalFacilityMass,
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         solarPanelEfficiency: 0.5,
@@ -191,10 +194,10 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             p: 2,
         },
         mass: DefaultOrbitalFacilityMass,
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         solarPanelEfficiency: 0.5,
@@ -230,10 +233,10 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             p: 2,
         },
         mass: DefaultOrbitalFacilityMass,
-        rotation: {
+        spin: {
             siderealPeriod: 0,
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         solarPanelEfficiency: 0.5,

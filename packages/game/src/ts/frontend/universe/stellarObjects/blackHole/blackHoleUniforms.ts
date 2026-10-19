@@ -59,12 +59,12 @@ export class BlackHoleUniforms {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
-        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.rotation.siderealPeriod);
+        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.spin.siderealPeriod);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
 
-        computeSpinAxisOrientation(blackHoleModel.orbit, blackHoleModel.rotation).toRotationMatrix(this.diskRotation);
+        computeSpinAxisOrientation(blackHoleModel.orbit, blackHoleModel.spin).toRotationMatrix(this.diskRotation);
         this.diskRotation.transposeToRef(this.inverseDiskRotation);
     }
 

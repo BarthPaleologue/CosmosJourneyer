@@ -38,7 +38,7 @@ import type {
     SpaceElevatorModel,
     ElevatorSectionModel,
     StarSystemModel,
-    Rotation,
+    SpinModel,
 } from "@cosmos-journeyer/universe-model";
 
 import { generateFusionSectionModel } from "./sections/fusion";
@@ -59,7 +59,7 @@ export function generateSpaceElevatorModel(
 
     const name = generateSpaceElevatorName(rng, 2756);
 
-    const parentSiderealDayDuration = parentBody.rotation.siderealPeriod;
+    const parentSiderealDayDuration = parentBody.spin.siderealPeriod;
 
     const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
 
@@ -67,7 +67,7 @@ export function generateSpaceElevatorModel(
         parentIds: [parentBody.id],
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: parentBody.orbit.inclination + parentBody.rotation.axialTilt,
+        inclination: parentBody.orbit.inclination + parentBody.spin.axialTilt,
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
@@ -78,10 +78,10 @@ export function generateSpaceElevatorModel(
 
     const mass = DefaultOrbitalFacilityMass;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: parentSiderealDayDuration,
         axialTilt: Math.PI / 2,
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -209,7 +209,7 @@ export function generateSpaceElevatorModel(
         name,
         orbit,
         mass,
-        rotation,
+        spin,
         tetherLength,
         population,
         annualEnergyPerCapitaKWh,

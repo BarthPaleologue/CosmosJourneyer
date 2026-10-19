@@ -17,7 +17,7 @@
 
 import { z } from "zod";
 
-export const RotationSchema = z.object({
+export const SpinModelSchema = z.object({
     /**
      * The angle between the planet's spin axis and its orbital axis (in radians)
      * @see https://en.wikipedia.org/wiki/Axial_tilt
@@ -25,7 +25,7 @@ export const RotationSchema = z.object({
     axialTilt: z.number(),
 
     /** Azimuth around orbital +Y, measured from the tilt direction -X (in radians). */
-    spinAxisAzimuth: z.number(),
+    axisAzimuth: z.number(),
 
     /**
      * Time needed for the object to rotate 360° on its axis in seconds.
@@ -39,4 +39,4 @@ export const RotationSchema = z.object({
     initialRotationAngle: z.number(),
 });
 
-export type Rotation = z.infer<typeof RotationSchema>;
+export type SpinModel = z.infer<typeof SpinModelSchema>;

@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
 import { computeAbsoluteOrientation, getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
 
@@ -36,7 +36,7 @@ export type KeplerianObject = Transformable &
         readonly id: string;
         readonly mass: number;
         readonly orbit: DeepReadonly<Orbit>;
-        readonly rotation: DeepReadonly<Rotation>;
+        readonly spin: DeepReadonly<SpinModel>;
     }>;
 
 /**
@@ -202,6 +202,6 @@ export class KeplerianOrbitalSimulation {
     }
 
     private computeAbsoluteOrientation(object: KeplerianObject): Quaternion {
-        return computeAbsoluteOrientation(object.orbit, object.rotation, this.elapsedSeconds);
+        return computeAbsoluteOrientation(object.orbit, object.spin, this.elapsedSeconds);
     }
 }
