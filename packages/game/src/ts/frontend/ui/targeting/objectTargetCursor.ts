@@ -147,7 +147,7 @@ export class ObjectTargetCursor {
             camera.fov,
         );
 
-        let size = 100 * (screenSize * 1.3);
+        let size = 100 * Math.min(screenSize * 1.3, 1);
         if (this.minSize > 0) {
             size = Math.max(size, this.minSize);
         }

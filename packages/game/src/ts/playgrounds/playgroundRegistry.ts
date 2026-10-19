@@ -57,6 +57,7 @@ import { createSpaceDotsScene } from "./spaceDots";
 import { createSpaceElevatorScene } from "./spaceElevator";
 import { createSpaceStationScene } from "./spaceStation";
 import { createSpaceStationUIScene } from "./spaceStationUI";
+import { createSpaceTelescopeScene } from "./spaceTelescope";
 import { createSphericalHeightFieldTerrainScene } from "./sphericalHeightFieldTerrain";
 import { createSpotLightsScene } from "./spotLights";
 import { createStarMapScene } from "./starMap";
@@ -82,6 +83,7 @@ export class PlaygroundRegistry {
         ["automaticLanding", createAutomaticLandingScene],
         ["debugAssets", createDebugAssetsScene],
         ["spaceStation", createSpaceStationScene],
+        ["spaceTelescope", createSpaceTelescopeScene],
         ["spaceStationUI", createSpaceStationUIScene],
         ["xr", createXrScene],
         ["flightDemo", createFlightDemoScene],

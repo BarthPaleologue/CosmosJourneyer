@@ -116,7 +116,7 @@ describe("orbital reference selection", () => {
 
     it("selects the telescope at a million km where a sixth-power score still selects the star", () => {
         const star = object("star", SolarMass, Vector3.Zero());
-        const telescope = object("telescope", 100_000, new Vector3(astronomicalUnitToMeters(30), 0, 0));
+        const telescope = object("telescope", 100_000, new Vector3(astronomicalUnitToMeters(3), 0, 0));
         const observer = telescope.getTransform().position.add(new Vector3(0, 1e9, 0));
         const sixthPower = (entry: KeplerianObject) =>
             entry.mass / Vector3.DistanceSquared(entry.getTransform().getAbsolutePosition(), observer) ** 3;
@@ -140,37 +140,40 @@ describe("orbital reference selection", () => {
         expect(getMostInfluentialObject([giant, teapot], observer)?.id).toBe(expected);
     });
 
-    it.each([0, 86400])("selects Vesta's station and planet near their current orbital positions at t=%s", (time) => {
-        const { starSystem, systemEntities } = getVestaModel();
-        const models = [
-            ...starSystem.stellarObjects,
-            ...starSystem.planets,
-            ...starSystem.satellites,
-            ...starSystem.orbitalFacilities,
-            ...systemEntities.flatMap((entity) =>
-                entity.placement.type === "inOrbit"
-                    ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
-                    : [],
-            ),
-        ];
-        const simulation = placeModels(models, time);
-        for (const id of ["newJulesVerne", "aphrodite"]) {
-            const target = simulation.getTransform(id);
-            expect(target).toBeDefined();
-            if (target === undefined) {
-                continue;
+    it.each([0, 86400])(
+        "selects Vesta's telescope and station near their current orbital positions at t=%s",
+        (time) => {
+            const { starSystem, systemEntities } = getVestaModel();
+            const models = [
+                ...starSystem.stellarObjects,
+                ...starSystem.planets,
+                ...starSystem.satellites,
+                ...starSystem.orbitalFacilities,
+                ...systemEntities.flatMap((entity) =>
+                    entity.placement.type === "inOrbit"
+                        ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
+                        : [],
+                ),
+            ];
+            const simulation = placeModels(models, time);
+            for (const id of ["vestaSpaceTelescope", "newJulesVerne"]) {
+                const target = simulation.getTransform(id);
+                expect(target).toBeDefined();
+                if (target === undefined) {
+                    continue;
+                }
+                const observer = target.position.add(new Vector3(0, 20_000, 0));
+                expect(getMostInfluentialObject(simulation.getObjects(), observer)?.id).toBe(id);
             }
-            const observer = target.position.add(new Vector3(0, 20_000, 0));
-            expect(getMostInfluentialObject(simulation.getObjects(), observer)?.id).toBe(id);
-        }
-        const planet = simulation.getTransform("aphrodite");
-        expect(planet).toBeDefined();
-        if (planet !== undefined) {
-            expect(
-                getMostInfluentialObject(simulation.getObjects(), planet.position.add(new Vector3(0, 2e6, 0)))?.id,
-            ).toBe("aphrodite");
-        }
-    });
+            const planet = simulation.getTransform("aphrodite");
+            expect(planet).toBeDefined();
+            if (planet !== undefined) {
+                expect(
+                    getMostInfluentialObject(simulation.getObjects(), planet.position.add(new Vector3(0, 2e6, 0)))?.id,
+                ).toBe("aphrodite");
+            }
+        },
+    );
 
     it("keeps generated stations and elevators selectable near their orbital terminals", () => {
         const { starSystem } = getVestaModel();

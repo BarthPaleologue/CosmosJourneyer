@@ -23,6 +23,7 @@ import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
+import type { RenderingAssets } from "../assets/renderingAssets";
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
 import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
@@ -41,6 +42,7 @@ type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
 
 export type SystemEntityLoadContext = Readonly<{
     scene: Scene;
+    assets: RenderingAssets;
     orbitalObjects: ReadonlyArray<OrbitalObject>;
     orbitalSimulation: KeplerianOrbitalSimulation;
     terrainSystem: ITerrainSystem;
@@ -66,7 +68,7 @@ export class SystemEntityLoader {
         const onSurfacePlacementModels: Array<SurfacePlacementRequest> = [];
         const entityContents = new Map<string, { model: DeepReadonly<SystemEntityModel>; content: SystemContent }>();
         for (const model of models) {
-            const contentResult = this.createContent(model, context.scene);
+            const contentResult = this.createContent(model, context.scene, context.assets);
             if (!contentResult.success) {
                 return contentResult;
             }
@@ -118,8 +120,12 @@ export class SystemEntityLoader {
         return ok(systemEntities);
     }
 
-    private createContent(model: DeepReadonly<SystemEntityModel>, scene: Scene): Result<SystemContent, Error> {
-        const context = { scene };
+    private createContent(
+        model: DeepReadonly<SystemEntityModel>,
+        scene: Scene,
+        assets: RenderingAssets,
+    ): Result<SystemContent, Error> {
+        const context = { scene, assets };
         const factory = this.registry.get(model.content.type);
         if (factory === undefined) {
             return err(new Error(`No SystemContent factory registered for "${model.content.type}"`));

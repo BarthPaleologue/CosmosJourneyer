@@ -196,6 +196,7 @@ export class StarSystemController {
 
         const entityLoaderContext: SystemEntityLoadContext = {
             scene,
+            assets,
             terrainSystem,
             orbitalObjects,
             orbitalSimulation,

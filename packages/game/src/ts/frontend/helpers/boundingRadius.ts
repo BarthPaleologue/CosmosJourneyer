@@ -19,5 +19,10 @@ import type { TransformNode } from "@babylonjs/core/pure";
 
 export function getBoundingRadius(transform: TransformNode): number {
     const { min: boundingMin, max: boundingMax } = transform.getHierarchyBoundingVectors();
-    return boundingMax.subtract(boundingMin).length() / 2;
+    const origin = transform.getAbsolutePosition();
+    return Math.hypot(
+        Math.max(Math.abs(boundingMin.x - origin.x), Math.abs(boundingMax.x - origin.x)),
+        Math.max(Math.abs(boundingMin.y - origin.y), Math.abs(boundingMax.y - origin.y)),
+        Math.max(Math.abs(boundingMin.z - origin.z), Math.abs(boundingMax.z - origin.z)),
+    );
 }

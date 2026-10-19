@@ -96,6 +96,7 @@ export class CreditsPanel {
 
         const materialsCredits = [
             'Awesome PBR materials from <a target="_blank" href="https://freepbr.com">freepbr.com</a>',
+            'Foil 003 insulation material from <a target="_blank" href="https://ambientcg.com/view?id=Foil003">ambientCG</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
             'Solar panel material from <a target="_blank" href="https://www.texturecan.com/details/208/">texturecan.com</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
             'Metallic Tire material from <a target="_blank" href="https://www.texturecan.com/details/445/">texturecan.com</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
             'Rubber Tire material from <a target="_blank" href="https://www.texturecan.com/details/575/">texturecan.com</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
