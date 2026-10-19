@@ -49,6 +49,8 @@ import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel
 import { CropType } from "@/utils/agriculture";
 
 import type { MonolithModel } from "../monolith/entity";
+import { createSpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
+import type { SpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
 
 export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
@@ -413,6 +415,36 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
+    const spaceTelescopeOrbitRadius = astronomicalUnitToMeters(3);
+    const spaceTelescope: SystemEntityModel<SpaceTelescopeModel> = {
+        id: "vestaSpaceTelescope",
+        name: "Vesta Deep Space Telescope",
+        content: createSpaceTelescopeModel(),
+        placement: {
+            type: "inOrbit",
+            mass: 100_000,
+            orbit: {
+                parentIds: [vesta.id],
+                semiMajorAxis: spaceTelescopeOrbitRadius,
+                eccentricity: 0,
+                inclination: 0,
+                longitudeOfAscendingNode: 0,
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: 0,
+                p: 2,
+            },
+            attitude: {
+                spin: {
+                    axialTilt: 0,
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                    siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, vesta.mass),
+                },
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+            },
+        },
+    };
+
     return {
         starSystem: {
             name: "Vesta",
@@ -423,6 +455,6 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             anomalies: [],
             orbitalFacilities: [newJulesVerne],
         },
-        systemEntities: [monolith],
+        systemEntities: [monolith, spaceTelescope],
     };
 }
