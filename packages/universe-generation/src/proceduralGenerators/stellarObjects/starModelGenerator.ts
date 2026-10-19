@@ -22,7 +22,7 @@ import type { StellarType } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, wheelOfFortune, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalObjectModel, Orbit, StarModel, Rotation } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectModel, Orbit, StarModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export function generateStarModel(
     id: string,
@@ -39,10 +39,10 @@ export function generateStarModel(
     const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
     const mass = 1.9885e30;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 24 * 60 * 60,
         axialTilt: 0,
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -76,7 +76,7 @@ export function generateStarModel(
         orbit,
         blackBodyTemperature: temperature,
         mass,
-        rotation,
+        spin,
         rings,
     };
 }

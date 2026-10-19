@@ -18,7 +18,7 @@
 import type { OrbitalObjectType } from "./index";
 import type { Orbit } from "./orbit";
 import type { OrbitalObjectId } from "./orbitalObjectId";
-import type { Rotation } from "./rotation";
+import type { SpinModel } from "./spinModel";
 
 /**
  * Describes the model of an orbital object
@@ -47,5 +47,5 @@ export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
     mass: number;
 
     /** Rotational elements of the object */
-    rotation: Rotation;
+    spin: SpinModel;
 };

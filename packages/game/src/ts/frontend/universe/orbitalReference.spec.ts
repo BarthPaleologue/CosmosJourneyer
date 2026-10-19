@@ -67,12 +67,12 @@ describe("orbital reference selection", () => {
                 initialMeanAnomaly: 0,
                 p: 2,
             },
-            rotation: { axialTilt: 0, spinAxisAzimuth: 0, siderealPeriod: 0, initialRotationAngle: 0 },
+            spin: { axialTilt: 0, axisAzimuth: 0, siderealPeriod: 0, initialRotationAngle: 0 },
         };
     }
 
     function placeModels(
-        models: ReadonlyArray<Pick<KeplerianObject, "id" | "mass" | "orbit" | "rotation">>,
+        models: ReadonlyArray<Pick<KeplerianObject, "id" | "mass" | "orbit" | "spin">>,
         time = 0,
     ): KeplerianOrbitalSimulation {
         const objects = models.map((model) => ({ ...object(model.id, model.mass, Vector3.Zero()), ...model }));
@@ -148,7 +148,9 @@ describe("orbital reference selection", () => {
             ...starSystem.satellites,
             ...starSystem.orbitalFacilities,
             ...systemEntities.flatMap((entity) =>
-                entity.placement.type === "inOrbit" ? [{ id: entity.id, ...entity.placement }] : [],
+                entity.placement.type === "inOrbit"
+                    ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
+                    : [],
             ),
         ];
         const simulation = placeModels(models, time);
@@ -220,7 +222,9 @@ describe("orbital reference selection", () => {
         const models = [
             ...systemModel.stellarObjects,
             ...systemEntityModels.flatMap((entity) =>
-                entity.placement.type === "inOrbit" ? [{ id: entity.id, ...entity.placement }] : [],
+                entity.placement.type === "inOrbit"
+                    ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
+                    : [],
             ),
             ...systemModel.orbitalFacilities,
         ];

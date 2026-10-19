@@ -20,7 +20,7 @@ import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type { CelestialBodyModel, Orbit, BlackHoleModel, Rotation } from "@cosmos-journeyer/universe-model";
+import type { CelestialBodyModel, Orbit, BlackHoleModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export function generateBlackHoleModel(
     id: string,
@@ -51,10 +51,10 @@ export function generateBlackHoleModel(
 
     const blackHoleMass = getMassFromSchwarzschildRadius(schwarzschildRadius);
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 1.5e-19,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -67,7 +67,7 @@ export function generateBlackHoleModel(
         name,
         mass: blackHoleMass,
         blackBodyTemperature: blackHoleBlackBodyTemperature,
-        rotation,
+        spin,
         accretionDiskRadius: blackHoleAccretionDiskRadius,
         orbit,
     };

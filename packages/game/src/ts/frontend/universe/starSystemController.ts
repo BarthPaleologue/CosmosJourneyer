@@ -362,7 +362,7 @@ export class StarSystemController {
             return;
         }
 
-        const relativeTransformFrame = getNavigationReferenceFrame(referenceObject.rotation.siderealPeriod);
+        const relativeTransformFrame = getNavigationReferenceFrame(referenceObject.spin.siderealPeriod);
         const localFrameOrientation =
             relativeTransformFrame === "reference"
                 ? referenceAnchorOrientation.multiply(referenceTransform.orientation.conjugate())

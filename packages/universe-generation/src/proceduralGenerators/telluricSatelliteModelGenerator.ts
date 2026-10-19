@@ -39,7 +39,7 @@ import type {
     OceanModel,
     Orbit,
     TelluricSatelliteModel,
-    Rotation,
+    SpinModel,
 } from "@cosmos-journeyer/universe-model";
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
@@ -146,7 +146,7 @@ export function generateTelluricSatelliteModel(
     let parentAverageAxialTilt = 0;
     for (const parent of parentBodies) {
         parentAverageInclination += parent.orbit.inclination;
-        parentAverageAxialTilt += parent.rotation.axialTilt;
+        parentAverageAxialTilt += parent.spin.axialTilt;
     }
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
@@ -167,10 +167,10 @@ export function generateTelluricSatelliteModel(
         initialMeanAnomaly: 0,
     };
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum),
         axialTilt: 0,
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -199,7 +199,7 @@ export function generateTelluricSatelliteModel(
         name,
         mass,
         radius,
-        rotation,
+        spin,
         composition: {
             rock: 1 - waterAmount,
             h2o: waterAmount,

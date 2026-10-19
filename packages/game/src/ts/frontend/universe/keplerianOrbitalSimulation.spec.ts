@@ -56,9 +56,9 @@ function createTestOrbitalObject(
             eccentricity: 0,
             p: 2,
         },
-        rotation: {
+        spin: {
             axialTilt: 0,
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             siderealPeriod,
             initialRotationAngle: 0,
         },

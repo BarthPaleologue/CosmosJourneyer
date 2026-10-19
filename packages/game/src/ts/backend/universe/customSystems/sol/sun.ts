@@ -9,10 +9,10 @@ export function getSunModel(): StarModel {
         radius: 695_508e3,
         mass: 1.989e30,
         blackBodyTemperature: 5778,
-        rotation: {
+        spin: {
             siderealPeriod: durationToSeconds({ days: 25.67 }),
             axialTilt: degreesToRadians(7.25),
-            spinAxisAzimuth: 0,
+            axisAzimuth: 0,
             initialRotationAngle: 0,
         },
         orbit: {

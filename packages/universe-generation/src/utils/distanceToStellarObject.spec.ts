@@ -50,10 +50,10 @@ describe("distanceToStellarObject", () => {
                     longitudeOfAscendingNode: 0,
                     eccentricity: 0,
                 },
-                rotation: {
+                spin: {
                     siderealPeriod: 0,
                     axialTilt: 0,
-                    spinAxisAzimuth: 0,
+                    axisAzimuth: 0,
                     initialRotationAngle: 0,
                 },
                 seed: 0,
@@ -78,10 +78,10 @@ describe("distanceToStellarObject", () => {
                     longitudeOfAscendingNode: 0,
                     eccentricity: 0,
                 },
-                rotation: {
+                spin: {
                     siderealPeriod: 0,
                     axialTilt: 0,
-                    spinAxisAzimuth: 0,
+                    axisAzimuth: 0,
                     initialRotationAngle: 0,
                 },
                 seed: 0,
@@ -120,10 +120,10 @@ describe("distanceToStellarObject", () => {
                 solarPanelEfficiency: 0.4,
                 agricultureMix: [],
                 seed: 0,
-                rotation: {
+                spin: {
                     siderealPeriod: 0,
                     axialTilt: 0,
-                    spinAxisAzimuth: 0,
+                    axisAzimuth: 0,
                     initialRotationAngle: 0,
                 },
                 starSystemCoordinates: {

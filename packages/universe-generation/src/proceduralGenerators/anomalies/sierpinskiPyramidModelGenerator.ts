@@ -22,7 +22,7 @@ import { clamp } from "#/utils/math";
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { SierpinskiPyramidModel, OrbitalObjectModel, Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { SierpinskiPyramidModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export function generateSierpinskiPyramidModel(
     id: string,
@@ -59,10 +59,10 @@ export function generateSierpinskiPyramidModel(
 
     const mass = DefaultAnomalyMass;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 0,
         axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -74,6 +74,6 @@ export function generateSierpinskiPyramidModel(
         accentColor,
         orbit,
         mass,
-        rotation,
+        spin,
     };
 }

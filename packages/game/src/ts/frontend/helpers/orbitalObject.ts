@@ -62,7 +62,7 @@ export function toKeplerian(orbitalObject: OrbitalObject): KeplerianObject {
         id: orbitalObject.model.id,
         mass: orbitalObject.model.mass,
         orbit: orbitalObject.model.orbit,
-        rotation: orbitalObject.model.rotation,
+        spin: orbitalObject.model.spin,
         getTransform: () => orbitalObject.getTransform(),
     };
 }

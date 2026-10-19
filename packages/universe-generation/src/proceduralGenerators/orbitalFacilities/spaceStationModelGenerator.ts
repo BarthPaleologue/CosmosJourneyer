@@ -40,7 +40,7 @@ import type {
     SpaceStationModel,
     StationSectionModel,
     StarSystemModel,
-    Rotation,
+    SpinModel,
 } from "@cosmos-journeyer/universe-model";
 
 import { generateEngineBayModel } from "./sections/engineBay";
@@ -92,10 +92,10 @@ export function generateSpaceStationModel(
 
     const mass = DefaultOrbitalFacilityMass;
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: 0,
         axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -232,7 +232,7 @@ export function generateSpaceStationModel(
         name,
         orbit,
         mass,
-        rotation,
+        spin,
         population,
         annualEnergyPerCapitaKWh,
         populationDensity: targetPopulationDensity,

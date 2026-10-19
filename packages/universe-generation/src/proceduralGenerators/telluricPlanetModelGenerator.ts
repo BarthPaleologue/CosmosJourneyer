@@ -35,7 +35,7 @@ import type {
     OceanModel,
     Orbit,
     RingsModel,
-    Rotation,
+    SpinModel,
     StellarObjectModel,
     TelluricPlanetModel,
 } from "@cosmos-journeyer/universe-model";
@@ -74,7 +74,7 @@ export function generateTelluricPlanetModel(
     let parentAverageAxialTilt = 0;
     for (const parent of parentBodies) {
         parentAverageInclination += parent.orbit.inclination;
-        parentAverageAxialTilt += parent.rotation.axialTilt;
+        parentAverageAxialTilt += parent.spin.axialTilt;
     }
     parentAverageInclination /= parentBodies.length;
     parentAverageAxialTilt /= parentBodies.length;
@@ -119,10 +119,10 @@ export function generateTelluricPlanetModel(
 
     const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
 
-    const rotation: Rotation = {
+    const spin: SpinModel = {
         siderealPeriod: (60 * 60 * 24) / 10,
         axialTilt: normalRandom(0, 0.2, rng, GenerationSteps.AXIAL_TILT),
-        spinAxisAzimuth: 0,
+        axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
@@ -173,7 +173,7 @@ export function generateTelluricPlanetModel(
         seed,
         name,
         mass,
-        rotation,
+        spin,
         composition: {
             rock: 1 - waterAmount,
             h2o: waterAmount,

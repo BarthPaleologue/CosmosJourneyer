@@ -2,9 +2,11 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { computeLpFactor, getOrbitalPeriod, keplerEquation } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
+import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
 import { findMinimumNewtonRaphson } from "@/utils/math";
+
+type OrbitalPlane = DeepReadonly<Pick<Orbit, "inclination" | "longitudeOfAscendingNode">>;
 
 /**
  *
@@ -49,25 +51,27 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 }
 
 export function computeAbsoluteOrientation(
-    orbitalInclination: number,
-    rotation: DeepReadonly<Rotation>,
+    orbitalPlane: OrbitalPlane,
+    spin: DeepReadonly<SpinModel>,
     elapsedSeconds: number,
 ): Quaternion {
-    const spinAxisOrientation = computeSpinAxisOrientation(orbitalInclination, rotation);
+    const spinAxisOrientation = computeSpinAxisOrientation(orbitalPlane, spin);
 
-    let rotationAngle = rotation.initialRotationAngle;
-    if (rotation.siderealPeriod !== 0) {
-        rotationAngle += (2 * Math.PI * elapsedSeconds) / rotation.siderealPeriod;
+    let rotationAngle = spin.initialRotationAngle;
+    if (spin.siderealPeriod !== 0) {
+        rotationAngle += (2 * Math.PI * elapsedSeconds) / spin.siderealPeriod;
     }
 
     return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
 }
 
-export function computeSpinAxisOrientation(orbitalInclination: number, rotation: DeepReadonly<Rotation>): Quaternion {
-    const orbitOrientation = Quaternion.RotationAxis(Axis.Z, orbitalInclination);
+export function computeSpinAxisOrientation(orbitalPlane: OrbitalPlane, spin: DeepReadonly<SpinModel>): Quaternion {
+    const orbitOrientation = Quaternion.RotationAxis(Axis.Y, orbitalPlane.longitudeOfAscendingNode).multiply(
+        Quaternion.RotationAxis(Axis.Z, orbitalPlane.inclination),
+    );
 
-    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Z, rotation.axialTilt).multiply(
-        Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth),
+    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Y, spin.axisAzimuth).multiply(
+        Quaternion.RotationAxis(Axis.Z, spin.axialTilt),
     );
 
     return orbitOrientation.multiply(spinAxisLocalOrientation);
