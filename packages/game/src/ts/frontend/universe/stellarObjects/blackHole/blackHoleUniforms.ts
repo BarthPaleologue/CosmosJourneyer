@@ -64,9 +64,7 @@ export class BlackHoleUniforms {
         this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
 
-        computeSpinAxisOrientation(blackHoleModel.orbit.inclination, blackHoleModel.rotation).toRotationMatrix(
-            this.diskRotation,
-        );
+        computeSpinAxisOrientation(blackHoleModel.orbit, blackHoleModel.rotation).toRotationMatrix(this.diskRotation);
         this.diskRotation.transposeToRef(this.inverseDiskRotation);
     }
 

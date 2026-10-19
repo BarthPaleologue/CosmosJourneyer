@@ -6,6 +6,8 @@ import type { Orbit, Rotation } from "@cosmos-journeyer/universe-model";
 
 import { findMinimumNewtonRaphson } from "@/utils/math";
 
+type OrbitalPlane = DeepReadonly<Pick<Orbit, "inclination" | "longitudeOfAscendingNode">>;
+
 /**
  *
  * @param orbit
@@ -49,11 +51,11 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 }
 
 export function computeAbsoluteOrientation(
-    orbitalInclination: number,
+    orbitalPlane: OrbitalPlane,
     rotation: DeepReadonly<Rotation>,
     elapsedSeconds: number,
 ): Quaternion {
-    const spinAxisOrientation = computeSpinAxisOrientation(orbitalInclination, rotation);
+    const spinAxisOrientation = computeSpinAxisOrientation(orbitalPlane, rotation);
 
     let rotationAngle = rotation.initialRotationAngle;
     if (rotation.siderealPeriod !== 0) {
@@ -63,11 +65,13 @@ export function computeAbsoluteOrientation(
     return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
 }
 
-export function computeSpinAxisOrientation(orbitalInclination: number, rotation: DeepReadonly<Rotation>): Quaternion {
-    const orbitOrientation = Quaternion.RotationAxis(Axis.Z, orbitalInclination);
+export function computeSpinAxisOrientation(orbitalPlane: OrbitalPlane, rotation: DeepReadonly<Rotation>): Quaternion {
+    const orbitOrientation = Quaternion.RotationAxis(Axis.Y, orbitalPlane.longitudeOfAscendingNode).multiply(
+        Quaternion.RotationAxis(Axis.Z, orbitalPlane.inclination),
+    );
 
-    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Z, rotation.axialTilt).multiply(
-        Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth),
+    const spinAxisLocalOrientation = Quaternion.RotationAxis(Axis.Y, rotation.spinAxisAzimuth).multiply(
+        Quaternion.RotationAxis(Axis.Z, rotation.axialTilt),
     );
 
     return orbitOrientation.multiply(spinAxisLocalOrientation);

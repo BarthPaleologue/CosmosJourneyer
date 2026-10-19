@@ -24,7 +24,7 @@ export const RotationSchema = z.object({
      */
     axialTilt: z.number(),
 
-    /** The azimuth of the planet's spin axis (in radians) */
+    /** Azimuth around orbital +Y, measured from the tilt direction -X (in radians). */
     spinAxisAzimuth: z.number(),
 
     /**
