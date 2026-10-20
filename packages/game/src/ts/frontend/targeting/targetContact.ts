@@ -13,6 +13,12 @@ export type TargetContact = {
     readonly acquisition: TargetAcquisition;
 };
 
+/**
+ * Associates a target with how it became available to the player.
+ * @param target Target represented by the contact.
+ * @param acquisition Whether it is known directly or detected by sensors.
+ * @returns Contact data used by the targeting system.
+ */
 export function createTargetContact(target: Target, acquisition: TargetAcquisition): TargetContact {
     return {
         target,
@@ -20,7 +26,11 @@ export function createTargetContact(target: Target, acquisition: TargetAcquisiti
     };
 }
 
-/** Default acquisition for contacts registered by the player and star system. */
+/**
+ * Creates a contact using the default acquisition policy for its target type.
+ * @param target Target whose type determines its default acquisition state.
+ * @returns Contact initialized as known or sensor-detected.
+ */
 export function createDefaultTargetContact(target: Target): TargetContact {
     const acquisition = defaultAcquisition[target.type];
     return { target, acquisition };

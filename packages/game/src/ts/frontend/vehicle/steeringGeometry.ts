@@ -41,6 +41,10 @@ const AxleTolerance = 0.001;
  * counter-phase steering about the midpoint of the extreme steering axles.
  * Multiple fixed axles require an explicit approximation via an override.
  * Undefined means the caller must use legacy steering.
+ * @param wheels Wheel positions and steering capabilities in frame-local coordinates.
+ * @param mechanicalAngleLimit Maximum absolute steering angle in radians.
+ * @param options Optional explicit longitudinal position of the steering reference.
+ * @returns Derived turning geometry, or `undefined` when the wheel layout cannot define it.
  */
 export function deriveSteeringGeometry(
     wheels: ReadonlyArray<SteeringWheelGeometry>,
@@ -87,7 +91,15 @@ export function deriveSteeringGeometry(
     };
 }
 
-/** The requested angle is virtual: it acts at the largest steering lever arm. */
+/**
+ * The requested angle is virtual: it acts at the largest steering lever arm.
+ * @param requestedSteeringAngle Requested steering angle in radians.
+ * @param referenceLeverArm Distance from the steering reference to the outer steering axle.
+ * @param speed Vehicle speed used to limit lateral acceleration.
+ * @param maxLateralAcceleration Maximum allowed lateral acceleration.
+ * @param mechanicalAngleLimit Maximum steering angle in radians.
+ * @returns Curvature limited by steering angle and lateral acceleration.
+ */
 export function computeSpeedLimitedCurvature(
     requestedSteeringAngle: number,
     referenceLeverArm: number,
@@ -108,6 +120,10 @@ export function computeSpeedLimitedCurvature(
  * Bound curvature before computing Ackermann angles so no individual wheel hits
  * its stop early and breaks the common turning center. Positive motor angles
  * steer front wheels toward +X with the existing axle/frame constraints.
+ * @param wheels Wheel positions and steering capabilities in frame-local coordinates.
+ * @param steeringReferenceZ Longitudinal position of the turning reference.
+ * @param mechanicalAngleLimit Maximum absolute steering angle in radians.
+ * @returns Minimum and maximum curvature before any wheel exceeds its steering stop.
  */
 export function getMechanicalCurvatureLimits(
     wheels: ReadonlyArray<SteeringWheelGeometry>,
@@ -131,7 +147,14 @@ export function getMechanicalCurvatureLimits(
     };
 }
 
-/** Ackermann about (1 / curvature, steeringReferenceZ); in-phase steering bypasses this model. */
+/**
+ * Ackermann about (1 / curvature, steeringReferenceZ); in-phase steering bypasses this model.
+ * @param curvature Signed curvature of the vehicle's path.
+ * @param leverArm Wheel's longitudinal offset from the turning reference.
+ * @param mechanicalAngleLimit Maximum absolute steering angle in radians.
+ * @param lateralPosition Wheel's lateral position in the vehicle frame.
+ * @returns Clamped Ackermann steering angle in radians.
+ */
 export function getWheelSteeringAngle(
     curvature: number,
     leverArm: number,

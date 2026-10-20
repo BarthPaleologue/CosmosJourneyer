@@ -30,11 +30,13 @@ import type { Mission } from "./mission";
 import { newSightSeeingMission } from "./sightSeeingMission";
 
 /**
- * Generates sightseeing missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
- * @param spaceStationModel The space station model where the missions are generated
- * @param systemContentModel
- * @param player The player for which the missions are generated
- * @param timestampMillis The current timestamp in milliseconds
+ * Generates station missions deterministically for the current hour.
+ * @param spaceStationModel - Station offering the missions.
+ * @param systemContentModel - System content and orbital-object data.
+ * @param universeBackend - Universe lookup for target objects.
+ * @param player - Player whose accepted and completed missions are excluded.
+ * @param timestampMillis - Timestamp in milliseconds used to select the hourly set.
+ * @returns Available station and nearby-system missions not already accepted or completed.
  */
 export function generateSightseeingMissions(
     spaceStationModel: DeepReadonly<OrbitalFacilityModel>,
@@ -93,6 +95,16 @@ export function generateSightseeingMissions(
     );
 }
 
+/**
+ * Collects eligible anomaly, neutron-star, and black-hole fly-by missions in a neighboring system.
+ * @param systemModel - Target system content and orbital-object data.
+ * @param systemPosition - Galactic position used in deterministic anomaly sampling.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param distance - Distance from the mission giver in light-years.
+ * @param rng - Seeded source used to choose anomaly missions.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Generated fly-by missions for valid targets.
+ */
 function generateSightseeingMissionsInSystem(
     systemModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
@@ -121,6 +133,16 @@ function generateSightseeingMissionsInSystem(
     return missions;
 }
 
+/**
+ * Samples anomaly fly-by missions with a probability that decreases with system distance.
+ * @param systemContentModel - System content and orbital-object data.
+ * @param systemPosition - Galactic position used in deterministic anomaly sampling.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param distance - Distance from the mission giver in light-years.
+ * @param rng - Random source used to sample placements or missions.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Sampled anomaly fly-by missions.
+ */
 function generateAnomalyFlyByMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
@@ -157,6 +179,12 @@ function generateAnomalyFlyByMissionsInSystem(
     return missions;
 }
 
+/**
+ * @param systemContentModel - System content and orbital-object data.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Fly-by missions for neutron-star targets.
+ */
 function generateNeutronStarFlyByMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
@@ -187,6 +215,12 @@ function generateNeutronStarFlyByMissionsInSystem(
     return missions;
 }
 
+/**
+ * @param systemContentModel - System content and orbital-object data.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Fly-by missions for black-hole targets.
+ */
 function generateBlackHoleFlyByMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
@@ -217,6 +251,13 @@ function generateBlackHoleFlyByMissionsInSystem(
     return missions;
 }
 
+/**
+ * Creates asteroid-field missions for planets with rings.
+ * @param systemContentModel - System content and orbital-object data.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Missions for valid asteroid-field targets.
+ */
 function generateAsteroidFieldMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,
@@ -250,6 +291,13 @@ function generateAsteroidFieldMissionsInSystem(
     return missions;
 }
 
+/**
+ * Creates terminator-landing missions for telluric planets without oceans.
+ * @param systemContentModel - System content and orbital-object data.
+ * @param spaceStationUniverseId - Universe identifier of the station offering the mission.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns Missions for eligible landing targets.
+ */
 function generateTerminatorLandingMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     spaceStationUniverseId: UniverseObjectId,

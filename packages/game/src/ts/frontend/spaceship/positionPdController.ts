@@ -43,10 +43,17 @@ export class PositionPDController {
     }
 
     /**
-     * @param current
-     * @param target
-     * @param mass
-     * @returns A world-space force to apply this step.
+     * Computes a force that steers the body toward a position and velocity.
+     * @param current Current position and velocity state.
+     * @param current.position Current world-space position.
+     * @param current.velocity Current world-space velocity.
+     * @param target Desired position and velocity state.
+     * @param target.position Desired world-space position.
+     * @param target.velocity Desired world-space velocity.
+     * @param mass Mass of the controlled body.
+     * @param ref Vector that receives the computed force.
+     * @param options Optional limits on closing speed and acceleration.
+     * @returns The computed world-space force in `ref`.
      */
     computeForceToRef(
         current: { position: Vector3; velocity: Vector3 },

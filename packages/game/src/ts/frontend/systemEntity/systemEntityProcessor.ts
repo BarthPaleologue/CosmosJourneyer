@@ -55,6 +55,12 @@ export class SystemEntityProcessorRegistry<TContext, TOutput> {
     }
 }
 
+/**
+ * Adapts a typed entity processor to the registry's erased entity type.
+ * @param type Content discriminator accepted by the processor.
+ * @param processor Processor that handles entities with the narrowed type.
+ * @returns A registry processor that validates the entity discriminator before dispatch.
+ */
 function eraseProcessor<T extends AnySystemContentType, TContext, TOutput>(
     type: T,
     processor: SystemEntityProcessor<T, TContext, TOutput>,

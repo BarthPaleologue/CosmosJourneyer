@@ -24,37 +24,40 @@ import type { MissionContext } from "../missionContext";
 import type { MissionNode } from "./missionNode";
 
 /**
- * Describes any node in the mission tree.
+ * Contract shared by mission task and logic nodes.
  */
 
 export interface MissionNodeBase<TSerialized> {
     /**
-     * Returns true if the node is completed, false otherwise.
+     * @returns Whether this node is complete.
      */
     isCompleted(): boolean;
 
     /**
-     * Updates the state of the node recursively.
-     * @param context The mission context.
+     * @param context - Current mission state and player location.
      */
     updateState(context: MissionContext): void;
 
     /**
-     * Returns true if the node is equal to another node, false otherwise.
-     * @param other The other node to compare to.
+     * @param other - Node whose task tree is compared.
+     * @returns Whether both nodes represent the same task tree.
      */
     equals(other: MissionNode): boolean;
 
     /**
-     * Describes the node recursively.
-     * @param originSystemCoordinates The seed of the system where the mission has been given.
+     * @param originSystemCoordinates - Coordinates of the system that issued the mission.
+     * @param universeBackend - Universe lookup for referenced objects.
+     * @param t - Translation function for player-facing text.
+     * @returns Localized description of this subtree.
      */
     describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string;
 
     /**
-     * Describes the next task to be done in the mission subtree.
-     * @param context The mission context.
-     * @param keyboardLayout The keyboard layout map to localize the keys.
+     * @param context - Current mission state and player location.
+     * @param keyboardLayout - Keyboard code-to-label map.
+     * @param universeBackend - Universe lookup for referenced objects.
+     * @param t - Translation function for player-facing text.
+     * @returns Localized instructions for the next task.
      */
     describeNextTask(
         context: MissionContext,
@@ -64,17 +67,17 @@ export interface MissionNodeBase<TSerialized> {
     ): string;
 
     /**
-     * Returns the target systems of the subtree.
+     * @returns Systems containing active targets in this subtree.
      */
     getTargetSystems(): StarSystemCoordinates[];
 
     /**
-     * @returns mission targets that should guide the player in the current system.
+     * @returns Objects that should guide the player in the current system.
      */
     getGuidanceTargetObjectIds(): UniverseObjectId[];
 
     /**
-     * Serializes the node recursively.
+     * @returns Serialized state for this subtree.
      */
     serialize(): TSerialized;
 }

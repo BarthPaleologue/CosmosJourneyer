@@ -150,6 +150,15 @@ export class Wheel {
     }
 }
 
+/**
+ * Creates a box collision body and shape for an axle mesh.
+ * @param mesh Axle transform used by the physics body.
+ * @param mass Axle mass in kilograms.
+ * @param bounce Restitution coefficient for axle collisions.
+ * @param friction Friction coefficient for axle collisions.
+ * @param scene Scene that owns the physics aggregate.
+ * @returns The axle's physics body and collision shape.
+ */
 function AddAxlePhysics(
     mesh: TransformNode,
     mass: number,
@@ -173,6 +182,17 @@ function AddAxlePhysics(
     return { physicsBody, physicsShape };
 }
 
+/**
+ * Creates a cylindrical collision body and shape for a wheel mesh.
+ * @param mesh Wheel mesh used by the physics body.
+ * @param radius Wheel radius in world units.
+ * @param thickness Wheel thickness in world units.
+ * @param mass Wheel mass in kilograms.
+ * @param bounce Restitution coefficient for wheel collisions.
+ * @param friction Friction coefficient for wheel collisions.
+ * @param scene Scene that owns the physics aggregate.
+ * @returns The wheel's physics body and collision shape.
+ */
 function AddWheelPhysics(
     mesh: Mesh,
     radius: number,
@@ -201,6 +221,17 @@ function AddWheelPhysics(
     return { physicsBody, physicsShape };
 }
 
+/**
+ * Connects a wheel to its axle while allowing wheel rotation around the axle.
+ * @param axle Axle transform and physics body.
+ * @param axle.mesh Transform node for the axle.
+ * @param axle.body Physics body for the axle.
+ * @param wheel Wheel mesh and physics body.
+ * @param wheel.mesh Mesh for the wheel.
+ * @param wheel.body Physics body for the wheel.
+ * @param scene Scene that owns the constraint.
+ * @returns The wheel-to-axle constraint.
+ */
 function AttachWheelToAxle(
     axle: { mesh: TransformNode; body: PhysicsBody },
     wheel: { mesh: Mesh; body: PhysicsBody },
@@ -233,6 +264,14 @@ function AttachWheelToAxle(
     return motorJoint;
 }
 
+/**
+ * Connects an axle to the vehicle frame with suspension and optional steering.
+ * @param axle Physics body for the axle.
+ * @param frame Physics body for the vehicle frame.
+ * @param scene Scene that owns the constraint.
+ * @param steerable Whether the axle can rotate to steer.
+ * @returns The axle-to-frame constraint.
+ */
 function AttachAxleToFrame(
     axle: PhysicsBody,
     frame: PhysicsBody,
@@ -300,6 +339,13 @@ function AttachAxleToFrame(
     return joint;
 }
 
+/**
+ * Creates the transform node used to render and attach an axle.
+ * @param position Axle center in vehicle-local coordinates.
+ * @param radius Axle radius in world units.
+ * @param scene Scene that owns the axle mesh.
+ * @returns The axle transform node.
+ */
 export function CreateAxle(position: Vector3, radius: number, scene: Scene): TransformNode {
     const axleMesh = new TransformNode("Axle", scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
@@ -308,6 +354,17 @@ export function CreateAxle(position: Vector3, radius: number, scene: Scene): Tra
     return axleMesh;
 }
 
+/**
+ * Creates a wheel mesh with separate materials for its wheel and tire.
+ * @param position Wheel center in vehicle-local coordinates.
+ * @param radius Wheel radius in world units.
+ * @param thickness Wheel thickness in world units.
+ * @param materials Materials applied to the wheel and tire surfaces.
+ * @param materials.wheel Material for the wheel body.
+ * @param materials.tire Material for the tire surface.
+ * @param scene Scene that owns the mesh.
+ * @returns The configured wheel mesh.
+ */
 export function CreateWheel(
     position: Vector3,
     radius: number,

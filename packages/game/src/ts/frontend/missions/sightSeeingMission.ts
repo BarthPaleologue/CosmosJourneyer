@@ -30,22 +30,21 @@ import { MissionFlyByNode } from "./nodes/actions/sightseeing/missionFlyByNode";
 import { MissionTerminatorLandingNode } from "./nodes/actions/sightseeing/missionTerminatorLandingNode";
 import type { MissionNode } from "./nodes/missionNode";
 
-/**
- * Sightseeing mission types are a subset of mission types.
- */
 export type SightSeeingType =
     | (typeof MissionType)["SIGHT_SEEING_FLY_BY"]
     | (typeof MissionType)["SIGHT_SEEING_TERMINATOR_LANDING"]
     | (typeof MissionType)["SIGHT_SEEING_ASTEROID_FIELD"];
 
-/**
- * Defines a target for a sightseeing mission and the type of sightseeing mission.
- */
 export type SightSeeingTarget = {
     type: SightSeeingType;
     objectId: UniverseObjectId;
 };
 
+/**
+ * @param target - Sightseeing action type and target universe identifier.
+ * @param universeBackend - Universe lookup for target objects.
+ * @returns The action node, or null when the target cannot be resolved.
+ */
 function generateMissionTree(target: SightSeeingTarget, universeBackend: UniverseBackend): MissionNode | null {
     switch (target.type) {
         case MissionType.SIGHT_SEEING_FLY_BY:
@@ -60,9 +59,9 @@ function generateMissionTree(target: SightSeeingTarget, universeBackend: Univers
 }
 
 /**
- * Creates a new sightseeing mission from a mission giver to a target.
- * @param missionGiver The space station that gives the mission.
- * @param target The target of the sightseeing mission.
+ * @param missionGiver - Station offering the mission.
+ * @param target - Target and sightseeing action type.
+ * @param universeBackend - Universe lookup for target objects.
  * @returns The new sightseeing mission.
  */
 export function newSightSeeingMission(

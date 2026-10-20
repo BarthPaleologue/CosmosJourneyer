@@ -61,6 +61,11 @@ type TestWheelLayout = {
     readonly powered?: boolean;
 };
 
+/**
+ * Creates wheel instances using the requested test layout.
+ * @param layout Wheel positions and steering capabilities.
+ * @returns The test scene, frame, and constructed wheels.
+ */
 function createWheels(layout: ReadonlyArray<TestWheelLayout> = [{ z: 2.6, steerable: true }]) {
     const engine = new NullEngine();
     const scene = new Scene(engine);

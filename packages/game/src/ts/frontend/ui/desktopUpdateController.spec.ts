@@ -181,6 +181,11 @@ describe("DesktopUpdateController", () => {
     });
 });
 
+/**
+ * Creates test player actions with a fixed successful update flow.
+ * @param getContext Provides the current update presentation context.
+ * @returns The mocked player actions consumed by the update controller.
+ */
 function createPlayerActions(getContext: () => UpdatePresentationContext): DesktopUpdatePlayerActions {
     return {
         getPresentationContext: getContext,

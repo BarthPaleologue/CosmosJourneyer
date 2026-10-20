@@ -251,6 +251,7 @@ export class StellarPathfinder {
 
     /**
      * Get the progress of the pathfinder as a number between 0 and 1
+     * @returns Search progress from zero to one.
      */
     getProgress(): number {
         if (this.startSystem === null || this.targetSystem === null) {

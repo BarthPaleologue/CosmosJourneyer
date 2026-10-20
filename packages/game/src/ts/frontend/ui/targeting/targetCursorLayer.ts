@@ -79,7 +79,10 @@ export class TargetCursorLayer {
         }
     }
 
-    /** Returns the same canonical contact whose hover indication was rendered, without resolving again. */
+    /**
+     * Returns the same canonical target whose hover indication was rendered.
+     * @returns The hovered target, or `null` when no target is hovered.
+     */
     public getHoveredTarget(): Target | null {
         return this.hoveredTarget;
     }

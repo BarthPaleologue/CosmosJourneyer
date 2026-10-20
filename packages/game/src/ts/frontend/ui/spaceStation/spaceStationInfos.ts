@@ -25,6 +25,12 @@ import { makeD3PieChart } from "@/frontend/helpers/d3PieChart";
 import { cropTypeToString } from "@/utils/agriculture";
 import type { CropType } from "@/utils/agriculture";
 
+/**
+ * Generates station information markup from the station and its orbital parents.
+ * @param model Orbital facility model whose information is displayed.
+ * @param parentModels Models of the bodies orbited by the station.
+ * @returns HTML containing the station's orbital, population, and agriculture details.
+ */
 export function generateInfoHTML(
     model: DeepReadonly<OrbitalFacilityModel>,
     parentModels: DeepReadonly<Array<OrbitalObjectModel>>,

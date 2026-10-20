@@ -158,19 +158,16 @@ export class StarSystemView implements View {
 
     /**
      * The default controls are used for debug purposes. They allow to move freely between orbital objects without speed limitations.
-     * @private
      */
     private defaultControls: DefaultControls | null = null;
 
     /**
      * The spaceship controls are used to control the spaceship. They allow to move the spaceship and to enable the warp drive.
-     * @private
      */
     private spaceshipControls: ShipControls | null = null;
 
     /**
      * The character controls are used to control the character when out of the spaceship. They allow to move the character.
-     * @private
      */
     private characterControls: CharacterControls | null = null;
 
@@ -178,19 +175,16 @@ export class StarSystemView implements View {
 
     /**
      * A debug helper to display the orbits of the orbital objects
-     * @private
      */
     private readonly orbitRenderer: OrbitRenderer = new OrbitRenderer(CreateLinesHelper);
 
     /**
      * A debug helper to display the axes of the orbital objects
-     * @private
      */
     private readonly axisRenderer: AxisRenderer = new AxisRenderer(CreateLinesHelper);
 
     /**
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
-     * @private
      */
     private starSystem: StarSystemController | null = null;
 
@@ -224,13 +218,11 @@ export class StarSystemView implements View {
 
     /**
      * A lock to prevent multiple executions of the jump to system action
-     * @private
      */
     private jumpLock = false;
 
     /**
      * Whether the star system is currently loading or not
-     * @private
      */
     private _isLoadingSystem = false;
 
@@ -266,11 +258,14 @@ export class StarSystemView implements View {
      * @param physicsEngine The physics engine V2 instance
      * @param encyclopaedia The encyclopaedia manager
      * @param universeBackend The universe backend
+     * @param systemEntityLoader Loads runtime content for system entities.
+     * @param systemEntityProcessors Handles render and gameplay behavior for entities.
      * @param soundPlayer The sound player
      * @param tts The text-to-speech system
      * @param notificationManager The notification manager
      * @param assets The rendering assets
      * @param terrainSystem The system used to generate surface chunks for telluric planets
+     * @param t Translation function for player-facing text.
      * @param progressMonitor The loading progress monitor to report star system loading progress
      */
     constructor(
@@ -536,7 +531,8 @@ export class StarSystemView implements View {
 
     /**
      * Dispose the previous star system and incrementally loads the new star system. All the assets are instantiated but the system still need to be initialized
-     * @param systemContentModel
+     * @param systemContentModel Model whose orbital objects and entities are loaded.
+     * @returns The loaded star system controller, or an error if loading fails.
      */
     public async loadStarSystem(
         systemContentModel: DeepReadonly<StarSystemContentModel>,
@@ -602,6 +598,7 @@ export class StarSystemView implements View {
     /**
      * Initializes the star system. It initializes the positions of the orbital objects, the UI and the post processes
      * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
+     * @param timestampSeconds Simulation time in seconds used to initialize orbital positions.
      */
     public initStarSystem(timestampSeconds: number): void {
         const starSystem = this.getStarSystem();
@@ -742,6 +739,7 @@ export class StarSystemView implements View {
 
     /**
      * Instantiates the incoming player's spaceship before atomically replacing the current player and controls.
+     * @param nextPlayer Player state whose spaceship and controls replace the current ones.
      */
     public async resetPlayer(nextPlayer: Player): Promise<void> {
         const spaceshipSerialized = nextPlayer.serializedSpaceships[0];
@@ -1215,7 +1213,7 @@ export class StarSystemView implements View {
     /**
      * Returns the spaceship controls
      * @returns the spaceship controls
-     * @throws Error if the spaceship controls is null (the assets are not initialized, you must call `initAssets` before)
+     * @throws {Error} If spaceship controls have not been initialized.
      */
     public getSpaceshipControls(): ShipControls {
         if (this.spaceshipControls === null) {
@@ -1227,7 +1225,7 @@ export class StarSystemView implements View {
     /**
      * Returns the character controls
      * @returns the character controls
-     * @throws Error if the character controls is null (the assets are not initialized, you must call `initAssets` before)
+     * @throws {Error} If character controls have not been initialized.
      */
     public getCharacterControls(): CharacterControls {
         if (this.characterControls === null) {
@@ -1239,7 +1237,7 @@ export class StarSystemView implements View {
     /**
      * Returns the default controls
      * @returns the default controls
-     * @throws Error if the default controls is null (the assets are not initialized, you must call `initAssets` before)
+     * @throws {Error} If default controls have not been initialized.
      */
     public getDefaultControls(): DefaultControls {
         if (this.defaultControls === null) {
@@ -1312,6 +1310,7 @@ export class StarSystemView implements View {
 
     /**
      * Switches the active controller to the default controls
+     * @param showHelpNotification Whether to display the default-controls help notification.
      */
     public async switchToDefaultControls(showHelpNotification: boolean): Promise<void> {
         const shipControls = this.getSpaceshipControls();
@@ -1448,7 +1447,7 @@ export class StarSystemView implements View {
     /**
      * Returns the star system
      * @returns the star system
-     * @throws Error if the star system is null
+     * @throws {Error} If the star system has not been initialized.
      */
     public getStarSystem(): StarSystemController {
         if (this.starSystem === null) {

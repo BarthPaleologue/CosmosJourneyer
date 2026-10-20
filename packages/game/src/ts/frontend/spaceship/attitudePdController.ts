@@ -48,7 +48,16 @@ export class AttitudePDController {
     }
 
     /**
-     * Returns world-space torque to apply this step.
+     * Computes torque to reduce orientation and angular-velocity error.
+     * @param current Current orientation and angular velocity.
+     * @param current.orientation Current body orientation.
+     * @param current.angularVelocity Current world-space angular velocity.
+     * @param target Desired orientation and angular velocity.
+     * @param target.orientation Desired body orientation.
+     * @param target.angularVelocity Desired world-space angular velocity.
+     * @param massProps Body mass and principal inertia properties.
+     * @param ref Vector that receives the computed world-space torque.
+     * @returns The computed torque in `ref`.
      */
     computeTorqueToRef(
         current: { orientation: Quaternion; angularVelocity: Vector3 },

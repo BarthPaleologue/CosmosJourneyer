@@ -19,6 +19,12 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+/**
+ * Prompts for an Encyclopaedia Galactica server and account credentials.
+ * @param soundPlayer Plays the dialog confirmation sound.
+ * @param t Translation function for the cancel action.
+ * @returns Entered server credentials, or `null` when the dialog is cancelled.
+ */
 export async function connectEncyclopaediaGalacticaModal(
     soundPlayer: ISoundPlayer,
     t: TFunction,

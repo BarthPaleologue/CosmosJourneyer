@@ -26,6 +26,12 @@ describe("TargetingSystem", () => {
         engine.dispose();
     });
 
+    /**
+     * Creates a target fixture at a position relative to the test scene.
+     * @param x Horizontal position in scene units.
+     * @param z Forward position in scene units.
+     * @returns Target backed by the created transform.
+     */
     function createTarget(x: number, z: number): Target {
         const transform = new TransformNode("target", scene);
         transform.position.set(x, 0, z);

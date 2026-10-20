@@ -37,6 +37,12 @@ export type GreasedLinePath = Readonly<{
 
 type GetSystemGalacticPosition = (system: DeepReadonly<StarSystemCoordinates>) => Vector3Like;
 
+/**
+ * Creates a canonical key for a system-to-system edge independent of direction.
+ * @param from First endpoint's star system coordinates.
+ * @param to Second endpoint's star system coordinates.
+ * @returns Stable key shared by the edge in either direction.
+ */
 function getUndirectedSystemSegmentKey(
     from: DeepReadonly<StarSystemCoordinates>,
     to: DeepReadonly<StarSystemCoordinates>,
@@ -47,6 +53,11 @@ function getUndirectedSystemSegmentKey(
     return fromKey < toKey ? `${fromKey}|${toKey}` : `${toKey}|${fromKey}`;
 }
 
+/**
+ * Extracts unique undirected edges from a route, skipping repeats and self-edges.
+ * @param systems Ordered star systems that form the route.
+ * @returns Unique adjacent system segments in encounter order.
+ */
 export function getUniqueSystemSegments(systems: DeepReadonly<Array<StarSystemCoordinates>>): StarSystemSegment[] {
     const visitedSegmentKeys = new Set<string>();
     const segments: StarSystemSegment[] = [];
@@ -75,6 +86,12 @@ export function getUniqueSystemSegments(systems: DeepReadonly<Array<StarSystemCo
     return segments;
 }
 
+/**
+ * Builds a greased-line path from unique route segments, hiding gaps between disjoint runs.
+ * @param systems Ordered star systems that form the route.
+ * @param getSystemGalacticPosition Resolves each system's galactic position.
+ * @returns Line points and paired widths for rendering the route.
+ */
 export function getGreasedLinePathFromSystemSegments(
     systems: DeepReadonly<Array<StarSystemCoordinates>>,
     getSystemGalacticPosition: GetSystemGalacticPosition,

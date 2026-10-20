@@ -22,6 +22,13 @@ export type RingWarpInfluence = {
 
 export type WarpInfluence = SolidWarpInfluence | RingWarpInfluence;
 
+/**
+ * Converts clearance from a collision volume into a bounded warp speed.
+ * @param collisionDistance Distance from the ship to the collision volume.
+ * @param minWarpSpeed Lower bound for the allowed warp speed.
+ * @param maxWarpSpeed Upper bound for the allowed warp speed.
+ * @returns A target speed within the supplied bounds.
+ */
 function computeTargetSpeedFromCollisionDistance(
     collisionDistance: number,
     minWarpSpeed: number,
@@ -34,6 +41,14 @@ function computeTargetSpeedFromCollisionDistance(
     return clamp(Math.max(closeSpeed, deepSpaceSpeed), minWarpSpeed, maxWarpSpeed);
 }
 
+/**
+ * Computes the warp speed limit from clearance to a solid body.
+ * @param influence Solid body's center and radius.
+ * @param shipPosition Ship's world-space position.
+ * @param minWarpSpeed Lower bound for the allowed warp speed.
+ * @param maxWarpSpeed Upper bound for the allowed warp speed.
+ * @returns The speed limit imposed by the body.
+ */
 function computeSolidInfluenceTargetSpeed(
     influence: SolidWarpInfluence,
     shipPosition: Vector3,
@@ -47,6 +62,13 @@ function computeSolidInfluenceTargetSpeed(
     return computeTargetSpeedFromCollisionDistance(collisionDistance, minWarpSpeed, maxWarpSpeed);
 }
 
+/**
+ * Measures how directly the ship's forward path approaches a ring volume.
+ * @param influence Ring geometry that may intersect the ship's path.
+ * @param shipPosition Ship's world-space position.
+ * @param shipForward Normalized ship-forward direction.
+ * @returns A risk value from zero for a path away from the ring to one for a direct approach.
+ */
 function computeRingTrajectoryRisk(influence: RingWarpInfluence, shipPosition: Vector3, shipForward: Vector3): number {
     const nearestRingPosition = getNearestPointOnRingVolume(shipPosition, influence.volume);
     const toNearestRingPosition = nearestRingPosition.subtract(shipPosition);
@@ -62,6 +84,15 @@ function computeRingTrajectoryRisk(influence: RingWarpInfluence, shipPosition: V
     return clamp(remap(trajectoryAlignment, 0.15, 0.85, 0, 1), 0, 1);
 }
 
+/**
+ * Computes the warp speed limit from distance and approach direction to a ring.
+ * @param influence Ring geometry that may intersect the ship's path.
+ * @param shipPosition Ship's world-space position.
+ * @param shipForward Normalized ship-forward direction.
+ * @param minWarpSpeed Lower bound for the allowed warp speed.
+ * @param maxWarpSpeed Upper bound for the allowed warp speed.
+ * @returns The speed limit imposed by the ring.
+ */
 function computeRingInfluenceTargetSpeed(
     influence: RingWarpInfluence,
     shipPosition: Vector3,
@@ -78,6 +109,15 @@ function computeRingInfluenceTargetSpeed(
     return lerp(maxWarpSpeed, radialTargetSpeed, trajectoryRisk);
 }
 
+/**
+ * Finds the strictest warp speed limit imposed by nearby collision volumes.
+ * @param influences Solid bodies and rings that constrain warp speed.
+ * @param shipPosition Ship's world-space position.
+ * @param shipForward Normalized ship-forward direction.
+ * @param minWarpSpeed Lower bound for the allowed warp speed.
+ * @param maxWarpSpeed Upper bound for the allowed warp speed.
+ * @returns The lowest speed limit imposed by any influence.
+ */
 export function computeMaxTargetSpeedFromWarpInfluences(
     influences: ReadonlyArray<WarpInfluence>,
     shipPosition: Vector3,

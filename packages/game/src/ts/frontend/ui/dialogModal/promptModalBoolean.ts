@@ -19,6 +19,13 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+/**
+ * Asks the player to confirm or cancel a boolean prompt.
+ * @param prompt Question shown in the dialog.
+ * @param soundPlayer Plays the confirmation sound when the dialog closes.
+ * @param t Translation function for the dialog buttons.
+ * @returns `true` when confirmed, otherwise `false`.
+ */
 export async function promptModalBoolean(prompt: string, soundPlayer: ISoundPlayer, t: TFunction): Promise<boolean> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `

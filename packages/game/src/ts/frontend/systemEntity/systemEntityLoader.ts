@@ -135,6 +135,12 @@ export class SystemEntityLoader {
     }
 }
 
+/**
+ * Creates orbital transforms and registers the corresponding simulation objects.
+ * @param models Entity IDs paired with their orbital placement models.
+ * @param context Scene and orbital simulation that own the created placements.
+ * @returns Orbital placements keyed by entity ID.
+ */
 export function createInOrbitPlacements(
     models: Iterable<{ entityId: string; placementModel: DeepReadonly<InOrbitPlacementModel> }>,
     context: SystemEntityLoadContext,
@@ -157,6 +163,12 @@ export function createInOrbitPlacements(
     return placements;
 }
 
+/**
+ * Adapts a content factory to the registry's erased model and content types.
+ * @param type Content discriminator expected by the factory.
+ * @param factory Factory that creates content for the narrowed model type.
+ * @returns A registry factory that validates the discriminator before creation.
+ */
 function eraseFactory<T extends AnySystemContentType>(
     type: T,
     factory: SystemContentFactoryOf<T>,

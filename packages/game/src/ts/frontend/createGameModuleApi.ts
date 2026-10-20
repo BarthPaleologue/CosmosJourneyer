@@ -22,6 +22,13 @@ import type { GameModuleApi } from "@/modules/gameModuleApi";
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 
+/**
+ * Creates the API through which game modules register authored universe content.
+ * @param universeBackend Backend that stores authored star systems and entities.
+ * @param systemEntityLoader Registry for entity content factories.
+ * @param systemEntityProcessors Registries for entity runtime processors.
+ * @returns API exposed to game modules during registration.
+ */
 export function createGameModuleApi(
     universeBackend: UniverseBackend,
     systemEntityLoader: SystemEntityLoader,

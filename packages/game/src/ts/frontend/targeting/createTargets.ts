@@ -34,6 +34,12 @@ import type { PadTarget, Target } from "./target";
 
 export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
 
+/**
+ * Collects targetable bodies, entities, and system-defined targets.
+ * @param starSystem System whose objects are converted into targets.
+ * @param systemEntityTargetFactory Converts each system entity into its targets.
+ * @returns All targets available in the current star system.
+ */
 export function getSystemTargets(
     starSystem: StarSystemController,
     systemEntityTargetFactory: SystemEntityTargetFactory,
@@ -53,6 +59,11 @@ export function getSystemTargets(
     return out;
 }
 
+/**
+ * Creates target representations for a body, including facility subtargets.
+ * @param orbitalObject Orbital object to expose as a target.
+ * @returns The object's target and any facility targets it contains.
+ */
 function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target> {
     if (orbitalObject.type === "spaceElevator" || orbitalObject.type === "spaceStation") {
         return createOrbitalFacilityTargets(orbitalObject);
@@ -60,6 +71,11 @@ function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target>
     return [createOrbitalObjectTarget(orbitalObject)];
 }
 
+/**
+ * Converts an orbital object model into its target type and display data.
+ * @param orbitalObject Orbital object to represent.
+ * @returns Target data backed by the object's transform and bounds.
+ */
 export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target {
     switch (orbitalObject.type) {
         case "juliaSet":
@@ -107,6 +123,11 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
     };
 }
 
+/**
+ * Creates the target representation for a procedural anomaly.
+ * @param anomaly Anomaly to represent.
+ * @returns Target data backed by the anomaly's transform and bounds.
+ */
 function createAnomalyTarget(anomaly: Anomaly): Target {
     return {
         type: TargetType.ANOMALY,
@@ -116,6 +137,11 @@ function createAnomalyTarget(anomaly: Anomaly): Target {
     };
 }
 
+/**
+ * Creates a target representation for a nearby star system.
+ * @param systemTarget Star system to represent.
+ * @returns Target data backed by the system's transform and bounds.
+ */
 export function createSystemTarget(systemTarget: SystemTarget): Target {
     return {
         type: TargetType.STAR_SYSTEM,
@@ -125,6 +151,11 @@ export function createSystemTarget(systemTarget: SystemTarget): Target {
     };
 }
 
+/**
+ * Creates a target representation for a spaceship.
+ * @param spaceship Spaceship to represent.
+ * @returns Target data backed by the ship's transform and bounds.
+ */
 export function createSpaceshipTarget(spaceship: Spaceship): Target {
     return {
         type: TargetType.SPACESHIP,
@@ -134,6 +165,11 @@ export function createSpaceshipTarget(spaceship: Spaceship): Target {
     };
 }
 
+/**
+ * Creates a target representation for a ground vehicle.
+ * @param vehicle Vehicle to represent.
+ * @returns Target data backed by the vehicle's transform and bounds.
+ */
 export function createVehicleTarget(vehicle: Vehicle): Target {
     return {
         type: TargetType.VEHICLE,
@@ -143,6 +179,11 @@ export function createVehicleTarget(vehicle: Vehicle): Target {
     };
 }
 
+/**
+ * Collects a facility target and targets for its pads, bays, and climber.
+ * @param orbitalFacility Orbital facility whose parts can be targeted.
+ * @returns Targets for the facility and its targetable components.
+ */
 function createOrbitalFacilityTargets(orbitalFacility: OrbitalFacility): Array<Target> {
     const out: Array<Target> = [createOrbitalObjectTarget(orbitalFacility)];
 
@@ -162,6 +203,11 @@ function createOrbitalFacilityTargets(orbitalFacility: OrbitalFacility): Array<T
     return out;
 }
 
+/**
+ * Creates a target for a landing pad while preserving its identifier.
+ * @param landingPad Landing pad to represent.
+ * @returns Target data used to select the pad for landing.
+ */
 export function createLandingPadTargets(landingPad: ILandingPad): Array<PadTarget> {
     return [
         {
@@ -173,6 +219,11 @@ export function createLandingPadTargets(landingPad: ILandingPad): Array<PadTarge
     ];
 }
 
+/**
+ * Creates the target representation for a facility landing bay.
+ * @param landingBay Landing bay to represent.
+ * @returns Target data backed by the bay's transform and bounds.
+ */
 function createLandingBayTargets(landingBay: LandingBay): Array<Target> {
     return [
         {
@@ -183,6 +234,11 @@ function createLandingBayTargets(landingBay: LandingBay): Array<Target> {
     ];
 }
 
+/**
+ * Creates the target representation for a space-elevator climber.
+ * @param climber Climber to represent.
+ * @returns Target data backed by the climber's transform and bounds.
+ */
 function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
     return [
         {
@@ -193,6 +249,12 @@ function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
     ];
 }
 
+/**
+ * Finds current-system objects referenced by mission guidance.
+ * @param missions Missions that provide guidance object identifiers.
+ * @param starSystem Current system used to resolve those identifiers.
+ * @returns Targets for guidance objects that exist in the current system.
+ */
 export function getMissionKnownTargets(
     missions: ReadonlyArray<Pick<Mission, "getGuidanceTargetObjectIds">>,
     starSystem: Pick<StarSystemController, "getOrbitalObjectById"> & {

@@ -24,6 +24,14 @@ import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOn
 
 import type { Altimeter } from "../altimeter";
 
+/**
+ * Checks whether the ship has enough clearance to engage or remain in warp.
+ * @param shipTransform Ship position and forward direction.
+ * @param shipAltimeter Altitude above the nearest surface, when available.
+ * @param currentVelocity Current forward speed used to predict clearance.
+ * @param nearestOrbitalObject Nearest body and its surrounding ring volume.
+ * @returns Whether the predicted path clears the body and its rings.
+ */
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
     shipAltimeter: Altimeter,

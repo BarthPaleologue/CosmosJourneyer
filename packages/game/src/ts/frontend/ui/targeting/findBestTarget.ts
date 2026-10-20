@@ -7,6 +7,14 @@ export type Ray = {
     direction: Vector3;
 };
 
+/**
+ * Selects the target that best matches a camera ray, subject to a score threshold.
+ * @param targets Candidate targets to compare.
+ * @param ray World-space ray indicating the viewer's aim direction.
+ * @param verticalFov Camera's vertical field of view in radians.
+ * @param minimumScore Minimum score required for a target to be selected.
+ * @returns The highest-scoring target, or `null` when none reaches the threshold.
+ */
 export function findBestTarget(
     targets: Iterable<Target>,
     ray: Readonly<Ray>,
@@ -35,7 +43,14 @@ export function findBestTarget(
     return bestTarget;
 }
 
-/** Scores a world-space offset against a normalized ray, independently of contact availability. */
+/**
+ * Scores a world-space offset against a normalized ray, independently of contact availability.
+ * @param toTarget World-space offset from the ray origin to the target center.
+ * @param rayDirection Normalized direction of the camera ray.
+ * @param radius Target bounding radius in world units.
+ * @param verticalFov Camera's vertical field of view in radians.
+ * @returns A score where higher values indicate a larger, better-aligned target.
+ */
 function computeTargetScore(toTarget: Vector3, rayDirection: Vector3, radius: number, verticalFov: number): number {
     const forwardDistance = Vector3.Dot(toTarget, rayDirection);
     if (forwardDistance <= 0) {

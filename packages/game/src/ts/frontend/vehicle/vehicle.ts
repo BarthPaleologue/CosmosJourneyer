@@ -142,7 +142,11 @@ export class Vehicle {
         this.setTargetSteeringAngle(0);
     }
 
-    /** Pass ground-plane speed when available; other callers retain the 3D speed fallback. */
+    /**
+     * Pass ground-plane speed when available; other callers retain the 3D speed fallback.
+     * @param requestedSteeringAngle Requested steering angle in radians.
+     * @param options Optional horizontal speed used for the speed-based steering limit.
+     */
     setTargetSteeringAngle(requestedSteeringAngle: number, options?: Partial<VehicleSteeringOptions>): void {
         const speed = Math.abs(options?.horizontalSpeed ?? this.frame.body.getLinearVelocity().length());
         const geometry = this.steeringMode === "counterPhase" ? this.steeringGeometry : undefined;
