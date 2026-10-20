@@ -34,6 +34,8 @@ Make sure you read and understand the root level `.md` files. Other `.md` files 
 
 - **Type safety**: model known data with precise domain types; use `unknown` for unvalidated external data and narrow it at the boundary. Use `type` for data records and `interface` for contracts implemented by classes. Name types after their semantics and keep one canonical definition per contract.
 
+- **Zod at the boundary, type safety inside**: parse and validate untrusted external data with Zod where it enters the application. Internal code trusts typed inputs and documented domain preconditions; do not repeat range, `NaN`, or infinity checks inside domain functions.
+
 - **SI units**: internal physical calculations use SI units. Do not add unit suffixes to parameter or local variable names; document units in JSDoc instead. Convert to and from other units at input/output boundaries.
 
 - **Git LFS for large assets**: use Git LFS for large binary assets (e.g., textures, models). (Rationale: Git LFS helps keep the repo size manageable and improves performance.)
